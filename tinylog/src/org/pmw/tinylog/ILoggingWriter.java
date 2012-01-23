@@ -16,7 +16,7 @@ package org.pmw.tinylog;
 /**
  * Logging writers output created log entries of {@link Logger}.
  * 
- * @see Logger#registerWriter(ILoggingWriter)
+ * @see org.pmw.tinylog.Logger#setWriter(org.pmw.tinylog.ILoggingWriter)
  */
 public interface ILoggingWriter {
 

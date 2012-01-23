@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.pmw.tinylog.ConsoleLoggingWriter;
 import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.ILoggingWriter;
 import org.pmw.tinylog.Logger;
@@ -71,7 +70,7 @@ public class LoggerTest {
 				public void run() {
 					try {
 						for (int n = 0; n < 100; ++n) {
-							Logger.setWriter(new ConsoleLoggingWriter());
+							Logger.setWriter(new LoggingWriter());
 							Logger.setLoggingLevel(ELoggingLevel.TRACE);
 							Logger.info("Test threading! This is log entry {0}.", n);
 						}

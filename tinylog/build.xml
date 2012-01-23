@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="tinylog" default="compile">
+
+	<path id="junit.classpath">
+		<fileset dir="../ext/lib/junit">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="checkstyletask.properties">
+		<classpath>
+			<fileset dir="../ext/lib/checkstyle">
+				<include name="*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+		<classpath>
+			<fileset dir="../ext/lib/findbugs">
+				<include name="*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+
+	<target name="makedir">
+		<mkdir dir="bin" />
+	</target>
+
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="src" destdir="bin" includeantruntime="false" />
+		<javac srcdir="test" destdir="bin" includeantruntime="false">
+			<classpath refid="junit.classpath" />
+		</javac>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<mkdir dir="../dist/jar" />
+		<delete file="../dist/jar/tinylog.jar" />
+		<jar destfile="../dist/jar/tinylog.jar">
+			<fileset dir="bin">
+				<exclude name="**/test/**" />
+			</fileset>
+		</jar>
+		<delete file="../dist/jar/tinylog-src.zip" />
+		<zip destfile="../dist/jar/tinylog-src.zip">
+			<fileset dir="src" />
+		</zip>
+	</target>
+	
+	<target name="docs" depends="compile">
+		<delete dir="../dist/docs" />
+		<mkdir dir="../dist/docs" />
+		<javadoc destdir="../dist/docs" use="true" access="public" windowtitle="Tinylog framework">
+			<doctitle>Tinylog framework API Specification</doctitle>
+			<packageset dir="src" />
+			<classpath>
+				<dirset dir="bin" />
+			</classpath>
+			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="../ext/doc" />
+		</javadoc>
+	</target>
+
+	<target name="check" depends="compile">
+		<checkstyle config="../ext/conf/tinylog-checkstyle.xml">
+			<fileset dir="src" includes="**/*.java" />
+			<fileset dir="test" includes="**/*.java" />
+			<formatter type="plain" usefile="false" />
+		</checkstyle>
+		<findbugs home="../ext/lib/findbugs" output="text">
+			<sourcepath>
+				<dirset>
+					<include name="src" />
+					<include name="test" />
+				</dirset>
+			</sourcepath>
+			<fileset>
+				<include name="bin" />
+			</fileset>
+		</findbugs>
+	</target>
+
+	<target name="test" depends="compile">
+		<junit>
+			<formatter type="plain" usefile="false" />
+			<classpath path="bin" />
+			<classpath refid="junit.classpath" />
+			<batchtest>
+				<fileset dir="test">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="all" depends="jar, docs, check, test" />
+
+</project>

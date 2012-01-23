@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link ELoggingLevel#INFO} which ignores trace and debug log entries.
+ * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO} which ignores trace and debug log entries.
  * 
  * An {@link ILoggingWriter} must be registered to create any output.
  */
