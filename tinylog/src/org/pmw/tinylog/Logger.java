@@ -15,23 +15,27 @@ package org.pmw.tinylog;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Static class to create log entries.
  * 
  * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO} which ignores trace and debug log entries.
  * 
- * An {@link ILoggingWriter} must be registered to create any output.
+ * An {@link ILoggingWriter} must be set to create any output.
  */
 public final class Logger {
 
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final int MAX_STACK_TRACE_ELEMENTS = 40;
+	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	private static final int MAX_STACK_TRACE_ELEMENTS = 4;
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private static volatile ILoggingWriter loggingWriter = null;
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
+	private static volatile String loggingFormat = "{date} [{thread}] {method}\n{level}: {message}";
+	private static volatile List<String> loggingEntryTokens = parse(loggingFormat);
 
 	private Logger() {
 	}
@@ -63,6 +67,30 @@ public final class Logger {
 	 */
 	public static void setLoggingLevel(final ELoggingLevel level) {
 		loggingLevel = level;
+	}
+
+	/**
+	 * Sets the format pattern for log entries.
+	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {method}\n{level}: {message}"</code> is the default format pattern.
+	 * The date format pattern is compatible with {@link SimpleDateFormat}.
+	 * 
+	 * @param format
+	 *            Format pattern for log entries
+	 * 
+	 * @see SimpleDateFormat
+	 */
+	public static void setLoggingFormat(final String format) {
+		loggingFormat = format;
+		loggingEntryTokens = parse(loggingFormat);
+	}
+
+	/**
+	 * Returns the format pattern for log entries.
+	 * 
+	 * @return Format pattern for log entries.
+	 */
+	public static String getLoggingFormat() {
+		return loggingFormat;
 	}
 
 	/**
@@ -302,29 +330,72 @@ public final class Logger {
 			final String text) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append(new SimpleDateFormat(DATE_TIME_FORMAT).format(time));
-		builder.append(" [");
-		builder.append(threadName);
-		builder.append("] ");
-		builder.append(methodName);
-		builder.append(NEW_LINE);
-
-		builder.append(level);
-		if (text != null) {
-			builder.append(": ");
-			builder.append(text);
+		for (String token : loggingEntryTokens) {
+			if ("{thread}".equals(token)) {
+				builder.append(threadName);
+			} else if ("{method}".equals(token)) {
+				builder.append(methodName);
+			} else if ("{level}".equals(token)) {
+				builder.append(level);
+			} else if ("{message}".equals(token)) {
+				if (text != null) {
+					builder.append(text);
+				}
+				if (exception != null) {
+					if (text != null) {
+						builder.append(": ");
+					}
+					builder.append(getPrintedException(exception, 0));
+				}
+			} else if (token.startsWith("{date") && token.endsWith("}")) {
+				String dateFormatPattern;
+				if (token.length() > 6) {
+					dateFormatPattern = token.substring(6, token.length() - 1);
+				} else {
+					dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
+				}
+				builder.append(new SimpleDateFormat(dateFormatPattern).format(time));
+			} else {
+				builder.append(token);
+			}
 		}
-		if (exception != null) {
-			builder.append(": ");
-			appendStackTrace(builder, exception, 0);
-		} else {
-			builder.append(NEW_LINE);
-		}
+		builder.append("\n");
 
-		return builder.toString();
+		return builder.toString().replaceAll("\n", NEW_LINE);
 	}
 
-	private static void appendStackTrace(final StringBuilder builder, final Throwable exception, final int countStackTraceElements) {
+	private static List<String> parse(final String format) {
+		List<String> tokens = new ArrayList<String>();
+		char[] chars = format.toCharArray();
+
+		int start = 0;
+		int openMarkers = 0;
+		for (int i = 0; i < chars.length; ++i) {
+			char c = chars[i];
+			if (c == '{') {
+				if (openMarkers == 0 && start < i) {
+					tokens.add(format.substring(start, i));
+					start = i;
+				}
+				++openMarkers;
+			} else if (openMarkers > 0 && c == '}') {
+				--openMarkers;
+				if (openMarkers == 0) {
+					tokens.add(format.substring(start, i + 1));
+					start = i + 1;
+				}
+			}
+		}
+
+		if (start < chars.length - 1) {
+			tokens.add(format.substring(start, chars.length));
+		}
+
+		return tokens;
+	}
+
+	private static String getPrintedException(final Throwable exception, final int countStackTraceElements) {
+		StringBuilder builder = new StringBuilder();
 		builder.append(exception.getClass().getName());
 
 		String message = exception.getMessage();
@@ -332,27 +403,26 @@ public final class Logger {
 			builder.append(": ");
 			builder.append(message);
 		}
-		builder.append(NEW_LINE);
 
 		StackTraceElement[] stackTrace = exception.getStackTrace();
 		int length = Math.max(1, Math.min(stackTrace.length, MAX_STACK_TRACE_ELEMENTS - countStackTraceElements));
 		for (int i = 0; i < length; ++i) {
-			builder.append("\tat ");
+			builder.append("\n\tat ");
 			builder.append(stackTrace[i]);
-			builder.append(NEW_LINE);
 		}
 
 		if (stackTrace.length > length) {
-			builder.append("\t...");
-			builder.append(NEW_LINE);
-			return;
+			builder.append("\n\t...");
+			return builder.toString();
 		}
 
 		Throwable cause = exception.getCause();
 		if (cause != null) {
-			builder.append("Caused by: ");
-			appendStackTrace(builder, cause, countStackTraceElements + length);
+			builder.append("\nCaused by: ");
+			builder.append(getPrintedException(cause, countStackTraceElements + length));
 		}
+
+		return builder.toString();
 	}
 
 }
