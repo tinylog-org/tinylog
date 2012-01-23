@@ -24,7 +24,7 @@ import java.util.List;
  * 
  * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO} which ignores trace and debug log entries.
  * 
- * An {@link ILoggingWriter} must be set to create any output.
+ * An {@link org.pmw.tinylog.ILoggingWriter} must be set to create any output.
  */
 public final class Logger {
 

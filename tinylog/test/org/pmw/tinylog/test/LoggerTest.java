@@ -28,7 +28,7 @@ import org.pmw.tinylog.Logger;
 /**
  * Test the logger.
  * 
- * @see Logger
+ * @see org.pmw.tinylog.Logger
  */
 public class LoggerTest {
 

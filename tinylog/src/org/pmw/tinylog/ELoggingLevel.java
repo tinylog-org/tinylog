@@ -14,7 +14,7 @@
 package org.pmw.tinylog;
 
 /**
- * Logging levels of {@link Logger}.
+ * Logging levels of {@link org.pmw.tinylog.Logger}.
  */
 public enum ELoggingLevel {
 
