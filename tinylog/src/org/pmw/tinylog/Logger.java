@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,14 +30,19 @@ import java.util.List;
  */
 public final class Logger {
 
+	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-	private static final int MAX_STACK_TRACE_ELEMENTS = 4;
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
-	private static volatile ILoggingWriter loggingWriter = null;
+	private static volatile int maxLoggingStackTraceElements = 40;
+	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
-	private static volatile String loggingFormat = "{date} [{thread}] {method}\n{level}: {message}";
+	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
 	private static volatile List<String> loggingEntryTokens = parse(loggingFormat);
+
+	static {
+		readProperties();
+	}
 
 	private Logger() {
 	}
@@ -44,7 +51,7 @@ public final class Logger {
 	 * Register a logging writer to output the created log entries.
 	 * 
 	 * @param writer
-	 *            Logging writer to add
+	 *            Logging writer to add (can be <code>null</code> to disable any output)
 	 */
 	public static void setWriter(final ILoggingWriter writer) {
 		loggingWriter = writer;
@@ -75,12 +82,16 @@ public final class Logger {
 	 * The date format pattern is compatible with {@link SimpleDateFormat}.
 	 * 
 	 * @param format
-	 *            Format pattern for log entries
+	 *            Format pattern for log entries (or <code>null</code> to reset to default)
 	 * 
 	 * @see SimpleDateFormat
 	 */
 	public static void setLoggingFormat(final String format) {
-		loggingFormat = format;
+		if (format == null) {
+			loggingFormat = DEFAULT_LOGGING_FORMAT;
+		} else {
+			loggingFormat = format;
+		}
 		loggingEntryTokens = parse(loggingFormat);
 	}
 
@@ -91,6 +102,29 @@ public final class Logger {
 	 */
 	public static String getLoggingFormat() {
 		return loggingFormat;
+	}
+
+	/**
+	 * Returns the limit of stack traces for exceptions.
+	 * 
+	 * @return The limit of stack traces
+	 */
+	public static int getMaxStackTraceElements() {
+		return maxLoggingStackTraceElements;
+	}
+
+	/**
+	 * Set the limit of stack traces for exceptions (default is 40). Set <code>-1</code> for no limitation.
+	 * 
+	 * @param maxStackTraceElements
+	 *            Limit of stack traces
+	 */
+	public static void setMaxStackTraceElements(final int maxStackTraceElements) {
+		if (maxStackTraceElements < 0) {
+			Logger.maxLoggingStackTraceElements = Integer.MAX_VALUE;
+		} else {
+			Logger.maxLoggingStackTraceElements = maxStackTraceElements;
+		}
 	}
 
 	/**
@@ -293,6 +327,48 @@ public final class Logger {
 		output(ELoggingLevel.ERROR, exception, null);
 	}
 
+	private static void readProperties() {
+		String level = System.getProperty("tinylog.level");
+		if (level != null && !level.isEmpty()) {
+			try {
+				setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase()));
+			} catch (IllegalArgumentException ex) {
+				// Ignore
+			}
+		}
+		String format = System.getProperty("tinylog.format");
+		if (format != null && !format.isEmpty()) {
+			setLoggingFormat(format);
+		}
+		String stacktace = System.getProperty("tinylog.stacktrace");
+		if (stacktace != null && !stacktace.isEmpty()) {
+			try {
+				int limit = Integer.parseInt(stacktace);
+				setMaxStackTraceElements(limit);
+			} catch (NumberFormatException ex) {
+				// Ignore
+			}
+		}
+		String writer = System.getProperty("tinylog.writer");
+		if (writer != null && !writer.isEmpty()) {
+			if (writer.equalsIgnoreCase("null")) {
+				setWriter(null);
+			} else if (writer.equalsIgnoreCase("console")) {
+				setWriter(new ConsoleLoggingWriter());
+			} else if (writer.equalsIgnoreCase("file")) {
+				String filename = System.getProperty("tinylog.writer.file");
+				if (filename != null && !filename.isEmpty()) {
+					try {
+						File file = new File(filename);
+						setWriter(new FileLoggingWriter(file));
+					} catch (IOException e) {
+						// Ignore
+					}
+				}
+			}
+		}
+	}
+
 	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		ILoggingWriter currentWriter = loggingWriter;
 		if (currentWriter != null && loggingLevel.ordinal() <= level.ordinal()) {
@@ -405,7 +481,7 @@ public final class Logger {
 		}
 
 		StackTraceElement[] stackTrace = exception.getStackTrace();
-		int length = Math.max(1, Math.min(stackTrace.length, MAX_STACK_TRACE_ELEMENTS - countStackTraceElements));
+		int length = Math.max(1, Math.min(stackTrace.length, maxLoggingStackTraceElements - countStackTraceElements));
 		for (int i = 0; i < length; ++i) {
 			builder.append("\n\tat ");
 			builder.append(stackTrace[i]);

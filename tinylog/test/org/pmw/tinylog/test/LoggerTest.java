@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.ILoggingWriter;
 import org.pmw.tinylog.Logger;
 
 /**
@@ -90,23 +89,6 @@ public class LoggerTest {
 		for (Exception exception : exceptions) {
 			throw exception;
 		}
-	}
-
-	private static class LoggingWriter implements ILoggingWriter {
-
-		private String entry;
-
-		@Override
-		public final void write(final ELoggingLevel level, final String logEntry) {
-			entry = logEntry;
-		}
-
-		public String consumeEntry() {
-			String copy = entry;
-			entry = null;
-			return copy;
-		}
-
 	}
 
 }
