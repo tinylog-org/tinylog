@@ -26,7 +26,7 @@ import org.pmw.tinylog.ILoggingWriter;
 import org.pmw.tinylog.Logger;
 
 /**
- * Test the logger.
+ * Tests for the logger.
  * 
  * @see org.pmw.tinylog.Logger
  */
