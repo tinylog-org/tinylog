@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="tinylog" default="compile">
+<project name="tinylog" default="all">
+	
+	<property name="version" value="0.2" />
+	
+	<property name="root" location="../" />
+	
+	<property name="bin" location="bin" />
+	<property name="src" location="src" />
+	<property name="src-test" location="test" />
+		
+	<property name="ext" location="${root}/ext" />
+	<property name="ext.conf" location="${ext}/conf" />
+	<property name="ext.lib" location="${ext}/lib" />
+	<property name="ext.lib.checkstyle" location="${ext.lib}/checkstyle" />
+	<property name="ext.lib.findbugs" location="${ext.lib}/findbugs" />
+	<property name="ext.lib.junit" location="${ext.lib}/junit" />
+	
+	<property name="dist" location="${root}/dist" />
+	<property name="dist.docs" location="${dist}/docs" />
+	<property name="dist.jar" location="${dist}/jar" />
 
 	<path id="junit.classpath">
-		<fileset dir="../ext/lib/junit">
+		<fileset dir="${ext.lib.junit}">
 			<include name="*.jar" />
 		</fileset>
 	</path>
 
 	<taskdef resource="checkstyletask.properties">
 		<classpath>
-			<fileset dir="../ext/lib/checkstyle">
+			<fileset dir="${ext.lib.checkstyle}">
 				<include name="*.jar" />
 			</fileset>
 		</classpath>
@@ -17,69 +36,80 @@
 
 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
 		<classpath>
-			<fileset dir="../ext/lib/findbugs">
+			<fileset dir="${ext.lib.findbugs}">
 				<include name="*.jar" />
 			</fileset>
 		</classpath>
 	</taskdef>
 
 	<target name="clean">
-		<delete dir="bin" />
+		<delete dir="${bin}" />
 	</target>
 
 	<target name="makedir">
-		<mkdir dir="bin" />
+		<mkdir dir="${bin}" />
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="src" destdir="bin" includeantruntime="false" />
-		<javac srcdir="test" destdir="bin" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
+		<javac srcdir="${src-test}" destdir="${bin}" includeantruntime="false">
 			<classpath refid="junit.classpath" />
 		</javac>
 	</target>
 	
 	<target name="jar" depends="compile">
-		<mkdir dir="../dist/jar" />
-		<delete file="../dist/jar/tinylog.jar" />
-		<jar destfile="../dist/jar/tinylog.jar">
-			<fileset dir="bin">
+		<mkdir dir="${dist.jar}" />
+		<delete>
+			<fileset dir="${dist.jar}">
+				<include name="tinylog.jar" />
+				<include name="tinylog-*.zip" />
+			</fileset>
+		</delete>
+		<jar destfile="${dist.jar}/tinylog.jar">
+			<fileset dir="${bin}">
 				<exclude name="**/test/**" />
 			</fileset>
 		</jar>
-		<delete file="../dist/jar/tinylog-src.zip" />
-		<zip destfile="../dist/jar/tinylog-src.zip">
-			<fileset dir="src" />
+		<zip destfile="${dist.jar}/tinylog-src.zip">
+			<fileset dir="${src}" />
+		</zip>
+		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
+			<fileset dir="${dist.jar}">
+				<include name="tinylog.jar" />
+				<include name="tinylog-src.zip" />
+			</fileset>
+			<fileset dir="${root}" includes="LICENSE" />
 		</zip>
 	</target>
 	
 	<target name="docs" depends="compile">
-		<delete dir="../dist/docs" />
-		<mkdir dir="../dist/docs" />
-		<javadoc destdir="../dist/docs" use="true" access="public" windowtitle="Tinylog framework">
-			<doctitle>Tinylog framework API Specification</doctitle>
-			<packageset dir="src" />
+		<delete dir="${dist.docs}" />
+		<mkdir dir="${dist.docs}" />
+		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="Tinylog framework ${version}">
+			<doctitle>Tinylog framework ${version} - API Specification</doctitle>
+			<packageset dir="${src}" />
 			<classpath>
-				<dirset dir="bin" />
+				<dirset dir="${bin}" />
 			</classpath>
-			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="../ext/doc" />
+			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 	</target>
 
 	<target name="check" depends="compile">
-		<checkstyle config="../ext/conf/tinylog-checkstyle.xml">
-			<fileset dir="src" includes="**/*.java" />
-			<fileset dir="test" includes="**/*.java" />
+		<checkstyle config="${ext.conf}/tinylog-checkstyle.xml">
+			<fileset dir="${src}" includes="**/*.java" />
+			<fileset dir="${src-test}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
-		<findbugs home="../ext/lib/findbugs" output="text">
+		<findbugs home="${ext.lib.findbugs}" output="text">
 			<sourcepath>
 				<dirset>
-					<include name="src" />
-					<include name="test" />
+					<include name="${src}" />
+					<include name="${src-test}" />
 				</dirset>
 			</sourcepath>
 			<fileset>
-				<include name="bin" />
+				<include name="${bin}" />
 			</fileset>
 		</findbugs>
 	</target>
@@ -87,10 +117,10 @@
 	<target name="test" depends="compile">
 		<junit>
 			<formatter type="plain" usefile="false" />
-			<classpath path="bin" />
+			<classpath path="${bin}" />
 			<classpath refid="junit.classpath" />
 			<batchtest>
-				<fileset dir="test">
+				<fileset dir="${src-test}">
 					<include name="**/*Test*.java" />
 				</fileset>
 			</batchtest>
