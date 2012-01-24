@@ -78,7 +78,10 @@
 				<include name="tinylog.jar" />
 				<include name="tinylog-src.zip" />
 			</fileset>
-			<fileset dir="${root}" includes="LICENSE" />
+			<fileset dir="${root}">
+				<include name="License.txt" />
+				<include name="ReadMe.txt" />
+			</fileset>
 		</zip>
 	</target>
 	
