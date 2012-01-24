@@ -17,17 +17,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Writes log entries to a file.
  */
 public class FileLoggingWriter implements ILoggingWriter {
 
-	private final Lock lock;
 	private final BufferedWriter writer;
-	private boolean isClosed;
 
 	/**
 	 * @param file
@@ -37,23 +33,16 @@ public class FileLoggingWriter implements ILoggingWriter {
 	 */
 	public FileLoggingWriter(final File file) throws IOException {
 		super();
-		this.lock = new ReentrantLock();
 		this.writer = new BufferedWriter(new FileWriter(file));
-		this.isClosed = false;
 	}
 
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
-		lock.lock();
 		try {
-			if (!isClosed) {
-				writer.write(logEntry);
-				writer.flush();
-			}
+			writer.write(logEntry);
+			writer.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
-		} finally {
-			lock.unlock();
 		}
 	}
 
@@ -64,15 +53,7 @@ public class FileLoggingWriter implements ILoggingWriter {
 	 *             Failed to close the log file
 	 */
 	public final void close() throws IOException {
-		lock.lock();
-		try {
-			if (!isClosed) {
-				isClosed = true;
-				writer.close();
-			}
-		} finally {
-			lock.unlock();
-		}
+		writer.close();
 	}
 
 	@Override
