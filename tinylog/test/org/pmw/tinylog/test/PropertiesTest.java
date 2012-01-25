@@ -85,16 +85,19 @@ public class PropertiesTest {
 
 		System.setProperty("tinylog.format", "My log entry");
 		readProperties();
+		assertEquals("My log entry", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry" + NEW_LINE, writer.consumeEntry());
 
 		System.setProperty("tinylog.format", "My log entry: {message}");
 		readProperties();
+		assertEquals("My log entry: {message}", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry: My message" + NEW_LINE, writer.consumeEntry());
 
 		System.setProperty("tinylog.format", "My log entry: {message");
 		readProperties();
+		assertEquals("My log entry: {message", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry: {message" + NEW_LINE, writer.consumeEntry());
 	}
@@ -112,15 +115,25 @@ public class PropertiesTest {
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.ERROR);
 
-		System.setProperty("tinylog.stacktrace", "1");
+		System.setProperty("tinylog.stacktrace", "0");
 		readProperties();
+		assertEquals(0, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		String entry = writer.consumeEntry();
+		assertNotNull(entry);
+		assertEquals(1, entry.split(NEW_LINE).length);
+
+		System.setProperty("tinylog.stacktrace", "1");
+		readProperties();
+		assertEquals(1, Logger.getMaxStackTraceElements());
+		Logger.error(new Exception());
+		entry = writer.consumeEntry();
 		assertNotNull(entry);
 		assertEquals(3, entry.split(NEW_LINE).length);
 
 		System.setProperty("tinylog.stacktrace", "5");
 		readProperties();
+		assertEquals(5, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		entry = writer.consumeEntry();
 		assertNotNull(entry);
@@ -128,6 +141,7 @@ public class PropertiesTest {
 
 		System.setProperty("tinylog.stacktrace", "-1");
 		readProperties();
+		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		entry = writer.consumeEntry();
 		assertNotNull(entry);

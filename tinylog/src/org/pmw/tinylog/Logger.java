@@ -114,7 +114,8 @@ public final class Logger {
 	}
 
 	/**
-	 * Set the limit of stack traces for exceptions (default is 40). Set <code>-1</code> for no limitation.
+	 * Sets the limit of stack traces for exceptions (default is 40). Set "-1" for no limitation and "0" to disable any
+	 * stack traces.
 	 * 
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces
@@ -336,10 +337,12 @@ public final class Logger {
 				// Ignore
 			}
 		}
+
 		String format = System.getProperty("tinylog.format");
 		if (format != null && !format.isEmpty()) {
 			setLoggingFormat(format);
 		}
+
 		String stacktace = System.getProperty("tinylog.stacktrace");
 		if (stacktace != null && !stacktace.isEmpty()) {
 			try {
@@ -349,6 +352,7 @@ public final class Logger {
 				// Ignore
 			}
 		}
+
 		String writer = System.getProperty("tinylog.writer");
 		if (writer != null && !writer.isEmpty()) {
 			if (writer.equalsIgnoreCase("null")) {
@@ -421,7 +425,13 @@ public final class Logger {
 					if (text != null) {
 						builder.append(": ");
 					}
-					builder.append(getPrintedException(exception, 0));
+					int countLoggingStackTraceElements = maxLoggingStackTraceElements;
+					if (countLoggingStackTraceElements == 0) {
+						builder.append(":");
+						builder.append(exception.getMessage());
+					} else {
+						builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+					}
 				}
 			} else if (token.startsWith("{date") && token.endsWith("}")) {
 				String dateFormatPattern;
@@ -481,7 +491,7 @@ public final class Logger {
 		}
 
 		StackTraceElement[] stackTrace = exception.getStackTrace();
-		int length = Math.max(1, Math.min(stackTrace.length, maxLoggingStackTraceElements - countStackTraceElements));
+		int length = Math.max(1, Math.min(stackTrace.length, countStackTraceElements));
 		for (int i = 0; i < length; ++i) {
 			builder.append("\n\tat ");
 			builder.append(stackTrace[i]);
