@@ -15,11 +15,13 @@ package org.pmw.tinylog;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Static class to create log entries.
@@ -33,12 +35,13 @@ public final class Logger {
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final Pattern NEW_LINE_REPLACER = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
-	private static volatile List<String> loggingEntryTokens = parse(loggingFormat);
+	private static volatile List<Token> loggingEntryTokens = parse(loggingFormat);
 
 	static {
 		readProperties();
@@ -402,7 +405,7 @@ public final class Logger {
 			StackTraceElement stackTraceElement = stackTraceElements[4];
 			return stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "()";
 		} else {
-			return null;
+			return "<unknown>()";
 		}
 	}
 
@@ -410,48 +413,54 @@ public final class Logger {
 			final String text) {
 		StringBuilder builder = new StringBuilder();
 
-		for (String token : loggingEntryTokens) {
-			if ("{thread}".equals(token)) {
-				builder.append(threadName);
-			} else if ("{method}".equals(token)) {
-				builder.append(methodName);
-			} else if ("{level}".equals(token)) {
-				builder.append(level);
-			} else if ("{message}".equals(token)) {
-				if (text != null) {
-					builder.append(text);
-				}
-				if (exception != null) {
+		for (Token token : loggingEntryTokens) {
+			switch (token.getType()) {
+				case THREAD:
+					builder.append(threadName);
+					break;
+				case METHOD:
+					builder.append(methodName);
+					break;
+				case LOGGING_LEVEL:
+					builder.append(level);
+					break;
+				case DATE:
+					DateFormat formatter = (DateFormat) token.getData();
+					String format;
+					synchronized (formatter) {
+						format = formatter.format(time);
+					}
+					builder.append(format);
+					break;
+				case MESSAGE:
 					if (text != null) {
-						builder.append(": ");
+						builder.append(text);
 					}
-					int countLoggingStackTraceElements = maxLoggingStackTraceElements;
-					if (countLoggingStackTraceElements == 0) {
-						builder.append(":");
-						builder.append(exception.getMessage());
-					} else {
-						builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+					if (exception != null) {
+						if (text != null) {
+							builder.append(": ");
+						}
+						int countLoggingStackTraceElements = maxLoggingStackTraceElements;
+						if (countLoggingStackTraceElements == 0) {
+							builder.append(":");
+							builder.append(exception.getMessage());
+						} else {
+							builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+						}
 					}
-				}
-			} else if (token.startsWith("{date") && token.endsWith("}")) {
-				String dateFormatPattern;
-				if (token.length() > 6) {
-					dateFormatPattern = token.substring(6, token.length() - 1);
-				} else {
-					dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
-				}
-				builder.append(new SimpleDateFormat(dateFormatPattern).format(time));
-			} else {
-				builder.append(token);
+					break;
+				default:
+					builder.append(token.getData());
+					break;
 			}
 		}
-		builder.append("\n");
+		builder.append(NEW_LINE);
 
-		return builder.toString().replaceAll("\n", NEW_LINE);
+		return builder.toString();
 	}
 
-	private static List<String> parse(final String format) {
-		List<String> tokens = new ArrayList<String>();
+	private static List<Token> parse(final String format) {
+		List<Token> tokens = new ArrayList<Token>();
 		char[] chars = format.toCharArray();
 
 		int start = 0;
@@ -460,24 +469,46 @@ public final class Logger {
 			char c = chars[i];
 			if (c == '{') {
 				if (openMarkers == 0 && start < i) {
-					tokens.add(format.substring(start, i));
+					tokens.add(getToken(format.substring(start, i)));
 					start = i;
 				}
 				++openMarkers;
 			} else if (openMarkers > 0 && c == '}') {
 				--openMarkers;
 				if (openMarkers == 0) {
-					tokens.add(format.substring(start, i + 1));
+					tokens.add(getToken(format.substring(start, i + 1)));
 					start = i + 1;
 				}
 			}
 		}
 
 		if (start < chars.length - 1) {
-			tokens.add(format.substring(start, chars.length));
+			tokens.add(getToken(format.substring(start, chars.length)));
 		}
 
 		return tokens;
+	}
+
+	private static Token getToken(final String text) {
+		if ("{thread}".equals(text)) {
+			return new Token(EToken.THREAD);
+		} else if ("{method}".equals(text)) {
+			return new Token(EToken.METHOD);
+		} else if ("{level}".equals(text)) {
+			return new Token(EToken.LOGGING_LEVEL);
+		} else if ("{message}".equals(text)) {
+			return new Token(EToken.MESSAGE);
+		} else if (text.startsWith("{date") && text.endsWith("}")) {
+			String dateFormatPattern;
+			if (text.length() > 6) {
+				dateFormatPattern = text.substring(6, text.length() - 1);
+			} else {
+				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
+			}
+			return new Token(EToken.DATE, new SimpleDateFormat(dateFormatPattern));
+		} else {
+			return new Token(EToken.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
+		}
 	}
 
 	private static String getPrintedException(final Throwable exception, final int countStackTraceElements) {
@@ -493,18 +524,23 @@ public final class Logger {
 		StackTraceElement[] stackTrace = exception.getStackTrace();
 		int length = Math.max(1, Math.min(stackTrace.length, countStackTraceElements));
 		for (int i = 0; i < length; ++i) {
-			builder.append("\n\tat ");
+			builder.append(NEW_LINE);
+			builder.append('\t');
+			builder.append("at ");
 			builder.append(stackTrace[i]);
 		}
 
 		if (stackTrace.length > length) {
-			builder.append("\n\t...");
+			builder.append(NEW_LINE);
+			builder.append('\t');
+			builder.append("...");
 			return builder.toString();
 		}
 
 		Throwable cause = exception.getCause();
 		if (cause != null) {
-			builder.append("\nCaused by: ");
+			builder.append(NEW_LINE);
+			builder.append("Caused by: ");
 			builder.append(getPrintedException(cause, countStackTraceElements + length));
 		}
 
