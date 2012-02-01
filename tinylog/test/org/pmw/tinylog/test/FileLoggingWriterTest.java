@@ -21,7 +21,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.junit.Test;
@@ -55,7 +54,7 @@ public class FileLoggingWriterTest {
 		System.setErr(new PrintStream(outputStream));
 		writer.write(ELoggingLevel.INFO, "Won't be written\n");
 		System.setErr(defaultPrintStream);
-		assertTrue(outputStream.isUsed);
+		assertTrue(outputStream.isUsed());
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
@@ -64,17 +63,6 @@ public class FileLoggingWriterTest {
 		reader.close();
 
 		file.delete();
-	}
-
-	private static class SilentOutputStream extends OutputStream {
-
-		private boolean isUsed = false;
-
-		@Override
-		public void write(final int b) throws IOException {
-			isUsed = true;
-		}
-
 	}
 
 }
