@@ -13,14 +13,14 @@
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
     <module name="JavadocMethod">
-      <property name="scope" value="public"/>
+      <property name="scope" value="package"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="JavadocType">
-      <property name="scope" value="public"/>
+      <property name="scope" value="package"/>
     </module>
     <module name="JavadocVariable">
-      <property name="scope" value="public"/>
+      <property name="scope" value="package"/>
     </module>
     <module name="JavadocStyle">
       <property name="tokens" value="INTERFACE_DEF,CLASS_DEF,METHOD_DEF,CTOR_DEF"/>
