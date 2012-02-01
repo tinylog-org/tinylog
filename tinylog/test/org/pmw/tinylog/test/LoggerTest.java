@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -41,13 +42,113 @@ public class LoggerTest {
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 
 		Logger.info("Hello!");
-		assertNotNull(writer.consumeEntry());
+		assertNotNull(writer.consumeMessage());
 
 		Logger.error(new NullPointerException());
-		assertNotNull(writer.consumeEntry());
+		assertNotNull(writer.consumeMessage());
 
 		Logger.debug("Hello!");
-		assertNull(writer.consumeEntry());
+		assertNull(writer.consumeMessage());
+	}
+
+	/**
+	 * Test trace methods.
+	 */
+	@Test
+	public final void testTrace() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.TRACE);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.trace("Hello!");
+		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+
+		Logger.trace(new Exception());
+		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+
+		Logger.trace(new Exception(), "Hello!");
+		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+	}
+
+	/**
+	 * Test debug methods.
+	 */
+	@Test
+	public final void testDebug() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.DEBUG);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.debug("Hello!");
+		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+
+		Logger.debug(new Exception());
+		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+
+		Logger.debug(new Exception(), "Hello!");
+		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+	}
+
+	/**
+	 * Test info methods.
+	 */
+	@Test
+	public final void testInfo() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.info("Hello!");
+		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+
+		Logger.info(new Exception());
+		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+
+		Logger.info(new Exception(), "Hello!");
+		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+	}
+
+	/**
+	 * Test warning methods.
+	 */
+	@Test
+	public final void testWarn() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.WARNING);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.warn("Hello!");
+		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+
+		Logger.warn(new Exception());
+		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+
+		Logger.warn(new Exception(), "Hello!");
+		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+	}
+
+	/**
+	 * Test error methods.
+	 */
+	@Test
+	public final void testError() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.ERROR);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.error("Hello!");
+		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+
+		Logger.error(new Exception());
+		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+
+		Logger.error(new Exception(), "Hello!");
+		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
 	}
 
 	/**

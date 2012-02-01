@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNull;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Test;
@@ -87,19 +88,57 @@ public class PropertiesTest {
 		readProperties();
 		assertEquals("My log entry", Logger.getLoggingFormat());
 		Logger.info("My message");
-		assertEquals("My log entry" + NEW_LINE, writer.consumeEntry());
+		assertEquals("My log entry" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.format", "My log entry: {message}");
 		readProperties();
 		assertEquals("My log entry: {message}", Logger.getLoggingFormat());
 		Logger.info("My message");
-		assertEquals("My log entry: My message" + NEW_LINE, writer.consumeEntry());
+		assertEquals("My log entry: My message" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.format", "My log entry: {message");
 		readProperties();
 		assertEquals("My log entry: {message", Logger.getLoggingFormat());
 		Logger.info("My message");
-		assertEquals("My log entry: {message" + NEW_LINE, writer.consumeEntry());
+		assertEquals("My log entry: {message" + NEW_LINE, writer.consumeMessage());
+	}
+
+	/**
+	 * Test locale for message format.
+	 * 
+	 * @throws Exception
+	 *             Failed to reread properties
+	 */
+	@Test
+	public final void testLocale() throws Exception {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingFormat("{message}");
+
+		System.setProperty("tinylog.locale", "de");
+		readProperties();
+		assertEquals(Locale.GERMAN, Logger.getLocale());
+		Logger.info("{0}", 0.1);
+		assertEquals("0,1" + NEW_LINE, writer.consumeMessage());
+
+		System.setProperty("tinylog.locale", "de-DE");
+		readProperties();
+		assertEquals(Locale.GERMANY, Logger.getLocale());
+		Logger.info("{0}", 0.1);
+		assertEquals("0,1" + NEW_LINE, writer.consumeMessage());
+
+		System.setProperty("tinylog.locale", "en");
+		readProperties();
+		assertEquals(Locale.ENGLISH, Logger.getLocale());
+		Logger.info("{0}", 0.1);
+		assertEquals("0.1" + NEW_LINE, writer.consumeMessage());
+
+		System.setProperty("tinylog.locale", "en-US");
+		readProperties();
+		assertEquals(Locale.US, Logger.getLocale());
+		Logger.info("{0}", 0.1);
+		assertEquals("0.1" + NEW_LINE, writer.consumeMessage());
 	}
 
 	/**
@@ -119,7 +158,7 @@ public class PropertiesTest {
 		readProperties();
 		assertEquals(0, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
-		String entry = writer.consumeEntry();
+		String entry = writer.consumeMessage();
 		assertNotNull(entry);
 		assertEquals(1, entry.split(NEW_LINE).length);
 
@@ -127,7 +166,7 @@ public class PropertiesTest {
 		readProperties();
 		assertEquals(1, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
-		entry = writer.consumeEntry();
+		entry = writer.consumeMessage();
 		assertNotNull(entry);
 		assertEquals(3, entry.split(NEW_LINE).length);
 
@@ -135,7 +174,7 @@ public class PropertiesTest {
 		readProperties();
 		assertEquals(5, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
-		entry = writer.consumeEntry();
+		entry = writer.consumeMessage();
 		assertNotNull(entry);
 		assertEquals(7, entry.split(NEW_LINE).length);
 
@@ -143,7 +182,7 @@ public class PropertiesTest {
 		readProperties();
 		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
-		entry = writer.consumeEntry();
+		entry = writer.consumeMessage();
 		assertNotNull(entry);
 		assertEquals(Thread.currentThread().getStackTrace().length, entry.split(NEW_LINE).length);
 
@@ -151,7 +190,7 @@ public class PropertiesTest {
 		System.setProperty("tinylog.stacktrace", "invalid");
 		readProperties();
 		Logger.error(new Exception());
-		entry = writer.consumeEntry();
+		entry = writer.consumeMessage();
 		assertNotNull(entry);
 		assertEquals(3, entry.split(NEW_LINE).length);
 	}

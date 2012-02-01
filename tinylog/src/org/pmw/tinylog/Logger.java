@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -41,6 +42,7 @@ public final class Logger {
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
+	private static volatile Locale locale = Locale.getDefault();
 	private static volatile List<Token> loggingEntryTokens = parse(loggingFormat);
 
 	static {
@@ -80,6 +82,15 @@ public final class Logger {
 	}
 
 	/**
+	 * Returns the format pattern for log entries.
+	 * 
+	 * @return Format pattern for log entries.
+	 */
+	public static String getLoggingFormat() {
+		return loggingFormat;
+	}
+
+	/**
 	 * Sets the format pattern for log entries.
 	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {method}\n{level}: {message}"</code> is the default format pattern.
 	 * The date format pattern is compatible with {@link SimpleDateFormat}.
@@ -99,12 +110,26 @@ public final class Logger {
 	}
 
 	/**
-	 * Returns the format pattern for log entries.
+	 * Gets the locale for message format.
 	 * 
-	 * @return Format pattern for log entries.
+	 * @return Locale for message format
+	 * 
+	 * @see MessageFormat#getLocale()
 	 */
-	public static String getLoggingFormat() {
-		return loggingFormat;
+	public static Locale getLocale() {
+		return locale;
+	}
+
+	/**
+	 * Sets the locale for message format.
+	 * 
+	 * @param locale
+	 *            Locale for message format
+	 * 
+	 * @see MessageFormat#setLocale(Locale)
+	 */
+	public static void setLocale(final Locale locale) {
+		Logger.locale = locale;
 	}
 
 	/**
@@ -346,6 +371,18 @@ public final class Logger {
 			setLoggingFormat(format);
 		}
 
+		String localeString = System.getProperty("tinylog.locale");
+		if (localeString != null && !localeString.isEmpty()) {
+			String[] localeArray = localeString.split("-", 3);
+			if (localeArray.length == 1) {
+				setLocale(new Locale(localeArray[0]));
+			} else if (localeArray.length == 2) {
+				setLocale(new Locale(localeArray[0], localeArray[1]));
+			} else if (localeArray.length >= 3) {
+				setLocale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
+			}
+		}
+
 		String stacktace = System.getProperty("tinylog.stacktrace");
 		if (stacktace != null && !stacktace.isEmpty()) {
 			try {
@@ -386,7 +423,7 @@ public final class Logger {
 
 				String text;
 				if (message != null) {
-					text = MessageFormat.format(message, arguments);
+					text = new MessageFormat(message, locale).format(arguments);
 				} else {
 					text = null;
 				}

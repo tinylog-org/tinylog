@@ -21,6 +21,7 @@ import org.pmw.tinylog.ILoggingWriter;
  */
 class LoggingWriter implements ILoggingWriter {
 
+	private ELoggingLevel level;
 	private String entry;
 
 	/** */
@@ -29,16 +30,30 @@ class LoggingWriter implements ILoggingWriter {
 
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
-		entry = logEntry;
+		this.level = level;
+		this.entry = logEntry;
 	}
 
 	/**
-	 * Consume the last written log entry and remove it.
+	 * Consume the logging level of the last written log entry and remove it.
 	 * 
-	 * @return The last log entry
+	 * @return The logging level of the last log entry
 	 */
-	public String consumeEntry() {
+	public ELoggingLevel consumeLevel() {
+		ELoggingLevel copy = level;
+		level = null;
+		entry = null;
+		return copy;
+	}
+
+	/**
+	 * Consume the message text of the last written log entry and remove it.
+	 * 
+	 * @return The message text of the last log entry
+	 */
+	public String consumeMessage() {
 		String copy = entry;
+		level = null;
 		entry = null;
 		return copy;
 	}
