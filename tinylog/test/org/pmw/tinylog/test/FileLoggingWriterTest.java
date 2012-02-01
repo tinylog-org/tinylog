@@ -45,7 +45,7 @@ public class FileLoggingWriterTest {
 	public final void testWriting() throws IOException {
 		File file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
-		FileLoggingWriter writer = new FileLoggingWriter(file);
+		FileLoggingWriter writer = new FileLoggingWriter(file.getAbsolutePath());
 		writer.write(ELoggingLevel.INFO, "Hello\n");
 		writer.write(ELoggingLevel.INFO, "World\n");
 		writer.close();

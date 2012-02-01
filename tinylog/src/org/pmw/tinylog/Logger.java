@@ -13,7 +13,6 @@
 
 package org.pmw.tinylog;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -395,16 +394,15 @@ public final class Logger {
 
 		String writer = System.getProperty("tinylog.writer");
 		if (writer != null && !writer.isEmpty()) {
-			if (writer.equalsIgnoreCase("null")) {
+			if (writer.equals("null")) {
 				setWriter(null);
-			} else if (writer.equalsIgnoreCase("console")) {
+			} else if (writer.equals("console")) {
 				setWriter(new ConsoleLoggingWriter());
-			} else if (writer.equalsIgnoreCase("file")) {
-				String filename = System.getProperty("tinylog.writer.file");
+			} else if (writer.startsWith("file:")) {
+				String filename = writer.substring(5);
 				if (filename != null && !filename.isEmpty()) {
 					try {
-						File file = new File(filename);
-						setWriter(new FileLoggingWriter(file));
+						setWriter(new FileLoggingWriter(filename));
 					} catch (IOException e) {
 						// Ignore
 					}

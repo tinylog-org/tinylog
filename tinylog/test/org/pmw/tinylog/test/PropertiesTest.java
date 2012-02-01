@@ -227,7 +227,7 @@ public class PropertiesTest {
 		assertNull(writer);
 
 		File file = File.createTempFile("test", "tmp");
-		System.setProperty("tinylog.writer.file", file.getAbsolutePath());
+		System.setProperty("tinylog.writer", "file:" + file.getAbsolutePath());
 		readProperties();
 		writer = getWriter();
 		assertNotNull(writer);

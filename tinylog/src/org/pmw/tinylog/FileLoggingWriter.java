@@ -14,7 +14,6 @@
 package org.pmw.tinylog;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -26,14 +25,14 @@ public class FileLoggingWriter implements ILoggingWriter {
 	private final BufferedWriter writer;
 
 	/**
-	 * @param file
-	 *            The log file
+	 * @param filename
+	 *            Filename of the log file
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public FileLoggingWriter(final File file) throws IOException {
+	public FileLoggingWriter(final String filename) throws IOException {
 		super();
-		this.writer = new BufferedWriter(new FileWriter(file));
+		this.writer = new BufferedWriter(new FileWriter(filename));
 	}
 
 	@Override
