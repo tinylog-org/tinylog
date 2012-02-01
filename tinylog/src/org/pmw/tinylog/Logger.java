@@ -373,7 +373,7 @@ public final class Logger {
 
 		String localeString = System.getProperty("tinylog.locale");
 		if (localeString != null && !localeString.isEmpty()) {
-			String[] localeArray = localeString.split("-", 3);
+			String[] localeArray = localeString.split("_", 3);
 			if (localeArray.length == 1) {
 				setLocale(new Locale(localeArray[0]));
 			} else if (localeArray.length == 2) {

@@ -122,7 +122,7 @@ public class PropertiesTest {
 		Logger.info("{0}", 0.1);
 		assertEquals("0,1" + NEW_LINE, writer.consumeMessage());
 
-		System.setProperty("tinylog.locale", "de-DE");
+		System.setProperty("tinylog.locale", "de_DE");
 		readProperties();
 		assertEquals(Locale.GERMANY, Logger.getLocale());
 		Logger.info("{0}", 0.1);
@@ -134,7 +134,7 @@ public class PropertiesTest {
 		Logger.info("{0}", 0.1);
 		assertEquals("0.1" + NEW_LINE, writer.consumeMessage());
 
-		System.setProperty("tinylog.locale", "en-US");
+		System.setProperty("tinylog.locale", "en_US");
 		readProperties();
 		assertEquals(Locale.US, Logger.getLocale());
 		Logger.info("{0}", 0.1);
