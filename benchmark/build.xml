@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="benchmark" default="run">
+
+	<property name="root" location="../" />
+	<property name="bin" location="bin" />
+	<property name="src" location="src" />
+	<property name="lib" location="lib" />
+	<property name="dist" location="${root}/dist" />
+	<property name="dist.jar" location="${dist}/jar" />
+
+	<path id="log4j.classpath">
+		<fileset dir="${lib}">
+			<include name="log4j-*.jar" />
+		</fileset>
+	</path>
+
+	<path id="logback.classpath">
+		<fileset dir="${lib}">
+			<include name="slf4j-*.jar" />
+			<include name="logback-*.jar" />
+		</fileset>
+	</path>
+
+	<path id="tinylog.classpath">
+		<fileset dir="${dist.jar}">
+			<include name="tinylog.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean">
+		<delete dir="${bin}" />
+	</target>
+
+	<target name="makedir">
+		<mkdir dir="${bin}" />
+	</target>
+
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
+			<classpath refid="log4j.classpath" />
+			<classpath refid="logback.classpath" />
+			<classpath refid="tinylog.classpath" />
+		</javac>
+	</target>
+
+	<target name="run" depends="compile">
+		<java classname="org.pmw.benchmark.jdk.NativeLoggerSingleThreadBenchmarkApplication" classpath="${bin}" fork="true" />
+		<java classname="org.pmw.benchmark.jdk.NativeLoggerMultiThreadBenchmarkApplication" classpath="${bin}" fork="true" />
+		<java classname="org.pmw.benchmark.log4j.Log4jSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j.Log4jMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.logback.LogbackSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.logback.LogbackMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.tinylog.TinylogSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.tinylog.TinylogMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />
+	</target>
+
+</project>
