@@ -14,6 +14,8 @@
 package org.pmw.tinylog;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -403,12 +405,55 @@ public final class Logger {
 				if (filename != null && !filename.isEmpty()) {
 					try {
 						setWriter(new FileLoggingWriter(filename));
-					} catch (IOException e) {
+					} catch (IOException ex) {
 						// Ignore
 					}
 				}
+			} else {
+				ILoggingWriter writerInstance;
+				if (writer.contains(":")) {
+					String className = writer.substring(0, writer.indexOf(':'));
+					String parameter = writer.substring(writer.indexOf(':') + 1);
+					writerInstance = createInstance(className, parameter);
+				} else {
+					String className = writer;
+					writerInstance = createInstance(className, null);
+				}
+				if (writerInstance != null) {
+					setWriter(writerInstance);
+				}
 			}
 		}
+	}
+
+	private static ILoggingWriter createInstance(final String className, final String parameter) {
+		try {
+			Class<?> clazz = Class.forName(className);
+			if (ILoggingWriter.class.isAssignableFrom(clazz)) {
+				if (parameter == null) {
+					Constructor<?> constructor = clazz.getConstructor();
+					if (constructor != null) {
+						return (ILoggingWriter) constructor.newInstance();
+					}
+				} else {
+					Constructor<?> constructor = clazz.getConstructor(String.class);
+					if (constructor != null) {
+						return (ILoggingWriter) constructor.newInstance(parameter);
+					}
+				}
+			}
+		} catch (ClassNotFoundException ex) {
+			// Ignore
+		} catch (InstantiationException ex) {
+			// Ignore
+		} catch (IllegalAccessException ex) {
+			// Ignore
+		} catch (InvocationTargetException ex) {
+			// Ignore
+		} catch (NoSuchMethodException ex) {
+			// Ignore
+		}
+		return null;
 	}
 
 	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {

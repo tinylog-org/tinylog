@@ -46,9 +46,9 @@ public class PropertiesTest {
 	public final void init() {
 		System.clearProperty("tinylog.level");
 		System.clearProperty("tinylog.format");
+		System.clearProperty("tinylog.locale");
 		System.clearProperty("tinylog.stacktrace");
 		System.clearProperty("tinylog.writer");
-		System.clearProperty("tinylog.writer.file");
 	}
 
 	/**
@@ -228,6 +228,19 @@ public class PropertiesTest {
 
 		File file = File.createTempFile("test", "tmp");
 		System.setProperty("tinylog.writer", "file:" + file.getAbsolutePath());
+		readProperties();
+		writer = getWriter();
+		assertNotNull(writer);
+		assertEquals(FileLoggingWriter.class, writer.getClass());
+
+		System.setProperty("tinylog.writer", ConsoleLoggingWriter.class.getName());
+		readProperties();
+		writer = getWriter();
+		assertNotNull(writer);
+		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
+
+		file = File.createTempFile("test", "tmp");
+		System.setProperty("tinylog.writer", FileLoggingWriter.class.getName() + ":" + file.getAbsolutePath());
 		readProperties();
 		writer = getWriter();
 		assertNotNull(writer);
