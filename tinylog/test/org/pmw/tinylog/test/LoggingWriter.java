@@ -16,10 +16,14 @@ package org.pmw.tinylog.test;
 import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.ILoggingWriter;
 
+/**
+ * A logging writer that just save the written log entry as string.
+ */
 class LoggingWriter implements ILoggingWriter {
 
 	private String entry;
 
+	/** */
 	public LoggingWriter() {
 	}
 
@@ -28,6 +32,11 @@ class LoggingWriter implements ILoggingWriter {
 		entry = logEntry;
 	}
 
+	/**
+	 * Consume the last written log entry and remove it.
+	 * 
+	 * @return The last log entry
+	 */
 	public String consumeEntry() {
 		String copy = entry;
 		entry = null;
