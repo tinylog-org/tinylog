@@ -59,4 +59,5 @@ public class FileLoggingWriter implements ILoggingWriter {
 	protected final void finalize() throws Throwable {
 		close();
 	}
+
 }
