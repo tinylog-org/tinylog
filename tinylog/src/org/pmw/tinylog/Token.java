@@ -18,7 +18,7 @@ package org.pmw.tinylog;
  * 
  * @see Logger#setLoggingFormat(String)
  */
-class Token {
+final class Token {
 
 	private final EToken type;
 	private final Object data;
@@ -49,7 +49,7 @@ class Token {
 	 * 
 	 * @return Token type
 	 */
-	public final EToken getType() {
+	public EToken getType() {
 		return type;
 	}
 
@@ -58,7 +58,7 @@ class Token {
 	 * 
 	 * @return Additional data (can be <code>null</code>)
 	 */
-	public final Object getData() {
+	public Object getData() {
 		return data;
 	}
 

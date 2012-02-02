@@ -20,12 +20,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
  * Static class to create log entries.
@@ -38,9 +36,7 @@ public final class Logger {
 
 	private static final String PROPERTIES_FILE = "/tinylog.properties";
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
-	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	private static final String NEW_LINE = System.getProperty("line.separator");
-	private static final Pattern NEW_LINE_REPLACER = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
 
 	private static final String TINYLOG_WRITER = "tinylog.writer";
 	private static final String TINYLOG_STACKTRACE = "tinylog.stacktrace";
@@ -54,7 +50,7 @@ public final class Logger {
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
 	private static volatile Locale locale = Locale.getDefault();
-	private static volatile List<Token> loggingEntryTokens = parse(loggingFormat);
+	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat);
 
 	static {
 		readProperties();
@@ -117,7 +113,7 @@ public final class Logger {
 		} else {
 			loggingFormat = format;
 		}
-		loggingEntryTokens = parse(loggingFormat);
+		loggingEntryTokens = Tokenizer.parse(loggingFormat);
 	}
 
 	/**
@@ -571,58 +567,6 @@ public final class Logger {
 		builder.append(NEW_LINE);
 
 		return builder.toString();
-	}
-
-	private static List<Token> parse(final String format) {
-		List<Token> tokens = new ArrayList<Token>();
-		char[] chars = format.toCharArray();
-
-		int start = 0;
-		int openMarkers = 0;
-		for (int i = 0; i < chars.length; ++i) {
-			char c = chars[i];
-			if (c == '{') {
-				if (openMarkers == 0 && start < i) {
-					tokens.add(getToken(format.substring(start, i)));
-					start = i;
-				}
-				++openMarkers;
-			} else if (openMarkers > 0 && c == '}') {
-				--openMarkers;
-				if (openMarkers == 0) {
-					tokens.add(getToken(format.substring(start, i + 1)));
-					start = i + 1;
-				}
-			}
-		}
-
-		if (start < chars.length - 1) {
-			tokens.add(getToken(format.substring(start, chars.length)));
-		}
-
-		return tokens;
-	}
-
-	private static Token getToken(final String text) {
-		if ("{thread}".equals(text)) {
-			return new Token(EToken.THREAD);
-		} else if ("{method}".equals(text)) {
-			return new Token(EToken.METHOD);
-		} else if ("{level}".equals(text)) {
-			return new Token(EToken.LOGGING_LEVEL);
-		} else if ("{message}".equals(text)) {
-			return new Token(EToken.MESSAGE);
-		} else if (text.startsWith("{date") && text.endsWith("}")) {
-			String dateFormatPattern;
-			if (text.length() > 6) {
-				dateFormatPattern = text.substring(6, text.length() - 1);
-			} else {
-				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
-			}
-			return new Token(EToken.DATE, new SimpleDateFormat(dateFormatPattern));
-		} else {
-			return new Token(EToken.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
-		}
 	}
 
 	private static String getPrintedException(final Throwable exception, final int countStackTraceElements) {
