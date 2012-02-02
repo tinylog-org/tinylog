@@ -66,7 +66,11 @@ public final class Logger {
 	 *            New logging level
 	 */
 	public static void setLoggingLevel(final ELoggingLevel level) {
-		loggingLevel = level;
+		if (level == null) {
+			loggingLevel = ELoggingLevel.OFF;
+		} else {
+			loggingLevel = level;
+		}
 	}
 
 	/**
