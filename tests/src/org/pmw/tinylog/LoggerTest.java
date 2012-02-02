@@ -37,6 +37,8 @@ import org.junit.Test;
  */
 public class LoggerTest {
 
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	/**
 	 * Test getter and setter for logging level.
 	 */
@@ -209,6 +211,46 @@ public class LoggerTest {
 	}
 
 	/**
+	 * Test special logging levels for packages.
+	 */
+	@Test
+	public final void testPackageLoggingLevel() {
+
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.setLoggingLevel("a.b", ELoggingLevel.DEBUG);
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a"));
+		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b.c"));
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
+
+		Logger.resetLoggingLevel("a.b");
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+
+		Logger.debug("Hello!");
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertNull(writer.consumeMessage());
+
+		Logger.setLoggingLevel("org.pmw.tinylog", ELoggingLevel.INFO);
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertNull(writer.consumeMessage());
+
+		Logger.setLoggingLevel("org.pmw.tinylog", ELoggingLevel.DEBUG);
+		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.resetAllLoggingLevel();
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertNull(writer.consumeMessage());
+	}
+
+	/**
 	 * Test a full log entry with all possible patterns.
 	 */
 	@Test
@@ -222,8 +264,8 @@ public class LoggerTest {
 		Logger.info("Hello");
 		assertEquals(
 				MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread.currentThread().getName(),
-						LoggerTest.class.getName(), lineNumber, ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()),
-						System.getProperty("line.separator")), writer.consumeMessage());
+						LoggerTest.class.getName(), lineNumber, ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE),
+				writer.consumeMessage());
 	}
 
 	/**
@@ -231,8 +273,6 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testExceptions() {
-		String newLine = System.getProperty("line.separator");
-
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
@@ -240,23 +280,23 @@ public class LoggerTest {
 
 		Logger.setMaxStackTraceElements(0);
 		Logger.info(new Exception());
-		assertEquals(Exception.class.getName() + newLine, writer.consumeMessage());
+		assertEquals(Exception.class.getName() + NEW_LINE, writer.consumeMessage());
 
 		Logger.setMaxStackTraceElements(0);
 		Logger.info(new Exception("my test"));
-		assertEquals(Exception.class.getName() + ": my test" + newLine, writer.consumeMessage());
+		assertEquals(Exception.class.getName() + ": my test" + NEW_LINE, writer.consumeMessage());
 
 		Logger.setMaxStackTraceElements(1);
 		Logger.info(new Exception());
-		String regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + newLine + "\tat [\\S ]*" + newLine + "\t\\.\\.\\." + newLine;
+		String regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE + "\tat [\\S ]*" + NEW_LINE + "\t\\.\\.\\." + NEW_LINE;
 		String message = writer.consumeMessage();
 		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
 
 		Logger.setMaxStackTraceElements(-1);
 		Logger.info(new Exception(new IndexOutOfBoundsException()));
-		regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + "\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + newLine
-				+ "(\tat [\\S ]*" + newLine + ")*" + "Caused by\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + newLine
-				+ "(\tat [\\S ]*" + newLine + ")*";
+		regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + "\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE
+				+ "(\tat [\\S ]*" + NEW_LINE + ")*" + "Caused by\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE
+				+ "(\tat [\\S ]*" + NEW_LINE + ")*";
 		message = writer.consumeMessage();
 		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
 	}

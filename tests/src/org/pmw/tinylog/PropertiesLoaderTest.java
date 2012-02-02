@@ -18,9 +18,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Locale;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -35,23 +38,23 @@ public class PropertiesLoaderTest {
 	/**
 	 * Clear properties.
 	 */
+	@Before
 	@After
-	public final void init() {
-		System.clearProperty("tinylog.level");
-		System.clearProperty("tinylog.format");
-		System.clearProperty("tinylog.locale");
-		System.clearProperty("tinylog.stacktrace");
-		System.clearProperty("tinylog.writer");
+	public final void clean() {
+		Enumeration<Object> keys = System.getProperties().keys();
+		while (keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			if (key.startsWith("tinylog")) {
+				System.clearProperty(key);
+			}
+		}
 	}
 
 	/**
 	 * Test reading logging level.
-	 * 
-	 * @throws Exception
-	 *             Failed to reread properties
 	 */
 	@Test
-	public final void testLevel() throws Exception {
+	public final void testLevel() {
 		System.setProperty("tinylog.level", "TRACE");
 		PropertiesLoader.reload();
 		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel());
@@ -66,13 +69,32 @@ public class PropertiesLoaderTest {
 	}
 
 	/**
-	 * Test reading logging format.
-	 * 
-	 * @throws Exception
-	 *             Failed to reread properties
+	 * Test reading special logging levels for packages.
 	 */
 	@Test
-	public final void testFormat() throws Exception {
+	public final void testPackageLevels() {
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+
+		System.setProperty("tinylog.level:a.b", "WARNING");
+		PropertiesLoader.reload();
+		assertEquals(ELoggingLevel.WARNING, Logger.getLoggingLevel("a.b"));
+
+		System.setProperty("tinylog.level:a.b.c", "TRACE");
+		PropertiesLoader.reload();
+		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel("a.b.c"));
+
+		System.setProperty("tinylog.level:org.pmw.tinylog", "ERROR");
+		PropertiesLoader.reload();
+		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel("org.pmw.tinylog"));
+
+		Logger.resetAllLoggingLevel();
+	}
+
+	/**
+	 * Test reading logging format.
+	 */
+	@Test
+	public final void testFormat() {
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
@@ -98,12 +120,9 @@ public class PropertiesLoaderTest {
 
 	/**
 	 * Test locale for message format.
-	 * 
-	 * @throws Exception
-	 *             Failed to reread properties
 	 */
 	@Test
-	public final void testLocale() throws Exception {
+	public final void testLocale() {
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
@@ -140,12 +159,9 @@ public class PropertiesLoaderTest {
 
 	/**
 	 * Test reading stack trace limit.
-	 * 
-	 * @throws Exception
-	 *             Failed to reread properties
 	 */
 	@Test
-	public final void testStackTrace() throws Exception {
+	public final void testStackTrace() {
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setLoggingFormat("{message}");
 		Logger.setWriter(writer);
@@ -195,11 +211,11 @@ public class PropertiesLoaderTest {
 	/**
 	 * Test reading logging writer.
 	 * 
-	 * @throws Exception
-	 *             Failed to reread properties
+	 * @throws IOException
+	 *             Failed to create temp file
 	 */
 	@Test
-	public final void testLoggingWriter() throws Exception {
+	public final void testLoggingWriter() throws IOException {
 		Logger.setLoggingFormat(null);
 		Logger.setWriter(null);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);

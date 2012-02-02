@@ -16,9 +16,12 @@ package org.pmw.tinylog;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Static class to create log entries.
@@ -31,10 +34,12 @@ public final class Logger {
 
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final boolean USE_SUN_REFLECTION_FOR_CALLER = isCallerClassReflectionAvailable();
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
+	private static final Map<String, ELoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, ELoggingLevel>());
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
 	private static volatile Locale locale = Locale.getDefault();
 	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
@@ -63,6 +68,47 @@ public final class Logger {
 	 */
 	public static void setLoggingLevel(final ELoggingLevel level) {
 		loggingLevel = level;
+	}
+
+	/**
+	 * Returns the logging level of a package.
+	 * 
+	 * @param packageName
+	 *            Name of package
+	 * 
+	 * @return The logging level
+	 */
+	public static ELoggingLevel getLoggingLevel(final String packageName) {
+		return getLoggingLevelOfPackage(packageName);
+	}
+
+	/**
+	 * Sets the logging level of a package.
+	 * 
+	 * @param packageName
+	 *            Name of package
+	 * @param level
+	 *            The logging level
+	 */
+	public static void setLoggingLevel(final String packageName, final ELoggingLevel level) {
+		packageLoggingLevels.put(packageName, level);
+	}
+
+	/**
+	 * Resets the logging level of a package to default (to use the current logging level again).
+	 * 
+	 * @param packageName
+	 *            Name of package
+	 */
+	public static void resetLoggingLevel(final String packageName) {
+		packageLoggingLevels.remove(packageName);
+	}
+
+	/**
+	 * Resets all logging level for packages to default (to use the current logging level again).
+	 */
+	public static void resetAllLoggingLevel() {
+		packageLoggingLevels.clear();
 	}
 
 	/**
@@ -366,23 +412,136 @@ public final class Logger {
 
 	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		ILoggingWriter currentWriter = loggingWriter;
-		if (currentWriter != null && loggingLevel.ordinal() <= level.ordinal()) {
+
+		String className;
+		StackTraceElement stackTraceElement = null;
+		if (USE_SUN_REFLECTION_FOR_CALLER) {
 			try {
-				String threadName = Thread.currentThread().getName();
-				StackTraceElement stackTraceElement = getStackTraceElement();
-				Date now = new Date();
+				className = getCallerClassName();
+			} catch (Exception ex) {
+				stackTraceElement = getStackTraceElement();
+				className = stackTraceElement.getClassName();
+			}
+		} else {
+			stackTraceElement = getStackTraceElement();
+			className = stackTraceElement.getClassName();
+		}
 
-				String text;
-				if (message != null) {
-					text = new MessageFormat(message, locale).format(arguments);
-				} else {
-					text = null;
+		if (currentWriter != null && getLoggingLevelOfClass(className).ordinal() <= level.ordinal()) {
+			try {
+				StringBuilder builder = new StringBuilder();
+
+				String threadName = null;
+				Date now = null;
+
+				for (Token token : loggingEntryTokens) {
+					switch (token.getType()) {
+						case THREAD:
+							if (threadName == null) {
+								threadName = Thread.currentThread().getName();
+							}
+							builder.append(threadName);
+							break;
+
+						case CLASS:
+							builder.append(className);
+							break;
+
+						case METHOD:
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement();
+							}
+							builder.append(stackTraceElement.getMethodName());
+							break;
+
+						case FILE:
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement();
+							}
+							builder.append(stackTraceElement.getFileName());
+							break;
+
+						case LINE_NUMBER:
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement();
+							}
+							builder.append(stackTraceElement.getLineNumber());
+							break;
+
+						case LOGGING_LEVEL:
+							builder.append(level);
+							break;
+
+						case DATE:
+							if (now == null) {
+								now = new Date();
+							}
+							DateFormat formatter = (DateFormat) token.getData();
+							String format;
+							synchronized (formatter) {
+								format = formatter.format(now);
+							}
+							builder.append(format);
+							break;
+
+						case MESSAGE:
+							if (message != null) {
+								builder.append(new MessageFormat(message, locale).format(arguments));
+							}
+							if (exception != null) {
+								if (message != null) {
+									builder.append(": ");
+								}
+								int countLoggingStackTraceElements = maxLoggingStackTraceElements;
+								if (countLoggingStackTraceElements == 0) {
+									builder.append(exception.getClass().getName());
+									String exceptionMessage = exception.getMessage();
+									if (exceptionMessage != null) {
+										builder.append(": ");
+										builder.append(exceptionMessage);
+									}
+								} else {
+									builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+								}
+							}
+							break;
+
+						default:
+							builder.append(token.getData());
+							break;
+					}
 				}
+				builder.append(NEW_LINE);
 
-				String logEntry = createEntry(threadName, stackTraceElement, now, level, exception, text);
-				currentWriter.write(level, logEntry);
+				currentWriter.write(level, builder.toString());
 			} catch (Exception ex) {
 				error(ex, "Could not create log entry");
+			}
+		}
+	}
+
+	private static ELoggingLevel getLoggingLevelOfClass(final String className) {
+		if (!packageLoggingLevels.isEmpty()) {
+			int index = className.lastIndexOf('.');
+			if (index > 0) {
+				return getLoggingLevel(className.substring(0, index));
+			}
+		}
+		return loggingLevel;
+	}
+
+	private static ELoggingLevel getLoggingLevelOfPackage(final String packageName) {
+		String packageKey = packageName;
+		while (true) {
+			ELoggingLevel level = packageLoggingLevels.get(packageKey);
+			if (level != null) {
+				return level;
+			}
+			int index = packageKey.lastIndexOf('.');
+			if (index > 0) {
+				packageKey = packageKey.substring(0, index);
+			} else {
+				return loggingLevel;
 			}
 		}
 	}
@@ -394,69 +553,6 @@ public final class Logger {
 		} else {
 			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
 		}
-	}
-
-	private static String createEntry(final String threadName, final StackTraceElement stackTraceElement, final Date time, final ELoggingLevel level,
-			final Throwable exception, final String text) {
-		StringBuilder builder = new StringBuilder();
-
-		for (Token token : loggingEntryTokens) {
-			switch (token.getType()) {
-				case THREAD:
-					builder.append(threadName);
-					break;
-				case CLASS:
-					builder.append(stackTraceElement.getClassName());
-					break;
-				case METHOD:
-					builder.append(stackTraceElement.getMethodName());
-					break;
-				case FILE:
-					builder.append(stackTraceElement.getFileName());
-					break;
-				case LINE_NUMBER:
-					builder.append(stackTraceElement.getLineNumber());
-					break;
-				case LOGGING_LEVEL:
-					builder.append(level);
-					break;
-				case DATE:
-					DateFormat formatter = (DateFormat) token.getData();
-					String format;
-					synchronized (formatter) {
-						format = formatter.format(time);
-					}
-					builder.append(format);
-					break;
-				case MESSAGE:
-					if (text != null) {
-						builder.append(text);
-					}
-					if (exception != null) {
-						if (text != null) {
-							builder.append(": ");
-						}
-						int countLoggingStackTraceElements = maxLoggingStackTraceElements;
-						if (countLoggingStackTraceElements == 0) {
-							builder.append(exception.getClass().getName());
-							String message = exception.getMessage();
-							if (message != null) {
-								builder.append(": ");
-								builder.append(message);
-							}
-						} else {
-							builder.append(getPrintedException(exception, countLoggingStackTraceElements));
-						}
-					}
-					break;
-				default:
-					builder.append(token.getData());
-					break;
-			}
-		}
-		builder.append(NEW_LINE);
-
-		return builder.toString();
 	}
 
 	private static String getPrintedException(final Throwable exception, final int countStackTraceElements) {
@@ -493,6 +589,20 @@ public final class Logger {
 		}
 
 		return builder.toString();
+	}
+
+	private static boolean isCallerClassReflectionAvailable() {
+		try {
+			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
+			return reflectionClass.getDeclaredMethod("getCallerClass", int.class) != null;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@SuppressWarnings("restriction")
+	private static String getCallerClassName() {
+		return sun.reflect.Reflection.getCallerClass(4).getName();
 	}
 
 }

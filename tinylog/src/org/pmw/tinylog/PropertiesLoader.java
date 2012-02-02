@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -30,18 +31,18 @@ public final class PropertiesLoader {
 	private static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
 	private static final String WRITER_PROPERTY = "tinylog.writer";
 
-	private static final String[] ALL_PROPERTIES = new String[] { LEVEL_PROPERTY, FORMAT_PROPERTY, LOCALE_PROPERTY, STACKTRACE_PROPERTY, WRITER_PROPERTY };
+	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + ":";
 	private static final String PROPERTIES_FILE = "/tinylog.properties";
 
 	private PropertiesLoader() {
 	}
 
 	/**
-	 * Reload properties from default properties file ("/tinylog.properties") and environment variables.
+	 * Reload properties from environment variables and from default properties file ("/tinylog.properties").
 	 */
 	public static void reload() {
 		Properties properties = getPropertiesFromFile(PROPERTIES_FILE);
-		properties.putAll(getPropertiesFromEnviroment());
+		properties.putAll(System.getProperties());
 		readProperties(properties);
 	}
 
@@ -71,26 +72,29 @@ public final class PropertiesLoader {
 		return properties;
 	}
 
-	private static Properties getPropertiesFromEnviroment() {
-		Properties properties = new Properties();
-
-		for (String key : ALL_PROPERTIES) {
-			String value = System.getProperty(key);
-			if (value != null && !value.isEmpty()) {
-				properties.setProperty(key, value);
-			}
-		}
-
-		return properties;
-	}
-
 	private static void readProperties(final Properties properties) {
 		String level = properties.getProperty(LEVEL_PROPERTY);
 		if (level != null && !level.isEmpty()) {
 			try {
-				Logger.setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase()));
+				Logger.setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
 				// Ignore
+			}
+		}
+
+		Enumeration<Object> keys = properties.keys();
+		while (keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			if (key.startsWith(PACKAGE_LEVEL_PREFIX)) {
+				String packageName = key.substring(PACKAGE_LEVEL_PREFIX.length());
+				String value = properties.getProperty(key);
+				try {
+					ELoggingLevel loggingLevel = ELoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
+					Logger.setLoggingLevel(packageName, loggingLevel);
+				} catch (IllegalArgumentException ex) {
+					// Illegal logging level => reset
+					Logger.resetLoggingLevel(packageName);
+				}
 			}
 		}
 
