@@ -13,17 +13,12 @@
 
 package org.pmw.tinylog;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 /**
  * Static class to create log entries.
@@ -34,16 +29,8 @@ import java.util.Properties;
  */
 public final class Logger {
 
-	private static final String PROPERTIES_FILE = "/tinylog.properties";
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
-
-	private static final String TINYLOG_WRITER = "tinylog.writer";
-	private static final String TINYLOG_STACKTRACE = "tinylog.stacktrace";
-	private static final String TINYLOG_LOCALE = "tinylog.locale";
-	private static final String TINYLOG_FORMAT = "tinylog.format";
-	private static final String TINYLOG_LEVEL = "tinylog.level";
-	private static final String[] ALL_TINYLOG_PROPERTIES = new String[] { TINYLOG_LEVEL, TINYLOG_FORMAT, TINYLOG_LOCALE, TINYLOG_STACKTRACE, TINYLOG_WRITER };
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
@@ -53,7 +40,7 @@ public final class Logger {
 	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat);
 
 	static {
-		readProperties();
+		PropertiesLoader.load();
 	}
 
 	private Logger() {
@@ -361,129 +348,6 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception) {
 		output(ELoggingLevel.ERROR, exception, null);
-	}
-
-	private static void readProperties() {
-		Properties properties = new Properties();
-
-		// Load properties file if exits
-		InputStream stream = Logger.class.getResourceAsStream(PROPERTIES_FILE);
-		if (stream != null) {
-			try {
-				properties.load(stream);
-			} catch (IOException ex) {
-				// Ignore
-			}
-		}
-
-		// Load existing environment variables
-		for (String key : ALL_TINYLOG_PROPERTIES) {
-			String value = System.getProperty(key);
-			if (value != null && !value.isEmpty()) {
-				properties.setProperty(key, value);
-			}
-		}
-
-		readProperties(properties);
-	}
-
-	private static void readProperties(final Properties properties) {
-		String level = properties.getProperty(TINYLOG_LEVEL);
-		if (level != null && !level.isEmpty()) {
-			try {
-				setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase()));
-			} catch (IllegalArgumentException ex) {
-				// Ignore
-			}
-		}
-
-		String format = properties.getProperty(TINYLOG_FORMAT);
-		if (format != null && !format.isEmpty()) {
-			setLoggingFormat(format);
-		}
-
-		String localeString = properties.getProperty(TINYLOG_LOCALE);
-		if (localeString != null && !localeString.isEmpty()) {
-			String[] localeArray = localeString.split("_", 3);
-			if (localeArray.length == 1) {
-				setLocale(new Locale(localeArray[0]));
-			} else if (localeArray.length == 2) {
-				setLocale(new Locale(localeArray[0], localeArray[1]));
-			} else if (localeArray.length >= 3) {
-				setLocale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
-			}
-		}
-
-		String stacktace = properties.getProperty(TINYLOG_STACKTRACE);
-		if (stacktace != null && !stacktace.isEmpty()) {
-			try {
-				int limit = Integer.parseInt(stacktace);
-				setMaxStackTraceElements(limit);
-			} catch (NumberFormatException ex) {
-				// Ignore
-			}
-		}
-
-		String writer = properties.getProperty(TINYLOG_WRITER);
-		if (writer != null && !writer.isEmpty()) {
-			if (writer.equals("null")) {
-				setWriter(null);
-			} else if (writer.equals("console")) {
-				setWriter(new ConsoleLoggingWriter());
-			} else if (writer.startsWith("file:")) {
-				String filename = writer.substring(5);
-				if (filename != null && !filename.isEmpty()) {
-					try {
-						setWriter(new FileLoggingWriter(filename));
-					} catch (IOException ex) {
-						// Ignore
-					}
-				}
-			} else {
-				ILoggingWriter writerInstance;
-				if (writer.contains(":")) {
-					String className = writer.substring(0, writer.indexOf(':'));
-					String parameter = writer.substring(writer.indexOf(':') + 1);
-					writerInstance = createInstance(className, parameter);
-				} else {
-					String className = writer;
-					writerInstance = createInstance(className, null);
-				}
-				if (writerInstance != null) {
-					setWriter(writerInstance);
-				}
-			}
-		}
-	}
-
-	private static ILoggingWriter createInstance(final String className, final String parameter) {
-		try {
-			Class<?> clazz = Class.forName(className);
-			if (ILoggingWriter.class.isAssignableFrom(clazz)) {
-				if (parameter == null) {
-					Constructor<?> constructor = clazz.getConstructor();
-					if (constructor != null) {
-						return (ILoggingWriter) constructor.newInstance();
-					}
-				} else {
-					Constructor<?> constructor = clazz.getConstructor(String.class);
-					if (constructor != null) {
-						return (ILoggingWriter) constructor.newInstance(parameter);
-					}
-				}
-			}
-		} catch (ClassNotFoundException ex) {
-			// Ignore
-		} catch (InstantiationException ex) {
-			// Ignore
-		} catch (IllegalAccessException ex) {
-			// Ignore
-		} catch (InvocationTargetException ex) {
-			// Ignore
-		} catch (NoSuchMethodException ex) {
-			// Ignore
-		}
-		return null;
 	}
 
 	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
