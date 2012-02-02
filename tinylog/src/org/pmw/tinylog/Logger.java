@@ -591,6 +591,7 @@ public final class Logger {
 		return builder.toString();
 	}
 
+	// To use sun.reflect.Reflection to get caller class is much faster than stack trace elements!
 	private static boolean isCallerClassReflectionAvailable() {
 		try {
 			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
