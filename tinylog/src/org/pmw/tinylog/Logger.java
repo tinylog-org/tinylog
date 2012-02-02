@@ -113,7 +113,11 @@ public final class Logger {
 	 * @see MessageFormat#setLocale(Locale)
 	 */
 	public static void setLocale(final Locale locale) {
-		Logger.locale = locale;
+		if (locale == null) {
+			Logger.locale = Locale.getDefault();
+		} else {
+			Logger.locale = locale;
+		}
 	}
 
 	/**
