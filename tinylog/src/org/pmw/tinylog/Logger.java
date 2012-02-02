@@ -40,20 +40,10 @@ public final class Logger {
 	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat);
 
 	static {
-		PropertiesLoader.load();
+		PropertiesLoader.reload();
 	}
 
 	private Logger() {
-	}
-
-	/**
-	 * Register a logging writer to output the created log entries.
-	 * 
-	 * @param writer
-	 *            Logging writer to add (can be <code>null</code> to disable any output)
-	 */
-	public static void setWriter(final ILoggingWriter writer) {
-		loggingWriter = writer;
 	}
 
 	/**
@@ -148,6 +138,25 @@ public final class Logger {
 		} else {
 			Logger.maxLoggingStackTraceElements = maxStackTraceElements;
 		}
+	}
+
+	/**
+	 * Returns the current logging writer.
+	 * 
+	 * @return The current logging writer
+	 */
+	public static ILoggingWriter getWriter() {
+		return loggingWriter;
+	}
+
+	/**
+	 * Register a logging writer to output the created log entries.
+	 * 
+	 * @param writer
+	 *            Logging writer to add (can be <code>null</code> to disable any output)
+	 */
+	public static void setWriter(final ILoggingWriter writer) {
+		loggingWriter = writer;
 	}
 
 	/**

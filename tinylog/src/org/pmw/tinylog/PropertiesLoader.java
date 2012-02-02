@@ -20,9 +20,9 @@ import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Load properties form file and from environment variables.
+ * Load and set properties for logger from file and environment variables.
  */
-final class PropertiesLoader {
+public final class PropertiesLoader {
 
 	private static final String LEVEL_PROPERTY = "tinylog.level";
 	private static final String FORMAT_PROPERTY = "tinylog.format";
@@ -37,18 +37,29 @@ final class PropertiesLoader {
 	}
 
 	/**
-	 * Do load properties.
+	 * Reload properties from default properties file ("/tinylog.properties") and environment variables.
 	 */
-	static void load() {
-		Properties properties = getPropertiesFromFile();
+	public static void reload() {
+		Properties properties = getPropertiesFromFile(PROPERTIES_FILE);
 		properties.putAll(getPropertiesFromEnviroment());
 		readProperties(properties);
 	}
 
-	private static Properties getPropertiesFromFile() {
+	/**
+	 * Load properties from a file.
+	 * 
+	 * @param file
+	 *            File in classpath to load
+	 */
+	public static void loadFile(final String file) {
+		Properties properties = getPropertiesFromFile(file);
+		readProperties(properties);
+	}
+
+	private static Properties getPropertiesFromFile(final String file) {
 		Properties properties = new Properties();
 
-		InputStream stream = Logger.class.getResourceAsStream(PROPERTIES_FILE);
+		InputStream stream = Logger.class.getResourceAsStream(file);
 		if (stream != null) {
 			try {
 				properties.load(stream);
