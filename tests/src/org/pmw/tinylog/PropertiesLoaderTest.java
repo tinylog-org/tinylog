@@ -18,19 +18,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Test;
 
 /**
- * Test reading of properties for the logger.
+ * Test reading properties for the logger.
  * 
- * @see org.pmw.tinylog.Logger
+ * @see org.pmw.tinylog.PropertiesLoader
  */
-public class PropertiesTest {
+public class PropertiesLoaderTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -55,15 +53,15 @@ public class PropertiesTest {
 	@Test
 	public final void testLevel() throws Exception {
 		System.setProperty("tinylog.level", "TRACE");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel());
 
 		System.setProperty("tinylog.level", "error");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
 
 		System.setProperty("tinylog.level", "invalid");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
 	}
 
@@ -80,19 +78,19 @@ public class PropertiesTest {
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 
 		System.setProperty("tinylog.format", "My log entry");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals("My log entry", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.format", "My log entry: {message}");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals("My log entry: {message}", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry: My message" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.format", "My log entry: {message");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals("My log entry: {message", Logger.getLoggingFormat());
 		Logger.info("My message");
 		assertEquals("My log entry: {message" + NEW_LINE, writer.consumeMessage());
@@ -112,28 +110,32 @@ public class PropertiesTest {
 		Logger.setLoggingFormat("{message}");
 
 		System.setProperty("tinylog.locale", "de");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(Locale.GERMAN, Logger.getLocale());
 		Logger.info("{0}", 0.1);
 		assertEquals("0,1" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.locale", "de_DE");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(Locale.GERMANY, Logger.getLocale());
 		Logger.info("{0}", 0.1);
 		assertEquals("0,1" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.locale", "en");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(Locale.ENGLISH, Logger.getLocale());
 		Logger.info("{0}", 0.1);
 		assertEquals("0.1" + NEW_LINE, writer.consumeMessage());
 
 		System.setProperty("tinylog.locale", "en_US");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(Locale.US, Logger.getLocale());
 		Logger.info("{0}", 0.1);
 		assertEquals("0.1" + NEW_LINE, writer.consumeMessage());
+
+		System.setProperty("tinylog.locale", "en_US_WIN");
+		PropertiesLoader.reload();
+		assertEquals(new Locale("en", "US", "WIN"), Logger.getLocale());
 	}
 
 	/**
@@ -150,7 +152,7 @@ public class PropertiesTest {
 		Logger.setLoggingLevel(ELoggingLevel.ERROR);
 
 		System.setProperty("tinylog.stacktrace", "0");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(0, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		String entry = writer.consumeMessage();
@@ -158,7 +160,7 @@ public class PropertiesTest {
 		assertEquals(1, entry.split(NEW_LINE).length);
 
 		System.setProperty("tinylog.stacktrace", "1");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(1, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		entry = writer.consumeMessage();
@@ -166,7 +168,7 @@ public class PropertiesTest {
 		assertEquals(3, entry.split(NEW_LINE).length);
 
 		System.setProperty("tinylog.stacktrace", "5");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(5, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		entry = writer.consumeMessage();
@@ -174,7 +176,7 @@ public class PropertiesTest {
 		assertEquals(7, entry.split(NEW_LINE).length);
 
 		System.setProperty("tinylog.stacktrace", "-1");
-		readProperties();
+		PropertiesLoader.reload();
 		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
 		Logger.error(new Exception());
 		entry = writer.consumeMessage();
@@ -183,7 +185,7 @@ public class PropertiesTest {
 
 		Logger.setMaxStackTraceElements(1);
 		System.setProperty("tinylog.stacktrace", "invalid");
-		readProperties();
+		PropertiesLoader.reload();
 		Logger.error(new Exception());
 		entry = writer.consumeMessage();
 		assertNotNull(entry);
@@ -202,55 +204,58 @@ public class PropertiesTest {
 		Logger.setWriter(null);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);
 
-		ILoggingWriter writer = getWriter();
+		ILoggingWriter writer = Logger.getWriter();
 		assertNull(writer);
 
 		System.setProperty("tinylog.writer", "console");
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
 
 		System.setProperty("tinylog.writer", "null");
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNull(writer);
 
 		System.setProperty("tinylog.writer", "file");
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNull(writer);
 
 		File file = File.createTempFile("test", "tmp");
 		System.setProperty("tinylog.writer", "file:" + file.getAbsolutePath());
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(FileLoggingWriter.class, writer.getClass());
 
 		System.setProperty("tinylog.writer", ConsoleLoggingWriter.class.getName());
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
 
 		file = File.createTempFile("test", "tmp");
 		System.setProperty("tinylog.writer", FileLoggingWriter.class.getName() + ":" + file.getAbsolutePath());
-		readProperties();
-		writer = getWriter();
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(FileLoggingWriter.class, writer.getClass());
 	}
 
-	private void readProperties() throws Exception {
-		Method method = Logger.class.getDeclaredMethod("readProperties");
-		method.setAccessible(true);
-		method.invoke(null);
+	/**
+	 * Test loading properties form file.
+	 */
+	@Test
+	public final void testLoadFromFile() {
+		PropertiesLoader.reload();
+		PropertiesLoader.loadFile("./propertiesLoaderTest.properties");
+		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+		assertEquals("Hello from file!", Logger.getLoggingFormat());
+		assertEquals(Locale.US, Logger.getLocale());
+		assertEquals(42, Logger.getMaxStackTraceElements());
+		assertNull(Logger.getWriter());
 	}
 
-	private ILoggingWriter getWriter() throws Exception {
-		Field field = Logger.class.getDeclaredField("loggingWriter");
-		field.setAccessible(true);
-		return (ILoggingWriter) field.get(null);
-	}
 }

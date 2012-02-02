@@ -3,11 +3,13 @@
 	
 	<property name="version" value="0.4" />
 	
-	<property name="root" location="../" />
+	<property name="root" location=".." />
 	
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
-	<property name="src-test" location="test" />
+	
+	<property name="tests.bin" location="${root}/tests/bin" />
+	<property name="tests.src" location="${root}/tests/src" />
 		
 	<property name="ext" location="${root}/ext" />
 	<property name="ext.conf" location="${ext}/conf" />
@@ -52,8 +54,9 @@
 
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
-		<javac srcdir="${src-test}" destdir="${bin}" includeantruntime="false">
+		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false">
 			<classpath refid="junit.classpath" />
+			<classpath location="${bin}" />
 		</javac>
 	</target>
 	
@@ -66,9 +69,7 @@
 			</fileset>
 		</delete>
 		<jar destfile="${dist.jar}/tinylog.jar">
-			<fileset dir="${bin}">
-				<exclude name="**/test/**" />
-			</fileset>
+			<fileset dir="${bin}" />
 		</jar>
 		<zip destfile="${dist.jar}/tinylog-src.zip">
 			<fileset dir="${src}" />
@@ -88,8 +89,8 @@
 	<target name="docs" depends="compile">
 		<delete dir="${dist.docs}" />
 		<mkdir dir="${dist.docs}" />
-		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="Tinylog framework ${version}">
-			<doctitle>Tinylog framework ${version} - API Specification</doctitle>
+		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="tinylog ${version}">
+			<doctitle>tinylog ${version} - API Specification</doctitle>
 			<packageset dir="${src}" />
 			<classpath>
 				<dirset dir="${bin}" />
@@ -101,18 +102,19 @@
 	<target name="check" depends="compile">
 		<checkstyle config="${ext.conf}/tinylog-checkstyle.xml">
 			<fileset dir="${src}" includes="**/*.java" />
-			<fileset dir="${src-test}" includes="**/*.java" />
+			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
 		<findbugs home="${ext.lib.findbugs}" output="text">
 			<sourcepath>
 				<dirset>
 					<include name="${src}" />
-					<include name="${src-test}" />
+					<include name="${tests.src}" />
 				</dirset>
 			</sourcepath>
 			<fileset>
 				<include name="${bin}" />
+				<include name="${tests.bin}" />
 			</fileset>
 		</findbugs>
 	</target>
@@ -120,10 +122,14 @@
 	<target name="test" depends="compile">
 		<junit>
 			<formatter type="plain" usefile="false" />
-			<classpath path="${bin}" />
-			<classpath refid="junit.classpath" />
+			<classpath>
+				<path location="${bin}" />
+				<path location="${tests.bin}" />
+				<path location="${tests.src}" />
+				<path refid="junit.classpath" />
+			</classpath>
 			<batchtest>
-				<fileset dir="${src-test}">
+				<fileset dir="${tests.src}">
 					<include name="**/*Test*.java" />
 				</fileset>
 			</batchtest>
