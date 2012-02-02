@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -38,9 +39,12 @@ final class Tokenizer {
 	 * @param formatPattern
 	 *            Format pattern for logging entries
 	 * 
+	 * @param locale
+	 *            Locale for formats
+	 * 
 	 * @return List of tokens
 	 */
-	static List<Token> parse(final String formatPattern) {
+	static List<Token> parse(final String formatPattern, final Locale locale) {
 		List<Token> tokens = new ArrayList<Token>();
 		char[] chars = formatPattern.toCharArray();
 
@@ -50,27 +54,27 @@ final class Tokenizer {
 			char c = chars[i];
 			if (c == '{') {
 				if (openMarkers == 0 && start < i) {
-					tokens.add(getToken(formatPattern.substring(start, i)));
+					tokens.add(getToken(formatPattern.substring(start, i), locale));
 					start = i;
 				}
 				++openMarkers;
 			} else if (openMarkers > 0 && c == '}') {
 				--openMarkers;
 				if (openMarkers == 0) {
-					tokens.add(getToken(formatPattern.substring(start, i + 1)));
+					tokens.add(getToken(formatPattern.substring(start, i + 1), locale));
 					start = i + 1;
 				}
 			}
 		}
 
 		if (start < chars.length) {
-			tokens.add(getToken(formatPattern.substring(start, chars.length)));
+			tokens.add(getToken(formatPattern.substring(start, chars.length), locale));
 		}
 
 		return tokens;
 	}
 
-	private static Token getToken(final String text) {
+	private static Token getToken(final String text, final Locale locale) {
 		if ("{thread}".equals(text)) {
 			return new Token(EToken.THREAD);
 		} else if ("{method}".equals(text)) {
@@ -86,7 +90,7 @@ final class Tokenizer {
 			} else {
 				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
 			}
-			return new Token(EToken.DATE, new SimpleDateFormat(dateFormatPattern));
+			return new Token(EToken.DATE, new SimpleDateFormat(dateFormatPattern, locale));
 		} else {
 			return new Token(EToken.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
 		}

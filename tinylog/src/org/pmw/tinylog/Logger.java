@@ -37,7 +37,7 @@ public final class Logger {
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
 	private static volatile Locale locale = Locale.getDefault();
-	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat);
+	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
 
 	static {
 		PropertiesLoader.reload();
@@ -90,7 +90,7 @@ public final class Logger {
 		} else {
 			loggingFormat = format;
 		}
-		loggingEntryTokens = Tokenizer.parse(loggingFormat);
+		loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
 	}
 
 	/**
@@ -118,6 +118,7 @@ public final class Logger {
 		} else {
 			Logger.locale = locale;
 		}
+		loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
 	}
 
 	/**

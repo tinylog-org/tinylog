@@ -18,7 +18,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -28,49 +30,59 @@ import org.junit.Test;
  */
 public class TokenizerTest {
 
+	private Locale locale;
+
+	/**
+	 * Initiate locale.
+	 */
+	@Before
+	public final void init() {
+		locale = Locale.getDefault();
+	}
+
 	/**
 	 * Test parsing with results of one single token.
 	 */
 	@Test
 	public final void testSingleTokens() {
-		List<Token> tokens = Tokenizer.parse("Hello!");
+		List<Token> tokens = Tokenizer.parse("Hello!", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("Hello!", tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("{date");
+		tokens = Tokenizer.parse("{date", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("{date", tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("{{date}}");
+		tokens = Tokenizer.parse("{{date}}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("{{date}}", tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("{date}");
+		tokens = Tokenizer.parse("{date}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.DATE, tokens.get(0).getType());
 		assertNotNull(tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("{date:yyyy}");
+		tokens = Tokenizer.parse("{date:yyyy}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.DATE, tokens.get(0).getType());
 		assertEquals(new SimpleDateFormat("yyyy"), tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("{thread}");
+		tokens = Tokenizer.parse("{thread}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.THREAD, tokens.get(0).getType());
 
-		tokens = Tokenizer.parse("{method}");
+		tokens = Tokenizer.parse("{method}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.METHOD, tokens.get(0).getType());
 
-		tokens = Tokenizer.parse("{level}");
+		tokens = Tokenizer.parse("{level}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.LOGGING_LEVEL, tokens.get(0).getType());
 
-		tokens = Tokenizer.parse("{message}");
+		tokens = Tokenizer.parse("{message}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.MESSAGE, tokens.get(0).getType());
 	}
@@ -80,7 +92,7 @@ public class TokenizerTest {
 	 */
 	@Test
 	public final void testMultiTokens() {
-		List<Token> tokens = Tokenizer.parse("Hello {thread}!\nI'm {method} and this {method is invalid");
+		List<Token> tokens = Tokenizer.parse("Hello {thread}!\nI'm {method} and this {method is invalid", locale);
 		assertEquals(6, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("Hello ", tokens.get(0).getData());
@@ -101,42 +113,42 @@ public class TokenizerTest {
 	public final void testNewLines() {
 		String newLine = System.getProperty("line.separator");
 
-		List<Token> tokens = Tokenizer.parse("\n");
+		List<Token> tokens = Tokenizer.parse("\n", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\r");
+		tokens = Tokenizer.parse("\r", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\r\n");
+		tokens = Tokenizer.parse("\r\n", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\n\r");
+		tokens = Tokenizer.parse("\n\r", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine + newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\\n");
+		tokens = Tokenizer.parse("\\n", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\\r");
+		tokens = Tokenizer.parse("\\r", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\\r\\n");
+		tokens = Tokenizer.parse("\\r\\n", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine, tokens.get(0).getData());
 
-		tokens = Tokenizer.parse("\\n\\r");
+		tokens = Tokenizer.parse("\\n\\r", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals(newLine + newLine, tokens.get(0).getData());
