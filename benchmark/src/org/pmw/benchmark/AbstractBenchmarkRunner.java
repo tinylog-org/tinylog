@@ -30,20 +30,30 @@ public abstract class AbstractBenchmarkRunner {
 	}
 
 	public final void start() throws Exception {
+		File[] files = new File[BENCHMARK_ITERATIONS];
+		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
+			File file = File.createTempFile("log", ".txt");
+			file.deleteOnExit();
+			files[i] = file;
+		}
+
 		long start = System.currentTimeMillis();
 
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			File file = File.createTempFile("log", ".txt");
-			benchmark.init(file);
+			benchmark.init(files[i]);
 			run(benchmark);
 			benchmark.dispose();
-			file.delete();
 		}
 
 		long finished = System.currentTimeMillis();
 		long time = finished - start;
 		long iterations = BENCHMARK_ITERATIONS * countLogEntries();
 		long iterationsPerSecond = Math.round(iterations * 1000d / time);
+
+		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
+			files[i].delete();
+		}
+
 		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
 	}
 
