@@ -216,11 +216,14 @@ public class LoggerTest {
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
-		Logger.setLoggingFormat("{thread}#{method}#{level}#{date:yyyy}#{message}");
+		Logger.setLoggingFormat("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}");
 
+		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
-		assertEquals(MessageFormat.format("{0}#{1}.testFullLogEntry()#{2}#{3}#Hello{4}", Thread.currentThread().getName(), LoggerTest.class.getName(),
-				ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), System.getProperty("line.separator")), writer.consumeMessage());
+		assertEquals(
+				MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread.currentThread().getName(),
+						LoggerTest.class.getName(), lineNumber, ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()),
+						System.getProperty("line.separator")), writer.consumeMessage());
 	}
 
 	/**

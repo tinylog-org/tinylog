@@ -74,9 +74,21 @@ public class TokenizerTest {
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.THREAD, tokens.get(0).getType());
 
+		tokens = Tokenizer.parse("{class}", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(EToken.CLASS, tokens.get(0).getType());
+
 		tokens = Tokenizer.parse("{method}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(EToken.METHOD, tokens.get(0).getType());
+
+		tokens = Tokenizer.parse("{file}", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(EToken.FILE, tokens.get(0).getType());
+
+		tokens = Tokenizer.parse("{line}", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(EToken.LINE_NUMBER, tokens.get(0).getType());
 
 		tokens = Tokenizer.parse("{level}", locale);
 		assertEquals(1, tokens.size());

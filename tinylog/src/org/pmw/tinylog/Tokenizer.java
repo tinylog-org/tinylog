@@ -77,8 +77,14 @@ final class Tokenizer {
 	private static Token getToken(final String text, final Locale locale) {
 		if ("{thread}".equals(text)) {
 			return new Token(EToken.THREAD);
+		} else if ("{class}".equals(text)) {
+			return new Token(EToken.CLASS);
 		} else if ("{method}".equals(text)) {
 			return new Token(EToken.METHOD);
+		} else if ("{file}".equals(text)) {
+			return new Token(EToken.FILE);
+		} else if ("{line}".equals(text)) {
+			return new Token(EToken.LINE_NUMBER);
 		} else if ("{level}".equals(text)) {
 			return new Token(EToken.LOGGING_LEVEL);
 		} else if ("{message}".equals(text)) {

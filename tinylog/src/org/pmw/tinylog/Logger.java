@@ -29,7 +29,7 @@ import java.util.Locale;
  */
 public final class Logger {
 
-	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
+	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private static volatile int maxLoggingStackTraceElements = 40;
@@ -76,8 +76,8 @@ public final class Logger {
 
 	/**
 	 * Sets the format pattern for log entries.
-	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {method}\n{level}: {message}"</code> is the default format pattern.
-	 * The date format pattern is compatible with {@link SimpleDateFormat}.
+	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"</code> is the default format
+	 * pattern. The date format pattern is compatible with {@link SimpleDateFormat}.
 	 * 
 	 * @param format
 	 *            Format pattern for log entries (or <code>null</code> to reset to default)
@@ -369,7 +369,7 @@ public final class Logger {
 		if (currentWriter != null && loggingLevel.ordinal() <= level.ordinal()) {
 			try {
 				String threadName = Thread.currentThread().getName();
-				String methodName = getMethodName();
+				StackTraceElement stackTraceElement = getStackTraceElement();
 				Date now = new Date();
 
 				String text;
@@ -379,7 +379,7 @@ public final class Logger {
 					text = null;
 				}
 
-				String logEntry = createEntry(threadName, methodName, now, level, exception, text);
+				String logEntry = createEntry(threadName, stackTraceElement, now, level, exception, text);
 				currentWriter.write(level, logEntry);
 			} catch (Exception ex) {
 				error(ex, "Could not create log entry");
@@ -387,18 +387,17 @@ public final class Logger {
 		}
 	}
 
-	private static String getMethodName() {
+	private static StackTraceElement getStackTraceElement() {
 		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 		if (stackTraceElements.length > 4) {
-			StackTraceElement stackTraceElement = stackTraceElements[4];
-			return stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "()";
+			return stackTraceElements[4];
 		} else {
-			return "<unknown>()";
+			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
 		}
 	}
 
-	private static String createEntry(final String threadName, final String methodName, final Date time, final ELoggingLevel level, final Throwable exception,
-			final String text) {
+	private static String createEntry(final String threadName, final StackTraceElement stackTraceElement, final Date time, final ELoggingLevel level,
+			final Throwable exception, final String text) {
 		StringBuilder builder = new StringBuilder();
 
 		for (Token token : loggingEntryTokens) {
@@ -406,8 +405,17 @@ public final class Logger {
 				case THREAD:
 					builder.append(threadName);
 					break;
+				case CLASS:
+					builder.append(stackTraceElement.getClassName());
+					break;
 				case METHOD:
-					builder.append(methodName);
+					builder.append(stackTraceElement.getMethodName());
+					break;
+				case FILE:
+					builder.append(stackTraceElement.getFileName());
+					break;
+				case LINE_NUMBER:
+					builder.append(stackTraceElement.getLineNumber());
 					break;
 				case LOGGING_LEVEL:
 					builder.append(level);

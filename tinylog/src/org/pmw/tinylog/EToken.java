@@ -34,9 +34,24 @@ enum EToken {
 	THREAD,
 
 	/**
-	 * The class and method name of the caller
+	 * The class name of the caller
+	 */
+	CLASS,
+
+	/**
+	 * The method name of the caller
 	 */
 	METHOD,
+
+	/**
+	 * The filename of the caller
+	 */
+	FILE,
+
+	/**
+	 * The line number of calling
+	 */
+	LINE_NUMBER,
 
 	/**
 	 * The logging level
