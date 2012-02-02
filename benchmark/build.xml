@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="benchmark" default="run">
 
-	<property name="root" location="../" />
+	<property name="root" location=".." />
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="lib" location="lib" />
