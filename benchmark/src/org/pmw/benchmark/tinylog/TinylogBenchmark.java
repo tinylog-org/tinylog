@@ -40,7 +40,7 @@ public class TinylogBenchmark implements IBenchmark {
 	public void init(final File file) throws Exception {
 		Logger.setWriter(new FileLoggingWriter(file.getAbsolutePath()));
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
-		Logger.setLoggingFormat("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {method}: {message}");
+		Logger.setLoggingFormat("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
 	}
 
 	@Override
