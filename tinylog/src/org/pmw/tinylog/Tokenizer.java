@@ -63,7 +63,7 @@ final class Tokenizer {
 			}
 		}
 
-		if (start < chars.length - 1) {
+		if (start < chars.length) {
 			tokens.add(getToken(formatPattern.substring(start, chars.length)));
 		}
 
