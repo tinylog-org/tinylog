@@ -524,7 +524,7 @@ public final class Logger {
 		if (!packageLoggingLevels.isEmpty()) {
 			int index = className.lastIndexOf('.');
 			if (index > 0) {
-				return getLoggingLevel(className.substring(0, index));
+				return getLoggingLevelOfPackage(className.substring(0, index));
 			}
 		}
 		return loggingLevel;
