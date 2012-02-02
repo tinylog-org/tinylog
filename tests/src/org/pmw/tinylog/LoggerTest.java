@@ -14,12 +14,19 @@
 package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -31,22 +38,74 @@ import org.junit.Test;
 public class LoggerTest {
 
 	/**
-	 * Test logging.
+	 * Test getter and setter for logging level.
 	 */
 	@Test
-	public final void testLogging() {
-		LoggingWriter writer = new LoggingWriter();
+	public final void testLoggingLevel() {
+		Logger.setLoggingLevel(ELoggingLevel.TRACE);
+		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel());
+
+		Logger.setLoggingLevel(ELoggingLevel.OFF);
+		assertEquals(ELoggingLevel.OFF, Logger.getLoggingLevel());
+	}
+
+	/**
+	 * Test getter and setter for logging format pattern.
+	 */
+	@Test
+	public final void testLoggingFormat() {
+		Logger.setLoggingFormat("{message}");
+		assertEquals("{message}", Logger.getLoggingFormat());
+
+		Logger.setLoggingFormat(null);
+		assertNotNull(Logger.getLoggingFormat());
+		assertFalse("{message}".equals(Logger.getLoggingFormat()));
+	}
+
+	/**
+	 * Test getter and setter for locale.
+	 */
+	@Test
+	public final void testLocale() {
+		Logger.setLocale(Locale.US);
+		assertEquals(Locale.US, Logger.getLocale());
+
+		Logger.setLocale(Locale.GERMANY);
+		assertEquals(Locale.GERMANY, Logger.getLocale());
+
+		Logger.setLocale(null);
+		assertEquals(Locale.getDefault(), Logger.getLocale());
+	}
+
+	/**
+	 * Test getter and setter for limitation of stack traces.
+	 */
+	@Test
+	public final void testMaxStackTraceElements() {
+		Logger.setMaxStackTraceElements(Integer.MIN_VALUE);
+		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
+
+		Logger.setMaxStackTraceElements(-1);
+		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
+
+		Logger.setMaxStackTraceElements(0);
+		assertEquals(0, Logger.getMaxStackTraceElements());
+
+		Logger.setMaxStackTraceElements(40);
+		assertEquals(40, Logger.getMaxStackTraceElements());
+	}
+
+	/**
+	 * Test getter and setter for logging writer.
+	 */
+	@Test
+	public final void testLoggingWriter() {
+		Logger.setWriter(null);
+		assertNull(Logger.getWriter());
+
+		ILoggingWriter writer = new ConsoleLoggingWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
-
-		Logger.info("Hello!");
-		assertNotNull(writer.consumeMessage());
-
-		Logger.error(new NullPointerException());
-		assertNotNull(writer.consumeMessage());
-
-		Logger.debug("Hello!");
-		assertNull(writer.consumeMessage());
+		assertEquals(writer, Logger.getWriter());
 	}
 
 	/**
@@ -147,6 +206,56 @@ public class LoggerTest {
 
 		Logger.error(new Exception(), "Hello!");
 		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+	}
+
+	/**
+	 * Test a full log entry with all possible patterns.
+	 */
+	@Test
+	public final void testFullLogEntry() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingFormat("{thread}#{method}#{level}#{date:yyyy}#{message}");
+
+		Logger.info("Hello");
+		assertEquals(MessageFormat.format("{0}#{1}.testFullLogEntry()#{2}#{3}#Hello{4}", Thread.currentThread().getName(), LoggerTest.class.getName(),
+				ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), System.getProperty("line.separator")), writer.consumeMessage());
+	}
+
+	/**
+	 * Test log entries which display exceptions.
+	 */
+	@Test
+	public final void testExceptions() {
+		String newLine = System.getProperty("line.separator");
+
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingFormat("{message}");
+
+		Logger.setMaxStackTraceElements(0);
+		Logger.info(new Exception());
+		assertEquals(Exception.class.getName() + newLine, writer.consumeMessage());
+
+		Logger.setMaxStackTraceElements(0);
+		Logger.info(new Exception("my test"));
+		assertEquals(Exception.class.getName() + ": my test" + newLine, writer.consumeMessage());
+
+		Logger.setMaxStackTraceElements(1);
+		Logger.info(new Exception());
+		String regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + newLine + "\tat [\\S ]*" + newLine + "\t\\.\\.\\." + newLine;
+		String message = writer.consumeMessage();
+		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
+
+		Logger.setMaxStackTraceElements(-1);
+		Logger.info(new Exception(new IndexOutOfBoundsException()));
+		regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + "\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + newLine
+				+ "(\tat [\\S ]*" + newLine + ")*" + "Caused by\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + newLine
+				+ "(\tat [\\S ]*" + newLine + ")*";
+		message = writer.consumeMessage();
+		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
 	}
 
 	/**

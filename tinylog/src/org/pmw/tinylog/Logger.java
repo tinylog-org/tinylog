@@ -118,7 +118,7 @@ public final class Logger {
 		} else {
 			Logger.locale = locale;
 		}
-		loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
+		loggingEntryTokens = Tokenizer.parse(loggingFormat, Logger.locale);
 	}
 
 	/**
@@ -430,8 +430,12 @@ public final class Logger {
 						}
 						int countLoggingStackTraceElements = maxLoggingStackTraceElements;
 						if (countLoggingStackTraceElements == 0) {
-							builder.append(":");
-							builder.append(exception.getMessage());
+							builder.append(exception.getClass().getName());
+							String message = exception.getMessage();
+							if (message != null) {
+								builder.append(": ");
+								builder.append(message);
+							}
 						} else {
 							builder.append(getPrintedException(exception, countLoggingStackTraceElements));
 						}
@@ -477,7 +481,7 @@ public final class Logger {
 		if (cause != null) {
 			builder.append(NEW_LINE);
 			builder.append("Caused by: ");
-			builder.append(getPrintedException(cause, countStackTraceElements + length));
+			builder.append(getPrintedException(cause, countStackTraceElements - length));
 		}
 
 		return builder.toString();
