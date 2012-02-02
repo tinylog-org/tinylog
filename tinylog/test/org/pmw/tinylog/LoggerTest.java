@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.test;
+package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.Logger;
 
 /**
  * Tests for the logger.

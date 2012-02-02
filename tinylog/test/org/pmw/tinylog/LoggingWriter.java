@@ -11,10 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.test;
-
-import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.ILoggingWriter;
+package org.pmw.tinylog;
 
 /**
  * A logging writer that just save the written log entry as string.

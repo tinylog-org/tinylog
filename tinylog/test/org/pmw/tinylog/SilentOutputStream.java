@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.test;
+package org.pmw.tinylog;
 
 import java.io.IOException;
 import java.io.OutputStream;
