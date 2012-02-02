@@ -34,7 +34,6 @@ public final class Logger {
 
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
-	private static final boolean USE_SUN_REFLECTION_FOR_CALLER = isCallerClassReflectionAvailable();
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
@@ -91,7 +90,11 @@ public final class Logger {
 	 *            The logging level
 	 */
 	public static void setLoggingLevel(final String packageName, final ELoggingLevel level) {
-		packageLoggingLevels.put(packageName, level);
+		if (level == null) {
+			packageLoggingLevels.remove(packageName);
+		} else {
+			packageLoggingLevels.put(packageName, level);
+		}
 	}
 
 	/**
@@ -413,121 +416,126 @@ public final class Logger {
 	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		ILoggingWriter currentWriter = loggingWriter;
 
-		String className;
-		StackTraceElement stackTraceElement = null;
-		if (USE_SUN_REFLECTION_FOR_CALLER) {
-			try {
-				className = getCallerClassName();
-			} catch (Exception ex) {
+		if (currentWriter != null) {
+			StackTraceElement stackTraceElement = null;
+			ELoggingLevel activeLoggingLevel = loggingLevel;
+
+			if (!packageLoggingLevels.isEmpty()) {
 				stackTraceElement = getStackTraceElement();
-				className = stackTraceElement.getClassName();
+				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
 			}
-		} else {
-			stackTraceElement = getStackTraceElement();
-			className = stackTraceElement.getClassName();
-		}
 
-		if (currentWriter != null && getLoggingLevelOfClass(className).ordinal() <= level.ordinal()) {
-			try {
-				StringBuilder builder = new StringBuilder();
-
-				String threadName = null;
-				Date now = null;
-
-				for (Token token : loggingEntryTokens) {
-					switch (token.getType()) {
-						case THREAD:
-							if (threadName == null) {
-								threadName = Thread.currentThread().getName();
-							}
-							builder.append(threadName);
-							break;
-
-						case CLASS:
-							builder.append(className);
-							break;
-
-						case METHOD:
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement();
-							}
-							builder.append(stackTraceElement.getMethodName());
-							break;
-
-						case FILE:
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement();
-							}
-							builder.append(stackTraceElement.getFileName());
-							break;
-
-						case LINE_NUMBER:
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement();
-							}
-							builder.append(stackTraceElement.getLineNumber());
-							break;
-
-						case LOGGING_LEVEL:
-							builder.append(level);
-							break;
-
-						case DATE:
-							if (now == null) {
-								now = new Date();
-							}
-							DateFormat formatter = (DateFormat) token.getData();
-							String format;
-							synchronized (formatter) {
-								format = formatter.format(now);
-							}
-							builder.append(format);
-							break;
-
-						case MESSAGE:
-							if (message != null) {
-								builder.append(new MessageFormat(message, locale).format(arguments));
-							}
-							if (exception != null) {
-								if (message != null) {
-									builder.append(": ");
-								}
-								int countLoggingStackTraceElements = maxLoggingStackTraceElements;
-								if (countLoggingStackTraceElements == 0) {
-									builder.append(exception.getClass().getName());
-									String exceptionMessage = exception.getMessage();
-									if (exceptionMessage != null) {
-										builder.append(": ");
-										builder.append(exceptionMessage);
-									}
-								} else {
-									builder.append(getPrintedException(exception, countLoggingStackTraceElements));
-								}
-							}
-							break;
-
-						default:
-							builder.append(token.getData());
-							break;
-					}
+			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
+				try {
+					String logEntry = createLogEntry(level, stackTraceElement, exception, message, arguments);
+					currentWriter.write(level, logEntry);
+				} catch (Exception ex) {
+					error(ex, "Could not created log entry");
 				}
-				builder.append(NEW_LINE);
-
-				currentWriter.write(level, builder.toString());
-			} catch (Exception ex) {
-				error(ex, "Could not create log entry");
 			}
 		}
 	}
 
-	private static ELoggingLevel getLoggingLevelOfClass(final String className) {
-		if (!packageLoggingLevels.isEmpty()) {
-			int index = className.lastIndexOf('.');
-			if (index > 0) {
-				return getLoggingLevelOfPackage(className.substring(0, index));
+	private static String createLogEntry(final ELoggingLevel level, final StackTraceElement createdStackTraceElement, final Throwable exception,
+			final String message, final Object... arguments) {
+		StringBuilder builder = new StringBuilder();
+
+		String threadName = null;
+		StackTraceElement stackTraceElement = createdStackTraceElement;
+		Date now = null;
+
+		for (Token token : loggingEntryTokens) {
+			switch (token.getType()) {
+				case THREAD:
+					if (threadName == null) {
+						threadName = Thread.currentThread().getName();
+					}
+					builder.append(threadName);
+					break;
+
+				case CLASS:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement();
+					}
+					builder.append(stackTraceElement.getClassName());
+					break;
+
+				case METHOD:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement();
+					}
+					builder.append(stackTraceElement.getMethodName());
+					break;
+
+				case FILE:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement();
+					}
+					builder.append(stackTraceElement.getFileName());
+					break;
+
+				case LINE_NUMBER:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement();
+					}
+					builder.append(stackTraceElement.getLineNumber());
+					break;
+
+				case LOGGING_LEVEL:
+					builder.append(level);
+					break;
+
+				case DATE:
+					if (now == null) {
+						now = new Date();
+					}
+					DateFormat formatter = (DateFormat) token.getData();
+					String format;
+					synchronized (formatter) {
+						format = formatter.format(now);
+					}
+					builder.append(format);
+					break;
+
+				case MESSAGE:
+					if (message != null) {
+						builder.append(new MessageFormat(message, locale).format(arguments));
+					}
+					if (exception != null) {
+						if (message != null) {
+							builder.append(": ");
+						}
+						int countLoggingStackTraceElements = maxLoggingStackTraceElements;
+						if (countLoggingStackTraceElements == 0) {
+							builder.append(exception.getClass().getName());
+							String exceptionMessage = exception.getMessage();
+							if (exceptionMessage != null) {
+								builder.append(": ");
+								builder.append(exceptionMessage);
+							}
+						} else {
+							builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+						}
+					}
+					break;
+
+				default:
+					builder.append(token.getData());
+					break;
 			}
 		}
-		return loggingLevel;
+		builder.append(NEW_LINE);
+
+		return builder.toString();
+	}
+
+	private static ELoggingLevel getLoggingLevelOfClass(final String className) {
+		int index = className.lastIndexOf('.');
+		if (index > 0) {
+			return getLoggingLevelOfPackage(className.substring(0, index));
+		} else {
+			return loggingLevel;
+		}
 	}
 
 	private static ELoggingLevel getLoggingLevelOfPackage(final String packageName) {
@@ -589,21 +597,6 @@ public final class Logger {
 		}
 
 		return builder.toString();
-	}
-
-	// To use sun.reflect.Reflection to get caller class is much faster than stack trace elements!
-	private static boolean isCallerClassReflectionAvailable() {
-		try {
-			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
-			return reflectionClass.getDeclaredMethod("getCallerClass", int.class) != null;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@SuppressWarnings("restriction")
-	private static String getCallerClassName() {
-		return sun.reflect.Reflection.getCallerClass(4).getName();
 	}
 
 }
