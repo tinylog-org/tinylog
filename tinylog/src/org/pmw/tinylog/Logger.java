@@ -14,6 +14,7 @@
 package org.pmw.tinylog;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
@@ -34,10 +36,18 @@ import java.util.regex.Pattern;
  */
 public final class Logger {
 
+	private static final String PROPERTIES_FILE = "/tinylog.properties";
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {method}\n{level}: {message}";
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final Pattern NEW_LINE_REPLACER = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
+
+	private static final String TINYLOG_WRITER = "tinylog.writer";
+	private static final String TINYLOG_STACKTRACE = "tinylog.stacktrace";
+	private static final String TINYLOG_LOCALE = "tinylog.locale";
+	private static final String TINYLOG_FORMAT = "tinylog.format";
+	private static final String TINYLOG_LEVEL = "tinylog.level";
+	private static final String[] ALL_TINYLOG_PROPERTIES = new String[] { TINYLOG_LEVEL, TINYLOG_FORMAT, TINYLOG_LOCALE, TINYLOG_STACKTRACE, TINYLOG_WRITER };
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
@@ -358,7 +368,31 @@ public final class Logger {
 	}
 
 	private static void readProperties() {
-		String level = System.getProperty("tinylog.level");
+		Properties properties = new Properties();
+
+		// Load properties file if exits
+		InputStream stream = Logger.class.getResourceAsStream(PROPERTIES_FILE);
+		if (stream != null) {
+			try {
+				properties.load(stream);
+			} catch (IOException ex) {
+				// Ignore
+			}
+		}
+
+		// Load existing environment variables
+		for (String key : ALL_TINYLOG_PROPERTIES) {
+			String value = System.getProperty(key);
+			if (value != null && !value.isEmpty()) {
+				properties.setProperty(key, value);
+			}
+		}
+
+		readProperties(properties);
+	}
+
+	private static void readProperties(final Properties properties) {
+		String level = properties.getProperty(TINYLOG_LEVEL);
 		if (level != null && !level.isEmpty()) {
 			try {
 				setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase()));
@@ -367,12 +401,12 @@ public final class Logger {
 			}
 		}
 
-		String format = System.getProperty("tinylog.format");
+		String format = properties.getProperty(TINYLOG_FORMAT);
 		if (format != null && !format.isEmpty()) {
 			setLoggingFormat(format);
 		}
 
-		String localeString = System.getProperty("tinylog.locale");
+		String localeString = properties.getProperty(TINYLOG_LOCALE);
 		if (localeString != null && !localeString.isEmpty()) {
 			String[] localeArray = localeString.split("_", 3);
 			if (localeArray.length == 1) {
@@ -384,7 +418,7 @@ public final class Logger {
 			}
 		}
 
-		String stacktace = System.getProperty("tinylog.stacktrace");
+		String stacktace = properties.getProperty(TINYLOG_STACKTRACE);
 		if (stacktace != null && !stacktace.isEmpty()) {
 			try {
 				int limit = Integer.parseInt(stacktace);
@@ -394,7 +428,7 @@ public final class Logger {
 			}
 		}
 
-		String writer = System.getProperty("tinylog.writer");
+		String writer = properties.getProperty(TINYLOG_WRITER);
 		if (writer != null && !writer.isEmpty()) {
 			if (writer.equals("null")) {
 				setWriter(null);
