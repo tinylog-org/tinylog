@@ -430,12 +430,13 @@ public final class Logger {
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
+				String logEntry;
 				try {
-					String logEntry = createLogEntry(level, stackTraceElement, exception, message, arguments);
-					currentWriter.write(level, logEntry);
+					logEntry = createLogEntry(level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					error(ex, "Could not created log entry");
+					logEntry = createLogEntry(ELoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
+				currentWriter.write(level, logEntry);
 			}
 		}
 	}
@@ -563,7 +564,7 @@ public final class Logger {
 		if (stackTraceElements.length > deep) {
 			return stackTraceElements[deep];
 		} else {
-			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
+			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", 0);
 		}
 	}
 

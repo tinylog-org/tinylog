@@ -269,6 +269,31 @@ public class LoggerTest {
 	}
 
 	/**
+	 * Test case if failed to create log entry.
+	 */
+	@Test
+	public final void testFailedLogEntry() {
+		LoggingWriter writer = new LoggingWriter();
+		Logger.setWriter(writer);
+		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setMaxStackTraceElements(0);
+
+		Object object = new Object() {
+
+			@Override
+			public String toString() {
+				throw new NullPointerException();
+			}
+
+		};
+
+		Logger.setLoggingFormat("{level}#{class}#{message}");
+		Logger.info("{0}", object);
+		assertEquals(MessageFormat.format("ERROR#{0}#Could not created log entry: {1}{2}", LoggerTest.class.getName(), NullPointerException.class.getName(),
+				NEW_LINE), writer.consumeMessage());
+	}
+
+	/**
 	 * Test log entries which display exceptions.
 	 */
 	@Test
