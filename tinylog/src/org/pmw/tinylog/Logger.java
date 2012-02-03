@@ -425,7 +425,7 @@ public final class Logger {
 			ELoggingLevel activeLoggingLevel = loggingLevel;
 
 			if (!packageLoggingLevels.isEmpty()) {
-				stackTraceElement = getStackTraceElement();
+				stackTraceElement = getStackTraceElement(4);
 				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
 			}
 
@@ -459,28 +459,28 @@ public final class Logger {
 
 				case CLASS:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement();
+						stackTraceElement = getStackTraceElement(5);
 					}
 					builder.append(stackTraceElement.getClassName());
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement();
+						stackTraceElement = getStackTraceElement(5);
 					}
 					builder.append(stackTraceElement.getMethodName());
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement();
+						stackTraceElement = getStackTraceElement(5);
 					}
 					builder.append(stackTraceElement.getFileName());
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement();
+						stackTraceElement = getStackTraceElement(5);
 					}
 					builder.append(stackTraceElement.getLineNumber());
 					break;
@@ -558,10 +558,10 @@ public final class Logger {
 		}
 	}
 
-	private static StackTraceElement getStackTraceElement() {
+	private static StackTraceElement getStackTraceElement(final int deep) {
 		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-		if (stackTraceElements.length > 4) {
-			return stackTraceElements[4];
+		if (stackTraceElements.length > deep) {
+			return stackTraceElements[deep];
 		} else {
 			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
 		}
