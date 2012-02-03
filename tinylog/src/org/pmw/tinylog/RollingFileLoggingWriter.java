@@ -36,7 +36,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 *             Failed to open or create the log file
 	 */
 	public RollingFileLoggingWriter(final String filename, final int maxBackups) throws IOException {
-		this(filename, maxBackups, -1);
+		this(filename, maxBackups, 0);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 * @param maxBackups
 	 *            Number of backups
 	 * @param maxSize
-	 *            Maximum size of log files in bytes
+	 *            Maximum number of characters to write in a log file ("0" for no limitation)
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
@@ -76,7 +76,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 			writer.write(level, logEntry);
 		} else {
 			synchronized (this) {
-				if (size + logEntry.length() > maxSize) {
+				if (size + logEntry.getBytes().length > maxSize) {
 					try {
 						writer.close();
 						roll();
