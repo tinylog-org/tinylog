@@ -244,11 +244,14 @@ public class PropertiesLoaderTest {
 		assertNull(writer);
 
 		File file = File.createTempFile("test", "tmp");
-		System.setProperty("tinylog.writer", "file:" + file.getAbsolutePath());
+		file.deleteOnExit();
+		System.setProperty("tinylog.writer", "file");
+		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(FileLoggingWriter.class, writer.getClass());
+		file.delete();
 
 		System.setProperty("tinylog.writer", ConsoleLoggingWriter.class.getName());
 		PropertiesLoader.reload();
@@ -257,11 +260,51 @@ public class PropertiesLoaderTest {
 		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
 
 		file = File.createTempFile("test", "tmp");
-		System.setProperty("tinylog.writer", FileLoggingWriter.class.getName() + ":" + file.getAbsolutePath());
+		file.deleteOnExit();
+		System.setProperty("tinylog.writer", FileLoggingWriter.class.getName());
+		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(FileLoggingWriter.class, writer.getClass());
+		file.delete();
+
+		file = File.createTempFile("test", "tmp");
+		file.deleteOnExit();
+		System.setProperty("tinylog.writer", "rollingfile");
+		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
+		System.setProperty("tinylog.writer.maxBackups", "0");
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(RollingFileLoggingWriter.class, writer.getClass());
+		file.delete();
+
+		Logger.setWriter(null);
+
+		file = File.createTempFile("test", "tmp");
+		file.deleteOnExit();
+		System.setProperty("tinylog.writer", "rollingfile");
+		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
+		System.setProperty("tinylog.writer.maxBackups", "0");
+		System.setProperty("tinylog.writer.maxFiles", "0");
+		PropertiesLoader.reload();
+		writer = Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(RollingFileLoggingWriter.class, writer.getClass());
+		file.delete();
+
+		Logger.setWriter(null);
+
+		file = File.createTempFile("test", "tmp");
+		file.deleteOnExit();
+		System.setProperty("tinylog.writer", "rollingfile");
+		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
+		System.setProperty("tinylog.writer.maxBackups", "invalid");
+		System.clearProperty("tinylog.writer.maxFiles");
+		PropertiesLoader.reload();
+		assertNull(Logger.getWriter());
+		file.delete();
 	}
 
 	/**

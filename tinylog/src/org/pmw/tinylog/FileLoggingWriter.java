@@ -35,6 +35,17 @@ public class FileLoggingWriter implements ILoggingWriter {
 		this.writer = new BufferedWriter(new FileWriter(filename));
 	}
 
+	/**
+	 * Returns the supported properties for this writer.
+	 * 
+	 * The file logging writer needs a "filename" for initiation.
+	 * 
+	 * @return One string array with the property "filename"
+	 */
+	public static String[][] getSupportedProperties() {
+		return new String[][] { new String[] { "filename" } };
+	}
+
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
 		try {
