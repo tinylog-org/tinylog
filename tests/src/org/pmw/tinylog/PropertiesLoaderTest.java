@@ -87,6 +87,10 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel("org.pmw.tinylog"));
 
+		System.setProperty("tinylog.level:org.pmw.tinylog", "invalid");
+		PropertiesLoader.reload();
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+
 		Logger.resetAllLoggingLevel();
 	}
 

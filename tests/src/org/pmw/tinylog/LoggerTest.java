@@ -49,6 +49,12 @@ public class LoggerTest {
 
 		Logger.setLoggingLevel(ELoggingLevel.OFF);
 		assertEquals(ELoggingLevel.OFF, Logger.getLoggingLevel());
+
+		Logger.setLoggingLevel(ELoggingLevel.ERROR);
+		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+
+		Logger.setLoggingLevel(null);
+		assertEquals(ELoggingLevel.OFF, Logger.getLoggingLevel());
 	}
 
 	/**
@@ -104,6 +110,7 @@ public class LoggerTest {
 	public final void testLoggingWriter() {
 		Logger.setWriter(null);
 		assertNull(Logger.getWriter());
+		Logger.info("My message"); // Must NOT thrown any exception but ignore the log entry
 
 		ILoggingWriter writer = new ConsoleLoggingWriter();
 		Logger.setWriter(writer);
@@ -228,6 +235,12 @@ public class LoggerTest {
 		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
 
 		Logger.resetLoggingLevel("a.b");
+		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+
+		Logger.setLoggingLevel("a.b", ELoggingLevel.DEBUG);
+		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+
+		Logger.setLoggingLevel("a.b", null);
 		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
 
 		Logger.debug("Hello!");
