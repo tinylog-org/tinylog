@@ -15,7 +15,7 @@ package org.pmw.benchmark;
 
 public class SingleThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 
-	private static final int LOGGING_ITERATIONS = 1000;
+	private static final int LOGGING_ITERATIONS = 20000;
 
 	public SingleThreadBenchmarkRunner(final IBenchmark benchmark) {
 		super(benchmark.getName() + " (single thread)", benchmark);

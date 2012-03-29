@@ -15,10 +15,12 @@ package org.pmw.benchmark;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 public abstract class AbstractBenchmarkRunner {
 
-	private static final int BENCHMARK_ITERATIONS = 100;
+	private static final int BENCHMARK_ITERATIONS = 120;
+	private static final int OUTLIERS_CUT = 10;
 	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
 
 	private final String name;
@@ -37,17 +39,20 @@ public abstract class AbstractBenchmarkRunner {
 			files[i] = file;
 		}
 
-		long start = System.currentTimeMillis();
-
+		long[] times = new long[BENCHMARK_ITERATIONS];
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
 			benchmark.init(files[i]);
+
+			long start = System.currentTimeMillis();
 			run(benchmark);
+			long finished = System.currentTimeMillis();
+			times[i] = finished - start;
+
 			benchmark.dispose();
 		}
 
-		long finished = System.currentTimeMillis();
-		long time = finished - start;
-		long iterations = BENCHMARK_ITERATIONS * countLogEntries();
+		long time = calcTime(times);
+		long iterations = (BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2) * countLogEntries();
 		long iterationsPerSecond = Math.round(iterations * 1000d / time);
 
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
@@ -61,4 +66,12 @@ public abstract class AbstractBenchmarkRunner {
 
 	protected abstract void run(IBenchmark benchmark);
 
+	private long calcTime(final long[] times) {
+		Arrays.sort(times);
+		long time = 0L;
+		for (int i = OUTLIERS_CUT; i < BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2; ++i) {
+			time += times[i];
+		}
+		return time;
+	}
 }
