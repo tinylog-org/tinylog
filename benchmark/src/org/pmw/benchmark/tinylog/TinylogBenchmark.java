@@ -22,6 +22,8 @@ import org.pmw.tinylog.Logger;
 
 public class TinylogBenchmark implements IBenchmark {
 
+	private FileLoggingWriter writer;
+
 	@Override
 	public String getName() {
 		return "tinylog";
@@ -38,14 +40,15 @@ public class TinylogBenchmark implements IBenchmark {
 
 	@Override
 	public void init(final File file) throws Exception {
-		Logger.setWriter(new FileLoggingWriter(file.getAbsolutePath()));
+		writer = new FileLoggingWriter(file.getAbsolutePath());
+		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
 	}
 
 	@Override
 	public void dispose() throws Exception {
-
+		writer.close();
 	}
 
 }

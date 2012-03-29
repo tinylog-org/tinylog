@@ -57,6 +57,7 @@ public class NativeLoggerBenchmark implements IBenchmark {
 
 	@Override
 	public void dispose() throws Exception {
+		handler.close();
 		logger.removeHandler(handler);
 	}
 

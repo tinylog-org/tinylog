@@ -27,6 +27,7 @@ import ch.qos.logback.core.FileAppender;
 public class LogbackBenchmark implements IBenchmark {
 
 	private Logger logger;
+	private FileAppender<ILoggingEvent> appender;
 
 	@Override
 	public String getName() {
@@ -48,7 +49,7 @@ public class LogbackBenchmark implements IBenchmark {
 
 		logger = context.getLogger(Logger.ROOT_LOGGER_NAME);
 
-		FileAppender<ILoggingEvent> appender = new FileAppender<ILoggingEvent>();
+		appender = new FileAppender<ILoggingEvent>();
 		appender.setContext(context);
 		appender.setAppend(false);
 		appender.setFile(file.getAbsolutePath());
@@ -67,7 +68,7 @@ public class LogbackBenchmark implements IBenchmark {
 
 	@Override
 	public void dispose() throws Exception {
-
+		appender.stop();
 	}
 
 }
