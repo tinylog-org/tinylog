@@ -14,7 +14,9 @@
 package org.pmw.tinylog;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Writes log entries to a file like {@link org.pmw.tinylog.FileLoggingWriter} but keep backups of old logging files.
@@ -25,7 +27,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	private final int maxBackups;
 	private final int maxSize;
 	private int size;
-	private FileLoggingWriter writer;
+	private OutputStream out;
 
 	/**
 	 * @param filename
@@ -55,7 +57,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 		this.maxSize = maxSize;
 		this.size = 0;
 		roll();
-		this.writer = new FileLoggingWriter(file.getPath());
+		this.out = new FileOutputStream(filename);
 	}
 
 	/**
@@ -73,21 +75,23 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
 		if (maxSize <= 0) {
-			writer.write(level, logEntry);
+			write(logEntry.getBytes());
 		} else {
 			synchronized (this) {
-				if (size + logEntry.getBytes().length > maxSize) {
+				byte[] bytes = logEntry.getBytes();
+				int length = bytes.length;
+				if (size + length > maxSize) {
 					try {
-						writer.close();
+						out.close();
 						roll();
-						writer = new FileLoggingWriter(file.getPath());
+						out = new FileOutputStream(file);
 						size = 0;
 					} catch (IOException ex) {
 						throw new RuntimeException(ex);
 					}
 				}
-				size += logEntry.length();
-				writer.write(level, logEntry);
+				size += length;
+				write(bytes);
 			}
 		}
 	}
@@ -100,7 +104,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 */
 	public final void close() throws IOException {
 		synchronized (this) {
-			writer.close();
+			out.close();
 		}
 	}
 
@@ -138,6 +142,14 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 			baseFile.renameTo(targetFile);
 		} else {
 			baseFile.delete();
+		}
+	}
+
+	private void write(final byte[] bytes) {
+		try {
+			out.write(bytes);
+		} catch (IOException ex) {
+			ex.printStackTrace(System.err);
 		}
 	}
 
