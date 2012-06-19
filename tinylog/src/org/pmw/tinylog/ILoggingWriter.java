@@ -19,7 +19,7 @@ package org.pmw.tinylog;
  * Instances of <code>ILoggingWriter</code> can implement a static method
  * <code>public static String[][] getSupportedProperties()</code> to support properties.
  * 
- * @see Logger#setWriter(ILoggingWriter)
+ * @see org.pmw.tinylog.Logger#setWriter(ILoggingWriter)
  */
 public interface ILoggingWriter {
 

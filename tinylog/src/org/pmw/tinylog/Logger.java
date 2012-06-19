@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link ELoggingLevel#INFO}, which ignores trace and debug log entries.
+ * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO}, which ignores trace and debug log entries.
  */
 public final class Logger {
 
