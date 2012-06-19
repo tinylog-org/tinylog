@@ -64,10 +64,10 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	/**
 	 * Returns the supported properties for this writer.
 	 * 
-	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally the
-	 * limit for file size ("maxSize") for initiation.
+	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally a
+	 * limit for the maximum file size of log files ("maxSize").
 	 * 
-	 * @return Two string array with and without the property "maxSize"
+	 * @return Two string arrays with and without the property "maxSize"
 	 */
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "maxSize" } };
