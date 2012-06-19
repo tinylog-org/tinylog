@@ -31,7 +31,6 @@ public class FileLoggingWriter implements ILoggingWriter {
 	 *             Failed to open or create the log file
 	 */
 	public FileLoggingWriter(final String filename) throws IOException {
-		super();
 		this.writer = new BufferedWriter(new FileWriter(filename));
 	}
 
