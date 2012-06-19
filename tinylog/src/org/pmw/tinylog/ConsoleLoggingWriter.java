@@ -20,12 +20,6 @@ import java.io.PrintStream;
  */
 public class ConsoleLoggingWriter implements ILoggingWriter {
 
-	/** 
-	 */
-	public ConsoleLoggingWriter() {
-		super();
-	}
-
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
 		getPrintStream(level).print(logEntry);
