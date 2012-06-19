@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * Convert a format pattern to a list of tokens.
+ * Converts a format pattern for log entries to a list of tokens.
  * 
  * @see Logger#setLoggingFormat(String)
  */
@@ -37,10 +37,10 @@ final class Tokenizer {
 	 * Parse a format pattern.
 	 * 
 	 * @param formatPattern
-	 *            Format pattern for logging entries
+	 *            Format pattern for log entries
 	 * 
 	 * @param locale
-	 *            Locale for formats
+	 *            Locale for formatting
 	 * 
 	 * @return List of tokens
 	 */

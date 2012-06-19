@@ -44,7 +44,7 @@ enum EToken {
 	METHOD,
 
 	/**
-	 * The filename of the caller
+	 * The source filename of the caller
 	 */
 	FILE,
 
@@ -61,7 +61,7 @@ enum EToken {
 	LOGGING_LEVEL,
 
 	/**
-	 * The logging message (including the possible exception stack trace)
+	 * The logging message (including a possible exception stack trace)
 	 */
 	MESSAGE;
 

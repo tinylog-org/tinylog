@@ -14,7 +14,7 @@
 package org.pmw.tinylog;
 
 /**
- * The logging format pattern will be split in tokens.
+ * The format pattern for log entries will be split in tokens.
  * 
  * @see Logger#setLoggingFormat(String)
  */
@@ -37,7 +37,7 @@ final class Token {
 	 * @param type
 	 *            Token type
 	 * @param data
-	 *            Additional data for token (can be <code>null</code>)
+	 *            Additional data for the token (can be <code>null</code>)
 	 */
 	public Token(final EToken type, final Object data) {
 		this.type = type;
@@ -45,7 +45,7 @@ final class Token {
 	}
 
 	/**
-	 * Get the token type.
+	 * Returns the token type.
 	 * 
 	 * @return Token type
 	 */
@@ -54,7 +54,7 @@ final class Token {
 	}
 
 	/**
-	 * Get the additional data of the token.
+	 * Returns the additional data of the token.
 	 * 
 	 * @return Additional data (can be <code>null</code>)
 	 */

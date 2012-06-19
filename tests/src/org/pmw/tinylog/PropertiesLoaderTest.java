@@ -313,7 +313,7 @@ public class PropertiesLoaderTest {
 	@Test
 	public final void testLoadFromFile() {
 		PropertiesLoader.reload();
-		PropertiesLoader.loadFile("./propertiesLoaderTest.properties");
+		PropertiesLoader.loadFromFile("./propertiesLoaderTest.properties");
 		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
 		assertEquals("Hello from file!", Logger.getLoggingFormat());
 		assertEquals(Locale.US, Logger.getLocale());

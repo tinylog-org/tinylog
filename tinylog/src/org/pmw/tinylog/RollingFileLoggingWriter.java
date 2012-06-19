@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Writes log entries to a file like {@link org.pmw.tinylog.FileLoggingWriter} but keep backups of old logging files.
+ * Writes log entries to a file like {@link FileLoggingWriter} but keeps backups of old logging files.
  */
 public class RollingFileLoggingWriter implements ILoggingWriter {
 

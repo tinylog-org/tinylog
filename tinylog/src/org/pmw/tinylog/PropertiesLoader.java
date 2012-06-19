@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Load and set properties for logger from file and environment variables.
+ * Loads and sets properties for {@link Logger} from the properties files and from environment variables.
  */
 public final class PropertiesLoader {
 
@@ -40,7 +40,7 @@ public final class PropertiesLoader {
 	}
 
 	/**
-	 * Reload properties from environment variables and from default properties file ("/tinylog.properties").
+	 * Reload properties from environment variables and from the default properties file ("/tinylog.properties").
 	 */
 	public static void reload() {
 		Properties properties = getPropertiesFromFile(PROPERTIES_FILE);
@@ -49,12 +49,12 @@ public final class PropertiesLoader {
 	}
 
 	/**
-	 * Load properties from a file.
+	 * Load properties from a properties file.
 	 * 
 	 * @param file
 	 *            File in classpath to load
 	 */
-	public static void loadFile(final String file) {
+	public static void loadFromFile(final String file) {
 		Properties properties = getPropertiesFromFile(file);
 		readProperties(properties);
 	}

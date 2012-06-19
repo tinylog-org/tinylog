@@ -14,12 +14,12 @@
 package org.pmw.tinylog;
 
 /**
- * Logging writers output created log entries of {@link org.pmw.tinylog.Logger}.
+ * Logging writers output created log entries from {@link Logger}.
  * 
- * Instances of <code>ILoggingWriter</code> should also implement a static method
+ * Instances of <code>ILoggingWriter</code> can implement a static method
  * <code>public static String[][] getSupportedProperties()</code> to support properties.
  * 
- * @see org.pmw.tinylog.Logger#setWriter(ILoggingWriter)
+ * @see Logger#setWriter(ILoggingWriter)
  */
 public interface ILoggingWriter {
 

@@ -26,9 +26,7 @@ import java.util.Map;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO} which ignores trace and debug log entries.
- * 
- * An {@link org.pmw.tinylog.ILoggingWriter} must be set to create any output.
+ * The default logging level is {@link ELoggingLevel#INFO}, which ignores trace and debug log entries.
  */
 public final class Logger {
 
@@ -60,7 +58,8 @@ public final class Logger {
 	}
 
 	/**
-	 * Change the logging level. The logger creates only log entries for the current logging level or higher.
+	 * Change the logging level. The logger creates and outputs only log entries for the current logging level and
+	 * higher.
 	 * 
 	 * @param level
 	 *            New logging level
@@ -74,10 +73,10 @@ public final class Logger {
 	}
 
 	/**
-	 * Returns the logging level of a package.
+	 * Returns the logging level for a package.
 	 * 
 	 * @param packageName
-	 *            Name of package
+	 *            Name of the package
 	 * 
 	 * @return The logging level
 	 */
@@ -86,12 +85,14 @@ public final class Logger {
 	}
 
 	/**
-	 * Sets the logging level of a package.
+	 * Set the logging level for a package.
+	 * 
+	 * This will override the default logging level for this package.
 	 * 
 	 * @param packageName
-	 *            Name of package
+	 *            Name of the package
 	 * @param level
-	 *            The logging level
+	 *            The logging level (or <code>null</code> to reset it to the default logging level)
 	 */
 	public static void setLoggingLevel(final String packageName, final ELoggingLevel level) {
 		if (level == null) {
@@ -102,17 +103,17 @@ public final class Logger {
 	}
 
 	/**
-	 * Resets the logging level of a package to default (to use the current logging level again).
+	 * Reset the logging level for a package (to use the default logging level again).
 	 * 
 	 * @param packageName
-	 *            Name of package
+	 *            Name of the package
 	 */
 	public static void resetLoggingLevel(final String packageName) {
 		packageLoggingLevels.remove(packageName);
 	}
 
 	/**
-	 * Resets all logging level for packages to default (to use the current logging level again).
+	 * Reset all package depending logging levels (to use the default logging level again).
 	 */
 	public static void resetAllLoggingLevel() {
 		packageLoggingLevels.clear();
@@ -121,14 +122,14 @@ public final class Logger {
 	/**
 	 * Returns the format pattern for log entries.
 	 * 
-	 * @return Format pattern for log entries.
+	 * @return Format pattern for log entries
 	 */
 	public static String getLoggingFormat() {
 		return loggingFormat;
 	}
 
 	/**
-	 * Sets the format pattern for log entries.
+	 * Change the format pattern for log entries.
 	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"</code> is the default format
 	 * pattern. The date format pattern is compatible with {@link SimpleDateFormat}.
 	 * 
@@ -147,23 +148,21 @@ public final class Logger {
 	}
 
 	/**
-	 * Gets the locale for message format.
+	 * Returns the locale, which is used in format patterns for log entries.
 	 * 
-	 * @return Locale for message format
-	 * 
-	 * @see MessageFormat#getLocale()
+	 * @return Locale for format patterns
 	 */
 	public static Locale getLocale() {
 		return locale;
 	}
 
 	/**
-	 * Sets the locale for message format.
+	 * Change the locale, which is used in format patterns for log entries.
+	 * 
+	 * It will be used e. g. to format numbers and dates.
 	 * 
 	 * @param locale
-	 *            Locale for message format
-	 * 
-	 * @see MessageFormat#setLocale(Locale)
+	 *            Locale for format patterns
 	 */
 	public static void setLocale(final Locale locale) {
 		if (locale == null) {
@@ -184,8 +183,8 @@ public final class Logger {
 	}
 
 	/**
-	 * Sets the limit of stack traces for exceptions (default is 40). Set "-1" for no limitation and "0" to disable any
-	 * stack traces.
+	 * Change the limit of stack traces for exceptions (default is 40). Can be set to "-1" for no limitation and to "0"
+	 * to disable any stack traces.
 	 * 
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces
@@ -208,10 +207,10 @@ public final class Logger {
 	}
 
 	/**
-	 * Register a logging writer to output the created log entries.
+	 * Register a logging writer for outputting the created log entries.
 	 * 
 	 * @param writer
-	 *            Logging writer to add (can be <code>null</code> to disable any output)
+	 *            New logging writer (can be <code>null</code> to disable any output)
 	 */
 	public static void setWriter(final ILoggingWriter writer) {
 		loggingWriter = writer;

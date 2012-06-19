@@ -39,7 +39,7 @@ public class FileLoggingWriter implements ILoggingWriter {
 	 * 
 	 * The file logging writer needs a "filename" for initiation.
 	 * 
-	 * @return One string array with the property "filename"
+	 * @return String array with the single property "filename"
 	 */
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename" } };
