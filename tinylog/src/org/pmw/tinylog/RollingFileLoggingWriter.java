@@ -14,6 +14,7 @@
 package org.pmw.tinylog;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -83,10 +84,14 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 				if (size + length > maxSize) {
 					try {
 						out.close();
-						roll();
+					} catch (IOException ex) {
+						ex.printStackTrace(System.err);
+					}
+					roll();
+					try {
 						out = new FileOutputStream(file);
 						size = 0;
-					} catch (IOException ex) {
+					} catch (FileNotFoundException ex) {
 						throw new RuntimeException(ex);
 					}
 				}
