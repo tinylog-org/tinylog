@@ -21,7 +21,7 @@ specific language governing permissions and limitations under the License.
 2) Optionally attach "tinylog-src.zip" for JavaDoc documentation and source
    code attachment
 
-3) You can now test the logger by the following simple program:
+3) Now you can test the logger by the following simple program:
 
       import org.pmw.tinylog.Logger;
 
@@ -38,4 +38,4 @@ specific language governing permissions and limitations under the License.
    You should see a log statement appearing on the console.
 
 4) A detailed user manual and the JavaDoc documentation can be found on
-   http://www.pmwmedia.de/tinylog
+   http://www.tinylog.org/
