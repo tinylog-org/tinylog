@@ -53,7 +53,7 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" />
+		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" target="1.5" />
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false">
 			<classpath refid="junit.classpath" />
 			<classpath location="${bin}" />
