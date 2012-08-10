@@ -133,11 +133,11 @@ public final class PropertiesLoader {
 				Logger.setWriter(null);
 			} else {
 				if (writer.equals("console")) {
-					writer = ConsoleLoggingWriter.class.getName();
+					writer = ConsoleWriter.class.getName();
 				} else if (writer.equals("file")) {
-					writer = FileLoggingWriter.class.getName();
+					writer = FileWriter.class.getName();
 				} else if (writer.equals("rollingfile")) {
-					writer = RollingFileLoggingWriter.class.getName();
+					writer = RollingFileWriter.class.getName();
 				}
 				loadAndSetWriter(properties, writer);
 			}

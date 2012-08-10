@@ -18,7 +18,7 @@ import java.io.PrintStream;
 /**
  * Writes log entries to the console.
  */
-public class ConsoleLoggingWriter implements ILoggingWriter {
+public class ConsoleWriter implements ILoggingWriter {
 
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {

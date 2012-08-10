@@ -28,9 +28,9 @@ import org.junit.Test;
 /**
  * Tests for the file logging writer.
  * 
- * @see org.pmw.tinylog.FileLoggingWriter
+ * @see org.pmw.tinylog.FileWriter
  */
-public class FileLoggingWriterTest {
+public class FileWriterTest {
 
 	/**
 	 * Test writing.
@@ -42,7 +42,7 @@ public class FileLoggingWriterTest {
 	public final void testWriting() throws IOException {
 		File file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
-		FileLoggingWriter writer = new FileLoggingWriter(file.getAbsolutePath());
+		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		writer.write(ELoggingLevel.INFO, "Hello\n");
 		writer.write(ELoggingLevel.INFO, "World\n");
 		writer.close();

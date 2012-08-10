@@ -34,7 +34,7 @@ public final class Logger {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private static volatile int maxLoggingStackTraceElements = 40;
-	private static volatile ILoggingWriter loggingWriter = new ConsoleLoggingWriter();
+	private static volatile ILoggingWriter loggingWriter = new ConsoleWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static final Map<String, ELoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, ELoggingLevel>());
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;

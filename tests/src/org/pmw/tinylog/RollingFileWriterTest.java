@@ -29,9 +29,9 @@ import org.junit.Test;
 /**
  * Tests for the rolling file logging writer.
  * 
- * @see org.pmw.tinylog.RollingFileLoggingWriter
+ * @see org.pmw.tinylog.RollingFileWriter
  */
-public class RollingFileLoggingWriterTest {
+public class RollingFileWriterTest {
 
 	/**
 	 * Test writing.
@@ -44,7 +44,7 @@ public class RollingFileLoggingWriterTest {
 		File file = File.createTempFile("test", "tmp");
 		file.delete();
 		file.deleteOnExit();
-		RollingFileLoggingWriter writer = new RollingFileLoggingWriter(file.getAbsolutePath(), 0);
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
 		writer.write(ELoggingLevel.INFO, "Hello\n");
 		writer.write(ELoggingLevel.INFO, "World\n");
 		writer.close();
@@ -82,7 +82,7 @@ public class RollingFileLoggingWriterTest {
 		File backupFile3 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".2.tmp");
 		backupFile3.deleteOnExit();
 
-		RollingFileLoggingWriter writer = new RollingFileLoggingWriter(baseFile.getAbsolutePath(), 2);
+		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
 		writer.write(ELoggingLevel.INFO, "1");
 		writer.close();
 
@@ -90,7 +90,7 @@ public class RollingFileLoggingWriterTest {
 		assertTrue(backupFile1.exists());
 		assertFalse(backupFile2.exists());
 
-		writer = new RollingFileLoggingWriter(baseFile.getAbsolutePath(), 2);
+		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
 		writer.write(ELoggingLevel.INFO, "2");
 		writer.close();
 
@@ -99,7 +99,7 @@ public class RollingFileLoggingWriterTest {
 		assertTrue(backupFile2.exists());
 		assertFalse(backupFile3.exists());
 
-		writer = new RollingFileLoggingWriter(baseFile.getAbsolutePath(), 2);
+		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
 		writer.write(ELoggingLevel.INFO, "3");
 		writer.close();
 
@@ -139,7 +139,7 @@ public class RollingFileLoggingWriterTest {
 		File backupFile = new File(baseFile.getPath() + ".0");
 		backupFile.deleteOnExit();
 
-		RollingFileLoggingWriter writer = new RollingFileLoggingWriter(baseFile.getAbsolutePath(), 1, 3);
+		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 1, 3);
 		backupFile.delete();
 		writer.write(ELoggingLevel.INFO, "1");
 		writer.write(ELoggingLevel.INFO, "2");

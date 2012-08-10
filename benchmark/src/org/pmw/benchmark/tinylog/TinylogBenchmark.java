@@ -17,12 +17,12 @@ import java.io.File;
 
 import org.pmw.benchmark.IBenchmark;
 import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.FileLoggingWriter;
+import org.pmw.tinylog.FileWriter;
 import org.pmw.tinylog.Logger;
 
 public class TinylogBenchmark implements IBenchmark {
 
-	private FileLoggingWriter writer;
+	private FileWriter writer;
 
 	@Override
 	public String getName() {
@@ -40,7 +40,7 @@ public class TinylogBenchmark implements IBenchmark {
 
 	@Override
 	public void init(final File file) throws Exception {
-		writer = new FileLoggingWriter(file.getAbsolutePath());
+		writer = new FileWriter(file.getAbsolutePath());
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");

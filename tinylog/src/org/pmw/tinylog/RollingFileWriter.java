@@ -20,9 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Writes log entries to a file like {@link FileLoggingWriter} but keeps backups of old logging files.
+ * Writes log entries to a file like {@link FileWriter} but keeps backups of old logging files.
  */
-public class RollingFileLoggingWriter implements ILoggingWriter {
+public class RollingFileWriter implements ILoggingWriter {
 
 	private final File file;
 	private final int maxBackups;
@@ -38,7 +38,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileLoggingWriter(final String filename, final int maxBackups) throws IOException {
+	public RollingFileWriter(final String filename, final int maxBackups) throws IOException {
 		this(filename, maxBackups, 0);
 	}
 
@@ -52,7 +52,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileLoggingWriter(final String filename, final int maxBackups, final int maxSize) throws IOException {
+	public RollingFileWriter(final String filename, final int maxBackups, final int maxSize) throws IOException {
 		this.file = new File(filename);
 		this.maxBackups = Math.max(0, maxBackups);
 		this.maxSize = maxSize;

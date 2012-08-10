@@ -16,7 +16,7 @@ public class RegressionsTest {
 	 */
 	@Test
 	public final void testWrongClass() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);
 		Logger.setLoggingFormat("{class}");

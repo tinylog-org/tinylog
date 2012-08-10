@@ -112,7 +112,7 @@ public class LoggerTest {
 		assertNull(Logger.getWriter());
 		Logger.info("My message"); // Must NOT thrown any exception but ignore the log entry
 
-		ILoggingWriter writer = new ConsoleLoggingWriter();
+		ILoggingWriter writer = new ConsoleWriter();
 		Logger.setWriter(writer);
 		assertEquals(writer, Logger.getWriter());
 	}
@@ -122,7 +122,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testTrace() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);
 		Logger.setLoggingFormat("{message}");
@@ -142,7 +142,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testDebug() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.DEBUG);
 		Logger.setLoggingFormat("{message}");
@@ -162,7 +162,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testInfo() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
@@ -182,7 +182,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testWarn() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.WARNING);
 		Logger.setLoggingFormat("{message}");
@@ -202,7 +202,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testError() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.ERROR);
 		Logger.setLoggingFormat("{message}");
@@ -223,7 +223,7 @@ public class LoggerTest {
 	@Test
 	public final void testPackageLoggingLevel() {
 
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
@@ -268,7 +268,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testFullLogEntry() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}");
@@ -286,7 +286,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testFailedLogEntry() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setMaxStackTraceElements(0);
@@ -311,7 +311,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testExceptions() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
@@ -358,7 +358,7 @@ public class LoggerTest {
 				public void run() {
 					try {
 						for (int n = 0; n < 100; ++n) {
-							Logger.setWriter(new LoggingWriter());
+							Logger.setWriter(new StoreWriter());
 							Logger.setLoggingLevel(ELoggingLevel.TRACE);
 							Logger.info("Test threading! This is log entry {0}.", n);
 						}

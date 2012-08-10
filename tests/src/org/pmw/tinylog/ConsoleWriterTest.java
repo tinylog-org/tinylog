@@ -25,11 +25,11 @@ import org.junit.Test;
 /**
  * Tests for the console logging writer.
  * 
- * @see org.pmw.tinylog.ConsoleLoggingWriter
+ * @see org.pmw.tinylog.ConsoleWriter
  */
-public class ConsoleLoggingWriterTest {
+public class ConsoleWriterTest {
 
-	private ConsoleLoggingWriter writer;
+	private ConsoleWriter writer;
 
 	private PrintStream defaultErrorStream;
 	private PrintStream defaultOutputStream;
@@ -42,7 +42,7 @@ public class ConsoleLoggingWriterTest {
 	 */
 	@Before
 	public final void init() {
-		writer = new ConsoleLoggingWriter();
+		writer = new ConsoleWriter();
 
 		defaultErrorStream = System.err;
 		errorStream = new SilentOutputStream();

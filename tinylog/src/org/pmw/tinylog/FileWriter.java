@@ -14,13 +14,12 @@
 package org.pmw.tinylog;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**
  * Writes log entries to a file.
  */
-public class FileLoggingWriter implements ILoggingWriter {
+public class FileWriter implements ILoggingWriter {
 
 	private final BufferedWriter writer;
 
@@ -30,8 +29,8 @@ public class FileLoggingWriter implements ILoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public FileLoggingWriter(final String filename) throws IOException {
-		this.writer = new BufferedWriter(new FileWriter(filename));
+	public FileWriter(final String filename) throws IOException {
+		this.writer = new BufferedWriter(new java.io.FileWriter(filename));
 	}
 
 	/**

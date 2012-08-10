@@ -99,7 +99,7 @@ public class PropertiesLoaderTest {
 	 */
 	@Test
 	public final void testFormat() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 
@@ -127,7 +127,7 @@ public class PropertiesLoaderTest {
 	 */
 	@Test
 	public final void testLocale() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
@@ -166,7 +166,7 @@ public class PropertiesLoaderTest {
 	 */
 	@Test
 	public final void testStackTrace() {
-		LoggingWriter writer = new LoggingWriter();
+		StoreWriter writer = new StoreWriter();
 		Logger.setLoggingFormat("{message}");
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.ERROR);
@@ -231,7 +231,7 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
+		assertEquals(ConsoleWriter.class, writer.getClass());
 
 		System.setProperty("tinylog.writer", "null");
 		PropertiesLoader.reload();
@@ -250,23 +250,23 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(FileLoggingWriter.class, writer.getClass());
+		assertEquals(FileWriter.class, writer.getClass());
 		file.delete();
 
-		System.setProperty("tinylog.writer", ConsoleLoggingWriter.class.getName());
+		System.setProperty("tinylog.writer", ConsoleWriter.class.getName());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(ConsoleLoggingWriter.class, writer.getClass());
+		assertEquals(ConsoleWriter.class, writer.getClass());
 
 		file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
-		System.setProperty("tinylog.writer", FileLoggingWriter.class.getName());
+		System.setProperty("tinylog.writer", FileWriter.class.getName());
 		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(FileLoggingWriter.class, writer.getClass());
+		assertEquals(FileWriter.class, writer.getClass());
 		file.delete();
 
 		file = File.createTempFile("test", "tmp");
@@ -277,7 +277,7 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(RollingFileLoggingWriter.class, writer.getClass());
+		assertEquals(RollingFileWriter.class, writer.getClass());
 		file.delete();
 
 		Logger.setWriter(null);
@@ -291,7 +291,7 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
-		assertEquals(RollingFileLoggingWriter.class, writer.getClass());
+		assertEquals(RollingFileWriter.class, writer.getClass());
 		file.delete();
 
 		Logger.setWriter(null);
