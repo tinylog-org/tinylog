@@ -13,11 +13,11 @@
 
 package org.pmw.tinylog;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Writes log entries to a file like {@link FileLoggingWriter} but keeps backups of old logging files.
@@ -28,7 +28,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	private final int maxBackups;
 	private final int maxSize;
 	private int size;
-	private OutputStream out;
+	private BufferedOutputStream out;
 
 	/**
 	 * @param filename
@@ -48,7 +48,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	 * @param maxBackups
 	 *            Number of backups
 	 * @param maxSize
-	 *            Maximum number of characters to write in a log file ("0" for no limitation)
+	 *            Maximum size for a log file in bytes ("0" for no limitation)
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
@@ -58,7 +58,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 		this.maxSize = maxSize;
 		this.size = 0;
 		roll();
-		this.out = new FileOutputStream(filename);
+		this.out = new BufferedOutputStream(new FileOutputStream(filename));
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 					}
 					roll();
 					try {
-						out = new FileOutputStream(file);
+						out = new BufferedOutputStream(new FileOutputStream(file));
 						size = 0;
 					} catch (FileNotFoundException ex) {
 						throw new RuntimeException(ex);
@@ -153,6 +153,7 @@ public class RollingFileLoggingWriter implements ILoggingWriter {
 	private void write(final byte[] bytes) {
 		try {
 			out.write(bytes);
+			out.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 		}
