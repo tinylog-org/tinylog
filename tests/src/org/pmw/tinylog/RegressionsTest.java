@@ -15,7 +15,7 @@ public class RegressionsTest {
 	 * Bug: Wrong class in log entry if there isn't set any special logging level for at least one package.
 	 */
 	@Test
-	public final void wrongClassTest() {
+	public final void testWrongClass() {
 		LoggingWriter writer = new LoggingWriter();
 		Logger.setWriter(writer);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);
