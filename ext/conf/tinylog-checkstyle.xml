@@ -68,7 +68,10 @@
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
-    <module name="AvoidInlineConditionals"/>
+    <module name="AvoidInlineConditionals">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="DoubleCheckedLocking"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
@@ -83,6 +86,7 @@
     </module>
     <module name="MissingSwitchDefault"/>
     <module name="RedundantThrows">
+      <property name="allowUnchecked" value="true"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="SimplifyBooleanExpression"/>
@@ -118,5 +122,9 @@
     <property name="format" value="\s+$"/>
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+  </module>
+  <module name="RegexpHeader">
+    <property name="header" value="^/\*\n \* Copyright \d\d\d\d \w+\n"/>
+    <property name="fileExtensions" value="java"/>
   </module>
 </module>

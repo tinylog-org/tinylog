@@ -18,9 +18,21 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.regex.Pattern;
+
+import org.pmw.tinylog.policies.DailyPolicy;
+import org.pmw.tinylog.policies.HourlyPolicy;
+import org.pmw.tinylog.policies.IPolicy;
+import org.pmw.tinylog.policies.MonthlyPolicy;
+import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.policies.WeeklyPolicy;
+import org.pmw.tinylog.policies.YearlyPolicy;
 
 /**
  * Loads and sets properties for {@link Logger} from the properties files and from environment variables.
@@ -210,6 +222,12 @@ public final class PropertiesLoader {
 					} catch (NumberFormatException ex) {
 						return null;
 					}
+				} else if (boolean.class.equals(type)) {
+					parameters[i] = "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value);
+				} else if (IPolicy.class.equals(type)) {
+					parameters[i] = parsePolicy(value);
+				} else if (IPolicy[].class.equals(type)) {
+					parameters[i] = parsePolicies(value);
 				} else {
 					return null;
 				}
@@ -218,6 +236,61 @@ public final class PropertiesLoader {
 			}
 		}
 		return parameters;
+	}
+
+	private static IPolicy[] parsePolicies(final String string) {
+		List<IPolicy> policies = new ArrayList<IPolicy>();
+		for (String part : string.split(Pattern.quote(", "))) {
+			IPolicy policy = parsePolicy(part);
+			if (policy != null) {
+				policies.add(policy);
+			}
+		}
+		return policies.toArray(new IPolicy[0]);
+	}
+
+	private static IPolicy parsePolicy(final String string) {
+		int separator = string.indexOf(':');
+		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
+		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
+
+		if (name.equals("startup")) {
+			name = StartupPolicy.class.getName();
+		} else if (name.equals("size")) {
+			name = SizePolicy.class.getName();
+		} else if (name.equals("hourly")) {
+			name = HourlyPolicy.class.getName();
+		} else if (name.equals("daily")) {
+			name = DailyPolicy.class.getName();
+		} else if (name.equals("weekly")) {
+			name = WeeklyPolicy.class.getName();
+		} else if (name.equals("monthly")) {
+			name = MonthlyPolicy.class.getName();
+		} else if (name.equals("yearly")) {
+			name = YearlyPolicy.class.getName();
+		}
+
+		try {
+			Class<?> policyClass = Class.forName(name);
+			if (IPolicy.class.isAssignableFrom(policyClass)) {
+				if (parameter != null) {
+					try {
+						Constructor<?> constructor = policyClass.getDeclaredConstructor(String.class);
+						constructor.setAccessible(true);
+						return (IPolicy) constructor.newInstance(parameter);
+					} catch (NoSuchMethodException ex) {
+						// Continue
+					}
+				}
+				Constructor<?> constructor = policyClass.getDeclaredConstructor();
+				constructor.setAccessible(true);
+				return (IPolicy) constructor.newInstance();
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 
 }

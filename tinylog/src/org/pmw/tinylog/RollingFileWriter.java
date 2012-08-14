@@ -13,11 +13,14 @@
 
 package org.pmw.tinylog;
 
-import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.pmw.tinylog.policies.IPolicy;
+import org.pmw.tinylog.policies.StartupPolicy;
 
 /**
  * Writes log entries to a file like {@link FileWriter} but keeps backups of old logging files.
@@ -26,20 +29,24 @@ public class RollingFileWriter implements ILoggingWriter {
 
 	private final File file;
 	private final int maxBackups;
-	private final int maxSize;
-	private int size;
-	private BufferedOutputStream out;
+	private final List<? extends IPolicy> policies;
+	private BufferedWriter writer;
 
 	/**
+	 * Rolling log files once at startup (= {@link #RollingFileWriter(String, int, IPolicy...)
+	 * RollingFileWriter(filename, maxBackups, new StartupPolicy())}).
+	 * 
 	 * @param filename
 	 *            Filename of the log file
 	 * @param maxBackups
 	 *            Number of backups
 	 * @throws IOException
 	 *             Failed to open or create the log file
+	 * 
+	 * @see StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int maxBackups) throws IOException {
-		this(filename, maxBackups, 0);
+		this(filename, maxBackups, new StartupPolicy());
 	}
 
 	/**
@@ -47,57 +54,47 @@ public class RollingFileWriter implements ILoggingWriter {
 	 *            Filename of the log file
 	 * @param maxBackups
 	 *            Number of backups
-	 * @param maxSize
-	 *            Maximum size for a log file in bytes ("0" for no limitation)
+	 * @param policies
+	 *            Rollover strategies
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int maxBackups, final int maxSize) throws IOException {
+	public RollingFileWriter(final String filename, final int maxBackups, final IPolicy... policies) throws IOException {
 		this.file = new File(filename);
 		this.maxBackups = Math.max(0, maxBackups);
-		this.maxSize = maxSize;
-		this.size = 0;
-		roll();
-		this.out = new BufferedOutputStream(new FileOutputStream(filename));
+		this.policies = Arrays.asList(policies);
+		this.writer = new BufferedWriter(new java.io.FileWriter(file, true));
 	}
 
 	/**
 	 * Returns the supported properties for this writer.
 	 * 
-	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally a
-	 * limit for the maximum file size of log files ("maxSize").
+	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally
+	 * rollover strategies ("policies").
 	 * 
-	 * @return Two string arrays with and without the property "maxSize"
+	 * @return Two string arrays with and without the property "policies"
 	 */
 	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "maxSize" } };
+		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "policies" } };
 	}
 
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
-		if (maxSize <= 0) {
-			write(logEntry.getBytes());
-		} else {
-			synchronized (this) {
-				byte[] bytes = logEntry.getBytes();
-				int length = bytes.length;
-				if (size + length > maxSize) {
-					try {
-						out.close();
-					} catch (IOException ex) {
-						ex.printStackTrace(System.err);
-					}
-					roll();
-					try {
-						out = new BufferedOutputStream(new FileOutputStream(file));
-						size = 0;
-					} catch (FileNotFoundException ex) {
-						throw new RuntimeException(ex);
-					}
+		synchronized (this) {
+			if (!checkPolicies(level, logEntry)) {
+				try {
+					writer.close();
+				} catch (IOException ex) {
+					ex.printStackTrace(System.err);
 				}
-				size += length;
-				write(bytes);
+				roll();
+				try {
+					writer = new BufferedWriter(new java.io.FileWriter(file));
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
 			}
+			write(logEntry);
 		}
 	}
 
@@ -109,13 +106,29 @@ public class RollingFileWriter implements ILoggingWriter {
 	 */
 	public final void close() throws IOException {
 		synchronized (this) {
-			out.close();
+			writer.close();
 		}
 	}
 
 	@Override
 	protected final void finalize() throws Throwable {
 		close();
+	}
+
+	private boolean checkPolicies(final ELoggingLevel level, final String logEntry) {
+		for (IPolicy policy : policies) {
+			if (!policy.check(level, logEntry)) {
+				resetPolicies();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void resetPolicies() {
+		for (IPolicy policy : policies) {
+			policy.reset();
+		}
 	}
 
 	private void roll() {
@@ -150,10 +163,10 @@ public class RollingFileWriter implements ILoggingWriter {
 		}
 	}
 
-	private void write(final byte[] bytes) {
+	private void write(final String logEntry) {
 		try {
-			out.write(bytes);
-			out.flush();
+			writer.write(logEntry);
+			writer.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 		}

@@ -5,11 +5,12 @@
 	
 	<property name="root" location=".." />
 	
-	<property name="bin" location="bin" />
-	<property name="src" location="src" />
+	<property name="bin" location="${root}/tinylog/bin" />
+	<property name="src" location="${root}/tinylog/src" />
 	
 	<property name="tests.bin" location="${root}/tests/bin" />
 	<property name="tests.src" location="${root}/tests/src" />
+	<property name="tests.lib" location="${root}/tests/lib" />
 		
 	<property name="ext" location="${root}/ext" />
 	<property name="ext.conf" location="${ext}/conf" />
@@ -46,17 +47,20 @@
 
 	<target name="clean">
 		<delete dir="${bin}" />
+		<delete dir="${tests.bin}" />
 	</target>
 
 	<target name="makedir">
 		<mkdir dir="${bin}" />
+		<mkdir dir="${tests.bin}" />
 	</target>
 
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" target="1.5" />
-		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false">
+		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${bin}" />
+			<classpath><fileset dir="${tests.lib}" includes="*.jar" /></classpath>
 		</javac>
 	</target>
 	
@@ -120,20 +124,24 @@
 	</target>
 
 	<target name="test" depends="compile">
-		<junit>
+		<junit fork="true" failureproperty="junit.tests.failure" errorproperty="junit.tests.error">
 			<formatter type="plain" usefile="false" />
 			<classpath>
 				<path location="${bin}" />
 				<path location="${tests.bin}" />
 				<path location="${tests.src}" />
+				<path><fileset dir="${tests.lib}" includes="*.jar" /></path>
 				<path refid="junit.classpath" />
 			</classpath>
 			<batchtest>
 				<fileset dir="${tests.src}">
 					<include name="**/*Test*.java" />
+					<exclude name="**/Abstract*.java" />
 				</fileset>
 			</batchtest>
 		</junit>
+		<fail message="Tests failed" if="junit.test.error" />
+		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
 	
 	<target name="all" depends="jar, docs, check, test" />

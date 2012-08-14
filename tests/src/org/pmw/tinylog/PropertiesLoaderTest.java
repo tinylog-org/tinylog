@@ -25,6 +25,13 @@ import java.util.Locale;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pmw.tinylog.policies.DailyPolicy;
+import org.pmw.tinylog.policies.HourlyPolicy;
+import org.pmw.tinylog.policies.MonthlyPolicy;
+import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.policies.WeeklyPolicy;
+import org.pmw.tinylog.policies.YearlyPolicy;
 
 /**
  * Test reading properties for the logger.
@@ -252,12 +259,14 @@ public class PropertiesLoaderTest {
 		assertNotNull(writer);
 		assertEquals(FileWriter.class, writer.getClass());
 		file.delete();
+		Logger.setWriter(null);
 
 		System.setProperty("tinylog.writer", ConsoleWriter.class.getName());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(ConsoleWriter.class, writer.getClass());
+		Logger.setWriter(null);
 
 		file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
@@ -268,6 +277,7 @@ public class PropertiesLoaderTest {
 		assertNotNull(writer);
 		assertEquals(FileWriter.class, writer.getClass());
 		file.delete();
+		Logger.setWriter(null);
 
 		file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
@@ -279,32 +289,99 @@ public class PropertiesLoaderTest {
 		assertNotNull(writer);
 		assertEquals(RollingFileWriter.class, writer.getClass());
 		file.delete();
-
 		Logger.setWriter(null);
 
-		file = File.createTempFile("test", "tmp");
-		file.deleteOnExit();
-		System.setProperty("tinylog.writer", "rollingfile");
-		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
-		System.setProperty("tinylog.writer.maxBackups", "0");
-		System.setProperty("tinylog.writer.maxFiles", "0");
+		System.setProperty("tinylog.writer", String.class.getName());
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		file.delete();
+		assertNull(writer);
+	}
 
+	/**
+	 * Test reading policies.
+	 */
+	@Test
+	public final void testLoadPolicies() {
+		System.setProperty("tinylog.writer", "org.pmw.tinylog.PolicyWriter");
+
+		System.setProperty("tinylog.writer.policies", "startup");
+		PropertiesLoader.reload();
+		PolicyWriter writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		file = File.createTempFile("test", "tmp");
-		file.deleteOnExit();
-		System.setProperty("tinylog.writer", "rollingfile");
-		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
-		System.setProperty("tinylog.writer.maxBackups", "invalid");
-		System.clearProperty("tinylog.writer.maxFiles");
+		System.setProperty("tinylog.writer.policies", "startup: abc");
 		PropertiesLoader.reload();
-		assertNull(Logger.getWriter());
-		file.delete();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", StartupPolicy.class.getName());
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "size: 1MB");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(SizePolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "hourly");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(HourlyPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "daily: 24:00");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(DailyPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "weekly: monday");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(WeeklyPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "monthly: true");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(MonthlyPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", "yearly: january");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(1, writer.getPolicies().size());
+		assertEquals(YearlyPolicy.class, writer.getPolicies().get(0).getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.policies", String.class.getName());
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(0, writer.getPolicies().size());
+		Logger.setWriter(null);
 	}
 
 	/**

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.junit.Test;
+import org.pmw.tinylog.policies.SizePolicy;
 
 /**
  * Tests for the rolling file logging writer.
@@ -139,7 +140,7 @@ public class RollingFileWriterTest {
 		File backupFile = new File(baseFile.getPath() + ".0");
 		backupFile.deleteOnExit();
 
-		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 1, 3);
+		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 1, new SizePolicy(3));
 		backupFile.delete();
 		writer.write(ELoggingLevel.INFO, "1");
 		writer.write(ELoggingLevel.INFO, "2");
