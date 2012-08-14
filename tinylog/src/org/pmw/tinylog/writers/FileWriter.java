@@ -11,10 +11,12 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+
+import org.pmw.tinylog.ELoggingLevel;
 
 /**
  * Writes log entries to a file.

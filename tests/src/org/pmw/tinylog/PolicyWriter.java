@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.pmw.tinylog.policies.IPolicy;
+import org.pmw.tinylog.writers.ILoggingWriter;
 
 /**
  * A logging writer that just store policies.

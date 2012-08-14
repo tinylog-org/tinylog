@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog;
 
+import org.pmw.tinylog.writers.ILoggingWriter;
+
 /**
  * A logging writer that just save the written log entry as string.
  */

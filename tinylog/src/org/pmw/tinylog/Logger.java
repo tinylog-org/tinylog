@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.writers.ILoggingWriter;
+
 /**
  * Static class to create log entries.
  * 

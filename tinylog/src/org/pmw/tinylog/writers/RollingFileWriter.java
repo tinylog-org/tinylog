@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.policies.IPolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 

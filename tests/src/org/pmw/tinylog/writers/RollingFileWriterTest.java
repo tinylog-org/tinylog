@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.junit.Test;
+import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.SilentOutputStream;
 import org.pmw.tinylog.policies.SizePolicy;
 
 /**
  * Tests for the rolling file logging writer.
  * 
- * @see org.pmw.tinylog.RollingFileWriter
+ * @see org.pmw.tinylog.writers.RollingFileWriter
  */
 public class RollingFileWriterTest {
 

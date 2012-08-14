@@ -33,6 +33,10 @@ import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.policies.WeeklyPolicy;
 import org.pmw.tinylog.policies.YearlyPolicy;
+import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.writers.FileWriter;
+import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
  * Loads and sets properties for {@link Logger} from the properties files and from environment variables.

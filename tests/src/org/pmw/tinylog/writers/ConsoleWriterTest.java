@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,11 +21,13 @@ import java.io.PrintStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.SilentOutputStream;
 
 /**
  * Tests for the console logging writer.
  * 
- * @see org.pmw.tinylog.ConsoleWriter
+ * @see org.pmw.tinylog.writers.ConsoleWriter
  */
 public class ConsoleWriterTest {
 

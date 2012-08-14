@@ -17,8 +17,8 @@ import java.io.File;
 
 import org.pmw.benchmark.IBenchmark;
 import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.FileWriter;
 import org.pmw.tinylog.Logger;
+import org.pmw.tinylog.writers.FileWriter;
 
 public class TinylogBenchmark implements IBenchmark {
 

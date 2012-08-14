@@ -11,7 +11,10 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
+
+import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.Logger;
 
 /**
  * Logging writers output created log entries from {@link Logger}.

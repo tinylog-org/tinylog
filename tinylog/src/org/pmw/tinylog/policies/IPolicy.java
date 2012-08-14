@@ -16,7 +16,7 @@ package org.pmw.tinylog.policies;
 import org.pmw.tinylog.ELoggingLevel;
 
 /**
- * Policies define rollover strategies for {@link org.pmw.tinylog.RollingFileWriter RollingFileWriter} .
+ * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter} .
  */
 public interface IPolicy {
 
