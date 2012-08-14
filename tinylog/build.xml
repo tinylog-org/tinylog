@@ -88,6 +88,12 @@
 				<include name="ReadMe.txt" />
 			</fileset>
 		</zip>
+		<zip destfile="${dist.jar}/tinylog-${version}-src.zip" level="9">
+			<fileset dir="${root}">
+				<exclude name=".*/**" />
+				<exclude name="dist/**" />
+			</fileset>
+		</zip>
 	</target>
 	
 	<target name="docs" depends="compile">
