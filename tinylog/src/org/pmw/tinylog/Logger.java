@@ -33,6 +33,7 @@ import org.pmw.tinylog.writers.ILoggingWriter;
  */
 public final class Logger {
 
+	private static final int DEEP_OF_STACK_TRACE = 4;
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -230,7 +231,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final String message, final Object... arguments) {
-		output(ELoggingLevel.TRACE, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, null, message, arguments);
 	}
 
 	/**
@@ -246,7 +247,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
-		output(ELoggingLevel.TRACE, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, exception, message, arguments);
 	}
 
 	/**
@@ -256,7 +257,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void trace(final Throwable exception) {
-		output(ELoggingLevel.TRACE, exception, null);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, exception, null);
 	}
 
 	/**
@@ -270,7 +271,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final String message, final Object... arguments) {
-		output(ELoggingLevel.DEBUG, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, null, message, arguments);
 	}
 
 	/**
@@ -286,7 +287,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
-		output(ELoggingLevel.DEBUG, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, exception, message, arguments);
 	}
 
 	/**
@@ -296,7 +297,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void debug(final Throwable exception) {
-		output(ELoggingLevel.DEBUG, exception, null);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, exception, null);
 	}
 
 	/**
@@ -310,7 +311,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final String message, final Object... arguments) {
-		output(ELoggingLevel.INFO, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, null, message, arguments);
 	}
 
 	/**
@@ -326,7 +327,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
-		output(ELoggingLevel.INFO, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, exception, message, arguments);
 	}
 
 	/**
@@ -336,7 +337,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void info(final Throwable exception) {
-		output(ELoggingLevel.INFO, exception, null);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, exception, null);
 	}
 
 	/**
@@ -350,7 +351,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final String message, final Object... arguments) {
-		output(ELoggingLevel.WARNING, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, null, message, arguments);
 	}
 
 	/**
@@ -366,7 +367,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
-		output(ELoggingLevel.WARNING, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, exception, message, arguments);
 	}
 
 	/**
@@ -376,7 +377,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void warn(final Throwable exception) {
-		output(ELoggingLevel.WARNING, exception, null);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, exception, null);
 	}
 
 	/**
@@ -390,7 +391,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final String message, final Object... arguments) {
-		output(ELoggingLevel.ERROR, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, null, message, arguments);
 	}
 
 	/**
@@ -406,7 +407,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
-		output(ELoggingLevel.ERROR, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, exception, message, arguments);
 	}
 
 	/**
@@ -416,10 +417,24 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void error(final Throwable exception) {
-		output(ELoggingLevel.ERROR, exception, null);
+		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, exception, null);
 	}
 
-	private static void output(final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
+	/**
+	 * Add a log entry. This method is helpful for adding log entries form logger bridges.
+	 * 
+	 * @param strackTraceDeep
+	 *            Deep of stack trace for finding the class, source line etc.
+	 * @param level
+	 *            Logging level of the log entry
+	 * @param exception
+	 *            Exception to log (can be <code>null</code> if there is no exception to log)
+	 * @param message
+	 *            Formated text for the log entry
+	 * @param arguments
+	 *            Arguments for the text message
+	 */
+	static void output(final int strackTraceDeep, final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		ILoggingWriter currentWriter = loggingWriter;
 
 		if (currentWriter != null) {
@@ -427,24 +442,24 @@ public final class Logger {
 			ELoggingLevel activeLoggingLevel = loggingLevel;
 
 			if (!packageLoggingLevels.isEmpty()) {
-				stackTraceElement = getStackTraceElement(4);
+				stackTraceElement = getStackTraceElement(strackTraceDeep);
 				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
 				String logEntry;
 				try {
-					logEntry = createLogEntry(level, stackTraceElement, exception, message, arguments);
+					logEntry = createLogEntry(strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					logEntry = createLogEntry(ELoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+					logEntry = createLogEntry(strackTraceDeep + 1, ELoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
 				currentWriter.write(level, logEntry);
 			}
 		}
 	}
 
-	private static String createLogEntry(final ELoggingLevel level, final StackTraceElement createdStackTraceElement, final Throwable exception,
-			final String message, final Object... arguments) {
+	private static String createLogEntry(final int strackTraceDeep, final ELoggingLevel level, final StackTraceElement createdStackTraceElement,
+			final Throwable exception, final String message, final Object... arguments) {
 		StringBuilder builder = new StringBuilder();
 
 		String threadName = null;
@@ -462,28 +477,28 @@ public final class Logger {
 
 				case CLASS:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(5);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getClassName());
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(5);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getMethodName());
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(5);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getFileName());
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(5);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getLineNumber());
 					break;

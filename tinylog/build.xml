@@ -8,9 +8,14 @@
 	<property name="bin" location="${root}/tinylog/bin" />
 	<property name="src" location="${root}/tinylog/src" />
 	
-	<property name="tests.bin" location="${root}/tests/bin" />
-	<property name="tests.src" location="${root}/tests/src" />
-	<property name="tests.lib" location="${root}/tests/lib" />
+	<property name="log4j" location="${root}/log4j-facade" />
+	<property name="log4j.bin" location="${log4j}/bin" />
+	<property name="log4j.src" location="${log4j}/src" />
+	
+	<property name="tests" location="${root}/tests" />
+	<property name="tests.bin" location="${tests}/bin" />
+	<property name="tests.src" location="${tests}/src" />
+	<property name="tests.lib" location="${tests}/lib" />
 		
 	<property name="ext" location="${root}/ext" />
 	<property name="ext.conf" location="${ext}/conf" />
@@ -47,16 +52,21 @@
 
 	<target name="clean">
 		<delete dir="${bin}" />
+		<delete dir="${log4j.bin}" />
 		<delete dir="${tests.bin}" />
 	</target>
 
 	<target name="makedir">
 		<mkdir dir="${bin}" />
+		<mkdir dir="${log4j.bin}" />
 		<mkdir dir="${tests.bin}" />
 	</target>
 
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" target="1.5" />
+		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" target="1.5">
+			<classpath location="${bin}" />
+		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${bin}" />
@@ -67,10 +77,7 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="${dist.jar}" />
 		<delete>
-			<fileset dir="${dist.jar}">
-				<include name="tinylog.jar" />
-				<include name="tinylog-*.zip" />
-			</fileset>
+			<fileset dir="${dist.jar}" />
 		</delete>
 		<jar destfile="${dist.jar}/tinylog.jar">
 			<fileset dir="${bin}" />
@@ -85,6 +92,25 @@
 			</fileset>
 			<fileset dir="${root}">
 				<include name="License.txt" />
+				<include name="ReadMe.txt" />
+			</fileset>
+		</zip>
+		<jar destfile="${dist.jar}/log4j-facade.jar">
+			<fileset dir="${log4j.bin}" />
+		</jar>
+		<zip destfile="${dist.jar}/log4j-facade-src.zip">
+			<fileset dir="${log4j.src}" />
+		</zip>
+		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
+			<fileset dir="${dist.jar}">
+				<include name="tinylog.jar" />
+				<include name="log4j-facade.jar" />
+				<include name="log4j-facade-src.zip" />
+			</fileset>
+			<fileset dir="${root}">
+				<include name="License.txt" />
+			</fileset>
+			<fileset dir="${log4j}">
 				<include name="ReadMe.txt" />
 			</fileset>
 		</zip>
