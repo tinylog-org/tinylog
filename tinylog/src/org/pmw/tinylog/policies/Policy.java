@@ -20,7 +20,7 @@ import org.pmw.tinylog.ELoggingLevel;
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter} .
  */
-public interface IPolicy {
+public interface Policy {
 
 	/**
 	 * Determine if a rollover should occur at startup.

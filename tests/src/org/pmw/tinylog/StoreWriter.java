@@ -13,12 +13,12 @@
 
 package org.pmw.tinylog;
 
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * A logging writer that just save the written log entry as string.
  */
-class StoreWriter implements ILoggingWriter {
+class StoreWriter implements LoggingWriter {
 
 	private ELoggingLevel level;
 	private String entry;

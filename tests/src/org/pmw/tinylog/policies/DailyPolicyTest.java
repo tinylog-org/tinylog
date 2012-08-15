@@ -37,7 +37,7 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAfterOneDay() {
 		setTime(DAY / 2L);
 
-		IPolicy policy = new DailyPolicy();
+		Policy policy = new DailyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY - 1L);
 		assertTrue(policy.check(null, null));
@@ -59,7 +59,7 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtMidnight() {
 		setTime(DAY / 2L);
 
-		IPolicy policy = new DailyPolicy(24, 0);
+		Policy policy = new DailyPolicy(24, 0);
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY / 2 - 1L);
 		assertTrue(policy.check(null, null));
@@ -87,7 +87,7 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		IPolicy policy = new DailyPolicy(14, 0);
+		Policy policy = new DailyPolicy(14, 0);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		increaseTime(HOUR * 2 - 1L);
@@ -122,7 +122,7 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(0L);
 
-		IPolicy policy = new DailyPolicy();
+		Policy policy = new DailyPolicy();
 		assertFalse(policy.initCheck(file));
 
 		policy = new DailyPolicy(0, 0);

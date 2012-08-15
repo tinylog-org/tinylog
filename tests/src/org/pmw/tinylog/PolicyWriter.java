@@ -16,21 +16,21 @@ package org.pmw.tinylog;
 import java.util.Arrays;
 import java.util.List;
 
-import org.pmw.tinylog.policies.IPolicy;
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.policies.Policy;
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * A logging writer that just store policies.
  */
-class PolicyWriter implements ILoggingWriter {
+class PolicyWriter implements LoggingWriter {
 
-	private final List<? extends IPolicy> policies;
+	private final List<? extends Policy> policies;
 
 	/**
 	 * @param policies
 	 *            Policies to store
 	 */
-	public PolicyWriter(final IPolicy... policies) {
+	public PolicyWriter(final Policy... policies) {
 		this.policies = Arrays.asList(policies);
 	}
 
@@ -48,7 +48,7 @@ class PolicyWriter implements ILoggingWriter {
 	 * 
 	 * @return Stored policies
 	 */
-	public List<? extends IPolicy> getPolicies() {
+	public List<? extends Policy> getPolicies() {
 		return policies;
 	}
 

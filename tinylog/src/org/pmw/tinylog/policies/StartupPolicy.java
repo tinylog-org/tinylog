@@ -20,7 +20,7 @@ import org.pmw.tinylog.ELoggingLevel;
 /**
  * Policy for rolling log files once at startup.
  */
-public class StartupPolicy implements IPolicy {
+public class StartupPolicy implements Policy {
 
 	@Override
 	public final boolean initCheck(final File logFile) {

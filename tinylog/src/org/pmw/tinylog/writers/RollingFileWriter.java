@@ -20,21 +20,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.policies.IPolicy;
+import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
 /**
  * Writes log entries to a file like {@link FileWriter} but keeps backups of old logging files.
  */
-public class RollingFileWriter implements ILoggingWriter {
+public class RollingFileWriter implements LoggingWriter {
 
 	private final File file;
 	private final int maxBackups;
-	private final List<? extends IPolicy> policies;
+	private final List<? extends Policy> policies;
 	private BufferedWriter writer;
 
 	/**
-	 * Rolling log files once at startup (= {@link #RollingFileWriter(String, int, IPolicy...)
+	 * Rolling log files once at startup (= {@link #RollingFileWriter(String, int, Policy...)
 	 * RollingFileWriter(filename, maxBackups, new StartupPolicy())}).
 	 * 
 	 * @param filename
@@ -60,7 +60,7 @@ public class RollingFileWriter implements ILoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int maxBackups, final IPolicy... policies) throws IOException {
+	public RollingFileWriter(final String filename, final int maxBackups, final Policy... policies) throws IOException {
 		this.file = new File(filename);
 		this.maxBackups = Math.max(0, maxBackups);
 		this.policies = Arrays.asList(policies);
@@ -118,7 +118,7 @@ public class RollingFileWriter implements ILoggingWriter {
 	}
 
 	private void initCkeckPolicies() {
-		for (IPolicy policy : policies) {
+		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();
 				roll();
@@ -128,7 +128,7 @@ public class RollingFileWriter implements ILoggingWriter {
 	}
 
 	private boolean checkPolicies(final ELoggingLevel level, final String logEntry) {
-		for (IPolicy policy : policies) {
+		for (Policy policy : policies) {
 			if (!policy.check(level, logEntry)) {
 				resetPolicies();
 				return false;
@@ -138,7 +138,7 @@ public class RollingFileWriter implements ILoggingWriter {
 	}
 
 	private void resetPolicies() {
-		for (IPolicy policy : policies) {
+		for (Policy policy : policies) {
 			policy.reset();
 		}
 	}

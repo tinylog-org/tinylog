@@ -36,7 +36,7 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAfterOneHour() {
 		setTime(HOUR / 2L);
 
-		IPolicy policy = new HourlyPolicy();
+		Policy policy = new HourlyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(HOUR / 2L);
 		assertTrue(policy.check(null, null));
@@ -58,7 +58,7 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtFirstFullHour() {
 		setTime(HOUR / 2L);
 
-		IPolicy policy = new HourlyPolicy(true);
+		Policy policy = new HourlyPolicy(true);
 		assertTrue(policy.check(null, null));
 		increaseTime(HOUR / 2L);
 		assertFalse(policy.check(null, null));
@@ -84,7 +84,7 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		IPolicy policy = new HourlyPolicy(true);
+		Policy policy = new HourlyPolicy(true);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		increaseTime(HOUR / 2L - 1L);
@@ -118,7 +118,7 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(0L);
 
-		IPolicy policy = new HourlyPolicy();
+		Policy policy = new HourlyPolicy();
 		assertFalse(policy.initCheck(file));
 
 		policy = new HourlyPolicy(false);

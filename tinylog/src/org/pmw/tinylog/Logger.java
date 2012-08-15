@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Static class to create log entries.
@@ -38,7 +38,7 @@ public final class Logger {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private static volatile int maxLoggingStackTraceElements = 40;
-	private static volatile ILoggingWriter loggingWriter = new ConsoleWriter();
+	private static volatile LoggingWriter loggingWriter = new ConsoleWriter();
 	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
 	private static final Map<String, ELoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, ELoggingLevel>());
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
@@ -206,7 +206,7 @@ public final class Logger {
 	 * 
 	 * @return The current logging writer
 	 */
-	public static ILoggingWriter getWriter() {
+	public static LoggingWriter getWriter() {
 		return loggingWriter;
 	}
 
@@ -216,7 +216,7 @@ public final class Logger {
 	 * @param writer
 	 *            New logging writer (can be <code>null</code> to disable any output)
 	 */
-	public static void setWriter(final ILoggingWriter writer) {
+	public static void setWriter(final LoggingWriter writer) {
 		loggingWriter = writer;
 	}
 
@@ -435,7 +435,7 @@ public final class Logger {
 	 *            Arguments for the text message
 	 */
 	static void output(final int strackTraceDeep, final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
-		ILoggingWriter currentWriter = loggingWriter;
+		LoggingWriter currentWriter = loggingWriter;
 
 		if (currentWriter != null) {
 			StackTraceElement stackTraceElement = null;

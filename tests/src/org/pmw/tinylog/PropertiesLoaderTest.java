@@ -34,7 +34,7 @@ import org.pmw.tinylog.policies.WeeklyPolicy;
 import org.pmw.tinylog.policies.YearlyPolicy;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
@@ -235,7 +235,7 @@ public class PropertiesLoaderTest {
 		Logger.setWriter(null);
 		Logger.setLoggingLevel(ELoggingLevel.TRACE);
 
-		ILoggingWriter writer = Logger.getWriter();
+		LoggingWriter writer = Logger.getWriter();
 		assertNull(writer);
 
 		System.setProperty("tinylog.writer", "console");

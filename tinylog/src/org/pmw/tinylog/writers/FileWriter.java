@@ -21,7 +21,7 @@ import org.pmw.tinylog.ELoggingLevel;
 /**
  * Writes log entries to a file.
  */
-public class FileWriter implements ILoggingWriter {
+public class FileWriter implements LoggingWriter {
 
 	private final BufferedWriter writer;
 

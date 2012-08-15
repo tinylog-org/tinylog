@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.HourlyPolicy;
-import org.pmw.tinylog.policies.IPolicy;
+import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.MonthlyPolicy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
@@ -35,7 +35,7 @@ import org.pmw.tinylog.policies.WeeklyPolicy;
 import org.pmw.tinylog.policies.YearlyPolicy;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
@@ -163,7 +163,7 @@ public final class PropertiesLoader {
 	private static void loadAndSetWriter(final Properties properties, final String writer) {
 		try {
 			Class<?> writerClass = Class.forName(writer);
-			if (ILoggingWriter.class.isAssignableFrom(writerClass)) {
+			if (LoggingWriter.class.isAssignableFrom(writerClass)) {
 				String[][] supportedProperties = getSupportedProperties(writerClass);
 				Constructor<?> foundConstructor = null;
 				Object[] foundParameters = null;
@@ -181,7 +181,7 @@ public final class PropertiesLoader {
 					}
 				}
 				if (foundConstructor != null) {
-					Logger.setWriter((ILoggingWriter) foundConstructor.newInstance(foundParameters));
+					Logger.setWriter((LoggingWriter) foundConstructor.newInstance(foundParameters));
 				}
 			}
 		} catch (Exception ex) {
@@ -228,9 +228,9 @@ public final class PropertiesLoader {
 					}
 				} else if (boolean.class.equals(type)) {
 					parameters[i] = "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value);
-				} else if (IPolicy.class.equals(type)) {
+				} else if (Policy.class.equals(type)) {
 					parameters[i] = parsePolicy(value);
-				} else if (IPolicy[].class.equals(type)) {
+				} else if (Policy[].class.equals(type)) {
 					parameters[i] = parsePolicies(value);
 				} else {
 					return null;
@@ -242,18 +242,18 @@ public final class PropertiesLoader {
 		return parameters;
 	}
 
-	private static IPolicy[] parsePolicies(final String string) {
-		List<IPolicy> policies = new ArrayList<IPolicy>();
+	private static Policy[] parsePolicies(final String string) {
+		List<Policy> policies = new ArrayList<Policy>();
 		for (String part : string.split(Pattern.quote(", "))) {
-			IPolicy policy = parsePolicy(part);
+			Policy policy = parsePolicy(part);
 			if (policy != null) {
 				policies.add(policy);
 			}
 		}
-		return policies.toArray(new IPolicy[0]);
+		return policies.toArray(new Policy[0]);
 	}
 
-	private static IPolicy parsePolicy(final String string) {
+	private static Policy parsePolicy(final String string) {
 		int separator = string.indexOf(':');
 		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
 		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
@@ -276,19 +276,19 @@ public final class PropertiesLoader {
 
 		try {
 			Class<?> policyClass = Class.forName(name);
-			if (IPolicy.class.isAssignableFrom(policyClass)) {
+			if (Policy.class.isAssignableFrom(policyClass)) {
 				if (parameter != null) {
 					try {
 						Constructor<?> constructor = policyClass.getDeclaredConstructor(String.class);
 						constructor.setAccessible(true);
-						return (IPolicy) constructor.newInstance(parameter);
+						return (Policy) constructor.newInstance(parameter);
 					} catch (NoSuchMethodException ex) {
 						// Continue
 					}
 				}
 				Constructor<?> constructor = policyClass.getDeclaredConstructor();
 				constructor.setAccessible(true);
-				return (IPolicy) constructor.newInstance();
+				return (Policy) constructor.newInstance();
 			} else {
 				return null;
 			}

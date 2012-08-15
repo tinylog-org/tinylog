@@ -43,7 +43,7 @@ public class SizePolicyTest {
 		File file = File.createTempFile("test", ".tmp");
 		file.delete();
 
-		IPolicy policy = new SizePolicy(10);
+		Policy policy = new SizePolicy(10);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, "0123456789"));
 		assertFalse(policy.check(null, "0"));
@@ -68,7 +68,7 @@ public class SizePolicyTest {
 		writer.write("01234");
 		writer.close();
 
-		IPolicy policy = new SizePolicy(10);
+		Policy policy = new SizePolicy(10);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, "56789"));
 		assertFalse(policy.check(null, "0"));

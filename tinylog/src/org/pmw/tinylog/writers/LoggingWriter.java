@@ -24,7 +24,7 @@ import org.pmw.tinylog.Logger;
  * 
  * @see org.pmw.tinylog.Logger#setWriter(ILoggingWriter)
  */
-public interface ILoggingWriter {
+public interface LoggingWriter {
 
 	/**
 	 * Write a log entry.

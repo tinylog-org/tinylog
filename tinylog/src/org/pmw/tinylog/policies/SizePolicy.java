@@ -21,7 +21,7 @@ import org.pmw.tinylog.PropertiesLoader;
 /**
  * Policy for limiting the size of log files.
  */
-public class SizePolicy implements IPolicy {
+public class SizePolicy implements Policy {
 
 	private final long maxSize;
 	private long size;

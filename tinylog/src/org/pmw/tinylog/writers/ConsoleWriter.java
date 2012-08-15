@@ -20,7 +20,7 @@ import org.pmw.tinylog.ELoggingLevel;
 /**
  * Writes log entries to the console.
  */
-public class ConsoleWriter implements ILoggingWriter {
+public class ConsoleWriter implements LoggingWriter {
 
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {

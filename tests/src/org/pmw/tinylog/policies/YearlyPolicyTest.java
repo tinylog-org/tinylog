@@ -37,7 +37,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAfterOneYear() {
 		setTime(YEAR / 2L);
 
-		IPolicy policy = new YearlyPolicy();
+		Policy policy = new YearlyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(YEAR - 1L);
 		assertTrue(policy.check(null, null));
@@ -63,7 +63,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtEndOfYear() {
 		setTime(YEAR / 2L);
 
-		IPolicy policy = new YearlyPolicy(1);
+		Policy policy = new YearlyPolicy(1);
 		assertTrue(policy.check(null, null));
 		increaseTime(YEAR / 2L - 1L);
 		assertTrue(policy.check(null, null));
@@ -91,7 +91,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime() + 1L);
 
-		IPolicy policy = new YearlyPolicy(1);
+		Policy policy = new YearlyPolicy(1);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 365L - 1L);
@@ -118,7 +118,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		IPolicy policy = new YearlyPolicy();
+		Policy policy = new YearlyPolicy();
 		assertFalse(policy.initCheck(file));
 
 		policy = new YearlyPolicy(1);

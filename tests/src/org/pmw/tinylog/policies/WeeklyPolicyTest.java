@@ -37,7 +37,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAfterOneDay() {
 		setTime(DAY);
 
-		IPolicy policy = new WeeklyPolicy();
+		Policy policy = new WeeklyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 7 - 1L);
 		assertTrue(policy.check(null, null));
@@ -59,7 +59,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtEndOfWeek() {
 		setTime(DAY);
 
-		IPolicy policy = new WeeklyPolicy(1);
+		Policy policy = new WeeklyPolicy(1);
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 3 - 1L);
 		assertTrue(policy.check(null, null));
@@ -87,7 +87,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime() + 1L);
 
-		IPolicy policy = new WeeklyPolicy(2);
+		Policy policy = new WeeklyPolicy(2);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY - 1L);
@@ -122,7 +122,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		IPolicy policy = new WeeklyPolicy();
+		Policy policy = new WeeklyPolicy();
 		assertFalse(policy.initCheck(file));
 
 		policy = new WeeklyPolicy(1);

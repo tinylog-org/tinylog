@@ -36,7 +36,7 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAfterOneMonth() {
 		setTime(DAY * 16L);
 
-		IPolicy policy = new MonthlyPolicy();
+		Policy policy = new MonthlyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 31L - 1L);
 		assertTrue(policy.check(null, null));
@@ -58,7 +58,7 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtFirstOfNextMonth() {
 		setTime(DAY * 16L);
 
-		IPolicy policy = new MonthlyPolicy(true);
+		Policy policy = new MonthlyPolicy(true);
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 15L - 1L);
 		assertTrue(policy.check(null, null));
@@ -86,7 +86,7 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		IPolicy policy = new MonthlyPolicy(true);
+		Policy policy = new MonthlyPolicy(true);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		increaseTime(DAY * 15L - 1L);
@@ -120,7 +120,7 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		file.deleteOnExit();
 		file.setLastModified(0L);
 
-		IPolicy policy = new MonthlyPolicy();
+		Policy policy = new MonthlyPolicy();
 		assertFalse(policy.initCheck(file));
 
 		policy = new MonthlyPolicy(false);

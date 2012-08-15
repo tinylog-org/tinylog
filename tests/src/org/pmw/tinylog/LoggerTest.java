@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.ILoggingWriter;
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Tests for the logger.
@@ -114,7 +114,7 @@ public class LoggerTest {
 		assertNull(Logger.getWriter());
 		Logger.info("My message"); // Must NOT thrown any exception but ignore the log entry
 
-		ILoggingWriter writer = new ConsoleWriter();
+		LoggingWriter writer = new ConsoleWriter();
 		Logger.setWriter(writer);
 		assertEquals(writer, Logger.getWriter());
 	}

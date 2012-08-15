@@ -39,7 +39,7 @@ public class StartupPolicyTest {
 		File file = File.createTempFile("test", ".tmp");
 		file.deleteOnExit();
 
-		IPolicy policy = new StartupPolicy();
+		Policy policy = new StartupPolicy();
 		assertFalse(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		assertTrue(policy.check(null, null));

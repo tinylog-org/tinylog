@@ -27,7 +27,7 @@ import org.pmw.tinylog.ELoggingLevel;
  * @see MonthlyPolicy
  * @see YearlyPolicy
  */
-public abstract class AbstractTimeBasedPolicy implements IPolicy {
+public abstract class AbstractTimeBasedPolicy implements Policy {
 
 	private final Calendar calendar;
 	private final int field;
