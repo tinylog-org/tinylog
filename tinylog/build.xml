@@ -64,6 +64,12 @@
 
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" target="1.5" />
+		<copy todir="${bin}">
+			<fileset dir="${src}">
+				<include name="**/*.properties" />
+				<include name="META-INF/**" />
+			</fileset>
+		</copy>
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" target="1.5">
 			<classpath location="${bin}" />
 		</javac>
@@ -72,6 +78,12 @@
 			<classpath location="${bin}" />
 			<classpath><fileset dir="${tests.lib}" includes="*.jar" /></classpath>
 		</javac>
+		<copy todir="${tests.bin}">
+			<fileset dir="${tests.src}">
+				<include name="**/*.properties" />
+				<include name="META-INF/**" />
+			</fileset>
+		</copy>
 	</target>
 	
 	<target name="jar" depends="compile">

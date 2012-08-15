@@ -23,7 +23,7 @@ import org.pmw.tinylog.Logger;
  * static method <code>public static String getName()</code>, so that tinylog can find it. Writers can also implement
  * <code>public static String[][] getSupportedProperties()</code> to support properties.
  * 
- * @see org.pmw.tinylog.Logger#setWriter(ILoggingWriter)
+ * @see org.pmw.tinylog.Logger#setWriter(LoggingWriter)
  */
 public interface LoggingWriter {
 
