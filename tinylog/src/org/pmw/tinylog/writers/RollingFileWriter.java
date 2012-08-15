@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.labellers.CountLabeller;
+import org.pmw.tinylog.labellers.Labeller;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
@@ -28,9 +30,11 @@ import org.pmw.tinylog.policies.StartupPolicy;
  */
 public class RollingFileWriter implements LoggingWriter {
 
-	private final File file;
 	private final int maxBackups;
+	private final Labeller labeller;
 	private final List<? extends Policy> policies;
+
+	private File file;
 	private BufferedWriter writer;
 
 	/**
@@ -61,9 +65,26 @@ public class RollingFileWriter implements LoggingWriter {
 	 *             Failed to open or create the log file
 	 */
 	public RollingFileWriter(final String filename, final int maxBackups, final Policy... policies) throws IOException {
-		this.file = new File(filename);
+		this(filename, maxBackups, new CountLabeller(), policies);
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param maxBackups
+	 *            Number of backups
+	 * @param labeller
+	 *            Labeller for naming backups
+	 * @param policies
+	 *            Rollover strategies
+	 * @throws IOException
+	 *             Failed to open or create the log file
+	 */
+	public RollingFileWriter(final String filename, final int maxBackups, final Labeller labeller, final Policy... policies) throws IOException {
 		this.maxBackups = Math.max(0, maxBackups);
+		this.labeller = labeller;
 		this.policies = Arrays.asList(policies);
+		this.file = labeller.getLogFile(new File(filename));
 		initCkeckPolicies();
 		this.writer = new BufferedWriter(new java.io.FileWriter(file, true));
 	}
@@ -80,13 +101,14 @@ public class RollingFileWriter implements LoggingWriter {
 	/**
 	 * Returns the supported properties for this writer.
 	 * 
-	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally
-	 * rollover strategies ("policies").
+	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally a
+	 * labeller ("labeling") and rollover strategies ("policies").
 	 * 
-	 * @return Two string arrays with and without the property "policies"
+	 * @return Three string arrays with and without the properties "naming" and "policies"
 	 */
 	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "policies" } };
+		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "policies" },
+				new String[] { "filename", "maxBackups", "labeling", "policies" } };
 	}
 
 	@Override
@@ -98,7 +120,7 @@ public class RollingFileWriter implements LoggingWriter {
 				} catch (IOException ex) {
 					ex.printStackTrace(System.err);
 				}
-				roll();
+				file = labeller.roll(file, maxBackups);
 				try {
 					writer = new BufferedWriter(new java.io.FileWriter(file));
 				} catch (IOException ex) {
@@ -130,7 +152,7 @@ public class RollingFileWriter implements LoggingWriter {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();
-				roll();
+				file = labeller.roll(file, maxBackups);
 				return;
 			}
 		}
@@ -149,38 +171,6 @@ public class RollingFileWriter implements LoggingWriter {
 	private void resetPolicies() {
 		for (Policy policy : policies) {
 			policy.reset();
-		}
-	}
-
-	private void roll() {
-		if (file.exists()) {
-			String filenameWithoutExtension;
-			String filenameExtension;
-
-			String path = file.getPath();
-			String name = file.getName();
-			int index = name.indexOf('.', 1);
-			if (index > 0) {
-				filenameWithoutExtension = path.substring(0, (path.length() - name.length()) + index);
-				filenameExtension = name.substring(index);
-			} else {
-				filenameWithoutExtension = path;
-				filenameExtension = "";
-			}
-
-			roll(file, 0, filenameWithoutExtension, filenameExtension);
-		}
-	}
-
-	private void roll(final File baseFile, final int number, final String filenameWithoutExtension, final String filenameExtension) {
-		File targetFile = new File(filenameWithoutExtension + "." + number + filenameExtension);
-		if (targetFile.exists()) {
-			roll(targetFile, number + 1, filenameWithoutExtension, filenameExtension);
-		}
-		if (number < maxBackups) {
-			baseFile.renameTo(targetFile);
-		} else {
-			baseFile.delete();
 		}
 	}
 

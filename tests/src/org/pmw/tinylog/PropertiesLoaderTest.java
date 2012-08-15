@@ -25,6 +25,8 @@ import java.util.Locale;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pmw.tinylog.labellers.CountLabeller;
+import org.pmw.tinylog.labellers.TimestampLabeller;
 import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.HourlyPolicy;
 import org.pmw.tinylog.policies.MonthlyPolicy;
@@ -32,6 +34,7 @@ import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.policies.WeeklyPolicy;
 import org.pmw.tinylog.policies.YearlyPolicy;
+import org.pmw.tinylog.util.LabellerWriter;
 import org.pmw.tinylog.util.PolicyWriter;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.ConsoleWriter;
@@ -292,7 +295,9 @@ public class PropertiesLoaderTest {
 	public final void testLoadPolicies() {
 		System.setProperty("tinylog.writer", "policy");
 
-		System.setProperty("tinylog.writer.policies", "startup");
+		System.setProperty("tinylog.writer.ignored", "true");
+
+		System.setProperty("tinylog.writer.policy", "startup");
 		PropertiesLoader.reload();
 		PolicyWriter writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -300,7 +305,7 @@ public class PropertiesLoaderTest {
 		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "startup: abc");
+		System.setProperty("tinylog.writer.policy", "startup: abc");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -308,7 +313,7 @@ public class PropertiesLoaderTest {
 		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "size: 1MB");
+		System.setProperty("tinylog.writer.policy", "size: 1MB");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -316,7 +321,7 @@ public class PropertiesLoaderTest {
 		assertEquals(SizePolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "hourly");
+		System.setProperty("tinylog.writer.policy", "hourly");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -324,7 +329,7 @@ public class PropertiesLoaderTest {
 		assertEquals(HourlyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "daily: 24:00");
+		System.setProperty("tinylog.writer.policy", "daily: 24:00");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -332,7 +337,7 @@ public class PropertiesLoaderTest {
 		assertEquals(DailyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "weekly: monday");
+		System.setProperty("tinylog.writer.policy", "weekly: monday");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -340,7 +345,7 @@ public class PropertiesLoaderTest {
 		assertEquals(WeeklyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "monthly: true");
+		System.setProperty("tinylog.writer.policy", "monthly: true");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -348,7 +353,7 @@ public class PropertiesLoaderTest {
 		assertEquals(MonthlyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", "yearly: january");
+		System.setProperty("tinylog.writer.policy", "yearly: january");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -356,11 +361,68 @@ public class PropertiesLoaderTest {
 		assertEquals(YearlyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
+		System.setProperty("tinylog.writer.policy", "invalid");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(0, writer.getPolicies().size());
+		Logger.setWriter(null);
+
+		System.clearProperty("tinylog.writer.ignored");
+
+		System.setProperty("tinylog.writer.policies", "startup, daily: 00:00");
+		PropertiesLoader.reload();
+		writer = (PolicyWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertEquals(2, writer.getPolicies().size());
+		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
+		assertEquals(DailyPolicy.class, writer.getPolicies().get(1).getClass());
+		Logger.setWriter(null);
+
 		System.setProperty("tinylog.writer.policies", "invalid");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
 		assertEquals(0, writer.getPolicies().size());
+		Logger.setWriter(null);
+	}
+
+	/**
+	 * Test reading labellers.
+	 */
+	@Test
+	public final void testLoadLabellers() {
+		System.setProperty("tinylog.writer", "labeller");
+
+		System.setProperty("tinylog.writer.labeling", "count");
+		PropertiesLoader.reload();
+		LabellerWriter writer = (LabellerWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertNotNull(writer.getLabeller());
+		assertEquals(CountLabeller.class, writer.getLabeller().getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.labeling", "timestamp");
+		PropertiesLoader.reload();
+		writer = (LabellerWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertNotNull(writer.getLabeller());
+		assertEquals(TimestampLabeller.class, writer.getLabeller().getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.labeling", "timestamp: yyyyMMdd");
+		PropertiesLoader.reload();
+		writer = (LabellerWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertNotNull(writer.getLabeller());
+		assertEquals(TimestampLabeller.class, writer.getLabeller().getClass());
+		Logger.setWriter(null);
+
+		System.setProperty("tinylog.writer.labeling", "invalid");
+		PropertiesLoader.reload();
+		writer = (LabellerWriter) Logger.getWriter();
+		assertNotNull(writer);
+		assertNull(writer.getLabeller());
 		Logger.setWriter(null);
 	}
 

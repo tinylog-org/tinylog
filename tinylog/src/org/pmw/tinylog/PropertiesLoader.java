@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.pmw.tinylog.labellers.Labeller;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
@@ -159,7 +160,7 @@ public final class PropertiesLoader {
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {
 		try {
-			Enumeration<URL> urls = ClassLoader.getSystemResources(SERVICES_PREFIX + service.getName());
+			Enumeration<URL> urls = ClassLoader.getSystemResources(SERVICES_PREFIX + service.getPackage().getName());
 			if (urls == null || !urls.hasMoreElements()) {
 				return Collections.emptyList();
 			} else {
@@ -289,8 +290,10 @@ public final class PropertiesLoader {
 					}
 				} else if (boolean.class.equals(type)) {
 					parameters[i] = "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value);
+				} else if (Labeller.class.equals(type)) {
+					parameters[i] = parse(Labeller.class, value);
 				} else if (Policy.class.equals(type)) {
-					parameters[i] = parsePolicy(value);
+					parameters[i] = parse(Policy.class, value);
 				} else if (Policy[].class.equals(type)) {
 					parameters[i] = parsePolicies(value);
 				} else {
@@ -306,7 +309,7 @@ public final class PropertiesLoader {
 	private static Policy[] parsePolicies(final String string) {
 		List<Policy> policies = new ArrayList<Policy>();
 		for (String part : string.split(Pattern.quote(", "))) {
-			Policy policy = parsePolicy(part);
+			Policy policy = (Policy) parse(Policy.class, part);
 			if (policy != null) {
 				policies.add(policy);
 			}
@@ -314,15 +317,15 @@ public final class PropertiesLoader {
 		return policies.toArray(new Policy[0]);
 	}
 
-	private static Policy parsePolicy(final String string) {
+	private static Object parse(final Class<?> service, final String string) {
 		int separator = string.indexOf(':');
 		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
 		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
 
-		for (Class<?> implementation : findImplementations(Policy.class)) {
-			if (Policy.class.isAssignableFrom(implementation)) {
+		for (Class<?> implementation : findImplementations(service)) {
+			if (service.isAssignableFrom(implementation)) {
 				if (name.equalsIgnoreCase(getName(implementation))) {
-					return loadPolicy(implementation, parameter);
+					return createInstance(implementation, parameter);
 				}
 			}
 		}
@@ -330,20 +333,20 @@ public final class PropertiesLoader {
 		return null;
 	}
 
-	private static Policy loadPolicy(final Class<?> policyClass, final String parameter) {
+	private static Object createInstance(final Class<?> clazz, final String parameter) {
 		try {
 			if (parameter != null) {
 				try {
-					Constructor<?> constructor = policyClass.getDeclaredConstructor(String.class);
+					Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
 					constructor.setAccessible(true);
-					return (Policy) constructor.newInstance(parameter);
+					return constructor.newInstance(parameter);
 				} catch (NoSuchMethodException ex) {
 					// Continue
 				}
 			}
-			Constructor<?> constructor = policyClass.getDeclaredConstructor();
+			Constructor<?> constructor = clazz.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			return (Policy) constructor.newInstance();
+			return constructor.newInstance();
 		} catch (InstantiationException ex) {
 			return null;
 		} catch (IllegalAccessException ex) {

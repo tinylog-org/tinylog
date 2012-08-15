@@ -14,6 +14,7 @@
 package org.pmw.tinylog.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.pmw.tinylog.ELoggingLevel;
@@ -28,6 +29,20 @@ public final class PolicyWriter implements LoggingWriter {
 	private final List<? extends Policy> policies;
 
 	/**
+	 * @param policy
+	 *            Policy to store
+	 * @param ignored
+	 *            Parameter will be ignored (is only defined to distinguish constructors)
+	 */
+	public PolicyWriter(final Policy policy, final boolean ignored) {
+		if (policy == null) {
+			this.policies = Collections.emptyList();
+		} else {
+			this.policies = Collections.singletonList(policy);
+		}
+	}
+
+	/**
 	 * @param policies
 	 *            Policies to store
 	 */
@@ -36,7 +51,7 @@ public final class PolicyWriter implements LoggingWriter {
 	}
 
 	/**
-	 * Returns the name of the policy.
+	 * Returns the name of the writer.
 	 * 
 	 * @return "policy"
 	 */
@@ -45,12 +60,12 @@ public final class PolicyWriter implements LoggingWriter {
 	}
 
 	/**
-	 * Returns the supported properties ("policies") for this writer.
+	 * Returns the supported properties for this writer.
 	 * 
-	 * @return String array with the property "policies"
+	 * @return String array with the properties
 	 */
 	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "policies" } };
+		return new String[][] { new String[] { "policy", "ignored" }, new String[] { "policies" } };
 	}
 
 	/**
