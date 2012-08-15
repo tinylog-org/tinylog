@@ -13,7 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.Logger;
 
 /**
@@ -35,6 +35,6 @@ public interface LoggingWriter {
 	 * @param logEntry
 	 *            Log entry to output
 	 */
-	void write(ELoggingLevel level, String logEntry);
+	void write(LoggingLevel level, String logEntry);
 
 }

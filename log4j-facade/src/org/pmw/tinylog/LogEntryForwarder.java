@@ -18,11 +18,11 @@ public class LogEntryForwarder {
 	private LogEntryForwarder() {
 	}
 
-	public static void forward(final ELoggingLevel level, final String message) {
+	public static void forward(final LoggingLevel level, final String message) {
 		Logger.output(5, level, null, message);
 	}
 
-	public static void forward(final ELoggingLevel level, final String message, final Throwable exception) {
+	public static void forward(final LoggingLevel level, final String message, final Throwable exception) {
 		Logger.output(5, level, exception, message);
 	}
 

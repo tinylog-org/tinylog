@@ -76,19 +76,19 @@ final class Tokenizer {
 
 	private static Token getToken(final String text, final Locale locale) {
 		if ("{thread}".equals(text)) {
-			return new Token(EToken.THREAD);
+			return new Token(TokenType.THREAD);
 		} else if ("{class}".equals(text)) {
-			return new Token(EToken.CLASS);
+			return new Token(TokenType.CLASS);
 		} else if ("{method}".equals(text)) {
-			return new Token(EToken.METHOD);
+			return new Token(TokenType.METHOD);
 		} else if ("{file}".equals(text)) {
-			return new Token(EToken.FILE);
+			return new Token(TokenType.FILE);
 		} else if ("{line}".equals(text)) {
-			return new Token(EToken.LINE_NUMBER);
+			return new Token(TokenType.LINE_NUMBER);
 		} else if ("{level}".equals(text)) {
-			return new Token(EToken.LOGGING_LEVEL);
+			return new Token(TokenType.LOGGING_LEVEL);
 		} else if ("{message}".equals(text)) {
-			return new Token(EToken.MESSAGE);
+			return new Token(TokenType.MESSAGE);
 		} else if (text.startsWith("{date") && text.endsWith("}")) {
 			String dateFormatPattern;
 			if (text.length() > 6) {
@@ -96,9 +96,9 @@ final class Tokenizer {
 			} else {
 				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
 			}
-			return new Token(EToken.DATE, new SimpleDateFormat(dateFormatPattern, locale));
+			return new Token(TokenType.DATE, new SimpleDateFormat(dateFormatPattern, locale));
 		} else {
-			return new Token(EToken.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
+			return new Token(TokenType.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
 		}
 	}
 

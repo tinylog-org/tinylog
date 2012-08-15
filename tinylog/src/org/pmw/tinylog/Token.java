@@ -20,14 +20,14 @@ package org.pmw.tinylog;
  */
 final class Token {
 
-	private final EToken type;
+	private final TokenType type;
 	private final Object data;
 
 	/**
 	 * @param type
 	 *            Token type
 	 */
-	public Token(final EToken type) {
+	public Token(final TokenType type) {
 		this.type = type;
 		this.data = null;
 	}
@@ -39,7 +39,7 @@ final class Token {
 	 * @param data
 	 *            Additional data for the token (can be <code>null</code>)
 	 */
-	public Token(final EToken type, final Object data) {
+	public Token(final TokenType type, final Object data) {
 		this.type = type;
 		this.data = data;
 	}
@@ -49,7 +49,7 @@ final class Token {
 	 * 
 	 * @return Token type
 	 */
-	public EToken getType() {
+	public TokenType getType() {
 		return type;
 	}
 

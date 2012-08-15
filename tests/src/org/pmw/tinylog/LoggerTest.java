@@ -47,17 +47,17 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testLoggingLevel() {
-		Logger.setLoggingLevel(ELoggingLevel.TRACE);
-		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel());
+		Logger.setLoggingLevel(LoggingLevel.TRACE);
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel());
 
-		Logger.setLoggingLevel(ELoggingLevel.OFF);
-		assertEquals(ELoggingLevel.OFF, Logger.getLoggingLevel());
+		Logger.setLoggingLevel(LoggingLevel.OFF);
+		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
 
-		Logger.setLoggingLevel(ELoggingLevel.ERROR);
-		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+		Logger.setLoggingLevel(LoggingLevel.ERROR);
+		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
 
 		Logger.setLoggingLevel(null);
-		assertEquals(ELoggingLevel.OFF, Logger.getLoggingLevel());
+		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
 	}
 
 	/**
@@ -127,17 +127,17 @@ public class LoggerTest {
 	public final void testTrace() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.TRACE);
+		Logger.setLoggingLevel(LoggingLevel.TRACE);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.trace("Hello!");
-		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
 
 		Logger.trace(new Exception());
-		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
 
 		Logger.trace(new Exception(), "Hello!");
-		assertEquals(ELoggingLevel.TRACE, writer.consumeLevel());
+		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
 	}
 
 	/**
@@ -147,17 +147,17 @@ public class LoggerTest {
 	public final void testDebug() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.DEBUG);
+		Logger.setLoggingLevel(LoggingLevel.DEBUG);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.debug("Hello!");
-		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
 
 		Logger.debug(new Exception());
-		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
 
 		Logger.debug(new Exception(), "Hello!");
-		assertEquals(ELoggingLevel.DEBUG, writer.consumeLevel());
+		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
 	}
 
 	/**
@@ -167,17 +167,17 @@ public class LoggerTest {
 	public final void testInfo() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.info("Hello!");
-		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
 
 		Logger.info(new Exception());
-		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
 
 		Logger.info(new Exception(), "Hello!");
-		assertEquals(ELoggingLevel.INFO, writer.consumeLevel());
+		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
 	}
 
 	/**
@@ -187,17 +187,17 @@ public class LoggerTest {
 	public final void testWarn() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.WARNING);
+		Logger.setLoggingLevel(LoggingLevel.WARNING);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.warn("Hello!");
-		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
 
 		Logger.warn(new Exception());
-		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
 
 		Logger.warn(new Exception(), "Hello!");
-		assertEquals(ELoggingLevel.WARNING, writer.consumeLevel());
+		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
 	}
 
 	/**
@@ -207,17 +207,17 @@ public class LoggerTest {
 	public final void testError() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.ERROR);
+		Logger.setLoggingLevel(LoggingLevel.ERROR);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.error("Hello!");
-		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
 
 		Logger.error(new Exception());
-		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
 
 		Logger.error(new Exception(), "Hello!");
-		assertEquals(ELoggingLevel.ERROR, writer.consumeLevel());
+		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
 	}
 
 	/**
@@ -228,40 +228,40 @@ public class LoggerTest {
 
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
 
-		Logger.setLoggingLevel("a.b", ELoggingLevel.DEBUG);
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a"));
-		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
-		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b.c"));
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
+		Logger.setLoggingLevel("a.b", LoggingLevel.DEBUG);
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a"));
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b.c"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
 
 		Logger.resetLoggingLevel("a.b");
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
 
-		Logger.setLoggingLevel("a.b", ELoggingLevel.DEBUG);
-		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+		Logger.setLoggingLevel("a.b", LoggingLevel.DEBUG);
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
 
 		Logger.setLoggingLevel("a.b", null);
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
 
 		Logger.debug("Hello!");
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
 		assertNull(writer.consumeMessage());
 
-		Logger.setLoggingLevel("org.pmw.tinylog", ELoggingLevel.INFO);
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.setLoggingLevel("org.pmw.tinylog", LoggingLevel.INFO);
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
 		Logger.debug("Hello!");
 		assertNull(writer.consumeMessage());
 
-		Logger.setLoggingLevel("org.pmw.tinylog", ELoggingLevel.DEBUG);
-		assertEquals(ELoggingLevel.DEBUG, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.setLoggingLevel("org.pmw.tinylog", LoggingLevel.DEBUG);
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("org.pmw.tinylog"));
 		Logger.debug("Hello!");
 		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.resetAllLoggingLevel();
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
 		Logger.debug("Hello!");
 		assertNull(writer.consumeMessage());
 	}
@@ -273,14 +273,14 @@ public class LoggerTest {
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setLoggingFormat("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}");
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
 		assertEquals(
 				MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread.currentThread().getName(),
-						LoggerTest.class.getName(), lineNumber, ELoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE),
+						LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE),
 				writer.consumeMessage());
 	}
 
@@ -291,7 +291,7 @@ public class LoggerTest {
 	public final void testFailedLogEntry() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setMaxStackTraceElements(0);
 
 		Object object = new Object() {
@@ -316,7 +316,7 @@ public class LoggerTest {
 	public final void testExceptions() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
 
 		Logger.setMaxStackTraceElements(0);
@@ -362,7 +362,7 @@ public class LoggerTest {
 					try {
 						for (int n = 0; n < 100; ++n) {
 							Logger.setWriter(new StoreWriter());
-							Logger.setLoggingLevel(ELoggingLevel.TRACE);
+							Logger.setLoggingLevel(LoggingLevel.TRACE);
 							Logger.info("Test threading! This is log entry {0}.", n);
 						}
 					} catch (Exception ex) {

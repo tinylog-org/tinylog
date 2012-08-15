@@ -13,7 +13,7 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.LogEntryForwarder;
 
 public abstract class Category {
@@ -122,70 +122,70 @@ public abstract class Category {
 
 	public void error(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString());
 		}
 	}
 
 	public void error(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.ERROR, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString(), ex);
 		}
 	}
 
 	public void fatal(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString());
 		}
 	}
 
 	public void fatal(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.ERROR, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString(), ex);
 		}
 	}
 
 	public void warn(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.WARNING, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.WARNING, message.toString());
 		}
 	}
 
 	public void warn(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.WARNING, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.WARNING, message.toString(), ex);
 		}
 	}
 
 	public void info(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.INFO, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.INFO, message.toString());
 		}
 	}
 
 	public void info(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.INFO, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.INFO, message.toString(), ex);
 		}
 	}
 
 	public void debug(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.DEBUG, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.DEBUG, message.toString());
 		}
 	}
 
 	public void debug(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.DEBUG, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.DEBUG, message.toString(), ex);
 		}
 	}
 
 	public boolean isInfoEnabled() {
-		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= ELoggingLevel.INFO.ordinal();
+		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= LoggingLevel.INFO.ordinal();
 	}
 
 	public boolean isDebugEnabled() {
-		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= ELoggingLevel.DEBUG.ordinal();
+		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= LoggingLevel.DEBUG.ordinal();
 	}
 
 	public boolean isEnabledFor(final Priority level) {

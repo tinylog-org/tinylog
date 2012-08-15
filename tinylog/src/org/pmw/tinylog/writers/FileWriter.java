@@ -16,7 +16,7 @@ package org.pmw.tinylog.writers;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Writes log entries to a file.
@@ -56,7 +56,7 @@ public class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final ELoggingLevel level, final String logEntry) {
+	public final void write(final LoggingLevel level, final String logEntry) {
 		try {
 			writer.write(logEntry);
 			writer.flush();

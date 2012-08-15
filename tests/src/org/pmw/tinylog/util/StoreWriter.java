@@ -13,7 +13,7 @@
 
 package org.pmw.tinylog.util;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -21,7 +21,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class StoreWriter implements LoggingWriter {
 
-	private ELoggingLevel level;
+	private LoggingLevel level;
 	private String entry;
 
 	/** */
@@ -29,7 +29,7 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final ELoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		this.level = level;
 		this.entry = logEntry;
 	}
@@ -48,8 +48,8 @@ public final class StoreWriter implements LoggingWriter {
 	 * 
 	 * @return The logging level of the last log entry
 	 */
-	public ELoggingLevel consumeLevel() {
-		ELoggingLevel copy = level;
+	public LoggingLevel consumeLevel() {
+		LoggingLevel copy = level;
 		level = null;
 		entry = null;
 		return copy;

@@ -15,7 +15,7 @@ package org.pmw.tinylog.writers;
 
 import java.io.PrintStream;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Writes log entries to the console.
@@ -32,12 +32,12 @@ public class ConsoleWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final ELoggingLevel level, final String logEntry) {
+	public final void write(final LoggingLevel level, final String logEntry) {
 		getPrintStream(level).print(logEntry);
 	}
 
-	private static PrintStream getPrintStream(final ELoggingLevel level) {
-		if (level == ELoggingLevel.ERROR || level == ELoggingLevel.WARNING) {
+	private static PrintStream getPrintStream(final LoggingLevel level) {
+		if (level == LoggingLevel.ERROR || level == LoggingLevel.WARNING) {
 			return System.err;
 		} else {
 			return System.out;

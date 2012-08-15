@@ -37,10 +37,10 @@ public class RegressionsTest {
 	public final void testWrongClass() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.TRACE);
+		Logger.setLoggingLevel(LoggingLevel.TRACE);
 		Logger.setLoggingFormat("{class}");
 
-		Logger.setLoggingLevel("org", ELoggingLevel.TRACE);
+		Logger.setLoggingLevel("org", LoggingLevel.TRACE);
 		Logger.info("");
 		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Was already OK
 		Logger.resetLoggingLevel("org");

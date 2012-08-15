@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
@@ -78,7 +78,7 @@ public final class PolicyWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final ELoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		// Do nothing
 	}
 

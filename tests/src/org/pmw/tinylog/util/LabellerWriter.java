@@ -13,7 +13,7 @@
 
 package org.pmw.tinylog.util;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.labellers.Labeller;
 import org.pmw.tinylog.writers.LoggingWriter;
 
@@ -60,7 +60,7 @@ public final class LabellerWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final ELoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		// Do nothing
 	}
 

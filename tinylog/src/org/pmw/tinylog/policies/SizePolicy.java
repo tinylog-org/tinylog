@@ -15,7 +15,7 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.PropertiesLoader;
 
 /**
@@ -87,7 +87,7 @@ public class SizePolicy implements Policy {
 	}
 
 	@Override
-	public final boolean check(final ELoggingLevel level, final String logEntry) {
+	public final boolean check(final LoggingLevel level, final String logEntry) {
 		size += logEntry.getBytes().length;
 		return size <= maxSize;
 	}

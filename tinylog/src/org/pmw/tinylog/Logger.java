@@ -29,7 +29,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link org.pmw.tinylog.ELoggingLevel#INFO}, which ignores trace and debug log entries.
+ * The default logging level is {@link org.pmw.tinylog.LoggingLevel#INFO}, which ignores trace and debug log entries.
  */
 public final class Logger {
 
@@ -39,8 +39,8 @@ public final class Logger {
 
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile LoggingWriter loggingWriter = new ConsoleWriter();
-	private static volatile ELoggingLevel loggingLevel = ELoggingLevel.INFO;
-	private static final Map<String, ELoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, ELoggingLevel>());
+	private static volatile LoggingLevel loggingLevel = LoggingLevel.INFO;
+	private static final Map<String, LoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, LoggingLevel>());
 	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
 	private static volatile Locale locale = Locale.getDefault();
 	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
@@ -57,7 +57,7 @@ public final class Logger {
 	 * 
 	 * @return The current logging level
 	 */
-	public static ELoggingLevel getLoggingLevel() {
+	public static LoggingLevel getLoggingLevel() {
 		return loggingLevel;
 	}
 
@@ -68,9 +68,9 @@ public final class Logger {
 	 * @param level
 	 *            New logging level
 	 */
-	public static void setLoggingLevel(final ELoggingLevel level) {
+	public static void setLoggingLevel(final LoggingLevel level) {
 		if (level == null) {
-			loggingLevel = ELoggingLevel.OFF;
+			loggingLevel = LoggingLevel.OFF;
 		} else {
 			loggingLevel = level;
 		}
@@ -84,7 +84,7 @@ public final class Logger {
 	 * 
 	 * @return The logging level
 	 */
-	public static ELoggingLevel getLoggingLevel(final String packageName) {
+	public static LoggingLevel getLoggingLevel(final String packageName) {
 		return getLoggingLevelOfPackage(packageName);
 	}
 
@@ -98,7 +98,7 @@ public final class Logger {
 	 * @param level
 	 *            The logging level (or <code>null</code> to reset it to the default logging level)
 	 */
-	public static void setLoggingLevel(final String packageName, final ELoggingLevel level) {
+	public static void setLoggingLevel(final String packageName, final LoggingLevel level) {
 		if (level == null) {
 			packageLoggingLevels.remove(packageName);
 		} else {
@@ -231,7 +231,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, null, message, arguments);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, exception, message, arguments);
 	}
 
 	/**
@@ -257,7 +257,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void trace(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.TRACE, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, exception, null);
 	}
 
 	/**
@@ -271,7 +271,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, message, arguments);
 	}
 
 	/**
@@ -287,7 +287,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, exception, message, arguments);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void debug(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.DEBUG, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, exception, null);
 	}
 
 	/**
@@ -311,7 +311,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, message, arguments);
 	}
 
 	/**
@@ -327,7 +327,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, exception, message, arguments);
 	}
 
 	/**
@@ -337,7 +337,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void info(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.INFO, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, exception, null);
 	}
 
 	/**
@@ -351,7 +351,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, null, message, arguments);
 	}
 
 	/**
@@ -367,7 +367,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, message, arguments);
 	}
 
 	/**
@@ -377,7 +377,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void warn(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.WARNING, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, null);
 	}
 
 	/**
@@ -391,7 +391,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, null, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, null, message, arguments);
 	}
 
 	/**
@@ -407,7 +407,7 @@ public final class Logger {
 	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, exception, message, arguments);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, message, arguments);
 	}
 
 	/**
@@ -417,7 +417,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void error(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, ELoggingLevel.ERROR, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, null);
 	}
 
 	/**
@@ -434,12 +434,12 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	static void output(final int strackTraceDeep, final ELoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
+	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		LoggingWriter currentWriter = loggingWriter;
 
 		if (currentWriter != null) {
 			StackTraceElement stackTraceElement = null;
-			ELoggingLevel activeLoggingLevel = loggingLevel;
+			LoggingLevel activeLoggingLevel = loggingLevel;
 
 			if (!packageLoggingLevels.isEmpty()) {
 				stackTraceElement = getStackTraceElement(strackTraceDeep);
@@ -451,14 +451,14 @@ public final class Logger {
 				try {
 					logEntry = createLogEntry(strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					logEntry = createLogEntry(strackTraceDeep + 1, ELoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+					logEntry = createLogEntry(strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
 				currentWriter.write(level, logEntry);
 			}
 		}
 	}
 
-	private static String createLogEntry(final int strackTraceDeep, final ELoggingLevel level, final StackTraceElement createdStackTraceElement,
+	private static String createLogEntry(final int strackTraceDeep, final LoggingLevel level, final StackTraceElement createdStackTraceElement,
 			final Throwable exception, final String message, final Object... arguments) {
 		StringBuilder builder = new StringBuilder();
 
@@ -551,7 +551,7 @@ public final class Logger {
 		return builder.toString();
 	}
 
-	private static ELoggingLevel getLoggingLevelOfClass(final String className) {
+	private static LoggingLevel getLoggingLevelOfClass(final String className) {
 		int index = className.lastIndexOf('.');
 		if (index > 0) {
 			return getLoggingLevelOfPackage(className.substring(0, index));
@@ -560,10 +560,10 @@ public final class Logger {
 		}
 	}
 
-	private static ELoggingLevel getLoggingLevelOfPackage(final String packageName) {
+	private static LoggingLevel getLoggingLevelOfPackage(final String packageName) {
 		String packageKey = packageName;
 		while (true) {
-			ELoggingLevel level = packageLoggingLevels.get(packageKey);
+			LoggingLevel level = packageLoggingLevels.get(packageKey);
 			if (level != null) {
 				return level;
 			}

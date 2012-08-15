@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.junit.Test;
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.util.SilentOutputStream;
 
@@ -48,14 +48,14 @@ public class RollingFileWriterTest {
 		file.delete();
 		file.deleteOnExit();
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
-		writer.write(ELoggingLevel.INFO, "Hello\n");
-		writer.write(ELoggingLevel.INFO, "World\n");
+		writer.write(LoggingLevel.INFO, "Hello\n");
+		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
 
 		PrintStream defaultPrintStream = System.err;
 		SilentOutputStream outputStream = new SilentOutputStream();
 		System.setErr(new PrintStream(outputStream));
-		writer.write(ELoggingLevel.INFO, "Won't be written\n");
+		writer.write(LoggingLevel.INFO, "Won't be written\n");
 		System.setErr(defaultPrintStream);
 		assertTrue(outputStream.isUsed());
 
@@ -86,7 +86,7 @@ public class RollingFileWriterTest {
 		backupFile3.deleteOnExit();
 
 		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
-		writer.write(ELoggingLevel.INFO, "1");
+		writer.write(LoggingLevel.INFO, "1");
 		writer.close();
 
 		assertTrue(baseFile.exists());
@@ -94,7 +94,7 @@ public class RollingFileWriterTest {
 		assertFalse(backupFile2.exists());
 
 		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
-		writer.write(ELoggingLevel.INFO, "2");
+		writer.write(LoggingLevel.INFO, "2");
 		writer.close();
 
 		assertTrue(baseFile.exists());
@@ -103,7 +103,7 @@ public class RollingFileWriterTest {
 		assertFalse(backupFile3.exists());
 
 		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
-		writer.write(ELoggingLevel.INFO, "3");
+		writer.write(LoggingLevel.INFO, "3");
 		writer.close();
 
 		assertTrue(baseFile.exists());
@@ -144,10 +144,10 @@ public class RollingFileWriterTest {
 
 		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 1, new SizePolicy(3));
 		backupFile.delete();
-		writer.write(ELoggingLevel.INFO, "1");
-		writer.write(ELoggingLevel.INFO, "2");
-		writer.write(ELoggingLevel.INFO, "3");
-		writer.write(ELoggingLevel.INFO, "4");
+		writer.write(LoggingLevel.INFO, "1");
+		writer.write(LoggingLevel.INFO, "2");
+		writer.write(LoggingLevel.INFO, "3");
+		writer.write(LoggingLevel.INFO, "4");
 		writer.close();
 
 		BufferedReader reader = new BufferedReader(new FileReader(baseFile));

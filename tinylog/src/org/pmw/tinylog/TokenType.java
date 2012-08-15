@@ -14,38 +14,55 @@
 package org.pmw.tinylog;
 
 /**
- * Logging levels of {@link Logger}.
+ * Token types.
  */
-public enum ELoggingLevel {
+enum TokenType {
 
 	/**
-	 * Output all log entries
+	 * Plain text
 	 */
-	TRACE,
+	PLAIN_TEXT,
 
 	/**
-	 * Output all log entries but trace log entries
+	 * The current date
 	 */
-	DEBUG,
+	DATE,
 
 	/**
-	 * Output all log entries but trace and debug log entries (default)
+	 * The name of the current thread
 	 */
-	INFO,
+	THREAD,
 
 	/**
-	 * Output error and warning log entries
+	 * The class name of the caller
 	 */
-	WARNING,
+	CLASS,
 
 	/**
-	 * Output only error log entries
+	 * The method name of the caller
 	 */
-	ERROR,
+	METHOD,
 
 	/**
-	 * Disable logging (no log entries will be output)
+	 * The source filename of the caller
 	 */
-	OFF;
+	FILE,
+
+	/**
+	 * The line number of calling
+	 */
+	LINE_NUMBER,
+
+	/**
+	 * The logging level
+	 * 
+	 * @see ELoggingLevel
+	 */
+	LOGGING_LEVEL,
+
+	/**
+	 * The logging message (including a possible exception stack trace)
+	 */
+	MESSAGE;
 
 }

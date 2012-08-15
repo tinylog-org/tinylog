@@ -92,7 +92,7 @@ public final class PropertiesLoader {
 		String level = properties.getProperty(LEVEL_PROPERTY);
 		if (level != null && !level.isEmpty()) {
 			try {
-				Logger.setLoggingLevel(ELoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
+				Logger.setLoggingLevel(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
 				// Ignore
 			}
@@ -105,7 +105,7 @@ public final class PropertiesLoader {
 				String packageName = key.substring(PACKAGE_LEVEL_PREFIX.length());
 				String value = properties.getProperty(key);
 				try {
-					ELoggingLevel loggingLevel = ELoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
+					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
 					Logger.setLoggingLevel(packageName, loggingLevel);
 				} catch (IllegalArgumentException ex) {
 					// Illegal logging level => reset

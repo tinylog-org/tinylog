@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.junit.Test;
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.SilentOutputStream;
 
 /**
@@ -45,14 +45,14 @@ public class FileWriterTest {
 		File file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
-		writer.write(ELoggingLevel.INFO, "Hello\n");
-		writer.write(ELoggingLevel.INFO, "World\n");
+		writer.write(LoggingLevel.INFO, "Hello\n");
+		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
 
 		PrintStream defaultPrintStream = System.err;
 		SilentOutputStream outputStream = new SilentOutputStream();
 		System.setErr(new PrintStream(outputStream));
-		writer.write(ELoggingLevel.INFO, "Won't be written\n");
+		writer.write(LoggingLevel.INFO, "Won't be written\n");
 		System.setErr(defaultPrintStream);
 		assertTrue(outputStream.isUsed());
 

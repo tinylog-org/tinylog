@@ -13,7 +13,7 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.LogEntryForwarder;
 
 public class Logger extends Category {
@@ -37,18 +37,18 @@ public class Logger extends Category {
 
 	public void trace(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.TRACE, message.toString());
+			LogEntryForwarder.forward(LoggingLevel.TRACE, message.toString());
 		}
 	}
 
 	public void trace(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(ELoggingLevel.TRACE, message.toString(), ex);
+			LogEntryForwarder.forward(LoggingLevel.TRACE, message.toString(), ex);
 		}
 	}
 
 	public boolean isTraceEnabled() {
-		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= ELoggingLevel.TRACE.ordinal();
+		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= LoggingLevel.TRACE.ordinal();
 	}
 
 }

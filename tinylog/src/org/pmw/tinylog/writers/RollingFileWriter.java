@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.labellers.CountLabeller;
 import org.pmw.tinylog.labellers.Labeller;
 import org.pmw.tinylog.policies.Policy;
@@ -112,7 +112,7 @@ public class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final ELoggingLevel level, final String logEntry) {
+	public final void write(final LoggingLevel level, final String logEntry) {
 		synchronized (this) {
 			if (!checkPolicies(level, logEntry)) {
 				try {
@@ -158,7 +158,7 @@ public class RollingFileWriter implements LoggingWriter {
 		}
 	}
 
-	private boolean checkPolicies(final ELoggingLevel level, final String logEntry) {
+	private boolean checkPolicies(final LoggingLevel level, final String logEntry) {
 		for (Policy policy : policies) {
 			if (!policy.check(level, logEntry)) {
 				resetPolicies();

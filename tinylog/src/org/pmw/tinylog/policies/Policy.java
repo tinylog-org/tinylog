@@ -15,7 +15,7 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
@@ -43,7 +43,7 @@ public interface Policy {
 	 *            Log entry to write
 	 * @return <code>true</code> to continue the current log file, <code>false</code> to trigger a rollover
 	 */
-	boolean check(ELoggingLevel level, String logEntry);
+	boolean check(LoggingLevel level, String logEntry);
 
 	/**
 	 * The log file was rolled and reset the policy.

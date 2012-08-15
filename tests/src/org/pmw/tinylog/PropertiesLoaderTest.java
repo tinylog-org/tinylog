@@ -73,15 +73,15 @@ public class PropertiesLoaderTest {
 	public final void testLevel() {
 		System.setProperty("tinylog.level", "TRACE");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel());
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel());
 
 		System.setProperty("tinylog.level", "error");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
 
 		System.setProperty("tinylog.level", "invalid");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
 	}
 
 	/**
@@ -89,23 +89,23 @@ public class PropertiesLoaderTest {
 	 */
 	@Test
 	public final void testPackageLevels() {
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 
 		System.setProperty("tinylog.level:a.b", "WARNING");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.WARNING, Logger.getLoggingLevel("a.b"));
+		assertEquals(LoggingLevel.WARNING, Logger.getLoggingLevel("a.b"));
 
 		System.setProperty("tinylog.level:a.b.c", "TRACE");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.TRACE, Logger.getLoggingLevel("a.b.c"));
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.b.c"));
 
 		System.setProperty("tinylog.level:org.pmw.tinylog", "ERROR");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel("org.pmw.tinylog"));
 
 		System.setProperty("tinylog.level:org.pmw.tinylog", "invalid");
 		PropertiesLoader.reload();
-		assertEquals(ELoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
 
 		Logger.resetAllLoggingLevel();
 	}
@@ -117,7 +117,7 @@ public class PropertiesLoaderTest {
 	public final void testFormat() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 
 		System.setProperty("tinylog.format", "My log entry");
 		PropertiesLoader.reload();
@@ -145,7 +145,7 @@ public class PropertiesLoaderTest {
 	public final void testLocale() {
 		StoreWriter writer = new StoreWriter();
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.INFO);
+		Logger.setLoggingLevel(LoggingLevel.INFO);
 		Logger.setLoggingFormat("{message}");
 
 		System.setProperty("tinylog.locale", "de");
@@ -185,7 +185,7 @@ public class PropertiesLoaderTest {
 		StoreWriter writer = new StoreWriter();
 		Logger.setLoggingFormat("{message}");
 		Logger.setWriter(writer);
-		Logger.setLoggingLevel(ELoggingLevel.ERROR);
+		Logger.setLoggingLevel(LoggingLevel.ERROR);
 
 		System.setProperty("tinylog.stacktrace", "0");
 		PropertiesLoader.reload();
@@ -238,7 +238,7 @@ public class PropertiesLoaderTest {
 	public final void testLoggingWriter() throws IOException {
 		Logger.setLoggingFormat(null);
 		Logger.setWriter(null);
-		Logger.setLoggingLevel(ELoggingLevel.TRACE);
+		Logger.setLoggingLevel(LoggingLevel.TRACE);
 
 		LoggingWriter writer = Logger.getWriter();
 		assertNull(writer);
@@ -433,7 +433,7 @@ public class PropertiesLoaderTest {
 	public final void testLoadFromFile() {
 		PropertiesLoader.reload();
 		PropertiesLoader.loadFromFile("./propertiesLoaderTest.properties");
-		assertEquals(ELoggingLevel.ERROR, Logger.getLoggingLevel());
+		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
 		assertEquals("Hello from file!", Logger.getLoggingFormat());
 		assertEquals(Locale.US, Logger.getLocale());
 		assertEquals(42, Logger.getMaxStackTraceElements());

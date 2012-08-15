@@ -21,7 +21,7 @@ import java.io.PrintStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.ELoggingLevel;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.SilentOutputStream;
 
 /**
@@ -69,7 +69,7 @@ public class ConsoleWriterTest {
 	 */
 	@Test
 	public final void testErrorStream() {
-		writer.write(ELoggingLevel.ERROR, "Hello\n");
+		writer.write(LoggingLevel.ERROR, "Hello\n");
 
 		assertTrue(errorStream.isUsed());
 		assertFalse(outputStream.isUsed());
@@ -80,7 +80,7 @@ public class ConsoleWriterTest {
 	 */
 	@Test
 	public final void testOutputStream() {
-		writer.write(ELoggingLevel.INFO, "Hello\n");
+		writer.write(LoggingLevel.INFO, "Hello\n");
 
 		assertFalse(errorStream.isUsed());
 		assertTrue(outputStream.isUsed());
