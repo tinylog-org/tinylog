@@ -66,6 +66,15 @@ public abstract class AbstractTimeBasedTest {
 	}
 
 	/**
+	 * Get the current time.
+	 * 
+	 * @return Current time in milliseconds
+	 */
+	protected final long getTime() {
+		return mockSystem.time;
+	}
+
+	/**
 	 * Set the current time.
 	 * 
 	 * @param time

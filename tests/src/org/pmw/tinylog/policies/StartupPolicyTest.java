@@ -16,6 +16,9 @@ package org.pmw.tinylog.policies;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
 
 /**
@@ -27,16 +30,26 @@ public class StartupPolicyTest {
 
 	/**
 	 * Test rolling.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
 	 */
 	@Test
-	public final void testRolling() {
+	public final void testRolling() throws IOException {
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+
 		IPolicy policy = new StartupPolicy();
+		assertFalse(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null, null));
 		policy.reset();
 		assertTrue(policy.check(null, null));
 
+		file.delete();
+
 		policy = new StartupPolicy();
-		assertFalse(policy.check(null, null));
-		policy.reset();
+		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
 		assertTrue(policy.check(null, null));
 		policy.reset();

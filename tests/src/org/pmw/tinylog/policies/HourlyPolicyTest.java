@@ -17,6 +17,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
 
 /**
@@ -66,6 +69,65 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		assertTrue(policy.check(null, null));
 		increaseTime(HOUR / 2L);
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test continuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		setTime(HOUR / 2L);
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(getTime());
+
+		IPolicy policy = new HourlyPolicy(true);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(HOUR / 2L - 1L);
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		increaseTime(-1L);
+		policy = new HourlyPolicy(true);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		file.delete();
+
+		policy = new HourlyPolicy();
+		assertTrue(policy.initCheck(file));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testDisontinueLogFile() throws IOException {
+		setTime(HOUR);
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(0L);
+
+		IPolicy policy = new HourlyPolicy();
+		assertFalse(policy.initCheck(file));
+
+		policy = new HourlyPolicy(false);
+		assertFalse(policy.initCheck(file));
+
+		policy = new HourlyPolicy(true);
+		assertFalse(policy.initCheck(file));
+
+		file.delete();
 	}
 
 	/**

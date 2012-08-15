@@ -17,6 +17,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
 
 /**
@@ -68,6 +71,65 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		assertTrue(policy.check(null, null));
 		increaseTime(1L);
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test continuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		setTime(DAY * 16L);
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(getTime());
+
+		IPolicy policy = new MonthlyPolicy(true);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 15L - 1L);
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		increaseTime(-1L);
+		policy = new MonthlyPolicy(true);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		file.delete();
+
+		policy = new MonthlyPolicy();
+		assertTrue(policy.initCheck(file));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testDisontinueLogFile() throws IOException {
+		setTime(DAY * 31L);
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(0L);
+
+		IPolicy policy = new MonthlyPolicy();
+		assertFalse(policy.initCheck(file));
+
+		policy = new MonthlyPolicy(false);
+		assertFalse(policy.initCheck(file));
+
+		policy = new MonthlyPolicy(true);
+		assertFalse(policy.initCheck(file));
+
+		file.delete();
 	}
 
 	/**

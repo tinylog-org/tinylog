@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog.policies;
 
+import java.io.File;
+
 import org.pmw.tinylog.ELoggingLevel;
 
 /**
@@ -20,23 +22,19 @@ import org.pmw.tinylog.ELoggingLevel;
  */
 public class StartupPolicy implements IPolicy {
 
-	private boolean rolled;
-
-	/** */
-	public StartupPolicy() {
-		this.rolled = false;
+	@Override
+	public final boolean initCheck(final File logFile) {
+		return !logFile.exists();
 	}
 
 	@Override
 	public final boolean check(final ELoggingLevel level, final String logEntry) {
-		return rolled;
+		return true;
 	}
 
 	@Override
 	public final void reset() {
-		if (!rolled) {
-			rolled = true;
-		}
+		// Do nothing
 	}
 
 }

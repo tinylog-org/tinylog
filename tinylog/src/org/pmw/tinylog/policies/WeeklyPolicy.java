@@ -33,7 +33,7 @@ public class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	/**
-	 * Trigger the first rollover at midnight at the defined day of week.
+	 * Trigger the first rollover at 00:00 at the defined day of week.
 	 * 
 	 * @param dayOfWeek
 	 *            Day of week (between 1..7) for rollover
@@ -78,7 +78,7 @@ public class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	private static int convert(final Calendar calendar, final int dayOfWeek) {
-		return (calendar.getFirstDayOfWeek() + dayOfWeek - 1) % 7;
+		return (calendar.getFirstDayOfWeek() - 1 + dayOfWeek - 1) % 7 + 1;
 	}
 
 	private static Calendar createCalendar(final String dayOfWeek) {

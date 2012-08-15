@@ -18,6 +18,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
 
 /**
@@ -56,9 +59,9 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	public final void testRollingAtEndOfWeek() {
 		setTime(DAY);
 
-		IPolicy policy = new WeeklyPolicy(7);
+		IPolicy policy = new WeeklyPolicy(1);
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 2 - 1L);
+		increaseTime(DAY * 3 - 1L);
 		assertTrue(policy.check(null, null));
 		increaseTime(1L);
 		assertFalse(policy.check(null, null));
@@ -69,6 +72,63 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		assertTrue(policy.check(null, null));
 		increaseTime(1L);
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test continuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		setTime(DAY * 4L); // Monday
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(getTime() + 1L);
+
+		IPolicy policy = new WeeklyPolicy(2);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L);
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		policy = new WeeklyPolicy(1);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 6 - 1L);
+		assertTrue(policy.check(null, null));
+		increaseTime(1L);
+		assertFalse(policy.check(null, null));
+
+		file.delete();
+
+		policy = new WeeklyPolicy();
+		assertTrue(policy.initCheck(file));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testDisontinueLogFile() throws IOException {
+		setTime(DAY * 4L); // Monday
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		file.setLastModified(getTime());
+
+		IPolicy policy = new WeeklyPolicy();
+		assertFalse(policy.initCheck(file));
+
+		policy = new WeeklyPolicy(1);
+		assertFalse(policy.initCheck(file));
+
+		file.delete();
 	}
 
 	/**

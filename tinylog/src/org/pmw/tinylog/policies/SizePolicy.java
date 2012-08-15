@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog.policies;
 
+import java.io.File;
+
 import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.PropertiesLoader;
 
@@ -65,6 +67,14 @@ public class SizePolicy implements IPolicy {
 			throw new IllegalArgumentException("maxSize must be > 0");
 		}
 		this.size = 0L;
+	}
+
+	@Override
+	public final boolean initCheck(final File logFile) {
+		if (logFile.exists()) {
+			size = logFile.length();
+		}
+		return true;
 	}
 
 	@Override

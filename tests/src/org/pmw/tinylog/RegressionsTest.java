@@ -15,7 +15,12 @@ package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Test;
+import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
  * Tests old fixed bugs to prevent regressions.
@@ -41,6 +46,29 @@ public class RegressionsTest {
 
 		Logger.info("");
 		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Failed
+	}
+
+	/**
+	 * Bug: If a log file is continued, the policy will start from scratch. This leads to a too late rollover.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		File file = File.createTempFile("test", "tmp");
+		file.deleteOnExit();
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
+		writer.write(null, "12345");
+		writer.close();
+
+		writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
+		writer.write(null, "123456");
+		writer.close();
+
+		assertEquals(6, file.length());
+		file.delete();
 	}
 
 }

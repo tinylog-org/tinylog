@@ -31,7 +31,7 @@ public class YearlyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	/**
-	 * Trigger the first rollover at first of the defined month.
+	 * Trigger the first rollover at the first of the defined month.
 	 * 
 	 * @param month
 	 *            Month (between 1..12) for rollover

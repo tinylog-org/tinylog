@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog.policies;
 
+import java.io.File;
 import java.util.Calendar;
 
 import org.pmw.tinylog.ELoggingLevel;
@@ -47,6 +48,17 @@ public abstract class AbstractTimeBasedPolicy implements IPolicy {
 		this.field = field;
 		this.multiplier = 1;
 		this.nextTime = calendar.getTimeInMillis();
+	}
+
+	@Override
+	public final boolean initCheck(final File logFile) {
+		if (logFile.exists()) {
+			Calendar clone = (Calendar) calendar.clone();
+			clone.add(field, -1);
+			return clone.getTimeInMillis() < logFile.lastModified();
+		} else {
+			return true;
+		}
 	}
 
 	@Override

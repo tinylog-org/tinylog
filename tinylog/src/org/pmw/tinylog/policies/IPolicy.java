@@ -13,12 +13,23 @@
 
 package org.pmw.tinylog.policies;
 
+import java.io.File;
+
 import org.pmw.tinylog.ELoggingLevel;
 
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter} .
  */
 public interface IPolicy {
+
+	/**
+	 * Determine if a rollover should occur at startup.
+	 * 
+	 * @param logFile
+	 *            Log file to continue
+	 * @return <code>true</code> to continue the log file, <code>false</code> to trigger a rollover
+	 */
+	boolean initCheck(File logFile);
 
 	/**
 	 * Determine if a rollover should occur.

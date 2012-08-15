@@ -18,6 +18,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.junit.Test;
@@ -30,11 +33,18 @@ import org.junit.Test;
 public class SizePolicyTest {
 
 	/**
-	 * Test rolling.
+	 * Test rolling with inexistent log file.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
 	 */
 	@Test
-	public final void testRolling() {
+	public final void testRollingWithInexistingLogFile() throws IOException {
+		File file = File.createTempFile("test", ".tmp");
+		file.delete();
+
 		IPolicy policy = new SizePolicy(10);
+		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, "0123456789"));
 		assertFalse(policy.check(null, "0"));
 
@@ -42,6 +52,28 @@ public class SizePolicyTest {
 		assertTrue(policy.check(null, "0"));
 		assertTrue(policy.check(null, "123456789"));
 		assertFalse(policy.check(null, "0"));
+	}
+
+	/**
+	 * Test rolling with existent log file.
+	 * 
+	 * @throws IOException
+	 *             Problem with the temporary file
+	 */
+	@Test
+	public final void testRollingWithExistingLogFile() throws IOException {
+		File file = File.createTempFile("test", ".tmp");
+		file.deleteOnExit();
+		FileWriter writer = new FileWriter(file);
+		writer.write("01234");
+		writer.close();
+
+		IPolicy policy = new SizePolicy(10);
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, "56789"));
+		assertFalse(policy.check(null, "0"));
+
+		file.delete();
 	}
 
 	/**

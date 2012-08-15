@@ -64,6 +64,7 @@ public class RollingFileWriter implements ILoggingWriter {
 		this.file = new File(filename);
 		this.maxBackups = Math.max(0, maxBackups);
 		this.policies = Arrays.asList(policies);
+		initCkeckPolicies();
 		this.writer = new BufferedWriter(new java.io.FileWriter(file, true));
 	}
 
@@ -114,6 +115,16 @@ public class RollingFileWriter implements ILoggingWriter {
 	@Override
 	protected final void finalize() throws Throwable {
 		close();
+	}
+
+	private void initCkeckPolicies() {
+		for (IPolicy policy : policies) {
+			if (!policy.initCheck(file)) {
+				resetPolicies();
+				roll();
+				return;
+			}
+		}
 	}
 
 	private boolean checkPolicies(final ELoggingLevel level, final String logEntry) {
