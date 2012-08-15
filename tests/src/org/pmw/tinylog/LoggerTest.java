@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
 

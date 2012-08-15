@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**

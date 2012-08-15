@@ -11,18 +11,19 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.util;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * A logging writer that just store policies.
  */
-class PolicyWriter implements LoggingWriter {
+public final class PolicyWriter implements LoggingWriter {
 
 	private final List<? extends Policy> policies;
 

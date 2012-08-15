@@ -11,14 +11,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.util;
 
+import org.pmw.tinylog.ELoggingLevel;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * A logging writer that just save the written log entry as string.
  */
-class StoreWriter implements LoggingWriter {
+public final class StoreWriter implements LoggingWriter {
 
 	private ELoggingLevel level;
 	private String entry;
@@ -28,7 +29,7 @@ class StoreWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final ELoggingLevel level, final String logEntry) {
+	public void write(final ELoggingLevel level, final String logEntry) {
 		this.level = level;
 		this.entry = logEntry;
 	}

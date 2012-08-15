@@ -1,2 +1,2 @@
-org.pmw.tinylog.StoreWriter
-org.pmw.tinylog.PolicyWriter
+org.pmw.tinylog.util.StoreWriter
+org.pmw.tinylog.util.PolicyWriter

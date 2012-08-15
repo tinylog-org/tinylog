@@ -17,12 +17,11 @@ import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import mockit.Mock;
-import mockit.MockClass;
 import mockit.Mockit;
 
 import org.junit.After;
 import org.junit.Before;
+import org.pmw.tinylog.util.MockSystem;
 
 /**
  * Basis class for times based tests.
@@ -71,7 +70,7 @@ public abstract class AbstractTimeBasedTest {
 	 * @return Current time in milliseconds
 	 */
 	protected final long getTime() {
-		return mockSystem.time;
+		return mockSystem.currentTimeMillis();
 	}
 
 	/**
@@ -81,7 +80,7 @@ public abstract class AbstractTimeBasedTest {
 	 *            Current time in milliseconds
 	 */
 	protected final void setTime(final long time) {
-		mockSystem.time = time;
+		mockSystem.setCurrentTimeMillis(time);
 	}
 
 	/**
@@ -91,7 +90,7 @@ public abstract class AbstractTimeBasedTest {
 	 *            Milliseconds to add
 	 */
 	protected final void increaseTime(final long time) {
-		mockSystem.time += time;
+		mockSystem.setCurrentTimeMillis(mockSystem.currentTimeMillis() + time);
 	}
 
 	/**
@@ -113,31 +112,6 @@ public abstract class AbstractTimeBasedTest {
 		} catch (IllegalAccessException ex) {
 			throw new RuntimeException(ex);
 		}
-	}
-
-	/**
-	 * Mock for {@link System}.
-	 */
-	@MockClass(realClass = System.class)
-	protected static final class MockSystem {
-
-		private long time;
-
-		/** */
-		protected MockSystem() {
-			time = 0L;
-		}
-
-		/**
-		 * Get the current time in milliseconds.
-		 * 
-		 * @return Current time in milliseconds
-		 */
-		@Mock
-		public long currentTimeMillis() {
-			return time;
-		}
-
 	}
 
 }

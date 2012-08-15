@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +19,7 @@ import java.io.OutputStream;
 /**
  * Doesn't output anything, only the used flag will be set if anything was written.
  */
-public class SilentOutputStream extends OutputStream {
+public final class SilentOutputStream extends OutputStream {
 
 	private boolean isUsed;
 
@@ -33,12 +33,12 @@ public class SilentOutputStream extends OutputStream {
 	 * 
 	 * @return <code>true</code> if anything was written, otherwise <code>false</code>
 	 */
-	public final boolean isUsed() {
+	public boolean isUsed() {
 		return isUsed;
 	}
 
 	@Override
-	public final void write(final int b) throws IOException {
+	public void write(final int b) throws IOException {
 		isUsed = true;
 	}
 

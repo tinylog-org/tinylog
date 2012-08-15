@@ -22,7 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.ELoggingLevel;
-import org.pmw.tinylog.SilentOutputStream;
+import org.pmw.tinylog.util.SilentOutputStream;
 
 /**
  * Tests for the console logging writer.
