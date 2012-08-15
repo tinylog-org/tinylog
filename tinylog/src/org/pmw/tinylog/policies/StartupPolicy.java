@@ -22,6 +22,15 @@ import org.pmw.tinylog.ELoggingLevel;
  */
 public class StartupPolicy implements Policy {
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "startup"
+	 */
+	public static String getName() {
+		return "startup";
+	}
+
 	@Override
 	public final boolean initCheck(final File logFile) {
 		return !logFile.exists();

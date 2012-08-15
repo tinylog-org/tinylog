@@ -69,6 +69,15 @@ public class RollingFileWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Returns the name of the writer.
+	 * 
+	 * @return "rollingfile"
+	 */
+	public static String getName() {
+		return "rollingfile";
+	}
+
+	/**
 	 * Returns the supported properties for this writer.
 	 * 
 	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally

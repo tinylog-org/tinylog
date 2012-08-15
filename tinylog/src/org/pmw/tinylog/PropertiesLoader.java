@@ -13,30 +13,26 @@
 
 package org.pmw.tinylog;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.pmw.tinylog.policies.DailyPolicy;
-import org.pmw.tinylog.policies.HourlyPolicy;
 import org.pmw.tinylog.policies.Policy;
-import org.pmw.tinylog.policies.MonthlyPolicy;
-import org.pmw.tinylog.policies.SizePolicy;
-import org.pmw.tinylog.policies.StartupPolicy;
-import org.pmw.tinylog.policies.WeeklyPolicy;
-import org.pmw.tinylog.policies.YearlyPolicy;
-import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.FileWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
-import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
  * Loads and sets properties for {@link Logger} from the properties files and from environment variables.
@@ -49,6 +45,7 @@ public final class PropertiesLoader {
 	private static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
 	private static final String WRITER_PROPERTY = "tinylog.writer";
 
+	private static final String SERVICES_PREFIX = "META-INF/services/";
 	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + ":";
 	private static final String PROPERTIES_FILE = "/tinylog.properties";
 
@@ -148,50 +145,114 @@ public final class PropertiesLoader {
 			if (writer.equals("null")) {
 				Logger.setWriter(null);
 			} else {
-				if (writer.equals("console")) {
-					writer = ConsoleWriter.class.getName();
-				} else if (writer.equals("file")) {
-					writer = FileWriter.class.getName();
-				} else if (writer.equals("rollingfile")) {
-					writer = RollingFileWriter.class.getName();
+				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
+					if (LoggingWriter.class.isAssignableFrom(implementation)) {
+						if (writer.equalsIgnoreCase(getName(implementation))) {
+							loadAndSetWriter(properties, implementation);
+							break;
+						}
+					}
 				}
-				loadAndSetWriter(properties, writer);
 			}
 		}
 	}
 
-	private static void loadAndSetWriter(final Properties properties, final String writer) {
+	private static Collection<Class<?>> findImplementations(final Class<?> service) {
 		try {
-			Class<?> writerClass = Class.forName(writer);
-			if (LoggingWriter.class.isAssignableFrom(writerClass)) {
-				String[][] supportedProperties = getSupportedProperties(writerClass);
-				Constructor<?> foundConstructor = null;
-				Object[] foundParameters = null;
-				for (Constructor<?> constructor : writerClass.getConstructors()) {
-					Class<?>[] parameterTypes = constructor.getParameterTypes();
-					String[] propertiesNames = findPropertyNames(supportedProperties, parameterTypes.length);
-					if (propertiesNames != null) {
-						if (foundParameters == null || foundParameters.length < parameterTypes.length) {
-							Object[] parameters = loadParameters(properties, propertiesNames, parameterTypes);
-							if (parameters != null) {
-								foundConstructor = constructor;
-								foundParameters = parameters;
+			Enumeration<URL> urls = ClassLoader.getSystemResources(SERVICES_PREFIX + service.getName());
+			if (urls == null || !urls.hasMoreElements()) {
+				return Collections.emptyList();
+			} else {
+				Collection<Class<?>> services = new ArrayList<Class<?>>();
+				while (urls.hasMoreElements()) {
+					URL url = urls.nextElement();
+					InputStream inputStream = null;
+					BufferedReader reader = null;
+					try {
+						inputStream = url.openStream();
+						reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+						for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+							line = line.trim();
+							if (line != null) {
+								try {
+									services.add(Class.forName(line));
+								} catch (ClassNotFoundException ec) {
+									// Continue
+								}
+							}
+						}
+					} finally {
+						if (inputStream != null) {
+							try {
+								inputStream.close();
+							} catch (IOException ex) {
+								// Ignore
+							}
+						}
+						if (reader != null) {
+							try {
+								reader.close();
+							} catch (IOException ex) {
+								// Ignore
 							}
 						}
 					}
 				}
-				if (foundConstructor != null) {
-					Logger.setWriter((LoggingWriter) foundConstructor.newInstance(foundParameters));
+				return services;
+			}
+		} catch (IOException ex) {
+			return Collections.emptyList();
+		}
+	}
+
+	private static void loadAndSetWriter(final Properties properties, final Class<?> writerClass) {
+		try {
+			String[][] supportedProperties = getSupportedProperties(writerClass);
+			Constructor<?> foundConstructor = null;
+			Object[] foundParameters = null;
+			for (Constructor<?> constructor : writerClass.getConstructors()) {
+				Class<?>[] parameterTypes = constructor.getParameterTypes();
+				String[] propertiesNames = findPropertyNames(supportedProperties, parameterTypes.length);
+				if (propertiesNames != null) {
+					if (foundParameters == null || foundParameters.length < parameterTypes.length) {
+						Object[] parameters = loadParameters(properties, propertiesNames, parameterTypes);
+						if (parameters != null) {
+							foundConstructor = constructor;
+							foundParameters = parameters;
+						}
+					}
 				}
 			}
-		} catch (Exception ex) {
+			if (foundConstructor != null) {
+				Logger.setWriter((LoggingWriter) foundConstructor.newInstance(foundParameters));
+			}
+		} catch (InstantiationException ex) {
+			// Failed to create writer => keep old writer
+		} catch (IllegalAccessException ex) {
+			// Failed to create writer => keep old writer
+		} catch (IllegalArgumentException ex) {
+			// Failed to create writer => keep old writer
+		} catch (InvocationTargetException ex) {
 			// Failed to create writer => keep old writer
 		}
 	}
 
-	private static String[][] getSupportedProperties(final Class<?> writerClass) {
+	private static String getName(final Class<?> clazz) {
 		try {
-			Method method = writerClass.getMethod("getSupportedProperties");
+			Method method = clazz.getMethod("getName");
+			if (method.getReturnType() == String.class && Modifier.isStatic(method.getModifiers())) {
+				return (String) method.invoke(null);
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
+	private static String[][] getSupportedProperties(final Class<?> clazz) {
+		try {
+			Method method = clazz.getMethod("getSupportedProperties");
 			if (method.getReturnType() == String[][].class && Modifier.isStatic(method.getModifiers())) {
 				return (String[][]) method.invoke(null);
 			} else {
@@ -258,41 +319,42 @@ public final class PropertiesLoader {
 		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
 		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
 
-		if (name.equals("startup")) {
-			name = StartupPolicy.class.getName();
-		} else if (name.equals("size")) {
-			name = SizePolicy.class.getName();
-		} else if (name.equals("hourly")) {
-			name = HourlyPolicy.class.getName();
-		} else if (name.equals("daily")) {
-			name = DailyPolicy.class.getName();
-		} else if (name.equals("weekly")) {
-			name = WeeklyPolicy.class.getName();
-		} else if (name.equals("monthly")) {
-			name = MonthlyPolicy.class.getName();
-		} else if (name.equals("yearly")) {
-			name = YearlyPolicy.class.getName();
+		for (Class<?> implementation : findImplementations(Policy.class)) {
+			if (Policy.class.isAssignableFrom(implementation)) {
+				if (name.equalsIgnoreCase(getName(implementation))) {
+					return loadPolicy(implementation, parameter);
+				}
+			}
 		}
 
+		return null;
+	}
+
+	private static Policy loadPolicy(final Class<?> policyClass, final String parameter) {
 		try {
-			Class<?> policyClass = Class.forName(name);
-			if (Policy.class.isAssignableFrom(policyClass)) {
-				if (parameter != null) {
-					try {
-						Constructor<?> constructor = policyClass.getDeclaredConstructor(String.class);
-						constructor.setAccessible(true);
-						return (Policy) constructor.newInstance(parameter);
-					} catch (NoSuchMethodException ex) {
-						// Continue
-					}
+			if (parameter != null) {
+				try {
+					Constructor<?> constructor = policyClass.getDeclaredConstructor(String.class);
+					constructor.setAccessible(true);
+					return (Policy) constructor.newInstance(parameter);
+				} catch (NoSuchMethodException ex) {
+					// Continue
 				}
-				Constructor<?> constructor = policyClass.getDeclaredConstructor();
-				constructor.setAccessible(true);
-				return (Policy) constructor.newInstance();
-			} else {
-				return null;
 			}
-		} catch (Exception ex) {
+			Constructor<?> constructor = policyClass.getDeclaredConstructor();
+			constructor.setAccessible(true);
+			return (Policy) constructor.newInstance();
+		} catch (InstantiationException ex) {
+			return null;
+		} catch (IllegalAccessException ex) {
+			return null;
+		} catch (IllegalArgumentException ex) {
+			return null;
+		} catch (InvocationTargetException ex) {
+			return null;
+		} catch (SecurityException ex) {
+			return null;
+		} catch (NoSuchMethodException ex) {
 			return null;
 		}
 	}

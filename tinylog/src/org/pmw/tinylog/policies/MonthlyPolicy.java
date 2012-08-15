@@ -51,6 +51,15 @@ public class MonthlyPolicy extends AbstractTimeBasedPolicy {
 		this("true".equalsIgnoreCase(firstOfMonth) || "1".equalsIgnoreCase(firstOfMonth));
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "monthly"
+	 */
+	public static String getName() {
+		return "monthly";
+	}
+
 	private static Calendar createCalendar(final boolean firstOfMonth) {
 		Calendar calendar = Calendar.getInstance();
 		if (firstOfMonth) {

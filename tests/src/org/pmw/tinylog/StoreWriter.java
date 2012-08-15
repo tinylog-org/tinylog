@@ -34,6 +34,15 @@ class StoreWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "store"
+	 */
+	public static String getName() {
+		return "store";
+	}
+
+	/**
 	 * Consume the logging level of the last written log entry and remove it.
 	 * 
 	 * @return The logging level of the last log entry

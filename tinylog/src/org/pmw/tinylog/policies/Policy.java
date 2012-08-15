@@ -18,7 +18,10 @@ import java.io.File;
 import org.pmw.tinylog.ELoggingLevel;
 
 /**
- * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter} .
+ * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
+ * 
+ * An implemented policy must be registered as service in "META-INF/services/org.pmw.tinylog.policies" and implement the
+ * static method <code>public static String getName()</code>, so that tinylog can find it.
  */
 public interface Policy {
 

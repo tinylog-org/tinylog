@@ -50,6 +50,15 @@ public class YearlyPolicy extends AbstractTimeBasedPolicy {
 		this(convert(month));
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "yearly"
+	 */
+	public static String getName() {
+		return "yearly";
+	}
+
 	private static Calendar createCalendar() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.YEAR, 1);

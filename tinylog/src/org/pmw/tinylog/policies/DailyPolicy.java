@@ -56,6 +56,15 @@ public class DailyPolicy extends AbstractTimeBasedPolicy {
 		this(parseHour(time), parseMinute(time));
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "daily"
+	 */
+	public static String getName() {
+		return "daily";
+	}
+
 	private static Calendar createCalendar() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DATE, 1);

@@ -19,7 +19,8 @@ import org.pmw.tinylog.Logger;
 /**
  * Logging writers output created log entries from {@link Logger}.
  * 
- * Instances of <code>ILoggingWriter</code> can implement a static method
+ * An implemented writer must be registered as service in "META-INF/services/org.pmw.tinylog.writers" and implement the
+ * static method <code>public static String getName()</code>, so that tinylog can find it. Writers can also implement
  * <code>public static String[][] getSupportedProperties()</code> to support properties.
  * 
  * @see org.pmw.tinylog.Logger#setWriter(ILoggingWriter)

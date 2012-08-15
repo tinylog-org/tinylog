@@ -69,6 +69,15 @@ public class SizePolicy implements Policy {
 		this.size = 0L;
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "size"
+	 */
+	public static String getName() {
+		return "size";
+	}
+
 	@Override
 	public final boolean initCheck(final File logFile) {
 		if (logFile.exists()) {

@@ -265,24 +265,6 @@ public class PropertiesLoaderTest {
 		file.delete();
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer", ConsoleWriter.class.getName());
-		PropertiesLoader.reload();
-		writer = Logger.getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		Logger.setWriter(null);
-
-		file = File.createTempFile("test", "tmp");
-		file.deleteOnExit();
-		System.setProperty("tinylog.writer", FileWriter.class.getName());
-		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
-		PropertiesLoader.reload();
-		writer = Logger.getWriter();
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		file.delete();
-		Logger.setWriter(null);
-
 		file = File.createTempFile("test", "tmp");
 		file.deleteOnExit();
 		System.setProperty("tinylog.writer", "rollingfile");
@@ -295,7 +277,7 @@ public class PropertiesLoaderTest {
 		file.delete();
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer", String.class.getName());
+		System.setProperty("tinylog.writer", "invalid");
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNull(writer);
@@ -306,7 +288,7 @@ public class PropertiesLoaderTest {
 	 */
 	@Test
 	public final void testLoadPolicies() {
-		System.setProperty("tinylog.writer", "org.pmw.tinylog.PolicyWriter");
+		System.setProperty("tinylog.writer", "policy");
 
 		System.setProperty("tinylog.writer.policies", "startup");
 		PropertiesLoader.reload();
@@ -317,14 +299,6 @@ public class PropertiesLoaderTest {
 		Logger.setWriter(null);
 
 		System.setProperty("tinylog.writer.policies", "startup: abc");
-		PropertiesLoader.reload();
-		writer = (PolicyWriter) Logger.getWriter();
-		assertNotNull(writer);
-		assertEquals(1, writer.getPolicies().size());
-		assertEquals(StartupPolicy.class, writer.getPolicies().get(0).getClass());
-		Logger.setWriter(null);
-
-		System.setProperty("tinylog.writer.policies", StartupPolicy.class.getName());
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);
@@ -380,7 +354,7 @@ public class PropertiesLoaderTest {
 		assertEquals(YearlyPolicy.class, writer.getPolicies().get(0).getClass());
 		Logger.setWriter(null);
 
-		System.setProperty("tinylog.writer.policies", String.class.getName());
+		System.setProperty("tinylog.writer.policies", "invalid");
 		PropertiesLoader.reload();
 		writer = (PolicyWriter) Logger.getWriter();
 		assertNotNull(writer);

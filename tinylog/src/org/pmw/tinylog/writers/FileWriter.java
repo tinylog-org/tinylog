@@ -36,6 +36,15 @@ public class FileWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Returns the name of the writer.
+	 * 
+	 * @return "file"
+	 */
+	public static String getName() {
+		return "file";
+	}
+
+	/**
 	 * Returns the supported properties for this writer.
 	 * 
 	 * The file logging writer needs a "filename" for initiation.

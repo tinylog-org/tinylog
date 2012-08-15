@@ -50,6 +50,15 @@ public class HourlyPolicy extends AbstractTimeBasedPolicy {
 		this("true".equalsIgnoreCase(fullHour) || "1".equalsIgnoreCase(fullHour));
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "hourly"
+	 */
+	public static String getName() {
+		return "hourly";
+	}
+
 	private static Calendar createCalendar(final boolean fullHour) {
 		Calendar calendar = Calendar.getInstance();
 		if (fullHour) {

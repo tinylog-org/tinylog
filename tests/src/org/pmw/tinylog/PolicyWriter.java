@@ -35,6 +35,15 @@ class PolicyWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "policy"
+	 */
+	public static String getName() {
+		return "policy";
+	}
+
+	/**
 	 * Returns the supported properties ("policies") for this writer.
 	 * 
 	 * @return String array with the property "policies"

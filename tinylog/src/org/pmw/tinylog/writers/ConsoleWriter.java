@@ -22,6 +22,15 @@ import org.pmw.tinylog.ELoggingLevel;
  */
 public class ConsoleWriter implements LoggingWriter {
 
+	/**
+	 * Returns the name of the writer.
+	 * 
+	 * @return "console"
+	 */
+	public static String getName() {
+		return "console";
+	}
+
 	@Override
 	public final void write(final ELoggingLevel level, final String logEntry) {
 		getPrintStream(level).print(logEntry);

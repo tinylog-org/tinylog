@@ -56,6 +56,15 @@ public class WeeklyPolicy extends AbstractTimeBasedPolicy {
 		super(createCalendar(dayOfWeek), Calendar.WEEK_OF_YEAR);
 	}
 
+	/**
+	 * Returns the name of the policy.
+	 * 
+	 * @return "weekly"
+	 */
+	public static String getName() {
+		return "weekly";
+	}
+
 	private static Calendar createCalendar() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.WEEK_OF_YEAR, 1);
