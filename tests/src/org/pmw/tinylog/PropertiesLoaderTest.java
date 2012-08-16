@@ -45,7 +45,7 @@ import org.pmw.tinylog.writers.RollingFileWriter;
 /**
  * Test reading properties for the logger.
  * 
- * @see org.pmw.tinylog.PropertiesLoader
+ * @see PropertiesLoader
  */
 public class PropertiesLoaderTest {
 
@@ -286,6 +286,38 @@ public class PropertiesLoaderTest {
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNull(writer);
+	}
+
+	/**
+	 * Test reading writing thread.
+	 * 
+	 * @throws InterruptedException
+	 *             Thread was interrupted
+	 */
+	@Test
+	public final void testWritingThread() throws InterruptedException {
+		Logger.shutdownWritingThread(true);
+		int threadCount = Thread.activeCount();
+
+		System.setProperty("tinylog.writingthread", "true");
+		PropertiesLoader.reload();
+		assertEquals(threadCount + 1, Thread.activeCount());
+
+		System.setProperty("tinylog.writingthread", "false");
+		PropertiesLoader.reload();
+		Thread.sleep(100L);
+		assertEquals(threadCount, Thread.activeCount());
+
+		System.setProperty("tinylog.writingthread", "1");
+		System.setProperty("tinylog.writingthread.observe", "null");
+		System.setProperty("tinylog.writingthread.priority", "1");
+		PropertiesLoader.reload();
+		assertEquals(threadCount + 1, Thread.activeCount());
+
+		System.clearProperty("tinylog.writingthread");
+		PropertiesLoader.reload();
+		Thread.sleep(100L);
+		assertEquals(threadCount, Thread.activeCount());
 	}
 
 	/**

@@ -45,6 +45,9 @@ public final class PropertiesLoader {
 	private static final String LOCALE_PROPERTY = "tinylog.locale";
 	private static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
 	private static final String WRITER_PROPERTY = "tinylog.writer";
+	private static final String WRITING_THREAD_PROPERTY = "tinylog.writingthread";
+	private static final String WRITING_THREAD_OBSERVE_PROPERTY = WRITING_THREAD_PROPERTY + ".observe";
+	private static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
 
 	private static final String SERVICES_PREFIX = "META-INF/services/";
 	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + ":";
@@ -143,7 +146,7 @@ public final class PropertiesLoader {
 
 		String writer = properties.getProperty(WRITER_PROPERTY);
 		if (writer != null && !writer.isEmpty()) {
-			if (writer.equals("null")) {
+			if (writer.equalsIgnoreCase("null")) {
 				Logger.setWriter(null);
 			} else {
 				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
@@ -155,6 +158,30 @@ public final class PropertiesLoader {
 					}
 				}
 			}
+		}
+
+		String writingThread = properties.getProperty(WRITING_THREAD_PROPERTY);
+		if ("true".equalsIgnoreCase(writingThread) || "1".equalsIgnoreCase(writingThread)) {
+			String observedThread = properties.getProperty(WRITING_THREAD_OBSERVE_PROPERTY);
+			if (observedThread == null) {
+				observedThread = WritingThread.DEFAULT_THREAD_TO_OBSERVE;
+			} else if (observedThread.equalsIgnoreCase("null")) {
+				observedThread = null;
+			}
+			String priorityString = properties.getProperty(WRITING_THREAD_PRIORITY_PROPERTY);
+			int priority;
+			if (priorityString == null) {
+				priority = WritingThread.DEFAULT_PRIORITY;
+			} else {
+				try {
+					priority = Integer.parseInt(priorityString.trim());
+				} catch (NumberFormatException ex) {
+					priority = WritingThread.DEFAULT_PRIORITY;
+				}
+			}
+			Logger.startWritingThread(observedThread, priority);
+		} else {
+			Logger.shutdownWritingThread(false);
 		}
 	}
 

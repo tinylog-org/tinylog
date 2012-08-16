@@ -37,6 +37,7 @@ public final class Logger {
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
+	private static volatile WritingThread writingThread = null;
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile LoggingWriter loggingWriter = new ConsoleWriter();
 	private static volatile LoggingLevel loggingLevel = LoggingLevel.INFO;
@@ -232,6 +233,60 @@ public final class Logger {
 	 */
 	public static void trace(final String message, final Object... arguments) {
 		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, null, message, arguments);
+	}
+
+	/**
+	 * Start a separate thread with a low priority (2) for writing log entries. This thread will automatically shutdown,
+	 * if the main thread is dead.
+	 */
+	public static void startWritingThread() {
+		startWritingThread(WritingThread.DEFAULT_THREAD_TO_OBSERVE, WritingThread.DEFAULT_PRIORITY);
+	}
+
+	/**
+	 * Start a separate thread for writing log entries. This thread will automatically shutdown, if the observed thread
+	 * is dead.
+	 * 
+	 * @param nameOfThreadToObserve
+	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
+	 *            automatic shutdown
+	 * @param priority
+	 *            Priority for the writing thread (must be between {@link Thread#MIN_PRIORITY} and
+	 *            {@link Thread#MAX_PRIORITY}).
+	 */
+	public static synchronized void startWritingThread(final String nameOfThreadToObserve, final int priority) {
+		if (writingThread == null) {
+			WritingThread thread = new WritingThread(nameOfThreadToObserve);
+			thread.setPriority(priority);
+			thread.setName("tinylog-WritingThread");
+			thread.start();
+			writingThread = thread;
+		}
+	}
+
+	/**
+	 * Shutdown the writing thread.
+	 * 
+	 * @param wait
+	 *            <code>true</code> to wait for the successful shutdown, <code>false</code> for an asynchronous shutdown
+	 */
+	public static synchronized void shutdownWritingThread(final boolean wait) {
+		WritingThread thread = writingThread;
+		if (thread != null) {
+			writingThread = null;
+			thread.shutdown();
+			if (wait) {
+				boolean finished;
+				do {
+					try {
+						thread.join();
+						finished = true;
+					} catch (InterruptedException ex) {
+						finished = false;
+					}
+				} while (!finished);
+			}
+		}
 	}
 
 	/**
@@ -453,7 +508,13 @@ public final class Logger {
 				} catch (Exception ex) {
 					logEntry = createLogEntry(strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
-				currentWriter.write(level, logEntry);
+
+				WritingThread currentWritingThread = writingThread;
+				if (currentWritingThread == null) {
+					currentWriter.write(activeLoggingLevel, logEntry);
+				} else {
+					currentWritingThread.putLogEntry(currentWriter, activeLoggingLevel, logEntry);
+				}
 			}
 		}
 	}

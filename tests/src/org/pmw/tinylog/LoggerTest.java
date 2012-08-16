@@ -36,7 +36,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Tests for the logger.
  * 
- * @see org.pmw.tinylog.Logger
+ * @see Logger
  */
 public class LoggerTest {
 
@@ -118,6 +118,26 @@ public class LoggerTest {
 		LoggingWriter writer = new ConsoleWriter();
 		Logger.setWriter(writer);
 		assertEquals(writer, Logger.getWriter());
+	}
+
+	/**
+	 * Test startup and shutdown of writing thread.
+	 */
+	@Test
+	public final void testWritingThread() {
+		int threadCount = Thread.activeCount();
+		Logger.startWritingThread();
+		assertEquals(threadCount + 1, Thread.activeCount());
+		Logger.shutdownWritingThread(true);
+		assertEquals(threadCount, Thread.activeCount());
+
+		Logger.startWritingThread();
+		Logger.startWritingThread(); // Must NOT thrown any exception, just ignore the second call
+		assertEquals(threadCount + 1, Thread.activeCount());
+
+		Logger.shutdownWritingThread(true);
+		assertEquals(threadCount, Thread.activeCount());
+		Logger.shutdownWritingThread(false); // Must NOT thrown any exception, just ignore the second call
 	}
 
 	/**
