@@ -335,8 +335,8 @@ public final class PropertiesLoader {
 
 	private static Policy[] parsePolicies(final String string) {
 		List<Policy> policies = new ArrayList<Policy>();
-		for (String part : string.split(Pattern.quote(", "))) {
-			Policy policy = (Policy) parse(Policy.class, part);
+		for (String part : string.split(Pattern.quote(","))) {
+			Policy policy = (Policy) parse(Policy.class, part.trim());
 			if (policy != null) {
 				policies.add(policy);
 			}
