@@ -166,4 +166,19 @@ public class TokenizerTest {
 		assertEquals(newLine + newLine, tokens.get(0).getData());
 	}
 
+	/**
+	 * Test converting tabs.
+	 */
+	@Test
+	public final void testTabs() {
+		List<Token> tokens = Tokenizer.parse("\t", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertEquals("\t", tokens.get(0).getData());
+
+		tokens = Tokenizer.parse("\\t", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertEquals("\t", tokens.get(0).getData());
+	}
 }

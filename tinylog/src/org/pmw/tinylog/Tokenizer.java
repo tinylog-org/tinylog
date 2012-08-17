@@ -29,6 +29,8 @@ final class Tokenizer {
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final Pattern NEW_LINE_REPLACER = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
+	private static final String TAB = "\t";
+	private static final Pattern TAB_REPLACER = Pattern.compile("\t|\\\\t");
 
 	private Tokenizer() {
 	}
@@ -98,7 +100,9 @@ final class Tokenizer {
 			}
 			return new Token(TokenType.DATE, new SimpleDateFormat(dateFormatPattern, locale));
 		} else {
-			return new Token(TokenType.PLAIN_TEXT, NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE));
+			String plainText = NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE);
+			plainText = TAB_REPLACER.matcher(plainText).replaceAll(TAB);
+			return new Token(TokenType.PLAIN_TEXT, plainText);
 		}
 	}
 
