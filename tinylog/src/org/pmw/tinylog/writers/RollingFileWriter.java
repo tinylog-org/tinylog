@@ -38,8 +38,7 @@ public class RollingFileWriter implements LoggingWriter {
 	private BufferedWriter writer;
 
 	/**
-	 * Rolling log files once at startup (= {@link #RollingFileWriter(String, int, Policy...)
-	 * RollingFileWriter(filename, backups, new StartupPolicy())}).
+	 * Rolling log files once at startup.
 	 * 
 	 * @param filename
 	 *            Filename of the log file
@@ -48,7 +47,7 @@ public class RollingFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 * 
-	 * @see StartupPolicy
+	 * @see org.pmw.tinylog.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) throws IOException {
 		this(filename, backups, new StartupPolicy());
