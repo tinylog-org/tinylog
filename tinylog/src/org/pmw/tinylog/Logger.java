@@ -34,8 +34,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class Logger {
 
-	static final int DEEP_OF_STACK_TRACE = 3;
-
+	private static final int DEEP_OF_STACK_TRACE = 3;
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
