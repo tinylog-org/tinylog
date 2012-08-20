@@ -26,7 +26,7 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
 /**
- * Writes log entries to a file like {@link FileWriter} but keeps backups of old logging files.
+ * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter} but keeps backups of old logging files.
  */
 public class RollingFileWriter implements LoggingWriter {
 
