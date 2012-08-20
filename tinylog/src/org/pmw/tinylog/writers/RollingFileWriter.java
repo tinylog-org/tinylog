@@ -47,7 +47,7 @@ public class RollingFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 * 
-	 * @see org.pmw.tinylog.StartupPolicy
+	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) throws IOException {
 		this(filename, backups, new StartupPolicy());
