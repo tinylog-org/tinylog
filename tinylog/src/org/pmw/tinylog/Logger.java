@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -33,10 +34,12 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class Logger {
 
-	private static final int DEEP_OF_STACK_TRACE = 4;
+	static final int DEEP_OF_STACK_TRACE = 3;
+
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
+	private static Method stackTraceMethod;
 	private static volatile WritingThread writingThread = null;
 	private static volatile int maxLoggingStackTraceElements = 40;
 	private static volatile LoggingWriter loggingWriter = new ConsoleWriter();
@@ -48,6 +51,13 @@ public final class Logger {
 
 	static {
 		PropertiesLoader.reload();
+		try {
+			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
+			stackTraceMethod.setAccessible(true);
+			stackTraceMethod.invoke(new Throwable(), 0); // Test if method can be invoked
+		} catch (Exception ex) {
+			stackTraceMethod = null;
+		}
 	}
 
 	private Logger() {
@@ -638,7 +648,15 @@ public final class Logger {
 	}
 
 	private static StackTraceElement getStackTraceElement(final int deep) {
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		if (stackTraceMethod != null) {
+			try {
+				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
+			} catch (Exception ex) {
+				// Fallback
+			}
+		}
+
+		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
 		if (stackTraceElements.length > deep) {
 			return stackTraceElements[deep];
 		} else {
