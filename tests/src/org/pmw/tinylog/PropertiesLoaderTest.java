@@ -274,7 +274,7 @@ public class PropertiesLoaderTest {
 		file.deleteOnExit();
 		System.setProperty("tinylog.writer", "rollingfile");
 		System.setProperty("tinylog.writer.filename", file.getAbsolutePath());
-		System.setProperty("tinylog.writer.maxBackups", "0");
+		System.setProperty("tinylog.writer.backups", "0");
 		PropertiesLoader.reload();
 		writer = Logger.getWriter();
 		assertNotNull(writer);

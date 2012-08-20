@@ -20,12 +20,6 @@ import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Base class for time based policies.
- * 
- * @see HourlyPolicy
- * @see DailyPolicy
- * @see WeeklyPolicy
- * @see MonthlyPolicy
- * @see YearlyPolicy
  */
 public abstract class AbstractTimeBasedPolicy implements Policy {
 

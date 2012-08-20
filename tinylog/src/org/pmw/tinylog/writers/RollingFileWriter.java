@@ -30,7 +30,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
  */
 public class RollingFileWriter implements LoggingWriter {
 
-	private final int maxBackups;
+	private final int backups;
 	private final Labeller labeller;
 	private final List<? extends Policy> policies;
 
@@ -38,40 +38,39 @@ public class RollingFileWriter implements LoggingWriter {
 	private BufferedWriter writer;
 
 	/**
-	 * Rolling log files once at startup (= {@link #RollingFileWriter(String, int, Policy...)
-	 * RollingFileWriter(filename, maxBackups, new StartupPolicy())}).
+	 * Rolling log files once at startup.
 	 * 
 	 * @param filename
 	 *            Filename of the log file
-	 * @param maxBackups
+	 * @param backups
 	 *            Number of backups
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 * 
-	 * @see StartupPolicy
+	 * @see org.pmw.tinylog.StartupPolicy
 	 */
-	public RollingFileWriter(final String filename, final int maxBackups) throws IOException {
-		this(filename, maxBackups, new StartupPolicy());
+	public RollingFileWriter(final String filename, final int backups) throws IOException {
+		this(filename, backups, new StartupPolicy());
 	}
 
 	/**
 	 * @param filename
 	 *            Filename of the log file
-	 * @param maxBackups
+	 * @param backups
 	 *            Number of backups
 	 * @param policies
 	 *            Rollover strategies
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int maxBackups, final Policy... policies) throws IOException {
-		this(filename, maxBackups, new CountLabeller(), policies);
+	public RollingFileWriter(final String filename, final int backups, final Policy... policies) throws IOException {
+		this(filename, backups, new CountLabeller(), policies);
 	}
 
 	/**
 	 * @param filename
 	 *            Filename of the log file
-	 * @param maxBackups
+	 * @param backups
 	 *            Number of backups
 	 * @param labeller
 	 *            Labeller for naming backups
@@ -80,8 +79,8 @@ public class RollingFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int maxBackups, final Labeller labeller, final Policy... policies) throws IOException {
-		this.maxBackups = Math.max(0, maxBackups);
+	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) throws IOException {
+		this.backups = Math.max(0, backups);
 		this.labeller = labeller;
 		this.policies = Arrays.asList(policies);
 		this.file = labeller.getLogFile(new File(filename));
@@ -101,14 +100,14 @@ public class RollingFileWriter implements LoggingWriter {
 	/**
 	 * Returns the supported properties for this writer.
 	 * 
-	 * The rolling file logging writer needs a "filename" and the number of backups ("maxBackups") plus optionally a
+	 * The rolling file logging writer needs a "filename" and the number of backups ("backups") plus optionally a
 	 * labeller ("labeling") and rollover strategies ("policies").
 	 * 
 	 * @return Three string arrays with and without the properties "naming" and "policies"
 	 */
 	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename", "maxBackups" }, new String[] { "filename", "maxBackups", "policies" },
-				new String[] { "filename", "maxBackups", "labeling", "policies" } };
+		return new String[][] { new String[] { "filename", "backups" }, new String[] { "filename", "backups", "policies" },
+				new String[] { "filename", "backups", "labeling", "policies" } };
 	}
 
 	@Override
@@ -120,7 +119,7 @@ public class RollingFileWriter implements LoggingWriter {
 				} catch (IOException ex) {
 					ex.printStackTrace(System.err);
 				}
-				file = labeller.roll(file, maxBackups);
+				file = labeller.roll(file, backups);
 				try {
 					writer = new BufferedWriter(new java.io.FileWriter(file));
 				} catch (IOException ex) {
@@ -152,7 +151,7 @@ public class RollingFileWriter implements LoggingWriter {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();
-				file = labeller.roll(file, maxBackups);
+				file = labeller.roll(file, backups);
 				return;
 			}
 		}
