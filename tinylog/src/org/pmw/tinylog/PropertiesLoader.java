@@ -187,7 +187,7 @@ public final class PropertiesLoader {
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {
 		try {
-			Enumeration<URL> urls = ClassLoader.getSystemResources(SERVICES_PREFIX + service.getPackage().getName());
+			Enumeration<URL> urls = PropertiesLoader.class.getClassLoader().getResources(SERVICES_PREFIX + service.getPackage().getName());
 			if (urls == null || !urls.hasMoreElements()) {
 				return Collections.emptyList();
 			} else {
