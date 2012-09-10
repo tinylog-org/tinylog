@@ -34,7 +34,11 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class Logger {
 
-	private static final int DEEP_OF_STACK_TRACE = 3;
+	/**
+	 * Default deep in stack trace to find the needed stack trace element.
+	 */
+	static final int DEEP_OF_STACK_TRACE = 3;
+
 	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -516,6 +520,49 @@ public final class Logger {
 					logEntry = createLogEntry(strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
 					logEntry = createLogEntry(strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+				}
+
+				WritingThread currentWritingThread = writingThread;
+				if (currentWritingThread == null) {
+					currentWriter.write(activeLoggingLevel, logEntry);
+				} else {
+					currentWritingThread.putLogEntry(currentWriter, activeLoggingLevel, logEntry);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Add a log entry. This method is helpful for adding log entries form logger bridges.
+	 * 
+	 * @param stackTraceElement
+	 *            Created stack trace element with class, source line etc.
+	 * @param level
+	 *            Logging level of the log entry
+	 * @param exception
+	 *            Exception to log (can be <code>null</code> if there is no exception to log)
+	 * @param message
+	 *            Formated text for the log entry
+	 * @param arguments
+	 *            Arguments for the text message
+	 */
+	static void output(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final String message,
+			final Object... arguments) {
+		LoggingWriter currentWriter = loggingWriter;
+
+		if (currentWriter != null) {
+			LoggingLevel activeLoggingLevel = loggingLevel;
+
+			if (!packageLoggingLevels.isEmpty()) {
+				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
+			}
+
+			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
+				String logEntry;
+				try {
+					logEntry = createLogEntry(-1, level, stackTraceElement, exception, message, arguments);
+				} catch (Exception ex) {
+					logEntry = createLogEntry(-1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
 
 				WritingThread currentWritingThread = writingThread;

@@ -13,8 +13,8 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.LogEntryForwarder;
+import org.pmw.tinylog.LoggingLevel;
 
 public abstract class Category {
 
@@ -122,61 +122,61 @@ public abstract class Category {
 
 	public void error(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message.toString());
 		}
 	}
 
 	public void error(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString(), ex);
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
 		}
 	}
 
 	public void fatal(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message.toString());
 		}
 	}
 
 	public void fatal(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.ERROR, message.toString(), ex);
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
 		}
 	}
 
 	public void warn(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.WARNING, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.WARNING, message.toString());
 		}
 	}
 
 	public void warn(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.WARNING, message.toString(), ex);
+			LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, message.toString());
 		}
 	}
 
 	public void info(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.INFO, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.INFO, message.toString());
 		}
 	}
 
 	public void info(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.INFO, message.toString(), ex);
+			LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, message.toString());
 		}
 	}
 
 	public void debug(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.DEBUG, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, message.toString());
 		}
 	}
 
 	public void debug(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(LoggingLevel.DEBUG, message.toString(), ex);
+			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, message.toString());
 		}
 	}
 
