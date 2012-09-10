@@ -15,39 +15,16 @@ package org.pmw.tinylog.policies;
 
 import java.util.Calendar;
 
-import org.pmw.tinylog.PropertiesLoader;
-
 /**
  * Policy for one rollover per hour.
  */
 public class HourlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
-	 * Trigger the first rollover after one hour uptime (= {@link #HourlyPolicy(boolean) HourlyPolicy(false)}).
+	 * Trigger a rollover every new hour.
 	 */
 	public HourlyPolicy() {
-		this(false);
-	}
-
-	/**
-	 * @param fullHour
-	 *            <code>true</code> to trigger the first rollover at the next full hour, <code>false</code> to trigger
-	 *            the first rollover after one hour uptime
-	 * 
-	 */
-	public HourlyPolicy(final boolean fullHour) {
-		super(createCalendar(fullHour), Calendar.HOUR_OF_DAY);
-	}
-
-	/**
-	 * String parameter for {@link PropertiesLoader}.
-	 * 
-	 * @param fullHour
-	 *            <code>true</code> to trigger the first rollover at the next full hour, <code>false</code> to trigger
-	 *            the first rollover after one hour uptime
-	 */
-	HourlyPolicy(final String fullHour) {
-		this("true".equalsIgnoreCase(fullHour) || "1".equalsIgnoreCase(fullHour));
+		super(createCalendar(), Calendar.HOUR_OF_DAY);
 	}
 
 	/**
@@ -59,13 +36,11 @@ public class HourlyPolicy extends AbstractTimeBasedPolicy {
 		return "hourly";
 	}
 
-	private static Calendar createCalendar(final boolean fullHour) {
+	private static Calendar createCalendar() {
 		Calendar calendar = Calendar.getInstance();
-		if (fullHour) {
-			calendar.set(Calendar.MINUTE, 0);
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-		}
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 		calendar.add(Calendar.HOUR_OF_DAY, 1);
 		return calendar;
 	}

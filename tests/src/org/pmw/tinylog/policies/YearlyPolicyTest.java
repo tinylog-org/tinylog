@@ -31,39 +31,13 @@ import org.junit.Test;
 public class YearlyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling after one year.
-	 */
-	@Test
-	public final void testRollingAfterOneYear() {
-		setTime(YEAR / 2L);
-
-		Policy policy = new YearlyPolicy();
-		assertTrue(policy.check(null, null));
-		increaseTime(YEAR - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-
-		policy.reset();
-		assertTrue(policy.check(null, null));
-		increaseTime(YEAR - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertTrue(policy.check(null, null)); // Leap year
-		increaseTime(DAY - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-	}
-
-	/**
 	 * Test rolling at the end of the year.
 	 */
 	@Test
 	public final void testRollingAtEndOfYear() {
 		setTime(YEAR / 2L);
 
-		Policy policy = new YearlyPolicy(1);
+		Policy policy = new YearlyPolicy();
 		assertTrue(policy.check(null, null));
 		increaseTime(YEAR / 2L - 1L);
 		assertTrue(policy.check(null, null));
@@ -103,28 +77,6 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 
 		policy = new YearlyPolicy();
 		assertTrue(policy.initCheck(file));
-	}
-
-	/**
-	 * Test discontinuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
-	 */
-	@Test
-	public final void testDisontinueLogFile() throws IOException {
-		setTime(0L);
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(getTime());
-
-		Policy policy = new YearlyPolicy();
-		assertFalse(policy.initCheck(file));
-
-		policy = new YearlyPolicy(1);
-		assertFalse(policy.initCheck(file));
-
-		file.delete();
 	}
 
 	/**

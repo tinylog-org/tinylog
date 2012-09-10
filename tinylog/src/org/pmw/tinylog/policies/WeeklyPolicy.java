@@ -26,10 +26,10 @@ public class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	private static final Pattern DAY_OF_WEEK_PATTERN = Pattern.compile("[1234567]");
 
 	/**
-	 * Trigger the first rollover after one week uptime.
+	 * Trigger a rollover every week (= {@link #WeeklyPolicy(int) WeeklyPolicy(1)}).
 	 */
 	public WeeklyPolicy() {
-		super(createCalendar(), Calendar.WEEK_OF_YEAR);
+		super(createCalendar(1), Calendar.WEEK_OF_YEAR);
 	}
 
 	/**
@@ -63,12 +63,6 @@ public class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public static String getName() {
 		return "weekly";
-	}
-
-	private static Calendar createCalendar() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.WEEK_OF_YEAR, 1);
-		return calendar;
 	}
 
 	private static Calendar createCalendar(final int dayOfWeek) {

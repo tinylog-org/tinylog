@@ -15,40 +15,16 @@ package org.pmw.tinylog.policies;
 
 import java.util.Calendar;
 
-import org.pmw.tinylog.PropertiesLoader;
-
 /**
  * Policy for one rollover per month.
  */
 public class MonthlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
-	 * Trigger the first rollover after one month uptime (= {@link #MonthlyPolicy(boolean) MonthlyPolicy(false)}).
+	 * Trigger a rollover every new month.
 	 */
 	public MonthlyPolicy() {
-		this(false);
-	}
-
-	/**
-	 * @param firstOfMonth
-	 *            <code>true</code> to trigger the first rollover at the first of the next month, <code>false</code> to
-	 *            trigger the first rollover after one month uptime
-	 * 
-	 */
-	public MonthlyPolicy(final boolean firstOfMonth) {
-		super(createCalendar(firstOfMonth), Calendar.MONTH);
-	}
-
-	/**
-	 * String parameter for {@link PropertiesLoader}.
-	 * 
-	 * @param firstOfMonth
-	 *            <code>true</code> to trigger the first rollover at the first of the next month, <code>false</code> to
-	 *            trigger the first rollover after one month uptime
-	 * 
-	 */
-	MonthlyPolicy(final String firstOfMonth) {
-		this("true".equalsIgnoreCase(firstOfMonth) || "1".equalsIgnoreCase(firstOfMonth));
+		super(createCalendar(), Calendar.MONTH);
 	}
 
 	/**
@@ -60,18 +36,14 @@ public class MonthlyPolicy extends AbstractTimeBasedPolicy {
 		return "monthly";
 	}
 
-	private static Calendar createCalendar(final boolean firstOfMonth) {
+	private static Calendar createCalendar() {
 		Calendar calendar = Calendar.getInstance();
-		if (firstOfMonth) {
-			calendar.set(Calendar.DATE, 1);
-			calendar.set(Calendar.HOUR_OF_DAY, 0);
-			calendar.set(Calendar.MINUTE, 0);
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-			normalize(calendar, Calendar.MONTH);
-		} else {
-			calendar.add(Calendar.MONTH, 1);
-		}
+		calendar.set(Calendar.DATE, 1);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		normalize(calendar, Calendar.MONTH);
 		return calendar;
 	}
 

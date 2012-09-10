@@ -31,46 +31,24 @@ import org.junit.Test;
 public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling after one week.
-	 */
-	@Test
-	public final void testRollingAfterOneDay() {
-		setTime(DAY);
-
-		Policy policy = new WeeklyPolicy();
-		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 7 - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-
-		policy.reset();
-		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 7 - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-	}
-
-	/**
 	 * Test rolling at the end of the week.
 	 */
 	@Test
 	public final void testRollingAtEndOfWeek() {
-		setTime(DAY);
+		setTime(DAY); // Friday, 2nd Januar 1970
 
-		Policy policy = new WeeklyPolicy(1);
+		Policy policy = new WeeklyPolicy();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 3 - 1L);
+		increaseTime(DAY * 3 - 1L); // Sunday, 4th Januar 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // Monday, 5th Januar 1970
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 7 - 1L);
+		increaseTime(DAY * 7 - 1L); // Sunday, 11th Januar 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // Monday, 12th Januar 1970
 		assertFalse(policy.check(null, null));
 	}
 
@@ -82,7 +60,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		setTime(DAY * 4L); // Monday
+		setTime(DAY * 4L); // Monday, 5th Januar 1970
 		File file = File.createTempFile("test", ".tmp");
 		file.deleteOnExit();
 		file.setLastModified(getTime() + 1L);
@@ -90,17 +68,17 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new WeeklyPolicy(2);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY - 1L);
+		increaseTime(DAY - 1L); // Monday, 5th Januar 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // Tuesday, 6th Januar 1970 23:59:59,999
 		assertFalse(policy.check(null, null));
 
 		policy = new WeeklyPolicy(1);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 6 - 1L);
+		increaseTime(DAY * 6 - 1L); // Sunday, 11th Januar 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // Monday, 12th Januar 1970
 		assertFalse(policy.check(null, null));
 
 		file.delete();
@@ -110,33 +88,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	}
 
 	/**
-	 * Test discontinuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
-	 */
-	@Test
-	public final void testDisontinueLogFile() throws IOException {
-		setTime(DAY * 4L); // Monday
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(getTime());
-
-		Policy policy = new WeeklyPolicy();
-		assertFalse(policy.initCheck(file));
-
-		policy = new WeeklyPolicy(1);
-		assertFalse(policy.initCheck(file));
-
-		file.delete();
-	}
-
-	/**
 	 * Test String parameter.
 	 */
 	@Test
 	public final void testStringParameter() {
-		setTime(DAY * 4L); // Monday
+		setTime(DAY * 4L); // Monday, 5th Januar 1970
 
 		AbstractTimeBasedPolicy policy = new WeeklyPolicy("1");
 		assertEquals(DAY * 4L + DAY * 7L, getCalendar(policy).getTimeInMillis());

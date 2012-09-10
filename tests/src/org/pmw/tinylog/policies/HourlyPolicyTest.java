@@ -13,7 +13,6 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -30,44 +29,22 @@ import org.junit.Test;
 public class HourlyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling after one hour.
-	 */
-	@Test
-	public final void testRollingAfterOneHour() {
-		setTime(HOUR / 2L);
-
-		Policy policy = new HourlyPolicy();
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
-		assertFalse(policy.check(null, null));
-
-		policy.reset();
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
-		assertFalse(policy.check(null, null));
-	}
-
-	/**
 	 * Test rolling at first full hour.
 	 */
 	@Test
 	public final void testRollingAtFirstFullHour() {
-		setTime(HOUR / 2L);
+		setTime(HOUR / 2L); // 00:30
 
-		Policy policy = new HourlyPolicy(true);
+		Policy policy = new HourlyPolicy();
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
+		increaseTime(HOUR / 2L); // 01:00
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
+		increaseTime(HOUR / 2L); // 01:30
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L);
+		increaseTime(HOUR / 2L); // 02:00
 		assertFalse(policy.check(null, null));
 	}
 
@@ -79,72 +56,30 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		setTime(HOUR / 2L);
+		setTime(HOUR / 2L); // 00:30
 		File file = File.createTempFile("test", ".tmp");
 		file.deleteOnExit();
 		file.setLastModified(getTime());
 
-		Policy policy = new HourlyPolicy(true);
+		Policy policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR / 2L - 1L);
+		increaseTime(HOUR / 2L - 1L); // 01:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 02:00
 		assertFalse(policy.check(null, null));
 
-		increaseTime(-1L);
-		policy = new HourlyPolicy(true);
+		increaseTime(-1L); // 01:59:59,999
+		policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 02:00
 		assertFalse(policy.check(null, null));
 
 		file.delete();
 
 		policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
-	}
-
-	/**
-	 * Test discontinuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
-	 */
-	@Test
-	public final void testDisontinueLogFile() throws IOException {
-		setTime(HOUR);
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(0L);
-
-		Policy policy = new HourlyPolicy();
-		assertFalse(policy.initCheck(file));
-
-		policy = new HourlyPolicy(false);
-		assertFalse(policy.initCheck(file));
-
-		policy = new HourlyPolicy(true);
-		assertFalse(policy.initCheck(file));
-
-		file.delete();
-	}
-
-	/**
-	 * Test String parameter.
-	 */
-	@Test
-	public final void testStringParameter() {
-		setTime(HOUR / 2L);
-
-		AbstractTimeBasedPolicy policy = new HourlyPolicy("true");
-		assertEquals(HOUR, getCalendar(policy).getTimeInMillis());
-
-		policy = new HourlyPolicy("1");
-		assertEquals(HOUR, getCalendar(policy).getTimeInMillis());
-
-		policy = new HourlyPolicy("false");
-		assertEquals(HOUR + HOUR / 2L, getCalendar(policy).getTimeInMillis());
 	}
 
 }

@@ -31,46 +31,24 @@ import org.junit.Test;
 public class DailyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling after one day.
-	 */
-	@Test
-	public final void testRollingAfterOneDay() {
-		setTime(DAY / 2L);
-
-		Policy policy = new DailyPolicy();
-		assertTrue(policy.check(null, null));
-		increaseTime(DAY - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-
-		policy.reset();
-		assertTrue(policy.check(null, null));
-		increaseTime(DAY - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
-		assertFalse(policy.check(null, null));
-	}
-
-	/**
 	 * Test rolling at midnight.
 	 */
 	@Test
 	public final void testRollingAtMidnight() {
-		setTime(DAY / 2L);
+		setTime(DAY / 2L); // 12:00
 
 		Policy policy = new DailyPolicy(24, 0);
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY / 2 - 1L);
+		increaseTime(DAY / 2 - 1L); // 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 24:00
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY - 1L);
+		increaseTime(DAY - 1L); // 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 24:00
 		assertFalse(policy.check(null, null));
 	}
 
@@ -82,7 +60,7 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		setTime(DAY / 2L);
+		setTime(DAY / 2L); // 12:00
 		File file = File.createTempFile("test", ".tmp");
 		file.deleteOnExit();
 		file.setLastModified(getTime());
@@ -90,45 +68,23 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new DailyPolicy(14, 0);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR * 2 - 1L);
+		increaseTime(HOUR * 2 - 1L); // 13:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 14:00
 		assertFalse(policy.check(null, null));
 
 		policy = new DailyPolicy(0, 0);
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(HOUR * 10 - 1L);
+		increaseTime(HOUR * 10 - 1L); // 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 24:00
 		assertFalse(policy.check(null, null));
 
 		file.delete();
 
 		policy = new DailyPolicy();
 		assertTrue(policy.initCheck(file));
-	}
-
-	/**
-	 * Test discontinuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
-	 */
-	@Test
-	public final void testDisontinueLogFile() throws IOException {
-		setTime(DAY);
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(0L);
-
-		Policy policy = new DailyPolicy();
-		assertFalse(policy.initCheck(file));
-
-		policy = new DailyPolicy(0, 0);
-		assertFalse(policy.initCheck(file));
-
-		file.delete();
 	}
 
 	/**

@@ -24,10 +24,10 @@ public class YearlyPolicy extends AbstractTimeBasedPolicy {
 	private static final Pattern MONTH_NUMBER_PATTERN = Pattern.compile("[123456789]|10|11|12");
 
 	/**
-	 * Trigger the first rollover after one year uptime.
+	 * Trigger a rollover every year (= {@link #YearlyPolicy(int) YearlyPolicy(1)}).
 	 */
 	public YearlyPolicy() {
-		super(createCalendar(), Calendar.YEAR);
+		super(createCalendar(1), Calendar.YEAR);
 	}
 
 	/**
@@ -57,12 +57,6 @@ public class YearlyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public static String getName() {
 		return "yearly";
-	}
-
-	private static Calendar createCalendar() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.YEAR, 1);
-		return calendar;
 	}
 
 	private static Calendar createCalendar(final int month) {

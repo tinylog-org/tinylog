@@ -24,10 +24,10 @@ import org.pmw.tinylog.PropertiesLoader;
 public class DailyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
-	 * Trigger the first rollover after one day uptime.
+	 * Trigger a rollover every new day.
 	 */
 	public DailyPolicy() {
-		super(createCalendar(), Calendar.DATE);
+		super(createCalendar(0, 0), Calendar.DATE);
 	}
 
 	/**
@@ -63,12 +63,6 @@ public class DailyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public static String getName() {
 		return "daily";
-	}
-
-	private static Calendar createCalendar() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DATE, 1);
-		return calendar;
 	}
 
 	private static Calendar createCalendar(final int hour, final int minute) {
