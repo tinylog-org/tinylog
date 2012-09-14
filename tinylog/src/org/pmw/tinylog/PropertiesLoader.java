@@ -36,7 +36,7 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Loads and sets properties for {@link Logger} from the properties files and from environment variables.
+ * Loads configuration for {@link Logger} from properties.
  */
 public final class PropertiesLoader {
 
@@ -51,51 +51,24 @@ public final class PropertiesLoader {
 
 	private static final String SERVICES_PREFIX = "META-INF/services/";
 	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + ":";
-	private static final String PROPERTIES_FILE = "/tinylog.properties";
 
 	private PropertiesLoader() {
 	}
 
 	/**
-	 * Reload properties from environment variables and from the default properties file ("/tinylog.properties").
-	 */
-	public static void reload() {
-		Properties properties = getPropertiesFromFile(PROPERTIES_FILE);
-		properties.putAll(System.getProperties());
-		readProperties(properties);
-	}
-
-	/**
-	 * Load properties from a properties file.
+	 * Load configuration from properties.
 	 * 
-	 * @param file
-	 *            File in classpath to load
+	 * @param properties
+	 *            Properties with configuration
+	 * @return A new configurator
 	 */
-	public static void loadFromFile(final String file) {
-		Properties properties = getPropertiesFromFile(file);
-		readProperties(properties);
-	}
+	static Configurator readProperties(final Properties properties) {
+		Configurator configuration = Configurator.defaultConfig();
 
-	private static Properties getPropertiesFromFile(final String file) {
-		Properties properties = new Properties();
-
-		InputStream stream = Logger.class.getResourceAsStream(file);
-		if (stream != null) {
-			try {
-				properties.load(stream);
-			} catch (IOException ex) {
-				// Ignore
-			}
-		}
-
-		return properties;
-	}
-
-	private static void readProperties(final Properties properties) {
 		String level = properties.getProperty(LEVEL_PROPERTY);
 		if (level != null && !level.isEmpty()) {
 			try {
-				Logger.setLoggingLevel(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
+				configuration.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
 				// Ignore
 			}
@@ -109,28 +82,28 @@ public final class PropertiesLoader {
 				String value = properties.getProperty(key);
 				try {
 					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
-					Logger.setLoggingLevel(packageName, loggingLevel);
+					configuration.level(packageName, loggingLevel);
 				} catch (IllegalArgumentException ex) {
 					// Illegal logging level => reset
-					Logger.resetLoggingLevel(packageName);
+					configuration.level(packageName, null);
 				}
 			}
 		}
 
 		String format = properties.getProperty(FORMAT_PROPERTY);
 		if (format != null && !format.isEmpty()) {
-			Logger.setLoggingFormat(format);
+			configuration.formatPattern(format);
 		}
 
 		String localeString = properties.getProperty(LOCALE_PROPERTY);
 		if (localeString != null && !localeString.isEmpty()) {
 			String[] localeArray = localeString.split("_", 3);
 			if (localeArray.length == 1) {
-				Logger.setLocale(new Locale(localeArray[0]));
+				configuration.locale(new Locale(localeArray[0]));
 			} else if (localeArray.length == 2) {
-				Logger.setLocale(new Locale(localeArray[0], localeArray[1]));
+				configuration.locale(new Locale(localeArray[0], localeArray[1]));
 			} else if (localeArray.length >= 3) {
-				Logger.setLocale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
+				configuration.locale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
 			}
 		}
 
@@ -138,7 +111,7 @@ public final class PropertiesLoader {
 		if (stacktace != null && !stacktace.isEmpty()) {
 			try {
 				int limit = Integer.parseInt(stacktace);
-				Logger.setMaxStackTraceElements(limit);
+				configuration.maxStackTraceElements(limit);
 			} catch (NumberFormatException ex) {
 				// Ignore
 			}
@@ -147,13 +120,16 @@ public final class PropertiesLoader {
 		String writer = properties.getProperty(WRITER_PROPERTY);
 		if (writer != null && !writer.isEmpty()) {
 			if (writer.equalsIgnoreCase("null")) {
-				Logger.setWriter(null);
+				configuration.writer(null);
 			} else {
 				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
 					if (LoggingWriter.class.isAssignableFrom(implementation)) {
 						if (writer.equalsIgnoreCase(getName(implementation))) {
-							loadAndSetWriter(properties, implementation);
-							break;
+							LoggingWriter loggingWriter = loadAndSetWriter(properties, implementation);
+							if (loggingWriter != null) {
+								configuration.writer(loggingWriter);
+								break;
+							}
 						}
 					}
 				}
@@ -163,26 +139,35 @@ public final class PropertiesLoader {
 		String writingThread = properties.getProperty(WRITING_THREAD_PROPERTY);
 		if ("true".equalsIgnoreCase(writingThread) || "1".equalsIgnoreCase(writingThread)) {
 			String observedThread = properties.getProperty(WRITING_THREAD_OBSERVE_PROPERTY);
-			if (observedThread == null) {
-				observedThread = WritingThread.DEFAULT_THREAD_TO_OBSERVE;
-			} else if (observedThread.equalsIgnoreCase("null")) {
+			boolean observedThreadDefined = observedThread != null;
+			if (observedThreadDefined && observedThread.equalsIgnoreCase("null")) {
 				observedThread = null;
 			}
 			String priorityString = properties.getProperty(WRITING_THREAD_PRIORITY_PROPERTY);
-			int priority;
+			Integer priority;
 			if (priorityString == null) {
-				priority = WritingThread.DEFAULT_PRIORITY;
+				priority = null;
 			} else {
 				try {
 					priority = Integer.parseInt(priorityString.trim());
 				} catch (NumberFormatException ex) {
-					priority = WritingThread.DEFAULT_PRIORITY;
+					priority = null;
 				}
 			}
-			Logger.startWritingThread(observedThread, priority);
+			if (priority != null && observedThreadDefined) {
+				configuration.writingThread(true, observedThread, priority);
+			} else if (priority != null) {
+				configuration.writingThread(true, priority);
+			} else if (observedThreadDefined) {
+				configuration.writingThread(true, observedThread);
+			} else {
+				configuration.writingThread(true);
+			}
 		} else {
-			Logger.shutdownWritingThread(false);
+			configuration.writingThread(false);
 		}
+
+		return configuration;
 	}
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {
@@ -233,7 +218,7 @@ public final class PropertiesLoader {
 		}
 	}
 
-	private static void loadAndSetWriter(final Properties properties, final Class<?> writerClass) {
+	private static LoggingWriter loadAndSetWriter(final Properties properties, final Class<?> writerClass) {
 		try {
 			String[][] supportedProperties = getSupportedProperties(writerClass);
 			Constructor<?> foundConstructor = null;
@@ -252,16 +237,18 @@ public final class PropertiesLoader {
 				}
 			}
 			if (foundConstructor != null) {
-				Logger.setWriter((LoggingWriter) foundConstructor.newInstance(foundParameters));
+				return (LoggingWriter) foundConstructor.newInstance(foundParameters);
+			} else {
+				return null;
 			}
 		} catch (InstantiationException ex) {
-			// Failed to create writer => keep old writer
+			return null;
 		} catch (IllegalAccessException ex) {
-			// Failed to create writer => keep old writer
+			return null;
 		} catch (IllegalArgumentException ex) {
-			// Failed to create writer => keep old writer
+			return null;
 		} catch (InvocationTargetException ex) {
-			// Failed to create writer => keep old writer
+			return null;
 		}
 	}
 

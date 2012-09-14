@@ -19,21 +19,14 @@ import java.util.List;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Thread to write log entries.
+ * Thread to write log entries asynchronously.
  */
 final class WritingThread extends Thread {
 
-	/**
-	 * Name of default thread to observe
-	 */
-	static final String DEFAULT_THREAD_TO_OBSERVE = "main";
-
-	/**
-	 * Default priority for writhing thread
-	 */
-	static final int DEFAULT_PRIORITY = 2;
+	private static final String THREAD_NAME = "tinylog-WritingThread";
 
 	private volatile List<LogEntry> entries;
+	private final String nameOfThreadToObserve;
 	private final Thread threadToObserve;
 	private volatile boolean shutdown;
 
@@ -43,10 +36,26 @@ final class WritingThread extends Thread {
 	 * @param nameOfThreadToObserve
 	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
 	 *            automatic shutdown
+	 * @param priority
+	 *            Priority of the writing thread (must be between {@link Thread#MIN_PRIORITY} and
+	 *            {@link Thread#MAX_PRIORITY})
 	 */
-	public WritingThread(final String nameOfThreadToObserve) {
-		entries = new ArrayList<WritingThread.LogEntry>();
-		threadToObserve = nameOfThreadToObserve == null ? null : getThread(nameOfThreadToObserve);
+	WritingThread(final String nameOfThreadToObserve, final int priority) {
+		this.entries = new ArrayList<WritingThread.LogEntry>();
+		this.nameOfThreadToObserve = nameOfThreadToObserve;
+		this.threadToObserve = nameOfThreadToObserve == null ? null : getThread(nameOfThreadToObserve);
+
+		setName(THREAD_NAME);
+		setPriority(priority);
+	}
+
+	/**
+	 * Get the name of the thread, which is observed by this writhing thread.
+	 * 
+	 * @return Name of the thread
+	 */
+	public String getNameOfThreadToObserve() {
+		return nameOfThreadToObserve;
 	}
 
 	/**
@@ -105,7 +114,7 @@ final class WritingThread extends Thread {
 	private static Thread getThread(final String name) {
 		ThreadGroup root = getRootThreadGroup(Thread.currentThread().getThreadGroup());
 
-		Thread[] threads = new Thread[root.activeCount()];
+		Thread[] threads = new Thread[root.activeCount() * 2];
 		int count = root.enumerate(threads);
 
 		for (int i = 0; i < count; ++i) {

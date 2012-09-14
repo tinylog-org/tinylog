@@ -16,16 +16,8 @@ package org.pmw.tinylog;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Static class to create log entries.
@@ -39,21 +31,13 @@ public final class Logger {
 	 */
 	static final int DEEP_OF_STACK_TRACE = 3;
 
-	private static final String DEFAULT_LOGGING_FORMAT = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
+	private static volatile Configuration configuration;
 	private static Method stackTraceMethod;
-	private static volatile WritingThread writingThread = null;
-	private static volatile int maxLoggingStackTraceElements = 40;
-	private static volatile LoggingWriter loggingWriter = new ConsoleWriter();
-	private static volatile LoggingLevel loggingLevel = LoggingLevel.INFO;
-	private static final Map<String, LoggingLevel> packageLoggingLevels = Collections.synchronizedMap(new HashMap<String, LoggingLevel>());
-	private static volatile String loggingFormat = DEFAULT_LOGGING_FORMAT;
-	private static volatile Locale locale = Locale.getDefault();
-	private static volatile List<Token> loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
 
 	static {
-		PropertiesLoader.reload();
+		Configurator.reload().activate();
 		try {
 			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			stackTraceMethod.setAccessible(true);
@@ -67,171 +51,33 @@ public final class Logger {
 	}
 
 	/**
-	 * Returns the current logging level.
+	 * Get the current global logging level.
 	 * 
-	 * @return The current logging level
+	 * @return Global logging level
 	 */
 	public static LoggingLevel getLoggingLevel() {
-		return loggingLevel;
+		return configuration.getLevel();
 	}
 
 	/**
-	 * Change the logging level. The logger creates and outputs only log entries for the current logging level and
-	 * higher.
-	 * 
-	 * @param level
-	 *            New logging level
-	 */
-	public static void setLoggingLevel(final LoggingLevel level) {
-		if (level == null) {
-			loggingLevel = LoggingLevel.OFF;
-		} else {
-			loggingLevel = level;
-		}
-	}
-
-	/**
-	 * Returns the logging level for a package.
+	 * Get the current logging level for a particular package.
 	 * 
 	 * @param packageName
 	 *            Name of the package
 	 * 
-	 * @return The logging level
+	 * @return Logging level for package
 	 */
 	public static LoggingLevel getLoggingLevel(final String packageName) {
-		return getLoggingLevelOfPackage(packageName);
+		return configuration.getLevelOfPackage(packageName);
 	}
 
 	/**
-	 * Set the logging level for a package.
-	 * 
-	 * This will override the default logging level for this package.
-	 * 
-	 * @param packageName
-	 *            Name of the package
-	 * @param level
-	 *            The logging level (or <code>null</code> to reset it to the default logging level)
-	 */
-	public static void setLoggingLevel(final String packageName, final LoggingLevel level) {
-		if (level == null) {
-			packageLoggingLevels.remove(packageName);
-		} else {
-			packageLoggingLevels.put(packageName, level);
-		}
-	}
-
-	/**
-	 * Reset the logging level for a package (to use the default logging level again).
-	 * 
-	 * @param packageName
-	 *            Name of the package
-	 */
-	public static void resetLoggingLevel(final String packageName) {
-		packageLoggingLevels.remove(packageName);
-	}
-
-	/**
-	 * Reset all package depending logging levels (to use the default logging level again).
-	 */
-	public static void resetAllLoggingLevel() {
-		packageLoggingLevels.clear();
-	}
-
-	/**
-	 * Returns the format pattern for log entries.
-	 * 
-	 * @return Format pattern for log entries
-	 */
-	public static String getLoggingFormat() {
-		return loggingFormat;
-	}
-
-	/**
-	 * Change the format pattern for log entries.
-	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"</code> is the default format
-	 * pattern. The date format pattern is compatible with {@link SimpleDateFormat}.
-	 * 
-	 * @param format
-	 *            Format pattern for log entries (or <code>null</code> to reset to default)
-	 * 
-	 * @see SimpleDateFormat
-	 */
-	public static void setLoggingFormat(final String format) {
-		if (format == null) {
-			loggingFormat = DEFAULT_LOGGING_FORMAT;
-		} else {
-			loggingFormat = format;
-		}
-		loggingEntryTokens = Tokenizer.parse(loggingFormat, locale);
-	}
-
-	/**
-	 * Returns the locale, which is used in format patterns for log entries.
+	 * Get the current locale, which is used in format patterns for log entries.
 	 * 
 	 * @return Locale for format patterns
 	 */
 	public static Locale getLocale() {
-		return locale;
-	}
-
-	/**
-	 * Change the locale, which is used in format patterns for log entries.
-	 * 
-	 * It will be used e. g. to format numbers and dates.
-	 * 
-	 * @param locale
-	 *            Locale for format patterns
-	 */
-	public static void setLocale(final Locale locale) {
-		if (locale == null) {
-			Logger.locale = Locale.getDefault();
-		} else {
-			Logger.locale = locale;
-		}
-		loggingEntryTokens = Tokenizer.parse(loggingFormat, Logger.locale);
-	}
-
-	/**
-	 * Returns the limit of stack traces for exceptions.
-	 * 
-	 * @return The limit of stack traces
-	 */
-	public static int getMaxStackTraceElements() {
-		return maxLoggingStackTraceElements;
-	}
-
-	/**
-	 * Change the limit of stack traces for exceptions (default is 40). Can be set to "-1" for no limitation and to "0"
-	 * to disable any stack traces.
-	 * 
-	 * @param maxStackTraceElements
-	 *            Limit of stack traces
-	 */
-	public static void setMaxStackTraceElements(final int maxStackTraceElements) {
-		if (maxStackTraceElements < 0) {
-			Logger.maxLoggingStackTraceElements = Integer.MAX_VALUE;
-		} else {
-			Logger.maxLoggingStackTraceElements = maxStackTraceElements;
-		}
-	}
-
-	/**
-	 * Returns the current logging writer.
-	 * 
-	 * @return The current logging writer
-	 */
-	public static LoggingWriter getWriter() {
-		return loggingWriter;
-	}
-
-	/**
-	 * Register a logging writer for outputting the created log entries.
-	 * 
-	 * @param writer
-	 *            New logging writer (can be <code>null</code> to disable any output)
-	 */
-	public static void setWriter(final LoggingWriter writer) {
-		loggingWriter = writer;
+		return configuration.getLocale();
 	}
 
 	/**
@@ -246,60 +92,6 @@ public final class Logger {
 	 */
 	public static void trace(final String message, final Object... arguments) {
 		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, null, message, arguments);
-	}
-
-	/**
-	 * Start a separate thread with a low priority (2) for writing log entries. This thread will automatically shutdown,
-	 * if the main thread is dead.
-	 */
-	public static void startWritingThread() {
-		startWritingThread(WritingThread.DEFAULT_THREAD_TO_OBSERVE, WritingThread.DEFAULT_PRIORITY);
-	}
-
-	/**
-	 * Start a separate thread for writing log entries. This thread will automatically shutdown, if the observed thread
-	 * is dead.
-	 * 
-	 * @param nameOfThreadToObserve
-	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
-	 *            automatic shutdown
-	 * @param priority
-	 *            Priority for the writing thread (must be between {@link Thread#MIN_PRIORITY} and
-	 *            {@link Thread#MAX_PRIORITY}).
-	 */
-	public static synchronized void startWritingThread(final String nameOfThreadToObserve, final int priority) {
-		if (writingThread == null) {
-			WritingThread thread = new WritingThread(nameOfThreadToObserve);
-			thread.setPriority(priority);
-			thread.setName("tinylog-WritingThread");
-			thread.start();
-			writingThread = thread;
-		}
-	}
-
-	/**
-	 * Shutdown the writing thread.
-	 * 
-	 * @param wait
-	 *            <code>true</code> to wait for the successful shutdown, <code>false</code> for an asynchronous shutdown
-	 */
-	public static synchronized void shutdownWritingThread(final boolean wait) {
-		WritingThread thread = writingThread;
-		if (thread != null) {
-			writingThread = null;
-			thread.shutdown();
-			if (wait) {
-				boolean finished;
-				do {
-					try {
-						thread.join();
-						finished = true;
-					} catch (InterruptedException ex) {
-						finished = false;
-					}
-				} while (!finished);
-			}
-		}
 	}
 
 	/**
@@ -489,6 +281,25 @@ public final class Logger {
 	}
 
 	/**
+	 * Get a copy of the current configuration.
+	 * 
+	 * @return A copy of the current configuration
+	 */
+	static Configurator getConfiguration() {
+		return configuration.copy();
+	}
+
+	/**
+	 * Set a new configuration.
+	 * 
+	 * @param configuration
+	 *            New configuration
+	 */
+	static void setConfirguration(final Configuration configuration) {
+		Logger.configuration = configuration;
+	}
+
+	/**
 	 * Add a log entry. This method is helpful for adding log entries form logger bridges.
 	 * 
 	 * @param strackTraceDeep
@@ -503,30 +314,29 @@ public final class Logger {
 	 *            Arguments for the text message
 	 */
 	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
-		LoggingWriter currentWriter = loggingWriter;
-
-		if (currentWriter != null) {
+		Configuration currentConfiguration = configuration;
+		if (configuration.getWriter() != null) {
 			StackTraceElement stackTraceElement = null;
-			LoggingLevel activeLoggingLevel = loggingLevel;
+			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (!packageLoggingLevels.isEmpty()) {
+			if (level.ordinal() >= currentConfiguration.getLowestPackageLevel().ordinal()) {
 				stackTraceElement = getStackTraceElement(strackTraceDeep);
-				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
+				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
 				String logEntry;
 				try {
-					logEntry = createLogEntry(strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
+					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					logEntry = createLogEntry(strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex,
+							"Could not created log entry");
 				}
 
-				WritingThread currentWritingThread = writingThread;
-				if (currentWritingThread == null) {
-					currentWriter.write(activeLoggingLevel, logEntry);
+				if (configuration.getWritingThread() == null) {
+					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
 				} else {
-					currentWritingThread.putLogEntry(currentWriter, activeLoggingLevel, logEntry);
+					configuration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
 				}
 			}
 		}
@@ -548,42 +358,40 @@ public final class Logger {
 	 */
 	static void output(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final String message,
 			final Object... arguments) {
-		LoggingWriter currentWriter = loggingWriter;
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.getWriter() != null) {
+			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-		if (currentWriter != null) {
-			LoggingLevel activeLoggingLevel = loggingLevel;
-
-			if (!packageLoggingLevels.isEmpty()) {
-				activeLoggingLevel = getLoggingLevelOfClass(stackTraceElement.getClassName());
+			if (level.ordinal() >= currentConfiguration.getLowestPackageLevel().ordinal()) {
+				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
 				String logEntry;
 				try {
-					logEntry = createLogEntry(-1, level, stackTraceElement, exception, message, arguments);
+					logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					logEntry = createLogEntry(-1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+					logEntry = createLogEntry(currentConfiguration, -1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
 
-				WritingThread currentWritingThread = writingThread;
-				if (currentWritingThread == null) {
-					currentWriter.write(activeLoggingLevel, logEntry);
+				if (configuration.getWritingThread() == null) {
+					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
 				} else {
-					currentWritingThread.putLogEntry(currentWriter, activeLoggingLevel, logEntry);
+					configuration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
 				}
 			}
 		}
 	}
 
-	private static String createLogEntry(final int strackTraceDeep, final LoggingLevel level, final StackTraceElement createdStackTraceElement,
-			final Throwable exception, final String message, final Object... arguments) {
+	private static String createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
+			final StackTraceElement createdStackTraceElement, final Throwable exception, final String message, final Object... arguments) {
 		StringBuilder builder = new StringBuilder();
 
 		String threadName = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		Date now = null;
 
-		for (Token token : loggingEntryTokens) {
+		for (Token token : currentConfiguration.getFormatTokens()) {
 			switch (token.getType()) {
 				case THREAD:
 					if (threadName == null) {
@@ -638,14 +446,13 @@ public final class Logger {
 
 				case MESSAGE:
 					if (message != null) {
-						builder.append(new MessageFormat(message, locale).format(arguments));
+						builder.append(new MessageFormat(message, currentConfiguration.getLocale()).format(arguments));
 					}
 					if (exception != null) {
 						if (message != null) {
 							builder.append(": ");
 						}
-						int countLoggingStackTraceElements = maxLoggingStackTraceElements;
-						if (countLoggingStackTraceElements == 0) {
+						if (currentConfiguration.getMaxStackTraceElements() == 0) {
 							builder.append(exception.getClass().getName());
 							String exceptionMessage = exception.getMessage();
 							if (exceptionMessage != null) {
@@ -653,7 +460,7 @@ public final class Logger {
 								builder.append(exceptionMessage);
 							}
 						} else {
-							builder.append(getPrintedException(exception, countLoggingStackTraceElements));
+							builder.append(getPrintedException(exception, currentConfiguration.getMaxStackTraceElements()));
 						}
 					}
 					break;
@@ -666,31 +473,6 @@ public final class Logger {
 		builder.append(NEW_LINE);
 
 		return builder.toString();
-	}
-
-	private static LoggingLevel getLoggingLevelOfClass(final String className) {
-		int index = className.lastIndexOf('.');
-		if (index > 0) {
-			return getLoggingLevelOfPackage(className.substring(0, index));
-		} else {
-			return loggingLevel;
-		}
-	}
-
-	private static LoggingLevel getLoggingLevelOfPackage(final String packageName) {
-		String packageKey = packageName;
-		while (true) {
-			LoggingLevel level = packageLoggingLevels.get(packageKey);
-			if (level != null) {
-				return level;
-			}
-			int index = packageKey.lastIndexOf('.');
-			if (index > 0) {
-				packageKey = packageKey.substring(0, index);
-			} else {
-				return loggingLevel;
-			}
-		}
 	}
 
 	private static StackTraceElement getStackTraceElement(final int deep) {
