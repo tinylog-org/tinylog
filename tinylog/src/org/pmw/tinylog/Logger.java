@@ -34,16 +34,34 @@ public final class Logger {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private static volatile Configuration configuration;
+
 	private static Method stackTraceMethod;
+	private static Method callerClassMethod;
 
 	static {
 		Configurator.reload().activate();
+
 		try {
 			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			stackTraceMethod.setAccessible(true);
-			stackTraceMethod.invoke(new Throwable(), 0); // Test if method can be invoked
+			StackTraceElement stackTraceElement = (StackTraceElement) stackTraceMethod.invoke(new Throwable(), 0);
+			if (!Logger.class.getName().equals(stackTraceElement.getClassName())) {
+				stackTraceMethod = null;
+			}
 		} catch (Exception ex) {
 			stackTraceMethod = null;
+		}
+
+		try {
+			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
+			callerClassMethod = reflectionClass.getDeclaredMethod("getCallerClass", int.class);
+			callerClassMethod.setAccessible(true);
+			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 1);
+			if (!Logger.class.getName().equals(callerClass.getName())) {
+				stackTraceMethod = null;
+			}
+		} catch (Exception ex) {
+			callerClassMethod = null;
 		}
 	}
 
@@ -315,12 +333,12 @@ public final class Logger {
 	 */
 	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
-		if (configuration.getWriter() != null) {
+		if (currentConfiguration.getWriter() != null) {
 			StackTraceElement stackTraceElement = null;
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
 			if (level.ordinal() >= currentConfiguration.getLowestPackageLevel().ordinal()) {
-				stackTraceElement = getStackTraceElement(strackTraceDeep);
+				stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
 			}
 
@@ -333,10 +351,10 @@ public final class Logger {
 							"Could not created log entry");
 				}
 
-				if (configuration.getWritingThread() == null) {
+				if (currentConfiguration.getWritingThread() == null) {
 					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
 				} else {
-					configuration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
+					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
 				}
 			}
 		}
@@ -374,10 +392,10 @@ public final class Logger {
 					logEntry = createLogEntry(currentConfiguration, -1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
 				}
 
-				if (configuration.getWritingThread() == null) {
+				if (currentConfiguration.getWritingThread() == null) {
 					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
 				} else {
-					configuration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
+					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
 				}
 			}
 		}
@@ -402,28 +420,28 @@ public final class Logger {
 
 				case CLASS:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getClassName());
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getMethodName());
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getFileName());
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getLineNumber());
 					break;
@@ -475,7 +493,16 @@ public final class Logger {
 		return builder.toString();
 	}
 
-	private static StackTraceElement getStackTraceElement(final int deep) {
+	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
+		if (!currentConfiguration.isFullStackTraceElemetRequired() && callerClassMethod != null) {
+			try {
+				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 1);
+				return new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", 0);
+			} catch (Exception ex) {
+				// Fallback
+			}
+		}
+
 		if (stackTraceMethod != null) {
 			try {
 				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
