@@ -464,7 +464,11 @@ public final class Logger {
 
 				case MESSAGE:
 					if (message != null) {
-						builder.append(new MessageFormat(message, currentConfiguration.getLocale()).format(arguments));
+						if (arguments.length == 0) {
+							builder.append(message);
+						} else {
+							builder.append(new MessageFormat(message, currentConfiguration.getLocale()).format(arguments));
+						}
 					}
 					if (exception != null) {
 						if (message != null) {

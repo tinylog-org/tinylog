@@ -70,4 +70,15 @@ public class RegressionsTest extends AbstractTest {
 		file.delete();
 	}
 
+	/**
+	 * Bug: IllegalArgumentException if there are curly brackets in the log message.
+	 */
+	@Test
+	public final void testCurlyBracketsInText() {
+		StoreWriter writer = new StoreWriter();
+		Configurator.defaultConfig().writer(writer).formatPattern("{message}").activate();
+		Logger.info("{TEST}");
+		assertEquals("{TEST}" + NEW_LINE, writer.consumeMessage()); // Failed (java.lang.IllegalArgumentException)
+	}
+
 }
