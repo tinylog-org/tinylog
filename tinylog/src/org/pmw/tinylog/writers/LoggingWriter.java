@@ -13,8 +13,8 @@
 
 package org.pmw.tinylog.writers;
 
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.Logger;
+import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Logging writers output created log entries from {@link Logger}.
@@ -22,8 +22,6 @@ import org.pmw.tinylog.Logger;
  * An implemented writer must be registered as service in "META-INF/services/org.pmw.tinylog.writers" and implement the
  * static method <code>public static String getName()</code>, so that tinylog can find it. Writers can also implement
  * <code>public static String[][] getSupportedProperties()</code> to support properties.
- * 
- * @see org.pmw.tinylog.Logger#setWriter(LoggingWriter)
  */
 public interface LoggingWriter {
 
