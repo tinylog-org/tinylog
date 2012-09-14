@@ -13,7 +13,6 @@
 
 package org.pmw.tinylog.writers;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.pmw.tinylog.LoggingLevel;
@@ -23,7 +22,7 @@ import org.pmw.tinylog.LoggingLevel;
  */
 public class FileWriter implements LoggingWriter {
 
-	private final BufferedWriter writer;
+	private final java.io.FileWriter writer;
 
 	/**
 	 * @param filename
@@ -32,7 +31,7 @@ public class FileWriter implements LoggingWriter {
 	 *             Failed to open or create the log file
 	 */
 	public FileWriter(final String filename) throws IOException {
-		this.writer = new BufferedWriter(new java.io.FileWriter(filename));
+		this.writer = new java.io.FileWriter(filename);
 	}
 
 	/**

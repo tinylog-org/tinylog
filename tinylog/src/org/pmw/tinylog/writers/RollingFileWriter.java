@@ -13,7 +13,6 @@
 
 package org.pmw.tinylog.writers;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,7 +34,7 @@ public class RollingFileWriter implements LoggingWriter {
 	private final List<? extends Policy> policies;
 
 	private File file;
-	private BufferedWriter writer;
+	private java.io.FileWriter writer;
 
 	/**
 	 * Rolling log files once at startup.
@@ -85,7 +84,7 @@ public class RollingFileWriter implements LoggingWriter {
 		this.policies = Arrays.asList(policies);
 		this.file = labeller.getLogFile(new File(filename));
 		initCkeckPolicies();
-		this.writer = new BufferedWriter(new java.io.FileWriter(file, true));
+		this.writer = new java.io.FileWriter(file, true);
 	}
 
 	/**
@@ -121,7 +120,7 @@ public class RollingFileWriter implements LoggingWriter {
 				}
 				file = labeller.roll(file, backups);
 				try {
-					writer = new BufferedWriter(new java.io.FileWriter(file));
+					writer = new java.io.FileWriter(file);
 				} catch (IOException ex) {
 					throw new RuntimeException(ex);
 				}
