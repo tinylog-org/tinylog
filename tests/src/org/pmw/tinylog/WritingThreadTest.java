@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -25,7 +26,7 @@ import org.pmw.tinylog.util.StoreWriter;
  * 
  * @see WritingThread
  */
-public class WritingThreadTest {
+public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test simple startup and shutdown.
@@ -37,10 +38,11 @@ public class WritingThreadTest {
 	public final void testSimpleStartupAndShutdown() throws InterruptedException {
 		int threadCount = Thread.activeCount();
 
-		WritingThread writingThread = new WritingThread(null);
+		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
 		assertEquals(threadCount, Thread.activeCount());
 
 		writingThread.start();
+		assertNull(writingThread.getNameOfThreadToObserve());
 		assertTrue(writingThread.isAlive());
 		assertEquals(threadCount + 1, Thread.activeCount());
 
@@ -59,7 +61,7 @@ public class WritingThreadTest {
 	@Test
 	public final void testWritingLogEntries() throws InterruptedException {
 		StoreWriter writer = new StoreWriter();
-		WritingThread writingThread = new WritingThread(null);
+		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
 		writingThread.start();
 
 		writingThread.putLogEntry(writer, LoggingLevel.INFO, "sample");
@@ -83,8 +85,9 @@ public class WritingThreadTest {
 		observableThread.setPriority(Thread.MIN_PRIORITY);
 		observableThread.start();
 
-		WritingThread writingThread = new WritingThread(EndlessThread.class.getName());
+		WritingThread writingThread = new WritingThread(EndlessThread.class.getName(), Thread.NORM_PRIORITY);
 		writingThread.start();
+		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
 		assertTrue(writingThread.isAlive());
 		Thread.sleep(100L);
 		assertTrue(writingThread.isAlive());

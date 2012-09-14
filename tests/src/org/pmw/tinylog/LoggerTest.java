@@ -14,8 +14,6 @@
 package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,15 +28,13 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Tests for the logger.
  * 
  * @see Logger
  */
-public class LoggerTest {
+public class LoggerTest extends AbstractTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -47,30 +43,60 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testLoggingLevel() {
-		Logger.setLoggingLevel(LoggingLevel.TRACE);
+		Configurator.defaultConfig().level(LoggingLevel.TRACE).activate();
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel());
 
-		Logger.setLoggingLevel(LoggingLevel.OFF);
+		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
 		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
 
-		Logger.setLoggingLevel(LoggingLevel.ERROR);
+		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
 		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
 
-		Logger.setLoggingLevel(null);
+		Configurator.currentConfig().level(null).activate();
 		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
 	}
 
 	/**
-	 * Test getter and setter for logging format pattern.
+	 * Test special logging levels for packages.
 	 */
 	@Test
-	public final void testLoggingFormat() {
-		Logger.setLoggingFormat("{message}");
-		assertEquals("{message}", Logger.getLoggingFormat());
+	public final void testPackageLoggingLevel() {
+		StoreWriter writer = new StoreWriter();
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
 
-		Logger.setLoggingFormat(null);
-		assertNotNull(Logger.getLoggingFormat());
-		assertFalse("{message}".equals(Logger.getLoggingFormat()));
+		Configurator.currentConfig().level("a.b", LoggingLevel.DEBUG).activate();
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a"));
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b.c"));
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
+
+		Configurator.currentConfig().level("a.b", null).activate();
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+
+		Configurator.currentConfig().level("a.b", LoggingLevel.DEBUG).activate();
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
+
+		Configurator.currentConfig().level("a.b", null).activate();
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
+
+		Logger.debug("Hello!");
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		assertNull(writer.consumeMessage());
+
+		Configurator.currentConfig().level("org.pmw.tinylog", LoggingLevel.INFO).activate();
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertNull(writer.consumeMessage());
+
+		Configurator.currentConfig().level("org.pmw.tinylog", LoggingLevel.DEBUG).activate();
+		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Configurator.currentConfig().resetAllLevelsForPackages().activate();
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
+		Logger.debug("Hello!");
+		assertNull(writer.consumeMessage());
 	}
 
 	/**
@@ -78,66 +104,14 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testLocale() {
-		Logger.setLocale(Locale.US);
+		Configurator.defaultConfig().locale(Locale.US).activate();
 		assertEquals(Locale.US, Logger.getLocale());
 
-		Logger.setLocale(Locale.GERMANY);
+		Configurator.currentConfig().locale(Locale.GERMANY).activate();
 		assertEquals(Locale.GERMANY, Logger.getLocale());
 
-		Logger.setLocale(null);
+		Configurator.currentConfig().locale(null).activate();
 		assertEquals(Locale.getDefault(), Logger.getLocale());
-	}
-
-	/**
-	 * Test getter and setter for limitation of stack traces.
-	 */
-	@Test
-	public final void testMaxStackTraceElements() {
-		Logger.setMaxStackTraceElements(Integer.MIN_VALUE);
-		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
-
-		Logger.setMaxStackTraceElements(-1);
-		assertEquals(Integer.MAX_VALUE, Logger.getMaxStackTraceElements());
-
-		Logger.setMaxStackTraceElements(0);
-		assertEquals(0, Logger.getMaxStackTraceElements());
-
-		Logger.setMaxStackTraceElements(40);
-		assertEquals(40, Logger.getMaxStackTraceElements());
-	}
-
-	/**
-	 * Test getter and setter for logging writer.
-	 */
-	@Test
-	public final void testLoggingWriter() {
-		Logger.setWriter(null);
-		assertNull(Logger.getWriter());
-		Logger.info("My message"); // Must NOT thrown any exception but ignore the log entry
-
-		LoggingWriter writer = new ConsoleWriter();
-		Logger.setWriter(writer);
-		assertEquals(writer, Logger.getWriter());
-	}
-
-	/**
-	 * Test startup and shutdown of writing thread.
-	 */
-	@Test
-	public final void testWritingThread() {
-		int threadCount = Thread.activeCount();
-		Logger.startWritingThread();
-		assertEquals(threadCount + 1, Thread.activeCount());
-		Logger.shutdownWritingThread(true);
-		assertEquals(threadCount, Thread.activeCount());
-
-		Logger.startWritingThread();
-		Logger.startWritingThread(); // Must NOT thrown any exception, just ignore the second call
-		assertEquals(threadCount + 1, Thread.activeCount());
-
-		Logger.shutdownWritingThread(true);
-		assertEquals(threadCount, Thread.activeCount());
-		Logger.shutdownWritingThread(false); // Must NOT thrown any exception, just ignore the second call
 	}
 
 	/**
@@ -146,9 +120,7 @@ public class LoggerTest {
 	@Test
 	public final void testTrace() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.TRACE);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).formatPattern("{message}").activate();
 
 		Logger.trace("Hello!");
 		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
@@ -166,9 +138,7 @@ public class LoggerTest {
 	@Test
 	public final void testDebug() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.DEBUG);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.DEBUG).formatPattern("{message}").activate();
 
 		Logger.debug("Hello!");
 		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
@@ -186,9 +156,7 @@ public class LoggerTest {
 	@Test
 	public final void testInfo() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
 
 		Logger.info("Hello!");
 		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
@@ -206,9 +174,7 @@ public class LoggerTest {
 	@Test
 	public final void testWarn() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.WARNING);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.WARNING).formatPattern("{message}").activate();
 
 		Logger.warn("Hello!");
 		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
@@ -226,9 +192,7 @@ public class LoggerTest {
 	@Test
 	public final void testError() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.ERROR);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.ERROR).formatPattern("{message}").activate();
 
 		Logger.error("Hello!");
 		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
@@ -241,60 +205,13 @@ public class LoggerTest {
 	}
 
 	/**
-	 * Test special logging levels for packages.
-	 */
-	@Test
-	public final void testPackageLoggingLevel() {
-
-		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setLoggingFormat("{message}");
-
-		Logger.setLoggingLevel("a.b", LoggingLevel.DEBUG);
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a"));
-		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
-		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b.c"));
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.bc"));
-
-		Logger.resetLoggingLevel("a.b");
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
-
-		Logger.setLoggingLevel("a.b", LoggingLevel.DEBUG);
-		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("a.b"));
-
-		Logger.setLoggingLevel("a.b", null);
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
-
-		Logger.debug("Hello!");
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
-		assertNull(writer.consumeMessage());
-
-		Logger.setLoggingLevel("org.pmw.tinylog", LoggingLevel.INFO);
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
-		Logger.debug("Hello!");
-		assertNull(writer.consumeMessage());
-
-		Logger.setLoggingLevel("org.pmw.tinylog", LoggingLevel.DEBUG);
-		assertEquals(LoggingLevel.DEBUG, Logger.getLoggingLevel("org.pmw.tinylog"));
-		Logger.debug("Hello!");
-		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
-
-		Logger.resetAllLoggingLevel();
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("org.pmw.tinylog"));
-		Logger.debug("Hello!");
-		assertNull(writer.consumeMessage());
-	}
-
-	/**
 	 * Test a full log entry with all possible patterns.
 	 */
 	@Test
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setLoggingFormat("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
+				.formatPattern("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
@@ -310,9 +227,7 @@ public class LoggerTest {
 	@Test
 	public final void testFailedLogEntry() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setMaxStackTraceElements(0);
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).maxStackTraceElements(0).activate();
 
 		Object object = new Object() {
 
@@ -323,10 +238,10 @@ public class LoggerTest {
 
 		};
 
-		Logger.setLoggingFormat("{level}#{class}#{message}");
+		Configurator.currentConfig().formatPattern("{level}#{class}#{message}").activate();
 		Logger.info("{0}", object);
-		assertEquals(MessageFormat.format("ERROR#{0}#Could not created log entry: {1}{2}", LoggerTest.class.getName(), NullPointerException.class.getName(),
-				NEW_LINE), writer.consumeMessage());
+		assertEquals(MessageFormat.format("ERROR#{0}#Could not created log entry: {1}{2}", LoggerTest.class.getName(),
+				NullPointerException.class.getName(), NEW_LINE), writer.consumeMessage());
 	}
 
 	/**
@@ -335,29 +250,27 @@ public class LoggerTest {
 	@Test
 	public final void testExceptions() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setLoggingFormat("{message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
 
-		Logger.setMaxStackTraceElements(0);
+		Configurator.currentConfig().maxStackTraceElements(0).activate();
 		Logger.info(new Exception());
 		assertEquals(Exception.class.getName() + NEW_LINE, writer.consumeMessage());
 
-		Logger.setMaxStackTraceElements(0);
+		Configurator.currentConfig().maxStackTraceElements(0).activate();
 		Logger.info(new Exception("my test"));
 		assertEquals(Exception.class.getName() + ": my test" + NEW_LINE, writer.consumeMessage());
 
-		Logger.setMaxStackTraceElements(1);
+		Configurator.currentConfig().maxStackTraceElements(1).activate();
 		Logger.info(new Exception());
 		String regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE + "\tat [\\S ]*" + NEW_LINE + "\t\\.\\.\\." + NEW_LINE;
 		String message = writer.consumeMessage();
 		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
 
-		Logger.setMaxStackTraceElements(-1);
+		Configurator.currentConfig().maxStackTraceElements(-1).activate();
 		Logger.info(new Exception(new IndexOutOfBoundsException()));
-		regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + "\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE
-				+ "(\tat [\\S ]*" + NEW_LINE + ")*" + "Caused by\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.") + NEW_LINE
-				+ "(\tat [\\S ]*" + NEW_LINE + ")*";
+		regex = Exception.class.getName().replaceAll("\\.", "\\\\.") + "\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.")
+				+ NEW_LINE + "(\tat [\\S ]*" + NEW_LINE + ")*" + "Caused by\\: " + IndexOutOfBoundsException.class.getName().replaceAll("\\.", "\\\\.")
+				+ NEW_LINE + "(\tat [\\S ]*" + NEW_LINE + ")*";
 		message = writer.consumeMessage();
 		assertTrue("[" + message + "] doesn't match [" + regex + "]", Pattern.matches(regex, message));
 	}
@@ -370,6 +283,7 @@ public class LoggerTest {
 	 */
 	@Test
 	public final void testThreading() throws Exception {
+		Configurator.defaultConfig().activate();
 		final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
 
 		ThreadGroup threadGroup = new ThreadGroup("logging threads");
@@ -381,8 +295,7 @@ public class LoggerTest {
 				public void run() {
 					try {
 						for (int n = 0; n < 100; ++n) {
-							Logger.setWriter(new StoreWriter());
-							Logger.setLoggingLevel(LoggingLevel.TRACE);
+							Configurator.currentConfig().writer(new StoreWriter()).level(LoggingLevel.TRACE).activate();
 							Logger.info("Test threading! This is log entry {0}.", n);
 						}
 					} catch (Exception ex) {

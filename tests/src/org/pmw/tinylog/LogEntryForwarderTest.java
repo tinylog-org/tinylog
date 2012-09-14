@@ -23,7 +23,7 @@ import org.pmw.tinylog.util.StoreWriter;
  * 
  * @see LogEntryForwarder
  */
-public class LogEntryForwarderTest {
+public class LogEntryForwarderTest extends AbstractTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -33,10 +33,7 @@ public class LogEntryForwarderTest {
 	@Test
 	public final void testLogging() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setMaxStackTraceElements(0);
-		Logger.setLoggingLevel(LoggingLevel.TRACE);
-		Logger.setLoggingFormat("{file}: {message}");
+		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{file}: {message}").activate();
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello!");
 		assertEquals("LogEntryForwarderTest.java: Hello!" + NEW_LINE, writer.consumeMessage());
@@ -51,10 +48,7 @@ public class LogEntryForwarderTest {
 	@Test
 	public final void testLoggingWithStackTraceElement() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setMaxStackTraceElements(0);
-		Logger.setLoggingLevel(LoggingLevel.TRACE);
-		Logger.setLoggingFormat("{class}: {message}");
+		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{class}: {message}").activate();
 
 		LogEntryForwarder.forward(new StackTraceElement("MyClass", "?", "?", -1), LoggingLevel.INFO, "Hello!");
 		assertEquals("MyClass: Hello!" + NEW_LINE, writer.consumeMessage());

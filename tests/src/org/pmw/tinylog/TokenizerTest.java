@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @see Tokenizer
  */
-public class TokenizerTest {
+public class TokenizerTest extends AbstractTest {
 
 	private Locale locale;
 

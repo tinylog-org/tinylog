@@ -26,7 +26,7 @@ import org.pmw.tinylog.writers.RollingFileWriter;
 /**
  * Tests old fixed bugs to prevent regressions.
  */
-public class RegressionsTest {
+public class RegressionsTest extends AbstractTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -36,14 +36,12 @@ public class RegressionsTest {
 	@Test
 	public final void testWrongClass() {
 		StoreWriter writer = new StoreWriter();
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.TRACE);
-		Logger.setLoggingFormat("{class}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).formatPattern("{class}").activate();
 
-		Logger.setLoggingLevel("org", LoggingLevel.TRACE);
+		Configurator.currentConfig().level("org", LoggingLevel.TRACE).activate();
 		Logger.info("");
 		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Was already OK
-		Logger.resetLoggingLevel("org");
+		Configurator.currentConfig().level("org", null).activate();
 
 		Logger.info("");
 		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Failed

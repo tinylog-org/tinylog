@@ -11,29 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.tinylog;
+package org.pmw.tinylog;
 
-import java.io.File;
+import org.junit.After;
+import org.junit.Before;
 
-import org.pmw.tinylog.Configurator;
+/**
+ * Base class for all logger tests.
+ */
+public abstract class AbstractTest {
 
-public class TinylogWithWritingThreadBenchmark extends TinylogBenchmark {
-
-	@Override
-	public String getName() {
-		return "tinylog with writing thread";
-	}
-
-	@Override
-	public void init(final File file) throws Exception {
-		super.init(file);
-		Configurator.currentConfig().writingThread(true).activate();
-	}
-
-	@Override
-	public void dispose() throws Exception {
-		Configurator.shutdownWritingThread(true);
-		super.dispose();
+	/**
+	 * Reset the configuration before and after each test.
+	 */
+	@Before
+	@After
+	public final void reset() {
+		Configurator.defaultConfig().activate();
 	}
 
 }

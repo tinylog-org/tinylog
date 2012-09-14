@@ -16,8 +16,9 @@ package org.pmw.benchmark.tinylog;
 import java.io.File;
 
 import org.pmw.benchmark.IBenchmark;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
+import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.writers.FileWriter;
 
 public class TinylogBenchmark implements IBenchmark {
@@ -41,9 +42,8 @@ public class TinylogBenchmark implements IBenchmark {
 	@Override
 	public void init(final File file) throws Exception {
 		writer = new FileWriter(file.getAbsolutePath());
-		Logger.setWriter(writer);
-		Logger.setLoggingLevel(LoggingLevel.INFO);
-		Logger.setLoggingFormat("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
+				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}").activate();
 	}
 
 	@Override
