@@ -101,6 +101,28 @@ public final class Logger {
 	/**
 	 * Create a trace log entry.
 	 * 
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void trace(final Object obj) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, null, obj, null);
+	}
+
+	/**
+	 * Create a trace log entry.
+	 * 
+	 * @param message
+	 *            Text message to log
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void trace(final String message) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, null, message, null);
+	}
+
+	/**
+	 * Create a trace log entry.
+	 * 
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
@@ -135,7 +157,29 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void trace(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.TRACE, exception, null, null);
+	}
+
+	/**
+	 * Create a debug log entry.
+	 * 
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void debug(final Object obj) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, obj, null);
+	}
+
+	/**
+	 * Create a debug log entry.
+	 * 
+	 * @param message
+	 *            Text message to log
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void debug(final String message) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, message, null);
 	}
 
 	/**
@@ -175,7 +219,29 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void debug(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, exception, null, null);
+	}
+
+	/**
+	 * Create an info log entry.
+	 * 
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void info(final Object obj) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, obj, null);
+	}
+
+	/**
+	 * Create an info log entry.
+	 * 
+	 * @param message
+	 *            Text message to log
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void info(final String message) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, message, null);
 	}
 
 	/**
@@ -215,7 +281,29 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void info(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.INFO, exception, null, null);
+	}
+
+	/**
+	 * Create a warning log entry.
+	 * 
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void warn(final Object obj) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, null, obj, null);
+	}
+
+	/**
+	 * Create a warning log entry.
+	 * 
+	 * @param message
+	 *            Text message to log
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void warn(final String message) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, null, message, null);
 	}
 
 	/**
@@ -255,7 +343,29 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void warn(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, null, null);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void error(final Object obj) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, null, obj, null);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param message
+	 *            Text message to log
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void error(final String message) {
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, null, message, null);
 	}
 
 	/**
@@ -295,7 +405,7 @@ public final class Logger {
 	 *            Exception to log
 	 */
 	public static void error(final Throwable exception) {
-		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, null);
+		output(DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, null, null);
 	}
 
 	/**
@@ -327,11 +437,11 @@ public final class Logger {
 	 * @param exception
 	 *            Exception to log (can be <code>null</code> if there is no exception to log)
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formated text or a object to log
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
+	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final Object message, final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.getWriter() != null) {
 			StackTraceElement stackTraceElement = null;
@@ -348,7 +458,7 @@ public final class Logger {
 					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
 					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex,
-							"Could not created log entry");
+							"Could not created log entry", null);
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
@@ -370,12 +480,12 @@ public final class Logger {
 	 * @param exception
 	 *            Exception to log (can be <code>null</code> if there is no exception to log)
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formated text or a object to log
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	static void output(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final String message,
-			final Object... arguments) {
+	static void output(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final Object message,
+			final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.getWriter() != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
@@ -389,7 +499,7 @@ public final class Logger {
 				try {
 					logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				} catch (Exception ex) {
-					logEntry = createLogEntry(currentConfiguration, -1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry");
+					logEntry = createLogEntry(currentConfiguration, -1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry", null);
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
@@ -402,7 +512,7 @@ public final class Logger {
 	}
 
 	private static String createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
-			final StackTraceElement createdStackTraceElement, final Throwable exception, final String message, final Object... arguments) {
+			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		StringBuilder builder = new StringBuilder();
 
 		String threadName = null;
@@ -464,10 +574,10 @@ public final class Logger {
 
 				case MESSAGE:
 					if (message != null) {
-						if (arguments.length == 0) {
-							builder.append(message);
+						if (arguments == null || arguments.length == 0) {
+							builder.append(message.toString());
 						} else {
-							builder.append(new MessageFormat(message, currentConfiguration.getLocale()).format(arguments));
+							builder.append(new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments));
 						}
 					}
 					if (exception != null) {

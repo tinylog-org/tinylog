@@ -35,7 +35,7 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	/**
-	 * Returns the name of the policy.
+	 * Get the name of the policy.
 	 * 
 	 * @return "store"
 	 */
@@ -44,9 +44,18 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Get the logging level of the last written log entry.
+	 * 
+	 * @return Logging level of the last log entry
+	 */
+	public LoggingLevel getLevel() {
+		return level;
+	}
+
+	/**
 	 * Consume the logging level of the last written log entry and remove it.
 	 * 
-	 * @return The logging level of the last log entry
+	 * @return Logging level of the last log entry
 	 */
 	public LoggingLevel consumeLevel() {
 		LoggingLevel copy = level;

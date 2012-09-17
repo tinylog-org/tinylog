@@ -122,8 +122,17 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).formatPattern("{message}").activate();
 
+		Logger.trace(new StringBuilder("Hello!"));
+		assertEquals(LoggingLevel.TRACE, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
 		Logger.trace("Hello!");
-		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
+		assertEquals(LoggingLevel.TRACE, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.trace("Hello!", (Object) null);
+		assertEquals(LoggingLevel.TRACE, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.trace(new Exception());
 		assertEquals(LoggingLevel.TRACE, writer.consumeLevel());
@@ -140,8 +149,17 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.DEBUG).formatPattern("{message}").activate();
 
+		Logger.debug(new StringBuilder("Hello!"));
+		assertEquals(LoggingLevel.DEBUG, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
 		Logger.debug("Hello!");
-		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
+		assertEquals(LoggingLevel.DEBUG, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.debug("Hello!", (Object) null);
+		assertEquals(LoggingLevel.DEBUG, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.debug(new Exception());
 		assertEquals(LoggingLevel.DEBUG, writer.consumeLevel());
@@ -158,8 +176,17 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
 
+		Logger.info(new StringBuilder("Hello!"));
+		assertEquals(LoggingLevel.INFO, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
 		Logger.info("Hello!");
-		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
+		assertEquals(LoggingLevel.INFO, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.info("Hello!", (Object) null);
+		assertEquals(LoggingLevel.INFO, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.info(new Exception());
 		assertEquals(LoggingLevel.INFO, writer.consumeLevel());
@@ -176,8 +203,17 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.WARNING).formatPattern("{message}").activate();
 
+		Logger.warn(new StringBuilder("Hello!"));
+		assertEquals(LoggingLevel.WARNING, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
 		Logger.warn("Hello!");
-		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
+		assertEquals(LoggingLevel.WARNING, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.warn("Hello!", (Object) null);
+		assertEquals(LoggingLevel.WARNING, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.warn(new Exception());
 		assertEquals(LoggingLevel.WARNING, writer.consumeLevel());
@@ -194,8 +230,17 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.ERROR).formatPattern("{message}").activate();
 
+		Logger.error(new StringBuilder("Hello!"));
+		assertEquals(LoggingLevel.ERROR, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
 		Logger.error("Hello!");
-		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
+		assertEquals(LoggingLevel.ERROR, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
+
+		Logger.error("Hello!", (Object) null);
+		assertEquals(LoggingLevel.ERROR, writer.getLevel());
+		assertEquals("Hello!" + NEW_LINE, writer.consumeMessage());
 
 		Logger.error(new Exception());
 		assertEquals(LoggingLevel.ERROR, writer.consumeLevel());
