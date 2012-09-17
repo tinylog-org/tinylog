@@ -58,7 +58,7 @@ public final class Logger {
 			callerClassMethod.setAccessible(true);
 			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 1);
 			if (!Logger.class.getName().equals(callerClass.getName())) {
-				stackTraceMethod = null;
+				callerClassMethod = null;
 			}
 		} catch (Exception ex) {
 			callerClassMethod = null;
