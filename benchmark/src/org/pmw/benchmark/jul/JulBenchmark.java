@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.jdk;
+package org.pmw.benchmark.jul;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -25,14 +25,14 @@ import java.util.logging.Logger;
 
 import org.pmw.benchmark.IBenchmark;
 
-public class NativeLoggerBenchmark implements IBenchmark {
+public class JulBenchmark implements IBenchmark {
 
 	private Logger logger;
 	private FileHandler handler;
 
 	@Override
 	public String getName() {
-		return "native JDK";
+		return "JUL";
 	}
 
 	@Override

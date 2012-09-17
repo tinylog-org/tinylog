@@ -11,14 +11,14 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.jdk;
+package org.pmw.benchmark.jul;
 
-import org.pmw.benchmark.MultiThreadBenchmarkRunner;
+import org.pmw.benchmark.SingleThreadBenchmarkRunner;
 
-public class NativeLoggerMultiThreadBenchmarkApplication {
+public class JulSingleThreadBenchmarkApplication {
 
 	public static void main(final String[] args) throws Exception {
-		new MultiThreadBenchmarkRunner(new NativeLoggerBenchmark()).start();
+		new SingleThreadBenchmarkRunner(new JulBenchmark()).start();
 	}
 
 }
