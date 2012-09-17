@@ -19,7 +19,7 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	private static final int LOGGING_ITERATIONS = 2000;
 
 	public MultiThreadBenchmarkRunner(final IBenchmark benchmark) {
-		super(benchmark.getName() + " (multi threading)", benchmark);
+		super(benchmark.getName() + " (multi threaded)", benchmark);
 	}
 
 	@Override

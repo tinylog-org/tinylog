@@ -18,7 +18,7 @@ public class SingleThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	private static final int LOGGING_ITERATIONS = 20000;
 
 	public SingleThreadBenchmarkRunner(final IBenchmark benchmark) {
-		super(benchmark.getName() + " (single thread)", benchmark);
+		super(benchmark.getName() + " (single threaded)", benchmark);
 	}
 
 	@Override
