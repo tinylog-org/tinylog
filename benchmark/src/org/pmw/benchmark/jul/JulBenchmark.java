@@ -14,7 +14,8 @@
 package org.pmw.benchmark.jul;
 
 import java.io.File;
-import java.text.MessageFormat;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.FileHandler;
@@ -76,8 +77,28 @@ public class JulBenchmark implements IBenchmark {
 			synchronized (formatter) {
 				date = formatter.format(new Date());
 			}
-			return MessageFormat.format("{0} [{1}] {2}.{3}(): {4}{5}", date, Thread.currentThread().getName(), record.getSourceClassName(),
-					record.getSourceMethodName(), formatMessage(record), NEW_LINE);
+			StringBuilder builder = new StringBuilder();
+			builder.append(date);
+			builder.append(" [");
+			builder.append(record.getLevel().getName());
+			builder.append("] ");
+			builder.append(Thread.currentThread().getName());
+			builder.append(" ");
+			builder.append(record.getSourceClassName());
+			builder.append(".");
+			builder.append(record.getSourceMethodName());
+			builder.append("(): ");
+			builder.append(formatMessage(record));
+			if (record.getThrown() != null) {
+				StringWriter stringWriter = new StringWriter();
+				PrintWriter printWriter = new PrintWriter(stringWriter);
+				printWriter.println();
+				record.getThrown().printStackTrace(printWriter);
+				printWriter.close();
+				builder.append(stringWriter.toString());
+			}
+			builder.append(NEW_LINE);
+			return builder.toString();
 		}
 
 	}

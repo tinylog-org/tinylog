@@ -44,8 +44,8 @@
 	</target>
 
 	<target name="run" depends="compile">
-		<java classname="org.pmw.benchmark.jdk.NativeLoggerSingleThreadBenchmarkApplication" classpath="${bin}" fork="true" />
-		<java classname="org.pmw.benchmark.jdk.NativeLoggerMultiThreadBenchmarkApplication" classpath="${bin}" fork="true" />
+		<java classname="org.pmw.benchmark.jul.JulSingleThreadBenchmarkApplication" classpath="${bin}" fork="true" />
+		<java classname="org.pmw.benchmark.jul.JulMultiThreadBenchmarkApplication" classpath="${bin}" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.logback.LogbackSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
