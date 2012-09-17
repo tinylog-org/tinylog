@@ -61,10 +61,10 @@ public class SizePolicy implements Policy {
 				this.maxSize = Long.parseLong(maxSize);
 			}
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException("Size is not a number");
+			throw new IllegalArgumentException("Size is not numberic");
 		}
 		if (this.maxSize <= 0L) {
-			throw new IllegalArgumentException("maxSize must be > 0");
+			throw new IllegalArgumentException("Size must be > 0");
 		}
 		this.size = 0L;
 	}
