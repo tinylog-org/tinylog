@@ -63,12 +63,24 @@ public final class PropertiesLoader {
 	 * @return A new configurator
 	 */
 	static Configurator readProperties(final Properties properties) {
-		Configurator configuration = Configurator.defaultConfig();
+		Configurator configurator = Configurator.defaultConfig();
+		readProperties(configurator, properties);
+		return configurator;
+	}
 
+	/**
+	 * Load configuration from properties.
+	 * 
+	 * @param configurator
+	 *            Confirgurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readProperties(final Configurator configurator, final Properties properties) {
 		String level = properties.getProperty(LEVEL_PROPERTY);
 		if (level != null && !level.isEmpty()) {
 			try {
-				configuration.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
+				configurator.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
 				// Ignore
 			}
@@ -82,28 +94,28 @@ public final class PropertiesLoader {
 				String value = properties.getProperty(key);
 				try {
 					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
-					configuration.level(packageName, loggingLevel);
+					configurator.level(packageName, loggingLevel);
 				} catch (IllegalArgumentException ex) {
 					// Illegal logging level => reset
-					configuration.level(packageName, null);
+					configurator.level(packageName, null);
 				}
 			}
 		}
 
 		String format = properties.getProperty(FORMAT_PROPERTY);
 		if (format != null && !format.isEmpty()) {
-			configuration.formatPattern(format);
+			configurator.formatPattern(format);
 		}
 
 		String localeString = properties.getProperty(LOCALE_PROPERTY);
 		if (localeString != null && !localeString.isEmpty()) {
 			String[] localeArray = localeString.split("_", 3);
 			if (localeArray.length == 1) {
-				configuration.locale(new Locale(localeArray[0]));
+				configurator.locale(new Locale(localeArray[0]));
 			} else if (localeArray.length == 2) {
-				configuration.locale(new Locale(localeArray[0], localeArray[1]));
+				configurator.locale(new Locale(localeArray[0], localeArray[1]));
 			} else if (localeArray.length >= 3) {
-				configuration.locale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
+				configurator.locale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
 			}
 		}
 
@@ -111,7 +123,7 @@ public final class PropertiesLoader {
 		if (stacktace != null && !stacktace.isEmpty()) {
 			try {
 				int limit = Integer.parseInt(stacktace);
-				configuration.maxStackTraceElements(limit);
+				configurator.maxStackTraceElements(limit);
 			} catch (NumberFormatException ex) {
 				// Ignore
 			}
@@ -120,14 +132,14 @@ public final class PropertiesLoader {
 		String writer = properties.getProperty(WRITER_PROPERTY);
 		if (writer != null && !writer.isEmpty()) {
 			if (writer.equalsIgnoreCase("null")) {
-				configuration.writer(null);
+				configurator.writer(null);
 			} else {
 				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
 					if (LoggingWriter.class.isAssignableFrom(implementation)) {
 						if (writer.equalsIgnoreCase(getName(implementation))) {
 							LoggingWriter loggingWriter = loadAndSetWriter(properties, implementation);
 							if (loggingWriter != null) {
-								configuration.writer(loggingWriter);
+								configurator.writer(loggingWriter);
 								break;
 							}
 						}
@@ -155,19 +167,17 @@ public final class PropertiesLoader {
 				}
 			}
 			if (priority != null && observedThreadDefined) {
-				configuration.writingThread(true, observedThread, priority);
+				configurator.writingThread(true, observedThread, priority);
 			} else if (priority != null) {
-				configuration.writingThread(true, priority);
+				configurator.writingThread(true, priority);
 			} else if (observedThreadDefined) {
-				configuration.writingThread(true, observedThread);
+				configurator.writingThread(true, observedThread);
 			} else {
-				configuration.writingThread(true);
+				configurator.writingThread(true);
 			}
 		} else {
-			configuration.writingThread(false);
+			configurator.writingThread(false);
 		}
-
-		return configuration;
 	}
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {

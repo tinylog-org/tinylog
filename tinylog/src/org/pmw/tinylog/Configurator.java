@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public final class Configurator {
 	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
 	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = 2;
 
-	private static WritingThread activeLoggingThread = null;
+	private static WritingThread activeWritingThread = null;
 	private static final Object lock = new Object();
 
 	private LoggingLevel level;
@@ -104,7 +105,17 @@ public final class Configurator {
 	public static Configurator reload() {
 		Properties properties = new Properties();
 
-		InputStream stream = Configurator.class.getResourceAsStream(DEFAULT_PROPERTIES_FILE);
+		String file = System.getProperty("tinylog.configuration", DEFAULT_PROPERTIES_FILE);
+		InputStream stream = Configurator.class.getResourceAsStream(file);
+		boolean isResource = true;
+		if (stream == null) {
+			try {
+				stream = new FileInputStream(file);
+				isResource = false;
+			} catch (FileNotFoundException ex) {
+				// Ignore
+			}
+		}
 		if (stream != null) {
 			try {
 				try {
@@ -117,8 +128,20 @@ public final class Configurator {
 			}
 		}
 
-		properties.putAll(System.getProperties());
-		return PropertiesLoader.readProperties(properties);
+		if (stream != null && "true".equalsIgnoreCase(System.getProperty("tinylog.configuration.observe"))) {
+			Configurator configurator = PropertiesLoader.readProperties(System.getProperties());
+			if (isResource) {
+				ConfigurationObserver.createResourceConfigurationObserver(configurator, file).start();
+			} else {
+				ConfigurationObserver.createFileConfigurationObserver(configurator, file).start();
+			}
+			configurator = configurator.copy();
+			PropertiesLoader.readProperties(configurator, properties);
+			return configurator;
+		} else {
+			properties.putAll(System.getProperties());
+			return PropertiesLoader.readProperties(properties);
+		}
 	}
 
 	/**
@@ -362,17 +385,17 @@ public final class Configurator {
 	 */
 	public void activate() {
 		synchronized (lock) {
-			if (activeLoggingThread != null) {
-				activeLoggingThread.shutdown();
-				activeLoggingThread = null;
+			if (activeWritingThread != null && writingThreadData != null && writingThreadData.covers(activeWritingThread)) {
+				activeWritingThread.shutdown();
+				activeWritingThread = null;
 			}
 
 			Configuration configuration = create();
 			Logger.setConfirguration(configuration);
 
-			if (writingThreadData != null) {
-				activeLoggingThread = configuration.getWritingThread();
-				activeLoggingThread.start();
+			if (activeWritingThread == null && writingThreadData != null) {
+				activeWritingThread = configuration.getWritingThread();
+				activeWritingThread.start();
 			}
 		}
 	}
@@ -385,22 +408,33 @@ public final class Configurator {
 	 */
 	public static void shutdownWritingThread(final boolean wait) {
 		synchronized (lock) {
-			if (activeLoggingThread != null) {
-				activeLoggingThread.shutdown();
+			if (activeWritingThread != null) {
+				activeWritingThread.shutdown();
 				if (wait) {
 					boolean finished;
 					do {
 						try {
-							activeLoggingThread.join();
+							activeWritingThread.join();
 							finished = true;
 						} catch (InterruptedException ex) {
 							finished = false;
 						}
 					} while (!finished);
 				}
-				activeLoggingThread = null;
+				activeWritingThread = null;
 			}
 		}
+	}
+
+	/**
+	 * Copy the configurator.
+	 * 
+	 * @return A new configurator with the same configuration
+	 */
+	Configurator copy() {
+		WritingThreadData writingThreadDataCopy = writingThreadData == null ? null : new WritingThreadData(writingThreadData.threadToObserve,
+				writingThreadData.priority);
+		return new Configurator(level, packageLevels, formatPattern, locale, writer, writingThreadDataCopy, maxStackTraceElements);
 	}
 
 	/**
@@ -434,6 +468,19 @@ public final class Configurator {
 			this.priority = priority;
 		}
 
+		private boolean covers(final WritingThread writingThread) {
+			if (writingThread == null) {
+				return false;
+			}
+			if (threadToObserve == null) {
+				if (writingThread.getNameOfThreadToObserve() != null) {
+					return false;
+				}
+			} else if (!threadToObserve.equals(writingThread.getNameOfThreadToObserve())) {
+				return false;
+			}
+			return priority == writingThread.getPriority();
+		}
 	}
 
 }
