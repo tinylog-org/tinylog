@@ -28,6 +28,20 @@ public final class LogEntryForwarder {
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
 	 *            Logging level
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Object obj) {
+		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE, level, null, obj, null);
+	}
+
+	/**
+	 * Forward a logging message.
+	 * 
+	 * @param deepOfStackTrace
+	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
+	 * @param level
+	 *            Logging level
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
@@ -54,6 +68,20 @@ public final class LogEntryForwarder {
 	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Throwable exception, final String message,
 			final Object... arguments) {
 		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE, level, exception, message, arguments);
+	}
+
+	/**
+	 * Forward a logging message.
+	 * 
+	 * @param stackTraceElement
+	 *            Stack trace element for class, method and source information
+	 * @param level
+	 *            Logging level
+	 * @param obj
+	 *            The result of the <code>toString()</code> method will be logged
+	 */
+	public static void forward(final StackTraceElement stackTraceElement, final LoggingLevel level, final Object obj) {
+		Logger.output(stackTraceElement, level, null, obj, null);
 	}
 
 	/**

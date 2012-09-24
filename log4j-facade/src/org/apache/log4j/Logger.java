@@ -37,13 +37,17 @@ public class Logger extends Category {
 
 	public void trace(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.TRACE, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.TRACE, message);
 		}
 	}
 
 	public void trace(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.TRACE, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.TRACE, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.TRACE, ex, message.toString());
+			}
 		}
 	}
 

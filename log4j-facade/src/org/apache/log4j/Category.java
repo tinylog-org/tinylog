@@ -86,97 +86,107 @@ public abstract class Category {
 
 	public void log(final Priority priority, final Object message) {
 		if (message != null) {
-			if (priority.isGreaterOrEqual(Level.ERROR)) {
-				org.pmw.tinylog.Logger.error(message.toString());
-			} else if (priority.isGreaterOrEqual(Level.WARN)) {
-				org.pmw.tinylog.Logger.warn(message.toString());
-			} else if (priority.isGreaterOrEqual(Level.INFO)) {
-				org.pmw.tinylog.Logger.info(message.toString());
-			} else if (priority.isGreaterOrEqual(Level.DEBUG)) {
-				org.pmw.tinylog.Logger.debug(message.toString());
-			} else if (priority.isGreaterOrEqual(Level.TRACE)) {
-				org.pmw.tinylog.Logger.trace(message.toString());
-			}
+			LogEntryForwarder.forward(1, toLoggingLevel(priority), message);
 		}
 	}
 
 	public void log(final Priority priority, final Object message, final Throwable ex) {
 		if (message != null) {
-			if (priority.isGreaterOrEqual(Level.ERROR)) {
-				org.pmw.tinylog.Logger.error(message.toString(), ex);
-			} else if (priority.isGreaterOrEqual(Level.WARN)) {
-				org.pmw.tinylog.Logger.warn(message.toString(), ex);
-			} else if (priority.isGreaterOrEqual(Level.INFO)) {
-				org.pmw.tinylog.Logger.info(message.toString(), ex);
-			} else if (priority.isGreaterOrEqual(Level.DEBUG)) {
-				org.pmw.tinylog.Logger.debug(message.toString(), ex);
-			} else if (priority.isGreaterOrEqual(Level.TRACE)) {
-				org.pmw.tinylog.Logger.trace(message.toString(), ex);
+			if (message == ex) {
+				LogEntryForwarder.forward(1, toLoggingLevel(priority), ex, null);
+			} else {
+				LogEntryForwarder.forward(1, toLoggingLevel(priority), ex, message.toString());
 			}
 		}
 	}
 
 	public void log(final String callerFQCN, final Priority level, final Object message, final Throwable ex) {
-		log(level, message, ex);
+		if (message != null) {
+			if (message == ex) {
+				LogEntryForwarder.forward(1, toLoggingLevel(level), ex, null);
+			} else {
+				LogEntryForwarder.forward(1, toLoggingLevel(level), ex, message.toString());
+			}
+		}
 	}
 
 	public void error(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message);
 		}
 	}
 
 	public void error(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
+			}
 		}
 	}
 
 	public void fatal(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message);
 		}
 	}
 
 	public void fatal(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
+			}
 		}
 	}
 
 	public void warn(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.WARNING, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.WARNING, message);
 		}
 	}
 
 	public void warn(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, message.toString());
+			}
 		}
 	}
 
 	public void info(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.INFO, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.INFO, message);
 		}
 	}
 
 	public void info(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, message.toString());
+			}
 		}
 	}
 
 	public void debug(final Object message) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, message.toString());
+			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, message);
 		}
 	}
 
 	public void debug(final Object message, final Throwable ex) {
 		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, message.toString());
+			if (message == ex) {
+				LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, null);
+			} else {
+				LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, message.toString());
+			}
 		}
 	}
 
@@ -190,6 +200,21 @@ public abstract class Category {
 
 	public boolean isEnabledFor(final Priority level) {
 		return level.isGreaterOrEqual(getLevel());
+	}
+
+	@SuppressWarnings("deprecation")
+	private LoggingLevel toLoggingLevel(final Priority priority) {
+		if (priority.isGreaterOrEqual(Priority.ERROR)) {
+			return LoggingLevel.ERROR;
+		} else if (priority.isGreaterOrEqual(Priority.WARN)) {
+			return LoggingLevel.WARNING;
+		} else if (priority.isGreaterOrEqual(Priority.INFO)) {
+			return LoggingLevel.INFO;
+		} else if (priority.isGreaterOrEqual(Priority.DEBUG)) {
+			return LoggingLevel.DEBUG;
+		} else {
+			return LoggingLevel.TRACE;
+		}
 	}
 
 }
