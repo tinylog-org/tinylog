@@ -39,7 +39,7 @@ public final class Configurator {
 	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = 2;
 
 	private static WritingThread activeLoggingThread = null;
-	private static Object lock = new Object();
+	private static final Object lock = new Object();
 
 	private LoggingLevel level;
 	private Map<String, LoggingLevel> packageLevels;
