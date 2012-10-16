@@ -56,7 +56,7 @@ enum TokenType {
 	/**
 	 * The logging level
 	 * 
-	 * @see ELoggingLevel
+	 * @see LoggingLevel
 	 */
 	LOGGING_LEVEL,
 
