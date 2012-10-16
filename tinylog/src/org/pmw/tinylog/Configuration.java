@@ -205,7 +205,7 @@ final class Configuration {
 		return new Configurator(level, copyOfPackageLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
 	}
 
-	private LoggingLevel calculateLowestPackageLevel(final Map<String, LoggingLevel> packageLevels) {
+	private static LoggingLevel calculateLowestPackageLevel(final Map<String, LoggingLevel> packageLevels) {
 		LoggingLevel lowestLevel = LoggingLevel.OFF;
 
 		for (LoggingLevel packageLevel : packageLevels.values()) {
