@@ -62,4 +62,29 @@ final class Token {
 		return data;
 	}
 
+	@Override
+	public int hashCode() {
+		return getType().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof Token) {
+			Token token = (Token) obj;
+			if (getType() != token.getType()) {
+				return false;
+			} else if (getData() == null) {
+				return token.getData() == null;
+			} else {
+				return getData().equals(token.getData());
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return getType() + " (" + getData() + ")";
+	}
 }
