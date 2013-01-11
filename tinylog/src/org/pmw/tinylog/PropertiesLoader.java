@@ -167,11 +167,11 @@ public final class PropertiesLoader {
 				}
 			}
 			if (priority != null && observedThreadDefined) {
-				configurator.writingThread(true, observedThread, priority);
+				configurator.writingThread(observedThread, priority);
 			} else if (priority != null) {
-				configurator.writingThread(true, priority);
+				configurator.writingThread(priority);
 			} else if (observedThreadDefined) {
-				configurator.writingThread(true, observedThread);
+				configurator.writingThread(observedThread);
 			} else {
 				configurator.writingThread(true);
 			}
