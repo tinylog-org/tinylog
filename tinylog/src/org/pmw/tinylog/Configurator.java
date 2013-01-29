@@ -467,7 +467,14 @@ public final class Configurator {
 			this.priority = priority;
 		}
 
-		private boolean covers(final WritingThread writingThread) {
+		/**
+		 * Test if this writing thread has the same parameters as another writing thread.
+		 * 
+		 * @param writingThread
+		 *            Writing thread to compare
+		 * @return <code>true</code> if both writing threads have the same parameters, <code>false</code> if not
+		 */
+		boolean covers(final WritingThread writingThread) {
 			if (writingThread == null) {
 				return false;
 			}
