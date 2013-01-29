@@ -39,7 +39,7 @@ public final class Logger {
 	private static Method callerClassMethod;
 
 	static {
-		Configurator.reload().activate();
+		Configurator.init().activate();
 
 		try {
 			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);

@@ -97,54 +97,6 @@ public final class Configurator {
 	}
 
 	/**
-	 * Load properties from environment variables (also know as "-D" parameter) and from the default properties file
-	 * "/tinylog.properties" that must be placed in the default package.
-	 * 
-	 * @return A new configurator
-	 */
-	public static Configurator reload() {
-		Properties properties = new Properties();
-
-		String file = System.getProperty("tinylog.configuration", DEFAULT_PROPERTIES_FILE);
-		InputStream stream = Configurator.class.getResourceAsStream(file);
-		boolean isResource = true;
-		if (stream == null) {
-			try {
-				stream = new FileInputStream(file);
-				isResource = false;
-			} catch (FileNotFoundException ex) {
-				// Ignore
-			}
-		}
-		if (stream != null) {
-			try {
-				try {
-					properties.load(stream);
-				} finally {
-					stream.close();
-				}
-			} catch (IOException ex) {
-				// Ignore
-			}
-		}
-
-		if (stream != null && "true".equalsIgnoreCase(System.getProperty("tinylog.configuration.observe"))) {
-			Configurator configurator = PropertiesLoader.readProperties(System.getProperties());
-			if (isResource) {
-				ConfigurationObserver.createResourceConfigurationObserver(configurator, file).start();
-			} else {
-				ConfigurationObserver.createFileConfigurationObserver(configurator, file).start();
-			}
-			configurator = configurator.copy();
-			PropertiesLoader.readProperties(configurator, properties);
-			return configurator;
-		} else {
-			properties.putAll(System.getProperties());
-			return PropertiesLoader.readProperties(properties);
-		}
-	}
-
-	/**
 	 * Load a properties file from classpath.
 	 * 
 	 * @param file
@@ -423,6 +375,56 @@ public final class Configurator {
 				}
 				activeWritingThread = null;
 			}
+		}
+	}
+
+	/**
+	 * Load properties from environment variables (also know as "-D" parameter) and from the default properties file
+	 * "tinylog.properties", which must be placed in the default package.
+	 * 
+	 * @return A new configurator
+	 */
+	static Configurator init() {
+		Properties properties = new Properties();
+
+		String file = System.getProperty("tinylog.configuration", DEFAULT_PROPERTIES_FILE);
+		InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file);
+		boolean isResource = true;
+		if (stream == null) {
+			try {
+				stream = new FileInputStream(file);
+				isResource = false;
+			} catch (FileNotFoundException ex) {
+				if (file != DEFAULT_PROPERTIES_FILE) {
+					System.err.println("Error: cannot find '" + file + "'");
+				}
+			}
+		}
+		if (stream != null) {
+			try {
+				try {
+					properties.load(stream);
+				} finally {
+					stream.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace(System.err);
+			}
+		}
+
+		if (stream != null && "true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"))) {
+			Configurator configurator = PropertiesLoader.readProperties(System.getProperties());
+			if (isResource) {
+				ConfigurationObserver.createResourceConfigurationObserver(configurator, file).start();
+			} else {
+				ConfigurationObserver.createFileConfigurationObserver(configurator, file).start();
+			}
+			configurator = configurator.copy();
+			PropertiesLoader.readProperties(configurator, properties);
+			return configurator;
+		} else {
+			properties.putAll(System.getProperties());
+			return PropertiesLoader.readProperties(properties);
 		}
 	}
 
