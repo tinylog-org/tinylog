@@ -37,7 +37,7 @@ public final class Configurator {
 	private static final int DEFAULT_MAX_STACK_TRACE_ELEMENTS = 40;
 	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
-	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = 2;
+	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = (Thread.MIN_PRIORITY + Thread.NORM_PRIORITY) / 2;
 
 	private static WritingThread activeWritingThread = null;
 	private static final Object lock = new Object();
