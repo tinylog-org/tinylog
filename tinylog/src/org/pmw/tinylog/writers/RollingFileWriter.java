@@ -83,7 +83,7 @@ public class RollingFileWriter implements LoggingWriter {
 		this.labeller = labeller;
 		this.policies = Arrays.asList(policies);
 		this.file = labeller.getLogFile(new File(filename));
-		initCkeckPolicies();
+		initCheckPolicies();
 		this.writer = new java.io.FileWriter(file, true);
 	}
 
@@ -146,7 +146,7 @@ public class RollingFileWriter implements LoggingWriter {
 		close();
 	}
 
-	private void initCkeckPolicies() {
+	private void initCheckPolicies() {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();
