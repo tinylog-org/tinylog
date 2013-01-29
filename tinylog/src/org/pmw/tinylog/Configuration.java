@@ -116,9 +116,9 @@ final class Configuration {
 	public LoggingLevel getLevelOfPackage(final String packageName) {
 		String packageKey = packageName;
 		while (true) {
-			LoggingLevel levelOfPacakge = packageLevels.get(packageKey);
-			if (levelOfPacakge != null) {
-				return levelOfPacakge;
+			LoggingLevel levelOfPackage = packageLevels.get(packageKey);
+			if (levelOfPackage != null) {
+				return levelOfPackage;
 			}
 			int index = packageKey.lastIndexOf('.');
 			if (index > 0) {
