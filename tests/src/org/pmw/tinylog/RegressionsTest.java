@@ -85,4 +85,16 @@ public class RegressionsTest extends AbstractTest {
 		assertEquals(logEntry, writer.consumeLogEntry()); // Failed (java.lang.IllegalArgumentException)
 	}
 
+	/**
+	 * Bug: Logging writer gets active logging level instead of the logging level of the log entry.
+	 */
+	@Test
+	public final void testLoggingLevel() {
+		StoreWriter writer = new StoreWriter();
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
+		Logger.error("Hello");
+		LogEntry logEntry = new LogEntry(LoggingLevel.ERROR, "Hello" + NEW_LINE);
+		assertEquals(logEntry, writer.consumeLogEntry()); // Failed
+	}
+
 }

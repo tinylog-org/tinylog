@@ -462,9 +462,9 @@ public final class Logger {
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
-					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
+					currentConfiguration.getWriter().write(level, logEntry);
 				} else {
-					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
+					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
 				}
 			}
 		}
@@ -503,9 +503,9 @@ public final class Logger {
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
-					currentConfiguration.getWriter().write(activeLoggingLevel, logEntry);
+					currentConfiguration.getWriter().write(level, logEntry);
 				} else {
-					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), activeLoggingLevel, logEntry);
+					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
 				}
 			}
 		}
