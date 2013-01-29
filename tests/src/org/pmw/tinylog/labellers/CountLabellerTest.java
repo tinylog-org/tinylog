@@ -18,21 +18,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
 
 /**
  * Tests for count labeller.
  * 
  * @see CountLabeller
  */
-public class CountLabellerTest {
+public class CountLabellerTest extends AbstractLabellerTest {
 
 	/**
 	 * Test labelling for log file with file extension.
@@ -42,51 +39,41 @@ public class CountLabellerTest {
 	 */
 	@Test
 	public final void testLabellingWithFileExtension() throws IOException {
-		File baseFile = File.createTempFile("test", ".tmp");
-		baseFile.deleteOnExit();
-		File backupFile1 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".0.tmp");
-		backupFile1.deleteOnExit();
-		File backupFile2 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".1.tmp");
-		backupFile2.deleteOnExit();
-		File backupFile3 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".2.tmp");
-		backupFile3.deleteOnExit();
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+		File backupFile1 = getBackupFile(baseFile, "tmp", "0");
+		File backupFile2 = getBackupFile(baseFile, "tmp", "1");
+		File backupFile3 = getBackupFile(baseFile, "tmp", "2");
 
 		Labeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));
-		BufferedWriter writer = new BufferedWriter(new FileWriter(baseFile));
-		writer.write("1");
-		writer.close();
 
-		assertSame(baseFile, labeller.roll(baseFile, 2));
-		writer = new BufferedWriter(new FileWriter(baseFile));
-		writer.write("2");
-		writer.close();
-		assertTrue(backupFile1.exists());
-		assertFalse(backupFile2.exists());
-		assertFalse(backupFile3.exists());
-
-		assertSame(baseFile, labeller.roll(baseFile, 2));
-		writer = new BufferedWriter(new FileWriter(baseFile));
-		writer.write("3");
-		writer.close();
-		assertTrue(backupFile1.exists());
-		assertTrue(backupFile2.exists());
-		assertFalse(backupFile3.exists());
-
+		FileHelper.write(baseFile, "1");
 		assertSame(baseFile, labeller.roll(baseFile, 2));
 		assertFalse(baseFile.exists());
 		assertTrue(backupFile1.exists());
-		assertTrue(backupFile2.exists());
+		assertEquals("1", FileHelper.read(backupFile1));
+		assertFalse(backupFile2.exists());
 		assertFalse(backupFile3.exists());
 
-		BufferedReader reader = new BufferedReader(new FileReader(backupFile1));
-		assertEquals("3", reader.readLine());
-		reader.close();
+		FileHelper.write(baseFile, "2");
+		assertSame(baseFile, labeller.roll(baseFile, 2));
+		assertFalse(baseFile.exists());
+		assertTrue(backupFile1.exists());
+		assertEquals("2", FileHelper.read(backupFile1));
+		assertTrue(backupFile2.exists());
+		assertEquals("1", FileHelper.read(backupFile2));
+		assertFalse(backupFile3.exists());
 
-		reader = new BufferedReader(new FileReader(backupFile2));
-		assertEquals("2", reader.readLine());
-		reader.close();
+		FileHelper.write(baseFile, "3");
+		assertSame(baseFile, labeller.roll(baseFile, 2));
+		assertFalse(baseFile.exists());
+		assertTrue(backupFile1.exists());
+		assertEquals("3", FileHelper.read(backupFile1));
+		assertTrue(backupFile2.exists());
+		assertEquals("2", FileHelper.read(backupFile2));
+		assertFalse(backupFile3.exists());
 
+		baseFile.delete();
 		backupFile1.delete();
 		backupFile2.delete();
 	}
@@ -99,33 +86,24 @@ public class CountLabellerTest {
 	 */
 	@Test
 	public final void testLabellingWithoutFileExtension() throws IOException {
-		File baseFile = File.createTempFile("test", "");
-		baseFile.deleteOnExit();
-		File backupFile1 = new File(baseFile.getPath() + ".0");
-		backupFile1.deleteOnExit();
-		File backupFile2 = new File(baseFile.getPath() + ".1");
-		backupFile2.deleteOnExit();
+		File baseFile = FileHelper.createTemporaryFile(null);
+		File backupFile1 = getBackupFile(baseFile, null, "0");
+		File backupFile2 = getBackupFile(baseFile, null, "1");
 
 		Labeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));
-		BufferedWriter writer = new BufferedWriter(new FileWriter(baseFile));
-		writer.write("1");
-		writer.close();
 
-		assertSame(baseFile, labeller.roll(baseFile, 1));
-		writer = new BufferedWriter(new FileWriter(baseFile));
-		writer.write("2");
-		writer.close();
-		assertTrue(backupFile1.exists());
-		assertFalse(backupFile2.exists());
-
+		FileHelper.write(baseFile, "1");
 		assertSame(baseFile, labeller.roll(baseFile, 1));
 		assertTrue(backupFile1.exists());
+		assertEquals("1", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
 
-		BufferedReader reader = new BufferedReader(new FileReader(backupFile1));
-		assertEquals("2", reader.readLine());
-		reader.close();
+		FileHelper.write(baseFile, "2");
+		assertSame(baseFile, labeller.roll(baseFile, 1));
+		assertTrue(backupFile1.exists());
+		assertEquals("2", FileHelper.read(backupFile1));
+		assertFalse(backupFile2.exists());
 
 		backupFile1.delete();
 	}
@@ -138,10 +116,8 @@ public class CountLabellerTest {
 	 */
 	@Test
 	public final void testLabellingWithoutBackups() throws IOException {
-		File baseFile = File.createTempFile("test", ".tmp");
-		baseFile.deleteOnExit();
-		File backupFile = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".0.tmp");
-		backupFile.deleteOnExit();
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+		File backupFile = getBackupFile(baseFile, "tmp", "0");
 
 		Labeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));

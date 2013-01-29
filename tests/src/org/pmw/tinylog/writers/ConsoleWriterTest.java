@@ -13,77 +13,58 @@
 
 package org.pmw.tinylog.writers;
 
+import java.util.Arrays;
+
+import org.junit.Test;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.util.StringListOutputStream;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.io.PrintStream;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.util.SilentOutputStream;
 
 /**
  * Tests for the console logging writer.
  * 
- * @see org.pmw.tinylog.writers.ConsoleWriter
+ * @see ConsoleWriter
  */
-public class ConsoleWriterTest {
-
-	private ConsoleWriter writer;
-
-	private PrintStream defaultErrorStream;
-	private PrintStream defaultOutputStream;
-
-	private SilentOutputStream errorStream;
-	private SilentOutputStream outputStream;
+public class ConsoleWriterTest extends AbstractTest {
 
 	/**
-	 * Bypass output streams.
-	 */
-	@Before
-	public final void init() {
-		writer = new ConsoleWriter();
-
-		defaultErrorStream = System.err;
-		errorStream = new SilentOutputStream();
-		System.setErr(new PrintStream(errorStream));
-
-		defaultOutputStream = System.out;
-		outputStream = new SilentOutputStream();
-		System.setOut(new PrintStream(outputStream));
-	}
-
-	/**
-	 * Reset the system output streams.
-	 */
-	@After
-	public final void dispose() {
-		System.setOut(defaultOutputStream);
-		System.setErr(defaultErrorStream);
-	}
-
-	/**
-	 * Test if error messages will appear in the "error" output stream.
+	 * Test if error and warning messages will appear in the "error" output stream.
 	 */
 	@Test
 	public final void testErrorStream() {
-		writer.write(LoggingLevel.ERROR, "Hello\n");
+		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
+			ConsoleWriter writer = new ConsoleWriter();
+			writer.write(loggingLevel, "Hello\n");
 
-		assertTrue(errorStream.isUsed());
-		assertFalse(outputStream.isUsed());
+			StringListOutputStream outputStream = getSystemOutputStream();
+			assertFalse(outputStream.hasLines());
+
+			StringListOutputStream errorStream = getSystemErrorStream();
+			assertTrue(errorStream.hasLines());
+			assertEquals("Hello", errorStream.nextLine());
+		}
 	}
 
 	/**
-	 * Test if info messages will appear in the "standard" output stream.
+	 * Test if info, debug and trace messages will appear in the "standard" output stream.
 	 */
 	@Test
 	public final void testOutputStream() {
-		writer.write(LoggingLevel.INFO, "Hello\n");
+		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
+			ConsoleWriter writer = new ConsoleWriter();
+			writer.write(loggingLevel, "Hello\n");
 
-		assertFalse(errorStream.isUsed());
-		assertTrue(outputStream.isUsed());
+			StringListOutputStream outputStream = getSystemOutputStream();
+			assertTrue(outputStream.hasLines());
+			assertEquals("Hello", outputStream.nextLine());
+
+			StringListOutputStream errorStream = getSystemErrorStream();
+			assertFalse(errorStream.hasLines());
+		}
 	}
 
 }

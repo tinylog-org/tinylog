@@ -13,48 +13,48 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import org.junit.Test;
+import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.util.SilentOutputStream;
+import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.StringListOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the file logging writer.
  * 
- * @see org.pmw.tinylog.writers.FileWriter
+ * @see FileWriter
  */
-public class FileWriterTest {
+public class FileWriterTest extends AbstractTest {
 
 	/**
 	 * Test writing.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testWriting() throws IOException {
-		File file = File.createTempFile("test", "tmp");
-		file.deleteOnExit();
+		File file = FileHelper.createTemporaryFile(null);
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		writer.write(LoggingLevel.INFO, "Hello\n");
 		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
 
-		PrintStream defaultPrintStream = System.err;
-		SilentOutputStream outputStream = new SilentOutputStream();
-		System.setErr(new PrintStream(outputStream));
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
 		writer.write(LoggingLevel.INFO, "Won't be written\n");
-		System.setErr(defaultPrintStream);
-		assertTrue(outputStream.isUsed());
+		assertTrue(errorStream.hasLines());
+		errorStream.clear();
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());

@@ -11,35 +11,42 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.util;
+package org.pmw.tinylog.mocks;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import mockit.Mock;
+import mockit.MockClass;
 
 /**
- * Doesn't output anything, only the used flag will be set if anything was written.
+ * Mock for {@link System}.
  */
-public final class SilentOutputStream extends OutputStream {
+@MockClass(realClass = System.class)
+public final class SystemTimeMock {
 
-	private boolean isUsed;
+	private long time;
 
 	/** */
-	public SilentOutputStream() {
-		isUsed = false;
+	public SystemTimeMock() {
+		time = 0L;
 	}
 
 	/**
-	 * Returns the used flag.
+	 * Get the current time in milliseconds.
 	 * 
-	 * @return <code>true</code> if anything was written, otherwise <code>false</code>
+	 * @return Current time in milliseconds
 	 */
-	public boolean isUsed() {
-		return isUsed;
+	@Mock
+	public long currentTimeMillis() {
+		return time;
 	}
 
-	@Override
-	public void write(final int b) throws IOException {
-		isUsed = true;
+	/**
+	 * Set the current time.
+	 * 
+	 * @param time
+	 *            Current time in milliseconds
+	 */
+	public void setCurrentTimeMillis(final long time) {
+		this.time = time;
 	}
 
 }

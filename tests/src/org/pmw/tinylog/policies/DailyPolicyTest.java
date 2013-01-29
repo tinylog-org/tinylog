@@ -13,15 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for daily policy.
@@ -31,7 +30,20 @@ import org.junit.Test;
 public class DailyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling at midnight.
+	 * Test rolling at midnight by default constructor.
+	 */
+	@Test
+	public final void testDefaultRollingAtMidnight() {
+		Policy policy = new DailyPolicy();
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L); // 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 24:00
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test rolling at midnight by setting explicitly 24:00.
 	 */
 	@Test
 	public final void testRollingAtMidnight() {
@@ -50,80 +62,6 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		assertTrue(policy.check(null, null));
 		increaseTime(1L); // 24:00
 		assertFalse(policy.check(null, null));
-	}
-
-	/**
-	 * Test continuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
-	 */
-	@Test
-	public final void testContinueLogFile() throws IOException {
-		setTime(DAY / 2L); // 12:00
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(getTime());
-
-		Policy policy = new DailyPolicy(14, 0);
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR * 2 - 1L); // 13:59:59,999
-		assertTrue(policy.check(null, null));
-		increaseTime(1L); // 14:00
-		assertFalse(policy.check(null, null));
-
-		policy = new DailyPolicy(0, 0);
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
-		increaseTime(HOUR * 10 - 1L); // 23:59:59,999
-		assertTrue(policy.check(null, null));
-		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null, null));
-
-		file.delete();
-
-		policy = new DailyPolicy();
-		assertTrue(policy.initCheck(file));
-	}
-
-	/**
-	 * Test String parameter.
-	 */
-	@Test
-	public final void testStringParameter() {
-		AbstractTimeBasedPolicy policy = new DailyPolicy("00:00");
-		assertEquals(DAY, getCalendar(policy).getTimeInMillis());
-
-		policy = new DailyPolicy("12");
-		assertEquals(HOUR * 12, getCalendar(policy).getTimeInMillis());
-
-		policy = new DailyPolicy("12:30");
-		assertEquals(HOUR * 12 + HOUR / 2, getCalendar(policy).getTimeInMillis());
-
-		policy = new DailyPolicy("24:00");
-		assertEquals(DAY, getCalendar(policy).getTimeInMillis());
-
-		try {
-			policy = new DailyPolicy("");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new DailyPolicy("ab");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new DailyPolicy("12:ab");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
 	}
 
 	/**
@@ -148,6 +86,123 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	@Test(expected = IllegalArgumentException.class)
 	public final void testTooHighMinute() {
 		new DailyPolicy(12, 60);
+	}
+
+	/**
+	 * Test String parameter for "24:00".
+	 */
+	@Test
+	public final void testStringParameterForMidnight() {
+		Policy policy = new DailyPolicy("24:00");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L); // 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 24:00
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "12".
+	 */
+	@Test
+	public final void testStringParameterForTwelveAM() {
+		Policy policy = new DailyPolicy("12");
+		assertTrue(policy.check(null, null));
+		increaseTime(HOUR * 12 - 1L); // 11:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 12:00
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "09:30".
+	 */
+	@Test
+	public final void testStringParameterForHalfPastNine() {
+		Policy policy = new DailyPolicy("09:30");
+		assertTrue(policy.check(null, null));
+		increaseTime(HOUR * 9 + MINUTE * 30 - 1L); // 09:29:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 09:30
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for invalid hour ("AB:30").
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidHour() {
+		new DailyPolicy("AB:30");
+	}
+
+	/**
+	 * Test String parameter for invalid minute ("09:AB").
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidMinute() {
+		new DailyPolicy("09:AB");
+	}
+
+	/**
+	 * Test continuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		setTime(DAY / 2L); // 12:00
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		Policy policy = new DailyPolicy();
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY / 2L - 1L); // 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 24:00
+		assertFalse(policy.check(null, null));
+
+		increaseTime(-1L); // 23:59:59,999
+		policy = new DailyPolicy();
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 24:00
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDiscontinueLogFile() throws IOException {
+		setTime(DAY / 2L); // 12:00
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		assertTrue(new DailyPolicy().initCheck(file));
+		increaseTime(DAY); // Next day 12:00
+		assertFalse(new DailyPolicy().initCheck(file));
+
+		file.delete();
+	}
+
+	/**
+	 * Test non-existing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonExistingLogFile() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
+
+		Policy policy = new DailyPolicy();
+		assertTrue(policy.initCheck(file));
 	}
 
 }

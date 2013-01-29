@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.util.StoreWriter.LogEntry;
 
 /**
  * Tests for writing thread.
@@ -32,7 +33,7 @@ public class WritingThreadTest extends AbstractTest {
 	 * Test simple startup and shutdown.
 	 * 
 	 * @throws InterruptedException
-	 *             Thread was interrupted
+	 *             Test failed
 	 */
 	@Test
 	public final void testSimpleStartupAndShutdown() throws InterruptedException {
@@ -56,7 +57,7 @@ public class WritingThreadTest extends AbstractTest {
 	 * Test write log entries by writing thread.
 	 * 
 	 * @throws InterruptedException
-	 *             Thread was interrupted
+	 *             Test failed
 	 */
 	@Test
 	public final void testWritingLogEntries() throws InterruptedException {
@@ -69,14 +70,14 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertEquals("sample", writer.consumeMessage());
+		assertEquals(new LogEntry(LoggingLevel.INFO, "sample"), writer.consumeLogEntry());
 	}
 
 	/**
 	 * Test observing a thread and shutdown writing thread, when observed thread is dead.
 	 * 
 	 * @throws InterruptedException
-	 *             Thread was interrupted
+	 *             Test failed
 	 */
 	@Test
 	public final void testObservingThread() throws InterruptedException {
@@ -89,11 +90,11 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.start();
 		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
 		assertTrue(writingThread.isAlive());
-		Thread.sleep(100L);
+		Thread.sleep(10L);
 		assertTrue(writingThread.isAlive());
 
 		observableThread.cancelled = true;
-		Thread.sleep(100L);
+		writingThread.join();
 		assertFalse(writingThread.isAlive());
 	}
 

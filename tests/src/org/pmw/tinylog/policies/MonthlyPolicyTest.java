@@ -13,13 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for monthly policy.
@@ -33,20 +34,18 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 	 */
 	@Test
 	public final void testRollingAtFirstOfNextMonth() {
-		setTime(DAY * 16L);
+		setTime(DAY * 30 + DAY / 2); // 31th January 1970 12:00
 
 		Policy policy = new MonthlyPolicy();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 15L - 1L);
-		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(DAY / 2L); // 31th January 1970 24:00
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 28L - 1L);
+		increaseTime(DAY * 27); // 27th February 1970 24:00
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(DAY); // 28th February 1970 24:00
 		assertFalse(policy.check(null, null));
 	}
 
@@ -54,33 +53,61 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 	 * Test continuing log files.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		setTime(DAY * 16L);
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
+		setTime(DAY * 30); // 31th January 1970
+		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
 		Policy policy = new MonthlyPolicy();
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 15L - 1L);
+		increaseTime(DAY - 1L); // 31th January 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 31th January 1970 24:00
 		assertFalse(policy.check(null, null));
 
-		increaseTime(-1L);
+		increaseTime(-1L); // 31th January 1970 23:59:59,999
 		policy = new MonthlyPolicy();
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 31th January 1970 24:00
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDiscontinueLogFile() throws IOException {
+		setTime(DAY * 30); // 31th January 1970
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		assertTrue(new MonthlyPolicy().initCheck(file));
+		increaseTime(DAY); // 1st February 1970
+		assertFalse(new MonthlyPolicy().initCheck(file));
 
 		file.delete();
+	}
 
-		policy = new MonthlyPolicy();
+	/**
+	 * Test non-existing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonExistingLogFile() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
+
+		Policy policy = new MonthlyPolicy();
 		assertTrue(policy.initCheck(file));
 	}
 

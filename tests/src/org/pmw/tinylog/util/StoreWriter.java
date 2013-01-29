@@ -21,59 +21,96 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class StoreWriter implements LoggingWriter {
 
-	private LoggingLevel level;
-	private String entry;
-
-	/** */
-	public StoreWriter() {
-	}
+	private LogEntry logEntry;
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
-		this.level = level;
-		this.entry = logEntry;
+	public void write(final LoggingLevel level, final String text) {
+		if (logEntry != null) {
+			throw new RuntimeException("Previous message wasn't consumed");
+		}
+		logEntry = new LogEntry(level, text);
 	}
 
 	/**
-	 * Get the name of the policy.
+	 * Get and remove the last written log entry.
 	 * 
-	 * @return "store"
+	 * @return Last written log entry
 	 */
-	public static String getName() {
-		return "store";
+	public LogEntry consumeLogEntry() {
+		LogEntry backup = this.logEntry;
+		this.logEntry = null;
+		return backup;
 	}
 
 	/**
-	 * Get the logging level of the last written log entry.
-	 * 
-	 * @return Logging level of the last log entry
+	 * Represents a log entry.
 	 */
-	public LoggingLevel getLevel() {
-		return level;
-	}
+	public static final class LogEntry {
 
-	/**
-	 * Consume the logging level of the last written log entry and remove it.
-	 * 
-	 * @return Logging level of the last log entry
-	 */
-	public LoggingLevel consumeLevel() {
-		LoggingLevel copy = level;
-		level = null;
-		entry = null;
-		return copy;
-	}
+		private final LoggingLevel level;
+		private final String text;
 
-	/**
-	 * Consume the message text of the last written log entry and remove it.
-	 * 
-	 * @return The message text of the last log entry
-	 */
-	public String consumeMessage() {
-		String copy = entry;
-		level = null;
-		entry = null;
-		return copy;
+		/**
+		 * @param level
+		 *            Level of the log entry
+		 * @param text
+		 *            Message of the log entry
+		 */
+		public LogEntry(final LoggingLevel level, final String text) {
+			this.level = level;
+			this.text = text;
+		}
+
+		/**
+		 * Get the level of the log entry.
+		 * 
+		 * @return Level of the log entry
+		 */
+		public LoggingLevel getLevel() {
+			return level;
+		}
+
+		/**
+		 * Get the message of the log entry.
+		 * 
+		 * @return Message of the log entry
+		 */
+		public String getText() {
+			return text;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == this) {
+				return true;
+			} else if (obj instanceof LogEntry) {
+				LogEntry logEntry = (LogEntry) obj;
+				if (level != logEntry.level) {
+					return false;
+				}
+				if (text == null) {
+					if (logEntry.text != null) {
+						return false;
+					}
+				} else if (!text.equals(logEntry.text)) {
+					return false;
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return text.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return level + ": " + text;
+		}
+
 	}
 
 }

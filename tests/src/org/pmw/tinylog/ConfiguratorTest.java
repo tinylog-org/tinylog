@@ -13,26 +13,36 @@
 
 package org.pmw.tinylog;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URLClassLoader;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.Properties;
+import java.util.Map;
 
 import mockit.Mockit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.util.MockClassLoader;
-import org.pmw.tinylog.util.MockSystem;
-import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.Configurator.WritingThreadData;
+import org.pmw.tinylog.mocks.ClassLoaderMock;
+import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.NullWriter;
+
+import static org.hamcrest.Matchers.containsString;
+
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for configurator.
@@ -41,109 +51,173 @@ import org.pmw.tinylog.writers.ConsoleWriter;
  */
 public class ConfiguratorTest extends AbstractTest {
 
-	private static final int DEFAULT_MAX_STACK_TRACE_ELEMENTS = 40;
-	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
-	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
-	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = 2;
-
-	private MockSystem mockSystem;
-	private MockClassLoader mockClassLoader;
+	private ClassLoaderMock classLoaderMock;
 
 	/**
-	 * Set up the mock for {@link System}.
+	 * Set up mocks.
 	 */
 	@Before
 	public final void init() {
-		Configurator.defaultConfig().activate();
-		mockSystem = new MockSystem();
-		mockClassLoader = new MockClassLoader();
-		Mockit.setUpMocks(mockSystem, mockClassLoader);
+		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
+		Mockit.setUpMocks(classLoaderMock);
 	}
 
 	/**
-	 * Tear down the mock for {@link System}.
+	 * Shutdown observer threads.
 	 */
 	@After
 	public final void dispose() {
-		Mockit.tearDownMocks(URLClassLoader.class, System.class);
-		Configurator.defaultConfig().activate();
+		for (Thread thread : Thread.getAllStackTraces().keySet()) {
+			if (thread instanceof ConfigurationObserver) {
+				ConfigurationObserver observer = (ConfigurationObserver) thread;
+				observer.shutdown();
+				while (true) {
+					try {
+						observer.join();
+						break;
+					} catch (InterruptedException ex) {
+						continue;
+					}
+				}
+			}
+		}
 	}
 
 	/**
-	 * Test creating a configuration, based on the default configuration as well as on current configuration.
+	 * Test creating configurations based on the default configuration.
 	 */
 	@Test
-	public final void testDefaultAndCurrent() {
-		Configuration configuration = Configurator.defaultConfig().create();
-		testDefault(configuration);
+	public final void testDefault() {
+		Configuration defaultConfiguration = Configurator.defaultConfig().create();
+		assertEquals(LoggingLevel.INFO, defaultConfiguration.getLevel());
+		assertEquals(LoggingLevel.OFF, defaultConfiguration.getLowestPackageLevel());
+		assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
+		assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
+		assertNotNull(defaultConfiguration.getWriter());
+		assertNull(defaultConfiguration.getWritingThread());
+		assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
 
-		configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
-		assertEquals(LoggingLevel.INFO, configuration.getLevel());
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
+		assertNotSame(defaultConfiguration, configuration);
+		assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
+		assertEquals(defaultConfiguration.getLowestPackageLevel(), configuration.getLowestPackageLevel());
 		assertEquals("TEST", configuration.getFormatPattern());
-		assertEquals(Locale.getDefault(), configuration.getLocale());
+		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
 		assertNull(configuration.getWriter());
-		assertEquals(DEFAULT_MAX_STACK_TRACE_ELEMENTS, configuration.getMaxStackTraceElements());
-
-		configuration = Configurator.currentConfig().create();
-		testDefault(configuration);
-
-		Configurator.defaultConfig().formatPattern("TEST").activate();
-
-		configuration = Configurator.currentConfig().create();
-		assertEquals("TEST", configuration.getFormatPattern());
-
-		configuration = Configurator.defaultConfig().create();
-		testDefault(configuration);
+		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
 	}
 
 	/**
-	 * Test reloading the configuration.
+	 * Test creating configurations based on the current configuration.
 	 */
 	@Test
-	public final void testReload() {
-		mockClassLoader.setContent("tinylog.properties", "tinylog.format=TEST1\n");
-		Configuration configuration = Configurator.reload().create();
+	public final void testCurrent() {
+		Configuration defaultConfiguration = Configurator.defaultConfig().create();
+
+		Configuration configuration = Configurator.currentConfig().create();
+		assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
+		assertEquals(defaultConfiguration.getLowestPackageLevel(), configuration.getLowestPackageLevel());
+		assertEquals(defaultConfiguration.getFormatPattern(), configuration.getFormatPattern());
+		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
+		assertSame(getClass(defaultConfiguration.getWriter()), getClass(configuration.getWriter()));
+		assertSame(defaultConfiguration.getWritingThread(), configuration.getWritingThread());
+		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
+
+		Configurator.currentConfig().formatPattern("TEST").create();
+		assertNotEquals("TEST", configuration.getFormatPattern());
+
+		Configurator.currentConfig().formatPattern("TEST").activate();
+		configuration = Configurator.currentConfig().create();
+		assertEquals("TEST", configuration.getFormatPattern());
+	}
+
+	/**
+	 * Test initialization of configuration.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testInit() throws IOException {
+		int threadCount = Thread.activeCount();
+
+		classLoaderMock.set("tinylog.properties", "tinylog.format=TEST1");
+		Configuration configuration = Configurator.init().create();
 		assertEquals("TEST1", configuration.getFormatPattern());
 
 		System.setProperty("tinylog.format", "TEST2");
-		configuration = Configurator.reload().create();
+		configuration = Configurator.init().create();
 		assertEquals("TEST2", configuration.getFormatPattern());
 
+		System.clearProperty("tinylog.format");
+		configuration = Configurator.init().create();
+		assertEquals("TEST1", configuration.getFormatPattern());
+
+		classLoaderMock.remove("tinylog.properties");
+		configuration = Configurator.init().create();
+		assertThat(configuration.getFormatPattern(), containsString("{message}"));
+
+		classLoaderMock.set("tinylog.properties", "tinylog.format=TEST1");
+		File file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST2");
+		System.setProperty("tinylog.configuration", file.getAbsolutePath());
+		configuration = Configurator.init().create();
+		assertEquals("TEST2", configuration.getFormatPattern());
+		System.clearProperty("tinylog.configuration");
+		file.delete();
+
+		assertEquals(threadCount, Thread.activeCount());
+		classLoaderMock.set("tinylog.properties", "tinylog.format=TEST1", "tinylog.configuration.observe=true");
+		configuration = Configurator.init().create();
+		assertEquals("TEST1", configuration.getFormatPattern());
+		assertEquals(threadCount + 1, Thread.activeCount());
 	}
 
 	/**
-	 * Test loading the configuration form a resource in classpath.
+	 * Test loading the configuration form a resource from classpath.
 	 * 
 	 * @throws IOException
-	 *             Failed to load the resource
+	 *             Test failed
 	 */
 	@Test
 	public final void testLoadFromResource() throws IOException {
-		mockClassLoader.setContent("my/package/tinylog.properties", "tinylog.format=TEST\n");
-		Configuration configuration = Configurator.fromResource("/my/package/tinylog.properties").create();
+		classLoaderMock.set("my/package/tinylog.properties", "tinylog.format=TEST");
+		Configuration configuration = Configurator.fromResource("my/package/tinylog.properties").create();
 		assertEquals("TEST", configuration.getFormatPattern());
 	}
 
 	/**
-	 * Test loading the configuration form a file.
+	 * Test loading the configuration from a file.
 	 * 
 	 * @throws IOException
-	 *             Failed to write or load the properties file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLoadFromFile() throws IOException {
-		File file = File.createTempFile("temp", ".properties");
-		file.deleteOnExit();
-
-		Properties properties = new Properties();
-		properties.setProperty("tinylog.format", "TEST");
-		properties.store(new FileWriter(file), null);
-
+		File file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST");
 		Configuration configuration = Configurator.fromFile(file).create();
 		assertEquals("TEST", configuration.getFormatPattern());
-
 		file.delete();
+	}
+
+	/**
+	 * Test copying an configurator.
+	 */
+	@Test
+	public final void testCopy() {
+		Map<String, LoggingLevel> packageLevels = Collections.singletonMap("a", LoggingLevel.DEBUG);
+		NullWriter writer = new NullWriter();
+		WritingThreadData writingThreadData = new WritingThreadData("thread", Thread.NORM_PRIORITY);
+		Configurator configurator = new Configurator(LoggingLevel.WARNING, packageLevels, "TEST", Locale.US, writer, writingThreadData, 42);
+
+		Configuration copy = configurator.copy().create();
+		assertEquals(LoggingLevel.WARNING, copy.getLevel());
+		assertEquals(LoggingLevel.DEBUG, copy.getLevelOfPackage("a"));
+		assertEquals("TEST", copy.getFormatPattern());
+		assertEquals(Locale.US, copy.getLocale());
+		assertSame(writer, copy.getWriter());
+		assertEquals("thread", copy.getWritingThread().getNameOfThreadToObserve());
+		assertEquals(Thread.NORM_PRIORITY, copy.getWritingThread().getPriority());
+		assertEquals(42, copy.getMaxStackTraceElements());
 	}
 
 	/**
@@ -152,9 +226,11 @@ public class ConfiguratorTest extends AbstractTest {
 	@Test
 	public final void testLevel() {
 		Configuration configuration = Configurator.defaultConfig().level(LoggingLevel.TRACE).create();
+		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
 
 		configuration = Configurator.defaultConfig().level(null).create();
+		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
 		assertEquals(LoggingLevel.OFF, configuration.getLevel());
 
 		configuration = Configurator.defaultConfig().level(LoggingLevel.ERROR).level("a", LoggingLevel.WARNING).create();
@@ -179,7 +255,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals("TEST", configuration.getFormatPattern());
 
 		configuration = Configurator.defaultConfig().formatPattern(null).create();
-		assertEquals(DEFAULT_FORMAT_PATTERN, configuration.getFormatPattern());
+		assertThat(configuration.getFormatPattern(), containsString("{message}"));
 	}
 
 	/**
@@ -202,9 +278,9 @@ public class ConfiguratorTest extends AbstractTest {
 	 */
 	@Test
 	public final void testWriter() {
-		Configuration configuration = Configurator.defaultConfig().writer(new StoreWriter()).create();
+		Configuration configuration = Configurator.defaultConfig().writer(new NullWriter()).create();
 		assertNotNull(configuration.getWriter());
-		assertEquals(StoreWriter.class, configuration.getWriter().getClass());
+		assertEquals(NullWriter.class, configuration.getWriter().getClass());
 
 		configuration = Configurator.defaultConfig().writer(null).create();
 		assertEquals(null, configuration.getWriter());
@@ -212,46 +288,56 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test handling writing thread.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
 	 */
 	@Test
-	public final void testWritingThread() {
+	public final void testWritingThread() throws InterruptedException {
 		int threadCount = Thread.activeCount();
 
 		Configurator configurator = Configurator.defaultConfig().writingThread(true);
 		Configuration configuration = configurator.create();
 		assertNotNull(configuration.getWritingThread());
-		assertEquals(DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, configuration.getWritingThread().getNameOfThreadToObserve());
-		assertEquals(DEFAULT_PRIORITY_FOR_WRITING_THREAD, configuration.getWritingThread().getPriority());
+		assertEquals("main", configuration.getWritingThread().getNameOfThreadToObserve());
+		assertThat(configuration.getWritingThread().getPriority(), lessThan(Thread.NORM_PRIORITY));
 
-		configurator = Configurator.defaultConfig().writingThread(true, Thread.MAX_PRIORITY);
+		configurator = Configurator.defaultConfig().writingThread(Thread.MAX_PRIORITY);
 		configuration = configurator.create();
 		assertNotNull(configuration.getWritingThread());
-		assertEquals(DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, configuration.getWritingThread().getNameOfThreadToObserve());
+		assertEquals("main", configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(Thread.MAX_PRIORITY, configuration.getWritingThread().getPriority());
 
-		configurator = Configurator.defaultConfig().writingThread(true, Thread.currentThread().getName());
+		configurator = Configurator.defaultConfig().writingThread(Thread.currentThread().getName());
 		configuration = configurator.create();
 		assertNotNull(configuration.getWritingThread());
 		assertEquals(Thread.currentThread().getName(), configuration.getWritingThread().getNameOfThreadToObserve());
-		assertEquals(DEFAULT_PRIORITY_FOR_WRITING_THREAD, configuration.getWritingThread().getPriority());
+		assertThat(configuration.getWritingThread().getPriority(), lessThan(Thread.NORM_PRIORITY));
 
 		assertEquals(threadCount, Thread.activeCount());
 		configurator.activate();
 		assertEquals(threadCount + 1, Thread.activeCount());
 
-		configurator = Configurator.defaultConfig().writingThread(false, "TITLE", Thread.MAX_PRIORITY);
+		configurator = Configurator.defaultConfig().writingThread(false);
 		configuration = configurator.create();
 		assertEquals(null, configuration.getWritingThread());
 
 		assertEquals(threadCount + 1, Thread.activeCount());
 		configurator.activate();
-		Thread.yield();
+		Thread.sleep(10L); // Wait for shutdown of writing thread
 		assertEquals(threadCount, Thread.activeCount());
 
-		// Start writing thread again in order to test the method shutdownWritingThread()
+	}
+
+	/**
+	 * Test manual shutdown of writing thread.
+	 */
+	@Test
+	public final void testShutdownWritingThread() {
+		int threadCount = Thread.activeCount();
 
 		assertEquals(threadCount, Thread.activeCount());
-		Configurator.defaultConfig().writingThread(true, null).activate();
+		Configurator.defaultConfig().writingThread(null).activate();
 		assertEquals(threadCount + 1, Thread.activeCount());
 
 		assertEquals(threadCount + 1, Thread.activeCount());
@@ -274,15 +360,40 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
 	}
 
-	private void testDefault(final Configuration configuration) {
-		assertEquals(LoggingLevel.INFO, configuration.getLevel());
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
-		assertEquals(DEFAULT_FORMAT_PATTERN, configuration.getFormatPattern());
-		assertEquals(Locale.getDefault(), configuration.getLocale());
-		assertNotNull(configuration.getWriter());
-		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertNull(configuration.getWritingThread());
-		assertEquals(DEFAULT_MAX_STACK_TRACE_ELEMENTS, configuration.getMaxStackTraceElements());
+	private static Class<?> getClass(final Object instance) {
+		if (instance == null) {
+			return null;
+		} else {
+			return instance.getClass();
+		}
+	}
+
+	/**
+	 * Tests for writing thread data.
+	 * 
+	 * @see WritingThreadData
+	 */
+	public static class WritingThreadDataTest {
+
+		/**
+		 * Test check if writing thread data covers an existing writing thread .
+		 */
+		@Test
+		public final void testCovers() {
+			Configurator.WritingThreadData writingThreadData = new Configurator.WritingThreadData(null, Thread.MIN_PRIORITY);
+			assertTrue(writingThreadData.covers(new WritingThread(null, Thread.MIN_PRIORITY)));
+			assertFalse(writingThreadData.covers(null));
+			assertFalse(writingThreadData.covers(new WritingThread("", Thread.MIN_PRIORITY)));
+			assertFalse(writingThreadData.covers(new WritingThread(null, Thread.MIN_PRIORITY + 1)));
+
+			writingThreadData = new Configurator.WritingThreadData("main", Thread.MIN_PRIORITY);
+			assertTrue(writingThreadData.covers(new WritingThread("main", Thread.MIN_PRIORITY)));
+			assertFalse(writingThreadData.covers(null));
+			assertFalse(writingThreadData.covers(new WritingThread(null, Thread.MIN_PRIORITY)));
+			assertFalse(writingThreadData.covers(new WritingThread("main2", Thread.MIN_PRIORITY)));
+			assertFalse(writingThreadData.covers(new WritingThread("main", Thread.MIN_PRIORITY + 1)));
+		}
+
 	}
 
 }

@@ -13,21 +13,72 @@
 
 package org.pmw.tinylog;
 
+import java.io.PrintStream;
+import java.util.Properties;
+
+import mockit.Mockit;
+
 import org.junit.After;
 import org.junit.Before;
+import org.pmw.tinylog.util.StringListOutputStream;
+
+import static org.junit.Assert.assertFalse;
 
 /**
- * Base class for all logger tests.
+ * Base class for all tests.
  */
 public abstract class AbstractTest {
 
+	private StringListOutputStream systemOutputStream;
+	private StringListOutputStream systemErrorStream;
+
+	private Properties originProperties;
+	private PrintStream originOutStream;
+	private PrintStream originErrStream;
+
 	/**
-	 * Reset the configuration before and after each test.
+	 * Reconfigure {@link System}.
 	 */
 	@Before
+	public final void setUp() {
+		originProperties = (Properties) System.getProperties().clone();
+		originOutStream = System.out;
+		originErrStream = System.err;
+		systemOutputStream = new StringListOutputStream();
+		systemErrorStream = new StringListOutputStream();
+		System.setOut(new PrintStream(systemOutputStream, true));
+		System.setErr(new PrintStream(systemErrorStream, true));
+	}
+
+	/**
+	 * Reset {@link System}.
+	 */
 	@After
-	public final void reset() {
-		Configurator.defaultConfig().activate();
+	public final void tearDown() {
+		Mockit.tearDownMocks();
+		System.setProperties(originProperties);
+		System.setOut(originOutStream);
+		System.setErr(originErrStream);
+		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
+		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
+	}
+
+	/**
+	 * {@link System#out} is piped into this stream.
+	 * 
+	 * @return Result stream of {@link System#out}
+	 */
+	public final StringListOutputStream getSystemOutputStream() {
+		return systemOutputStream;
+	}
+
+	/**
+	 * {@link System#err} is piped into this stream.
+	 * 
+	 * @return Result stream of {@link System#err}
+	 */
+	public final StringListOutputStream getSystemErrorStream() {
+		return systemErrorStream;
 	}
 
 }

@@ -17,9 +17,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.util.StoreWriter.LogEntry;
 
 /**
- * Tests for the logging facades API.
+ * Tests for the logging facade API.
  * 
  * @see LogEntryForwarder
  */
@@ -33,13 +34,16 @@ public class LogEntryForwarderTest extends AbstractTest {
 	@Test
 	public final void testLogging() {
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{file}: {message}").activate();
+		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{file}|{message}").activate();
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello!");
-		assertEquals("LogEntryForwarderTest.java: Hello!" + NEW_LINE, writer.consumeMessage());
+		assertEquals(new LogEntry(LoggingLevel.INFO, "LogEntryForwarderTest.java|Hello!" + NEW_LINE), writer.consumeLogEntry());
 
-		LogEntryForwarder.forward(0, LoggingLevel.ERROR, new Exception(), "Error");
-		assertEquals("LogEntryForwarderTest.java: Error: java.lang.Exception" + NEW_LINE, writer.consumeMessage());
+		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello {0}!", "World");
+		assertEquals(new LogEntry(LoggingLevel.INFO, "LogEntryForwarderTest.java|Hello World!" + NEW_LINE), writer.consumeLogEntry());
+
+		LogEntryForwarder.forward(0, LoggingLevel.ERROR, new Exception(), "Test");
+		assertEquals(new LogEntry(LoggingLevel.ERROR, "LogEntryForwarderTest.java|Test: java.lang.Exception" + NEW_LINE), writer.consumeLogEntry());
 	}
 
 	/**
@@ -47,14 +51,18 @@ public class LogEntryForwarderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLoggingWithStackTraceElement() {
+		StackTraceElement stackTraceElement = new StackTraceElement("MyClass", "?", "?", -1);
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{class}: {message}").activate();
+		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{class}|{message}").activate();
 
-		LogEntryForwarder.forward(new StackTraceElement("MyClass", "?", "?", -1), LoggingLevel.INFO, "Hello!");
-		assertEquals("MyClass: Hello!" + NEW_LINE, writer.consumeMessage());
+		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello!");
+		assertEquals(new LogEntry(LoggingLevel.INFO, "MyClass|Hello!" + NEW_LINE), writer.consumeLogEntry());
 
-		LogEntryForwarder.forward(new StackTraceElement("MyClass", "?", "?", -1), LoggingLevel.ERROR, new Exception(), "Error");
-		assertEquals("MyClass: Error: java.lang.Exception" + NEW_LINE, writer.consumeMessage());
+		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello {0}!", "World");
+		assertEquals(new LogEntry(LoggingLevel.INFO, "MyClass|Hello World!" + NEW_LINE), writer.consumeLogEntry());
+
+		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.ERROR, new Exception(), "Test");
+		assertEquals(new LogEntry(LoggingLevel.ERROR, "MyClass|Test: java.lang.Exception" + NEW_LINE), writer.consumeLogEntry());
 	}
 
 }

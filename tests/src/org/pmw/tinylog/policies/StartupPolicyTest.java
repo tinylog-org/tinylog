@@ -20,25 +20,25 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.util.FileHelper;
 
 /**
  * Tests for startup policy.
  * 
  * @see StartupPolicy
  */
-public class StartupPolicyTest {
+public class StartupPolicyTest extends AbstractTest {
 
 	/**
 	 * Test rolling.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testRolling() throws IOException {
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-
+		File file = FileHelper.createTemporaryFile(null);
 		Policy policy = new StartupPolicy();
 		assertFalse(policy.initCheck(file));
 		assertTrue(policy.check(null, null));

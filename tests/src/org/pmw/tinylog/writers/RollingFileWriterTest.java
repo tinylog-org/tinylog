@@ -13,51 +13,52 @@
 
 package org.pmw.tinylog.writers;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.junit.Test;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.StringListOutputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import org.junit.Test;
-import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.policies.SizePolicy;
-import org.pmw.tinylog.util.SilentOutputStream;
-
 /**
  * Tests for the rolling file logging writer.
  * 
- * @see org.pmw.tinylog.writers.RollingFileWriter
+ * @see RollingFileWriter
  */
-public class RollingFileWriterTest {
+public class RollingFileWriterTest extends AbstractTest {
 
 	/**
-	 * Test writing.
+	 * Test simple writing (non-existing log file and neither policies nor a labeller).
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
-	public final void testWriting() throws IOException {
-		File file = File.createTempFile("test", "tmp");
+	public final void testSimpleWriting() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
 		file.delete();
-		file.deleteOnExit();
+
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
 		writer.write(LoggingLevel.INFO, "Hello\n");
 		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
 
-		PrintStream defaultPrintStream = System.err;
-		SilentOutputStream outputStream = new SilentOutputStream();
-		System.setErr(new PrintStream(outputStream));
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
 		writer.write(LoggingLevel.INFO, "Won't be written\n");
-		System.setErr(defaultPrintStream);
-		assertTrue(outputStream.isUsed());
+		assertTrue(errorStream.hasLines());
+		errorStream.clear();
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
@@ -69,97 +70,47 @@ public class RollingFileWriterTest {
 	}
 
 	/**
-	 * Test rolling by creating a new instance of the rolling file logging writer.
+	 * Test rolling while writing.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
-	public final void testRollingByStarting() throws IOException {
-		File baseFile = File.createTempFile("test", ".tmp");
-		baseFile.deleteOnExit();
-		File backupFile1 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".0.tmp");
-		backupFile1.deleteOnExit();
-		File backupFile2 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".1.tmp");
-		backupFile2.deleteOnExit();
-		File backupFile3 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + ".2.tmp");
-		backupFile3.deleteOnExit();
+	public final void testRollingWhileWriting() throws IOException {
+		File file = FileHelper.createTemporaryFile(null, "12");
+		File backup = new File(file.getAbsolutePath() + ".0");
 
-		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
-		writer.write(LoggingLevel.INFO, "1");
-		writer.close();
-
-		assertTrue(baseFile.exists());
-		assertTrue(backupFile1.exists());
-		assertFalse(backupFile2.exists());
-
-		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
-		writer.write(LoggingLevel.INFO, "2");
-		writer.close();
-
-		assertTrue(baseFile.exists());
-		assertTrue(backupFile1.exists());
-		assertTrue(backupFile2.exists());
-		assertFalse(backupFile3.exists());
-
-		writer = new RollingFileWriter(baseFile.getAbsolutePath(), 2);
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new SizePolicy(3));
 		writer.write(LoggingLevel.INFO, "3");
+		writer.write(LoggingLevel.INFO, "4");
+		writer.write(LoggingLevel.INFO, "5");
 		writer.close();
 
-		assertTrue(baseFile.exists());
-		assertTrue(backupFile1.exists());
-		assertTrue(backupFile2.exists());
-		assertFalse(backupFile3.exists());
+		assertEquals("45", FileHelper.read(file));
+		assertEquals("123", FileHelper.read(backup));
 
-		BufferedReader reader = new BufferedReader(new FileReader(baseFile));
-		assertEquals("3", reader.readLine());
-		reader.close();
-
-		reader = new BufferedReader(new FileReader(backupFile1));
-		assertEquals("2", reader.readLine());
-		reader.close();
-
-		reader = new BufferedReader(new FileReader(backupFile2));
-		assertEquals("1", reader.readLine());
-		reader.close();
-
-		baseFile.delete();
-		backupFile1.delete();
-		backupFile2.delete();
-		backupFile3.delete();
+		file.delete();
+		backup.delete();
 	}
 
 	/**
-	 * Test rolling after gaining maximum file size.
+	 * Test rolling while opening.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
-	public final void testRollingByFileSize() throws IOException {
-		File baseFile = File.createTempFile("test", "");
-		baseFile.deleteOnExit();
-		File backupFile = new File(baseFile.getPath() + ".0");
-		backupFile.deleteOnExit();
+	public final void testRollingWhileOpening() throws IOException {
+		File file = FileHelper.createTemporaryFile(null, "123");
+		File backup = new File(file.getAbsolutePath() + ".0");
 
-		RollingFileWriter writer = new RollingFileWriter(baseFile.getAbsolutePath(), 1, new SizePolicy(3));
-		backupFile.delete();
-		writer.write(LoggingLevel.INFO, "1");
-		writer.write(LoggingLevel.INFO, "2");
-		writer.write(LoggingLevel.INFO, "3");
-		writer.write(LoggingLevel.INFO, "4");
-		writer.close();
+		new RollingFileWriter(file.getAbsolutePath(), 100, new StartupPolicy()).close();
 
-		BufferedReader reader = new BufferedReader(new FileReader(baseFile));
-		assertEquals("4", reader.readLine());
-		reader.close();
+		assertEquals("", FileHelper.read(file));
+		assertEquals("123", FileHelper.read(backup));
 
-		reader = new BufferedReader(new FileReader(backupFile));
-		assertEquals("123", reader.readLine());
-		reader.close();
-
-		baseFile.delete();
-		backupFile.delete();
+		file.delete();
+		backup.delete();
 	}
 
 }

@@ -13,13 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for hourly policy.
@@ -52,13 +53,12 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 	 * Test continuing log files.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
 		setTime(HOUR / 2L); // 00:30
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
+		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
 		Policy policy = new HourlyPolicy();
@@ -75,10 +75,39 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		assertTrue(policy.check(null, null));
 		increaseTime(1L); // 02:00
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDiscontinueLogFile() throws IOException {
+		setTime(HOUR / 2L); // 00:30
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		assertTrue(new HourlyPolicy().initCheck(file));
+		increaseTime(HOUR); // 01:30
+		assertFalse(new HourlyPolicy().initCheck(file));
 
 		file.delete();
+	}
 
-		policy = new HourlyPolicy();
+	/**
+	 * Test non-existing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonExistingLogFile() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
+
+		Policy policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
 	}
 

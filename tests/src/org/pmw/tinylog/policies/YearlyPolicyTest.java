@@ -13,15 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for yearly policy.
@@ -31,121 +30,366 @@ import org.junit.Test;
 public class YearlyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling at the end of the year.
+	 * Test rolling at the end of the year by default constructor.
 	 */
 	@Test
-	public final void testRollingAtEndOfYear() {
-		setTime(YEAR / 2L);
+	public final void testDefaultRollingAtEndOfYear() {
+		// 1st January 1970
 
 		Policy policy = new YearlyPolicy();
 		assertTrue(policy.check(null, null));
-		increaseTime(YEAR / 2L - 1L);
+		increaseTime(YEAR - DAY); // 31th December 1970
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(DAY); // 1st January 1971
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test rolling at the end of the year by setting explicitly 1.
+	 */
+	@Test
+	public final void testRollingAtEndOfYear() {
+		increaseTime(YEAR - DAY); // 31th December 1970
+
+		Policy policy = new YearlyPolicy(1);
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L); // 31th December 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // / 1st January 1971
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(YEAR - 1L);
+		increaseTime(YEAR - 1L); // 31th December 1971 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 1st January 1972
 		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test rolling at the end of December by setting explicitly 12.
+	 */
+	@Test
+	public final void testRollingAtEndOfDecember() {
+		increaseTime(YEAR - 31 * DAY - DAY); // 30th November 1970
+
+		Policy policy = new YearlyPolicy(12);
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L); // 30th November 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // / 1st December 1970
+		assertFalse(policy.check(null, null));
+
+		policy.reset();
+		assertTrue(policy.check(null, null));
+		increaseTime(YEAR - 1L); // 30th November 1971 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st December 1971
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test exception for month = 0.
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTooLowMonth() {
+		new YearlyPolicy(0);
+	}
+
+	/**
+	 * Test exception for month = 13.
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTooHighMonth() {
+		new YearlyPolicy(13);
+	}
+
+	/**
+	 * Test String parameter for numeric January (= "1").
+	 */
+	@Test
+	public final void testStringParameterForNumericJanuary() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("1");
+		assertTrue(policy.check(null, null));
+		increaseTime(YEAR - 1L); // 31th December 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st January 1971
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for numeric December (= "12").
+	 */
+	@Test
+	public final void testStringParameterForNumericDecember() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("12");
+		assertTrue(policy.check(null, null));
+		increaseTime(YEAR - 31 * DAY - 1L); // 30th November 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st December 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "january".
+	 */
+	@Test
+	public final void testStringParameterForJanuary() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("january");
+		assertTrue(policy.check(null, null));
+		increaseTime(YEAR - 1L); // 31th December 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st January 1971
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "february".
+	 */
+	@Test
+	public final void testStringParameterForFebruary() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("february");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 31 - 1L); // 31th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st February 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "march".
+	 */
+	@Test
+	public final void testStringParameterForMarch() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("march");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28) - 1L); // 28th February 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st March 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "april".
+	 */
+	@Test
+	public final void testStringParameterForApril() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("april");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31) - 1L); // 31th March 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st April 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "may".
+	 */
+	@Test
+	public final void testStringParameterForMay() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("may");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30) - 1L); // 30th April 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st May 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "june".
+	 */
+	@Test
+	public final void testStringParameterForJune() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("june");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31) - 1L); // 31th May 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st June 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "july".
+	 */
+	@Test
+	public final void testStringParameterForJuly() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("july");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30) - 1L); // 30th June 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st July 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "august".
+	 */
+	@Test
+	public final void testStringParameterForAugust() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("august");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31) - 1L); // 31th July 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st August 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "september".
+	 */
+	@Test
+	public final void testStringParameterForSeptember() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("september");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31) - 1L); // 31th August 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st September 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "OCTOBER".
+	 */
+	@Test
+	public final void testStringParameterForOctober() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("OCTOBER");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30) - 1L); // 30th September 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st October 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "NovemBer".
+	 */
+	@Test
+	public final void testStringParameterForNovember() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("NovemBer");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31) - 1L); // 31th October 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st November 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "December".
+	 */
+	@Test
+	public final void testStringParameterForDecember() {
+		// 1st January 1970
+
+		Policy policy = new YearlyPolicy("December");
+		assertTrue(policy.check(null, null));
+		increaseTime(YEAR - 31 * DAY - 1L); // 30th November 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st December 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test exception for "0".
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidNumericMonth() {
+		new YearlyPolicy("0");
+	}
+
+	/**
+	 * Test exception for "dummy".
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidString() {
+		new YearlyPolicy("dummy");
 	}
 
 	/**
 	 * Test continuing log files.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		setTime(0L);
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(getTime() + 1L);
+		setTime(YEAR - DAY); // 31th December 1970 00:00
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
 
-		Policy policy = new YearlyPolicy(1);
+		Policy policy = new YearlyPolicy();
 		assertTrue(policy.initCheck(file));
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 365L - 1L);
+		increaseTime(DAY - 1L); // 31th December 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L);
+		increaseTime(1L); // 1st January 1971 00:00
 		assertFalse(policy.check(null, null));
 
-		file.delete();
-
+		increaseTime(-1L); // 31th December 1970 23:59:59,999
 		policy = new YearlyPolicy();
 		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // 1st January 1971 00:00
+		assertFalse(policy.check(null, null));
 	}
 
 	/**
-	 * Test String parameter.
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
 	 */
 	@Test
-	public final void testStringParameter() {
-		AbstractTimeBasedPolicy policy = new YearlyPolicy("1");
-		assertEquals(YEAR, getCalendar(policy).getTimeInMillis());
+	public final void testDiscontinueLogFile() throws IOException {
+		setTime(YEAR - DAY); // 31th December 1970
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
 
-		policy = new YearlyPolicy("12");
-		assertEquals(YEAR - DAY * 31L, getCalendar(policy).getTimeInMillis());
+		assertTrue(new YearlyPolicy().initCheck(file));
+		increaseTime(DAY); // 1st January 1971
+		assertFalse(new YearlyPolicy().initCheck(file));
 
-		policy = new YearlyPolicy("January");
-		assertEquals(YEAR, getCalendar(policy).getTimeInMillis());
+		file.delete();
+	}
 
-		policy = new YearlyPolicy("february");
-		assertEquals(DAY * 31L, getCalendar(policy).getTimeInMillis());
+	/**
+	 * Test non-existing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonExistingLogFile() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
 
-		policy = new YearlyPolicy("MARCH");
-		assertEquals(DAY * (31L + 28L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("April");
-		assertEquals(DAY * (31L + 28L + 31L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("May");
-		assertEquals(DAY * (31L + 28L + 31L + 30L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("June");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("July");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L + 30L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("August");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L + 30L + 31L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("September");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L + 30L + 31L + 31L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("October");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L + 30L + 31L + 31L + 30L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("November");
-		assertEquals(DAY * (31L + 28L + 31L + 30L + 31L + 30L + 31L + 31L + 30L + 31L), getCalendar(policy).getTimeInMillis());
-
-		policy = new YearlyPolicy("December");
-		assertEquals(YEAR - DAY * 31L, getCalendar(policy).getTimeInMillis());
-
-		try {
-			policy = new YearlyPolicy("");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new YearlyPolicy("0");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new YearlyPolicy("13");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
+		Policy policy = new YearlyPolicy();
+		assertTrue(policy.initCheck(file));
 	}
 
 }

@@ -15,7 +15,6 @@
 	<property name="tests" location="${root}/tests" />
 	<property name="tests.bin" location="${tests}/bin" />
 	<property name="tests.src" location="${tests}/src" />
-	<property name="tests.lib" location="${tests}/lib" />
 		
 	<property name="ext" location="${root}/ext" />
 	<property name="ext.conf" location="${ext}/conf" />
@@ -76,7 +75,6 @@
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${bin}" />
-			<classpath><fileset dir="${tests.lib}" includes="*.jar" /></classpath>
 		</javac>
 		<copy todir="${tests.bin}">
 			<fileset dir="${tests.src}">
@@ -174,7 +172,6 @@
 				<path location="${bin}" />
 				<path location="${tests.bin}" />
 				<path location="${tests.src}" />
-				<path><fileset dir="${tests.lib}" includes="*.jar" /></path>
 				<path refid="junit.classpath" />
 			</classpath>
 			<batchtest>

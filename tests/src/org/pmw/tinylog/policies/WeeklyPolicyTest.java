@@ -13,15 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.FileHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for weekly policy.
@@ -31,116 +30,62 @@ import org.junit.Test;
 public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 
 	/**
-	 * Test rolling at the end of the week.
+	 * Test rolling at the end of the week by default constructor.
 	 */
 	@Test
-	public final void testRollingAtEndOfWeek() {
-		setTime(DAY); // Friday, 2nd Januar 1970
+	public final void testDefaultRollingAtEndOfWeek() {
+		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 3 - 1L); // Sunday, 4th Januar 1970 23:59:59,999
+		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L); // Monday, 5th Januar 1970
+		increaseTime(1L); // Monday, 5th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test rolling at the end of the week by setting explicitly 1.
+	 */
+	@Test
+	public final void testRollingAtEndOfWeek() {
+		setTime(DAY); // Friday, 2nd January 1970
+
+		Policy policy = new WeeklyPolicy(1);
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 3 - 1L); // Sunday, 4th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Monday, 5th January 1970
 		assertFalse(policy.check(null, null));
 
 		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 7 - 1L); // Sunday, 11th Januar 1970 23:59:59,999
+		increaseTime(DAY * 7 - 1L); // Sunday, 11th January 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L); // Monday, 12th Januar 1970
+		increaseTime(1L); // Monday, 12th January 1970
 		assertFalse(policy.check(null, null));
 	}
 
 	/**
-	 * Test continuing log files.
-	 * 
-	 * @throws IOException
-	 *             Problem with the temporary file
+	 * Test rolling at Sunday 00:00 by setting explicitly 7.
 	 */
 	@Test
-	public final void testContinueLogFile() throws IOException {
-		setTime(DAY * 4L); // Monday, 5th Januar 1970
-		File file = File.createTempFile("test", ".tmp");
-		file.deleteOnExit();
-		file.setLastModified(getTime() + 1L);
+	public final void testRollingAtSundayMorning() {
+		setTime(DAY); // Friday, 2nd January 1970
 
-		Policy policy = new WeeklyPolicy(2);
-		assertTrue(policy.initCheck(file));
+		Policy policy = new WeeklyPolicy(7);
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY - 1L); // Monday, 5th Januar 1970 23:59:59,999
+		increaseTime(DAY * 2 - 1L); // Saturday, 3rd January 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L); // Tuesday, 6th Januar 1970 23:59:59,999
+		increaseTime(1L); // Sunday, 4th January 1970
 		assertFalse(policy.check(null, null));
 
-		policy = new WeeklyPolicy(1);
-		assertTrue(policy.initCheck(file));
+		policy.reset();
 		assertTrue(policy.check(null, null));
-		increaseTime(DAY * 6 - 1L); // Sunday, 11th Januar 1970 23:59:59,999
+		increaseTime(DAY * 7 - 1L); // Saturday, 10th January 1970 23:59:59,999
 		assertTrue(policy.check(null, null));
-		increaseTime(1L); // Monday, 12th Januar 1970
+		increaseTime(1L); // Sunday, 11th January 1970
 		assertFalse(policy.check(null, null));
-
-		file.delete();
-
-		policy = new WeeklyPolicy();
-		assertTrue(policy.initCheck(file));
-	}
-
-	/**
-	 * Test String parameter.
-	 */
-	@Test
-	public final void testStringParameter() {
-		setTime(DAY * 4L); // Monday, 5th Januar 1970
-
-		AbstractTimeBasedPolicy policy = new WeeklyPolicy("1");
-		assertEquals(DAY * 4L + DAY * 7L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("7");
-		assertEquals(DAY * 4L + DAY * 6L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("monday");
-		assertEquals(DAY * 4L + DAY * 7L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("Tuesday");
-		assertEquals(DAY * 4L + DAY * 1L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("WEDNESDAY");
-		assertEquals(DAY * 4L + DAY * 2L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("thursDay");
-		assertEquals(DAY * 4L + DAY * 3L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("friday");
-		assertEquals(DAY * 4L + DAY * 4L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("saturday");
-		assertEquals(DAY * 4L + DAY * 5L, getCalendar(policy).getTimeInMillis());
-
-		policy = new WeeklyPolicy("sunday");
-		assertEquals(DAY * 4L + DAY * 6L, getCalendar(policy).getTimeInMillis());
-
-		try {
-			policy = new WeeklyPolicy("");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new WeeklyPolicy("0");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
-
-		try {
-			policy = new WeeklyPolicy("8");
-			fail("IllegalArgumentException expected");
-		} catch (IllegalArgumentException ex) {
-			assertEquals(IllegalArgumentException.class, ex.getClass());
-		}
 	}
 
 	/**
@@ -157,6 +102,219 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 	@Test(expected = IllegalArgumentException.class)
 	public final void testTooHighDay() {
 		new WeeklyPolicy(8);
+	}
+
+	/**
+	 * Test String parameter for numeric Monday (= "1").
+	 */
+	@Test
+	public final void testStringParameterForNumericMonday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("1");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Monday, 5th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for numeric Sunday (= "7").
+	 */
+	@Test
+	public final void testStringParameterForNumericSunday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("7");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 3 - 1L); // Saturday, 3th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Sunday, 4th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "monday".
+	 */
+	@Test
+	public final void testStringParameterForMonday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("monday");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Monday, 5th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "tuesday".
+	 */
+	@Test
+	public final void testStringParameterForTuesday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("tuesday");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 5 - 1L); // Monday, 5th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Tuesday, 6th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "wednesday".
+	 */
+	@Test
+	public final void testStringParameterForWednesday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("wednesday");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 6 - 1L); // Tuesday, 6th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Wednesday, 7th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "thursday".
+	 */
+	@Test
+	public final void testStringParameterForThursday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("thursday");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 7 - 1L); // Wednesday, 7th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Thursday, 8th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "FRIDAY".
+	 */
+	@Test
+	public final void testStringParameterForFriday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("FRIDAY");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY - 1L); // Thursday, 1st January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Friday, 2nd January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "Saturday".
+	 */
+	@Test
+	public final void testStringParameterForSaturday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("Saturday");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 2 - 1L); // Friday, 2nd January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Saturday, 3rd January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test String parameter for "SunDaY".
+	 */
+	@Test
+	public final void testStringParameterForSunday() {
+		// Thursday, 1st January 1970
+
+		Policy policy = new WeeklyPolicy("SunDaY");
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY * 3 - 1L); // Saturday, 3rd January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Sunday, 4th January 1970
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test exception for "0".
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidNumericDayOfWeek() {
+		new WeeklyPolicy("0");
+	}
+
+	/**
+	 * Test exception for "dummy".
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidString() {
+		new WeeklyPolicy("dummy");
+	}
+
+	/**
+	 * Test continuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testContinueLogFile() throws IOException {
+		setTime(DAY * 3 + DAY / 2L); // Sunday, 4th January 1970 12:00
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		Policy policy = new WeeklyPolicy();
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(DAY / 2L - 1L); // Sunday, 4th January 1970 23:59:59,999
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Sunday, 4th January 1970 24:00
+		assertFalse(policy.check(null, null));
+
+		increaseTime(-1L); // Sunday, 4th January 1970 23:59:59,999
+		policy = new WeeklyPolicy();
+		assertTrue(policy.initCheck(file));
+		assertTrue(policy.check(null, null));
+		increaseTime(1L); // Sunday, 4th January 1970 24:00
+		assertFalse(policy.check(null, null));
+	}
+
+	/**
+	 * Test discontinuing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDiscontinueLogFile() throws IOException {
+		setTime(DAY * 3 + DAY / 2L); // Sunday, 4th January 1970 12:00
+		File file = FileHelper.createTemporaryFile(null);
+		file.setLastModified(getTime());
+
+		assertTrue(new WeeklyPolicy().initCheck(file));
+		increaseTime(DAY); // Monday, 5th January 1970 12:00
+		assertFalse(new WeeklyPolicy().initCheck(file));
+
+		file.delete();
+	}
+
+	/**
+	 * Test non-existing log files.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonExistingLogFile() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
+
+		Policy policy = new WeeklyPolicy();
+		assertTrue(policy.initCheck(file));
 	}
 
 }

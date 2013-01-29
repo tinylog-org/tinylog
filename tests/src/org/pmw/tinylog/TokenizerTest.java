@@ -181,4 +181,5 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("\t", tokens.get(0).getData());
 	}
+
 }

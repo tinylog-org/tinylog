@@ -13,25 +13,34 @@
 
 package org.pmw.tinylog.policies;
 
-import java.lang.reflect.Field;
-import java.util.Calendar;
 import java.util.TimeZone;
 
 import mockit.Mockit;
 
 import org.junit.After;
 import org.junit.Before;
-import org.pmw.tinylog.util.MockSystem;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.mocks.SystemTimeMock;
 
 /**
- * Basis class for times based tests.
+ * Basis class for time based tests.
  */
-public abstract class AbstractTimeBasedTest {
+public abstract class AbstractTimeBasedTest extends AbstractTest {
+
+	/**
+	 * Milliseconds of a second
+	 */
+	protected static final long SECOND = 1000L;
+
+	/**
+	 * Milliseconds of a minute
+	 */
+	protected static final long MINUTE = 60L * SECOND;
 
 	/**
 	 * Milliseconds of an hour
 	 */
-	protected static final long HOUR = 60L * 60L * 1000L;
+	protected static final long HOUR = 60L * MINUTE;
 
 	/**
 	 * Milliseconds of a day (24 hours)
@@ -43,25 +52,24 @@ public abstract class AbstractTimeBasedTest {
 	 */
 	protected static final long YEAR = 365L * DAY;
 
-	private MockSystem mockSystem;
+	private SystemTimeMock systemTimeMock;
 
 	/**
-	 * Set up the mock for {@link System}.
+	 * Set time zone to UTC and set up the mock for {@link System} (to control time).
 	 */
 	@Before
 	public final void init() {
-		mockSystem = new MockSystem();
-		Mockit.setUpMocks(mockSystem);
+		systemTimeMock = new SystemTimeMock();
+		Mockit.setUpMock(systemTimeMock);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	/**
-	 * Tear down the mock for {@link System}.
+	 * Reset time zone.
 	 */
 	@After
 	public final void dispose() {
 		TimeZone.setDefault(null);
-		Mockit.tearDownMocks(System.class);
 	}
 
 	/**
@@ -70,7 +78,7 @@ public abstract class AbstractTimeBasedTest {
 	 * @return Current time in milliseconds
 	 */
 	protected final long getTime() {
-		return mockSystem.currentTimeMillis();
+		return systemTimeMock.currentTimeMillis();
 	}
 
 	/**
@@ -80,7 +88,7 @@ public abstract class AbstractTimeBasedTest {
 	 *            Current time in milliseconds
 	 */
 	protected final void setTime(final long time) {
-		mockSystem.setCurrentTimeMillis(time);
+		systemTimeMock.setCurrentTimeMillis(time);
 	}
 
 	/**
@@ -90,28 +98,7 @@ public abstract class AbstractTimeBasedTest {
 	 *            Milliseconds to add
 	 */
 	protected final void increaseTime(final long time) {
-		mockSystem.setCurrentTimeMillis(mockSystem.currentTimeMillis() + time);
-	}
-
-	/**
-	 * Get the calendar of an {@link AbstractTimeBasedPolicy}.
-	 * 
-	 * @param timeBasedPolicy
-	 *            Policy to get {@link Calendar} for
-	 * @return Calendar with next rolling time
-	 */
-	protected static final Calendar getCalendar(final AbstractTimeBasedPolicy timeBasedPolicy) {
-		try {
-			Field field = AbstractTimeBasedPolicy.class.getDeclaredField("calendar");
-			field.setAccessible(true);
-			return (Calendar) field.get(timeBasedPolicy);
-		} catch (SecurityException ex) {
-			throw new RuntimeException(ex);
-		} catch (NoSuchFieldException ex) {
-			throw new RuntimeException(ex);
-		} catch (IllegalAccessException ex) {
-			throw new RuntimeException(ex);
-		}
+		systemTimeMock.setCurrentTimeMillis(systemTimeMock.currentTimeMillis() + time);
 	}
 
 }

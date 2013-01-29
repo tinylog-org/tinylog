@@ -13,15 +13,17 @@
 
 package org.pmw.tinylog;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.util.StoreWriter.LogEntry;
 import org.pmw.tinylog.writers.RollingFileWriter;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests old fixed bugs to prevent regressions.
@@ -40,23 +42,24 @@ public class RegressionsTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org", LoggingLevel.TRACE).activate();
 		Logger.info("");
-		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Was already OK
-		Configurator.currentConfig().level("org", null).activate();
+		LogEntry logEntry = new LogEntry(LoggingLevel.INFO, RegressionsTest.class.getName() + NEW_LINE);
+		assertEquals(logEntry, writer.consumeLogEntry()); // Was already OK
 
+		Configurator.currentConfig().level("org", null).activate();
 		Logger.info("");
-		assertEquals(RegressionsTest.class.getName() + NEW_LINE, writer.consumeMessage()); // Failed
+		logEntry = new LogEntry(LoggingLevel.INFO, RegressionsTest.class.getName() + NEW_LINE);
+		assertEquals(logEntry, writer.consumeLogEntry()); // Failed
 	}
 
 	/**
 	 * Bug: If a log file is continued, the policy will start from scratch. This leads to a too late rollover.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testContinueLogFile() throws IOException {
-		File file = File.createTempFile("test", "tmp");
-		file.deleteOnExit();
+		File file = FileHelper.createTemporaryFile("tmp");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
 		writer.write(null, "12345");
@@ -78,7 +81,8 @@ public class RegressionsTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).formatPattern("{message}").activate();
 		Logger.info("{TEST}");
-		assertEquals("{TEST}" + NEW_LINE, writer.consumeMessage()); // Failed (java.lang.IllegalArgumentException)
+		LogEntry logEntry = new LogEntry(LoggingLevel.INFO, "{TEST}" + NEW_LINE);
+		assertEquals(logEntry, writer.consumeLogEntry()); // Failed (java.lang.IllegalArgumentException)
 	}
 
 }

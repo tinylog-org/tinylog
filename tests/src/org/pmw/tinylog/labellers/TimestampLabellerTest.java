@@ -29,84 +29,82 @@ import mockit.Mockit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.util.MockSystem;
+import org.pmw.tinylog.mocks.SystemTimeMock;
+import org.pmw.tinylog.util.FileHelper;
 
 /**
  * Tests for timestamp labeller.
  * 
  * @see TimestampLabeller
  */
-public class TimestampLabellerTest {
+public class TimestampLabellerTest extends AbstractLabellerTest {
 
-	private MockSystem mockSystem;
+	private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
+
+	private SystemTimeMock systemTimeMock;
 
 	/**
-	 * Set up the mock for {@link System}.
+	 * Set time zone to UTC and set up the mock for {@link System} (to control time).
 	 */
 	@Before
 	public final void init() {
-		mockSystem = new MockSystem();
-		Mockit.setUpMocks(mockSystem);
+		systemTimeMock = new SystemTimeMock();
+		Mockit.setUpMock(systemTimeMock);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	/**
-	 * Tear down the mock for {@link System}.
+	 * Reset time zone.
 	 */
 	@After
 	public final void dispose() {
 		TimeZone.setDefault(null);
-		Mockit.tearDownMocks(System.class);
 	}
 
 	/**
 	 * Test labelling for log file with file extension.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithFileExtension() throws IOException {
-		File baseFile = File.createTempFile("test", ".tmp");
+		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.delete();
 
-		mockSystem.setCurrentTimeMillis(0L);
-		File targetFile1 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
-		targetFile1.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(0L);
+		File targetFile1 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		Labeller labeller = new TimestampLabeller("yyyy-MM-dd HH-mm-ss");
+		Labeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
-		targetFile1.setLastModified(mockSystem.currentTimeMillis());
+		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
-		mockSystem.setCurrentTimeMillis(1000L);
-		File targetFile2 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
-		targetFile2.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(1000L);
+		File targetFile2 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
 		assertEquals(targetFile2, labeller.roll(targetFile1, 2));
 		targetFile2.createNewFile();
-		targetFile2.setLastModified(mockSystem.currentTimeMillis());
+		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
 		assertTrue(targetFile2.exists());
 
-		mockSystem.setCurrentTimeMillis(2000L);
-		File targetFile3 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
-		targetFile3.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(2000L);
+		File targetFile3 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
 		assertEquals(targetFile3, labeller.roll(targetFile2, 2));
 		targetFile3.createNewFile();
-		targetFile3.setLastModified(mockSystem.currentTimeMillis());
+		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
 		assertTrue(targetFile2.exists());
 		assertTrue(targetFile3.exists());
 
-		mockSystem.setCurrentTimeMillis(3000L);
-		File targetFile4 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
-		targetFile4.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(3000L);
+		File targetFile4 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
 		assertEquals(targetFile4, labeller.roll(targetFile3, 2));
 		targetFile4.createNewFile();
-		targetFile4.setLastModified(mockSystem.currentTimeMillis());
+		targetFile4.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
 		assertTrue(targetFile2.exists());
 		assertTrue(targetFile3.exists());
@@ -123,39 +121,36 @@ public class TimestampLabellerTest {
 	 * Test labelling for log file without file extension.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithoutFileExtension() throws IOException {
-		File baseFile = File.createTempFile("test", "");
+		File baseFile = FileHelper.createTemporaryFile(null);
 		baseFile.delete();
 
-		mockSystem.setCurrentTimeMillis(0L);
-		File targetFile1 = new File(baseFile.getPath() + "." + formatCurrentTime());
-		targetFile1.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(0L);
+		File targetFile1 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		Labeller labeller = new TimestampLabeller("yyyy-MM-dd HH-mm-ss");
+		Labeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
-		targetFile1.setLastModified(mockSystem.currentTimeMillis());
+		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
-		mockSystem.setCurrentTimeMillis(1000L);
-		File targetFile2 = new File(baseFile.getPath() + "." + formatCurrentTime());
-		targetFile2.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(1000L);
+		File targetFile2 = getBackupFile(baseFile, null, formatCurrentTime());
 
 		assertEquals(targetFile2, labeller.roll(targetFile1, 1));
 		targetFile2.createNewFile();
-		targetFile2.setLastModified(mockSystem.currentTimeMillis());
+		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
 		assertTrue(targetFile2.exists());
 
-		mockSystem.setCurrentTimeMillis(2000L);
-		File targetFile3 = new File(baseFile.getPath() + "." + formatCurrentTime());
-		targetFile3.deleteOnExit();
+		systemTimeMock.setCurrentTimeMillis(2000L);
+		File targetFile3 = getBackupFile(baseFile, null, formatCurrentTime());
 
 		assertEquals(targetFile3, labeller.roll(targetFile2, 1));
 		targetFile3.createNewFile();
-		targetFile3.setLastModified(mockSystem.currentTimeMillis());
+		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
 		assertTrue(targetFile2.exists());
 		assertTrue(targetFile3.exists());
@@ -170,26 +165,25 @@ public class TimestampLabellerTest {
 	 * Test labelling without storing backups.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithoutBackups() throws IOException {
-		mockSystem.setCurrentTimeMillis(0L);
-
 		File baseFile = File.createTempFile("test", ".tmp");
 		baseFile.delete();
-		File targetFile1 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
+
+		systemTimeMock.setCurrentTimeMillis(0L);
+		File targetFile1 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 		targetFile1.deleteOnExit();
 
 		Labeller labeller = new TimestampLabeller();
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
-		targetFile1.setLastModified(mockSystem.currentTimeMillis());
+		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
-		mockSystem.setCurrentTimeMillis(1000L);
-		File targetFile2 = new File(baseFile.getPath().substring(0, baseFile.getPath().length() - 4) + "." + formatCurrentTime() + ".tmp");
-		targetFile2.deleteOnExit();
-		targetFile2.setLastModified(mockSystem.currentTimeMillis());
+		systemTimeMock.setCurrentTimeMillis(1000L);
+		File targetFile2 = getBackupFile(baseFile, "tmp", formatCurrentTime());
+		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 
 		assertTrue(targetFile1.exists());
 		assertEquals(targetFile2, labeller.roll(targetFile1, 0));
@@ -201,6 +195,7 @@ public class TimestampLabellerTest {
 	}
 
 	private String formatCurrentTime() {
-		return new SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.ROOT).format(new Date());
+		return new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ROOT).format(new Date());
 	}
+
 }
