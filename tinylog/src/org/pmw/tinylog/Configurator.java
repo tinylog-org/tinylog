@@ -259,45 +259,44 @@ public final class Configurator {
 	 * @return The current configurator
 	 */
 	public Configurator writingThread(final boolean enable) {
-		return writingThread(enable, DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, DEFAULT_PRIORITY_FOR_WRITING_THREAD);
+		if (enable) {
+			return writingThread(DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, DEFAULT_PRIORITY_FOR_WRITING_THREAD);
+		} else {
+			this.writingThreadData = null;
+			return this;
+		}
 	}
 
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the main
 	 * thread is dead.
 	 * 
-	 * @param enable
-	 *            <code>true</code> to enable the writing thread, <code>false</code> to disable it
 	 * @param priority
 	 *            Priority of the writing thread (must be between {@link Thread#MIN_PRIORITY} and
 	 *            {@link Thread#MAX_PRIORITY})
 	 * @return The current configurator
 	 */
-	public Configurator writingThread(final boolean enable, final int priority) {
-		return writingThread(enable, DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, priority);
+	public Configurator writingThread(final int priority) {
+		return writingThread(DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD, priority);
 	}
 
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the
 	 * observed thread is dead.
 	 * 
-	 * @param enable
-	 *            <code>true</code> to enable the writing thread, <code>false</code> to disable it
 	 * @param threadToObserve
 	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
 	 *            automatic shutdown
 	 * @return The current configurator
 	 */
-	public Configurator writingThread(final boolean enable, final String threadToObserve) {
-		return writingThread(enable, threadToObserve, DEFAULT_PRIORITY_FOR_WRITING_THREAD);
+	public Configurator writingThread(final String threadToObserve) {
+		return writingThread(threadToObserve, DEFAULT_PRIORITY_FOR_WRITING_THREAD);
 	}
 
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the
 	 * observed thread is dead.
 	 * 
-	 * @param enable
-	 *            <code>true</code> to enable the writing thread, <code>false</code> to disable it
 	 * @param threadToObserve
 	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
 	 *            automatic shutdown
@@ -306,12 +305,8 @@ public final class Configurator {
 	 *            {@link Thread#MAX_PRIORITY})
 	 * @return The current configurator
 	 */
-	public Configurator writingThread(final boolean enable, final String threadToObserve, final int priority) {
-		if (enable) {
-			this.writingThreadData = new WritingThreadData(threadToObserve, priority);
-		} else {
-			this.writingThreadData = null;
-		}
+	public Configurator writingThread(final String threadToObserve, final int priority) {
+		this.writingThreadData = new WritingThreadData(threadToObserve, priority);
 		return this;
 	}
 
@@ -337,7 +332,7 @@ public final class Configurator {
 	 */
 	public void activate() {
 		synchronized (lock) {
-			if (activeWritingThread != null && writingThreadData != null && writingThreadData.covers(activeWritingThread)) {
+			if (activeWritingThread != null && (writingThreadData == null || !writingThreadData.covers(activeWritingThread))) {
 				activeWritingThread.shutdown();
 				activeWritingThread = null;
 			}
