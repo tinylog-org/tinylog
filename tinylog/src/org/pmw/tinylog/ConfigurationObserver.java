@@ -29,9 +29,11 @@ abstract class ConfigurationObserver extends Thread {
 	private static final String THREAD_NAME = "tinylog-ConfigurationObserver";
 
 	private final Configurator basisConfigurator;
+	private volatile boolean shutdown;
 
 	private ConfigurationObserver(final Configurator basisConfigurator) {
 		this.basisConfigurator = basisConfigurator;
+		this.shutdown = false;
 		setName(THREAD_NAME);
 		setPriority((NORM_PRIORITY + MIN_PRIORITY) / 2);
 		setDaemon(true);
@@ -85,7 +87,7 @@ abstract class ConfigurationObserver extends Thread {
 	@Override
 	public final void run() {
 		Properties oldProperties = null;
-		while (true) {
+		while (!shutdown) {
 			Properties properties = readProperties();
 			if (properties != null) {
 				if (changed(properties, oldProperties)) {
@@ -102,6 +104,14 @@ abstract class ConfigurationObserver extends Thread {
 				// Ignore and continue
 			}
 		}
+	}
+
+	/**
+	 * Shutdown thread.
+	 */
+	public void shutdown() {
+		shutdown = true;
+		interrupt();
 	}
 
 	private boolean changed(final Properties properties, final Properties oldProperties) {
