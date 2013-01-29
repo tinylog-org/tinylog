@@ -48,12 +48,11 @@ final class Tokenizer {
 	 */
 	static List<Token> parse(final String formatPattern, final Locale locale) {
 		List<Token> tokens = new ArrayList<Token>();
-		char[] chars = formatPattern.toCharArray();
 
 		int start = 0;
 		int openMarkers = 0;
-		for (int i = 0; i < chars.length; ++i) {
-			char c = chars[i];
+		for (int i = 0; i < formatPattern.length(); ++i) {
+			char c = formatPattern.charAt(i);
 			if (c == '{') {
 				if (openMarkers == 0 && start < i) {
 					tokens.add(getToken(formatPattern.substring(start, i), locale));
@@ -69,8 +68,8 @@ final class Tokenizer {
 			}
 		}
 
-		if (start < chars.length) {
-			tokens.add(getToken(formatPattern.substring(start, chars.length), locale));
+		if (start < formatPattern.length()) {
+			tokens.add(getToken(formatPattern.substring(start, formatPattern.length()), locale));
 		}
 
 		return tokens;
