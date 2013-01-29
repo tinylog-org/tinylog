@@ -60,6 +60,10 @@ public class YearlyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	private static Calendar createCalendar(final int month) {
+		if (month < 1 || month > 12) {
+			throw new IllegalArgumentException("month must be between 1..12");
+		}
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.DATE, 1);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
