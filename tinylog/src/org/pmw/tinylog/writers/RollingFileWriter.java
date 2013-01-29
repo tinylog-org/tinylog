@@ -106,7 +106,7 @@ public class RollingFileWriter implements LoggingWriter {
 	 */
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename", "backups" }, new String[] { "filename", "backups", "policies" },
-				new String[] { "filename", "backups", "label", "policies" } };
+				new String[] { "filename", "backups", "labeling", "policies" } };
 	}
 
 	@Override
