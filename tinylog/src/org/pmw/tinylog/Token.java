@@ -83,8 +83,4 @@ final class Token {
 		}
 	}
 
-	@Override
-	public String toString() {
-		return getType() + " (" + getData() + ")";
-	}
 }
