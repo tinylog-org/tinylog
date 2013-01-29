@@ -109,7 +109,9 @@ public final class Configurator {
 		Properties properties = new Properties();
 
 		InputStream stream = Configurator.class.getResourceAsStream(file);
-		if (stream != null) {
+		if (stream == null) {
+			throw new FileNotFoundException(file);
+		} else {
 			try {
 				properties.load(stream);
 			} finally {
