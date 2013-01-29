@@ -70,15 +70,20 @@ abstract class ConfigurationObserver extends Thread {
 		return new ConfigurationObserver(basisConfigurator) {
 
 			@Override
-			protected InputStream openInputStream() {
-				return Configurator.class.getResourceAsStream(file);
+			protected InputStream openInputStream() throws FileNotFoundException {
+				InputStream stream = ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
+				if (stream == null) {
+					throw new FileNotFoundException(file);
+				} else {
+					return stream;
+				}
 			}
 
 		};
 	}
 
 	@Override
-	public void run() {
+	public final void run() {
 		Properties oldProperties = null;
 		while (true) {
 			Properties properties = readProperties();
@@ -94,7 +99,7 @@ abstract class ConfigurationObserver extends Thread {
 			try {
 				sleep(1000L);
 			} catch (InterruptedException ex) {
-				// Ignore
+				// Ignore and continue
 			}
 		}
 	}
@@ -127,6 +132,7 @@ abstract class ConfigurationObserver extends Thread {
 			properties.load(stream);
 			return properties;
 		} catch (IOException ex) {
+			ex.printStackTrace(System.err);
 			return null;
 		} finally {
 			if (stream != null) {
