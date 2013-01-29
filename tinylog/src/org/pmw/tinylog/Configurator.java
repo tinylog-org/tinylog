@@ -33,7 +33,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class Configurator {
 
-	private static final String DEFAULT_PROPERTIES_FILE = "/tinylog.properties";
+	private static final String DEFAULT_PROPERTIES_FILE = "tinylog.properties";
 	private static final int DEFAULT_MAX_STACK_TRACE_ELEMENTS = 40;
 	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
@@ -108,7 +108,7 @@ public final class Configurator {
 	public static Configurator fromResource(final String file) throws IOException {
 		Properties properties = new Properties();
 
-		InputStream stream = Configurator.class.getResourceAsStream(file);
+		InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file);
 		if (stream == null) {
 			throw new FileNotFoundException(file);
 		} else {
