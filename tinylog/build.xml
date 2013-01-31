@@ -80,6 +80,7 @@
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${tinylog.bin}" />
+			<classpath location="${log4j.bin}" />
 		</javac>
 		<copy todir="${tests.bin}">
 			<fileset dir="${tests.src}">
@@ -221,6 +222,18 @@
 			<zipfileset dir="${dist.docs}" />
 		</zip>
 		
+		<delete dir="${dist.maven}/log4j-facade" />
+		<mkdir dir="${dist.maven}/log4j-facade" />
+		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="log4j facade {version}">
+			<doctitle>log4j facade ${version} - API Specification</doctitle>
+			<packageset dir="${log4j.src}" />
+			<classpath>
+				<dirset dir="${log4j.bin}" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
+		</javadoc>
+		
 		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>${line.separator}<modelVersion>4.0.0</modelVersion>${line.separator}<groupId>org.pmw</groupId>${line.separator}<artifactId>log4j-facade</artifactId>${line.separator}<version>${version}</version>${line.separator}<name>log4j-facade</name>${line.separator}<url>http://www.tinylog.org/</url>${line.separator}<licenses>${line.separator}<license>${line.separator}<name>The Apache Software License, Version 2.0</name>${line.separator}<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>${line.separator}</license>${line.separator}</licenses>${line.separator}</project>]]></echo>
 		
 		<jar destfile="${dist.maven}/log4j-facade-${version}.jar">
@@ -232,8 +245,12 @@
 		<zip destfile="${dist.maven}/log4j-facade-${version}-sources.jar">
 			<zipfileset dir="${log4j.src}" />
 		</zip>
-		
+		<zip destfile="${dist.maven}/log4j-facade-${version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/log4j-facade" />
+		</zip>
+	
 		<delete file="${dist.maven}/pom.xml" />
+		<delete dir="${dist.maven}/log4j-facade" />
 	</target>
 	
 	<target name="pack-sources">
@@ -290,8 +307,8 @@
 			<formatter type="plain" usefile="false" />
 			<classpath>
 				<path location="${tinylog.bin}" />
+				<path location="${log4j.bin}" />
 				<path location="${tests.bin}" />
-				<path location="${tests.src}" />
 				<path refid="junit.classpath" />
 			</classpath>
 			<batchtest>
