@@ -12,29 +12,26 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 
-====================
- Using log4j facade
-====================
+===============
+ Using tinylog
+===============
 
-1) Add "log4j-facade.jar" and "tinylog.jar" to your classpath
+1) Add bundle "org.pmw.tinylog_*.jar" to your target platform
 
-2) Now you can test the logger facade by the following simple program:
+2) Optionally add bundle "org.pmw.tinylog.source_*.jar" for JavaDoc
+   documentation and source code attachment
 
-      import org.apache.log4j.Logger;
-      import org.apache.log4j.BasicConfigurator;
-	  
+3) Now you can test the logger by the following simple statement:
+
+      import org.pmw.tinylog.Logger;
+
       public class Application {
          public static void main(final String[] args) {
-            BasicConfigurator.configure();
-            Logger.getLogger(Application.class).info("Hello World!");
+            Logger.info("Hello World!");
          }
       }
-
-   After compilation, try it out by issuing the command
-
-      java Application
   
    You should see a log statement appearing on the console.
 
-3) A detailed user manual can be found on
+4) A detailed user manual and the JavaDoc documentation can be found on
    http://www.tinylog.org/

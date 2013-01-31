@@ -5,10 +5,13 @@
 	
 	<property name="root" location=".." />
 	
-	<property name="bin" location="${root}/tinylog/bin" />
-	<property name="src" location="${root}/tinylog/src" />
+	<property name="tinylog" location="${root}/tinylog" />
+	<property name="tinylog.files" location="${tinylog}/files" />
+	<property name="tinylog.bin" location="${tinylog}/bin" />
+	<property name="tinylog.src" location="${tinylog}/src" />
 	
 	<property name="log4j" location="${root}/log4j-facade" />
+	<property name="log4j.files" location="${log4j}/files" />
 	<property name="log4j.bin" location="${log4j}/bin" />
 	<property name="log4j.src" location="${log4j}/src" />
 	
@@ -26,6 +29,8 @@
 	<property name="dist" location="${root}/dist" />
 	<property name="dist.docs" location="${dist}/docs" />
 	<property name="dist.jar" location="${dist}/jar" />
+	<property name="dist.bundle" location="${dist}/bundle" />
+	<property name="dist.maven" location="${dist}/maven" />
 
 	<path id="junit.classpath">
 		<fileset dir="${ext.lib.junit}">
@@ -50,31 +55,31 @@
 	</taskdef>
 
 	<target name="clean">
-		<delete dir="${bin}" />
+		<delete dir="${tinylog.bin}" />
 		<delete dir="${log4j.bin}" />
 		<delete dir="${tests.bin}" />
 	</target>
 
 	<target name="makedir">
-		<mkdir dir="${bin}" />
+		<mkdir dir="${tinylog.bin}" />
 		<mkdir dir="${log4j.bin}" />
 		<mkdir dir="${tests.bin}" />
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false" target="1.5" />
-		<copy todir="${bin}">
-			<fileset dir="${src}">
+		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" target="1.5" />
+		<copy todir="${tinylog.bin}">
+			<fileset dir="${tinylog.src}">
 				<include name="**/*.properties" />
 				<include name="META-INF/**" />
 			</fileset>
 		</copy>
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" target="1.5">
-			<classpath location="${bin}" />
+			<classpath location="${tinylog.bin}" />
 		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
-			<classpath location="${bin}" />
+			<classpath location="${tinylog.bin}" />
 		</javac>
 		<copy todir="${tests.bin}">
 			<fileset dir="${tests.src}">
@@ -84,62 +89,177 @@
 		</copy>
 	</target>
 	
-	<target name="jar" depends="compile">
+	<target name="pack-jar" depends="compile">
 		<mkdir dir="${dist.jar}" />
-		<delete>
-			<fileset dir="${dist.jar}" />
-		</delete>
+		<delete dir="${dist.jar}" />
+		
 		<jar destfile="${dist.jar}/tinylog.jar">
-			<fileset dir="${bin}" />
+			<zipfileset dir="${tinylog.bin}" />
 		</jar>
 		<zip destfile="${dist.jar}/tinylog-src.zip">
-			<fileset dir="${src}" />
+			<zipfileset dir="${tinylog.src}" />
 		</zip>
 		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
-			<fileset dir="${dist.jar}">
+			<zipfileset dir="${dist.jar}">
 				<include name="tinylog.jar" />
 				<include name="tinylog-src.zip" />
-			</fileset>
-			<fileset dir="${root}">
-				<include name="License.txt" />
-				<include name="ReadMe.txt" />
-			</fileset>
+			</zipfileset>
+			<zipfileset dir="${root}" file="license.txt" />
+			<zipfileset dir="${tinylog.files}" file="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
+		<delete file="${dist.jar}/tinylog.jar" />
+		<delete file="${dist.jar}/tinylog-src.zip" />
+		
 		<jar destfile="${dist.jar}/log4j-facade.jar">
-			<fileset dir="${log4j.bin}" />
+			<zipfileset dir="${log4j.bin}" />
 		</jar>
 		<zip destfile="${dist.jar}/log4j-facade-src.zip">
-			<fileset dir="${log4j.src}" />
+			<zipfileset dir="${log4j.src}" />
 		</zip>
 		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
-			<fileset dir="${dist.jar}">
-				<include name="tinylog.jar" />
+			<zipfileset dir="${dist.jar}">
 				<include name="log4j-facade.jar" />
 				<include name="log4j-facade-src.zip" />
-			</fileset>
-			<fileset dir="${root}">
-				<include name="License.txt" />
-			</fileset>
-			<fileset dir="${log4j}">
-				<include name="ReadMe.txt" />
-			</fileset>
+			</zipfileset>
+			<zipfileset dir="${root}" file="license.txt" />
+			<zipfileset dir="${log4j.files}" file="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
-		<zip destfile="${dist.jar}/tinylog-${version}-src.zip" level="9">
-			<fileset dir="${root}">
+		<delete file="${dist.jar}/log4j-facade.jar" />
+		<delete file="${dist.jar}/log4j-facade-src.zip" />
+	</target>
+	
+	<target name="pack-bundle" depends="compile">
+		<mkdir dir="${dist.bundle}" />
+		<delete dir="${dist.bundle}" />
+		
+		<jar destfile="${dist.bundle}/org.pmw.tinylog_${version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.tinylog;version=${version}, org.pmw.tinylog.labellers;version=${version}, org.pmw.tinylog.policies;version=${version}, org.pmw.tinylog.writers;version=${version}" />
+			</manifest>
+			<zipfileset dir="${tinylog.bin}" />
+		</jar>
+		<jar destfile="${dist.bundle}/org.pmw.tinylog.source_${version}.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${version}" />
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${tinylog.src}" />
+		</jar>
+		<zip destfile="${dist.bundle}/tinylog-${version}.zip" level="9">
+			<zipfileset dir="${dist.bundle}">
+				<include name="org.pmw.tinylog_${version}.jar" />
+				<include name="org.pmw.tinylog.source_${version}.jar" />
+			</zipfileset>
+			<zipfileset dir="${root}" file="license.txt" />
+			<zipfileset dir="${tinylog.files}" file="readme-bundle.txt" fullpath="readme.txt" />
+		</zip>	
+		<delete file="${dist.bundle}/org.pmw.tinylog_${version}.jar" />
+		<delete file="${dist.bundle}/org.pmw.tinylog.source_${version}.zip" />
+		
+		<jar destfile="${dist.bundle}/org.pmw.log4j-facade_${version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.apache.log4j;version=${version}" />
+				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${version}" />
+			</manifest>
+			<zipfileset dir="${log4j.bin}" />
+		</jar>
+		<jar destfile="${dist.bundle}/org.pmw.log4j-facade.source_${version}.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${version}" />
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${log4j.src}" />
+		</jar>
+		<zip destfile="${dist.bundle}/log4j-facade-${version}.zip" level="9">
+			<zipfileset dir="${dist.bundle}">
+				<include name="org.pmw.log4j-facade_${version}.jar" />
+				<include name="org.pmw.log4j-facade.source_${version}.jar" />
+			</zipfileset>
+			<zipfileset dir="${root}" file="license.txt" />
+			<zipfileset dir="${log4j.files}" file="readme-bundle.txt" fullpath="readme.txt" />
+		</zip>	
+		<delete file="${dist.bundle}/org.pmw.log4j-facade_${version}.jar" />
+		<delete file="${dist.bundle}/org.pmw.log4j-facade.source_${version}.zip" />
+	</target>
+	
+	<target name="pack-maven" depends="compile, docs">
+		<mkdir dir="${dist.maven}" />
+		<delete dir="${dist.maven}" />
+		
+		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>${line.separator}<modelVersion>4.0.0</modelVersion>${line.separator}<groupId>org.pmw</groupId>${line.separator}<artifactId>tinylog</artifactId>${line.separator}<version>${version}</version>${line.separator}<name>tinylog</name>${line.separator}<url>http://www.tinylog.org/</url>${line.separator}<licenses>${line.separator}<license>${line.separator}<name>The Apache Software License, Version 2.0</name>${line.separator}<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>${line.separator}</license>${line.separator}</licenses>${line.separator}</project>]]></echo>
+		
+		<jar destfile="${dist.maven}/tinylog-${version}.jar">
+			<zipfileset dir="${tinylog.bin}" />
+			<zipfileset dir="${dist.maven}" prefix="META-INF/">
+				<include name="pom.xml"/>
+			</zipfileset>
+		</jar>
+		<zip destfile="${dist.maven}/tinylog-${version}-sources.jar">
+			<zipfileset dir="${tinylog.src}" />
+		</zip>
+		<zip destfile="${dist.maven}/tinylog-${version}-javadoc.jar">
+			<zipfileset dir="${dist.docs}" />
+		</zip>
+		
+		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>${line.separator}<modelVersion>4.0.0</modelVersion>${line.separator}<groupId>org.pmw</groupId>${line.separator}<artifactId>log4j-facade</artifactId>${line.separator}<version>${version}</version>${line.separator}<name>log4j-facade</name>${line.separator}<url>http://www.tinylog.org/</url>${line.separator}<licenses>${line.separator}<license>${line.separator}<name>The Apache Software License, Version 2.0</name>${line.separator}<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>${line.separator}</license>${line.separator}</licenses>${line.separator}</project>]]></echo>
+		
+		<jar destfile="${dist.maven}/log4j-facade-${version}.jar">
+			<zipfileset dir="${log4j.bin}" />
+			<zipfileset dir="${dist.maven}" prefix="META-INF/">
+				<include name="pom.xml"/>
+			</zipfileset>
+		</jar>
+		<zip destfile="${dist.maven}/log4j-facade-${version}-sources.jar">
+			<zipfileset dir="${log4j.src}" />
+		</zip>
+		
+		<delete file="${dist.maven}/pom.xml" />
+	</target>
+	
+	<target name="pack-sources">
+		<delete>
+			<zipfileset dir="${dist}">
+				<include name="tinylog-*-src.zip" />
+			</zipfileset>
+		</delete>
+		<zip destfile="${dist}/tinylog-${version}-src.zip" level="9">
+			<zipfileset dir="${root}">
 				<exclude name=".*/**" />
 				<exclude name="dist/**" />
-			</fileset>
+			</zipfileset>
 		</zip>
 	</target>
+	
+	<target name="pack-all" depends="pack-jar, pack-bundle,  pack-maven, pack-sources" />
 	
 	<target name="docs" depends="compile">
 		<delete dir="${dist.docs}" />
 		<mkdir dir="${dist.docs}" />
 		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="tinylog ${version}">
 			<doctitle>tinylog ${version} - API Specification</doctitle>
-			<packageset dir="${src}" />
+			<packageset dir="${tinylog.src}" />
 			<classpath>
-				<dirset dir="${bin}" />
+				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
@@ -147,19 +267,19 @@
 
 	<target name="check" depends="compile">
 		<checkstyle config="${ext.conf}/tinylog-checkstyle.xml">
-			<fileset dir="${src}" includes="**/*.java" />
+			<fileset dir="${tinylog.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
 		<findbugs home="${ext.lib.findbugs}" output="text">
 			<sourcepath>
 				<dirset>
-					<include name="${src}" />
+					<include name="${tinylog.src}" />
 					<include name="${tests.src}" />
 				</dirset>
 			</sourcepath>
 			<fileset>
-				<include name="${bin}" />
+				<include name="${tinylog.bin}" />
 				<include name="${tests.bin}" />
 			</fileset>
 		</findbugs>
@@ -169,7 +289,7 @@
 		<junit fork="true" failureproperty="junit.tests.failure" errorproperty="junit.tests.error">
 			<formatter type="plain" usefile="false" />
 			<classpath>
-				<path location="${bin}" />
+				<path location="${tinylog.bin}" />
 				<path location="${tests.bin}" />
 				<path location="${tests.src}" />
 				<path refid="junit.classpath" />
@@ -185,6 +305,6 @@
 		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
 	
-	<target name="all" depends="jar, docs, check, test" />
+	<target name="all" depends="pack-all, docs, check, test" />
 
 </project>
