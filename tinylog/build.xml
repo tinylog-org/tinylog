@@ -324,6 +324,6 @@
 		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
 	
-	<target name="all" depends="pack-all, docs, check, test" />
+	<target name="all" depends="compile, docs, check, test, pack-all" />
 
 </project>
