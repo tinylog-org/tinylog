@@ -13,15 +13,24 @@
 
 package org.apache.log4j;
 
+/**
+ * Empty basic configurator skeleton (use tinylog for real configuration).
+ */
 public class BasicConfigurator {
 
 	protected BasicConfigurator() {
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configure() {
 		// Do nothing
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void resetConfiguration() {
 		// Do nothing
 	}

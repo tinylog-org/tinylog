@@ -13,13 +13,20 @@
 
 package org.apache.log4j;
 
-/**
- * log4j logging API.
- */
-public class Logger extends Category {
+import java.util.HashMap;
+import java.util.Map;
 
-	Logger(final Logger parent, final String name) {
-		super(parent, name);
+/**
+ * API to create and find loggers.
+ */
+public class LogManager {
+
+	private static final Logger root = new Logger(null, "root");
+	private static final Map<String, Logger> loggers = new HashMap<String, Logger>();
+	private static final Object mutex = new Object();
+
+	static {
+		loggers.put(root.getName(), root);
 	}
 
 	/**
@@ -28,7 +35,7 @@ public class Logger extends Category {
 	 * @return Root logger
 	 */
 	public static Logger getRootLogger() {
-		return LogManager.getRootLogger();
+		return root;
 	}
 
 	/**
@@ -39,7 +46,9 @@ public class Logger extends Category {
 	 * @return Logger instance
 	 */
 	public static Logger getLogger(final String name) {
-		return LogManager.getLogger(name);
+		synchronized (mutex) {
+			return getOrCreateLogger(name);
+		}
 	}
 
 	/**
@@ -51,38 +60,26 @@ public class Logger extends Category {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static Logger getLogger(final Class clazz) {
-		return LogManager.getLogger(clazz);
+		return getLogger(clazz.getName());
 	}
 
-	/**
-	 * Check if log entries with the logging level trace are output or not.
-	 * 
-	 * @return <code>true</code> if trace log entries will be output, <code>false</code> if not
-	 */
-	public boolean isTraceEnabled() {
-		return TinylogBride.isEnabled(Level.TRACE);
+	private static Logger getOrCreateLogger(final String name) {
+		if (name == null || name.isEmpty()) {
+			return root;
+		} else {
+			Logger logger = loggers.get(name);
+			if (logger == null) {
+				Logger parent = getOrCreateLogger(reduce(name));
+				logger = new Logger(parent, name);
+				loggers.put(name, logger);
+			}
+			return logger;
+		}
 	}
 
-	/**
-	 * Create a trace log entry.
-	 * 
-	 * @param message
-	 *            Message to log
-	 */
-	public void trace(final Object message) {
-		TinylogBride.log(Level.TRACE, message);
-	}
-
-	/**
-	 * Create a trace log entry.
-	 * 
-	 * @param message
-	 *            Message to log
-	 * @param throwable
-	 *            Throwable to log
-	 */
-	public void trace(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.TRACE, message, throwable);
+	private static String reduce(final String name) {
+		int index = name.lastIndexOf('.');
+		return index == -1 ? null : name.substring(0, index);
 	}
 
 }

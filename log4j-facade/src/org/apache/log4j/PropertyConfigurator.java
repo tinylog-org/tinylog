@@ -16,24 +16,42 @@ package org.apache.log4j;
 import java.net.URL;
 import java.util.Properties;
 
+/**
+ * Empty property configurator skeleton (use tinylog for real configuration).
+ */
 public class PropertyConfigurator {
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configure(final Properties properties) {
 		// Do nothing
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configure(final String configFilename) {
 		// Do nothing
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configure(final URL configURL) {
 		// Do nothing
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configureAndWatch(final String configFilename) {
 		// Do nothing
 	}
 
+	/**
+	 * Do nothing (this method exists only for compatible reasons).
+	 */
 	public static void configureAndWatch(final String configFilename, final long delay) {
 		// Do nothing
 	}

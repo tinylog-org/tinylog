@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Martin Winandy
+ * Copyright 2013 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,208 +13,279 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.LogEntryForwarder;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Logger;
 
-public abstract class Category {
+/**
+ * Deprecated log4j logging API (use {@link Logger} instead).
+ * 
+ * @see Logger
+ */
+public class Category {
 
-	private static final Logger INSTANCE = Logger.getRootLogger();
+	private final Category parent;
+	private final String name;
 
-	protected Category() {
+	Category(final Category parent, final String name) {
+		this.parent = parent;
+		this.name = name;
 	}
 
+	/**
+	 * @deprecated Replaced by {@link Logger#getRootLogger()}
+	 */
 	@Deprecated
-	final public static Category getRoot() {
-		return INSTANCE;
+	public static final Category getRoot() {
+		return LogManager.getRootLogger();
 	}
 
-	@Deprecated
-	public static Category getInstance(final Class<?> clazz) {
-		return INSTANCE;
-	}
-
+	/**
+	 * @deprecated Replaced by {@link Logger#getLogger(String)}
+	 */
 	@Deprecated
 	public static Category getInstance(final String name) {
-		return INSTANCE;
+		return LogManager.getLogger(name);
 	}
 
+	/**
+	 * @deprecated Replaced by {@link Logger#getLogger(String)}
+	 */
+	@SuppressWarnings("rawtypes")
 	@Deprecated
-	public static Logger exists(final String name) {
-		return INSTANCE;
+	public static Category getInstance(final Class clazz) {
+		return LogManager.getLogger(clazz);
 	}
 
-	public Level getLevel() {
-		switch (org.pmw.tinylog.Logger.getLoggingLevel()) {
-			case ERROR:
-				return Level.ERROR;
-			case WARNING:
-				return Level.WARN;
-			case INFO:
-				return Level.INFO;
-			case DEBUG:
-				return Level.DEBUG;
-			case TRACE:
-				return Level.TRACE;
-			case OFF:
-				return Level.OFF;
-			default:
-				return null;
-		}
+	/**
+	 * Get the parent logger.
+	 * 
+	 * @return Parent logger
+	 */
+	public final Category getParent() {
+		return parent;
 	}
 
-	public Level getEffectiveLevel() {
-		return getLevel();
+	/**
+	 * Get the name of the logger.
+	 * 
+	 * @return Name of the logger
+	 */
+	public final String getName() {
+		return name;
 	}
 
-	public void setLevel(final Level level) {
-		// Ignore
-	}
-
+	/**
+	 * @deprecated Replaced by {@link Category#getLevel()}
+	 */
 	@Deprecated
-	public Level getPriority() {
-		return getLevel();
+	public final Level getPriority() {
+		return TinylogBride.getLoggingLevel();
 	}
 
+	/**
+	 * @deprecated Replaced by {@link Category#getEffectiveLevel()}
+	 */
+	@Deprecated
 	public Priority getChainedPriority() {
-		return getLevel();
+		return TinylogBride.getLoggingLevel();
 	}
 
-	@Deprecated
-	public void setPriority(final Priority priority) {
-		// Ignore
+	/**
+	 * Get the active logging level for the caller class. In log4j-facade this method does exactly the same as
+	 * {@link Category#getEffectiveLevel()}.
+	 * 
+	 * @return Active logging level
+	 */
+	public final Level getLevel() {
+		return TinylogBride.getLoggingLevel();
 	}
 
-	public void log(final Priority priority, final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, toLoggingLevel(priority), message);
-		}
+	/**
+	 * Get the active logging level for the caller class. In log4j-facade this method does exactly the same as
+	 * {@link Category#getLevel()}.
+	 * 
+	 * @return Active logging level
+	 */
+	public Level getEffectiveLevel() {
+		return TinylogBride.getLoggingLevel();
 	}
 
-	public void log(final Priority priority, final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, toLoggingLevel(priority), ex, null);
-			} else {
-				LogEntryForwarder.forward(1, toLoggingLevel(priority), ex, message.toString());
-			}
-		}
-	}
-
-	public void log(final String callerFQCN, final Priority level, final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, toLoggingLevel(level), ex, null);
-			} else {
-				LogEntryForwarder.forward(1, toLoggingLevel(level), ex, message.toString());
-			}
-		}
-	}
-
-	public void error(final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message);
-		}
-	}
-
-	public void error(final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, null);
-			} else {
-				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
-			}
-		}
-	}
-
-	public void fatal(final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.ERROR, message);
-		}
-	}
-
-	public void fatal(final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, null);
-			} else {
-				LogEntryForwarder.forward(1, LoggingLevel.ERROR, ex, message.toString());
-			}
-		}
-	}
-
-	public void warn(final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.WARNING, message);
-		}
-	}
-
-	public void warn(final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, null);
-			} else {
-				LogEntryForwarder.forward(1, LoggingLevel.WARNING, ex, message.toString());
-			}
-		}
-	}
-
-	public void info(final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.INFO, message);
-		}
-	}
-
-	public void info(final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, null);
-			} else {
-				LogEntryForwarder.forward(1, LoggingLevel.INFO, ex, message.toString());
-			}
-		}
-	}
-
-	public void debug(final Object message) {
-		if (message != null) {
-			LogEntryForwarder.forward(1, LoggingLevel.DEBUG, message);
-		}
-	}
-
-	public void debug(final Object message, final Throwable ex) {
-		if (message != null) {
-			if (message == ex) {
-				LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, null);
-			} else {
-				LogEntryForwarder.forward(1, LoggingLevel.DEBUG, ex, message.toString());
-			}
-		}
-	}
-
-	public boolean isInfoEnabled() {
-		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= LoggingLevel.INFO.ordinal();
-	}
-
+	/**
+	 * Check if log entries with the logging level debug are output or not.
+	 * 
+	 * @return <code>true</code> if debug log entries will be output, <code>false</code> if not
+	 */
 	public boolean isDebugEnabled() {
-		return org.pmw.tinylog.Logger.getLoggingLevel().ordinal() <= LoggingLevel.DEBUG.ordinal();
+		return TinylogBride.isEnabled(Level.DEBUG);
 	}
 
+	/**
+	 * Create a debug log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 */
+	public void debug(final Object message) {
+		TinylogBride.log(Level.DEBUG, message);
+	}
+
+	/**
+	 * Create a debugr log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void debug(final Object message, final Throwable throwable) {
+		TinylogBride.log(Level.DEBUG, message, throwable);
+	}
+
+	/**
+	 * Check if log entries with the logging level info are output or not.
+	 * 
+	 * @return <code>true</code> if info log entries will be output, <code>false</code> if not
+	 */
+	public boolean isInfoEnabled() {
+		return TinylogBride.isEnabled(Level.INFO);
+	}
+
+	/**
+	 * Create an info log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 */
+	public void info(final Object message) {
+		TinylogBride.log(Level.INFO, message);
+	}
+
+	/**
+	 * Create an info log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void info(final Object message, final Throwable throwable) {
+		TinylogBride.log(Level.INFO, message, throwable);
+	}
+
+	/**
+	 * Create a warning log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 */
+	public void warn(final Object message) {
+		TinylogBride.log(Level.WARN, message);
+	}
+
+	/**
+	 * Create a warning log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void warn(final Object message, final Throwable throwable) {
+		TinylogBride.log(Level.WARN, message, throwable);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 */
+	public void error(final Object message) {
+		TinylogBride.log(Level.ERROR, message);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void error(final Object message, final Throwable throwable) {
+		TinylogBride.log(Level.ERROR, message, throwable);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 */
+	public void fatal(final Object message) {
+		TinylogBride.log(Level.FATAL, message);
+	}
+
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void fatal(final Object message, final Throwable throwable) {
+		TinylogBride.log(Level.FATAL, message, throwable);
+	}
+
+	/**
+	 * Check if a given logging level will be output.
+	 * 
+	 * @param level
+	 *            Logging level to test
+	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
+	 */
 	public boolean isEnabledFor(final Priority level) {
-		return level.isGreaterOrEqual(getLevel());
+		return TinylogBride.isEnabled(level);
 	}
 
-	@SuppressWarnings("deprecation")
-	private LoggingLevel toLoggingLevel(final Priority priority) {
-		if (priority.isGreaterOrEqual(Priority.ERROR)) {
-			return LoggingLevel.ERROR;
-		} else if (priority.isGreaterOrEqual(Priority.WARN)) {
-			return LoggingLevel.WARNING;
-		} else if (priority.isGreaterOrEqual(Priority.INFO)) {
-			return LoggingLevel.INFO;
-		} else if (priority.isGreaterOrEqual(Priority.DEBUG)) {
-			return LoggingLevel.DEBUG;
-		} else {
-			return LoggingLevel.TRACE;
+	/**
+	 * Create an error log entry.
+	 * 
+	 * @param assertion
+	 *            If <code>false</code> an error log entry will be generated, otherwise nothing will happen
+	 * @param message
+	 *            Message to log
+	 */
+	public void assertLog(final boolean assertion, final String message) {
+		if (!assertion) {
+			TinylogBride.log(Level.ERROR, message);
 		}
+	}
+
+	/**
+	 * Create a log entry.
+	 * 
+	 * @param level
+	 *            Logging level of log entry
+	 * @param message
+	 *            Message to log
+	 */
+	public void log(final Priority level, final Object message) {
+		TinylogBride.log(level, message);
+	}
+
+	/**
+	 * Create a log entry.
+	 * 
+	 * @param level
+	 *            Logging level of log entry
+	 * @param message
+	 *            Message to log
+	 * @param throwable
+	 *            Throwable to log
+	 */
+	public void log(final Priority level, final Object message, final Throwable throwable) {
+		TinylogBride.log(level, message, throwable);
 	}
 
 }
