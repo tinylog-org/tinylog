@@ -292,11 +292,13 @@
 			<sourcepath>
 				<dirset>
 					<include name="${tinylog.src}" />
+					<include name="${log4j.src}" />
 					<include name="${tests.src}" />
 				</dirset>
 			</sourcepath>
 			<fileset>
 				<include name="${tinylog.bin}" />
+				<include name="${log4j.bin}" />
 				<include name="${tests.bin}" />
 			</fileset>
 		</findbugs>
