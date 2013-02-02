@@ -165,7 +165,7 @@
 			<zipfileset dir="${tinylog.files}" file="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 		<delete file="${dist.bundle}/org.pmw.tinylog_${version}.jar" />
-		<delete file="${dist.bundle}/org.pmw.tinylog.source_${version}.zip" />
+		<delete file="${dist.bundle}/org.pmw.tinylog.source_${version}.jar" />
 		
 		<jar destfile="${dist.bundle}/org.pmw.log4j-facade_${version}.jar">
 			<manifest>
@@ -200,7 +200,7 @@
 			<zipfileset dir="${log4j.files}" file="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 		<delete file="${dist.bundle}/org.pmw.log4j-facade_${version}.jar" />
-		<delete file="${dist.bundle}/org.pmw.log4j-facade.source_${version}.zip" />
+		<delete file="${dist.bundle}/org.pmw.log4j-facade.source_${version}.jar" />
 	</target>
 	
 	<target name="pack-maven" depends="compile, docs">
@@ -255,9 +255,9 @@
 	
 	<target name="pack-sources">
 		<delete>
-			<zipfileset dir="${dist}">
+			<fileset dir="${dist}">
 				<include name="tinylog-*-src.zip" />
-			</zipfileset>
+			</fileset>
 		</delete>
 		<zip destfile="${dist}/tinylog-${version}-src.zip" level="9">
 			<zipfileset dir="${root}">
