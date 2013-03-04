@@ -13,7 +13,7 @@ specific language governing permissions and limitations under the License.
 
 
 ====================
- Using log4j facade
+ Using Log4j Facade
 ====================
 
 1) Add bundles "org.pmw.log4j-facade_*.jar" and "org.pmw.tinylog_*.jar" to your

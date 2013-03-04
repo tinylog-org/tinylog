@@ -13,7 +13,7 @@ specific language governing permissions and limitations under the License.
 
 
 ====================
- Using log4j facade
+ Using Log4j Facade
 ====================
 
 1) Add "log4j-facade.jar" and "tinylog.jar" to your classpath
