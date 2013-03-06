@@ -224,8 +224,8 @@
 		
 		<delete dir="${dist.maven}/log4j-facade" />
 		<mkdir dir="${dist.maven}/log4j-facade" />
-		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="log4j facade {version}">
-			<doctitle>log4j facade ${version} - API Specification</doctitle>
+		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="Log4j Facade {version}">
+			<doctitle>Log4j Facade ${version} - API Specification</doctitle>
 			<packageset dir="${log4j.src}" />
 			<classpath>
 				<dirset dir="${log4j.bin}" />
