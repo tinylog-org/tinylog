@@ -207,7 +207,28 @@
 		<mkdir dir="${dist.maven}" />
 		<delete dir="${dist.maven}" />
 		
-		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>${line.separator}<modelVersion>4.0.0</modelVersion>${line.separator}<groupId>org.tinylog</groupId>${line.separator}<artifactId>tinylog</artifactId>${line.separator}<version>${version}</version>${line.separator}<name>tinylog</name>${line.separator}<url>http://www.tinylog.org/</url>${line.separator}<licenses>${line.separator}<license>${line.separator}<name>The Apache Software License, Version 2.0</name>${line.separator}<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>${line.separator}</license>${line.separator}</licenses>${line.separator}</project>]]></echo>
+		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.tinylog</groupId>
+	<artifactId>tinylog</artifactId>
+	<version>${version}</version>
+	<name>tinylog</name>
+	<description>tinylog is a minimalist logger for Java, optimized for ease of use</description>
+	<url>http://www.tinylog.org/</url>
+	<scm><url>http://www.tinylog.org/downloads/tinylog-0.8-src.zip</url></scm>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Martin Winandy</name>
+			<email>martin.winandy@tinylog.org</email>
+		</developer>
+	</developers>
+</project>]]></echo>
 		
 		<jar destfile="${dist.maven}/tinylog-${version}.jar">
 			<zipfileset dir="${tinylog.bin}" />
@@ -234,7 +255,33 @@
 			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 		
-		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>${line.separator}<modelVersion>4.0.0</modelVersion>${line.separator}<parent>${line.separator}<groupId>org.tinylog</groupId>${line.separator}<artifactId>tinylog</artifactId>${line.separator}<version>${version}</version>${line.separator}</parent>${line.separator}<groupId>org.tinylog</groupId>${line.separator}<artifactId>log4j-facade</artifactId>${line.separator}<version>${version}</version>${line.separator}<name>Log4j Facade</name>${line.separator}<url>http://www.tinylog.org/</url>${line.separator}<licenses>${line.separator}<license>${line.separator}<name>The Apache Software License, Version 2.0</name>${line.separator}<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>${line.separator}</license>${line.separator}</licenses>${line.separator}</project>]]></echo>
+		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.tinylog</groupId>
+		<artifactId>tinylog</artifactId>
+		<version>${version}</version>
+	</parent>
+	<groupId>org.tinylog</groupId>
+	<artifactId>log4j-facade</artifactId>
+	<version>${version}</version>
+	<name>Log4j Facade</name>
+	<description>Log4j Facade is a Log4j-compatible logging API for tinylog</description>
+	<url>http://www.tinylog.org/</url>
+	<scm><url>http://www.tinylog.org/downloads/tinylog-0.8-src.zip</url></scm>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Martin Winandy</name>
+			<email>martin.winandy@tinylog.org</email>
+		</developer>
+	</developers>
+</project>]]></echo>
 		
 		<jar destfile="${dist.maven}/log4j-facade-${version}.jar">
 			<zipfileset dir="${log4j.bin}" />
