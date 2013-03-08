@@ -16,7 +16,6 @@ package org.pmw.tinylog.policies;
 import java.io.File;
 
 import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.PropertiesLoader;
 
 /**
  * Policy for limiting the size of log files.

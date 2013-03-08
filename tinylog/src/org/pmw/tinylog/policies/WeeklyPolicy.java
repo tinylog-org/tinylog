@@ -16,8 +16,6 @@ package org.pmw.tinylog.policies;
 import java.util.Calendar;
 import java.util.regex.Pattern;
 
-import org.pmw.tinylog.PropertiesLoader;
-
 /**
  * Policy for one rollover per week.
  */

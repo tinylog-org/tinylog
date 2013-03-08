@@ -38,7 +38,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Loads configuration for {@link Logger} from properties.
  */
-public final class PropertiesLoader {
+final class PropertiesLoader {
 
 	private static final String LEVEL_PROPERTY = "tinylog.level";
 	private static final String FORMAT_PROPERTY = "tinylog.format";
