@@ -105,8 +105,8 @@
 				<include name="tinylog.jar" />
 				<include name="tinylog-src.zip" />
 			</zipfileset>
-			<zipfileset dir="${root}" file="license.txt" />
-			<zipfileset dir="${tinylog.files}" file="readme-jar.txt" fullpath="readme.txt" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${tinylog.files}" includes="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
 		<delete file="${dist.jar}/tinylog.jar" />
 		<delete file="${dist.jar}/tinylog-src.zip" />
@@ -122,8 +122,8 @@
 				<include name="log4j-facade.jar" />
 				<include name="log4j-facade-src.zip" />
 			</zipfileset>
-			<zipfileset dir="${root}" file="license.txt" />
-			<zipfileset dir="${log4j.files}" file="readme-jar.txt" fullpath="readme.txt" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${log4j.files}" includes="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
 		<delete file="${dist.jar}/log4j-facade.jar" />
 		<delete file="${dist.jar}/log4j-facade-src.zip" />
@@ -161,8 +161,8 @@
 				<include name="org.pmw.tinylog_${version}.jar" />
 				<include name="org.pmw.tinylog.source_${version}.jar" />
 			</zipfileset>
-			<zipfileset dir="${root}" file="license.txt" />
-			<zipfileset dir="${tinylog.files}" file="readme-bundle.txt" fullpath="readme.txt" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${tinylog.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 		<delete file="${dist.bundle}/org.pmw.tinylog_${version}.jar" />
 		<delete file="${dist.bundle}/org.pmw.tinylog.source_${version}.jar" />
@@ -196,8 +196,8 @@
 				<include name="org.pmw.log4j-facade_${version}.jar" />
 				<include name="org.pmw.log4j-facade.source_${version}.jar" />
 			</zipfileset>
-			<zipfileset dir="${root}" file="license.txt" />
-			<zipfileset dir="${log4j.files}" file="readme-bundle.txt" fullpath="readme.txt" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${log4j.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 		<delete file="${dist.bundle}/org.pmw.log4j-facade_${version}.jar" />
 		<delete file="${dist.bundle}/org.pmw.log4j-facade.source_${version}.jar" />
@@ -268,7 +268,7 @@
 	<name>Log4j Facade</name>
 	<description>Log4j Facade is a Log4j-compatible logging API for tinylog</description>
 	<url>http://www.tinylog.org/</url>
-	<scm><url>http://www.tinylog.org/downloads/tinylog-0.8-src.zip</url></scm>
+	<scm><url>http://www.tinylog.org/downloads/tinylog-${version}-src.zip</url></scm>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -314,7 +314,7 @@
 		</zip>
 	</target>
 	
-	<target name="pack-all" depends="pack-jar, pack-bundle,  pack-maven, pack-sources" />
+	<target name="pack-all" depends="pack-jar, pack-bundle, pack-maven, pack-sources" />
 	
 	<target name="docs" depends="compile">
 		<delete dir="${dist.docs}" />
