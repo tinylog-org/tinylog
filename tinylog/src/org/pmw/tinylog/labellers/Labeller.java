@@ -41,6 +41,6 @@ public interface Labeller {
 	 *            Maximum number of backups to store
 	 * @return New log file
 	 */
-	File roll(final File file, final int maxBackups);
+	File roll(File file, int maxBackups);
 
 }
