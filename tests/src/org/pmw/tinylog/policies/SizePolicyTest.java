@@ -138,7 +138,6 @@ public class SizePolicyTest extends AbstractTest {
 
 			private final byte[] buffer = new byte[size]; // 1 MB
 
-			@SuppressWarnings("unused")
 			@Mock
 			public byte[] getBytes() {
 				return buffer;
