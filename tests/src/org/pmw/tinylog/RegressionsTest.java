@@ -24,6 +24,7 @@ import org.pmw.tinylog.util.StoreWriter.LogEntry;
 import org.pmw.tinylog.writers.RollingFileWriter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests old fixed bugs to prevent regressions.
@@ -97,4 +98,15 @@ public class RegressionsTest extends AbstractTest {
 		assertEquals(logEntry, writer.consumeLogEntry()); // Failed
 	}
 
+	/**
+	 * Bug: If all custom logging levels for packages are lower than the default package level, the custom logging
+	 * levels will be ignored.
+	 */
+	@Test
+	public final void testLowerCustomLoggingLevelsForPackages() {
+		StoreWriter writer = new StoreWriter();
+		Configurator.defaultConfig().level(LoggingLevel.INFO).level(RegressionsTest.class.getPackage().getName(), LoggingLevel.OFF).activate();
+		Logger.info("should be ignored"); // Was output
+		assertNull(writer.consumeLogEntry());
+	}
 }

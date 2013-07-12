@@ -447,7 +447,7 @@ public final class Logger {
 			StackTraceElement stackTraceElement = null;
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (level.ordinal() >= currentConfiguration.getLowestPackageLevel().ordinal()) {
+			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
 				stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
 			}
@@ -490,7 +490,7 @@ public final class Logger {
 		if (currentConfiguration.getWriter() != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (level.ordinal() >= currentConfiguration.getLowestPackageLevel().ordinal()) {
+			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
 				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
 			}
 

@@ -90,7 +90,7 @@ public class ConfiguratorTest extends AbstractTest {
 	public final void testDefault() {
 		Configuration defaultConfiguration = Configurator.defaultConfig().create();
 		assertEquals(LoggingLevel.INFO, defaultConfiguration.getLevel());
-		assertEquals(LoggingLevel.OFF, defaultConfiguration.getLowestPackageLevel());
+		assertFalse(defaultConfiguration.hasCustomLoggingLevelsForPackages());
 		assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
 		assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
 		assertNotNull(defaultConfiguration.getWriter());
@@ -100,7 +100,7 @@ public class ConfiguratorTest extends AbstractTest {
 		Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
 		assertNotSame(defaultConfiguration, configuration);
 		assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
-		assertEquals(defaultConfiguration.getLowestPackageLevel(), configuration.getLowestPackageLevel());
+		assertEquals(defaultConfiguration.hasCustomLoggingLevelsForPackages(), configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals("TEST", configuration.getFormatPattern());
 		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
 		assertNull(configuration.getWriter());
@@ -116,7 +116,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		Configuration configuration = Configurator.currentConfig().create();
 		assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
-		assertEquals(defaultConfiguration.getLowestPackageLevel(), configuration.getLowestPackageLevel());
+		assertEquals(defaultConfiguration.hasCustomLoggingLevelsForPackages(), configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(defaultConfiguration.getFormatPattern(), configuration.getFormatPattern());
 		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
 		assertSame(getClass(defaultConfiguration.getWriter()), getClass(configuration.getWriter()));
@@ -226,23 +226,23 @@ public class ConfiguratorTest extends AbstractTest {
 	@Test
 	public final void testLevel() {
 		Configuration configuration = Configurator.defaultConfig().level(LoggingLevel.TRACE).create();
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
 
 		configuration = Configurator.defaultConfig().level(null).create();
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.OFF, configuration.getLevel());
 
 		configuration = Configurator.defaultConfig().level(LoggingLevel.ERROR).level("a", LoggingLevel.WARNING).create();
-		assertEquals(LoggingLevel.WARNING, configuration.getLowestPackageLevel());
+		assertTrue(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("a"));
 
 		configuration = Configurator.defaultConfig().level(LoggingLevel.ERROR).level("a", LoggingLevel.WARNING).level("a", null).create();
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.ERROR, configuration.getLevelOfPackage("a"));
 
 		configuration = Configurator.defaultConfig().level(LoggingLevel.ERROR).level("a", LoggingLevel.WARNING).resetAllLevelsForPackages().create();
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.ERROR, configuration.getLevelOfPackage("a"));
 	}
 

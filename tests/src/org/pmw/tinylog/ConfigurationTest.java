@@ -76,7 +76,7 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testMinimalConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
-		assertEquals(LoggingLevel.OFF, configuration.getLowestPackageLevel());
+		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfPackage(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("", configuration.getFormatPattern());
@@ -97,7 +97,7 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testDetailedConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.WARNING, configuration.getLevel());
-		assertEquals(LoggingLevel.INFO, configuration.getLowestPackageLevel());
+		assertTrue(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfClass("invalid"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("invalid"));

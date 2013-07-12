@@ -35,7 +35,6 @@ final class Configuration {
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
-	private final LoggingLevel lowestPackageLevel;
 	private final List<Token> formatTokens;
 	private final boolean fullStackTraceElemetRequired;
 
@@ -65,7 +64,6 @@ final class Configuration {
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
-		this.lowestPackageLevel = calculateLowestPackageLevel(packageLevels);
 		this.formatTokens = Collections.unmodifiableList(Tokenizer.parse(formatPattern, locale));
 		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(formatTokens);
 	}
@@ -80,12 +78,12 @@ final class Configuration {
 	}
 
 	/**
-	 * Get the lowest level that is defined for a particular package.
+	 * Check if there are custom logging levels for one or more packages.
 	 * 
-	 * @return Lowest level for a particular package
+	 * @return <code>true</code> if custom logging levels exist, <code>false</code> if not
 	 */
-	public LoggingLevel getLowestPackageLevel() {
-		return lowestPackageLevel;
+	public boolean hasCustomLoggingLevelsForPackages() {
+		return !packageLevels.isEmpty();
 	}
 
 	/**
@@ -203,18 +201,6 @@ final class Configuration {
 		WritingThreadData writingThreadData = writingThread == null ? null : new WritingThreadData(writingThread.getNameOfThreadToObserve(),
 				writingThread.getPriority());
 		return new Configurator(level, copyOfPackageLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
-	}
-
-	private static LoggingLevel calculateLowestPackageLevel(final Map<String, LoggingLevel> packageLevels) {
-		LoggingLevel lowestLevel = LoggingLevel.OFF;
-
-		for (LoggingLevel packageLevel : packageLevels.values()) {
-			if (packageLevel.ordinal() < lowestLevel.ordinal()) {
-				lowestLevel = packageLevel;
-			}
-		}
-
-		return lowestLevel;
 	}
 
 	private static boolean fullStackTraceElemetRequired(final List<Token> tokens) {
