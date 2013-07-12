@@ -78,7 +78,7 @@ final class PropertiesLoader {
 	 */
 	static void readProperties(final Configurator configurator, final Properties properties) {
 		String level = properties.getProperty(LEVEL_PROPERTY);
-		if (level != null && !level.isEmpty()) {
+		if (level != null && level.length() > 0) {
 			try {
 				configurator.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
@@ -103,12 +103,12 @@ final class PropertiesLoader {
 		}
 
 		String format = properties.getProperty(FORMAT_PROPERTY);
-		if (format != null && !format.isEmpty()) {
+		if (format != null && format.length() > 0) {
 			configurator.formatPattern(format);
 		}
 
 		String localeString = properties.getProperty(LOCALE_PROPERTY);
-		if (localeString != null && !localeString.isEmpty()) {
+		if (localeString != null && localeString.length() > 0) {
 			String[] localeArray = localeString.split("_", 3);
 			if (localeArray.length == 1) {
 				configurator.locale(new Locale(localeArray[0]));
@@ -120,7 +120,7 @@ final class PropertiesLoader {
 		}
 
 		String stacktace = properties.getProperty(STACKTRACE_PROPERTY);
-		if (stacktace != null && !stacktace.isEmpty()) {
+		if (stacktace != null && stacktace.length() > 0) {
 			try {
 				int limit = Integer.parseInt(stacktace);
 				configurator.maxStackTraceElements(limit);
@@ -130,7 +130,7 @@ final class PropertiesLoader {
 		}
 
 		String writer = properties.getProperty(WRITER_PROPERTY);
-		if (writer != null && !writer.isEmpty()) {
+		if (writer != null && writer.length() > 0) {
 			if (writer.equalsIgnoreCase("null")) {
 				configurator.writer(null);
 			} else {

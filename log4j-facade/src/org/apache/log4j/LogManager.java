@@ -64,7 +64,7 @@ public class LogManager {
 	}
 
 	private static Logger getOrCreateLogger(final String name) {
-		if (name == null || name.isEmpty()) {
+		if (name == null || name.length() == 0) {
 			return root;
 		} else {
 			Logger logger = loggers.get(name);
