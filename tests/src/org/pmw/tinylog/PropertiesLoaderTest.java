@@ -301,7 +301,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		private String filename;
 
-		@SuppressWarnings("unused")
 		@Mock
 		public void $init(final String filename) {
 			this.filename = filename;
@@ -316,7 +315,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		private Labeller labeller;
 		private Policy[] policies;
 
-		@SuppressWarnings("unused")
 		@Mock
 		public void $init(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
 			this.filename = filename;
