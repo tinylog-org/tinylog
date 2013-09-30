@@ -22,6 +22,11 @@ import org.pmw.tinylog.writers.LoggingWriter;
 public final class NullWriter implements LoggingWriter {
 
 	@Override
+	public void init() {
+		// Do nothing
+	}
+
+	@Override
 	public void write(final LoggingLevel level, final String logEntry) {
 		// Just ignore
 	}

@@ -24,6 +24,11 @@ public final class StoreWriter implements LoggingWriter {
 	private LogEntry logEntry;
 
 	@Override
+	public void init() {
+		// Do nothing
+	}
+
+	@Override
 	public void write(final LoggingLevel level, final String text) {
 		if (logEntry != null) {
 			throw new RuntimeException("Previous message wasn't consumed");

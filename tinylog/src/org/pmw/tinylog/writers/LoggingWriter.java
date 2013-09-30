@@ -26,6 +26,11 @@ import org.pmw.tinylog.LoggingLevel;
 public interface LoggingWriter {
 
 	/**
+	 * Initialize the writer.
+	 */
+	void init();
+
+	/**
 	 * Write a log entry.
 	 * 
 	 * @param level

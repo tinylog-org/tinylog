@@ -22,16 +22,15 @@ import org.pmw.tinylog.LoggingLevel;
  */
 public class FileWriter implements LoggingWriter {
 
-	private final java.io.FileWriter writer;
+	private final String filename;
+	private java.io.FileWriter writer;
 
 	/**
 	 * @param filename
 	 *            Filename of the log file
-	 * @throws IOException
-	 *             Failed to open or create the log file
 	 */
-	public FileWriter(final String filename) throws IOException {
-		this.writer = new java.io.FileWriter(filename);
+	public FileWriter(final String filename) {
+		this.filename = filename;
 	}
 
 	/**
@@ -52,6 +51,15 @@ public class FileWriter implements LoggingWriter {
 	 */
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename" } };
+	}
+
+	@Override
+	public void init() {
+		try {
+			writer = new java.io.FileWriter(filename);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	@Override

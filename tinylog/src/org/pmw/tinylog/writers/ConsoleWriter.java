@@ -32,6 +32,11 @@ public class ConsoleWriter implements LoggingWriter {
 	}
 
 	@Override
+	public void init() {
+		// Do nothing
+	}
+
+	@Override
 	public final void write(final LoggingLevel level, final String logEntry) {
 		getPrintStream(level).print(logEntry);
 	}

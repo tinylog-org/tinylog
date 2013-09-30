@@ -13,6 +13,11 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,11 +28,6 @@ import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the file logging writer.
@@ -46,6 +46,7 @@ public class FileWriterTest extends AbstractTest {
 	public final void testWriting() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
+		writer.init();
 		writer.write(LoggingLevel.INFO, "Hello\n");
 		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();

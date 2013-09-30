@@ -13,18 +13,19 @@
 
 package org.pmw.tinylog;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.labellers.TimestampLabeller;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.util.StoreWriter.LogEntry;
 import org.pmw.tinylog.writers.RollingFileWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * Tests old fixed bugs to prevent regressions.
@@ -63,10 +64,12 @@ public class RegressionsTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile("tmp");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
+		writer.init();
 		writer.write(null, "12345");
 		writer.close();
 
 		writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
+		writer.init();
 		writer.write(null, "123456");
 		writer.close();
 
@@ -109,4 +112,17 @@ public class RegressionsTest extends AbstractTest {
 		Logger.info("should be ignored"); // Was output
 		assertNull(writer.consumeLogEntry());
 	}
+
+	/**
+	 * Bug: Timestamps need a locale but the locale isn't set at startup.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testTimestampLabellerAtStartup() throws IOException {
+		Logger.setConfirguration(null);
+		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller());
+	}
+
 }

@@ -19,6 +19,8 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.pmw.tinylog.writers.LoggingWriter;
+
 /**
  * Static class to create log entries.
  * 
@@ -425,6 +427,13 @@ public final class Logger {
 	 */
 	static void setConfirguration(final Configuration configuration) {
 		Logger.configuration = configuration;
+
+		if (configuration != null) {
+			LoggingWriter writer = configuration.getWriter();
+			if (writer != null) {
+				writer.init();
+			}
+		}
 	}
 
 	/**

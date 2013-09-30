@@ -13,16 +13,16 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StringListOutputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the console logging writer.
@@ -38,6 +38,7 @@ public class ConsoleWriterTest extends AbstractTest {
 	public final void testErrorStream() {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
 			ConsoleWriter writer = new ConsoleWriter();
+			writer.init();
 			writer.write(loggingLevel, "Hello\n");
 
 			StringListOutputStream outputStream = getSystemOutputStream();
@@ -56,6 +57,7 @@ public class ConsoleWriterTest extends AbstractTest {
 	public final void testOutputStream() {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
 			ConsoleWriter writer = new ConsoleWriter();
+			writer.init();
 			writer.write(loggingLevel, "Hello\n");
 
 			StringListOutputStream outputStream = getSystemOutputStream();

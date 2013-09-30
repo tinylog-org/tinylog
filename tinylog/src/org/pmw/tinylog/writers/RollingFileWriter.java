@@ -29,6 +29,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
  */
 public class RollingFileWriter implements LoggingWriter {
 
+	private final String filename;
 	private final int backups;
 	private final Labeller labeller;
 	private final List<? extends Policy> policies;
@@ -43,8 +44,6 @@ public class RollingFileWriter implements LoggingWriter {
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
-	 * @throws IOException
-	 *             Failed to open or create the log file
 	 * 
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
@@ -59,10 +58,8 @@ public class RollingFileWriter implements LoggingWriter {
 	 *            Number of backups
 	 * @param policies
 	 *            Rollover strategies
-	 * @throws IOException
-	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int backups, final Policy... policies) throws IOException {
+	public RollingFileWriter(final String filename, final int backups, final Policy... policies) {
 		this(filename, backups, new CountLabeller(), policies);
 	}
 
@@ -75,16 +72,12 @@ public class RollingFileWriter implements LoggingWriter {
 	 *            Labeller for naming backups
 	 * @param policies
 	 *            Rollover strategies
-	 * @throws IOException
-	 *             Failed to open or create the log file
 	 */
-	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) throws IOException {
+	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
+		this.filename = filename;
 		this.backups = Math.max(0, backups);
 		this.labeller = labeller;
 		this.policies = Arrays.asList(policies);
-		this.file = labeller.getLogFile(new File(filename));
-		initCheckPolicies();
-		this.writer = new java.io.FileWriter(file, true);
 	}
 
 	/**
@@ -107,6 +100,17 @@ public class RollingFileWriter implements LoggingWriter {
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename", "backups" }, new String[] { "filename", "backups", "policies" },
 				new String[] { "filename", "backups", "label", "policies" } };
+	}
+
+	@Override
+	public void init() {
+		file = labeller.getLogFile(new File(filename));
+		initCheckPolicies();
+		try {
+			writer = new java.io.FileWriter(file, true);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	@Override

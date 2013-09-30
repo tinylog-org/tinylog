@@ -13,6 +13,11 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,11 +30,6 @@ import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the rolling file logging writer.
@@ -50,6 +50,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		file.delete();
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
+		writer.init();
 		writer.write(LoggingLevel.INFO, "Hello\n");
 		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
@@ -81,6 +82,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File backup = new File(file.getAbsolutePath() + ".0");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new SizePolicy(3));
+		writer.init();
 		writer.write(LoggingLevel.INFO, "3");
 		writer.write(LoggingLevel.INFO, "4");
 		writer.write(LoggingLevel.INFO, "5");
@@ -104,7 +106,9 @@ public class RollingFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null, "123");
 		File backup = new File(file.getAbsolutePath() + ".0");
 
-		new RollingFileWriter(file.getAbsolutePath(), 100, new StartupPolicy()).close();
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new StartupPolicy());
+		writer.init();
+		writer.close();
 
 		assertEquals("", FileHelper.read(file));
 		assertEquals("123", FileHelper.read(backup));
