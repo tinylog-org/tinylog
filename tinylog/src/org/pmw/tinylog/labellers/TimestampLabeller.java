@@ -84,7 +84,7 @@ public class TimestampLabeller implements Labeller {
 
 	@Override
 	public final File roll(final File file, final int maxBackups) {
-		List<File> files = Arrays.asList(file.getParentFile().listFiles(logFileFilter));
+		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
 		if (files.size() > maxBackups) {
 			Collections.sort(files, logFileComparator);
 			for (int i = maxBackups; i < files.size(); ++i) {

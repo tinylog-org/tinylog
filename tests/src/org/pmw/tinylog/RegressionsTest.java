@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +123,23 @@ public class RegressionsTest extends AbstractTest {
 	@Test
 	public final void testTimestampLabellerAtStartup() throws IOException {
 		Logger.setConfirguration(null);
-		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller());
+		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller()); // Failed
+	}
+
+	/**
+	 * Bug: Rolling fails for files without a parent path in timestamp labeller.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testTimestampLabellerRolling() throws IOException {
+		File file = FileHelper.createTemporaryFileInWorkspace("log");
+		file = new File(file.getName());
+		assertTrue(file.exists());
+		TimestampLabeller labeller = new TimestampLabeller();
+		file = labeller.getLogFile(file);
+		labeller.roll(file, 10); // Failed
 	}
 
 }

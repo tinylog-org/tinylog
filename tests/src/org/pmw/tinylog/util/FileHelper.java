@@ -28,6 +28,21 @@ public final class FileHelper {
 	}
 
 	/**
+	 * Create an empty temporary file in the workspace. It will be deleted automatically on exit.
+	 * 
+	 * @param extension
+	 *            File extension without '.'
+	 * @return The created temporary file
+	 * @throws IOException
+	 *             Failed to create a temporary file
+	 */
+	public static File createTemporaryFileInWorkspace(final String extension) throws IOException {
+		File file = File.createTempFile("tmp", extension == null ? "" : "." + extension, new File("").getAbsoluteFile());
+		file.deleteOnExit();
+		return file;
+	}
+
+	/**
 	 * Create an empty temporary file. It will be deleted automatically on exit.
 	 * 
 	 * @param extension
