@@ -54,7 +54,7 @@ public class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public final void init() {
 		try {
 			writer = new java.io.FileWriter(filename);
 		} catch (IOException ex) {

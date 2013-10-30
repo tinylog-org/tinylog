@@ -32,7 +32,7 @@ public class ConsoleWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public final void init() {
 		// Do nothing
 	}
 

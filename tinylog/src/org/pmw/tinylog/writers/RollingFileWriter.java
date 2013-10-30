@@ -47,7 +47,7 @@ public class RollingFileWriter implements LoggingWriter {
 	 * 
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
-	public RollingFileWriter(final String filename, final int backups) throws IOException {
+	public RollingFileWriter(final String filename, final int backups) {
 		this(filename, backups, new StartupPolicy());
 	}
 
@@ -103,7 +103,7 @@ public class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public final void init() {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
 		try {
