@@ -75,11 +75,7 @@ final class WritingThread extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			boolean doShutdown = shutdown;
-
-			if (threadToObserve != null) {
-				doShutdown |= !threadToObserve.isAlive();
-			}
+			boolean doShutdown = shutdown || (threadToObserve != null && !threadToObserve.isAlive());
 
 			List<LogEntry> entriesToWrite = getLogEntriesToWrite();
 			while (entriesToWrite != null) {
@@ -91,9 +87,7 @@ final class WritingThread extends Thread {
 
 			if (doShutdown) {
 				break;
-			}
-
-			if (!shutdown) {
+			} else {
 				try {
 					sleep(10L);
 				} catch (InterruptedException ex) {
