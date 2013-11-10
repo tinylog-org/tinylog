@@ -61,8 +61,8 @@ class TinylogBride {
 	 */
 	public static Level getLoggingLevel() {
 		Package affectedPackage = getPackageFromStackTrace(3);
-		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger
-				.getLoggingLevel(affectedPackage.getName());
+		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger.getLoggingLevel(affectedPackage
+				.getName());
 		return toLog4jLevel(activeLevel);
 	}
 
@@ -75,8 +75,8 @@ class TinylogBride {
 	 */
 	public static boolean isEnabled(final Priority level) {
 		Package affectedPackage = getPackageFromStackTrace(3);
-		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger
-				.getLoggingLevel(affectedPackage.getName());
+		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger.getLoggingLevel(affectedPackage
+				.getName());
 		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
 	}
 
@@ -89,7 +89,7 @@ class TinylogBride {
 	 *            Message to log
 	 */
 	public static void log(final Priority level, final Object message) {
-		LogEntryForwarder.forward(3, toTinylogLevel(level), message);
+		LogEntryForwarder.forward(2, toTinylogLevel(level), message);
 	}
 
 	/**

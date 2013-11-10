@@ -13,6 +13,11 @@
 
 package org.apache.log4j;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
@@ -20,11 +25,6 @@ import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.util.StoreWriter.LogEntry;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for tinylog bridge.
@@ -35,7 +35,7 @@ public class TinylogBridgeTest extends AbstractTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
-	private SimpleLoggerWrapper logger;
+	private SimpleLog4Facade logger;
 	private StoreWriter writer;
 
 	/**
@@ -43,7 +43,7 @@ public class TinylogBridgeTest extends AbstractTest {
 	 */
 	@Before
 	public final void init() {
-		logger = new SimpleLoggerWrapper();
+		logger = new SimpleLog4Facade();
 		writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).formatPattern("{message}").maxStackTraceElements(0).activate();
 	}
@@ -129,26 +129,6 @@ public class TinylogBridgeTest extends AbstractTest {
 		Configurator.currentConfig().formatPattern("{class}").activate();
 		logger.log(Level.FATAL, "Hello!");
 		assertEquals(new LogEntry(LoggingLevel.ERROR, TinylogBridgeTest.class.getName() + NEW_LINE), writer.consumeLogEntry());
-	}
-
-	private static class SimpleLoggerWrapper {
-
-		private Level getLoggingLevel() {
-			return TinylogBride.getLoggingLevel();
-		}
-
-		private boolean isEnabled(final Priority level) {
-			return TinylogBride.isEnabled(level);
-		}
-
-		private void log(final Priority level, final Object message) {
-			TinylogBride.log(level, message);
-		}
-
-		private void log(final Priority level, final Object message, final Throwable throwable) {
-			TinylogBride.log(level, message, throwable);
-		}
-
 	}
 
 }
