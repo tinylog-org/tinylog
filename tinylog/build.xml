@@ -207,7 +207,7 @@
 		<mkdir dir="${dist.maven}" />
 		<delete dir="${dist.maven}" />
 		
-		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>
+		<echo file="${dist.maven}/tinylog-${version}.pom"><![CDATA[<project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tinylog</groupId>
 	<artifactId>tinylog</artifactId>
@@ -232,9 +232,7 @@
 		
 		<jar destfile="${dist.maven}/tinylog-${version}.jar">
 			<zipfileset dir="${tinylog.bin}" />
-			<zipfileset dir="${dist.maven}" prefix="META-INF/">
-				<include name="pom.xml"/>
-			</zipfileset>
+			<zipfileset dir="${dist.maven}" includes="tinylog-${version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<zip destfile="${dist.maven}/tinylog-${version}-sources.jar">
 			<zipfileset dir="${tinylog.src}" />
@@ -255,7 +253,7 @@
 			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 		
-		<echo file="${dist.maven}/pom.xml"><![CDATA[<project>
+		<echo file="${dist.maven}/log4j-facade-${version}.pom"><![CDATA[<project>
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.tinylog</groupId>
@@ -285,9 +283,7 @@
 		
 		<jar destfile="${dist.maven}/log4j-facade-${version}.jar">
 			<zipfileset dir="${log4j.bin}" />
-			<zipfileset dir="${dist.maven}" prefix="META-INF/">
-				<include name="pom.xml"/>
-			</zipfileset>
+			<zipfileset dir="${dist.maven}" includes="log4j-facade-${version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<zip destfile="${dist.maven}/log4j-facade-${version}-sources.jar">
 			<zipfileset dir="${log4j.src}" />
@@ -295,8 +291,7 @@
 		<zip destfile="${dist.maven}/log4j-facade-${version}-javadoc.jar">
 			<zipfileset dir="${dist.maven}/log4j-facade" />
 		</zip>
-	
-		<delete file="${dist.maven}/pom.xml" />
+		
 		<delete dir="${dist.maven}/log4j-facade" />
 	</target>
 	
