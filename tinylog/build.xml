@@ -215,7 +215,7 @@
 	<name>tinylog</name>
 	<description>tinylog is a minimalist logger for Java, optimized for ease of use</description>
 	<url>http://www.tinylog.org/</url>
-	<scm><url>http://www.tinylog.org/downloads/tinylog-0.8-src.zip</url></scm>
+	<scm><url>http://www.tinylog.org/downloads/tinylog-${version}-src.zip</url></scm>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
