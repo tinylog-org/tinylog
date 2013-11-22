@@ -13,6 +13,14 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.pmw.tinylog.hamcrest.RegexMatcher.contains;
+import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
+
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,15 +29,6 @@ import java.util.Locale;
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.util.StoreWriter.LogEntry;
-
-import static org.hamcrest.Matchers.containsString;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.contains;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
 
 /**
  * Tests for the logger.
@@ -407,9 +406,26 @@ public class LoggerTest extends AbstractTest {
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
 		assertEquals(
-				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread
-						.currentThread().getName(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy")
-						.format(new Date()), NEW_LINE)), writer.consumeLogEntry());
+				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread.currentThread()
+						.getName(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE)),
+				writer.consumeLogEntry());
+	}
+
+	/**
+	 * Test a full log entry with all possible patterns replacing {class} with {package}{class_name}.
+	 */
+	@Test
+	public final void testFullLogEntryWithPackageClassName() {
+		StoreWriter writer = new StoreWriter();
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
+				.formatPattern("{thread}#{package}.{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+
+		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
+		Logger.info("Hello");
+		assertEquals(
+				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#testFullLogEntryWithPackageClassName#LoggerTest.java#{2}#{3}#{4}#Hello{5}",
+						Thread.currentThread().getName(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO,
+						new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE)), writer.consumeLogEntry());
 	}
 
 	/**

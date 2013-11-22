@@ -34,9 +34,19 @@ enum TokenType {
 	THREAD,
 
 	/**
-	 * The class name of the caller
+	 * The fully qualified class name of the caller
 	 */
 	CLASS,
+
+	/**
+	 * The class name of the caller
+	 */
+	CLASS_NAME,
+
+	/**
+	 * The package name of the caller
+	 */
+	PACKAGE,
 
 	/**
 	 * The method name of the caller

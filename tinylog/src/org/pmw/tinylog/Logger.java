@@ -527,6 +527,8 @@ public final class Logger {
 		String threadName = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		Date now = null;
+		String fullyQualifiedClassName = null;
+		int dotIndex;
 
 		for (Token token : currentConfiguration.getFormatTokens()) {
 			switch (token.getType()) {
@@ -542,6 +544,44 @@ public final class Logger {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
 					builder.append(stackTraceElement.getClassName());
+					break;
+
+				case CLASS_NAME:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+					}
+					fullyQualifiedClassName = stackTraceElement.getClassName();
+
+					// determine the index of last . in the fully qualified class name
+					// for my.example.ClassName this would be 10
+					dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+
+					// defaults to no (default) package
+					String className = fullyQualifiedClassName;
+					if (dotIndex != -1) {
+						className = fullyQualifiedClassName.substring(dotIndex + 1);
+					}
+
+					builder.append(className);
+					break;
+
+				case PACKAGE:
+					if (stackTraceElement == null) {
+						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+					}
+					fullyQualifiedClassName = stackTraceElement.getClassName();
+
+					// determine the index of last . in the fully qualified class name
+					// for my.example.ClassName this would be 10
+					dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+
+					// defaults to no (default) package
+					String packageName = "";
+					if (dotIndex != -1) {
+						packageName = fullyQualifiedClassName.substring(0, dotIndex);
+					}
+
+					builder.append(packageName);
 					break;
 
 				case METHOD:

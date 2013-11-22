@@ -80,6 +80,10 @@ final class Tokenizer {
 			return new Token(TokenType.THREAD);
 		} else if ("{class}".equals(text)) {
 			return new Token(TokenType.CLASS);
+		} else if ("{package}".equals(text)) {
+			return new Token(TokenType.PACKAGE);
+		} else if ("{class_name}".equals(text)) {
+			return new Token(TokenType.CLASS_NAME);
 		} else if ("{method}".equals(text)) {
 			return new Token(TokenType.METHOD);
 		} else if ("{file}".equals(text)) {
