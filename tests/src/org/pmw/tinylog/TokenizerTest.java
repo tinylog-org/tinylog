@@ -68,7 +68,7 @@ public class TokenizerTest extends AbstractTest {
 		tokens = Tokenizer.parse("{date:yyyy}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.DATE, tokens.get(0).getType());
-		assertEquals(new SimpleDateFormat("yyyy"), tokens.get(0).getData());
+		assertEquals("yyyy", ((SimpleDateFormat) tokens.get(0).getData()).toPattern());
 
 		tokens = Tokenizer.parse("{thread}", locale);
 		assertEquals(1, tokens.size());
