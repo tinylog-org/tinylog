@@ -50,7 +50,7 @@ final class PropertiesLoader {
 	private static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
 
 	private static final String SERVICES_PREFIX = "META-INF/services/";
-	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + ":";
+	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
 
 	private PropertiesLoader() {
 	}

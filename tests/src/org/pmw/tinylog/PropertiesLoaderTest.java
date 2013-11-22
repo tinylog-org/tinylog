@@ -13,6 +13,14 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,14 +44,6 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
-
-import static org.hamcrest.number.OrderingComparison.lessThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test properties loader.
@@ -74,16 +74,16 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testPackageLevels() {
 		PropertiesBuilder builder = new PropertiesBuilder().set("tinylog.level", "INFO");
 
-		Configuration configuration = load(builder.set("tinylog.level:a.b", "WARNING"));
+		Configuration configuration = load(builder.set("tinylog.level@a.b", "WARNING"));
 		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("a.b"));
 
-		configuration = load(builder.set("tinylog.level:a.b.c", "TRACE"));
+		configuration = load(builder.set("tinylog.level@a.b.c", "TRACE"));
 		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfPackage("a.b.c"));
 
-		configuration = load(builder.set("tinylog.level:org.pmw.tinylog", "ERROR"));
+		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "ERROR"));
 		assertEquals(LoggingLevel.ERROR, configuration.getLevelOfPackage("org.pmw.tinylog"));
 
-		configuration = load(builder.set("tinylog.level:org.pmw.tinylog", "invalid"));
+		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "invalid"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevelOfPackage("org.pmw.tinylog"));
 	}
 
@@ -225,8 +225,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(2, rollingFileWriterMock.backups);
 		assertNotNull(rollingFileWriterMock.labeller);
 		assertEquals(TimestampLabeller.class, rollingFileWriterMock.labeller.getClass());
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log"),
-				rollingFileWriterMock.labeller.getLogFile(new File("my.log")));
+		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log"), rollingFileWriterMock.labeller.getLogFile(new File("my.log")));
 		assertNotNull(rollingFileWriterMock.policies);
 		assertEquals(1, rollingFileWriterMock.policies.length);
 		assertEquals(SizePolicy.class, rollingFileWriterMock.policies[0].getClass());
