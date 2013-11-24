@@ -20,7 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Writes log entries to a file.
  */
-public class FileWriter implements LoggingWriter {
+public final class FileWriter implements LoggingWriter {
 
 	private final String filename;
 	private java.io.FileWriter writer;
@@ -54,7 +54,7 @@ public class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void init() {
+	public void init() {
 		try {
 			writer = new java.io.FileWriter(filename);
 		} catch (IOException ex) {
@@ -63,7 +63,7 @@ public class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		try {
 			writer.write(logEntry);
 			writer.flush();
@@ -78,12 +78,12 @@ public class FileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
-	public final void close() throws IOException {
+	public void close() throws IOException {
 		writer.close();
 	}
 
 	@Override
-	protected final void finalize() throws Throwable {
+	protected void finalize() throws Throwable {
 		close();
 	}
 

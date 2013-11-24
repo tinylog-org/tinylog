@@ -27,7 +27,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
 /**
  * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter} but keeps backups of old logging files.
  */
-public class RollingFileWriter implements LoggingWriter {
+public final class RollingFileWriter implements LoggingWriter {
 
 	private final String filename;
 	private final int backups;
@@ -103,7 +103,7 @@ public class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void init() {
+	public void init() {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
 		try {
@@ -114,7 +114,7 @@ public class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		synchronized (this) {
 			if (!checkPolicies(level, logEntry)) {
 				try {
@@ -139,14 +139,14 @@ public class RollingFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
-	public final void close() throws IOException {
+	public void close() throws IOException {
 		synchronized (this) {
 			writer.close();
 		}
 	}
 
 	@Override
-	protected final void finalize() throws Throwable {
+	protected void finalize() throws Throwable {
 		close();
 	}
 

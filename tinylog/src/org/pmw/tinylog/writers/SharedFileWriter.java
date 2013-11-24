@@ -29,7 +29,7 @@ import org.pmw.tinylog.LoggingLevel;
  * 
  * Multiple instances of a program are allowed to log into the same file.
  */
-public class SharedFileWriter implements LoggingWriter {
+public final class SharedFileWriter implements LoggingWriter {
 
 	private static final Map<String, Mutex> mutexes = new HashMap<String, Mutex>();
 
@@ -80,7 +80,7 @@ public class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void init() {
+	public void init() {
 		try {
 			if (file.isFile()) {
 				file.delete();
@@ -93,7 +93,7 @@ public class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		try {
 			FileChannel channel = stream.getChannel();
 			synchronized (internalMutex) {
@@ -116,7 +116,7 @@ public class SharedFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
-	public final void close() throws IOException {
+	public void close() throws IOException {
 		synchronized (mutexes) {
 			if (internalMutex.count > 1) {
 				--internalMutex.count;
@@ -130,7 +130,7 @@ public class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	protected final void finalize() throws Throwable {
+	protected void finalize() throws Throwable {
 		close();
 	}
 

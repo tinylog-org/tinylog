@@ -20,7 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Writes log entries to the console.
  */
-public class ConsoleWriter implements LoggingWriter {
+public final class ConsoleWriter implements LoggingWriter {
 
 	/**
 	 * Returns the name of the writer.
@@ -32,12 +32,12 @@ public class ConsoleWriter implements LoggingWriter {
 	}
 
 	@Override
-	public final void init() {
+	public void init() {
 		// Do nothing
 	}
 
 	@Override
-	public final void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) {
 		getPrintStream(level).print(logEntry);
 	}
 
