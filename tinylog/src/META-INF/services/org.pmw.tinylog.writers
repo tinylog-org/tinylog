@@ -1,3 +1,4 @@
 org.pmw.tinylog.writers.ConsoleWriter
 org.pmw.tinylog.writers.FileWriter
+org.pmw.tinylog.writers.SharedFileWriter
 org.pmw.tinylog.writers.RollingFileWriter

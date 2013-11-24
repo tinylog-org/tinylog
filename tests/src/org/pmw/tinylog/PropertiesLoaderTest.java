@@ -44,6 +44,7 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
+import org.pmw.tinylog.writers.SharedFileWriter;
 
 /**
  * Test properties loader.
@@ -187,6 +188,31 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
+	 * Test reading shared file logging writer.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testSharedFileLoggingWriter() throws IOException {
+		new SharedFileWriter(FileHelper.createTemporaryFile("log").getAbsolutePath());
+
+		File file = FileHelper.createTemporaryFile("log");
+		SharedFileWriterMock fileWriterMock = new SharedFileWriterMock();
+
+		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile"));
+		assertNotNull(configuration.getWriter());
+		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
+
+		configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile").set("tinylog.writer.filename", file.getAbsolutePath()));
+		assertNotNull(configuration.getWriter());
+		assertEquals(SharedFileWriter.class, configuration.getWriter().getClass());
+		assertEquals(file.getAbsolutePath(), fileWriterMock.filename);
+
+		file.delete();
+	}
+
+	/**
 	 * Test reading rolling file logging writer.
 	 * 
 	 * @throws IOException
@@ -297,6 +323,17 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	private static final class FileWriterMock extends MockUp<FileWriter> {
+
+		private String filename;
+
+		@Mock
+		public void $init(final String filename) {
+			this.filename = filename;
+		}
+
+	}
+
+	private static final class SharedFileWriterMock extends MockUp<SharedFileWriter> {
 
 		private String filename;
 

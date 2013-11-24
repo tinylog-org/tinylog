@@ -66,4 +66,31 @@ public class FileWriterTest extends AbstractTest {
 		file.delete();
 	}
 
+	/**
+	 * Test overwriting of existing log file.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testOverwriting() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		FileHelper.write(file, "Hello World!");
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello World!", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath());
+		writer.init();
+		writer.close();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertNull(reader.readLine());
+		reader.close();
+
+		file.delete();
+	}
+
 }
