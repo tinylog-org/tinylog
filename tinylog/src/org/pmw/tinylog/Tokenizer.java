@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,14 @@ final class Tokenizer {
 	}
 
 	private static Token getToken(final String text, final Locale locale) {
-		if ("{thread}".equals(text)) {
+		if ("{pid}".equals(text)) {
+			String pid = ManagementFactory.getRuntimeMXBean().getName();
+			int index = pid.indexOf('@');
+			if (index > 0) {
+				pid = pid.substring(0, index);
+			}
+			return new Token(TokenType.PLAIN_TEXT, pid);
+		} else if ("{thread}".equals(text)) {
 			return new Token(TokenType.THREAD);
 		} else if ("{class}".equals(text)) {
 			return new Token(TokenType.CLASS);
