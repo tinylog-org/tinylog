@@ -18,13 +18,22 @@ import java.io.File;
 /**
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
  */
-public class CountLabeller implements Labeller {
+public final class CountLabeller implements Labeller {
 
 	private String filenameWithoutExtension;
 	private String filenameExtension;
 
+	/**
+	 * Returns the name of the labeller.
+	 * 
+	 * @return "count"
+	 */
+	public static String getName() {
+		return "count";
+	}
+
 	@Override
-	public final File getLogFile(final File baseFile) {
+	public File getLogFile(final File baseFile) {
 		String path = baseFile.getPath();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
@@ -38,17 +47,8 @@ public class CountLabeller implements Labeller {
 		return baseFile;
 	}
 
-	/**
-	 * Returns the name of the labeller.
-	 * 
-	 * @return "count"
-	 */
-	public static String getName() {
-		return "count";
-	}
-
 	@Override
-	public final File roll(final File file, final int maxBackups) {
+	public File roll(final File file, final int maxBackups) {
 		roll(file, 0, maxBackups);
 		return file;
 	}

@@ -27,7 +27,7 @@ import org.pmw.tinylog.Logger;
 /**
  * Add a timestamp to the real log file and the backups.
  */
-public class TimestampLabeller implements Labeller {
+public final class TimestampLabeller implements Labeller {
 
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
@@ -67,7 +67,7 @@ public class TimestampLabeller implements Labeller {
 	}
 
 	@Override
-	public final File getLogFile(final File baseFile) {
+	public File getLogFile(final File baseFile) {
 		String path = baseFile.getPath();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
@@ -83,7 +83,7 @@ public class TimestampLabeller implements Labeller {
 	}
 
 	@Override
-	public final File roll(final File file, final int maxBackups) {
+	public File roll(final File file, final int maxBackups) {
 		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
 		if (files.size() > maxBackups) {
 			Collections.sort(files, logFileComparator);
