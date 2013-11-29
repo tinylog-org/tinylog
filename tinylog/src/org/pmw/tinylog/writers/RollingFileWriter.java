@@ -16,6 +16,7 @@ package org.pmw.tinylog.writers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.pmw.tinylog.LoggingLevel;
@@ -100,6 +101,44 @@ public final class RollingFileWriter implements LoggingWriter {
 	public static String[][] getSupportedProperties() {
 		return new String[][] { new String[] { "filename", "backups" }, new String[] { "filename", "backups", "policies" },
 				new String[] { "filename", "backups", "label", "policies" } };
+	}
+
+	/**
+	 * Get the filename of the current log file.
+	 * 
+	 * @return Filename of the current log file
+	 */
+	public String getFilename() {
+		synchronized (this) {
+			return file == null ? filename : file.getAbsolutePath();
+		}
+	}
+
+	/**
+	 * Get the maximum number of backups.
+	 * 
+	 * @return Maximum number of backups
+	 */
+	public int getNumberOfBackups() {
+		return backups;
+	}
+
+	/**
+	 * Get the labeller for naming backups.
+	 * 
+	 * @return Labeller for naming backups
+	 */
+	public Labeller getLabeller() {
+		return labeller;
+	}
+
+	/**
+	 * Get the rollover strategies.
+	 * 
+	 * @return Rollover strategies
+	 */
+	public List<? extends Policy> getPolicies() {
+		return Collections.unmodifiableList(policies);
 	}
 
 	@Override

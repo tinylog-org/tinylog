@@ -79,6 +79,15 @@ public final class SharedFileWriter implements LoggingWriter {
 		return new String[][] { new String[] { "filename" } };
 	}
 
+	/**
+	 * Get the filename of the log file.
+	 * 
+	 * @return Filename of the log file
+	 */
+	public String getFilename() {
+		return file.getAbsolutePath();
+	}
+
 	@Override
 	public void init() {
 		try {

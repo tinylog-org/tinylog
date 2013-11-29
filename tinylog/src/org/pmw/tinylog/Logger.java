@@ -415,7 +415,7 @@ public final class Logger {
 	 * 
 	 * @return A copy of the current configuration
 	 */
-	static Configurator getConfiguration() {
+	public static Configurator getConfiguration() {
 		return configuration.copy();
 	}
 

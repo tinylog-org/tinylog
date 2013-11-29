@@ -53,6 +53,15 @@ public final class FileWriter implements LoggingWriter {
 		return new String[][] { new String[] { "filename" } };
 	}
 
+	/**
+	 * Get the filename of the log file.
+	 * 
+	 * @return Filename of the log file
+	 */
+	public String getFilename() {
+		return filename;
+	}
+
 	@Override
 	public void init() {
 		try {

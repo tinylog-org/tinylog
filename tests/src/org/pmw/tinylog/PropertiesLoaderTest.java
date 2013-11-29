@@ -25,11 +25,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.labellers.CountLabeller;
@@ -170,10 +168,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testFileLoggingWriter() throws IOException {
-		new FileWriter(FileHelper.createTemporaryFile("log").getAbsolutePath());
-
 		File file = FileHelper.createTemporaryFile("log");
-		FileWriterMock fileWriterMock = new FileWriterMock();
 
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "file"));
 		assertNotNull(configuration.getWriter());
@@ -182,7 +177,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath()));
 		assertNotNull(configuration.getWriter());
 		assertEquals(FileWriter.class, configuration.getWriter().getClass());
-		assertEquals(file.getAbsolutePath(), fileWriterMock.filename);
+		assertEquals(file.getAbsolutePath(), ((FileWriter) configuration.getWriter()).getFilename());
 
 		file.delete();
 	}
@@ -195,10 +190,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testSharedFileLoggingWriter() throws IOException {
-		new SharedFileWriter(FileHelper.createTemporaryFile("log").getAbsolutePath());
-
 		File file = FileHelper.createTemporaryFile("log");
-		SharedFileWriterMock fileWriterMock = new SharedFileWriterMock();
 
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile"));
 		assertNotNull(configuration.getWriter());
@@ -207,7 +199,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile").set("tinylog.writer.filename", file.getAbsolutePath()));
 		assertNotNull(configuration.getWriter());
 		assertEquals(SharedFileWriter.class, configuration.getWriter().getClass());
-		assertEquals(file.getAbsolutePath(), fileWriterMock.filename);
+		assertEquals(file.getAbsolutePath(), ((SharedFileWriter) configuration.getWriter()).getFilename());
 
 		file.delete();
 	}
@@ -221,7 +213,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 	@Test
 	public final void testRollingFileLoggingWriter() throws IOException {
 		File file = FileHelper.createTemporaryFile("log");
-		RollingFileWriterMock rollingFileWriterMock = new RollingFileWriterMock();
 
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile"));
 		assertNotNull(configuration.getWriter());
@@ -235,41 +226,50 @@ public class PropertiesLoaderTest extends AbstractTest {
 				.set("tinylog.writer.backups", "1"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		assertEquals(file.getAbsolutePath(), rollingFileWriterMock.filename);
-		assertEquals(1, rollingFileWriterMock.backups);
-		assertNotNull(rollingFileWriterMock.labeller);
-		assertEquals(CountLabeller.class, rollingFileWriterMock.labeller.getClass());
-		assertNotNull(rollingFileWriterMock.policies);
-		assertEquals(1, rollingFileWriterMock.policies.length);
-		assertEquals(StartupPolicy.class, rollingFileWriterMock.policies[0].getClass());
+		RollingFileWriter rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(1, rollingFileWriter.getNumberOfBackups());
+		Labeller labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(CountLabeller.class, labeller.getClass());
+		List<? extends Policy> policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(1, policies.size());
+		assertEquals(StartupPolicy.class, policies.get(0).getClass());
 
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
 				.set("tinylog.writer.backups", "2").set("tinylog.writer.label", "timestamp: yyyy").set("tinylog.writer.policies", "size: 1"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		assertEquals(file.getAbsolutePath(), rollingFileWriterMock.filename);
-		assertEquals(2, rollingFileWriterMock.backups);
-		assertNotNull(rollingFileWriterMock.labeller);
-		assertEquals(TimestampLabeller.class, rollingFileWriterMock.labeller.getClass());
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log"), rollingFileWriterMock.labeller.getLogFile(new File("my.log")));
-		assertNotNull(rollingFileWriterMock.policies);
-		assertEquals(1, rollingFileWriterMock.policies.length);
-		assertEquals(SizePolicy.class, rollingFileWriterMock.policies[0].getClass());
-		assertTrue(rollingFileWriterMock.policies[0].check(null, "1"));
-		assertFalse(rollingFileWriterMock.policies[0].check(null, "2"));
+		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(2, rollingFileWriter.getNumberOfBackups());
+		labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(TimestampLabeller.class, labeller.getClass());
+		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log"), labeller.getLogFile(new File("my.log")));
+		policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(1, policies.size());
+		assertEquals(SizePolicy.class, policies.get(0).getClass());
+		assertTrue(policies.get(0).check(null, "1"));
+		assertFalse(policies.get(0).check(null, "2"));
 
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
 				.set("tinylog.writer.backups", "3").set("tinylog.writer.label", "timestamp").set("tinylog.writer.policies", "startup, daily"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		assertEquals(file.getAbsolutePath(), rollingFileWriterMock.filename);
-		assertEquals(3, rollingFileWriterMock.backups);
-		assertNotNull(rollingFileWriterMock.labeller);
-		assertEquals(TimestampLabeller.class, rollingFileWriterMock.labeller.getClass());
-		assertNotNull(rollingFileWriterMock.policies);
-		assertEquals(2, rollingFileWriterMock.policies.length);
-		assertEquals(StartupPolicy.class, rollingFileWriterMock.policies[0].getClass());
-		assertEquals(DailyPolicy.class, rollingFileWriterMock.policies[1].getClass());
+		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(3, rollingFileWriter.getNumberOfBackups());
+		labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(TimestampLabeller.class, labeller.getClass());
+		policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(2, policies.size());
+		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+		assertEquals(DailyPolicy.class, policies.get(1).getClass());
 
 		file.delete();
 	}
@@ -320,45 +320,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	private static Configuration load(final Properties properties) {
 		return PropertiesLoader.readProperties(properties).create();
-	}
-
-	private static final class FileWriterMock extends MockUp<FileWriter> {
-
-		private String filename;
-
-		@Mock
-		public void $init(final String filename) {
-			this.filename = filename;
-		}
-
-	}
-
-	private static final class SharedFileWriterMock extends MockUp<SharedFileWriter> {
-
-		private String filename;
-
-		@Mock
-		public void $init(final String filename) {
-			this.filename = filename;
-		}
-
-	}
-
-	private static final class RollingFileWriterMock extends MockUp<RollingFileWriter> {
-
-		private String filename;
-		private int backups;
-		private Labeller labeller;
-		private Policy[] policies;
-
-		@Mock
-		public void $init(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
-			this.filename = filename;
-			this.backups = backups;
-			this.labeller = labeller;
-			this.policies = policies;
-		}
-
 	}
 
 }
