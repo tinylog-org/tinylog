@@ -18,7 +18,7 @@ import java.util.Calendar;
 /**
  * Policy for one rollover per hour.
  */
-public class HourlyPolicy extends AbstractTimeBasedPolicy {
+public final class HourlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
 	 * Trigger a rollover every new hour.

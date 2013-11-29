@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per week.
  */
-public class WeeklyPolicy extends AbstractTimeBasedPolicy {
+public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 
 	private static final Pattern DAY_OF_WEEK_PATTERN = Pattern.compile("[1234567]");
 

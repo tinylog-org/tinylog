@@ -20,7 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Policy for rolling log files once at startup.
  */
-public class StartupPolicy implements Policy {
+public final class StartupPolicy implements Policy {
 
 	/**
 	 * Returns the name of the policy.
@@ -32,17 +32,17 @@ public class StartupPolicy implements Policy {
 	}
 
 	@Override
-	public final boolean initCheck(final File logFile) {
+	public boolean initCheck(final File logFile) {
 		return !logFile.exists();
 	}
 
 	@Override
-	public final boolean check(final LoggingLevel level, final String logEntry) {
+	public boolean check(final LoggingLevel level, final String logEntry) {
 		return true;
 	}
 
 	@Override
-	public final void reset() {
+	public void reset() {
 		// Do nothing
 	}
 

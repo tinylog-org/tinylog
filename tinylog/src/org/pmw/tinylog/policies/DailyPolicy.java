@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per day.
  */
-public class DailyPolicy extends AbstractTimeBasedPolicy {
+public final class DailyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
 	 * Trigger a rollover every new day.

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per year.
  */
-public class YearlyPolicy extends AbstractTimeBasedPolicy {
+public final class YearlyPolicy extends AbstractTimeBasedPolicy {
 
 	private static final Pattern MONTH_NUMBER_PATTERN = Pattern.compile("[123456789]|10|11|12");
 

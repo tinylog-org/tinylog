@@ -20,7 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Policy for limiting the size of log files.
  */
-public class SizePolicy implements Policy {
+public final class SizePolicy implements Policy {
 
 	private final long maxSize;
 	private long size;
@@ -78,7 +78,7 @@ public class SizePolicy implements Policy {
 	}
 
 	@Override
-	public final boolean initCheck(final File logFile) {
+	public boolean initCheck(final File logFile) {
 		if (logFile.exists()) {
 			size = logFile.length();
 		}
@@ -86,13 +86,13 @@ public class SizePolicy implements Policy {
 	}
 
 	@Override
-	public final boolean check(final LoggingLevel level, final String logEntry) {
+	public boolean check(final LoggingLevel level, final String logEntry) {
 		size += logEntry.getBytes().length;
 		return size <= maxSize;
 	}
 
 	@Override
-	public final void reset() {
+	public void reset() {
 		size = 0L;
 	}
 

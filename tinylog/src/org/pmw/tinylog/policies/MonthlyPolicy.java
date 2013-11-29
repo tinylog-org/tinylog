@@ -18,7 +18,7 @@ import java.util.Calendar;
 /**
  * Policy for one rollover per month.
  */
-public class MonthlyPolicy extends AbstractTimeBasedPolicy {
+public final class MonthlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
 	 * Trigger a rollover every new month.
