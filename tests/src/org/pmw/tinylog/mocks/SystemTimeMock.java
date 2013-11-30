@@ -14,13 +14,12 @@
 package org.pmw.tinylog.mocks;
 
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 
 /**
  * Mock for {@link System}.
  */
-@MockClass(realClass = System.class)
-public final class SystemTimeMock {
+public final class SystemTimeMock extends MockUp<System> {
 
 	private long time;
 

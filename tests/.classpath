@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tinylog"/>
-	<classpathentry kind="lib" path="../ext/lib/junit/jmockit-1.0.jar"/>
+	<classpathentry kind="lib" path="../ext/lib/junit/jmockit-1.1.jar"/>
 	<classpathentry kind="lib" path="../ext/lib/junit/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="../ext/lib/junit/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="../ext/lib/junit/hamcrest-library-1.3.jar"/>

@@ -13,25 +13,7 @@
 
 package org.pmw.tinylog;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-
-import mockit.Mockit;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.pmw.tinylog.Configurator.WritingThreadData;
-import org.pmw.tinylog.mocks.ClassLoaderMock;
-import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.NullWriter;
-
 import static org.hamcrest.Matchers.containsString;
-
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
@@ -44,6 +26,21 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URLClassLoader;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.pmw.tinylog.Configurator.WritingThreadData;
+import org.pmw.tinylog.mocks.ClassLoaderMock;
+import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.NullWriter;
+
 /**
  * Tests for configurator.
  * 
@@ -54,19 +51,20 @@ public class ConfiguratorTest extends AbstractTest {
 	private ClassLoaderMock classLoaderMock;
 
 	/**
-	 * Set up mocks.
+	 * Set up mock for class loader.
 	 */
 	@Before
 	public final void init() {
 		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
-		Mockit.setUpMocks(classLoaderMock);
 	}
 
 	/**
-	 * Shutdown observer threads.
+	 * Tear down mock and shutdown observer threads.
 	 */
 	@After
 	public final void dispose() {
+		classLoaderMock.tearDown();
+
 		for (Thread thread : Thread.getAllStackTraces().keySet()) {
 			if (thread instanceof ConfigurationObserver) {
 				ConfigurationObserver observer = (ConfigurationObserver) thread;

@@ -13,25 +13,24 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
 
-import mockit.Mockit;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.mocks.SleepHandledThreadMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
-
-import static org.hamcrest.number.OrderingComparison.lessThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for configuration observer.
@@ -44,13 +43,21 @@ public class ConfigurationObserverTest extends AbstractTest {
 	private ClassLoaderMock classLoaderMock;
 
 	/**
-	 * Set up mocks.
+	 * Set up mocks for thread and class loader.
 	 */
 	@Before
 	public final void init() {
 		threadMock = new SleepHandledThreadMock();
 		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
-		Mockit.setUpMocks(threadMock, classLoaderMock);
+	}
+
+	/**
+	 * Tear down mocks.
+	 */
+	@After
+	public final void dispose() {
+		classLoaderMock.tearDown();
+		threadMock.tearDown();
 	}
 
 	/**
@@ -87,8 +94,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 	public final void testResourceConfigurationObserver() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
 			InterruptedException {
 		File file = classLoaderMock.set("config/tinylog.properties");
-		ConfigurationObserver observer = ConfigurationObserver.createResourceConfigurationObserver(Configurator.defaultConfig(),
-				"config/tinylog.properties");
+		ConfigurationObserver observer = ConfigurationObserver.createResourceConfigurationObserver(Configurator.defaultConfig(), "config/tinylog.properties");
 		testObserver(observer, file);
 		file.delete();
 	}
@@ -142,15 +148,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 		file.delete();
 		assertFalse(systemErrorStream.hasLines());
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals("TEST", currentConfiguration.getFormatPattern());
-		assertEquals(42, currentConfiguration.getMaxStackTraceElements());
-		assertTrue(systemErrorStream.hasLines());
-		systemErrorStream.clear();
-
-		FileHelper.write(file, "");
 		threadMock.awake();
 		threadMock.waitForSleep();
 		currentConfiguration = Logger.getConfiguration().create();

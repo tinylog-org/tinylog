@@ -73,12 +73,7 @@ abstract class ConfigurationObserver extends Thread {
 
 			@Override
 			protected InputStream openInputStream() throws FileNotFoundException {
-				InputStream stream = ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
-				if (stream == null) {
-					throw new FileNotFoundException(file);
-				} else {
-					return stream;
-				}
+				return ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
 			}
 
 		};
@@ -89,14 +84,14 @@ abstract class ConfigurationObserver extends Thread {
 		Properties oldProperties = null;
 		while (!shutdown) {
 			Properties properties = readProperties();
-			if (properties != null) {
-				if (changed(properties, oldProperties)) {
-					Configurator configurator = basisConfigurator.copy();
+			if (changed(properties, oldProperties)) {
+				Configurator configurator = basisConfigurator.copy();
+				if (properties != null) {
 					PropertiesLoader.readProperties(configurator, properties);
-					configurator.activate();
 				}
-				oldProperties = properties;
+				configurator.activate();
 			}
+			oldProperties = properties;
 
 			try {
 				sleep(1000L);
@@ -116,7 +111,9 @@ abstract class ConfigurationObserver extends Thread {
 
 	private boolean changed(final Properties properties, final Properties oldProperties) {
 		if (oldProperties == null) {
-			return true;
+			return properties != null;
+		} else if (properties == null) {
+			return oldProperties != null;
 		} else {
 			Set<Object> keys = new HashSet<Object>();
 			keys.addAll(properties.keySet());
@@ -138,9 +135,15 @@ abstract class ConfigurationObserver extends Thread {
 		InputStream stream = null;
 		try {
 			stream = openInputStream();
-			Properties properties = new Properties();
-			properties.load(stream);
-			return properties;
+			if (stream == null) {
+				return null;
+			} else {
+				Properties properties = new Properties();
+				properties.load(stream);
+				return properties;
+			}
+		} catch (FileNotFoundException ex) {
+			return null;
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 			return null;

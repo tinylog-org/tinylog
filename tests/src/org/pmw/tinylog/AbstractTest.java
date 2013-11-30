@@ -13,16 +13,14 @@
 
 package org.pmw.tinylog;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.PrintStream;
 import java.util.Properties;
-
-import mockit.Mockit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.pmw.tinylog.util.StringListOutputStream;
-
-import static org.junit.Assert.assertFalse;
 
 /**
  * Base class for all tests.
@@ -55,7 +53,6 @@ public abstract class AbstractTest {
 	 */
 	@After
 	public final void tearDown() {
-		Mockit.tearDownMocks();
 		System.setProperties(originProperties);
 		System.setOut(originOutStream);
 		System.setErr(originErrStream);

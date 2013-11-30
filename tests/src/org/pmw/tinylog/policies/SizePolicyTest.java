@@ -13,6 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -22,9 +25,6 @@ import mockit.MockUp;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.util.FileHelper;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for size policy.
@@ -134,7 +134,7 @@ public class SizePolicyTest extends AbstractTest {
 	public final void testStringParameterForGB() {
 		final int size = 1024 * 1024; // 1 MB
 
-		new MockUp<String>() { // Speed up test
+		MockUp<String> mock = new MockUp<String>() { // Speed up test
 
 			private final byte[] buffer = new byte[size]; // 1 MB
 
@@ -145,12 +145,16 @@ public class SizePolicyTest extends AbstractTest {
 
 		};
 
-		String filler = createString(size); // 1 MB
-		Policy policy = new SizePolicy("4GB");
-		for (int i = 0; i < 4 * 1024; ++i) {
-			assertTrue(policy.check(null, filler));
+		try {
+			String filler = createString(size); // 1 MB
+			Policy policy = new SizePolicy("4GB");
+			for (int i = 0; i < 4 * 1024; ++i) {
+				assertTrue(policy.check(null, filler));
+			}
+			assertFalse(policy.check(null, createString(1)));
+		} finally {
+			mock.tearDown();
 		}
-		assertFalse(policy.check(null, createString(1)));
 	}
 
 	/**

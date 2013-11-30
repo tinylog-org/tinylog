@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 
 import org.pmw.tinylog.util.FileHelper;
 
@@ -36,8 +36,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see URLClassLoader
  */
-@MockClass(realClass = URLClassLoader.class)
-public final class ClassLoaderMock implements Closeable {
+public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Closeable {
 
 	private final URLClassLoader classLoader;
 	private final Map<String, File> resources;

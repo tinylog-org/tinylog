@@ -14,15 +14,14 @@
 package org.pmw.tinylog.mocks;
 
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 
 /**
  * Mock for Thread to handle sleeps.
  * 
  * @see Thread
  */
-@MockClass(realClass = Thread.class)
-public final class SleepHandledThreadMock {
+public final class SleepHandledThreadMock extends MockUp<Thread> {
 
 	private static volatile boolean enabled;
 	private static volatile boolean sleeping;

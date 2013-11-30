@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import mockit.Mockit;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,15 +47,15 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 	@Before
 	public final void init() {
 		systemTimeMock = new SystemTimeMock();
-		Mockit.setUpMock(systemTimeMock);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	/**
-	 * Reset time zone.
+	 * Tear down mock and reset time zone.
 	 */
 	@After
 	public final void dispose() {
+		systemTimeMock.tearDown();
 		TimeZone.setDefault(null);
 	}
 
