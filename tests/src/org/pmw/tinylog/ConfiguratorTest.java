@@ -59,12 +59,10 @@ public class ConfiguratorTest extends AbstractTest {
 	}
 
 	/**
-	 * Tear down mock and shutdown observer threads.
+	 * Shutdown observer threads and tear down mock.
 	 */
 	@After
 	public final void dispose() {
-		classLoaderMock.tearDown();
-
 		for (Thread thread : Thread.getAllStackTraces().keySet()) {
 			if (thread instanceof ConfigurationObserver) {
 				ConfigurationObserver observer = (ConfigurationObserver) thread;
@@ -79,6 +77,8 @@ public class ConfiguratorTest extends AbstractTest {
 				}
 			}
 		}
+
+		classLoaderMock.tearDown();
 	}
 
 	/**

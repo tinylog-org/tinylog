@@ -52,8 +52,12 @@ abstract class ConfigurationObserver extends Thread {
 		return new ConfigurationObserver(basisConfigurator) {
 
 			@Override
-			protected InputStream openInputStream() throws FileNotFoundException {
-				return new FileInputStream(file);
+			protected InputStream openInputStream() {
+				try {
+					return new FileInputStream(file);
+				} catch (FileNotFoundException ex) {
+					return null;
+				}
 			}
 
 		};
@@ -72,7 +76,7 @@ abstract class ConfigurationObserver extends Thread {
 		return new ConfigurationObserver(basisConfigurator) {
 
 			@Override
-			protected InputStream openInputStream() throws FileNotFoundException {
+			protected InputStream openInputStream() {
 				return ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
 			}
 
@@ -142,8 +146,6 @@ abstract class ConfigurationObserver extends Thread {
 				properties.load(stream);
 				return properties;
 			}
-		} catch (FileNotFoundException ex) {
-			return null;
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 			return null;
@@ -161,10 +163,8 @@ abstract class ConfigurationObserver extends Thread {
 	/**
 	 * Open the configuration file.
 	 * 
-	 * @return Stream of configuration file.
-	 * @throws IOException
-	 *             Failed to load and read file
+	 * @return Stream of configuration file or <code>null</code> if not exists.
 	 */
-	protected abstract InputStream openInputStream() throws IOException;
+	protected abstract InputStream openInputStream();
 
 }
