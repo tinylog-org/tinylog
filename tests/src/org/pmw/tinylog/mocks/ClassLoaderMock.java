@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
 
@@ -40,7 +41,6 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 
 	private final URLClassLoader classLoader;
 	private final Map<String, File> resources;
-	private URLClassLoader it;
 
 	/**
 	 * @param classLoader
@@ -121,14 +121,16 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	/**
 	 * Mocked method {@link URLClassLoader#findResource(String)}.
 	 * 
+	 * @param invocation
+	 *            Context of the current invocation
 	 * @param name
 	 *            Path to resource
 	 * @return URL to resource or <code>null</code> if requested resource doesn't exist
 	 */
-	@Mock(reentrant = true)
-	protected URL findResource(final String name) {
-		URL url = classLoader.findResource(name);
-		if (url == null && classLoader == it) {
+	@Mock
+	protected URL findResource(final Invocation invocation, final String name) {
+		URL url = invocation.proceed(name);
+		if (url == null && classLoader == invocation.getInvokedInstance()) {
 			File file = resources.get(name);
 			if (file != null) {
 				try {
@@ -144,16 +146,19 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	/**
 	 * Mocked method {@link URLClassLoader#findResources(String)}.
 	 * 
+	 * @param invocation
+	 *            Context of the current invocation
 	 * @param name
 	 *            Path to resource
 	 * @return Found URLs to requested resource
 	 * @throws IOException
 	 *             Failed to get resources
 	 */
-	@Mock(reentrant = true)
-	protected Enumeration<URL> findResources(final String name) throws IOException {
-		if (classLoader == it) {
-			List<URL> urls = new ArrayList<URL>(Collections.list(classLoader.findResources(name)));
+	@Mock
+	protected Enumeration<URL> findResources(final Invocation invocation, final String name) throws IOException {
+		if (classLoader == invocation.getInvokedInstance()) {
+			Enumeration<URL> enumeration = invocation.proceed(name);
+			List<URL> urls = new ArrayList<URL>(Collections.list(enumeration));
 			File file = resources.get(name);
 			if (file != null) {
 				try {
@@ -164,7 +169,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 			}
 			return Collections.enumeration(urls);
 		} else {
-			return classLoader.findResources(name);
+			return invocation.proceed(name);
 		}
 	}
 
