@@ -247,7 +247,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		labeller = rollingFileWriter.getLabeller();
 		assertNotNull(labeller);
 		assertEquals(TimestampLabeller.class, labeller.getClass());
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log"), labeller.getLogFile(new File("my.log")));
+		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log"))
+				.getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(1, policies.size());
