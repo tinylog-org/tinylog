@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="../ext/lib/junit/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="../ext/lib/junit/hamcrest-library-1.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/log4j-facade"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/android-stub"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

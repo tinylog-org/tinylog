@@ -5,6 +5,10 @@
 	
 	<property name="root" location=".." />
 	
+	<property name="android" location="${root}/android-stub" />
+	<property name="android.bin" location="${android}/bin" />
+	<property name="android.src" location="${android}/src" />
+	
 	<property name="tinylog" location="${root}/tinylog" />
 	<property name="tinylog.files" location="${tinylog}/files" />
 	<property name="tinylog.bin" location="${tinylog}/bin" />
@@ -55,19 +59,24 @@
 	</taskdef>
 
 	<target name="clean">
+		<delete dir="${android.bin}" />
 		<delete dir="${tinylog.bin}" />
 		<delete dir="${log4j.bin}" />
 		<delete dir="${tests.bin}" />
 	</target>
 
 	<target name="makedir">
+		<mkdir dir="${android.bin}" />
 		<mkdir dir="${tinylog.bin}" />
 		<mkdir dir="${log4j.bin}" />
 		<mkdir dir="${tests.bin}" />
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" target="1.5" />
+		<javac srcdir="${android.src}" destdir="${android.bin}" includeantruntime="false" target="1.5" />
+		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" target="1.5">
+			<classpath location="${android.bin}" />
+		</javac>
 		<copy todir="${tinylog.bin}">
 			<fileset dir="${tinylog.src}">
 				<include name="**/*.properties" />
@@ -79,6 +88,7 @@
 		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
+			<classpath location="${android.bin}" />
 			<classpath location="${tinylog.bin}" />
 			<classpath location="${log4j.bin}" />
 		</javac>
@@ -318,6 +328,7 @@
 			<doctitle>tinylog ${version} - API Specification</doctitle>
 			<packageset dir="${tinylog.src}" />
 			<classpath>
+				<dirset dir="${android.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
@@ -326,6 +337,7 @@
 
 	<target name="check" depends="compile">
 		<checkstyle config="${ext.conf}/tinylog-checkstyle.xml">
+			<fileset dir="${android.src}" includes="**/*.java" />
 			<fileset dir="${tinylog.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
@@ -333,12 +345,14 @@
 		<findbugs home="${ext.lib.findbugs}" output="text">
 			<sourcepath>
 				<dirset>
+					<include name="${android.src}" />
 					<include name="${tinylog.src}" />
 					<include name="${log4j.src}" />
 					<include name="${tests.src}" />
 				</dirset>
 			</sourcepath>
 			<fileset>
+				<include name="${android.bin}" />
 				<include name="${tinylog.bin}" />
 				<include name="${log4j.bin}" />
 				<include name="${tests.bin}" />
@@ -350,6 +364,7 @@
 		<junit fork="true" failureproperty="junit.tests.failure" errorproperty="junit.tests.error">
 			<formatter type="plain" usefile="false" />
 			<classpath>
+				<path location="${android.bin}" />
 				<path location="${tinylog.bin}" />
 				<path location="${log4j.bin}" />
 				<path location="${tests.bin}" />
