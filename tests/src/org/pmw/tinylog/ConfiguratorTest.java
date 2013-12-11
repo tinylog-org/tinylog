@@ -79,6 +79,7 @@ public class ConfiguratorTest extends AbstractTest {
 		}
 
 		classLoaderMock.tearDown();
+		classLoaderMock.close();
 	}
 
 	/**

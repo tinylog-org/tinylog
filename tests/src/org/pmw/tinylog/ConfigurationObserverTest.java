@@ -57,6 +57,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@After
 	public final void dispose() {
 		classLoaderMock.tearDown();
+		classLoaderMock.close();
 		threadMock.tearDown();
 	}
 
