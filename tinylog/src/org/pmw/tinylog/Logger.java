@@ -426,14 +426,14 @@ public final class Logger {
 	 *            New configuration
 	 */
 	static void setConfirguration(final Configuration configuration) {
-		Logger.configuration = configuration;
-
 		if (configuration != null) {
 			LoggingWriter writer = configuration.getWriter();
 			if (writer != null) {
 				writer.init();
 			}
 		}
+
+		Logger.configuration = configuration;
 	}
 
 	/**
