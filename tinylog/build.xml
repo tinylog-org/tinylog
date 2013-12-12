@@ -73,8 +73,8 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${android.src}" destdir="${android.bin}" includeantruntime="false" target="1.5" />
-		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" target="1.5">
+		<javac srcdir="${android.src}" destdir="${android.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}" />
+		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
 			<classpath location="${android.bin}" />
 		</javac>
 		<copy todir="${tinylog.bin}">
@@ -83,10 +83,10 @@
 				<include name="META-INF/**" />
 			</fileset>
 		</copy>
-		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" target="1.5">
+		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
 			<classpath location="${tinylog.bin}" />
 		</javac>
-		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" target="1.5" debug="true" debuglevel="source,lines">
+		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${android.bin}" />
 			<classpath location="${tinylog.bin}" />
@@ -335,6 +335,7 @@
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
 		<findbugs home="${ext.lib.findbugs}" output="text">
+			<auxclasspath refid="junit.classpath" />
 			<sourcepath>
 				<dirset>
 					<include name="${android.src}" />
