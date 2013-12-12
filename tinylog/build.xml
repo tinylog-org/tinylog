@@ -334,7 +334,7 @@
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
-		<findbugs home="${ext.lib.findbugs}" output="text">
+		<findbugs home="${ext.lib.findbugs}" output="text" excludefilter="${ext.conf}/tinylog-findbugs.xml">
 			<auxclasspath refid="junit.classpath" />
 			<sourcepath location="${android.src}" />
 			<class location="${android.bin}" />

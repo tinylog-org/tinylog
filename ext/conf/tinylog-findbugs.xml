@@ -1,0 +1,8 @@
+<!-- Exclude list of warnings -->
+<FindBugsFilter>
+	<Match>
+		<Class name="org.pmw.tinylog.Logger" />
+		<!-- Catching of exceptions is required for the case that the fast but unofficial ways to get the stack trace will fail -->
+		<Bug pattern="REC_CATCH_EXCEPTION" />
+	</Match>
+</FindBugsFilter>
