@@ -117,7 +117,7 @@ abstract class ConfigurationObserver extends Thread {
 		if (oldProperties == null) {
 			return properties != null;
 		} else if (properties == null) {
-			return oldProperties != null;
+			return true;
 		} else {
 			Set<Object> keys = new HashSet<Object>();
 			keys.addAll(properties.keySet());
