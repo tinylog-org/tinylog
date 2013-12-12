@@ -336,20 +336,12 @@
 		</checkstyle>
 		<findbugs home="${ext.lib.findbugs}" output="text">
 			<auxclasspath refid="junit.classpath" />
-			<sourcepath>
-				<dirset>
-					<include name="${android.src}" />
-					<include name="${tinylog.src}" />
-					<include name="${log4j.src}" />
-					<include name="${tests.src}" />
-				</dirset>
-			</sourcepath>
-			<fileset>
-				<include name="${android.bin}" />
-				<include name="${tinylog.bin}" />
-				<include name="${log4j.bin}" />
-				<include name="${tests.bin}" />
-			</fileset>
+			<sourcepath location="${android.src}" />
+			<class location="${android.bin}" />
+			<sourcepath location="${tinylog.bin}" />
+			<class location="${tinylog.bin}" />
+			<sourcepath location="${log4j.src}" />
+			<class location="${log4j.bin}" />
 		</findbugs>
 	</target>
 
