@@ -18,6 +18,7 @@ import java.util.Calendar;
 /**
  * Policy for one rollover per hour.
  */
+@PropertiesSupport(name = "hourly")
 public final class HourlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
@@ -25,15 +26,6 @@ public final class HourlyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public HourlyPolicy() {
 		super(createCalendar(), Calendar.HOUR_OF_DAY);
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "hourly"
-	 */
-	public static String getName() {
-		return "hourly";
 	}
 
 	private static Calendar createCalendar() {

@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per day.
  */
+@PropertiesSupport(name = "daily")
 public final class DailyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
@@ -43,7 +44,7 @@ public final class DailyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	/**
-	 * String parameter for {@link PropertiesLoader}.
+	 * String parameter for {@link org.pmw.tinylog.PropertiesLoader PropertiesLoader}.
 	 * 
 	 * @param time
 	 *            Time of the day (between 00:00..23:59)
@@ -52,15 +53,6 @@ public final class DailyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	DailyPolicy(final String time) throws IllegalArgumentException {
 		this(parseHour(time), parseMinute(time));
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "daily"
-	 */
-	public static String getName() {
-		return "daily";
 	}
 
 	private static Calendar createCalendar(final int hour, final int minute) {

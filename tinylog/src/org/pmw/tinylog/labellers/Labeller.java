@@ -18,8 +18,25 @@ import java.io.File;
 /**
  * A labeller names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
- * An implemented labeller must be registered as service in "META-INF/services/org.pmw.tinylog.labellers" and implement
- * the static method <code>public static String getName()</code>, so that tinylog can find it.
+ * <p>
+ * The annotation {@link org.pmw.tinylog.labellers.PropertiesSupport PropertiesSupport} must be added to the implemented
+ * labeller class and the implemented labeller must be registered as service in
+ * "META-INF/services/org.pmw.tinylog.labellers" in order to make the labeller available by properties files and system
+ * properties.
+ * </p>
+ * 
+ * <p>
+ * Example:<br />
+ * <code>
+ * {@literal @}PropertiesSupport(name = "count")<br />
+ * public final class CountLabeller implements Labeller {
+ * </code>
+ * </p>
+ * 
+ * <p>
+ * A labeller must have a default constructor without any parameters. Optionally it can have an additional constructor
+ * with a string parameter if the labeller supports parameters.
+ * </p>
  */
 public interface Labeller {
 

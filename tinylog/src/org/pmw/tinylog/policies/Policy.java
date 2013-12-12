@@ -20,8 +20,24 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
- * An implemented policy must be registered as service in "META-INF/services/org.pmw.tinylog.policies" and implement the
- * static method <code>public static String getName()</code>, so that tinylog can find it.
+ * <p>
+ * The annotation {@link PropertiesSupport} must be added to the implemented policy class and the implemented policy
+ * must be registered as service in "META-INF/services/org.pmw.tinylog.policies" in order to make the policy available
+ * by properties files and system properties.
+ * </p>
+ * 
+ * <p>
+ * Example:<br />
+ * <code>
+ * {@literal @}PropertiesSupport(name = "startup")<br />
+ * public final class StartupPolicy implements Policy {
+ * </code>
+ * </p>
+ * 
+ * <p>
+ * A policy must have a default constructor without any parameters. Optionally it can have an additional constructor
+ * with a string parameter if the policy supports parameters.
+ * </p>
  */
 public interface Policy {
 

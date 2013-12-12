@@ -20,16 +20,8 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Writes log entries to the console.
  */
+@PropertiesSupport(name = "console", properties = { })
 public final class ConsoleWriter implements LoggingWriter {
-
-	/**
-	 * Returns the name of the writer.
-	 * 
-	 * @return "console"
-	 */
-	public static String getName() {
-		return "console";
-	}
 
 	@Override
 	public void init() {

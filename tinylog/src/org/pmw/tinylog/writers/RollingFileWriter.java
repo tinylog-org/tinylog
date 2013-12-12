@@ -28,6 +28,8 @@ import org.pmw.tinylog.policies.StartupPolicy;
 /**
  * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter} but keeps backups of old logging files.
  */
+@PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
+		@Property(name = "label", type = Labeller.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true) })
 public final class RollingFileWriter implements LoggingWriter {
 
 	private final String filename;
@@ -49,7 +51,23 @@ public final class RollingFileWriter implements LoggingWriter {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) {
-		this(filename, backups, new StartupPolicy());
+		this(filename, backups, null, (Policy[]) null);
+	}
+
+	/**
+	 * Rolling log files once at startup.
+	 * 
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param labeller
+	 *            Labeller for naming backups
+	 * 
+	 * @see org.pmw.tinylog.policies.StartupPolicy
+	 */
+	public RollingFileWriter(final String filename, final int backups, final Labeller labeller) {
+		this(filename, backups, labeller, (Policy[]) null);
 	}
 
 	/**
@@ -61,7 +79,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Policy... policies) {
-		this(filename, backups, new CountLabeller(), policies);
+		this(filename, backups, null, policies);
 	}
 
 	/**
@@ -77,30 +95,8 @@ public final class RollingFileWriter implements LoggingWriter {
 	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
 		this.filename = filename;
 		this.backups = Math.max(0, backups);
-		this.labeller = labeller;
-		this.policies = Arrays.asList(policies);
-	}
-
-	/**
-	 * Returns the name of the writer.
-	 * 
-	 * @return "rollingfile"
-	 */
-	public static String getName() {
-		return "rollingfile";
-	}
-
-	/**
-	 * Returns the supported properties for this writer.
-	 * 
-	 * The rolling file logging writer needs a "filename" and the number of backups ("backups") plus optionally a
-	 * labeller ("labeling") and rollover strategies ("policies").
-	 * 
-	 * @return Three string arrays with and without the properties "naming" and "policies"
-	 */
-	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename", "backups" }, new String[] { "filename", "backups", "policies" },
-				new String[] { "filename", "backups", "label", "policies" } };
+		this.labeller = labeller == null ? new CountLabeller() : labeller;
+		this.policies = policies == null || policies.length == 0 ? Arrays.asList(new StartupPolicy()) : Arrays.asList(policies);
 	}
 
 	/**

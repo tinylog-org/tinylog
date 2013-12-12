@@ -20,16 +20,8 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Policy for rolling log files once at startup.
  */
+@PropertiesSupport(name = "startup")
 public final class StartupPolicy implements Policy {
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "startup"
-	 */
-	public static String getName() {
-		return "startup";
-	}
 
 	@Override
 	public boolean initCheck(final File logFile) {

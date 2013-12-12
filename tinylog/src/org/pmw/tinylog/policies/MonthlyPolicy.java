@@ -18,6 +18,7 @@ import java.util.Calendar;
 /**
  * Policy for one rollover per month.
  */
+@PropertiesSupport(name = "monthly")
 public final class MonthlyPolicy extends AbstractTimeBasedPolicy {
 
 	/**
@@ -25,15 +26,6 @@ public final class MonthlyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public MonthlyPolicy() {
 		super(createCalendar(), Calendar.MONTH);
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "monthly"
-	 */
-	public static String getName() {
-		return "monthly";
 	}
 
 	private static Calendar createCalendar() {

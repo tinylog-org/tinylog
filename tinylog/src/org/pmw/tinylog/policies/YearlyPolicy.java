@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per year.
  */
+@PropertiesSupport(name = "yearly")
 public final class YearlyPolicy extends AbstractTimeBasedPolicy {
 
 	private static final Pattern MONTH_NUMBER_PATTERN = Pattern.compile("[123456789]|10|11|12");
@@ -48,15 +49,6 @@ public final class YearlyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	public YearlyPolicy(final String month) {
 		this(convert(month));
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "yearly"
-	 */
-	public static String getName() {
-		return "yearly";
 	}
 
 	private static Calendar createCalendar(final int month) {

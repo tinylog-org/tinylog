@@ -18,19 +18,11 @@ import java.io.File;
 /**
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
  */
+@PropertiesSupport(name = "count")
 public final class CountLabeller implements Labeller {
 
 	private String filenameWithoutExtension;
 	private String filenameExtension;
-
-	/**
-	 * Returns the name of the labeller.
-	 * 
-	 * @return "count"
-	 */
-	public static String getName() {
-		return "count";
-	}
 
 	@Override
 	public File getLogFile(final File baseFile) {

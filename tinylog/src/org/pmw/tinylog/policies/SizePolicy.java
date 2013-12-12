@@ -20,6 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Policy for limiting the size of log files.
  */
+@PropertiesSupport(name = "size")
 public final class SizePolicy implements Policy {
 
 	private final long maxSize;
@@ -66,15 +67,6 @@ public final class SizePolicy implements Policy {
 			throw new IllegalArgumentException("Size must be > 0");
 		}
 		this.size = 0L;
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "size"
-	 */
-	public static String getName() {
-		return "size";
 	}
 
 	@Override

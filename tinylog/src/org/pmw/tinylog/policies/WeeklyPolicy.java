@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Policy for one rollover per week.
  */
+@PropertiesSupport(name = "weekly")
 public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 
 	private static final Pattern DAY_OF_WEEK_PATTERN = Pattern.compile("[1234567]");
@@ -52,15 +53,6 @@ public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	 */
 	WeeklyPolicy(final String dayOfWeek) throws IllegalArgumentException {
 		super(createCalendar(dayOfWeek), Calendar.WEEK_OF_YEAR);
-	}
-
-	/**
-	 * Returns the name of the policy.
-	 * 
-	 * @return "weekly"
-	 */
-	public static String getName() {
-		return "weekly";
 	}
 
 	private static Calendar createCalendar(final int dayOfWeek) {

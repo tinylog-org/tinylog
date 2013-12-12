@@ -19,8 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,9 +133,10 @@ final class PropertiesLoader {
 				configurator.writer(null);
 			} else {
 				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
-					if (LoggingWriter.class.isAssignableFrom(implementation)) {
-						if (writer.equalsIgnoreCase(getName(implementation))) {
-							LoggingWriter loggingWriter = loadAndSetWriter(properties, implementation);
+					org.pmw.tinylog.writers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.writers.PropertiesSupport.class);
+					if (propertiesSupport != null) {
+						if (writer.equalsIgnoreCase(propertiesSupport.name())) {
+							LoggingWriter loggingWriter = loadAndSetWriter(properties, propertiesSupport.properties(), implementation);
 							if (loggingWriter != null) {
 								configurator.writer(loggingWriter);
 								break;
@@ -198,7 +197,10 @@ final class PropertiesLoader {
 							line = line.trim();
 							if (line != null) {
 								try {
-									services.add(Class.forName(line));
+									Class<?> implementation = Class.forName(line);
+									if (service.isAssignableFrom(implementation)) {
+										services.add(implementation);
+									}
 								} catch (ClassNotFoundException ec) {
 									// Continue
 								}
@@ -228,82 +230,52 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static LoggingWriter loadAndSetWriter(final Properties properties, final Class<?> writerClass) {
-		try {
-			String[][] supportedProperties = getSupportedProperties(writerClass);
-			Constructor<?> foundConstructor = null;
-			Object[] foundParameters = null;
-			for (Constructor<?> constructor : writerClass.getConstructors()) {
-				Class<?>[] parameterTypes = constructor.getParameterTypes();
-				String[] propertiesNames = findPropertyNames(supportedProperties, parameterTypes.length);
-				if (propertiesNames != null) {
-					if (foundParameters == null || foundParameters.length < parameterTypes.length) {
-						Object[] parameters = loadParameters(properties, propertiesNames, parameterTypes);
-						if (parameters != null) {
-							foundConstructor = constructor;
-							foundParameters = parameters;
+	private static LoggingWriter loadAndSetWriter(final Properties properties, final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
+		for (Constructor<?> constructor : writerClass.getConstructors()) {
+			Class<?>[] parameterTypes = constructor.getParameterTypes();
+			if (parameterTypes.length == definition.length) {
+				for (int i = 0; i < parameterTypes.length; ++i) {
+					if (!parameterTypes[i].equals(definition[i].type())) {
+						break;
+					} else if (i == parameterTypes.length - 1) {
+						try {
+							Object[] parameters = loadParameters(properties, definition);
+							if (parameters == null) {
+								return null;
+							} else {
+								return (LoggingWriter) constructor.newInstance(parameters);
+							}
+						} catch (IllegalArgumentException ex) {
+							return null;
+						} catch (InstantiationException ex) {
+							return null;
+						} catch (IllegalAccessException ex) {
+							return null;
+						} catch (InvocationTargetException ex) {
+							return null;
 						}
 					}
 				}
 			}
-			if (foundConstructor != null) {
-				return (LoggingWriter) foundConstructor.newInstance(foundParameters);
-			} else {
-				return null;
-			}
-		} catch (InstantiationException ex) {
-			return null;
-		} catch (IllegalAccessException ex) {
-			return null;
-		} catch (IllegalArgumentException ex) {
-			return null;
-		} catch (InvocationTargetException ex) {
-			return null;
 		}
-	}
 
-	private static String getName(final Class<?> clazz) {
-		try {
-			Method method = clazz.getMethod("getName");
-			if (method.getReturnType() == String.class && Modifier.isStatic(method.getModifiers())) {
-				return (String) method.invoke(null);
-			} else {
-				return null;
-			}
-		} catch (Exception ex) {
-			return null;
-		}
-	}
-
-	private static String[][] getSupportedProperties(final Class<?> clazz) {
-		try {
-			Method method = clazz.getMethod("getSupportedProperties");
-			if (method.getReturnType() == String[][].class && Modifier.isStatic(method.getModifiers())) {
-				return (String[][]) method.invoke(null);
-			} else {
-				return new String[][] { new String[] {} };
-			}
-		} catch (Exception ex) {
-			return new String[][] { new String[] {} };
-		}
-	}
-
-	private static String[] findPropertyNames(final String[][] supportedProperties, final int numParameters) {
-		for (String[] propertyNames : supportedProperties) {
-			if (propertyNames.length == numParameters) {
-				return propertyNames;
-			}
-		}
 		return null;
 	}
 
-	private static Object[] loadParameters(final Properties properties, final String[] propertyNames, final Class<?>[] parameterTypes) {
-		Object[] parameters = new Object[parameterTypes.length];
-		for (int i = 0; i < parameterTypes.length; ++i) {
-			String name = propertyNames[i];
+	private static Object[] loadParameters(final Properties properties, final org.pmw.tinylog.writers.Property[] definition) {
+		Object[] parameters = new Object[definition.length];
+
+		for (int i = 0; i < definition.length; ++i) {
+			String name = definition[i].name();
 			String value = properties.getProperty(WRITER_PROPERTY + "." + name);
-			if (value != null) {
-				Class<?> type = parameterTypes[i];
+			if (value == null) {
+				if (definition[i].optional()) {
+					definition[i] = null;
+				} else {
+					return null;
+				}
+			} else {
+				Class<?> type = definition[i].type();
 				if (String.class.equals(type)) {
 					parameters[i] = value;
 				} else if (int.class.equals(type)) {
@@ -313,27 +285,49 @@ final class PropertiesLoader {
 						return null;
 					}
 				} else if (boolean.class.equals(type)) {
-					parameters[i] = "true".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value);
+					if ("true".equalsIgnoreCase(value)) {
+						parameters[i] = Boolean.TRUE;
+					} else if ("false".equalsIgnoreCase(value)) {
+						parameters[i] = Boolean.FALSE;
+					} else {
+						return null;
+					}
 				} else if (Labeller.class.equals(type)) {
-					parameters[i] = parse(Labeller.class, value);
+					Object labeller = parseLabeller(value);
+					if (labeller == null) {
+						return null;
+					} else {
+						parameters[i] = labeller;
+					}
 				} else if (Policy.class.equals(type)) {
-					parameters[i] = parse(Policy.class, value);
+					Object policy = parsePolicy(value);
+					if (policy == null) {
+						return null;
+					} else {
+						parameters[i] = policy;
+					}
 				} else if (Policy[].class.equals(type)) {
-					parameters[i] = parsePolicies(value);
+					Policy[] policies = parsePolicies(value);
+					if (policies == null) {
+						return null;
+					} else if (policies.length == 0) {
+						return null;
+					} else {
+						parameters[i] = policies;
+					}
 				} else {
 					return null;
 				}
-			} else {
-				return null;
 			}
 		}
+
 		return parameters;
 	}
 
 	private static Policy[] parsePolicies(final String string) {
 		List<Policy> policies = new ArrayList<Policy>();
 		for (String part : string.split(Pattern.quote(","))) {
-			Policy policy = (Policy) parse(Policy.class, part.trim());
+			Policy policy = parsePolicy(part.trim());
 			if (policy != null) {
 				policies.add(policy);
 			}
@@ -341,15 +335,33 @@ final class PropertiesLoader {
 		return policies.toArray(new Policy[0]);
 	}
 
-	private static Object parse(final Class<?> service, final String string) {
+	private static Policy parsePolicy(final String string) {
 		int separator = string.indexOf(':');
 		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
 		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
 
-		for (Class<?> implementation : findImplementations(service)) {
-			if (service.isAssignableFrom(implementation)) {
-				if (name.equalsIgnoreCase(getName(implementation))) {
-					return createInstance(implementation, parameter);
+		for (Class<?> implementation : findImplementations(Policy.class)) {
+			org.pmw.tinylog.policies.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.policies.PropertiesSupport.class);
+			if (propertiesSupport != null) {
+				if (name.equalsIgnoreCase(propertiesSupport.name())) {
+					return (Policy) createInstance(implementation, parameter);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private static Labeller parseLabeller(final String string) {
+		int separator = string.indexOf(':');
+		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
+		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
+
+		for (Class<?> implementation : findImplementations(Labeller.class)) {
+			org.pmw.tinylog.labellers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labellers.PropertiesSupport.class);
+			if (propertiesSupport != null) {
+				if (name.equalsIgnoreCase(propertiesSupport.name())) {
+					return (Labeller) createInstance(implementation, parameter);
 				}
 			}
 		}
@@ -359,18 +371,15 @@ final class PropertiesLoader {
 
 	private static Object createInstance(final Class<?> clazz, final String parameter) {
 		try {
-			if (parameter != null) {
-				try {
-					Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
-					constructor.setAccessible(true);
-					return constructor.newInstance(parameter);
-				} catch (NoSuchMethodException ex) {
-					// Continue
-				}
+			if (parameter == null) {
+				Constructor<?> constructor = clazz.getDeclaredConstructor();
+				constructor.setAccessible(true);
+				return constructor.newInstance();
+			} else {
+				Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
+				constructor.setAccessible(true);
+				return constructor.newInstance(parameter);
 			}
-			Constructor<?> constructor = clazz.getDeclaredConstructor();
-			constructor.setAccessible(true);
-			return constructor.newInstance();
 		} catch (InstantiationException ex) {
 			return null;
 		} catch (IllegalAccessException ex) {
@@ -378,8 +387,6 @@ final class PropertiesLoader {
 		} catch (IllegalArgumentException ex) {
 			return null;
 		} catch (InvocationTargetException ex) {
-			return null;
-		} catch (SecurityException ex) {
 			return null;
 		} catch (NoSuchMethodException ex) {
 			return null;

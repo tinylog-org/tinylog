@@ -29,6 +29,7 @@ import org.pmw.tinylog.LoggingLevel;
  * 
  * Multiple instances of a program are allowed to log into the same file.
  */
+@PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
 public final class SharedFileWriter implements LoggingWriter {
 
 	private static final Map<String, Mutex> mutexes = new HashMap<String, Mutex>();
@@ -57,26 +58,6 @@ public final class SharedFileWriter implements LoggingWriter {
 			}
 		}
 		this.internalMutex = mutex;
-	}
-
-	/**
-	 * Returns the name of the writer.
-	 * 
-	 * @return "sharedfile"
-	 */
-	public static String getName() {
-		return "sharedfile";
-	}
-
-	/**
-	 * Returns the supported properties for this writer.
-	 * 
-	 * The file logging writer needs a "filename" for initiation.
-	 * 
-	 * @return String array with the single property "filename"
-	 */
-	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename" } };
 	}
 
 	/**

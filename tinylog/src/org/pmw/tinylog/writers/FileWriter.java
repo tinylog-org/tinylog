@@ -20,6 +20,7 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Writes log entries to a file.
  */
+@PropertiesSupport(name = "file", properties = @Property(name = "filename", type = String.class))
 public final class FileWriter implements LoggingWriter {
 
 	private final String filename;
@@ -31,26 +32,6 @@ public final class FileWriter implements LoggingWriter {
 	 */
 	public FileWriter(final String filename) {
 		this.filename = filename;
-	}
-
-	/**
-	 * Returns the name of the writer.
-	 * 
-	 * @return "file"
-	 */
-	public static String getName() {
-		return "file";
-	}
-
-	/**
-	 * Returns the supported properties for this writer.
-	 * 
-	 * The file logging writer needs a "filename" for initiation.
-	 * 
-	 * @return String array with the single property "filename"
-	 */
-	public static String[][] getSupportedProperties() {
-		return new String[][] { new String[] { "filename" } };
 	}
 
 	/**

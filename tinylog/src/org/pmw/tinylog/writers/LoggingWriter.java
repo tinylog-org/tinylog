@@ -19,9 +19,24 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Logging writers output created log entries from {@link Logger}.
  * 
- * An implemented writer must be registered as service in "META-INF/services/org.pmw.tinylog.writers" and implement the
- * static method <code>public static String getName()</code>, so that tinylog can find it. Writers can also implement
- * <code>public static String[][] getSupportedProperties()</code> to support properties.
+ * <p>
+ * The annotation {@link PropertiesSupport} must be added to the implemented writer class and the implemented writer
+ * must be registered as service in "META-INF/services/org.pmw.tinylog.writers" in order to make the writer available by
+ * properties files and system properties.
+ * </p>
+ * 
+ * <p>
+ * Example:<br />
+ * <code>
+ * {@literal @}PropertiesSupport(name = "example",
+ * properties = { {@literal @}Property(name = "filename", type = String.class), {@literal @}Property(name = "backups", type = int.class) })<br />
+ * public final class ExampleWriter implements LoggingWriter {
+ * </code>
+ * </p>
+ * 
+ * <p>
+ * A logging writer must have a constructor that matches to the defined properties.
+ * </p>
  */
 public interface LoggingWriter {
 

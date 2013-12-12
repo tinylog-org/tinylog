@@ -27,6 +27,7 @@ import org.pmw.tinylog.Logger;
 /**
  * Add a timestamp to the real log file and the backups.
  */
+@PropertiesSupport(name = "timestamp")
 public final class TimestampLabeller implements Labeller {
 
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
@@ -55,15 +56,6 @@ public final class TimestampLabeller implements Labeller {
 		this.timestampFormat = timestampFormat;
 		this.logFileFilter = new LogFileFilter();
 		this.logFileComparator = new LogFileComparator();
-	}
-
-	/**
-	 * Returns the name of the labeller.
-	 * 
-	 * @return "timestamp"
-	 */
-	public static String getName() {
-		return "timestamp";
 	}
 
 	@Override
