@@ -424,8 +424,11 @@ public final class Logger {
 	 * 
 	 * @param configuration
 	 *            New configuration
+	 * 
+	 * @throws Exception
+	 *             Failed to initialize the writer
 	 */
-	static void setConfirguration(final Configuration configuration) {
+	static void setConfirguration(final Configuration configuration) throws Exception {
 		if (configuration != null) {
 			LoggingWriter writer = configuration.getWriter();
 			if (writer != null) {
@@ -471,7 +474,11 @@ public final class Logger {
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
-					currentConfiguration.getWriter().write(level, logEntry);
+					try {
+						currentConfiguration.getWriter().write(level, logEntry);
+					} catch (Exception ex) {
+						ex.printStackTrace(System.err);
+					}
 				} else {
 					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
 				}
@@ -512,7 +519,11 @@ public final class Logger {
 				}
 
 				if (currentConfiguration.getWritingThread() == null) {
-					currentConfiguration.getWriter().write(level, logEntry);
+					try {
+						currentConfiguration.getWriter().write(level, logEntry);
+					} catch (Exception ex) {
+						ex.printStackTrace(System.err);
+					}
 				} else {
 					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
 				}

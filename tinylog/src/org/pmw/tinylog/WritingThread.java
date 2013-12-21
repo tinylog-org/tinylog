@@ -80,7 +80,11 @@ final class WritingThread extends Thread {
 			List<LogEntry> entriesToWrite = getLogEntriesToWrite();
 			while (entriesToWrite != null) {
 				for (LogEntry entry : entriesToWrite) {
-					entry.writer.write(entry.level, entry.text);
+					try {
+						entry.writer.write(entry.level, entry.text);
+					} catch (Exception ex) {
+						ex.printStackTrace(System.err);
+					}
 				}
 				entriesToWrite = getLogEntriesToWrite();
 			}

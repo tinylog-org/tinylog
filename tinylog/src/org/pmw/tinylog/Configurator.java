@@ -331,8 +331,11 @@ public final class Configurator {
 
 	/**
 	 * Activate the configuration.
+	 * 
+	 * @return <code>true</code> if the configuration has been successfully activated, <code>false</code> if the
+	 *         activation failed
 	 */
-	public void activate() {
+	public boolean activate() {
 		synchronized (lock) {
 			if (activeWritingThread != null && (writingThreadData == null || !writingThreadData.covers(activeWritingThread))) {
 				activeWritingThread.shutdown();
@@ -340,12 +343,18 @@ public final class Configurator {
 			}
 
 			Configuration configuration = create();
-			Logger.setConfirguration(configuration);
+			try {
+				Logger.setConfirguration(configuration);
+			} catch (Exception ex) {
+				return false;
+			}
 
 			if (activeWritingThread == null && writingThreadData != null) {
 				activeWritingThread = configuration.getWritingThread();
 				activeWritingThread.start();
 			}
+
+			return true;
 		}
 	}
 

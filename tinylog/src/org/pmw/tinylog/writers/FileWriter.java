@@ -44,22 +44,14 @@ public final class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
-		try {
-			writer = new java.io.FileWriter(filename);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+	public void init() throws IOException {
+		writer = new java.io.FileWriter(filename);
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
-		try {
-			writer.write(logEntry);
-			writer.flush();
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-		}
+	public void write(final LoggingLevel level, final String logEntry) throws IOException {
+		writer.write(logEntry);
+		writer.flush();
 	}
 
 	/**

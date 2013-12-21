@@ -138,18 +138,14 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public void init() throws IOException {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
-		try {
-			writer = new java.io.FileWriter(file, true);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+		writer = new java.io.FileWriter(file, true);
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LoggingLevel level, final String logEntry) throws IOException {
 		synchronized (this) {
 			if (!checkPolicies(level, logEntry)) {
 				try {
@@ -158,11 +154,7 @@ public final class RollingFileWriter implements LoggingWriter {
 					ex.printStackTrace(System.err);
 				}
 				file = labeller.roll(file, backups);
-				try {
-					writer = new java.io.FileWriter(file);
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+				writer = new java.io.FileWriter(file);
 			}
 			write(logEntry);
 		}

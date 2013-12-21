@@ -117,11 +117,11 @@ public class RegressionsTest extends AbstractTest {
 	/**
 	 * Bug: Timestamps need a locale but the locale isn't set at startup.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testTimestampLabellerAtStartup() throws IOException {
+	public final void testTimestampLabellerAtStartup() throws Exception {
 		Logger.setConfirguration(null);
 		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller()); // Failed
 	}

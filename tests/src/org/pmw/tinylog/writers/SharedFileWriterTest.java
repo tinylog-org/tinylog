@@ -14,10 +14,9 @@
 package org.pmw.tinylog.writers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +29,6 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for the shared file logging writer.
@@ -54,11 +52,12 @@ public class SharedFileWriterTest extends AbstractTest {
 		writer.write(LoggingLevel.INFO, "World\n");
 		writer.close();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
-		assertFalse(errorStream.hasLines());
-		writer.write(LoggingLevel.INFO, "Won't be written\n");
-		assertTrue(errorStream.hasLines());
-		errorStream.clear();
+		try {
+			writer.write(LoggingLevel.INFO, "Won't be written\n");
+			fail("Exception expected");
+		} catch (IOException ex) {
+			// Expected
+		}
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
@@ -176,7 +175,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		private long writtenLines;
 		private volatile boolean shutdown;
 
-		public WritingThread(final File file) {
+		public WritingThread(final File file) throws IOException {
 			writer = new SharedFileWriter(file.getAbsolutePath());
 			writer.init();
 			writtenLines = 0L;
@@ -189,11 +188,11 @@ public class SharedFileWriterTest extends AbstractTest {
 
 		@Override
 		public void run() {
-			while (!shutdown) {
-				writer.write(LoggingLevel.INFO, LINE + "\n");
-				++writtenLines;
-			}
 			try {
+				while (!shutdown) {
+					writer.write(LoggingLevel.INFO, LINE + "\n");
+					++writtenLines;
+				}
 				writer.close();
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);

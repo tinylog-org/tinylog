@@ -70,33 +70,25 @@ public final class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
-		try {
-			if (file.isFile()) {
-				file.delete();
-			}
-			stream = new FileOutputStream(file, true);
-			writer = new OutputStreamWriter(stream);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
+	public void init() throws IOException {
+		if (file.isFile()) {
+			file.delete();
 		}
+		stream = new FileOutputStream(file, true);
+		writer = new OutputStreamWriter(stream);
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
-		try {
-			FileChannel channel = stream.getChannel();
-			synchronized (internalMutex) {
-				FileLock externalLock = channel.lock();
-				try {
-					writer.write(logEntry);
-					writer.flush();
-				} finally {
-					externalLock.release();
-				}
+	public void write(final LoggingLevel level, final String logEntry) throws IOException {
+		FileChannel channel = stream.getChannel();
+		synchronized (internalMutex) {
+			FileLock externalLock = channel.lock();
+			try {
+				writer.write(logEntry);
+				writer.flush();
+			} finally {
+				externalLock.release();
 			}
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
 		}
 	}
 

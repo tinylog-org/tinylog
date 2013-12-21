@@ -42,8 +42,11 @@ public interface LoggingWriter {
 
 	/**
 	 * Initialize the writer.
+	 * 
+	 * @throws Exception
+	 *             Failed to initialize the writer
 	 */
-	void init();
+	void init() throws Exception;
 
 	/**
 	 * Write a log entry.
@@ -52,7 +55,10 @@ public interface LoggingWriter {
 	 *            Logging level
 	 * @param logEntry
 	 *            Log entry to output
+	 * 
+	 * @throws Exception
+	 *             Failed to write the log entry
 	 */
-	void write(LoggingLevel level, String logEntry);
+	void write(LoggingLevel level, String logEntry) throws Exception;
 
 }
