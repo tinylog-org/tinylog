@@ -14,18 +14,16 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import org.pmw.tinylog.Logger;
 
 /**
- * Add a timestamp to the real log file and the backups.
+ * Adds a timestamp to the real log file and the backups.
  */
 @PropertiesSupport(name = "timestamp")
 public final class TimestampLabeller implements Labeller {
@@ -33,9 +31,10 @@ public final class TimestampLabeller implements Labeller {
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
 	private final String timestampFormat;
-	private final LogFileFilter logFileFilter;
-	private final LogFileComparator logFileComparator;
 
+	private LogFileFilter logFileFilter;
+
+	private String directory;
 	private String filenameWithoutExtension;
 	private String filenameExtension;
 
@@ -54,22 +53,22 @@ public final class TimestampLabeller implements Labeller {
 	 */
 	public TimestampLabeller(final String timestampFormat) {
 		this.timestampFormat = timestampFormat;
-		this.logFileFilter = new LogFileFilter();
-		this.logFileComparator = new LogFileComparator();
 	}
 
 	@Override
 	public File getLogFile(final File baseFile) {
-		String path = baseFile.getPath();
+		directory = baseFile.getAbsoluteFile().getParent();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
 		if (index > 0) {
-			filenameWithoutExtension = path.substring(0, (path.length() - name.length()) + index);
+			filenameWithoutExtension = name.substring(0, index);
 			filenameExtension = name.substring(index);
 		} else {
-			filenameWithoutExtension = path;
+			filenameWithoutExtension = name;
 			filenameExtension = "";
 		}
+
+		logFileFilter = new LogFileFilter(filenameWithoutExtension, filenameExtension);
 
 		return createFile();
 	}
@@ -78,7 +77,7 @@ public final class TimestampLabeller implements Labeller {
 	public File roll(final File file, final int maxBackups) {
 		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
 		if (files.size() > maxBackups) {
-			Collections.sort(files, logFileComparator);
+			Collections.sort(files, LogFileComparator.getInstance());
 			for (int i = maxBackups; i < files.size(); ++i) {
 				files.get(i).delete();
 			}
@@ -88,33 +87,8 @@ public final class TimestampLabeller implements Labeller {
 	}
 
 	private File createFile() {
-		return new File(filenameWithoutExtension + "." + new SimpleDateFormat(timestampFormat, Logger.getLocale()).format(new Date()) + filenameExtension);
-	}
-
-	private final class LogFileFilter implements FileFilter {
-
-		@Override
-		public boolean accept(final File file) {
-			String path = file.getAbsolutePath();
-			return path.startsWith(filenameWithoutExtension) && path.endsWith(filenameExtension);
-		}
-
-	}
-
-	private final class LogFileComparator implements Comparator<File> {
-
-		@Override
-		public int compare(final File file1, final File file2) {
-			long diff = file2.lastModified() - file1.lastModified();
-			if (diff < 0) {
-				return -1;
-			} else if (diff > 0) {
-				return +1;
-			} else {
-				return 0;
-			}
-		}
-
+		String timestamp = new SimpleDateFormat(timestampFormat, Logger.getLocale()).format(new Date());
+		return new File(directory, filenameWithoutExtension + "." + timestamp + filenameExtension);
 	}
 
 }
