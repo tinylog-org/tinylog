@@ -86,6 +86,8 @@ final class Tokenizer {
 			return new Token(TokenType.PLAIN_TEXT, pid);
 		} else if ("{thread}".equals(text)) {
 			return new Token(TokenType.THREAD);
+		} else if ("{thread_id}".equals(text)) {
+			return new Token(TokenType.THREAD_ID);
 		} else if ("{class}".equals(text)) {
 			return new Token(TokenType.CLASS);
 		} else if ("{package}".equals(text)) {

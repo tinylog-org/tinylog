@@ -81,6 +81,10 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.THREAD, tokens.get(0).getType());
 
+		tokens = Tokenizer.parse("{thread_id}", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(TokenType.THREAD_ID, tokens.get(0).getType());
+
 		tokens = Tokenizer.parse("{class}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.CLASS, tokens.get(0).getType());

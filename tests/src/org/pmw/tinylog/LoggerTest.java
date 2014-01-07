@@ -401,14 +401,14 @@ public class LoggerTest extends AbstractTest {
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
-				.formatPattern("{thread}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+				.formatPattern("{thread}#{thread_id}#{class}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
 		assertEquals(
-				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#testFullLogEntry#LoggerTest.java#{2}#{3}#{4}#Hello{5}", Thread.currentThread()
-						.getName(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE)),
-				writer.consumeLogEntry());
+				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#{2}#testFullLogEntry#LoggerTest.java#{3}#{4}#{5}#Hello{6}", Thread
+						.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO,
+						new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE)), writer.consumeLogEntry());
 	}
 
 	/**
@@ -418,13 +418,13 @@ public class LoggerTest extends AbstractTest {
 	public final void testFullLogEntryWithPackageClassName() {
 		StoreWriter writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
-				.formatPattern("{thread}#{package}.{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+				.formatPattern("{thread}#{thread_id}#{package}.{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
 		assertEquals(
-				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#testFullLogEntryWithPackageClassName#LoggerTest.java#{2}#{3}#{4}#Hello{5}",
-						Thread.currentThread().getName(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO,
+				new LogEntry(LoggingLevel.INFO, MessageFormat.format("{0}#{1}#{2}#testFullLogEntryWithPackageClassName#LoggerTest.java#{3}#{4}#{5}#Hello{6}",
+						Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(), lineNumber, LoggingLevel.INFO,
 						new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE)), writer.consumeLogEntry());
 	}
 

@@ -535,7 +535,6 @@ public final class Logger {
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		StringBuilder builder = new StringBuilder();
 
-		String threadName = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		Date now = null;
 		String fullyQualifiedClassName = null;
@@ -544,10 +543,11 @@ public final class Logger {
 		for (Token token : currentConfiguration.getFormatTokens()) {
 			switch (token.getType()) {
 				case THREAD:
-					if (threadName == null) {
-						threadName = Thread.currentThread().getName();
-					}
-					builder.append(threadName);
+					builder.append(Thread.currentThread().getName());
+					break;
+
+				case THREAD_ID:
+					builder.append(Thread.currentThread().getId());
 					break;
 
 				case CLASS:

@@ -34,6 +34,11 @@ enum TokenType {
 	THREAD,
 
 	/**
+	 * The ID of the current thread
+	 */
+	THREAD_ID,
+
+	/**
 	 * The fully qualified class name of the caller
 	 */
 	CLASS,
