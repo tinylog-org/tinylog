@@ -431,7 +431,8 @@ public final class Logger {
 	static void setConfirguration(final Configuration configuration) throws Exception {
 		if (configuration != null) {
 			LoggingWriter writer = configuration.getWriter();
-			if (writer != null) {
+			LoggingWriter oldWriter = Logger.configuration == null ? null : Logger.configuration.getWriter();
+			if (writer != null && writer != oldWriter) {
 				writer.init();
 			}
 		}
