@@ -158,7 +158,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		}
 		reader.close();
 
-		assertEquals(5 * 100, readLines);
+		assertEquals(5 * 5000, readLines);
 
 		file.delete();
 	}
@@ -174,7 +174,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	public static void main(final String[] arguments) throws IOException {
 		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
 		writer.init();
-		for (int i = 0; i < 100; ++i) {
+		for (int i = 0; i < 5000; ++i) {
 			writer.write(LoggingLevel.INFO, WritingThread.LINE + "\n");
 		}
 		writer.close();
