@@ -1,8 +1,20 @@
 <!-- Exclude list of warnings -->
 <FindBugsFilter>
 	<Match>
-		<Class name="org.pmw.tinylog.Logger" />
+		<Or>
+			<Class name="org.pmw.tinylog.Logger" />
+			<Class name="org.apache.log4j.TinylogBride" />
+		</Or>
 		<!-- Catching of exceptions is required for the case that the fast but unofficial ways to get the stack trace will fail -->
 		<Bug pattern="REC_CATCH_EXCEPTION" />
+	</Match>
+	<Match>
+		<Class name="org.apache.log4j.Priority" />
+		<!-- Known as bad but source code is from Log4j -->
+		<Bug pattern="HE_EQUALS_USE_HASHCODE" />
+	</Match>
+	<Match>
+		<!-- Default encoding is wanted, even if the encoding vary between platforms -->
+		<Bug pattern="DM_DEFAULT_ENCODING" />
 	</Match>
 </FindBugsFilter>
