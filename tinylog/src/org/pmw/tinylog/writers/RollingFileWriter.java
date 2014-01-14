@@ -14,6 +14,7 @@
 package org.pmw.tinylog.writers;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,8 +38,9 @@ public final class RollingFileWriter implements LoggingWriter {
 	private final Labeller labeller;
 	private final List<? extends Policy> policies;
 
+	private final Object mutex;
 	private File file;
-	private java.io.FileWriter writer;
+	private FileOutputStream stream;
 
 	/**
 	 * Rolling log files once at startup.
@@ -93,6 +95,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
+		this.mutex = new Object();
 		this.filename = filename;
 		this.backups = Math.max(0, backups);
 		this.labeller = labeller == null ? new CountLabeller() : labeller;
@@ -105,7 +108,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	 * @return Filename of the current log file
 	 */
 	public String getFilename() {
-		synchronized (this) {
+		synchronized (mutex) {
 			return file == null ? filename : file.getAbsolutePath();
 		}
 	}
@@ -141,20 +144,20 @@ public final class RollingFileWriter implements LoggingWriter {
 	public void init() throws IOException {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
-		writer = new java.io.FileWriter(file, true);
+		stream = new FileOutputStream(file, true);
 	}
 
 	@Override
 	public void write(final LoggingLevel level, final String logEntry) throws IOException {
-		synchronized (this) {
+		synchronized (mutex) {
 			if (!checkPolicies(level, logEntry)) {
 				try {
-					writer.close();
+					stream.close();
 				} catch (IOException ex) {
 					ex.printStackTrace(System.err);
 				}
 				file = labeller.roll(file, backups);
-				writer = new java.io.FileWriter(file);
+				stream = new FileOutputStream(file);
 			}
 			write(logEntry);
 		}
@@ -167,8 +170,8 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *             Failed to close the log file
 	 */
 	public void close() throws IOException {
-		synchronized (this) {
-			writer.close();
+		synchronized (mutex) {
+			stream.close();
 		}
 	}
 
@@ -205,8 +208,7 @@ public final class RollingFileWriter implements LoggingWriter {
 
 	private void write(final String logEntry) {
 		try {
-			writer.write(logEntry);
-			writer.flush();
+			stream.write(logEntry.getBytes());
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
 		}

@@ -16,11 +16,8 @@ package org.pmw.tinylog.writers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.pmw.tinylog.LoggingLevel;
 
@@ -32,32 +29,17 @@ import org.pmw.tinylog.LoggingLevel;
 @PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
 public final class SharedFileWriter implements LoggingWriter {
 
-	private static final Map<String, Mutex> mutexes = new HashMap<String, Mutex>();
-
 	private final File file;
-	private final Mutex internalMutex;
+	private final Object mutex;
 	private FileOutputStream stream;
-	private java.io.OutputStreamWriter writer;
 
 	/**
 	 * @param filename
 	 *            Filename of the log file
 	 */
 	public SharedFileWriter(final String filename) {
-		this.file = new File(filename);
-
-		String key = file.getAbsolutePath();
-		Mutex mutex;
-		synchronized (mutexes) {
-			mutex = mutexes.get(key);
-			if (mutex == null) {
-				mutex = new Mutex(1);
-				mutexes.put(key, mutex);
-			} else {
-				++mutex.count;
-			}
-		}
-		this.internalMutex = mutex;
+		file = new File(filename);
+		mutex = new Object();
 	}
 
 	/**
@@ -75,19 +57,17 @@ public final class SharedFileWriter implements LoggingWriter {
 			file.delete();
 		}
 		stream = new FileOutputStream(file, true);
-		writer = new OutputStreamWriter(stream);
 	}
 
 	@Override
 	public void write(final LoggingLevel level, final String logEntry) throws IOException {
 		FileChannel channel = stream.getChannel();
-		synchronized (internalMutex) {
-			FileLock externalLock = channel.lock();
+		synchronized (mutex) {
+			FileLock lock = channel.lock();
 			try {
-				writer.write(logEntry);
-				writer.flush();
+				stream.write(logEntry.getBytes());
 			} finally {
-				externalLock.release();
+				lock.release();
 			}
 		}
 	}
@@ -99,31 +79,14 @@ public final class SharedFileWriter implements LoggingWriter {
 	 *             Failed to close the log file
 	 */
 	public void close() throws IOException {
-		synchronized (mutexes) {
-			if (internalMutex.count > 1) {
-				--internalMutex.count;
-			} else {
-				String key = file.getAbsolutePath();
-				mutexes.remove(key);
-			}
+		synchronized (mutex) {
+			stream.close();
 		}
-
-		writer.close();
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
 		close();
-	}
-
-	private static final class Mutex {
-
-		private int count;
-
-		public Mutex(final int count) {
-			this.count = count;
-		}
-
 	}
 
 }

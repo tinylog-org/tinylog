@@ -29,11 +29,12 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.WritingThread;
 
 /**
  * Tests for the shared file logging writer.
  * 
- * @see FileWriter
+ * @see SharedFileWriter
  */
 public class SharedFileWriterTest extends AbstractTest {
 
@@ -80,9 +81,12 @@ public class SharedFileWriterTest extends AbstractTest {
 	public final void testMultiThreadedWriting() throws IOException, InterruptedException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		List<WritingThread> threads = new ArrayList<SharedFileWriterTest.WritingThread>();
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		writer.init();
+
+		List<WritingThread> threads = new ArrayList<WritingThread>();
 		for (int i = 0; i < 5; ++i) {
-			threads.add(new WritingThread(file));
+			threads.add(new WritingThread(writer));
 		}
 
 		for (WritingThread thread : threads) {
@@ -115,7 +119,65 @@ public class SharedFileWriterTest extends AbstractTest {
 		assertNotEquals(0, readLines);
 		assertEquals(writtenLines, readLines);
 
+		writer.close();
 		file.delete();
+	}
+
+	/**
+	 * Test simultaneously writing from multiple JVMs.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testMultiJvmWriting() throws IOException, InterruptedException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		String separator = System.getProperty("file.separator");
+		String classpath = System.getProperty("java.class.path");
+		String path = System.getProperty("java.home") + separator + "bin" + separator + "java";
+		ProcessBuilder processBuilder = new ProcessBuilder(path, "-cp", classpath, SharedFileWriterTest.class.getCanonicalName(), file.getAbsolutePath());
+		processBuilder.redirectErrorStream(true);
+
+		List<Process> processes = new ArrayList<>();
+		for (int i = 0; i < 5; ++i) {
+			processes.add(processBuilder.start());
+		}
+
+		for (Process process : processes) {
+			process.waitFor();
+		}
+
+		long readLines = 0L;
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+			assertEquals(WritingThread.LINE, line);
+			++readLines;
+		}
+		reader.close();
+
+		assertEquals(5 * 100, readLines);
+
+		file.delete();
+	}
+
+	/**
+	 * Main method for {@link #testMultiJvmWriting()}.
+	 * 
+	 * @param arguments
+	 *            Contains the file name for logging writer
+	 * @throws IOException
+	 *             Logging failed
+	 */
+	public static void main(final String[] arguments) throws IOException {
+		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
+		writer.init();
+		for (int i = 0; i < 100; ++i) {
+			writer.write(LoggingLevel.INFO, WritingThread.LINE + "\n");
+		}
+		writer.close();
 	}
 
 	/**
@@ -165,44 +227,6 @@ public class SharedFileWriterTest extends AbstractTest {
 		reader.close();
 
 		file.delete();
-	}
-
-	private static final class WritingThread extends Thread {
-
-		private static final String LINE = "!!! Hello World! !!! qwertzuiopasdfghjklyxcvbnm !!!";
-
-		private final SharedFileWriter writer;
-		private long writtenLines;
-		private volatile boolean shutdown;
-
-		public WritingThread(final File file) throws IOException {
-			writer = new SharedFileWriter(file.getAbsolutePath());
-			writer.init();
-			writtenLines = 0L;
-			shutdown = false;
-		}
-
-		public long getWrittenLines() {
-			return writtenLines;
-		}
-
-		@Override
-		public void run() {
-			try {
-				while (!shutdown) {
-					writer.write(LoggingLevel.INFO, LINE + "\n");
-					++writtenLines;
-				}
-				writer.close();
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-
-		public void shutdown() {
-			this.shutdown = true;
-		}
-
 	}
 
 }

@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.pmw.tinylog.LoggingLevel;
@@ -24,7 +25,7 @@ import org.pmw.tinylog.LoggingLevel;
 public final class FileWriter implements LoggingWriter {
 
 	private final String filename;
-	private java.io.FileWriter writer;
+	private FileOutputStream stream;
 
 	/**
 	 * @param filename
@@ -45,13 +46,12 @@ public final class FileWriter implements LoggingWriter {
 
 	@Override
 	public void init() throws IOException {
-		writer = new java.io.FileWriter(filename);
+		stream = new FileOutputStream(filename);
 	}
 
 	@Override
 	public void write(final LoggingLevel level, final String logEntry) throws IOException {
-		writer.write(logEntry);
-		writer.flush();
+		stream.write(logEntry.getBytes());
 	}
 
 	/**
@@ -61,7 +61,7 @@ public final class FileWriter implements LoggingWriter {
 	 *             Failed to close the log file
 	 */
 	public void close() throws IOException {
-		writer.close();
+		stream.close();
 	}
 
 	@Override
