@@ -13,12 +13,30 @@
 
 package android.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Stub of the Android logging system (logcat).
  */
 public final class Log {
 
+	private static List<String> entries = new ArrayList<String>();
+
 	private Log() {
+	}
+
+	/**
+	 * Get and remove the current log entries.
+	 * 
+	 * @return Current log entries
+	 */
+	public static List<String> consumeEntries() {
+		try {
+			return entries;
+		} finally {
+			entries = new ArrayList<String>();
+		}
 	}
 
 	/**
@@ -31,7 +49,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int v(final String tag, final String message) {
-		return message.getBytes().length;
+		String entry = "V\t" + tag + "\t" + message;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -46,7 +66,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int v(final String tag, final String message, final Throwable ex) {
-		return message.getBytes().length;
+		String entry = "V\t" + tag + "\t" + message + "\t" + ex;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -59,7 +81,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int d(final String tag, final String message) {
-		return message.getBytes().length;
+		String entry = "D\t" + tag + "\t" + message;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -74,7 +98,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int d(final String tag, final String message, final Throwable ex) {
-		return message.getBytes().length;
+		String entry = "D\t" + tag + "\t" + message + "\t" + ex;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -87,7 +113,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int i(final String tag, final String message) {
-		return message.getBytes().length;
+		String entry = "I\t" + tag + "\t" + message;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -102,7 +130,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int i(final String tag, final String message, final Throwable ex) {
-		return message.getBytes().length;
+		String entry = "I\t" + tag + "\t" + message + "\t" + ex;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -115,7 +145,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int w(final String tag, final String message) {
-		return message.getBytes().length;
+		String entry = "W\t" + tag + "\t" + message;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -130,7 +162,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int w(final String tag, final String message, final Throwable ex) {
-		return message.getBytes().length;
+		String entry = "W\t" + tag + "\t" + message + "\t" + ex;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -143,7 +177,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int e(final String tag, final String message) {
-		return message.getBytes().length;
+		String entry = "E\t" + tag + "\t" + message;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 	/**
@@ -158,7 +194,9 @@ public final class Log {
 	 * @return Bytes to write
 	 */
 	public static int e(final String tag, final String message, final Throwable ex) {
-		return message.getBytes().length;
+		String entry = "E\t" + tag + "\t" + message + "\t" + ex;
+		entries.add(entry);
+		return entry.getBytes().length;
 	}
 
 }

@@ -43,6 +43,7 @@ import org.pmw.tinylog.util.ProcessIdHelper;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
+import org.pmw.tinylog.writers.LogcatWriter;
 import org.pmw.tinylog.writers.RollingFileWriter;
 import org.pmw.tinylog.writers.SharedFileWriter;
 
@@ -291,6 +292,24 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(DailyPolicy.class, policies.get(1).getClass());
 
 		file.delete();
+	}
+
+	/**
+	 * Test reading logcat logging writer.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testLogcatLoggingWriter() throws IOException {
+		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "logcat"));
+		assertNotNull(configuration.getWriter());
+		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
+
+		configuration = load(new PropertiesBuilder().set("tinylog.writer", "logcat").set("tinylog.writer.tag", "myapp"));
+		assertNotNull(configuration.getWriter());
+		assertEquals(LogcatWriter.class, configuration.getWriter().getClass());
+		assertEquals("myapp", ((LogcatWriter) configuration.getWriter()).getTag());
 	}
 
 	/**
