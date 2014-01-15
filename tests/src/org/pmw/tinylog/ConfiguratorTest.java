@@ -261,7 +261,7 @@ public class ConfiguratorTest extends AbstractTest {
 	 * Test setting locales.
 	 */
 	@Test
-	public final void testLocal() {
+	public final void testLocale() {
 		Configuration configuration = Configurator.defaultConfig().locale(Locale.GERMANY).create();
 		assertEquals(Locale.GERMANY, configuration.getLocale());
 
