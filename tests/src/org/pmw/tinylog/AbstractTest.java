@@ -14,8 +14,12 @@
 package org.pmw.tinylog;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.Properties;
 
 import org.junit.After;
@@ -76,6 +80,29 @@ public abstract class AbstractTest {
 	 */
 	public final StringListOutputStream getSystemErrorStream() {
 		return systemErrorStream;
+	}
+
+	/**
+	 * Test if a class is a valid utility class. A valid utility class must be final and has exactly one private
+	 * constructor.
+	 * 
+	 * @param clazz
+	 *            Class to test
+	 */
+	protected static final void testIfValidUtilityClass(final Class<?> clazz) {
+		assertTrue("A utility class must be final", Modifier.isFinal(clazz.getModifiers()));
+
+		Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+		assertTrue("A utility class must have exactly one private constructor", constructors.length == 1);
+		Constructor<?> constructor = constructors[0];
+		assertTrue("A utility class must have exactly one private constructor", Modifier.isPrivate(constructor.getModifiers()));
+
+		try {
+			constructor.setAccessible(true);
+			constructor.newInstance();
+		} catch (Exception ex) {
+			fail("Failed to call constructor: " + ex.getMessage());
+		}
 	}
 
 }

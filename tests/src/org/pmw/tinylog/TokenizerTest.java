@@ -15,8 +15,6 @@ package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -75,7 +73,7 @@ public class TokenizerTest extends AbstractTest {
 		tokens = Tokenizer.parse("{pid}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
-		assertThat((String) tokens.get(0).getData(), matches("\\d+"));
+		assertEquals(EnvironmentHelper.getProcessId(), tokens.get(0).getData());
 
 		tokens = Tokenizer.parse("{thread}", locale);
 		assertEquals(1, tokens.size());

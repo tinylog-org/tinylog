@@ -19,14 +19,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-
-import mockit.NonStrictExpectations;
 
 import org.junit.Test;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.ProcessIdHelper;
 
 /**
  * Tests for process ID labeller.
@@ -36,45 +32,11 @@ import org.pmw.tinylog.util.ProcessIdHelper;
 public class ProcessIdLabellerTest extends AbstractLabellerTest {
 
 	/**
-	 * Test if the labeller extract the right process ID (pid).
+	 * Test if the labeller extract the process ID (pid).
 	 */
 	@Test
-	public final void testCurrentProcessId() {
-		assertEquals(ProcessIdHelper.getProcessId(), new ProcessIdLabeller().getProcessId());
-	}
-
-	/**
-	 * Test if the labeller extract the process ID (pid) if the name of {@link RuntimeMXBean} is without host name.
-	 */
-	@Test
-	public final void testProcessIdOnly() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
-			{
-				ManagementFactory.getRuntimeMXBean().getName();
-				returns("1234");
-			}
-
-		};
-
-		assertEquals("1234", new ProcessIdLabeller().getProcessId());
-	}
-
-	/**
-	 * Test if the labeller extract the process ID (pid) if the name of {@link RuntimeMXBean} includes the host name.
-	 */
-	@Test
-	public final void testProcessIdWithHost() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
-			{
-				ManagementFactory.getRuntimeMXBean().getName();
-				returns("1234@localhost");
-			}
-
-		};
-
-		assertEquals("1234", new ProcessIdLabeller().getProcessId());
+	public final void testProcessId() {
+		assertEquals(EnvironmentHelper.getProcessId(), new ProcessIdLabeller().getProcessId());
 	}
 
 	/**
@@ -87,7 +49,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 	public final void testLabellingWithFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.delete();
-		File realFile = getBackupFile(baseFile, "tmp", ProcessIdHelper.getProcessId());
+		File realFile = getBackupFile(baseFile, "tmp", EnvironmentHelper.getProcessId().toString());
 
 		Labeller labeller = new ProcessIdLabeller();
 
@@ -112,7 +74,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 	public final void testLabellingWithoutFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile(null);
 		baseFile.delete();
-		File realFile = getBackupFile(baseFile, null, ProcessIdHelper.getProcessId());
+		File realFile = getBackupFile(baseFile, null, EnvironmentHelper.getProcessId().toString());
 
 		Labeller labeller = new ProcessIdLabeller();
 
@@ -138,7 +100,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		File baseFile = File.createTempFile("test", ".tmp");
 		baseFile.delete();
 
-		File targetFile = getBackupFile(baseFile, "tmp", ProcessIdHelper.getProcessId());
+		File targetFile = getBackupFile(baseFile, "tmp", EnvironmentHelper.getProcessId().toString());
 		targetFile.createNewFile();
 
 		Labeller labeller = new ProcessIdLabeller();

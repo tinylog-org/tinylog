@@ -14,10 +14,11 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.pmw.tinylog.EnvironmentHelper;
 
 /**
  * Add the process ID (PID) to log files.
@@ -31,13 +32,7 @@ public final class ProcessIdLabeller implements Labeller {
 	/**
 	 */
 	public ProcessIdLabeller() {
-		String name = ManagementFactory.getRuntimeMXBean().getName();
-		int index = name.indexOf('@');
-		if (index > 0) {
-			this.pid = name.substring(0, index);
-		} else {
-			this.pid = name;
-		}
+		pid = EnvironmentHelper.getProcessId().toString();
 	}
 
 	/**

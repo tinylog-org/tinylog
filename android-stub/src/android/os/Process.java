@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Martin Winandy
+ * Copyright 2014 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,30 +11,30 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.util;
+package android.os;
 
 import java.lang.management.ManagementFactory;
 
 /**
- * Helper for process ID (PID).
+ * Stub of the Android Process class.
  */
-public final class ProcessIdHelper {
+public final class Process {
 
-	private ProcessIdHelper() {
+	private Process() {
 	}
 
 	/**
-	 * Get the process ID (PID) of the JVM.
+	 * Get the ID of the current process (pid).
 	 * 
-	 * @return Process ID (PID) of the JVM.
+	 * @return ID of the current process
 	 */
-	public static String getProcessId() {
+	public static int myPid() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		int index = name.indexOf('@');
 		if (index > 0) {
-			return name.substring(0, index);
+			return Integer.parseInt(name.substring(0, index));
 		} else {
-			return name;
+			return Integer.parseInt(name);
 		}
 	}
 

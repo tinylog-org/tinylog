@@ -39,7 +39,6 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.ProcessIdHelper;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
@@ -250,7 +249,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		labeller = rollingFileWriter.getLabeller();
 		assertNotNull(labeller);
 		assertEquals(ProcessIdLabeller.class, labeller.getClass());
-		assertEquals(new File("my." + ProcessIdHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
+		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(1, policies.size());
