@@ -14,7 +14,17 @@
 		<Bug pattern="HE_EQUALS_USE_HASHCODE" />
 	</Match>
 	<Match>
-		<!-- Default encoding is wanted, even if the encoding vary between platforms -->
+		<!-- Default encoding is wanted, even if the encoding will be vary between platforms -->
 		<Bug pattern="DM_DEFAULT_ENCODING" />
+	</Match>
+	<Match>
+		<Class name="org.pmw.tinylog.writers.LogEntry" />
+		<!-- Problem with "java.util.Date" is known but currently there is no better alternative in the Java library -->
+		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
+	</Match>
+	<Match>
+		<Class name="org.pmw.tinylog.writers.SharedFileWriter" />
+		<!-- "file.delete()" can be successful (=> create a new log file) as well as it can fail (=> join existing log file) -->
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
 </FindBugsFilter>
