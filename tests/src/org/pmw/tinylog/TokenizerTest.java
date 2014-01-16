@@ -41,6 +41,16 @@ public class TokenizerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test if the class is a valid utility class.
+	 * 
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(Tokenizer.class);
+	}
+
+	/**
 	 * Test parsing with results of one single token.
 	 */
 	@Test
