@@ -13,15 +13,19 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
@@ -32,6 +36,15 @@ import org.pmw.tinylog.util.StringListOutputStream;
 public class ConsoleWriterTest extends AbstractTest {
 
 	/**
+	 * Test required log entry values.
+	 */
+	@Test
+	public final void testRequiredLogEntryValue() {
+		Set<LogEntryValue> requiredLogEntryValues = new ConsoleWriter().getRequiredLogEntryValues();
+		assertThat(requiredLogEntryValues, contains(LogEntryValue.LOGGING_LEVEL, LogEntryValue.RENDERED_LOG_ENTRY));
+	}
+
+	/**
 	 * Test if error and warning messages will appear in the "error" output stream.
 	 */
 	@Test
@@ -39,7 +52,7 @@ public class ConsoleWriterTest extends AbstractTest {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init();
-			writer.write(loggingLevel, "Hello\n");
+			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			StringListOutputStream outputStream = getSystemOutputStream();
 			assertFalse(outputStream.hasLines());
@@ -58,7 +71,7 @@ public class ConsoleWriterTest extends AbstractTest {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init();
-			writer.write(loggingLevel, "Hello\n");
+			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			StringListOutputStream outputStream = getSystemOutputStream();
 			assertTrue(outputStream.hasLines());

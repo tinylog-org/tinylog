@@ -24,7 +24,8 @@ import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StoreWriter.LogEntry;
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Tests for tinylog bridge.
@@ -32,8 +33,6 @@ import org.pmw.tinylog.util.StoreWriter.LogEntry;
  * @see TinylogBride
  */
 public class TinylogBridgeTest extends AbstractTest {
-
-	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private SimpleLog4Facade logger;
 	private StoreWriter writer;
@@ -45,7 +44,7 @@ public class TinylogBridgeTest extends AbstractTest {
 	public final void init() {
 		logger = new SimpleLog4Facade();
 		writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).formatPattern("{message}").maxStackTraceElements(0).activate();
+		Configurator.defaultConfig().writer(writer).activate();
 	}
 
 	/**
@@ -110,25 +109,54 @@ public class TinylogBridgeTest extends AbstractTest {
 	@Test
 	public final void testLogging() {
 		Configurator.currentConfig().level(LoggingLevel.INFO).activate();
+		Exception exception = new Exception();
 
 		logger.log(Level.TRACE, "Hello!");
-		assertNull(writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertNull(logEntry);
 
-		logger.log(Level.DEBUG, "Hello!", new Exception());
-		assertNull(writer.consumeLogEntry());
+		logger.log(Level.DEBUG, "Hello!", exception);
+		logEntry = writer.consumeLogEntry();
+		assertNull(logEntry);
 
 		logger.log(Level.INFO, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "Hello!" + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
 
-		logger.log(Level.WARN, null, new Exception());
-		assertEquals(new LogEntry(LoggingLevel.WARNING, Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logger.log(Level.WARN, null, exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(exception, logEntry.getException());
 
 		logger.log(Level.ERROR, new StringBuilder("Hello!"));
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Hello!" + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
 
-		Configurator.currentConfig().formatPattern("{class}").activate();
 		logger.log(Level.FATAL, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, TinylogBridgeTest.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+	}
+
+	/**
+	 * Test computing class name.
+	 */
+	@Test
+	public final void testClassName() {
+		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
+		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+
+		logger.log(Level.INFO, "Hello!");
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
+
+		logger.log(Level.ERROR, "Hello!", new Exception());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 	}
 
 }

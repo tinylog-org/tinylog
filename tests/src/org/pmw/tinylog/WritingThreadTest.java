@@ -19,8 +19,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StoreWriter.LogEntry;
+import org.pmw.tinylog.writers.LogEntry;
 
 /**
  * Tests for writing thread.
@@ -65,12 +66,14 @@ public class WritingThreadTest extends AbstractTest {
 		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
 		writingThread.start();
 
-		writingThread.putLogEntry(writer, LoggingLevel.INFO, "sample");
+		writingThread.putLogEntry(writer, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
 
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertEquals(new LogEntry(LoggingLevel.INFO, "sample"), writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("sample", logEntry.getMessage());
 	}
 
 	/**

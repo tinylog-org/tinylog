@@ -13,11 +13,12 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,14 +26,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
+import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.WritingThread;
 
 /**
@@ -41,6 +42,23 @@ import org.pmw.tinylog.util.WritingThread;
  * @see RollingFileWriter
  */
 public class RollingFileWriterTest extends AbstractTest {
+
+	/**
+	 * Test required log entry values.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testRequiredLogEntryValue() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
+		Set<LogEntryValue> requiredLogEntryValues = writer.getRequiredLogEntryValues();
+		assertThat(requiredLogEntryValues, contains(LogEntryValue.RENDERED_LOG_ENTRY));
+
+		file.delete();
+	}
 
 	/**
 	 * Test simple writing (non-existing log file and neither policies nor a labeller).
@@ -55,15 +73,16 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
 		writer.init();
-		writer.write(LoggingLevel.INFO, "Hello\n");
-		writer.write(LoggingLevel.INFO, "World\n");
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
-		assertFalse(errorStream.hasLines());
-		writer.write(LoggingLevel.INFO, "Won't be written\n");
-		assertTrue(errorStream.hasLines());
-		errorStream.clear();
+		try {
+			writer.write(new LogEntryBuilder().renderedLogEntry("Won't be written\n").create());
+			fail("Exception expected");
+		} catch (IOException ex) {
+			// Expected
+		}
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
@@ -141,9 +160,9 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new SizePolicy(3));
 		writer.init();
-		writer.write(LoggingLevel.INFO, "3");
-		writer.write(LoggingLevel.INFO, "4");
-		writer.write(LoggingLevel.INFO, "5");
+		writer.write(new LogEntryBuilder().renderedLogEntry("3").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("4").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("5").create());
 		writer.close();
 
 		assertEquals("45", FileHelper.read(file));

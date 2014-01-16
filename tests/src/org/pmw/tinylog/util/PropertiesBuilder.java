@@ -22,10 +22,6 @@ public final class PropertiesBuilder {
 
 	private final Properties properties = new Properties();
 
-	/** */
-	public PropertiesBuilder() {
-	}
-
 	/**
 	 * Set a property.
 	 * 

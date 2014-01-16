@@ -13,6 +13,13 @@
 
 package org.pmw.tinylog;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.Thread.State;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,14 +27,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Test;
-import org.pmw.tinylog.util.NullWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Tests for configuration.
@@ -91,8 +92,8 @@ public class ConfigurationTest extends AbstractTest {
 	private Configuration createDetailedConfigurationSample() {
 		Map<String, LoggingLevel> packageLevels = new HashMap<String, LoggingLevel>();
 		packageLevels.put(ConfigurationTest.class.getPackage().getName(), LoggingLevel.INFO);
-		return new Configuration(LoggingLevel.WARNING, packageLevels, "{class}{method}", Locale.GERMANY, new NullWriter(), new WritingThread(null,
-				Thread.MIN_PRIORITY), Integer.MAX_VALUE);
+		return new Configuration(LoggingLevel.WARNING, packageLevels, "{class}{method}", Locale.GERMANY, new StoreWriter(LogEntryValue.RENDERED_LOG_ENTRY),
+				new WritingThread(null, Thread.MIN_PRIORITY), Integer.MAX_VALUE);
 	}
 
 	private void testDetailedConfigurationSample(final Configuration configuration) {
@@ -106,7 +107,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(2, configuration.getFormatTokens().size());
 		assertEquals(Locale.GERMANY, configuration.getLocale());
 		assertNotNull(configuration.getWriter());
-		assertEquals(NullWriter.class, configuration.getWriter().getClass());
+		assertEquals(StoreWriter.class, configuration.getWriter().getClass());
 		assertNotNull(configuration.getWritingThread());
 		assertEquals(State.NEW, configuration.getWritingThread().getState());
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());

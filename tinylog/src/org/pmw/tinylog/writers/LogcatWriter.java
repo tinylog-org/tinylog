@@ -13,33 +13,22 @@
 
 package org.pmw.tinylog.writers;
 
-import org.pmw.tinylog.LoggingLevel;
+import java.util.EnumSet;
+import java.util.Set;
 
 import android.util.Log;
 
 /**
  * Forward log entries to Android's logcat.
  */
-@PropertiesSupport(name = "logcat", properties = { @Property(name = "tag", type = String.class) })
+@PropertiesSupport(name = "logcat", properties = { })
 public final class LogcatWriter implements LoggingWriter {
 
-	private final String tag;
+	private static final String NEW_LINE = System.getProperty("line.separator");
 
-	/**
-	 * @param tag
-	 *            String to identify the application
-	 */
-	public LogcatWriter(final String tag) {
-		this.tag = tag;
-	}
-
-	/**
-	 * Get the tag to identify the application.
-	 * 
-	 * @return Tag to identify the application
-	 */
-	public String getTag() {
-		return tag;
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
 	}
 
 	@Override
@@ -48,26 +37,41 @@ public final class LogcatWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
-		switch (level) {
+	public void write(final LogEntry logEntry) {
+		String tag = shorten(logEntry.getClassName());
+		String message = removeLastLineBreak(logEntry.getRenderedLogEntry());
+
+		switch (logEntry.getLevel()) {
 			case ERROR:
-				Log.e(tag, logEntry);
+				Log.e(tag, message);
 				break;
 			case WARNING:
-				Log.w(tag, logEntry);
+				Log.w(tag, message);
 				break;
 			case INFO:
-				Log.i(tag, logEntry);
+				Log.i(tag, message);
 				break;
 			case DEBUG:
-				Log.d(tag, logEntry);
+				Log.d(tag, message);
 				break;
 			case TRACE:
-				Log.v(tag, logEntry);
+				Log.v(tag, message);
 				break;
 			default:
-				// Do nothing
-				break;
+				throw new IllegalArgumentException(logEntry.getLevel().toString());
+		}
+	}
+
+	private String shorten(final String className) {
+		int index = className.lastIndexOf('.');
+		return index >= 0 ? className.substring(index + 1) : className;
+	}
+
+	private String removeLastLineBreak(final String message) {
+		if (message.endsWith(NEW_LINE)) {
+			return message.substring(0, message.length() - NEW_LINE.length());
+		} else {
+			return message;
 		}
 	}
 

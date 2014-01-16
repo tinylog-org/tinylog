@@ -17,7 +17,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StoreWriter.LogEntry;
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Tests for the logging facade API.
@@ -26,24 +27,33 @@ import org.pmw.tinylog.util.StoreWriter.LogEntry;
  */
 public class LogEntryForwarderTest extends AbstractTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
-
 	/**
 	 * Test the default forward methods.
 	 */
 	@Test
 	public final void testLogging() {
-		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{file}|{message}").activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.FILE, LogEntryValue.MESSAGE);
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "LogEntryForwarderTest.java|Hello!" + NEW_LINE), writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals("Hello!", logEntry.getMessage());
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello {0}!", "World");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "LogEntryForwarderTest.java|Hello World!" + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals("Hello World!", logEntry.getMessage());
 
-		LogEntryForwarder.forward(0, LoggingLevel.ERROR, new Exception(), "Test");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "LogEntryForwarderTest.java|Test: java.lang.Exception" + NEW_LINE), writer.consumeLogEntry());
+		Exception exception = new Exception();
+		LogEntryForwarder.forward(0, LoggingLevel.ERROR, exception, "Test");
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals("Test", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 	}
 
 	/**
@@ -52,17 +62,28 @@ public class LogEntryForwarderTest extends AbstractTest {
 	@Test
 	public final void testLoggingWithStackTraceElement() {
 		StackTraceElement stackTraceElement = new StackTraceElement("MyClass", "?", "?", -1);
-		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).maxStackTraceElements(0).level(LoggingLevel.TRACE).formatPattern("{class}|{message}").activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
 
 		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "MyClass|Hello!" + NEW_LINE), writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("Hello!", logEntry.getMessage());
 
 		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello {0}!", "World");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "MyClass|Hello World!" + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("Hello World!", logEntry.getMessage());
 
-		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.ERROR, new Exception(), "Test");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "MyClass|Test: java.lang.Exception" + NEW_LINE), writer.consumeLogEntry());
+		Exception exception = new Exception();
+		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.ERROR, exception, "Test");
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("Test", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 	}
 
 }

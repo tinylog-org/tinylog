@@ -13,14 +13,6 @@
 
 package org.apache.log4j;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StoreWriter.LogEntry;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -29,14 +21,20 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.Configurator;
+import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.writers.LogEntry;
+
 /**
  * Tests for log4j logging API.
  * 
  * @see Logger
  */
 public class LoggerTest extends AbstractTest {
-
-	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private StoreWriter writer;
 
@@ -46,7 +44,7 @@ public class LoggerTest extends AbstractTest {
 	@Before
 	public final void init() {
 		writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).formatPattern("{message}").maxStackTraceElements(0).activate();
+		Configurator.defaultConfig().writer(writer).activate();
 	}
 
 	/**
@@ -157,51 +155,87 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
-		Logger logger = Logger.getRootLogger();
-
 		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
 
+		Logger logger = Logger.getRootLogger();
+		Exception exception = new Exception();
+
 		logger.trace("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.TRACE, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.trace("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.TRACE, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.trace("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		logger.debug("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.DEBUG, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.debug("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.DEBUG, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.debug("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		logger.info("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.INFO, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.info("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.INFO, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.info("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		logger.warn("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.WARNING, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.warn("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.WARNING, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.warn("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		logger.error("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.error("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.error("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		logger.fatal("Hello!");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Hello!" + NEW_LINE), writer.consumeLogEntry());
-		logger.fatal("Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
+		logger.fatal("Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 
 		Configurator.currentConfig().level(LoggingLevel.INFO).activate();
 
 		logger.log(Level.TRACE, "Hello!");
 		assertNull(writer.consumeLogEntry());
 		logger.log(Level.FATAL, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Hello!" + NEW_LINE), writer.consumeLogEntry());
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
 
-		logger.log(Level.TRACE, "Failed", new Exception());
+		logger.log(Level.TRACE, "Failed", exception);
 		assertNull(writer.consumeLogEntry());
-		logger.log(Level.FATAL, "Failed", new Exception());
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Failed: " + Exception.class.getName() + NEW_LINE), writer.consumeLogEntry());
+		logger.log(Level.FATAL, "Failed", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Failed", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 	}
 
 	/**
@@ -213,8 +247,11 @@ public class LoggerTest extends AbstractTest {
 
 		logger.assertLog(true, "Hello!");
 		assertNull(writer.consumeLogEntry());
+
 		logger.assertLog(false, "Hello!");
-		assertEquals(new LogEntry(LoggingLevel.ERROR, "Hello!" + NEW_LINE), writer.consumeLogEntry());
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello!", logEntry.getMessage());
 	}
 
 }

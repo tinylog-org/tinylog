@@ -13,15 +13,19 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.util.LogEntryBuilder;
 
 import android.util.Log;
 
@@ -32,13 +36,15 @@ import android.util.Log;
  */
 public class LogcatWriterTest extends AbstractTest {
 
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	/**
-	 * Test setting and getting tag.
+	 * Test required log entry values.
 	 */
 	@Test
-	public final void testTag() {
-		assertEquals("hello", new LogcatWriter("hello").getTag());
-		assertEquals("test", new LogcatWriter("test").getTag());
+	public final void testRequiredLogEntryValue() {
+		Set<LogEntryValue> requiredLogEntryValues = new LogcatWriter().getRequiredLogEntryValues();
+		assertThat(requiredLogEntryValues, contains(LogEntryValue.CLASS, LogEntryValue.LOGGING_LEVEL, LogEntryValue.RENDERED_LOG_ENTRY));
 	}
 
 	/**
@@ -46,25 +52,32 @@ public class LogcatWriterTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
-		final LogcatWriter writer = new LogcatWriter("myapp");
+		LogcatWriter writer = new LogcatWriter();
 		writer.init();
 
 		assertEquals(0, Log.consumeEntries().size());
 
-		writer.write(LoggingLevel.TRACE, "Hello World");
-		assertThat(Log.consumeEntries(), is(Collections.singletonList("V\tmyapp\tHello World")));
+		writer.write(new LogEntryBuilder().level(LoggingLevel.TRACE).className("com.package.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("V\tMyClass\tHello World")));
 
-		writer.write(LoggingLevel.DEBUG, "Hello World");
-		assertThat(Log.consumeEntries(), is(Collections.singletonList("D\tmyapp\tHello World")));
+		writer.write(new LogEntryBuilder().level(LoggingLevel.DEBUG).className("a.b.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("D\tMyClass\tHello World")));
 
-		writer.write(LoggingLevel.INFO, "Hello World");
-		assertThat(Log.consumeEntries(), is(Collections.singletonList("I\tmyapp\tHello World")));
+		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).className("MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("I\tMyClass\tHello World")));
 
-		writer.write(LoggingLevel.WARNING, "Hello World");
-		assertThat(Log.consumeEntries(), is(Collections.singletonList("W\tmyapp\tHello World")));
+		writer.write(new LogEntryBuilder().level(LoggingLevel.WARNING).className("com.package.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("W\tMyClass\tHello World")));
 
-		writer.write(LoggingLevel.ERROR, "Hello World");
-		assertThat(Log.consumeEntries(), is(Collections.singletonList("E\tmyapp\tHello World")));
+		writer.write(new LogEntryBuilder().level(LoggingLevel.ERROR).className("com.package.MyClass").renderedLogEntry("Hello World").create());
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("E\tMyClass\tHello World")));
+
+		try {
+			writer.write(new LogEntryBuilder().level(LoggingLevel.OFF).className("com.package.MyClass").renderedLogEntry("Hello World").create());
+			fail("IllegalArgumentException expected");
+		} catch (IllegalArgumentException ex) {
+			// Expected
+		}
 	}
 
 }

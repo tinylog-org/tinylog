@@ -15,8 +15,8 @@ package org.pmw.tinylog.writers;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import org.pmw.tinylog.LoggingLevel;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Writes log entries to a file.
@@ -35,6 +35,11 @@ public final class FileWriter implements LoggingWriter {
 		this.filename = filename;
 	}
 
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY);
+	}
+
 	/**
 	 * Get the filename of the log file.
 	 * 
@@ -50,8 +55,8 @@ public final class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) throws IOException {
-		stream.write(logEntry.getBytes());
+	public void write(final LogEntry logEntry) throws IOException {
+		stream.write(logEntry.getRenderedLogEntry().getBytes());
 	}
 
 	/**

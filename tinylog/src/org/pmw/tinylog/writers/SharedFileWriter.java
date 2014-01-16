@@ -18,8 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-
-import org.pmw.tinylog.LoggingLevel;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Writes log entries to a shared file.
@@ -42,6 +42,11 @@ public final class SharedFileWriter implements LoggingWriter {
 		mutex = new Object();
 	}
 
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY);
+	}
+
 	/**
 	 * Get the filename of the log file.
 	 * 
@@ -60,12 +65,12 @@ public final class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) throws IOException {
+	public void write(final LogEntry logEntry) throws IOException {
 		FileChannel channel = stream.getChannel();
 		synchronized (mutex) {
 			FileLock lock = channel.lock();
 			try {
-				stream.write(logEntry.getBytes());
+				stream.write(logEntry.getRenderedLogEntry().getBytes());
 			} finally {
 				lock.release();
 			}

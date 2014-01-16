@@ -18,7 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.labellers.CountLabeller;
@@ -102,6 +104,11 @@ public final class RollingFileWriter implements LoggingWriter {
 		this.policies = policies == null || policies.length == 0 ? Arrays.asList(new StartupPolicy()) : Arrays.asList(policies);
 	}
 
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY);
+	}
+
 	/**
 	 * Get the filename of the current log file.
 	 * 
@@ -148,18 +155,18 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) throws IOException {
+	public void write(final LogEntry logEntry) throws IOException {
 		synchronized (mutex) {
-			if (!checkPolicies(level, logEntry)) {
+			if (!checkPolicies(logEntry.getLevel(), logEntry.getRenderedLogEntry())) {
 				try {
 					stream.close();
 				} catch (IOException ex) {
-					ex.printStackTrace(System.err);
+					// Can be ignored
 				}
 				file = labeller.roll(file, backups);
 				stream = new FileOutputStream(file);
 			}
-			write(logEntry);
+			stream.write(logEntry.getRenderedLogEntry().getBytes());
 		}
 	}
 
@@ -203,14 +210,6 @@ public final class RollingFileWriter implements LoggingWriter {
 	private void resetPolicies() {
 		for (Policy policy : policies) {
 			policy.reset();
-		}
-	}
-
-	private void write(final String logEntry) {
-		try {
-			stream.write(logEntry.getBytes());
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
 		}
 	}
 

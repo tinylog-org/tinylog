@@ -13,7 +13,12 @@
 
 package org.pmw.tinylog.util;
 
-import org.pmw.tinylog.LoggingLevel;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -21,7 +26,41 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public final class StoreWriter implements LoggingWriter {
 
+	private final Set<LogEntryValue> requiredLogEntryValue;
 	private LogEntry logEntry;
+
+	/**
+	 * Create a new instance of this writer that required {@link LogEntryValue#LOGGING_LEVEL},
+	 * {@link LogEntryValue#MESSAGE} and {@link LogEntryValue#EXCEPTION}.
+	 */
+	public StoreWriter() {
+		this.requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+	}
+
+	/**
+	 * Create a new instance of this writer that required the defined log entry values.
+	 * 
+	 * @param requiredLogEntryValues
+	 *            Required log entry values
+	 */
+	public StoreWriter(final LogEntryValue... requiredLogEntryValues) {
+		this.requiredLogEntryValue = EnumSet.copyOf(Arrays.asList(requiredLogEntryValues));
+	}
+
+	/**
+	 * Create a new instance of this writer that required the defined log entry values.
+	 * 
+	 * @param requiredLogEntryValues
+	 *            Required log entry values
+	 */
+	public StoreWriter(final Set<LogEntryValue> requiredLogEntryValues) {
+		this.requiredLogEntryValue = requiredLogEntryValues;
+	}
+
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return requiredLogEntryValue;
+	}
 
 	@Override
 	public void init() {
@@ -29,11 +68,11 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String text) {
-		if (logEntry != null) {
+	public void write(final LogEntry logEntry) {
+		if (this.logEntry != null) {
 			throw new RuntimeException("Previous message wasn't consumed");
 		}
-		logEntry = new LogEntry(level, text);
+		this.logEntry = logEntry;
 	}
 
 	/**
@@ -45,77 +84,6 @@ public final class StoreWriter implements LoggingWriter {
 		LogEntry backup = this.logEntry;
 		this.logEntry = null;
 		return backup;
-	}
-
-	/**
-	 * Represents a log entry.
-	 */
-	public static final class LogEntry {
-
-		private final LoggingLevel level;
-		private final String text;
-
-		/**
-		 * @param level
-		 *            Level of the log entry
-		 * @param text
-		 *            Message of the log entry
-		 */
-		public LogEntry(final LoggingLevel level, final String text) {
-			this.level = level;
-			this.text = text;
-		}
-
-		/**
-		 * Get the level of the log entry.
-		 * 
-		 * @return Level of the log entry
-		 */
-		public LoggingLevel getLevel() {
-			return level;
-		}
-
-		/**
-		 * Get the message of the log entry.
-		 * 
-		 * @return Message of the log entry
-		 */
-		public String getText() {
-			return text;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (obj == this) {
-				return true;
-			} else if (obj instanceof LogEntry) {
-				LogEntry logEntry = (LogEntry) obj;
-				if (level != logEntry.level) {
-					return false;
-				}
-				if (text == null) {
-					if (logEntry.text != null) {
-						return false;
-					}
-				} else if (!text.equals(logEntry.text)) {
-					return false;
-				}
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			return text.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return level + ": " + text;
-		}
-
 	}
 
 }

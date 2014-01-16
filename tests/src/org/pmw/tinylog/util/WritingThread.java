@@ -53,7 +53,7 @@ public final class WritingThread extends Thread {
 	public void run() {
 		try {
 			while (!shutdown) {
-				writer.write(LoggingLevel.INFO, LINE + "\n");
+				writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).renderedLogEntry(LINE + "\n").create());
 				++writtenLines;
 			}
 		} catch (Exception ex) {

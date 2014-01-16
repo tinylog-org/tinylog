@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -25,7 +26,7 @@ final class WritingThread extends Thread {
 
 	private static final String THREAD_NAME = "tinylog-WritingThread";
 
-	private volatile List<LogEntry> entries;
+	private volatile List<WritingTask> entries;
 	private final String nameOfThreadToObserve;
 	private final Thread threadToObserve;
 	private volatile boolean shutdown;
@@ -41,7 +42,7 @@ final class WritingThread extends Thread {
 	 *            {@link Thread#MAX_PRIORITY})
 	 */
 	WritingThread(final String nameOfThreadToObserve, final int priority) {
-		this.entries = new ArrayList<WritingThread.LogEntry>();
+		this.entries = new ArrayList<WritingTask>();
 		this.nameOfThreadToObserve = nameOfThreadToObserve;
 		this.threadToObserve = nameOfThreadToObserve == null ? null : getThread(nameOfThreadToObserve);
 
@@ -62,14 +63,12 @@ final class WritingThread extends Thread {
 	 * Put a log entry to write.
 	 * 
 	 * @param writer
-	 *            Writer to write this log entry
-	 * @param level
-	 *            Level of the log entry
-	 * @param text
-	 *            Formatted log entry to write
+	 *            Writer to write the log entry
+	 * @param logEntry
+	 *            Log entry to write
 	 */
-	public synchronized void putLogEntry(final LoggingWriter writer, final LoggingLevel level, final String text) {
-		entries.add(new LogEntry(writer, level, text));
+	public synchronized void putLogEntry(final LoggingWriter writer, final LogEntry logEntry) {
+		entries.add(new WritingTask(writer, logEntry));
 	}
 
 	@Override
@@ -77,16 +76,16 @@ final class WritingThread extends Thread {
 		while (true) {
 			boolean doShutdown = shutdown || (threadToObserve != null && !threadToObserve.isAlive());
 
-			List<LogEntry> entriesToWrite = getLogEntriesToWrite();
-			while (entriesToWrite != null) {
-				for (LogEntry entry : entriesToWrite) {
+			List<WritingTask> writingTasks = getWritingTasks();
+			while (writingTasks != null) {
+				for (WritingTask writingTask : writingTasks) {
 					try {
-						entry.writer.write(entry.level, entry.text);
+						writingTask.writer.write(writingTask.logEntry);
 					} catch (Exception ex) {
 						ex.printStackTrace(System.err);
 					}
 				}
-				entriesToWrite = getLogEntriesToWrite();
+				writingTasks = getWritingTasks();
 			}
 
 			if (doShutdown) {
@@ -133,26 +132,24 @@ final class WritingThread extends Thread {
 		return getRootThreadGroup(parent);
 	}
 
-	private synchronized List<LogEntry> getLogEntriesToWrite() {
+	private synchronized List<WritingTask> getWritingTasks() {
 		if (entries.isEmpty()) {
 			return null;
 		} else {
-			List<LogEntry> entriesToWrite = entries;
-			entries = new ArrayList<WritingThread.LogEntry>();
+			List<WritingTask> entriesToWrite = entries;
+			entries = new ArrayList<WritingTask>();
 			return entriesToWrite;
 		}
 	}
 
-	private static final class LogEntry {
+	private static final class WritingTask {
 
 		private final LoggingWriter writer;
-		private final LoggingLevel level;
-		private final String text;
+		private final LogEntry logEntry;
 
-		public LogEntry(final LoggingWriter writer, final LoggingLevel level, final String text) {
+		public WritingTask(final LoggingWriter writer, final LogEntry logEntry) {
 			this.writer = writer;
-			this.level = level;
-			this.text = text;
+			this.logEntry = logEntry;
 		}
 
 	}

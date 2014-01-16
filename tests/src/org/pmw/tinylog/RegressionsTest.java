@@ -24,8 +24,10 @@ import org.junit.Test;
 import org.pmw.tinylog.labellers.TimestampLabeller;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StoreWriter.LogEntry;
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.RollingFileWriter;
 
 /**
@@ -33,25 +35,25 @@ import org.pmw.tinylog.writers.RollingFileWriter;
  */
 public class RegressionsTest extends AbstractTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
-
 	/**
 	 * Bug: Wrong class in log entry if there isn't set any special logging level for at least one package.
 	 */
 	@Test
 	public final void testWrongClass() {
-		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).formatPattern("{class}").activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
 
 		Configurator.currentConfig().level("org", LoggingLevel.TRACE).activate();
 		Logger.info("");
-		LogEntry logEntry = new LogEntry(LoggingLevel.INFO, RegressionsTest.class.getName() + NEW_LINE);
-		assertEquals(logEntry, writer.consumeLogEntry()); // Was already OK
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Was already OK
 
 		Configurator.currentConfig().level("org", null).activate();
 		Logger.info("");
-		logEntry = new LogEntry(LoggingLevel.INFO, RegressionsTest.class.getName() + NEW_LINE);
-		assertEquals(logEntry, writer.consumeLogEntry()); // Failed
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Failed
 	}
 
 	/**
@@ -66,12 +68,12 @@ public class RegressionsTest extends AbstractTest {
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
 		writer.init();
-		writer.write(null, "12345");
+		writer.write(new LogEntryBuilder().renderedLogEntry("12345").create());
 		writer.close();
 
 		writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
 		writer.init();
-		writer.write(null, "123456");
+		writer.write(new LogEntryBuilder().renderedLogEntry("123456").create());
 		writer.close();
 
 		assertEquals(6, file.length());
@@ -84,10 +86,13 @@ public class RegressionsTest extends AbstractTest {
 	@Test
 	public final void testCurlyBracketsInText() {
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).formatPattern("{message}").activate();
-		Logger.info("{TEST}");
-		LogEntry logEntry = new LogEntry(LoggingLevel.INFO, "{TEST}" + NEW_LINE);
-		assertEquals(logEntry, writer.consumeLogEntry()); // Failed (java.lang.IllegalArgumentException)
+		Configurator.defaultConfig().writer(writer).activate();
+
+		Logger.info("{TEST}"); // Failed (java.lang.IllegalArgumentException)
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals("{TEST}", logEntry.getMessage());
 	}
 
 	/**
@@ -96,10 +101,13 @@ public class RegressionsTest extends AbstractTest {
 	@Test
 	public final void testLoggingLevel() {
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
+		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).activate();
+
 		Logger.error("Hello");
-		LogEntry logEntry = new LogEntry(LoggingLevel.ERROR, "Hello" + NEW_LINE);
-		assertEquals(logEntry, writer.consumeLogEntry()); // Failed
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals("Hello", logEntry.getMessage());
 	}
 
 	/**

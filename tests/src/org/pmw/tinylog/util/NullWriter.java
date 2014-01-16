@@ -13,7 +13,11 @@
 
 package org.pmw.tinylog.util;
 
-import org.pmw.tinylog.LoggingLevel;
+import java.util.Collections;
+import java.util.Set;
+
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -22,12 +26,17 @@ import org.pmw.tinylog.writers.LoggingWriter;
 public final class NullWriter implements LoggingWriter {
 
 	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return Collections.emptySet();
+	}
+
+	@Override
 	public void init() {
 		// Do nothing
 	}
 
 	@Override
-	public void write(final LoggingLevel level, final String logEntry) {
+	public void write(final LogEntry logEntry) {
 		// Just ignore
 	}
 

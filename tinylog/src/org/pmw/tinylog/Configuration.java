@@ -18,8 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.pmw.tinylog.Configurator.WritingThreadData;
+import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -35,6 +37,7 @@ final class Configuration {
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
+	private final Set<LogEntryValue> requiredLogEntryValues;
 	private final List<Token> formatTokens;
 	private final boolean fullStackTraceElemetRequired;
 
@@ -64,8 +67,9 @@ final class Configuration {
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
-		this.formatTokens = Collections.unmodifiableList(Tokenizer.parse(formatPattern, locale));
-		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(formatTokens);
+		this.requiredLogEntryValues = writer == null ? Collections.<LogEntryValue> emptySet() : writer.getRequiredLogEntryValues();
+		this.formatTokens = Tokenizer.parse(formatPattern, locale);
+		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(requiredLogEntryValues, formatTokens);
 	}
 
 	/**
@@ -125,6 +129,15 @@ final class Configuration {
 				return level;
 			}
 		}
+	}
+
+	/**
+	 * Get all log entry values that are required by logging writer.
+	 * 
+	 * @return Required values for log entry
+	 */
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return requiredLogEntryValues;
 	}
 
 	/**
@@ -203,13 +216,25 @@ final class Configuration {
 		return new Configurator(level, copyOfPackageLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
 	}
 
-	private static boolean fullStackTraceElemetRequired(final List<Token> tokens) {
-		for (Token token : tokens) {
-			switch (token.getType()) {
+	private static boolean fullStackTraceElemetRequired(final Set<LogEntryValue> logEntryValues, final List<Token> tokens) {
+		for (LogEntryValue logEntryValue : logEntryValues) {
+			switch (logEntryValue) {
 				case METHOD:
 				case FILE:
 				case LINE_NUMBER:
 					return true;
+				case RENDERED_LOG_ENTRY:
+					for (Token token : tokens) {
+						switch (token.getType()) {
+							case METHOD:
+							case FILE:
+							case LINE_NUMBER:
+								return true;
+							default:
+								continue;
+						}
+					}
+					continue;
 				default:
 					continue;
 			}

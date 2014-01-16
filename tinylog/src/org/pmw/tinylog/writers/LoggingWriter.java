@@ -13,8 +13,9 @@
 
 package org.pmw.tinylog.writers;
 
+import java.util.Set;
+
 import org.pmw.tinylog.Logger;
-import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Logging writers output created log entries from {@link Logger}.
@@ -41,7 +42,14 @@ import org.pmw.tinylog.LoggingLevel;
 public interface LoggingWriter {
 
 	/**
-	 * Initialize the writer.
+	 * Get all log entry values that are required by this logging writer.
+	 * 
+	 * @return Required values for log entry
+	 */
+	Set<LogEntryValue> getRequiredLogEntryValues();
+
+	/**
+	 * Initialize the writer (open a file for example).
 	 * 
 	 * @throws Exception
 	 *             Failed to initialize the writer
@@ -51,14 +59,12 @@ public interface LoggingWriter {
 	/**
 	 * Write a log entry.
 	 * 
-	 * @param level
-	 *            Logging level
 	 * @param logEntry
 	 *            Log entry to output
 	 * 
 	 * @throws Exception
 	 *             Failed to write the log entry
 	 */
-	void write(LoggingLevel level, String logEntry) throws Exception;
+	void write(LogEntry logEntry) throws Exception;
 
 }

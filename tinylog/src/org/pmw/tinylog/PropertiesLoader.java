@@ -233,27 +233,30 @@ final class PropertiesLoader {
 	private static LoggingWriter loadAndSetWriter(final Properties properties, final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
 		for (Constructor<?> constructor : writerClass.getConstructors()) {
 			Class<?>[] parameterTypes = constructor.getParameterTypes();
+			boolean matches = true;
 			if (parameterTypes.length == definition.length) {
 				for (int i = 0; i < parameterTypes.length; ++i) {
 					if (!parameterTypes[i].equals(definition[i].type())) {
+						matches = false;
 						break;
-					} else if (i == parameterTypes.length - 1) {
-						try {
-							Object[] parameters = loadParameters(properties, definition);
-							if (parameters == null) {
-								return null;
-							} else {
-								return (LoggingWriter) constructor.newInstance(parameters);
-							}
-						} catch (IllegalArgumentException ex) {
+					}
+				}
+				if (matches) {
+					try {
+						Object[] parameters = loadParameters(properties, definition);
+						if (parameters == null) {
 							return null;
-						} catch (InstantiationException ex) {
-							return null;
-						} catch (IllegalAccessException ex) {
-							return null;
-						} catch (InvocationTargetException ex) {
-							return null;
+						} else {
+							return (LoggingWriter) constructor.newInstance(parameters);
 						}
+					} catch (IllegalArgumentException ex) {
+						return null;
+					} catch (InstantiationException ex) {
+						return null;
+					} catch (IllegalAccessException ex) {
+						return null;
+					} catch (InvocationTargetException ex) {
+						return null;
 					}
 				}
 			}

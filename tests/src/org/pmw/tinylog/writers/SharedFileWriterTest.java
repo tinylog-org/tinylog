@@ -13,9 +13,11 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -24,11 +26,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.WritingThread;
 
 /**
@@ -37,6 +40,23 @@ import org.pmw.tinylog.util.WritingThread;
  * @see SharedFileWriter
  */
 public class SharedFileWriterTest extends AbstractTest {
+
+	/**
+	 * Test required log entry values.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testRequiredLogEntryValue() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		Set<LogEntryValue> requiredLogEntryValues = writer.getRequiredLogEntryValues();
+		assertThat(requiredLogEntryValues, contains(LogEntryValue.RENDERED_LOG_ENTRY));
+
+		file.delete();
+	}
 
 	/**
 	 * Test writing without threading.
@@ -49,12 +69,12 @@ public class SharedFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		writer.init();
-		writer.write(LoggingLevel.INFO, "Hello\n");
-		writer.write(LoggingLevel.INFO, "World\n");
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
 
 		try {
-			writer.write(LoggingLevel.INFO, "Won't be written\n");
+			writer.write(new LogEntryBuilder().renderedLogEntry("Won't be written\n").create());
 			fail("Exception expected");
 		} catch (IOException ex) {
 			// Expected
@@ -175,7 +195,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
 		writer.init();
 		for (int i = 0; i < 5000; ++i) {
-			writer.write(LoggingLevel.INFO, WritingThread.LINE + "\n");
+			writer.write(new LogEntryBuilder().renderedLogEntry(WritingThread.LINE + "\n").create());
 		}
 		writer.close();
 	}
@@ -211,11 +231,11 @@ public class SharedFileWriterTest extends AbstractTest {
 
 		SharedFileWriter writer1 = new SharedFileWriter(file.getAbsolutePath());
 		writer1.init();
-		writer1.write(LoggingLevel.INFO, "Hello\n");
+		writer1.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
 		SharedFileWriter writer2 = new SharedFileWriter(file.getAbsolutePath());
 		writer2.init();
-		writer2.write(LoggingLevel.INFO, "World\n");
+		writer2.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 
 		writer1.close();
 		writer2.close();

@@ -303,12 +303,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testLogcatLoggingWriter() throws IOException {
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "logcat"));
 		assertNotNull(configuration.getWriter());
-		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "logcat").set("tinylog.writer.tag", "myapp"));
-		assertNotNull(configuration.getWriter());
 		assertEquals(LogcatWriter.class, configuration.getWriter().getClass());
-		assertEquals("myapp", ((LogcatWriter) configuration.getWriter()).getTag());
 	}
 
 	/**

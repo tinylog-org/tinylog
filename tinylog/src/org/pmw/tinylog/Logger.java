@@ -19,6 +19,8 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -466,22 +468,15 @@ public final class Logger {
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
-				String logEntry;
 				try {
-					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
-				} catch (Exception ex) {
-					logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, LoggingLevel.ERROR, stackTraceElement, ex,
-							"Could not created log entry", null);
-				}
-
-				if (currentConfiguration.getWritingThread() == null) {
-					try {
-						currentConfiguration.getWriter().write(level, logEntry);
-					} catch (Exception ex) {
-						ex.printStackTrace(System.err);
+					LogEntry logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
+					if (currentConfiguration.getWritingThread() == null) {
+						currentConfiguration.getWriter().write(logEntry);
+					} else {
+						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
 					}
-				} else {
-					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
+				} catch (Exception ex) {
+					ex.printStackTrace(System.err);
 				}
 			}
 		}
@@ -512,167 +507,255 @@ public final class Logger {
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
-				String logEntry;
 				try {
-					logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
-				} catch (Exception ex) {
-					logEntry = createLogEntry(currentConfiguration, -1, LoggingLevel.ERROR, stackTraceElement, ex, "Could not created log entry", null);
-				}
-
-				if (currentConfiguration.getWritingThread() == null) {
-					try {
-						currentConfiguration.getWriter().write(level, logEntry);
-					} catch (Exception ex) {
-						ex.printStackTrace(System.err);
+					LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
+					if (currentConfiguration.getWritingThread() == null) {
+						currentConfiguration.getWriter().write(logEntry);
+					} else {
+						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
 					}
-				} else {
-					currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), level, logEntry);
+				} catch (Exception ex) {
+					ex.printStackTrace(System.err);
 				}
 			}
 		}
 	}
 
-	private static String createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
+	private static LogEntry createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
-		StringBuilder builder = new StringBuilder();
-
-		StackTraceElement stackTraceElement = createdStackTraceElement;
 		Date now = null;
+		String processId = null;
+		Thread thread = null;
+		StackTraceElement stackTraceElement = createdStackTraceElement;
 		String fullyQualifiedClassName = null;
-		int dotIndex;
+		String methodName = null;
+		String fileName = null;
+		int lineNumber = -1;
+		String renderedMessage = null;
 
-		for (Token token : currentConfiguration.getFormatTokens()) {
-			switch (token.getType()) {
-				case THREAD:
-					builder.append(Thread.currentThread().getName());
+		for (LogEntryValue logEntryValue : currentConfiguration.getRequiredLogEntryValues()) {
+			switch (logEntryValue) {
+				case DATE:
+					now = new Date();
 					break;
 
-				case THREAD_ID:
-					builder.append(Thread.currentThread().getId());
+				case PROCESS_ID:
+					processId = EnvironmentHelper.getProcessId().toString();
+					break;
+
+				case THREAD:
+					thread = Thread.currentThread();
 					break;
 
 				case CLASS:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					builder.append(stackTraceElement.getClassName());
-					break;
-
-				case CLASS_NAME:
-					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-					}
 					fullyQualifiedClassName = stackTraceElement.getClassName();
-
-					// determine the index of last . in the fully qualified class name
-					// for my.example.ClassName this would be 10
-					dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-
-					// defaults to no (default) package
-					String className = fullyQualifiedClassName;
-					if (dotIndex != -1) {
-						className = fullyQualifiedClassName.substring(dotIndex + 1);
-					}
-
-					builder.append(className);
-					break;
-
-				case PACKAGE:
-					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-					}
-					fullyQualifiedClassName = stackTraceElement.getClassName();
-
-					// determine the index of last . in the fully qualified class name
-					// for my.example.ClassName this would be 10
-					dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-
-					// defaults to no (default) package
-					String packageName = "";
-					if (dotIndex != -1) {
-						packageName = fullyQualifiedClassName.substring(0, dotIndex);
-					}
-
-					builder.append(packageName);
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					builder.append(stackTraceElement.getMethodName());
+					methodName = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					builder.append(stackTraceElement.getFileName());
+					fileName = stackTraceElement.getFileName();
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					builder.append(stackTraceElement.getLineNumber());
-					break;
-
-				case LOGGING_LEVEL:
-					builder.append(level);
-					break;
-
-				case DATE:
-					if (now == null) {
-						now = new Date();
-					}
-					DateFormat formatter = (DateFormat) token.getData();
-					String format;
-					synchronized (formatter) {
-						format = formatter.format(now);
-					}
-					builder.append(format);
+					lineNumber = stackTraceElement.getLineNumber();
 					break;
 
 				case MESSAGE:
 					if (message != null) {
 						if (arguments == null || arguments.length == 0) {
-							builder.append(message.toString());
+							renderedMessage = message.toString();
 						} else {
-							builder.append(new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments));
-						}
-					}
-					if (exception != null) {
-						if (message != null) {
-							builder.append(": ");
-						}
-						if (currentConfiguration.getMaxStackTraceElements() == 0) {
-							builder.append(exception.getClass().getName());
-							String exceptionMessage = exception.getMessage();
-							if (exceptionMessage != null) {
-								builder.append(": ");
-								builder.append(exceptionMessage);
-							}
-						} else {
-							builder.append(getPrintedException(exception, currentConfiguration.getMaxStackTraceElements()));
+							renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
 						}
 					}
 					break;
 
 				default:
-					builder.append(token.getData());
 					break;
 			}
 		}
-		builder.append(NEW_LINE);
 
-		return builder.toString();
+		String renderedLogEntry;
+		if (currentConfiguration.getRequiredLogEntryValues().contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
+			int dotIndex;
+			StringBuilder builder = new StringBuilder();
+			for (Token token : currentConfiguration.getFormatTokens()) {
+				switch (token.getType()) {
+					case THREAD:
+						if (thread == null) {
+							thread = Thread.currentThread();
+						}
+						builder.append(thread.getName());
+						break;
+
+					case THREAD_ID:
+						if (thread == null) {
+							thread = Thread.currentThread();
+						}
+						builder.append(thread.getId());
+						break;
+
+					case CLASS:
+						if (fullyQualifiedClassName == null) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							fullyQualifiedClassName = stackTraceElement.getClassName();
+						}
+						builder.append(fullyQualifiedClassName);
+						break;
+
+					case CLASS_NAME:
+						if (fullyQualifiedClassName == null) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							fullyQualifiedClassName = stackTraceElement.getClassName();
+						}
+
+						// determine the index of last . in the fully qualified class name
+						// for my.example.ClassName this would be 10
+						dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+
+						// defaults to no (default) package
+						String className = fullyQualifiedClassName;
+						if (dotIndex != -1) {
+							className = fullyQualifiedClassName.substring(dotIndex + 1);
+						}
+
+						builder.append(className);
+						break;
+
+					case PACKAGE:
+						if (fullyQualifiedClassName == null) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							fullyQualifiedClassName = stackTraceElement.getClassName();
+						}
+
+						// determine the index of last . in the fully qualified class name
+						// for my.example.ClassName this would be 10
+						dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+
+						// defaults to no (default) package
+						String packageName = "";
+						if (dotIndex != -1) {
+							packageName = fullyQualifiedClassName.substring(0, dotIndex);
+						}
+
+						builder.append(packageName);
+						break;
+
+					case METHOD:
+						if (methodName == null) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							methodName = stackTraceElement.getMethodName();
+						}
+						builder.append(methodName);
+						break;
+
+					case FILE:
+						if (fileName == null) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							fileName = stackTraceElement.getFileName();
+						}
+						builder.append(fileName);
+						break;
+
+					case LINE_NUMBER:
+						if (lineNumber < 0) {
+							if (stackTraceElement == null) {
+								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+							}
+							lineNumber = stackTraceElement.getLineNumber();
+						}
+						builder.append(lineNumber);
+						break;
+
+					case LOGGING_LEVEL:
+						builder.append(level);
+						break;
+
+					case DATE:
+						if (now == null) {
+							now = new Date();
+						}
+						DateFormat formatter = (DateFormat) token.getData();
+						String format;
+						synchronized (formatter) {
+							format = formatter.format(now);
+						}
+						builder.append(format);
+						break;
+
+					case MESSAGE:
+						if (message != null) {
+							if (renderedMessage == null) {
+								if (arguments == null || arguments.length == 0) {
+									renderedMessage = message.toString();
+								} else {
+									renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
+								}
+							}
+							builder.append(renderedMessage);
+						}
+						if (exception != null) {
+							if (message != null) {
+								builder.append(": ");
+							}
+							if (currentConfiguration.getMaxStackTraceElements() == 0) {
+								builder.append(exception.getClass().getName());
+								String exceptionMessage = exception.getMessage();
+								if (exceptionMessage != null) {
+									builder.append(": ");
+									builder.append(exceptionMessage);
+								}
+							} else {
+								builder.append(getPrintedException(exception, currentConfiguration.getMaxStackTraceElements()));
+							}
+						}
+						break;
+
+					default:
+						builder.append(token.getData());
+						break;
+				}
+			}
+			builder.append(NEW_LINE);
+			renderedLogEntry = builder.toString();
+		} else {
+			renderedLogEntry = null;
+		}
+
+		return new LogEntry(now, processId, thread, fullyQualifiedClassName, methodName, fileName, lineNumber, level, renderedMessage, exception,
+				renderedLogEntry);
 	}
 
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
 		if (!currentConfiguration.isFullStackTraceElemetRequired() && callerClassMethod != null) {
 			try {
 				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 1);
-				return new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", 0);
+				return new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
 			} catch (Exception ex) {
 				// Fallback
 			}
@@ -690,7 +773,7 @@ public final class Logger {
 		if (stackTraceElements.length > deep) {
 			return stackTraceElements[deep];
 		} else {
-			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", 0);
+			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
 		}
 	}
 
