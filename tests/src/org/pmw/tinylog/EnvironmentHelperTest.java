@@ -95,17 +95,9 @@ public class EnvironmentHelperTest extends AbstractTest {
 		String runtime = System.getProperty("java.runtime.name");
 		try {
 			System.setProperty("java.runtime.name", "Android Runtime");
-
-			new NonStrictExpectations(android.os.Process.class) {
-
-				{
-					android.os.Process.myPid();
-					returns(1234);
-				}
-
-			};
-
-			assertEquals(1234, EnvironmentHelper.getProcessId());
+			Object pid = EnvironmentHelper.getProcessId();
+			assertThat(pid, instanceOf(Integer.class));
+			assertThat(ManagementFactory.getRuntimeMXBean().getName(), startsWith(pid.toString()));
 		} finally {
 			System.setProperty("java.runtime.name", runtime);
 		}
