@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog;
+package org.pmw.tinylog.writers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -19,7 +19,8 @@ import static org.junit.Assert.assertSame;
 import java.util.Date;
 
 import org.junit.Test;
-import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Tests the log entry data class.
