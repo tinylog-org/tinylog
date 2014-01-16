@@ -13,16 +13,22 @@
 
 package org.pmw.tinylog.labellers;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for process ID labeller.
@@ -51,7 +57,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		baseFile.delete();
 		File realFile = getBackupFile(baseFile, "tmp", EnvironmentHelper.getProcessId().toString());
 
-		Labeller labeller = new ProcessIdLabeller();
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
 
 		assertEquals(realFile, labeller.getLogFile(baseFile));
 
@@ -76,7 +82,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		baseFile.delete();
 		File realFile = getBackupFile(baseFile, null, EnvironmentHelper.getProcessId().toString());
 
-		Labeller labeller = new ProcessIdLabeller();
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
 
 		assertEquals(realFile, labeller.getLogFile(baseFile));
 
@@ -103,7 +109,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		File targetFile = getBackupFile(baseFile, "tmp", EnvironmentHelper.getProcessId().toString());
 		targetFile.createNewFile();
 
-		Labeller labeller = new ProcessIdLabeller();
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
 		assertEquals(targetFile, labeller.getLogFile(baseFile));
 		assertTrue(targetFile.exists());
 		assertEquals(targetFile, labeller.roll(targetFile, 0));
@@ -131,7 +137,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		backupFile3.createNewFile();
 		backupFile3.setLastModified(0L);
 
-		Labeller labeller = new ProcessIdLabeller();
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
 		labeller.roll(labeller.getLogFile(baseFile), 1);
 
 		assertFalse(backupFile1.exists());
@@ -139,6 +145,60 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		assertFalse(backupFile3.exists());
 
 		backupFile2.delete();
+	}
+
+	/**
+	 * Test deleting if current file is in use.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDeletingOfCurrentFileFails() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		File currentFile = labeller.getLogFile(baseFile);
+		currentFile.createNewFile();
+		FileInputStream stream = new FileInputStream(currentFile);
+
+		try {
+			labeller.roll(currentFile, 0);
+			fail("IOException expected: Deleting should fail");
+		} catch (IOException ex) {
+			assertThat(ex.getMessage(), anyOf(containsString("delete"), containsString("remove")));
+		}
+
+		stream.close();
+		currentFile.delete();
+	}
+
+	/**
+	 * Test deleting if backup file is in use.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDeletingOfBackupFileFails() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+
+		File backupFile = getBackupFile(baseFile, "tmp", "$backup$");
+		backupFile.createNewFile();
+		FileInputStream stream = new FileInputStream(backupFile);
+
+		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		File currentFile = labeller.getLogFile(baseFile);
+
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
+		labeller.roll(currentFile, 0);
+		assertTrue(errorStream.hasLines());
+		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
+		errorStream.clear();
+
+		stream.close();
+		backupFile.delete();
 	}
 
 }

@@ -148,14 +148,14 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() throws IOException {
+	public void init() throws Exception {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
 		stream = new FileOutputStream(file, true);
 	}
 
 	@Override
-	public void write(final LogEntry logEntry) throws IOException {
+	public void write(final LogEntry logEntry) throws Exception {
 		synchronized (mutex) {
 			if (!checkPolicies(logEntry.getLevel(), logEntry.getRenderedLogEntry())) {
 				try {
@@ -187,7 +187,7 @@ public final class RollingFileWriter implements LoggingWriter {
 		close();
 	}
 
-	private void initCheckPolicies() {
+	private void initCheckPolicies() throws Exception {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();

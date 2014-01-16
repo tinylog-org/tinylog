@@ -13,16 +13,22 @@
 
 package org.pmw.tinylog.labellers;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for count labeller.
@@ -35,7 +41,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 	 * Test labelling for log file with file extension.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithFileExtension() throws IOException {
@@ -44,7 +50,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		File backupFile2 = getBackupFile(baseFile, "tmp", "1");
 		File backupFile3 = getBackupFile(baseFile, "tmp", "2");
 
-		Labeller labeller = new CountLabeller();
+		CountLabeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
@@ -82,7 +88,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 	 * Test labelling for log file without file extension.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithoutFileExtension() throws IOException {
@@ -90,7 +96,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		File backupFile1 = getBackupFile(baseFile, null, "0");
 		File backupFile2 = getBackupFile(baseFile, null, "1");
 
-		Labeller labeller = new CountLabeller();
+		CountLabeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
@@ -112,14 +118,14 @@ public class CountLabellerTest extends AbstractLabellerTest {
 	 * Test labelling without storing backups.
 	 * 
 	 * @throws IOException
-	 *             Problem with the temporary file
+	 *             Test failed
 	 */
 	@Test
 	public final void testLabellingWithoutBackups() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
 
-		Labeller labeller = new CountLabeller();
+		CountLabeller labeller = new CountLabeller();
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
@@ -128,6 +134,62 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 
+		baseFile.delete();
+	}
+
+	/**
+	 * Test renaming if file is in use.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testRenamingFails() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+		baseFile.createNewFile();
+		File backupFile = getBackupFile(baseFile, "tmp", "0");
+		backupFile.createNewFile();
+
+		FileInputStream stream = new FileInputStream(backupFile);
+
+		CountLabeller labeller = new CountLabeller();
+		assertSame(baseFile, labeller.getLogFile(baseFile));
+		try {
+			labeller.roll(baseFile, 2);
+			fail("IOException expected: Renaming should fail");
+		} catch (IOException ex) {
+			assertThat(ex.getMessage(), containsString("rename"));
+		}
+
+		stream.close();
+		baseFile.delete();
+		backupFile.delete();
+	}
+
+	/**
+	 * Test deleting if file is in use.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDeletingFails() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+		baseFile.createNewFile();
+
+		FileInputStream stream = new FileInputStream(baseFile);
+
+		CountLabeller labeller = new CountLabeller();
+		assertSame(baseFile, labeller.getLogFile(baseFile));
+
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
+		labeller.roll(baseFile, 0);
+		assertTrue(errorStream.hasLines());
+		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
+		errorStream.clear();
+
+		stream.close();
 		baseFile.delete();
 	}
 

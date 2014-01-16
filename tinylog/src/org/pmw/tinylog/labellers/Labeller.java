@@ -57,7 +57,10 @@ public interface Labeller {
 	 * @param maxBackups
 	 *            Maximum number of backups to store
 	 * @return New log file
+	 * 
+	 * @throws Exception
+	 *             Failed to roll log file
 	 */
-	File roll(File file, int maxBackups);
+	File roll(File file, int maxBackups) throws Exception;
 
 }

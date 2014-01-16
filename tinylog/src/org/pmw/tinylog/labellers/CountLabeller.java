@@ -14,6 +14,9 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.pmw.tinylog.InternalLogger;
 
 /**
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
@@ -40,20 +43,24 @@ public final class CountLabeller implements Labeller {
 	}
 
 	@Override
-	public File roll(final File file, final int maxBackups) {
+	public File roll(final File file, final int maxBackups) throws IOException {
 		roll(file, 0, maxBackups);
 		return file;
 	}
 
-	private void roll(final File sourceFile, final int number, final int maxBackups) {
+	private void roll(final File sourceFile, final int number, final int maxBackups) throws IOException {
 		File targetFile = new File(filenameWithoutExtension + "." + number + filenameExtension);
 		if (targetFile.exists()) {
 			roll(targetFile, number + 1, maxBackups);
 		}
 		if (number < maxBackups) {
-			sourceFile.renameTo(targetFile);
+			if (!sourceFile.renameTo(targetFile)) {
+				throw new IOException("Failed to rename \"" + sourceFile + "\" to \"" + targetFile + "\"");
+			}
 		} else {
-			sourceFile.delete();
+			if (!sourceFile.delete()) {
+				InternalLogger.warn("Failed to delete \"{0}\"", sourceFile);
+			}
 		}
 	}
 

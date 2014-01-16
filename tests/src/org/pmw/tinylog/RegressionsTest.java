@@ -59,11 +59,11 @@ public class RegressionsTest extends AbstractTest {
 	/**
 	 * Bug: If a log file is continued, the policy will start from scratch. This leads to a too late rollover.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testContinueLogFile() throws IOException {
+	public final void testContinueLogFile() throws Exception {
 		File file = FileHelper.createTemporaryFile("tmp");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));

@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.Logger;
 
 /**
@@ -79,7 +80,10 @@ public final class TimestampLabeller implements Labeller {
 		if (files.size() > maxBackups) {
 			Collections.sort(files, LogFileComparator.getInstance());
 			for (int i = maxBackups; i < files.size(); ++i) {
-				files.get(i).delete();
+				File backup = files.get(i);
+				if (!backup.delete()) {
+					InternalLogger.warn("Failed to delete \"{0}\"", backup);
+				}
 			}
 		}
 

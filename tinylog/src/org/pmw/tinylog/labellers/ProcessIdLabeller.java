@@ -14,11 +14,13 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.pmw.tinylog.EnvironmentHelper;
+import org.pmw.tinylog.InternalLogger;
 
 /**
  * Add the process ID (PID) to log files.
@@ -61,16 +63,21 @@ public final class ProcessIdLabeller implements Labeller {
 	}
 
 	@Override
-	public File roll(final File file, final int maxBackups) {
+	public File roll(final File file, final int maxBackups) throws IOException {
 		if (file.exists()) {
-			file.delete();
+			if (!file.delete()) {
+				throw new IOException("Failed to delete \"" + file + "\"");
+			}
 		}
 
 		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
 		if (files.size() > maxBackups) {
 			Collections.sort(files, LogFileComparator.getInstance());
 			for (int i = maxBackups; i < files.size(); ++i) {
-				files.get(i).delete();
+				File backup = files.get(i);
+				if (!backup.delete()) {
+					InternalLogger.warn("Failed to delete \"{0}\"", backup);
+				}
 			}
 		}
 

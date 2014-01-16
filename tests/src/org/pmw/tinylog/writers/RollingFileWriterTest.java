@@ -46,11 +46,11 @@ public class RollingFileWriterTest extends AbstractTest {
 	/**
 	 * Test required log entry values.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testRequiredLogEntryValue() throws IOException {
+	public final void testRequiredLogEntryValue() throws Exception {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
@@ -63,11 +63,11 @@ public class RollingFileWriterTest extends AbstractTest {
 	/**
 	 * Test simple writing (non-existing log file and neither policies nor a labeller).
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testSimpleWriting() throws IOException {
+	public final void testSimpleWriting() throws Exception {
 		File file = FileHelper.createTemporaryFile(null);
 		file.delete();
 
@@ -96,13 +96,11 @@ public class RollingFileWriterTest extends AbstractTest {
 	/**
 	 * Test writing with threading.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
-	 * @throws InterruptedException
-	 *             Sleep failed
 	 */
 	@Test
-	public final void testMultiThreadedWriting() throws IOException, InterruptedException {
+	public final void testMultiThreadedWriting() throws Exception {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 1);
@@ -150,11 +148,11 @@ public class RollingFileWriterTest extends AbstractTest {
 	/**
 	 * Test rolling while writing.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testRollingWhileWriting() throws IOException {
+	public final void testRollingWhileWriting() throws Exception {
 		File file = FileHelper.createTemporaryFile(null, "12");
 		File backup = new File(file.getAbsolutePath() + ".0");
 
@@ -175,11 +173,11 @@ public class RollingFileWriterTest extends AbstractTest {
 	/**
 	 * Test rolling while opening.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testRollingWhileOpening() throws IOException {
+	public final void testRollingWhileOpening() throws Exception {
 		File file = FileHelper.createTemporaryFile(null, "123");
 		File backup = new File(file.getAbsolutePath() + ".0");
 
