@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import org.pmw.tinylog.EnvironmentHelper;
+
 /**
  * Saves all written lines as a list of strings.
  */
@@ -82,7 +84,7 @@ public final class StringListOutputStream extends OutputStream {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < array.length; ++i) {
 			if (i > 0) {
-				builder.append(System.getProperty("line.separator"));
+				builder.append(EnvironmentHelper.getNewLine());
 			}
 			builder.append(array[i]);
 		}

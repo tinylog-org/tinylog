@@ -35,7 +35,7 @@ public final class Logger {
 	 */
 	static final int DEEP_OF_STACK_TRACE = 3;
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
 	private static volatile Configuration configuration;
 

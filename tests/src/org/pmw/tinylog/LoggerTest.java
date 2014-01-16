@@ -41,8 +41,6 @@ import org.pmw.tinylog.writers.LogEntryValue;
  */
 public class LoggerTest extends AbstractTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
-
 	/**
 	 * Test getter for logging level.
 	 */
@@ -498,7 +496,7 @@ public class LoggerTest extends AbstractTest {
 
 		String renderedLogEntry = MessageFormat.format("{0}#{1}#{2}#{3}#{4}#testFullLogEntry#LoggerTest.java#{5}#{6}#{7}#Hello{8}", Thread.currentThread()
 				.getName(), Thread.currentThread().getId(), LoggerTest.class.getName(), LoggerTest.class.getPackage().getName(), LoggerTest.class
-				.getSimpleName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), NEW_LINE);
+				.getSimpleName(), lineNumber, LoggingLevel.INFO, new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 
@@ -507,6 +505,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testExceptions() {
+		String newLine = EnvironmentHelper.getNewLine();
 		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.EXCEPTION, LogEntryValue.RENDERED_LOG_ENTRY);
 
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.ERROR).formatPattern("{message}").maxStackTraceElements(1).activate();
@@ -515,8 +514,8 @@ public class LoggerTest extends AbstractTest {
 		Logger.error(exception);
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertEquals(exception, logEntry.getException());
-		assertThat(logEntry.getRenderedLogEntry(), matches("java\\.lang\\.Exception\\: Test" + NEW_LINE
-				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + NEW_LINE + "\t\\.\\.\\." + NEW_LINE));
+		assertThat(logEntry.getRenderedLogEntry(), matches("java\\.lang\\.Exception\\: Test" + newLine
+				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine + "\t\\.\\.\\." + newLine));
 
 		Configurator.currentConfig().maxStackTraceElements(-1).activate();
 
@@ -524,10 +523,10 @@ public class LoggerTest extends AbstractTest {
 		Logger.error(exception);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(exception, logEntry.getException());
-		assertThat(logEntry.getRenderedLogEntry(), contains("java\\.lang\\.RuntimeException.*" + NEW_LINE
-				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + NEW_LINE));
-		assertThat(logEntry.getRenderedLogEntry(), contains("Caused by: java\\.lang\\.NullPointerException" + NEW_LINE
-				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + NEW_LINE));
+		assertThat(logEntry.getRenderedLogEntry(), contains("java\\.lang\\.RuntimeException.*" + newLine
+				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
+		assertThat(logEntry.getRenderedLogEntry(), contains("Caused by: java\\.lang\\.NullPointerException" + newLine
+				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
 	}
 
 	private static final class EvilObject {

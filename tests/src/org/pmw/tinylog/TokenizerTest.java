@@ -127,7 +127,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("Hello ", tokens.get(0).getData());
 		assertEquals(TokenType.THREAD, tokens.get(1).getType());
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(2).getType());
-		assertEquals("!" + System.getProperty("line.separator") + "I'm ", tokens.get(2).getData());
+		assertEquals("!" + EnvironmentHelper.getNewLine() + "I'm ", tokens.get(2).getData());
 		assertEquals(TokenType.METHOD, tokens.get(3).getType());
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(4).getType());
 		assertEquals(" and this ", tokens.get(4).getData());
@@ -140,7 +140,7 @@ public class TokenizerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testNewLines() {
-		String newLine = System.getProperty("line.separator");
+		String newLine = EnvironmentHelper.getNewLine();
 
 		List<Token> tokens = Tokenizer.parse("\n", locale);
 		assertEquals(1, tokens.size());

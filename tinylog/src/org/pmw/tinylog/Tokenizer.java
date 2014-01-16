@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 final class Tokenizer {
 
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 	private static final Pattern NEW_LINE_REPLACER = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
 	private static final String TAB = "\t";
 	private static final Pattern TAB_REPLACER = Pattern.compile("\t|\\\\t");

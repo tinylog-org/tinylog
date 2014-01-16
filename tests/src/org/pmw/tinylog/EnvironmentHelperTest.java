@@ -43,6 +43,14 @@ public class EnvironmentHelperTest extends AbstractTest {
 	}
 
 	/**
+	 * Test if the line separator is equals to the line separator of the OS.
+	 */
+	@Test
+	public final void testNewLine() {
+		assertEquals(System.getProperty("line.separator"), EnvironmentHelper.getNewLine());
+	}
+
+	/**
 	 * Test getting the current process ID.
 	 */
 	@Test

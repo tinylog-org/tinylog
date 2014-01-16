@@ -19,6 +19,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.pmw.tinylog.EnvironmentHelper;
+
 /**
  * Helper to create temporary files and write into files.
  */
@@ -156,7 +158,7 @@ public final class FileHelper {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < lines.length; ++i) {
 			if (i > 0) {
-				builder.append(System.getProperty("line.separator"));
+				builder.append(EnvironmentHelper.getNewLine());
 			}
 			builder.append(lines[i]);
 		}

@@ -16,6 +16,8 @@ package org.pmw.tinylog.writers;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.EnvironmentHelper;
+
 import android.util.Log;
 
 /**
@@ -24,7 +26,7 @@ import android.util.Log;
 @PropertiesSupport(name = "logcat", properties = { })
 public final class LogcatWriter implements LoggingWriter {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {

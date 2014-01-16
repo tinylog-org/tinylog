@@ -20,7 +20,18 @@ import java.lang.management.ManagementFactory;
  */
 public final class EnvironmentHelper {
 
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	private EnvironmentHelper() {
+	}
+
+	/**
+	 * Get the line separator.
+	 * 
+	 * @return Line separator
+	 */
+	public static String getNewLine() {
+		return NEW_LINE;
 	}
 
 	/**

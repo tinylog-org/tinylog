@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.LogEntryBuilder;
 
@@ -35,8 +36,6 @@ import android.util.Log;
  * @see LogcatWriter
  */
 public class LogcatWriterTest extends AbstractTest {
-
-	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	/**
 	 * Test required log entry values.
@@ -52,21 +51,23 @@ public class LogcatWriterTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
+		String newLine = EnvironmentHelper.getNewLine();
+
 		LogcatWriter writer = new LogcatWriter();
 		writer.init();
 
 		assertEquals(0, Log.consumeEntries().size());
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.TRACE).className("com.package.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		writer.write(new LogEntryBuilder().level(LoggingLevel.TRACE).className("com.package.MyClass").renderedLogEntry("Hello World" + newLine).create());
 		assertThat(Log.consumeEntries(), is(Collections.singletonList("V\tMyClass\tHello World")));
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.DEBUG).className("a.b.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		writer.write(new LogEntryBuilder().level(LoggingLevel.DEBUG).className("a.b.MyClass").renderedLogEntry("Hello World" + newLine).create());
 		assertThat(Log.consumeEntries(), is(Collections.singletonList("D\tMyClass\tHello World")));
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).className("MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).className("MyClass").renderedLogEntry("Hello World" + newLine).create());
 		assertThat(Log.consumeEntries(), is(Collections.singletonList("I\tMyClass\tHello World")));
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.WARNING).className("com.package.MyClass").renderedLogEntry("Hello World" + NEW_LINE).create());
+		writer.write(new LogEntryBuilder().level(LoggingLevel.WARNING).className("com.package.MyClass").renderedLogEntry("Hello World" + newLine).create());
 		assertThat(Log.consumeEntries(), is(Collections.singletonList("W\tMyClass\tHello World")));
 
 		writer.write(new LogEntryBuilder().level(LoggingLevel.ERROR).className("com.package.MyClass").renderedLogEntry("Hello World").create());
