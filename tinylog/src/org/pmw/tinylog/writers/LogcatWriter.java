@@ -21,7 +21,7 @@ import org.pmw.tinylog.EnvironmentHelper;
 import android.util.Log;
 
 /**
- * Forward log entries to Android's logcat.
+ * Forward log entries to Android's logcat. Class name of log entry will be used as tag.
  */
 @PropertiesSupport(name = "logcat", properties = { })
 public final class LogcatWriter implements LoggingWriter {
