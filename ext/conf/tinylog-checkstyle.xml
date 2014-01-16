@@ -12,6 +12,7 @@
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
+    <module name="FileContentsHolder"/>
     <module name="JavadocMethod">
       <property name="scope" value="package"/>
       <property name="suppressLoadErrors" value="true"/>
@@ -32,8 +33,8 @@
     <module name="LocalVariableName"/>
     <module name="MemberName"/>
     <module name="MethodName">
-		<property name="format" value="^\$?[a-z][a-zA-Z0-9]*$"/>
-	</module>
+      <property name="format" value="^\$?[a-z][a-zA-Z0-9]*$"/>
+    </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
@@ -49,7 +50,6 @@
       <property name="tabWidth" value="4"/>
     </module>
     <module name="MethodLength"/>
-    <module name="ParameterNumber"/>
     <module name="EmptyForIteratorPad"/>
     <module name="MethodParamPad"/>
     <module name="NoWhitespaceAfter">
@@ -127,5 +127,8 @@
   <module name="RegexpHeader">
     <property name="header" value="^/\*\n \* Copyright \d\d\d\d \w+\n"/>
     <property name="fileExtensions" value="java"/>
+  </module>
+  <module name="SuppressWithNearbyCommentFilter">
+    <property name="influenceFormat" value="1"/>
   </module>
 </module>

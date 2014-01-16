@@ -521,6 +521,7 @@ public final class Logger {
 		}
 	}
 
+	/* SUPPRESS CHECKSTYLE MethodLength */
 	private static LogEntry createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		Date now = null;
