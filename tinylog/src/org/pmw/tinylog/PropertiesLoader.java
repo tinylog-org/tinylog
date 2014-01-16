@@ -70,7 +70,7 @@ final class PropertiesLoader {
 	 * Load configuration from properties.
 	 * 
 	 * @param configurator
-	 *            Confirgurator to update
+	 *            Configurator to update
 	 * @param properties
 	 *            Properties with configuration
 	 */
