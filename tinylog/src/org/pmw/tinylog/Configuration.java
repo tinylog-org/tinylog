@@ -231,12 +231,12 @@ final class Configuration {
 							case LINE_NUMBER:
 								return true;
 							default:
-								continue;
+								break;
 						}
 					}
-					continue;
+					break;
 				default:
-					continue;
+					break;
 			}
 		}
 		return false;

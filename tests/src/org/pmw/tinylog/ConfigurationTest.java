@@ -13,11 +13,13 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.Thread.State;
@@ -71,6 +73,56 @@ public class ConfigurationTest extends AbstractTest {
 		testDetailedConfigurationSample(detailedCopy);
 	}
 
+	/**
+	 * Test calculating of requirement of full stack trace.
+	 */
+	@Test
+	public final void testIsFullStackTraceElemetRequired() {
+		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new StoreWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertFalse(configuration.isFullStackTraceElemetRequired());
+
+		/* Requirement from logging writer */
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new StoreWriter(
+				LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertFalse(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new StoreWriter(
+				LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new StoreWriter(
+				LogEntryValue.FILE, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new StoreWriter(
+				LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+
+		/* Requirement from format pattern */
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{class}", Locale.ROOT, new StoreWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertFalse(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new StoreWriter(
+				LogEntryValue.MESSAGE), null, 0);
+		assertFalse(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new StoreWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{file}", Locale.ROOT, new StoreWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{line}", Locale.ROOT, new StoreWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertTrue(configuration.isFullStackTraceElemetRequired());
+	}
+
 	private Configuration createMinimalConfigurationSample() {
 		return new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, null, null, 0);
 	}
@@ -80,6 +132,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
 		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfPackage(ConfigurationTest.class.getPackage().getName()));
+		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues());
 		assertEquals("", configuration.getFormatPattern());
 		assertEquals(Collections.emptyList(), configuration.getFormatTokens());
 		assertEquals(Locale.ROOT, configuration.getLocale());
@@ -103,11 +156,11 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(LoggingLevel.INFO, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("invalid"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevelOfPackage(ConfigurationTest.class.getPackage().getName()));
+		assertEquals(Collections.singleton(LogEntryValue.RENDERED_LOG_ENTRY), configuration.getRequiredLogEntryValues());
 		assertEquals("{class}{method}", configuration.getFormatPattern());
 		assertEquals(2, configuration.getFormatTokens().size());
 		assertEquals(Locale.GERMANY, configuration.getLocale());
-		assertNotNull(configuration.getWriter());
-		assertEquals(StoreWriter.class, configuration.getWriter().getClass());
+		assertThat(configuration.getWriter(), instanceOf(StoreWriter.class));
 		assertNotNull(configuration.getWritingThread());
 		assertEquals(State.NEW, configuration.getWritingThread().getState());
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
