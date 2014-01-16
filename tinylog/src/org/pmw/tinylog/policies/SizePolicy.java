@@ -42,7 +42,7 @@ public final class SizePolicy implements Policy {
 	}
 
 	/**
-	 * String parameter for {@link PropertiesLoader}.
+	 * String parameter for {@link org.pmw.tinylog.PropertiesLoader PropertiesLoader}.
 	 * 
 	 * @param maxSize
 	 *            Maximum size of a log file with byte unit (e.g 16MB)

@@ -15,13 +15,11 @@ package org.pmw.tinylog.writers;
 
 import java.util.Set;
 
-import org.pmw.tinylog.Logger;
-
 /**
- * Logging writers output created log entries from {@link Logger}.
+ * Logging writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.
  * 
  * <p>
- * The annotation {@link PropertiesSupport} must be added to the implemented writer class and the implemented writer
+ * The annotation {@link org.pmw.tinylog.writers.PropertiesSupport PropertiesSupport} must be added to the implemented writer class and the implemented writer
  * must be registered as service in "META-INF/services/org.pmw.tinylog.writers" in order to make the writer available by
  * properties files and system properties.
  * </p>

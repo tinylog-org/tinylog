@@ -46,7 +46,7 @@ abstract class ConfigurationObserver extends Thread {
 	 *            Plain basis configuration
 	 * @param file
 	 *            Configuration file to observe
-	 * @return A new instance of {@link ConfigurationObserver}
+	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createFileConfigurationObserver(final Configurator basisConfigurator, final String file) {
 		return new ConfigurationObserver(basisConfigurator) {
@@ -70,7 +70,7 @@ abstract class ConfigurationObserver extends Thread {
 	 *            Plain basis configuration
 	 * @param file
 	 *            Configuration file to observe
-	 * @return A new instance of {@link ConfigurationObserver}
+	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createResourceConfigurationObserver(final Configurator basisConfigurator, final String file) {
 		return new ConfigurationObserver(basisConfigurator) {

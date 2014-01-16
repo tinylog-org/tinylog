@@ -26,7 +26,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link org.pmw.tinylog.LoggingLevel#INFO}, which ignores trace and debug log entries.
+ * The default logging level is {@link org.pmw.tinylog.LoggingLevel#INFO LoggingLevel.INFO}, which ignores trace and debug log entries.
  */
 public final class Logger {
 

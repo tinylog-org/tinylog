@@ -29,7 +29,7 @@ import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Configurator to configure {@link Logger}.
+ * Configurator to configure {@link org.pmw.tinylog.Logger Logger}.
  */
 public final class Configurator {
 
@@ -456,7 +456,7 @@ public final class Configurator {
 	}
 
 	/**
-	 * Data for {@link WritingThread}.
+	 * Data for {@link org.pmw.tinylog.WritingThread}.
 	 */
 	static final class WritingThreadData {
 

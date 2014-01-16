@@ -44,7 +44,7 @@ public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	/**
-	 * String parameter for {@link PropertiesLoader}.
+	 * String parameter for {@link org.pmw.tinylog.PropertiesLoader PropertiesLoader}.
 	 * 
 	 * @param dayOfWeek
 	 *            Day of week (between Monday..Sunday) for rollover

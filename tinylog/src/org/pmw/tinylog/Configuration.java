@@ -25,7 +25,7 @@ import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Configuration for {@link Logger}.
+ * Configuration for {@link org.pmw.tinylog.Logger Logger}.
  */
 final class Configuration {
 

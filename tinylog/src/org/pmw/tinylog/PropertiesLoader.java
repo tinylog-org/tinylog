@@ -34,7 +34,7 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Loads configuration for {@link Logger} from properties.
+ * Loads configuration for {@link org.pmw.tinylog.Logger Logger} from properties.
  */
 final class PropertiesLoader {
 

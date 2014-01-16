@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation makes a {@link org.pmw.tinylog.policies.Policy} configurable by properties.
+ * This annotation makes a {@link org.pmw.tinylog.policies.Policy Policy} configurable by properties.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

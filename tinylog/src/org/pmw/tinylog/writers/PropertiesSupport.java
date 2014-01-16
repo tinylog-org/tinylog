@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation makes a {@link org.pmw.tinylog.writers.LoggingWriter} configurable by properties.
+ * This annotation makes a {@link org.pmw.tinylog.writers.LoggingWriter LoggingWriter} configurable by properties.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -18,7 +18,7 @@ import java.util.Date;
 import org.pmw.tinylog.LoggingLevel;
 
 /**
- * Log entry object for {@link org.pmw.tinylog.writers.LoggingWriter#write(LogEntry)}.
+ * Log entry object for {@link org.pmw.tinylog.writers.LoggingWriter#write(LogEntry) LoggingWriter.write(LogEntry)}.
  */
 public final class LogEntry {
 

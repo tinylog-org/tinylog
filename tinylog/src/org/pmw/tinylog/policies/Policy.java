@@ -21,7 +21,7 @@ import org.pmw.tinylog.LoggingLevel;
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
  * <p>
- * The annotation {@link PropertiesSupport} must be added to the implemented policy class and the implemented policy
+ * The annotation {@link org.pmw.tinylog.policies.PropertiesSupport PropertiesSupport} must be added to the implemented policy class and the implemented policy
  * must be registered as service in "META-INF/services/org.pmw.tinylog.policies" in order to make the policy available
  * by properties files and system properties.
  * </p>
