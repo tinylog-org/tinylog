@@ -29,7 +29,7 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
 /**
- * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter} but keeps backups of old logging files.
+ * Writes log entries to a file like {@link FileWriter} but keeps backups of old logging files.
  */
 @PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
 		@Property(name = "label", type = Labeller.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true) })
@@ -158,11 +158,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	public void write(final LogEntry logEntry) throws Exception {
 		synchronized (mutex) {
 			if (!checkPolicies(logEntry.getLevel(), logEntry.getRenderedLogEntry())) {
-				try {
-					stream.close();
-				} catch (IOException ex) {
-					// Can be ignored
-				}
+				stream.close();
 				file = labeller.roll(file, backups);
 				stream = new FileOutputStream(file);
 			}

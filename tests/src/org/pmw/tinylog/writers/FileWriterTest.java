@@ -22,11 +22,15 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
@@ -54,6 +58,22 @@ public class FileWriterTest extends AbstractTest {
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		Set<LogEntryValue> requiredLogEntryValues = writer.getRequiredLogEntryValues();
 		assertThat(requiredLogEntryValues, contains(LogEntryValue.RENDERED_LOG_ENTRY));
+
+		file.delete();
+	}
+
+	/**
+	 * Test required log entry values.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFilename() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath());
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		file.delete();
 	}
@@ -167,6 +187,62 @@ public class FileWriterTest extends AbstractTest {
 		assertNull(reader.readLine());
 		reader.close();
 
+		file.delete();
+	}
+
+	/**
+	 * Test if exception will be thrown if file can't be opened.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testOpenFileFails() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		File folder = file.getAbsoluteFile().getParentFile();
+		FileWriter writer = new FileWriter(folder.getAbsolutePath());
+		try {
+			writer.init(); // A folder can't be open as file
+			fail("IOException expected");
+		} catch (IOException ex) {
+			// Expected
+		}
+
+		file.delete();
+	}
+
+	/**
+	 * Test if exception will be thrown if writing fails.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testWritingFails() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		FileWriter writer = new FileWriter(file.getAbsolutePath());
+		writer.init();
+
+		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
+
+			@Mock
+			public void write(final byte[] b) throws IOException {
+				throw new IOException();
+			}
+
+		};
+
+		try {
+			writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+			fail("IOException expected");
+		} catch (IOException ex) {
+			// Expected
+		}
+
+		mock.tearDown();
+
+		writer.close();
 		file.delete();
 	}
 

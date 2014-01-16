@@ -14,6 +14,8 @@
 package org.pmw.tinylog.writers;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -22,14 +24,23 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import mockit.Mock;
+import mockit.MockUp;
+
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.labellers.CountLabeller;
+import org.pmw.tinylog.labellers.ProcessIdLabeller;
+import org.pmw.tinylog.policies.DailyPolicy;
+import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
@@ -44,13 +55,59 @@ import org.pmw.tinylog.util.WritingThread;
 public class RollingFileWriterTest extends AbstractTest {
 
 	/**
-	 * Test required log entry values.
+	 * Test all constructors.
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testRequiredLogEntryValue() throws Exception {
+	public final void testCreateInstance() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 10);
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(10, writer.getNumberOfBackups());
+		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, new ProcessIdLabeller());
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, null, new Policy[0]);
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, new ProcessIdLabeller(), new SizePolicy(1024), new DailyPolicy());
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(2));
+		assertThat(writer.getPolicies().get(0), instanceOf(SizePolicy.class));
+		assertThat(writer.getPolicies().get(1), instanceOf(DailyPolicy.class));
+		file.delete();
+	}
+
+	/**
+	 * Test required log entry values.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testRequiredLogEntryValue() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
@@ -73,6 +130,7 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
 		writer.init();
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
@@ -105,6 +163,7 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 1);
 		writer.init();
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		List<WritingThread> threads = new ArrayList<WritingThread>();
 		for (int i = 0; i < 5; ++i) {
@@ -190,6 +249,79 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		file.delete();
 		backup.delete();
+	}
+
+	/**
+	 * Test if exception will be thrown if file can't be opened.
+	 * 
+	 * @throws Exception
+	 *             Test failed
+	 */
+	@Test
+	public final void testOpenFileFails() throws Exception {
+		File file = FileHelper.createTemporaryFile(null);
+
+		File folder = file.getAbsoluteFile().getParentFile();
+		RollingFileWriter writer = new RollingFileWriter(folder.getAbsolutePath(), 0, new Policy() {
+
+			@Override
+			public boolean initCheck(final File logFile) {
+				return true;
+			}
+
+			@Override
+			public boolean check(final LoggingLevel level, final String logEntry) {
+				return true;
+			}
+
+			@Override
+			public void reset() {
+				// Do nothing
+			}
+
+		});
+		try {
+			writer.init(); // A folder can't be open as file
+			fail("IOException expected");
+		} catch (IOException ex) {
+			// Expected
+		}
+
+		file.delete();
+	}
+
+	/**
+	 * Test if exception will be thrown if writing fails.
+	 * 
+	 * @throws Exception
+	 *             Test failed
+	 */
+	@Test
+	public final void testWritingFails() throws Exception {
+		File file = FileHelper.createTemporaryFile(null);
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
+		writer.init();
+
+		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
+
+			@Mock
+			public void write(final byte[] b) throws IOException {
+				throw new IOException();
+			}
+
+		};
+
+		try {
+			writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+			fail("IOException expected");
+		} catch (IOException ex) {
+			// Expected
+		}
+
+		mock.tearDown();
+
+		writer.close();
+		file.delete();
 	}
 
 }
