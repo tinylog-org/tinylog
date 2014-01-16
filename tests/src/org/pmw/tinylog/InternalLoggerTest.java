@@ -13,7 +13,6 @@
 
 package org.pmw.tinylog;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +28,84 @@ import org.pmw.tinylog.util.StringListOutputStream;
 public class InternalLoggerTest extends AbstractTest {
 
 	/**
+	 * Test if the class is a valid utility class.
+	 * 
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(InternalLogger.class);
+	}
+
+	/**
+	 * Test warnings methods.
+	 */
+	@Test
+	public final void testWarnings() {
+		StringListOutputStream errorStream = getSystemErrorStream();
+
+		InternalLogger.warn("Hello World!");
+		assertTrue(errorStream.hasLines());
+		String nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Hello World!"));
+
+		InternalLogger.warn("Hello {0}!", "tinylog");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Hello tinylog!"));
+
+		InternalLogger.warn(new IndexOutOfBoundsException());
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+
+		InternalLogger.warn(new IndexOutOfBoundsException(""));
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+
+		InternalLogger.warn(new IndexOutOfBoundsException("Hello World!"));
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Hello World!"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+
+		InternalLogger.warn(new NullPointerException(), "Logging message");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+
+		InternalLogger.warn(new NullPointerException(""), "Logging message");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+
+		InternalLogger.warn(new NullPointerException("Exception message"), "Logging message");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString("Exception message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+
+		InternalLogger.warn(new RuntimeException(), "Hello {0}!", "tinylog");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("WARNING"));
+		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertThat(nextLine, containsString(RuntimeException.class.getName()));
+	}
+
+	/**
 	 * Test error methods.
 	 */
 	@Test
@@ -37,36 +114,63 @@ public class InternalLoggerTest extends AbstractTest {
 
 		InternalLogger.error("Hello World!");
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("Hello World!")));
+		String nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Hello World!"));
 
 		InternalLogger.error("Hello {0}!", "tinylog");
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("Hello tinylog!")));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Hello tinylog!"));
 
 		InternalLogger.error(new IndexOutOfBoundsException());
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IndexOutOfBoundsException.class.getName())));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+
+		InternalLogger.error(new IndexOutOfBoundsException(""));
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
 
 		InternalLogger.error(new IndexOutOfBoundsException("Hello World!"));
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(),
-				allOf(containsString("ERROR"), containsString("Hello World!"), containsString(IndexOutOfBoundsException.class.getName())));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Hello World!"));
+		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+
+		InternalLogger.error(new NullPointerException(""), "Logging message");
+		assertTrue(errorStream.hasLines());
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
 
 		InternalLogger.error(new NullPointerException(), "Logging message");
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(),
-				allOf(containsString("ERROR"), containsString("Logging message"), containsString(NullPointerException.class.getName())));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
 
 		InternalLogger.error(new NullPointerException("Exception message"), "Logging message");
 		assertTrue(errorStream.hasLines());
-		assertThat(
-				errorStream.nextLine(),
-				allOf(containsString("ERROR"), containsString("Logging message"), containsString("Exception message"),
-						containsString(NullPointerException.class.getName())));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Logging message"));
+		assertThat(nextLine, containsString("Exception message"));
+		assertThat(nextLine, containsString(NullPointerException.class.getName()));
 
 		InternalLogger.error(new RuntimeException(), "Hello {0}!", "tinylog");
 		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("Hello tinylog!"), containsString(RuntimeException.class.getName())));
+		nextLine = errorStream.nextLine();
+		assertThat(nextLine, containsString("ERROR"));
+		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertThat(nextLine, containsString(RuntimeException.class.getName()));
 	}
 
 }

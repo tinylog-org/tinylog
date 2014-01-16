@@ -16,15 +16,88 @@ package org.pmw.tinylog;
 import java.text.MessageFormat;
 
 /**
- * Static logger for logging internal problems in tinylog.
+ * Static logger for logging internal problems of tinylog.
  * 
  * Log entries will be always output into the console.
  */
 final class InternalLogger {
 
-	private static final String PREFIX = "LOGGING ERROR: ";
+	private static final String PREFIX_WARNING = "LOGGING WARNING: ";
+	private static final String PREFIX_ERROR = "LOGGING ERROR: ";
 
 	private InternalLogger() {
+	}
+
+	/**
+	 * Log an internal warning.
+	 * 
+	 * @param message
+	 *            Text to log
+	 */
+	public static void warn(final String message) {
+		System.err.println(PREFIX_WARNING + message);
+	}
+
+	/**
+	 * Log an internal warning.
+	 * 
+	 * @param message
+	 *            Formated text to log
+	 * @param arguments
+	 *            Arguments for the text message
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void warn(final String message, final Object... arguments) {
+		warn(MessageFormat.format(message, arguments));
+	}
+
+	/**
+	 * Log an internal warning.
+	 * 
+	 * @param exception
+	 *            Exception to log
+	 */
+	public static void warn(final Throwable exception) {
+		String message = exception.getMessage();
+		if (message == null || message.length() == 0) {
+			warn(exception.getClass().getName());
+		} else {
+			warn(message + " (" + exception.getClass().getName() + ")");
+		}
+	}
+
+	/**
+	 * Log an internal warning.
+	 * 
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Text to log
+	 */
+	public static void warn(final Throwable exception, final String message) {
+		String messageOfThrowable = exception.getMessage();
+		if (messageOfThrowable == null || messageOfThrowable.length() == 0) {
+			warn(message + " (" + exception.getClass().getName() + ")");
+		} else {
+			warn(message + " (" + exception.getClass().getName() + ": " + messageOfThrowable + ")");
+		}
+	}
+
+	/**
+	 * Log an internal warning.
+	 * 
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formated text to log
+	 * @param arguments
+	 *            Arguments for the text message
+	 * 
+	 * @see MessageFormat#format(String, Object...)
+	 */
+	public static void warn(final Throwable exception, final String message, final Object... arguments) {
+		warn(exception, MessageFormat.format(message, arguments));
 	}
 
 	/**
@@ -34,7 +107,7 @@ final class InternalLogger {
 	 *            Text to log
 	 */
 	public static void error(final String message) {
-		System.err.println(PREFIX + message);
+		System.err.println(PREFIX_ERROR + message);
 	}
 
 	/**
