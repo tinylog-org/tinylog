@@ -523,7 +523,6 @@ public final class Logger {
 		}
 	}
 
-	/* SUPPRESS CHECKSTYLE MethodLength */
 	private static LogEntry createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		Set<LogEntryValue> requiredLogEntryValues = currentConfiguration.getRequiredLogEntryValues();
@@ -597,76 +596,34 @@ public final class Logger {
 			for (Token token : currentConfiguration.getFormatTokens()) {
 				switch (token.getType()) {
 					case THREAD:
-						if (thread == null) {
-							thread = Thread.currentThread();
-						}
 						builder.append(thread.getName());
 						break;
 
 					case THREAD_ID:
-						if (thread == null) {
-							thread = Thread.currentThread();
-						}
 						builder.append(thread.getId());
 						break;
 
 					case CLASS:
-						if (fullyQualifiedClassName == null) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							fullyQualifiedClassName = stackTraceElement.getClassName();
-						}
 						builder.append(fullyQualifiedClassName);
 						break;
 
 					case CLASS_NAME:
-						if (fullyQualifiedClassName == null) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							fullyQualifiedClassName = stackTraceElement.getClassName();
-						}
 						builder.append(getNameOfClass(fullyQualifiedClassName));
 						break;
 
 					case PACKAGE:
-						if (fullyQualifiedClassName == null) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							fullyQualifiedClassName = stackTraceElement.getClassName();
-						}
 						builder.append(getPackageOfClass(fullyQualifiedClassName));
 						break;
 
 					case METHOD:
-						if (method == null) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							method = stackTraceElement.getMethodName();
-						}
 						builder.append(method);
 						break;
 
 					case FILE:
-						if (filename == null) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							filename = stackTraceElement.getFileName();
-						}
 						builder.append(filename);
 						break;
 
 					case LINE_NUMBER:
-						if (line < 0) {
-							if (stackTraceElement == null) {
-								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-							}
-							line = stackTraceElement.getLineNumber();
-						}
 						builder.append(line);
 						break;
 
@@ -675,17 +632,11 @@ public final class Logger {
 						break;
 
 					case DATE:
-						if (now == null) {
-							now = new Date();
-						}
 						builder.append(getRenderedDate(now, token));
 						break;
 
 					case MESSAGE:
 						if (message != null) {
-							if (renderedMessage == null) {
-								renderedMessage = getRenderedMessage(currentConfiguration, message, arguments);
-							}
 							builder.append(renderedMessage);
 						}
 						if (exception != null) {

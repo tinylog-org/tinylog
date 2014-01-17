@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,8 +39,8 @@ final class Configuration {
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
-	private final Set<LogEntryValue> requiredLogEntryValues;
 	private final List<Token> formatTokens;
+	private final Set<LogEntryValue> requiredLogEntryValues;
 	private final boolean fullStackTraceElemetRequired;
 
 	/**
@@ -67,9 +69,9 @@ final class Configuration {
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
-		this.requiredLogEntryValues = writer == null ? Collections.<LogEntryValue> emptySet() : writer.getRequiredLogEntryValues();
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
-		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(requiredLogEntryValues, formatTokens);
+		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
+		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(requiredLogEntryValues);
 	}
 
 	/**
@@ -132,15 +134,6 @@ final class Configuration {
 	}
 
 	/**
-	 * Get all log entry values that are required by logging writer.
-	 * 
-	 * @return Required values for log entry
-	 */
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return requiredLogEntryValues;
-	}
-
-	/**
 	 * Get the format pattern for log entries.
 	 * 
 	 * @return Format pattern for log entries
@@ -195,6 +188,15 @@ final class Configuration {
 	}
 
 	/**
+	 * Get all log entry values that are required by logging writer.
+	 * 
+	 * @return Required values for log entry
+	 */
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return requiredLogEntryValues;
+	}
+
+	/**
 	 * Check if a full stack trace element is required.
 	 * 
 	 * @return <code>true</code> if a full stack trace element is required, <code>false</code> if not
@@ -216,30 +218,65 @@ final class Configuration {
 		return new Configurator(level, copyOfPackageLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
 	}
 
-	private static boolean fullStackTraceElemetRequired(final Set<LogEntryValue> logEntryValues, final List<Token> tokens) {
-		for (LogEntryValue logEntryValue : logEntryValues) {
-			switch (logEntryValue) {
-				case METHOD:
-				case FILE:
-				case LINE_NUMBER:
-					return true;
-				case RENDERED_LOG_ENTRY:
-					for (Token token : tokens) {
-						switch (token.getType()) {
-							case METHOD:
-							case FILE:
-							case LINE_NUMBER:
-								return true;
-							default:
-								break;
-						}
+	private static Set<LogEntryValue> requiredLogEntryValues(final LoggingWriter writer, final Collection<Token> formatTokens) {
+		if (writer == null) {
+			return Collections.emptySet();
+		} else {
+			Set<LogEntryValue> logEntryValuesOfWriter = writer.getRequiredLogEntryValues();
+			if (logEntryValuesOfWriter == null || logEntryValuesOfWriter.isEmpty()) {
+				return Collections.emptySet();
+			} else if (logEntryValuesOfWriter.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
+				Set<LogEntryValue> requiredLogEntryValues = EnumSet.copyOf(logEntryValuesOfWriter);
+				for (Token token : formatTokens) {
+					LogEntryValue logEntryValue = getRequiredLogEntryValue(token);
+					if (logEntryValue != null) {
+						requiredLogEntryValues.add(logEntryValue);
 					}
-					break;
-				default:
-					break;
+				}
+				return requiredLogEntryValues;
+			} else {
+				return logEntryValuesOfWriter;
 			}
 		}
-		return false;
+	}
+
+	private static boolean fullStackTraceElemetRequired(final Set<LogEntryValue> logEntryValues) {
+		return logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE)
+				|| logEntryValues.contains(LogEntryValue.LINE_NUMBER);
+	}
+
+	private static LogEntryValue getRequiredLogEntryValue(final Token token) {
+		switch (token.getType()) {
+			case THREAD:
+			case THREAD_ID:
+				return LogEntryValue.THREAD;
+
+			case CLASS:
+			case CLASS_NAME:
+			case PACKAGE:
+				return LogEntryValue.CLASS;
+
+			case METHOD:
+				return LogEntryValue.METHOD;
+
+			case FILE:
+				return LogEntryValue.FILE;
+
+			case LINE_NUMBER:
+				return LogEntryValue.LINE_NUMBER;
+
+			case LOGGING_LEVEL:
+				return LogEntryValue.LOGGING_LEVEL;
+
+			case DATE:
+				return LogEntryValue.DATE;
+
+			case MESSAGE:
+				return LogEntryValue.MESSAGE;
+
+			default:
+				return null;
+		}
 	}
 
 }
