@@ -157,7 +157,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	@Override
 	public void write(final LogEntry logEntry) throws Exception {
 		synchronized (mutex) {
-			if (!checkPolicies(logEntry.getLevel(), logEntry.getRenderedLogEntry())) {
+			if (!checkPolicies(logEntry.getLoggingLevel(), logEntry.getRenderedLogEntry())) {
 				stream.close();
 				file = labeller.roll(file, backups);
 				stream = new FileOutputStream(file);

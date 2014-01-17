@@ -37,21 +37,21 @@ public class LogEntryForwarderTest extends AbstractTest {
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
-		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
-		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 		LogEntryForwarder.forward(0, LoggingLevel.ERROR, exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
-		assertEquals("LogEntryForwarderTest.java", logEntry.getFile());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 	}
@@ -67,20 +67,20 @@ public class LogEntryForwarderTest extends AbstractTest {
 
 		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.ERROR, exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());

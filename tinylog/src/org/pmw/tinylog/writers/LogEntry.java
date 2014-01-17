@@ -26,10 +26,10 @@ public final class LogEntry {
 	private final String processId;
 	private final Thread thread;
 	private final String className;
-	private final String method;
-	private final String file;
+	private final String methodName;
+	private final String filename;
 	private final int lineNumber;
-	private final LoggingLevel level;
+	private final LoggingLevel loggingLevel;
 	private final String message;
 	private final Throwable exception;
 	private final String renderedLogEntry;
@@ -42,14 +42,14 @@ public final class LogEntry {
 	 * @param thread
 	 *            The current thread
 	 * @param className
-	 *            The fully qualified class name of the caller
-	 * @param method
-	 *            The method name of the caller
-	 * @param file
-	 *            The source filename of the caller
+	 *            The fully qualified class name
+	 * @param methodName
+	 *            The method name
+	 * @param filename
+	 *            The source filename
 	 * @param lineNumber
-	 *            The line number of calling
-	 * @param level
+	 *            The line number
+	 * @param loggingLevel
 	 *            The logging level
 	 * @param message
 	 *            The message of the logging event
@@ -58,16 +58,16 @@ public final class LogEntry {
 	 * @param renderedLogEntry
 	 *            The rendered log entry
 	 */
-	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String method, final String file,
-			final int lineNumber, final LoggingLevel level, final String message, final Throwable exception, final String renderedLogEntry) {
+	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String methodName, final String filename,
+			final int lineNumber, final LoggingLevel loggingLevel, final String message, final Throwable exception, final String renderedLogEntry) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
 		this.className = className;
-		this.method = method;
-		this.file = file;
+		this.methodName = methodName;
+		this.filename = filename;
 		this.lineNumber = lineNumber;
-		this.level = level;
+		this.loggingLevel = loggingLevel;
 		this.message = message;
 		this.exception = exception;
 		this.renderedLogEntry = renderedLogEntry;
@@ -114,8 +114,8 @@ public final class LogEntry {
 	 * 
 	 * @return Method name of the caller
 	 */
-	public String getMethod() {
-		return method;
+	public String getMethodName() {
+		return methodName;
 	}
 
 	/**
@@ -123,8 +123,8 @@ public final class LogEntry {
 	 * 
 	 * @return Source filename of the caller
 	 */
-	public String getFile() {
-		return file;
+	public String getFilename() {
+		return filename;
 	}
 
 	/**
@@ -141,8 +141,8 @@ public final class LogEntry {
 	 * 
 	 * @return Logging level
 	 */
-	public LoggingLevel getLevel() {
-		return level;
+	public LoggingLevel getLoggingLevel() {
+		return loggingLevel;
 	}
 
 	/**

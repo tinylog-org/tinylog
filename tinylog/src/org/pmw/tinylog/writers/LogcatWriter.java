@@ -21,7 +21,7 @@ import org.pmw.tinylog.EnvironmentHelper;
 import android.util.Log;
 
 /**
- * Forward log entries to Android's logcat. Class name of log entry will be used as tag.
+ * Forward log entries to Android's logcat. The class name will be used as tag for logcat.
  */
 @PropertiesSupport(name = "logcat", properties = { })
 public final class LogcatWriter implements LoggingWriter {
@@ -43,7 +43,7 @@ public final class LogcatWriter implements LoggingWriter {
 		String tag = shorten(logEntry.getClassName());
 		String message = removeLastLineBreak(logEntry.getRenderedLogEntry());
 
-		switch (logEntry.getLevel()) {
+		switch (logEntry.getLoggingLevel()) {
 			case ERROR:
 				Log.e(tag, message);
 				break;
@@ -60,7 +60,7 @@ public final class LogcatWriter implements LoggingWriter {
 				Log.v(tag, message);
 				break;
 			default:
-				throw new IllegalArgumentException(logEntry.getLevel().toString());
+				throw new IllegalArgumentException(logEntry.getLoggingLevel().toString());
 		}
 	}
 

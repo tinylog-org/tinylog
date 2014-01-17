@@ -52,10 +52,10 @@ public class LogEntryTest extends AbstractTest {
 		assertSame(processId, logEntry.getProcessId());
 		assertSame(thread, logEntry.getThread());
 		assertEquals(className, logEntry.getClassName());
-		assertEquals(method, logEntry.getMethod());
-		assertEquals(file, logEntry.getFile());
+		assertEquals(method, logEntry.getMethodName());
+		assertEquals(file, logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
-		assertEquals(level, logEntry.getLevel());
+		assertEquals(level, logEntry.getLoggingLevel());
 		assertEquals(message, logEntry.getMessage());
 		assertSame(exception, logEntry.getException());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());

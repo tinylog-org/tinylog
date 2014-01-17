@@ -97,29 +97,29 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.trace(new StringBuilder("Hello!"));
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.trace("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.trace("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 
 		Logger.trace(exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.trace(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLevel());
+		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -138,29 +138,29 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.debug(new StringBuilder("Hello!"));
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.debug("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.debug("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 
 		Logger.debug(exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.debug(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -179,29 +179,29 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.info(new StringBuilder("Hello!"));
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.info("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.info("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 
 		Logger.info(exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.info(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -220,29 +220,29 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.warn(new StringBuilder("Hello!"));
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.warn("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.warn("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 
 		Logger.warn(exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.warn(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -261,29 +261,29 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.error(new StringBuilder("Hello!"));
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.error("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		Logger.error("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
 
 		Logger.error(exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.error(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -309,7 +309,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 
 		/* Test logging of plain texts */
@@ -322,7 +322,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		/* Test logging of exceptions */
@@ -331,12 +331,12 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(strackTraceDeep, LoggingLevel.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.output(strackTraceDeep, LoggingLevel.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -346,7 +346,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(strackTraceDeep, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		/* Test failure of creating log entry */
@@ -371,7 +371,7 @@ public class LoggerTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -393,7 +393,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("com.test.MyClass", logEntry.getClassName());
 
 		/* Test logging of plain texts */
@@ -406,7 +406,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		/* Test logging of exceptions */
@@ -417,12 +417,12 @@ public class LoggerTest extends AbstractTest {
 		Exception exception = new Exception();
 		Logger.output(stackTraceElement, LoggingLevel.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.output(stackTraceElement, LoggingLevel.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
@@ -432,7 +432,7 @@ public class LoggerTest extends AbstractTest {
 
 		Logger.output(stackTraceElement, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLevel());
+		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		/* Test failure of creating log entry */
@@ -457,7 +457,7 @@ public class LoggerTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -487,10 +487,10 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(EnvironmentHelper.getProcessId().toString(), logEntry.getProcessId());
 		assertEquals(Thread.currentThread(), logEntry.getThread());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
-		assertEquals("testFullLogEntry", logEntry.getMethod());
-		assertEquals("LoggerTest.java", logEntry.getFile());
+		assertEquals("testFullLogEntry", logEntry.getMethodName());
+		assertEquals("LoggerTest.java", logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 

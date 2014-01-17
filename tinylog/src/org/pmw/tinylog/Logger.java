@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
@@ -26,7 +27,8 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Static class to create log entries.
  * 
- * The default logging level is {@link org.pmw.tinylog.LoggingLevel#INFO LoggingLevel.INFO}, which ignores trace and debug log entries.
+ * The default logging level is {@link org.pmw.tinylog.LoggingLevel#INFO LoggingLevel.INFO}, which ignores trace and
+ * debug log entries.
  */
 public final class Logger {
 
@@ -524,17 +526,19 @@ public final class Logger {
 	/* SUPPRESS CHECKSTYLE MethodLength */
 	private static LogEntry createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
+		Set<LogEntryValue> requiredLogEntryValues = currentConfiguration.getRequiredLogEntryValues();
+
 		Date now = null;
 		String processId = null;
 		Thread thread = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		String fullyQualifiedClassName = null;
-		String methodName = null;
-		String fileName = null;
-		int lineNumber = -1;
+		String method = null;
+		String filename = null;
+		int line = -1;
 		String renderedMessage = null;
 
-		for (LogEntryValue logEntryValue : currentConfiguration.getRequiredLogEntryValues()) {
+		for (LogEntryValue logEntryValue : requiredLogEntryValues) {
 			switch (logEntryValue) {
 				case DATE:
 					now = new Date();
@@ -559,30 +563,26 @@ public final class Logger {
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					methodName = stackTraceElement.getMethodName();
+					method = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					fileName = stackTraceElement.getFileName();
+					filename = stackTraceElement.getFileName();
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 					}
-					lineNumber = stackTraceElement.getLineNumber();
+					line = stackTraceElement.getLineNumber();
 					break;
 
 				case MESSAGE:
 					if (message != null) {
-						if (arguments == null || arguments.length == 0) {
-							renderedMessage = message.toString();
-						} else {
-							renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
-						}
+						renderedMessage = getRenderedMessage(currentConfiguration, message, arguments);
 					}
 					break;
 
@@ -592,8 +592,7 @@ public final class Logger {
 		}
 
 		String renderedLogEntry;
-		if (currentConfiguration.getRequiredLogEntryValues().contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
-			int dotIndex;
+		if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
 			StringBuilder builder = new StringBuilder();
 			for (Token token : currentConfiguration.getFormatTokens()) {
 				switch (token.getType()) {
@@ -628,18 +627,7 @@ public final class Logger {
 							}
 							fullyQualifiedClassName = stackTraceElement.getClassName();
 						}
-
-						// determine the index of last . in the fully qualified class name
-						// for my.example.ClassName this would be 10
-						dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-
-						// defaults to no (default) package
-						String className = fullyQualifiedClassName;
-						if (dotIndex != -1) {
-							className = fullyQualifiedClassName.substring(dotIndex + 1);
-						}
-
-						builder.append(className);
+						builder.append(getNameOfClass(fullyQualifiedClassName));
 						break;
 
 					case PACKAGE:
@@ -649,48 +637,37 @@ public final class Logger {
 							}
 							fullyQualifiedClassName = stackTraceElement.getClassName();
 						}
-
-						// determine the index of last . in the fully qualified class name
-						// for my.example.ClassName this would be 10
-						dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-
-						// defaults to no (default) package
-						String packageName = "";
-						if (dotIndex != -1) {
-							packageName = fullyQualifiedClassName.substring(0, dotIndex);
-						}
-
-						builder.append(packageName);
+						builder.append(getPackageOfClass(fullyQualifiedClassName));
 						break;
 
 					case METHOD:
-						if (methodName == null) {
+						if (method == null) {
 							if (stackTraceElement == null) {
 								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 							}
-							methodName = stackTraceElement.getMethodName();
+							method = stackTraceElement.getMethodName();
 						}
-						builder.append(methodName);
+						builder.append(method);
 						break;
 
 					case FILE:
-						if (fileName == null) {
+						if (filename == null) {
 							if (stackTraceElement == null) {
 								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 							}
-							fileName = stackTraceElement.getFileName();
+							filename = stackTraceElement.getFileName();
 						}
-						builder.append(fileName);
+						builder.append(filename);
 						break;
 
 					case LINE_NUMBER:
-						if (lineNumber < 0) {
+						if (line < 0) {
 							if (stackTraceElement == null) {
 								stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
 							}
-							lineNumber = stackTraceElement.getLineNumber();
+							line = stackTraceElement.getLineNumber();
 						}
-						builder.append(lineNumber);
+						builder.append(line);
 						break;
 
 					case LOGGING_LEVEL:
@@ -701,22 +678,13 @@ public final class Logger {
 						if (now == null) {
 							now = new Date();
 						}
-						DateFormat formatter = (DateFormat) token.getData();
-						String format;
-						synchronized (formatter) {
-							format = formatter.format(now);
-						}
-						builder.append(format);
+						builder.append(getRenderedDate(now, token));
 						break;
 
 					case MESSAGE:
 						if (message != null) {
 							if (renderedMessage == null) {
-								if (arguments == null || arguments.length == 0) {
-									renderedMessage = message.toString();
-								} else {
-									renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
-								}
+								renderedMessage = getRenderedMessage(currentConfiguration, message, arguments);
 							}
 							builder.append(renderedMessage);
 						}
@@ -724,16 +692,7 @@ public final class Logger {
 							if (message != null) {
 								builder.append(": ");
 							}
-							if (currentConfiguration.getMaxStackTraceElements() == 0) {
-								builder.append(exception.getClass().getName());
-								String exceptionMessage = exception.getMessage();
-								if (exceptionMessage != null) {
-									builder.append(": ");
-									builder.append(exceptionMessage);
-								}
-							} else {
-								builder.append(getPrintedException(exception, currentConfiguration.getMaxStackTraceElements()));
-							}
+							formatException(builder, exception, currentConfiguration.getMaxStackTraceElements());
 						}
 						break;
 
@@ -748,8 +707,7 @@ public final class Logger {
 			renderedLogEntry = null;
 		}
 
-		return new LogEntry(now, processId, thread, fullyQualifiedClassName, methodName, fileName, lineNumber, level, renderedMessage, exception,
-				renderedLogEntry);
+		return new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception, renderedLogEntry);
 	}
 
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
@@ -778,8 +736,55 @@ public final class Logger {
 		}
 	}
 
-	private static String getPrintedException(final Throwable exception, final int countStackTraceElements) {
-		StringBuilder builder = new StringBuilder();
+	private static String getNameOfClass(final String fullyQualifiedClassName) {
+		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+		if (dotIndex < 0) {
+			return fullyQualifiedClassName;
+		} else {
+			return fullyQualifiedClassName.substring(dotIndex + 1);
+		}
+	}
+
+	private static String getPackageOfClass(final String fullyQualifiedClassName) {
+		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
+		if (dotIndex < 0) {
+			return "";
+		} else {
+			return fullyQualifiedClassName.substring(0, dotIndex);
+		}
+	}
+
+	private static String getRenderedDate(final Date now, final Token token) {
+		DateFormat formatter = (DateFormat) token.getData();
+		synchronized (formatter) {
+			return formatter.format(now);
+		}
+	}
+
+	private static String getRenderedMessage(final Configuration currentConfiguration, final Object message, final Object[] arguments) {
+		String renderedMessage;
+		if (arguments == null || arguments.length == 0) {
+			renderedMessage = message.toString();
+		} else {
+			renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
+		}
+		return renderedMessage;
+	}
+
+	private static void formatException(final StringBuilder builder, final Throwable exception, final int countStackTraceElements) {
+		if (countStackTraceElements == 0) {
+			builder.append(exception.getClass().getName());
+			String exceptionMessage = exception.getMessage();
+			if (exceptionMessage != null) {
+				builder.append(": ");
+				builder.append(exceptionMessage);
+			}
+		} else {
+			formatExceptionWithStackTrace(builder, exception, countStackTraceElements);
+		}
+	}
+
+	private static void formatExceptionWithStackTrace(final StringBuilder builder, final Throwable exception, final int countStackTraceElements) {
 		builder.append(exception.getClass().getName());
 
 		String message = exception.getMessage();
@@ -801,17 +806,14 @@ public final class Logger {
 			builder.append(NEW_LINE);
 			builder.append('\t');
 			builder.append("...");
-			return builder.toString();
+		} else {
+			Throwable cause = exception.getCause();
+			if (cause != null) {
+				builder.append(NEW_LINE);
+				builder.append("Caused by: ");
+				formatExceptionWithStackTrace(builder, cause, countStackTraceElements - length);
+			}
 		}
-
-		Throwable cause = exception.getCause();
-		if (cause != null) {
-			builder.append(NEW_LINE);
-			builder.append("Caused by: ");
-			builder.append(getPrintedException(cause, countStackTraceElements - length));
-		}
-
-		return builder.toString();
 	}
 
 }

@@ -46,13 +46,13 @@ public class RegressionsTest extends AbstractTest {
 		Configurator.currentConfig().level("org", LoggingLevel.TRACE).activate();
 		Logger.info("");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Was already OK
 
 		Configurator.currentConfig().level("org", null).activate();
 		Logger.info("");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Failed
 	}
 
@@ -91,7 +91,7 @@ public class RegressionsTest extends AbstractTest {
 		Logger.info("{TEST}"); // Failed (java.lang.IllegalArgumentException)
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("{TEST}", logEntry.getMessage());
 	}
 
@@ -106,7 +106,7 @@ public class RegressionsTest extends AbstractTest {
 		Logger.error("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello", logEntry.getMessage());
 	}
 

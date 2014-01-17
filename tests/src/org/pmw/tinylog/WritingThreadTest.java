@@ -72,7 +72,7 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.join();
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("sample", logEntry.getMessage());
 	}
 

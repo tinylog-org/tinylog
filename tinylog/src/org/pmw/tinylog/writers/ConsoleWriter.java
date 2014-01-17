@@ -37,7 +37,7 @@ public final class ConsoleWriter implements LoggingWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) {
-		getPrintStream(logEntry.getLevel()).print(logEntry.getRenderedLogEntry());
+		getPrintStream(logEntry.getLoggingLevel()).print(logEntry.getRenderedLogEntry());
 	}
 
 	private static PrintStream getPrintStream(final LoggingLevel level) {

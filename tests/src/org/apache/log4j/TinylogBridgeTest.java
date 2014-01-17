@@ -121,22 +121,22 @@ public class TinylogBridgeTest extends AbstractTest {
 
 		logger.log(Level.INFO, "Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		logger.log(Level.WARN, null, exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLevel());
+		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
 		logger.log(Level.ERROR, new StringBuilder("Hello!"));
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		logger.log(Level.FATAL, "Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -150,12 +150,12 @@ public class TinylogBridgeTest extends AbstractTest {
 
 		logger.log(Level.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLevel());
+		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 
 		logger.log(Level.ERROR, "Hello!", new Exception());
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLevel());
+		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 	}
 
