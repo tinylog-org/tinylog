@@ -82,7 +82,7 @@ final class WritingThread extends Thread {
 					try {
 						writingTask.writer.write(writingTask.logEntry);
 					} catch (Exception ex) {
-						ex.printStackTrace(System.err);
+						InternalLogger.error(ex, "Failed to write log entry");
 					}
 				}
 				writingTasks = getWritingTasks();

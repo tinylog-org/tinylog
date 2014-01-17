@@ -147,7 +147,7 @@ abstract class ConfigurationObserver extends Thread {
 				return properties;
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
+			InternalLogger.error(ex, "Failed to read properties file");
 			return null;
 		} finally {
 			if (stream != null) {

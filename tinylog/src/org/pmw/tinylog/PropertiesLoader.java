@@ -80,7 +80,7 @@ final class PropertiesLoader {
 			try {
 				configurator.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
-				// Ignore
+				InternalLogger.warn("\"{0}\" is an invalid logging level and will be ignored", level);
 			}
 		}
 
@@ -94,7 +94,7 @@ final class PropertiesLoader {
 					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
 					configurator.level(packageName, loggingLevel);
 				} catch (IllegalArgumentException ex) {
-					// Illegal logging level => reset
+					InternalLogger.warn("\"{0}\" is an invalid logging level and will be ignored", value);
 					configurator.level(packageName, null);
 				}
 			}
@@ -123,7 +123,7 @@ final class PropertiesLoader {
 				int limit = Integer.parseInt(stacktace);
 				configurator.maxStackTraceElements(limit);
 			} catch (NumberFormatException ex) {
-				// Ignore
+				InternalLogger.warn("\"{0}\" is an invalid stack trace size and will be ignored", stacktace);
 			}
 		}
 
@@ -163,6 +163,7 @@ final class PropertiesLoader {
 					priority = Integer.parseInt(priorityString.trim());
 				} catch (NumberFormatException ex) {
 					priority = null;
+					InternalLogger.warn("\"{0}\" is an invalid thread priority and will be ignored", priorityString);
 				}
 			}
 			if (priority != null && observedThreadDefined) {
@@ -201,8 +202,8 @@ final class PropertiesLoader {
 									if (service.isAssignableFrom(implementation)) {
 										services.add(implementation);
 									}
-								} catch (ClassNotFoundException ec) {
-									// Continue
+								} catch (ClassNotFoundException ex) {
+									InternalLogger.warn("Cannot find class \"{0}\"", line);
 								}
 							}
 						}
@@ -226,6 +227,7 @@ final class PropertiesLoader {
 				return services;
 			}
 		} catch (IOException ex) {
+			InternalLogger.error(ex, "Failed to read services from \"{0}\"", SERVICES_PREFIX + service.getPackage().getName());
 			return Collections.emptyList();
 		}
 	}
@@ -250,12 +252,16 @@ final class PropertiesLoader {
 							return (LoggingWriter) constructor.newInstance(parameters);
 						}
 					} catch (IllegalArgumentException ex) {
+						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 						return null;
 					} catch (InstantiationException ex) {
+						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 						return null;
 					} catch (IllegalAccessException ex) {
+						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 						return null;
 					} catch (InvocationTargetException ex) {
+						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 						return null;
 					}
 				}
@@ -285,6 +291,7 @@ final class PropertiesLoader {
 					try {
 						parameters[i] = Integer.parseInt(value);
 					} catch (NumberFormatException ex) {
+						InternalLogger.warn("\"{1}\" for \"{0}\" is an invalid number and will be ignored", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
 				} else if (boolean.class.equals(type)) {
@@ -293,6 +300,7 @@ final class PropertiesLoader {
 					} else if ("false".equalsIgnoreCase(value)) {
 						parameters[i] = Boolean.FALSE;
 					} else {
+						InternalLogger.warn("\"{1}\" for \"{0}\" is an invalid boolean and will be ignored", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
 				} else if (Labeller.class.equals(type)) {
@@ -384,14 +392,19 @@ final class PropertiesLoader {
 				return constructor.newInstance(parameter);
 			}
 		} catch (InstantiationException ex) {
+			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (IllegalAccessException ex) {
+			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (IllegalArgumentException ex) {
+			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (InvocationTargetException ex) {
+			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (NoSuchMethodException ex) {
+			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		}
 	}

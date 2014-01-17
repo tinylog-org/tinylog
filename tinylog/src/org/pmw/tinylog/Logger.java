@@ -478,7 +478,7 @@ public final class Logger {
 						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace(System.err);
+					InternalLogger.error(ex, "Failed to write log entry");
 				}
 			}
 		}
@@ -517,7 +517,7 @@ public final class Logger {
 						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace(System.err);
+					InternalLogger.error(ex, "Failed to write log entry");
 				}
 			}
 		}

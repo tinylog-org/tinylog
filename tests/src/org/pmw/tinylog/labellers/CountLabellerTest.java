@@ -187,7 +187,6 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		labeller.roll(baseFile, 0);
 		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
-		errorStream.clear();
 
 		stream.close();
 		baseFile.delete();

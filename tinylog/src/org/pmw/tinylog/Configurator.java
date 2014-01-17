@@ -346,7 +346,7 @@ public final class Configurator {
 			try {
 				Logger.setConfirguration(configuration);
 			} catch (Exception ex) {
-				return false;
+				InternalLogger.error(ex, "Failed to activate configuration");
 			}
 
 			if (activeWritingThread == null && writingThreadData != null) {
@@ -402,7 +402,7 @@ public final class Configurator {
 				isResource = false;
 			} catch (FileNotFoundException ex) {
 				if (file != DEFAULT_PROPERTIES_FILE) {
-					System.err.println("Error: cannot find '" + file + "'");
+					InternalLogger.error(ex, "Cannot find \"{0}\"", file);
 				}
 			}
 		}
@@ -414,7 +414,7 @@ public final class Configurator {
 					stream.close();
 				}
 			} catch (IOException ex) {
-				ex.printStackTrace(System.err);
+				InternalLogger.error(ex, "Failed to read properties file \"{0}\"", file);
 			}
 		}
 
