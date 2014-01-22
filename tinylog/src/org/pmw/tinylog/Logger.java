@@ -62,7 +62,7 @@ public final class Logger {
 			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
 			callerClassMethod = reflectionClass.getDeclaredMethod("getCallerClass", int.class);
 			callerClassMethod.setAccessible(true);
-			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 1);
+			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 2);
 			if (!Logger.class.getName().equals(callerClass.getName())) {
 				callerClassMethod = null;
 			}
@@ -664,7 +664,7 @@ public final class Logger {
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
 		if (!currentConfiguration.isFullStackTraceElemetRequired() && callerClassMethod != null) {
 			try {
-				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 1);
+				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 2);
 				return new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
 			} catch (Exception ex) {
 				// Fallback
