@@ -13,14 +13,19 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.EvilWriter;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
+import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.LogEntry;
 
 /**
@@ -77,6 +82,27 @@ public class WritingThreadTest extends AbstractTest {
 	}
 
 	/**
+	 * Test exceptions for writing log entries by writing thread.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFailedWritingLogEntries() throws InterruptedException {
+		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
+		writingThread.start();
+
+		writingThread.putLogEntry(new EvilWriter(), new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+
+		writingThread.shutdown();
+		writingThread.join();
+
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertTrue(errorStream.hasLines());
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+	}
+
+	/**
 	 * Test observing a thread and shutdown writing thread, when observed thread is dead.
 	 * 
 	 * @throws InterruptedException
@@ -97,6 +123,26 @@ public class WritingThreadTest extends AbstractTest {
 		assertTrue(writingThread.isAlive());
 
 		observableThread.cancelled = true;
+		writingThread.join();
+		assertFalse(writingThread.isAlive());
+	}
+
+	/**
+	 * Test observing a thread that doesn't exist.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testCannotFindThread() throws InterruptedException {
+		WritingThread writingThread = new WritingThread(EndlessThread.class.getName(), Thread.NORM_PRIORITY);
+		writingThread.start();
+		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
+		assertTrue(writingThread.isAlive());
+		Thread.sleep(100L);
+		assertTrue(writingThread.isAlive());
+
+		writingThread.shutdown();
 		writingThread.join();
 		assertFalse(writingThread.isAlive());
 	}
