@@ -111,9 +111,14 @@ final class WritingThread extends Thread {
 	private static Thread getThread(final String name) {
 		ThreadGroup root = getRootThreadGroup(Thread.currentThread().getThreadGroup());
 
-		int size = Math.max(32, root.activeCount() * 2);
-		Thread[] threads = new Thread[size];
-		int count = root.enumerate(threads);
+		Thread[] threads;
+		int size;
+		int count;
+		do {
+			size = Math.max(32, root.activeCount() * 2);
+			threads = new Thread[size];
+			count = root.enumerate(threads);
+		} while (count >= size);
 
 		for (int i = 0; i < count; ++i) {
 			if (name.equals(threads[i].getName())) {
