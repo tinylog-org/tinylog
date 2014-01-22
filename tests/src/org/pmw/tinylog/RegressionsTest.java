@@ -130,7 +130,7 @@ public class RegressionsTest extends AbstractTest {
 	 */
 	@Test
 	public final void testTimestampLabellerAtStartup() throws Exception {
-		Logger.setConfirguration(null);
+		Configurator.defaultConfig().locale(null).activate();
 		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller()); // Failed
 	}
 

@@ -433,12 +433,10 @@ public final class Logger {
 	 *             Failed to initialize the writer
 	 */
 	static void setConfirguration(final Configuration configuration) throws Exception {
-		if (configuration != null) {
-			LoggingWriter writer = configuration.getWriter();
-			LoggingWriter oldWriter = Logger.configuration == null ? null : Logger.configuration.getWriter();
-			if (writer != null && writer != oldWriter) {
-				writer.init();
-			}
+		LoggingWriter writer = configuration.getWriter();
+		LoggingWriter oldWriter = Logger.configuration == null ? null : Logger.configuration.getWriter();
+		if (writer != null && writer != oldWriter) {
+			writer.init();
 		}
 
 		Logger.configuration = configuration;
