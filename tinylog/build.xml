@@ -324,7 +324,7 @@
 				<dirset dir="${environment.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
-			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
+			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 	</target>
 
