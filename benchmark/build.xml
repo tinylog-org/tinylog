@@ -58,6 +58,8 @@
 		<java classname="org.pmw.benchmark.jul.JulMultiThreadBenchmarkApplication" classpath="${bin}" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j.Log4jWithAsyncAppenderSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j.Log4jWithAsyncAppenderMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j2.Log4j2SingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j2.Log4j2MultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j2.Log4j2WithAsyncLoggerSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />

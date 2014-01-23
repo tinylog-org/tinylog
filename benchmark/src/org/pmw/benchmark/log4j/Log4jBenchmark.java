@@ -14,8 +14,10 @@
 package org.pmw.benchmark.log4j;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,7 +27,7 @@ import org.pmw.benchmark.IBenchmark;
 public class Log4jBenchmark implements IBenchmark {
 
 	private Logger logger;
-	private FileAppender appender;
+	private Appender appender;
 
 	@Override
 	public String getName() {
@@ -45,7 +47,7 @@ public class Log4jBenchmark implements IBenchmark {
 	public void init(final File file) throws Exception {
 		logger = Logger.getRootLogger();
 		logger.removeAllAppenders();
-		appender = new FileAppender(new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n"), file.getAbsolutePath(), false);
+		appender = createAppender(file);
 		logger.addAppender(appender);
 		logger.setLevel(Level.INFO);
 	}
@@ -53,6 +55,10 @@ public class Log4jBenchmark implements IBenchmark {
 	@Override
 	public void dispose() throws Exception {
 		appender.close();
+	}
+
+	protected Appender createAppender(final File file) throws IOException {
+		return new FileAppender(new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n"), file.getAbsolutePath(), false);
 	}
 
 }
