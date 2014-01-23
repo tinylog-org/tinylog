@@ -117,6 +117,69 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(expected, configuration.getRequiredLogEntryValues());
 	}
 
+	/**
+	 * Test calculating of requirement of full stack trace.
+	 */
+	@Test
+	public final void testIsFullStackTraceElemetRequired() {
+		/* No requirements defined */
+
+		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(),
+				null, 0);
+		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.singletonMap("a", LoggingLevel.OFF), "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
+
+		/* Requirement from logging writer */
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
+				LogEntryValue.THREAD), null, 0);
+		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
+				LogEntryValue.CLASS), null, 0);
+		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
+				LogEntryValue.METHOD), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
+				LogEntryValue.FILE), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
+				LogEntryValue.LINE_NUMBER), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		/* Requirement from format pattern */
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{thread}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{class}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{file}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{line}", Locale.ROOT, new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
+	}
+
 	private Configuration createMinimalConfigurationSample() {
 		return new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, null, null, 0);
 	}
@@ -133,6 +196,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertNull(configuration.getWritingThread());
 		assertEquals(0, configuration.getMaxStackTraceElements());
 		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues());
+		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 	}
 
 	private Configuration createDetailedConfigurationSample() {
@@ -157,11 +221,16 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(State.NEW, configuration.getWritingThread().getState());
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
 		assertEquals(EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY, LogEntryValue.CLASS, LogEntryValue.METHOD), configuration.getRequiredLogEntryValues());
+		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 	}
 
 	private static final class DummyWriter implements LoggingWriter {
 
 		private final Set<LogEntryValue> requiredLogEntryValue;
+
+		public DummyWriter() {
+			this.requiredLogEntryValue = Collections.emptySet();
+		}
 
 		public DummyWriter(final Set<LogEntryValue> requiredLogEntryValues) {
 			this.requiredLogEntryValue = requiredLogEntryValues;

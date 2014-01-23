@@ -41,6 +41,7 @@ final class Configuration {
 
 	private final List<Token> formatTokens;
 	private final Set<LogEntryValue> requiredLogEntryValues;
+	private final StackTraceInformation requiredStackTraceInformation;
 
 	/**
 	 * @param level
@@ -70,6 +71,7 @@ final class Configuration {
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
 		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
+		this.requiredStackTraceInformation = getRequiredStackTraceInformation(packageLevels, requiredLogEntryValues);
 	}
 
 	/**
@@ -195,6 +197,15 @@ final class Configuration {
 	}
 
 	/**
+	 * Get the required stack trace information.
+	 * 
+	 * @return Required stack trace information
+	 */
+	public StackTraceInformation getRequiredStackTraceInformation() {
+		return requiredStackTraceInformation;
+	}
+
+	/**
 	 * Create a copy of this configuration.
 	 * 
 	 * @return Copy of this configuration
@@ -226,6 +237,16 @@ final class Configuration {
 			} else {
 				return logEntryValuesOfWriter;
 			}
+		}
+	}
+
+	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, LoggingLevel> packageLevels, final Set<LogEntryValue> logEntryValues) {
+		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE_NUMBER)) {
+			return StackTraceInformation.FULL;
+		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !packageLevels.isEmpty()) {
+			return StackTraceInformation.CLASS_NAME;
+		} else {
+			return StackTraceInformation.NONE;
 		}
 	}
 

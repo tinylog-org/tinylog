@@ -32,7 +32,7 @@ public final class LogEntryForwarder {
 	 *            The result of the <code>toString()</code> method will be logged
 	 */
 	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Object obj) {
-		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE, level, null, obj, null);
+		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, null, obj, null);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public final class LogEntryForwarder {
 	 *            Arguments for the text message
 	 */
 	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final String message, final Object... arguments) {
-		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE, level, null, message, arguments);
+		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, null, message, arguments);
 	}
 
 	/**
@@ -65,9 +65,8 @@ public final class LogEntryForwarder {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Throwable exception, final String message,
-			final Object... arguments) {
-		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE, level, exception, message, arguments);
+	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
+		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, exception, message, arguments);
 	}
 
 	/**

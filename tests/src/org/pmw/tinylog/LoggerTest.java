@@ -300,14 +300,12 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testOutputWithStackTraceDeep() throws InterruptedException {
-		int strackTraceDeep = Logger.DEEP_OF_STACK_TRACE - 1;
-
 		/* Test logging of class */
 
 		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.DEBUG).activate();
 
-		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
@@ -317,10 +315,10 @@ public class LoggerTest extends AbstractTest {
 		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).activate();
 
-		Logger.output(strackTraceDeep, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
 		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
@@ -329,12 +327,12 @@ public class LoggerTest extends AbstractTest {
 
 		Exception exception = new Exception();
 
-		Logger.output(strackTraceDeep, LoggingLevel.WARNING, exception, null, new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
 		assertEquals(exception, logEntry.getException());
 
-		Logger.output(strackTraceDeep, LoggingLevel.ERROR, exception, "Test", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
 		assertEquals("Test", logEntry.getMessage());
@@ -344,7 +342,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", LoggingLevel.DEBUG).activate();
 
-		Logger.output(strackTraceDeep, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
 		assertEquals("Hello!", logEntry.getMessage());
@@ -355,7 +353,7 @@ public class LoggerTest extends AbstractTest {
 
 		StringListOutputStream errorStream = getSystemErrorStream();
 		assertFalse(errorStream.hasLines());
-		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertTrue(errorStream.hasLines());
 		errorStream.clear();
@@ -366,7 +364,7 @@ public class LoggerTest extends AbstractTest {
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
-		Logger.output(strackTraceDeep, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 		writingThread.shutdown();
 		writingThread.join();
