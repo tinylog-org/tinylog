@@ -118,6 +118,7 @@ public class WritingThreadTest extends AbstractTest {
 		WritingThread writingThread = new WritingThread(EndlessThread.class.getName(), Thread.NORM_PRIORITY);
 		writingThread.start();
 		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
+		assertEquals(observableThread, writingThread.getThreadToObserve());
 		assertTrue(writingThread.isAlive());
 		Thread.sleep(10L);
 		assertTrue(writingThread.isAlive());
@@ -136,15 +137,8 @@ public class WritingThreadTest extends AbstractTest {
 	@Test
 	public final void testCannotFindThread() throws InterruptedException {
 		WritingThread writingThread = new WritingThread(EndlessThread.class.getName(), Thread.NORM_PRIORITY);
-		writingThread.start();
 		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
-		assertTrue(writingThread.isAlive());
-		Thread.sleep(100L);
-		assertTrue(writingThread.isAlive());
-
-		writingThread.shutdown();
-		writingThread.join();
-		assertFalse(writingThread.isAlive());
+		assertNull(writingThread.getThreadToObserve());
 	}
 
 	private static final class EndlessThread extends Thread {

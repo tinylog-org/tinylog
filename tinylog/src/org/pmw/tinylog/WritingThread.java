@@ -60,6 +60,15 @@ final class WritingThread extends Thread {
 	}
 
 	/**
+	 * Get the observed thread.
+	 * 
+	 * @return Observed thread
+	 */
+	public Thread getThreadToObserve() {
+		return threadToObserve;
+	}
+
+	/**
 	 * Put a log entry to write.
 	 * 
 	 * @param writer

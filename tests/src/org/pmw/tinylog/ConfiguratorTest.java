@@ -205,7 +205,7 @@ public class ConfiguratorTest extends AbstractTest {
 	public final void testCopy() {
 		Map<String, LoggingLevel> packageLevels = Collections.singletonMap("a", LoggingLevel.DEBUG);
 		NullWriter writer = new NullWriter();
-		WritingThreadData writingThreadData = new WritingThreadData("thread", Thread.NORM_PRIORITY);
+		WritingThreadData writingThreadData = new WritingThreadData(Thread.currentThread().getName(), Thread.NORM_PRIORITY);
 		Configurator configurator = new Configurator(LoggingLevel.WARNING, packageLevels, "TEST", Locale.US, writer, writingThreadData, 42);
 
 		Configuration copy = configurator.copy().create();
@@ -214,7 +214,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals("TEST", copy.getFormatPattern());
 		assertEquals(Locale.US, copy.getLocale());
 		assertSame(writer, copy.getWriter());
-		assertEquals("thread", copy.getWritingThread().getNameOfThreadToObserve());
+		assertEquals(Thread.currentThread().getName(), copy.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(Thread.NORM_PRIORITY, copy.getWritingThread().getPriority());
 		assertEquals(42, copy.getMaxStackTraceElements());
 	}

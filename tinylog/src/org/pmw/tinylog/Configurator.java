@@ -451,7 +451,17 @@ public final class Configurator {
 	 * @return The created configuration
 	 */
 	Configuration create() {
-		WritingThread writingThread = writingThreadData == null ? null : new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
+		WritingThread writingThread;
+		if (writingThreadData == null) {
+			writingThread = null;
+		} else {
+			writingThread = new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
+			if (writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
+				InternalLogger.warn("Thread \"{0}\" couldn't be found, writing thread won't be used");
+				writingThread = null;
+			}
+		}
+
 		return new Configuration(level, packageLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
 	}
 
