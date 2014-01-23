@@ -66,6 +66,8 @@
 		<java classname="org.pmw.benchmark.log4j2.Log4j2WithAsyncLoggerMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.logback.LogbackSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.logback.LogbackMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.logback.LogbackWithAsyncAppenderSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.logback.LogbackWithAsyncAppenderMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.tinylog.TinylogSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.tinylog.TinylogMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.tinylog.TinylogWithWritingThreadSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />

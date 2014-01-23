@@ -23,12 +23,13 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 
 public class LogbackBenchmark implements IBenchmark {
 
 	private Logger logger;
-	private FileAppender<ILoggingEvent> appender;
+	private Appender<ILoggingEvent> appender;
 
 	@Override
 	public String getName() {
@@ -51,17 +52,7 @@ public class LogbackBenchmark implements IBenchmark {
 		logger = context.getLogger(Logger.ROOT_LOGGER_NAME);
 		logger.setLevel(Level.INFO);
 
-		appender = new FileAppender<ILoggingEvent>();
-		appender.setContext(context);
-		appender.setAppend(false);
-		appender.setFile(file.getAbsolutePath());
-
-		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-		encoder.setContext(context);
-		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
-		encoder.start();
-
-		appender.setEncoder(encoder);
+		appender = createAppender(file, context);
 		appender.start();
 
 		logger.detachAndStopAllAppenders();
@@ -71,6 +62,20 @@ public class LogbackBenchmark implements IBenchmark {
 	@Override
 	public void dispose() throws Exception {
 		appender.stop();
+	}
+
+	protected Appender<ILoggingEvent> createAppender(final File file, final LoggerContext context) {
+		FileAppender<ILoggingEvent> appender = new FileAppender<ILoggingEvent>();
+		appender.setContext(context);
+		appender.setAppend(false);
+		appender.setFile(file.getAbsolutePath());
+
+		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+		encoder.setContext(context);
+		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		encoder.start();
+		appender.setEncoder(encoder);
+		return appender;
 	}
 
 }
