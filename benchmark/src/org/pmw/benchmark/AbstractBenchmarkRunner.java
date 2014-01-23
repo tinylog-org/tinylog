@@ -86,7 +86,7 @@ public abstract class AbstractBenchmarkRunner {
 	private long calcTime(final long[] times) {
 		Arrays.sort(times);
 		long time = 0L;
-		for (int i = OUTLIERS_CUT; i < BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2; ++i) {
+		for (int i = OUTLIERS_CUT; i < BENCHMARK_ITERATIONS - OUTLIERS_CUT; ++i) {
 			time += times[i];
 		}
 		return time;
