@@ -13,12 +13,12 @@
 
 package org.pmw.benchmark.log4j2;
 
-import org.pmw.benchmark.MultiThreadBenchmarkRunner;
+import org.pmw.benchmark.SingleThreadBenchmarkRunner;
 
-public class Log4j2MultiThreadBenchmarkApplication {
+public class Log4j2WithAsyncLoggerSingleThreadBenchmarkApplication {
 
 	public static void main(final String[] args) throws Exception {
-		new MultiThreadBenchmarkRunner(new Log4j2Benchmark()).start();
+		new SingleThreadBenchmarkRunner(new Log4j2WithAsyncLoggerBenchmark()).start();
 	}
 
 }

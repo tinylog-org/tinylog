@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Martin Winandy
+ * Copyright 2014 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import org.pmw.benchmark.IBenchmark;
 public class Log4j2Benchmark implements IBenchmark {
 
 	private Logger logger;
-	private FileAppender appender;
+	private Appender appender;
 
 	@Override
 	public String getName() {
@@ -46,14 +46,13 @@ public class Log4j2Benchmark implements IBenchmark {
 
 	@Override
 	public void init(final File file) throws Exception {
-		logger = (Logger) LogManager.getRootLogger();
+		logger = createLogger();
 		Configuration configuration = logger.getContext().getConfiguration();
 
 		for (Appender appender : configuration.getAppenders().values()) {
 			logger.removeAppender(appender);
 		}
-		PatternLayout layout = PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null);
-		appender = FileAppender.createAppender(file.getAbsolutePath(), null, null, "File", null, null, null, layout, null, null, null, configuration);
+		appender = createAppender(file, configuration);
 		logger.addAppender(appender);
 
 		logger.setLevel(Level.INFO);
@@ -62,6 +61,15 @@ public class Log4j2Benchmark implements IBenchmark {
 	@Override
 	public void dispose() throws Exception {
 		appender.stop();
+	}
+
+	protected Logger createLogger() {
+		return (Logger) LogManager.getRootLogger();
+	}
+
+	protected Appender createAppender(final File file, final Configuration configuration) {
+		PatternLayout layout = PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null);
+		return FileAppender.createAppender(file.getAbsolutePath(), null, null, "File", null, null, null, layout, null, null, null, configuration);
 	}
 
 }

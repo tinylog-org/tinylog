@@ -13,12 +13,26 @@
 
 package org.pmw.benchmark.log4j2;
 
-import org.pmw.benchmark.MultiThreadBenchmarkRunner;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.async.AsyncLogger;
 
-public class Log4j2MultiThreadBenchmarkApplication {
+public class Log4j2WithAsyncLoggerBenchmark extends Log4j2Benchmark {
 
-	public static void main(final String[] args) throws Exception {
-		new MultiThreadBenchmarkRunner(new Log4j2Benchmark()).start();
+	@Override
+	public String getName() {
+		return "log4j 2 with async logger";
+	}
+
+	@Override
+	public void dispose() throws Exception {
+		AsyncLogger.stop();
+		super.dispose();
+	}
+
+	@Override
+	protected Logger createLogger() {
+		Logger logger = super.createLogger();
+		return new AsyncLogger(logger.getContext(), logger.getName(), null);
 	}
 
 }

@@ -10,7 +10,14 @@
 
 	<path id="log4j.classpath">
 		<fileset dir="${lib}">
-			<include name="log4j-*.jar" />
+			<include name="log4j-1*.jar" />
+		</fileset>
+	</path>
+
+	<path id="log4j2.classpath">
+		<fileset dir="${lib}">
+			<include name="log4j-*-2*.jar" />
+			<include name="disruptor-*.jar" />
 		</fileset>
 	</path>
 
@@ -38,6 +45,7 @@
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
 			<classpath refid="log4j.classpath" />
+			<classpath refid="log4j2.classpath" />
 			<classpath refid="logback.classpath" />
 			<classpath refid="tinylog.classpath" />
 		</javac>
@@ -50,6 +58,10 @@
 		<java classname="org.pmw.benchmark.jul.JulMultiThreadBenchmarkApplication" classpath="${bin}" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.log4j.Log4jMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j2.Log4j2SingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j2.Log4j2MultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j2.Log4j2WithAsyncLoggerSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
+		<java classname="org.pmw.benchmark.log4j2.Log4j2WithAsyncLoggerMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="log4j2.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.logback.LogbackSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.logback.LogbackMultiThreadBenchmarkApplication" classpath="${bin}" classpathref="logback.classpath" fork="true" />
 		<java classname="org.pmw.benchmark.tinylog.TinylogSingleThreadBenchmarkApplication" classpath="${bin}" classpathref="tinylog.classpath" fork="true" />
