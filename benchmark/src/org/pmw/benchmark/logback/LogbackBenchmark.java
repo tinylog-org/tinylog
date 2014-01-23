@@ -16,9 +16,10 @@ package org.pmw.benchmark.logback;
 import java.io.File;
 
 import org.pmw.benchmark.IBenchmark;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -48,6 +49,7 @@ public class LogbackBenchmark implements IBenchmark {
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
 		logger = context.getLogger(Logger.ROOT_LOGGER_NAME);
+		logger.setLevel(Level.INFO);
 
 		appender = new FileAppender<ILoggingEvent>();
 		appender.setContext(context);
@@ -62,8 +64,8 @@ public class LogbackBenchmark implements IBenchmark {
 		appender.setEncoder(encoder);
 		appender.start();
 
-		((ch.qos.logback.classic.Logger) logger).detachAndStopAllAppenders();
-		((ch.qos.logback.classic.Logger) logger).addAppender(appender);
+		logger.detachAndStopAllAppenders();
+		logger.addAppender(appender);
 	}
 
 	@Override

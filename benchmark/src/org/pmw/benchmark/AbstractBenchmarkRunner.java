@@ -13,7 +13,9 @@
 
 package org.pmw.benchmark;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
@@ -22,6 +24,7 @@ public abstract class AbstractBenchmarkRunner {
 	private static final int BENCHMARK_ITERATIONS = 120;
 	private static final int OUTLIERS_CUT = 10;
 	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
+	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";
 
 	private final String name;
 	private final IBenchmark benchmark;
@@ -55,14 +58,28 @@ public abstract class AbstractBenchmarkRunner {
 		long iterations = (BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2) * countLogEntries();
 		long iterationsPerSecond = Math.round(iterations * 1000d / time);
 
+		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
+
+		long lines = 0;
+		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
+			BufferedReader reader = new BufferedReader(new FileReader(files[i]));
+			while (reader.readLine() != null) {
+				++lines;
+			}
+			reader.close();
+		}
+
+		long expected = BENCHMARK_ITERATIONS * countLogEntries() * 3L / 5L; // three of five log entries will be written
+		if (lines != expected) {
+			System.err.println(MessageFormat.format(ERROR_MESSAGE, lines, expected));
+		}
+
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
 			files[i].delete();
 		}
-
-		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
 	}
 
-	protected abstract int countLogEntries();
+	protected abstract long countLogEntries();
 
 	protected abstract void run(IBenchmark benchmark);
 

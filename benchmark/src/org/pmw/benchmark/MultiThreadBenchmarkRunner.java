@@ -23,8 +23,8 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	}
 
 	@Override
-	protected final int countLogEntries() {
-		return PARALLEL_THREADS * LOGGING_ITERATIONS * 5;
+	protected final long countLogEntries() {
+		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 5L;
 	}
 
 	@Override
