@@ -41,7 +41,6 @@ final class Configuration {
 
 	private final List<Token> formatTokens;
 	private final Set<LogEntryValue> requiredLogEntryValues;
-	private final boolean fullStackTraceElemetRequired;
 
 	/**
 	 * @param level
@@ -71,7 +70,6 @@ final class Configuration {
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
 		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
-		this.fullStackTraceElemetRequired = fullStackTraceElemetRequired(requiredLogEntryValues);
 	}
 
 	/**
@@ -197,15 +195,6 @@ final class Configuration {
 	}
 
 	/**
-	 * Check if a full stack trace element is required.
-	 * 
-	 * @return <code>true</code> if a full stack trace element is required, <code>false</code> if not
-	 */
-	public boolean isFullStackTraceElemetRequired() {
-		return fullStackTraceElemetRequired;
-	}
-
-	/**
 	 * Create a copy of this configuration.
 	 * 
 	 * @return Copy of this configuration
@@ -238,11 +227,6 @@ final class Configuration {
 				return logEntryValuesOfWriter;
 			}
 		}
-	}
-
-	private static boolean fullStackTraceElemetRequired(final Set<LogEntryValue> logEntryValues) {
-		return logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE)
-				|| logEntryValues.contains(LogEntryValue.LINE_NUMBER);
 	}
 
 	private static LogEntryValue getRequiredLogEntryValue(final Token token) {

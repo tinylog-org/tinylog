@@ -117,56 +117,6 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(expected, configuration.getRequiredLogEntryValues());
 	}
 
-	/**
-	 * Test calculating of requirement of full stack trace.
-	 */
-	@Test
-	public final void testIsFullStackTraceElemetRequired() {
-		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
-				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertFalse(configuration.isFullStackTraceElemetRequired());
-
-		/* Requirement from logging writer */
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
-				LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertFalse(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
-				LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
-				LogEntryValue.FILE, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(
-				LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-
-		/* Requirement from format pattern */
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{class}", Locale.ROOT, new DummyWriter(
-				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertFalse(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new DummyWriter(
-				LogEntryValue.MESSAGE), null, 0);
-		assertFalse(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT, new DummyWriter(
-				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{file}", Locale.ROOT, new DummyWriter(
-				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{line}", Locale.ROOT, new DummyWriter(
-				LogEntryValue.RENDERED_LOG_ENTRY), null, 0);
-		assertTrue(configuration.isFullStackTraceElemetRequired());
-	}
-
 	private Configuration createMinimalConfigurationSample() {
 		return new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, null, null, 0);
 	}
@@ -183,7 +133,6 @@ public class ConfigurationTest extends AbstractTest {
 		assertNull(configuration.getWritingThread());
 		assertEquals(0, configuration.getMaxStackTraceElements());
 		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues());
-		assertFalse(configuration.isFullStackTraceElemetRequired());
 	}
 
 	private Configuration createDetailedConfigurationSample() {
@@ -208,7 +157,6 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(State.NEW, configuration.getWritingThread().getState());
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
 		assertEquals(EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY, LogEntryValue.CLASS, LogEntryValue.METHOD), configuration.getRequiredLogEntryValues());
-		assertTrue(configuration.isFullStackTraceElemetRequired());
 	}
 
 	private static final class DummyWriter implements LoggingWriter {

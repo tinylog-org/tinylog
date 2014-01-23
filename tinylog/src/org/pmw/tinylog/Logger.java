@@ -42,7 +42,6 @@ public final class Logger {
 	private static volatile Configuration configuration;
 
 	private static Method stackTraceMethod;
-	private static Method callerClassMethod;
 
 	static {
 		Configurator.init().activate();
@@ -56,18 +55,6 @@ public final class Logger {
 			}
 		} catch (Exception ex) {
 			stackTraceMethod = null;
-		}
-
-		try {
-			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
-			callerClassMethod = reflectionClass.getDeclaredMethod("getCallerClass", int.class);
-			callerClassMethod.setAccessible(true);
-			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 2);
-			if (!Logger.class.getName().equals(callerClass.getName())) {
-				callerClassMethod = null;
-			}
-		} catch (Exception ex) {
-			callerClassMethod = null;
 		}
 	}
 
@@ -686,15 +673,6 @@ public final class Logger {
 	}
 
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
-		if (!currentConfiguration.isFullStackTraceElemetRequired() && callerClassMethod != null) {
-			try {
-				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 2);
-				return new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
-			} catch (Exception ex) {
-				// Fallback
-			}
-		}
-
 		if (stackTraceMethod != null) {
 			try {
 				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
