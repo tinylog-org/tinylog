@@ -435,11 +435,15 @@ public final class Logger {
 	static void setConfirguration(final Configuration configuration) throws Exception {
 		LoggingWriter writer = configuration.getWriter();
 		LoggingWriter oldWriter = Logger.configuration == null ? null : Logger.configuration.getWriter();
-		if (writer != null && writer != oldWriter) {
-			writer.init();
-		}
 
-		Logger.configuration = configuration;
+		if (writer == null || writer == oldWriter) {
+			Logger.configuration = configuration;
+		} else {
+			synchronized (writer) {
+				Logger.configuration = configuration;
+				writer.init();
+			}
+		}
 	}
 
 	/**
@@ -458,7 +462,9 @@ public final class Logger {
 	 */
 	static void output(final int strackTraceDeep, final LoggingLevel level, final Throwable exception, final Object message, final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
-		if (currentConfiguration.getWriter() != null) {
+		LoggingWriter writer = getWriter(currentConfiguration);
+
+		if (writer != null) {
 			StackTraceElement stackTraceElement = null;
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
@@ -471,9 +477,9 @@ public final class Logger {
 				try {
 					LogEntry logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 					if (currentConfiguration.getWritingThread() == null) {
-						currentConfiguration.getWriter().write(logEntry);
+						writer.write(logEntry);
 					} else {
-						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
+						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
 					}
 				} catch (Exception ex) {
 					InternalLogger.error(ex, "Failed to write log entry");
@@ -499,7 +505,9 @@ public final class Logger {
 	static void output(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final Object message,
 			final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
-		if (currentConfiguration.getWriter() != null) {
+		LoggingWriter writer = getWriter(currentConfiguration);
+
+		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
 			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
@@ -510,9 +518,9 @@ public final class Logger {
 				try {
 					LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 					if (currentConfiguration.getWritingThread() == null) {
-						currentConfiguration.getWriter().write(logEntry);
+						writer.write(logEntry);
 					} else {
-						currentConfiguration.getWritingThread().putLogEntry(currentConfiguration.getWriter(), logEntry);
+						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
 					}
 				} catch (Exception ex) {
 					InternalLogger.error(ex, "Failed to write log entry");
@@ -657,6 +665,17 @@ public final class Logger {
 		}
 
 		return new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception, renderedLogEntry);
+	}
+
+	private static LoggingWriter getWriter(final Configuration configuration) {
+		LoggingWriter writer = configuration.getWriter();
+		if (writer == null) {
+			return null;
+		} else {
+			synchronized (writer) {
+				return writer;
+			}
+		}
 	}
 
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {

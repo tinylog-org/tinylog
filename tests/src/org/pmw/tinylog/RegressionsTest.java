@@ -19,10 +19,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.junit.Test;
 import org.pmw.tinylog.labellers.TimestampLabeller;
 import org.pmw.tinylog.policies.SizePolicy;
+import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
@@ -145,9 +147,34 @@ public class RegressionsTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFileInWorkspace("log");
 		file = new File(file.getName());
 		assertTrue(file.exists());
+
 		TimestampLabeller labeller = new TimestampLabeller();
 		file = labeller.getLogFile(file);
 		labeller.roll(file, 10); // Failed
+
+		file.delete();
+	}
+
+	/**
+	 * Bug: Initialization of a rolling file writer with a timestamp labeller fails if there is no previous
+	 * configuration.
+	 * 
+	 * @throws Exception
+	 *             Test failed
+	 */
+	@Test
+	public final void testTimestampLabellerWithoutPreviousLocale() throws Exception {
+		resetLogger();
+		File file = FileHelper.createTemporaryFile("log");
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new TimestampLabeller(), new StartupPolicy());
+		Configurator.defaultConfig().writer(writer).activate(); // Failed
+		file.delete();
+	}
+
+	private void resetLogger() throws Exception {
+		Field field = Logger.class.getDeclaredField("configuration");
+		field.setAccessible(true);
+		field.set(null, null);
 	}
 
 }
