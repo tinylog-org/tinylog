@@ -433,15 +433,22 @@ public final class Logger {
 	 *             Failed to initialize the writer
 	 */
 	static void setConfirguration(final Configuration configuration) throws Exception {
-		LoggingWriter writer = configuration.getWriter();
-		LoggingWriter oldWriter = Logger.configuration == null ? null : Logger.configuration.getWriter();
+		Configuration previousConfiguration = Logger.configuration;
 
-		if (writer == null || writer == oldWriter) {
+		LoggingWriter newWriter = configuration.getWriter();
+		LoggingWriter oldWriter = previousConfiguration == null ? null : previousConfiguration.getWriter();
+
+		if (newWriter == null || newWriter == oldWriter) {
 			Logger.configuration = configuration;
 		} else {
-			synchronized (writer) {
+			synchronized (newWriter) {
 				Logger.configuration = configuration;
-				writer.init();
+				try {
+					newWriter.init();
+				} catch (Exception ex) {
+					Logger.configuration = previousConfiguration;
+					throw ex;
+				}
 			}
 		}
 	}
