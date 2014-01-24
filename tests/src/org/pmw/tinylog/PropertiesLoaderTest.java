@@ -197,6 +197,14 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWriter());
 		assertEquals(FileWriter.class, configuration.getWriter().getClass());
 		assertEquals(file.getAbsolutePath(), ((FileWriter) configuration.getWriter()).getFilename());
+		assertFalse(((FileWriter) configuration.getWriter()).isBuffered());
+
+		configuration = load(new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath())
+				.set("tinylog.writer.buffered", "true"));
+		assertNotNull(configuration.getWriter());
+		assertEquals(FileWriter.class, configuration.getWriter().getClass());
+		assertEquals(file.getAbsolutePath(), ((FileWriter) configuration.getWriter()).getFilename());
+		assertTrue(((FileWriter) configuration.getWriter()).isBuffered());
 
 		file.delete();
 	}

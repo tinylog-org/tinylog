@@ -13,19 +13,25 @@
 
 package org.pmw.tinylog.writers;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.EnumSet;
 import java.util.Set;
 
 /**
  * Writes log entries to a file.
  */
-@PropertiesSupport(name = "file", properties = @Property(name = "filename", type = String.class))
+@PropertiesSupport(name = "file", properties = { @Property(name = "filename", type = String.class),
+		@Property(name = "buffered", type = boolean.class, optional = true) })
 public final class FileWriter implements LoggingWriter {
 
+	private static final int BUFFER_SIZE = 64 * 1024;
+
 	private final String filename;
-	private FileOutputStream stream;
+	private final boolean buffered;
+	private OutputStream stream;
 
 	/**
 	 * @param filename
@@ -33,6 +39,18 @@ public final class FileWriter implements LoggingWriter {
 	 */
 	public FileWriter(final String filename) {
 		this.filename = filename;
+		this.buffered = false;
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param buffered
+	 *            Buffered writing
+	 */
+	public FileWriter(final String filename, final boolean buffered) {
+		this.filename = filename;
+		this.buffered = buffered;
 	}
 
 	@Override
@@ -49,9 +67,22 @@ public final class FileWriter implements LoggingWriter {
 		return filename;
 	}
 
+	/**
+	 * Check if buffered writing is enabled.
+	 * 
+	 * @return <code>true</code> if buffered writing is enabled, otherwise <code>false</code>
+	 */
+	public boolean isBuffered() {
+		return buffered;
+	}
+
 	@Override
 	public void init() throws IOException {
-		stream = new FileOutputStream(filename);
+		if (buffered) {
+			stream = new BufferedOutputStream(new FileOutputStream(filename), BUFFER_SIZE);
+		} else {
+			stream = new FileOutputStream(filename);
+		}
 	}
 
 	@Override

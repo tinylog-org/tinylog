@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -233,36 +234,45 @@ final class PropertiesLoader {
 	}
 
 	private static LoggingWriter loadAndSetWriter(final Properties properties, final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
-		for (Constructor<?> constructor : writerClass.getConstructors()) {
-			Class<?>[] parameterTypes = constructor.getParameterTypes();
-			boolean matches = true;
-			if (parameterTypes.length == definition.length) {
-				for (int i = 0; i < parameterTypes.length; ++i) {
-					if (!parameterTypes[i].equals(definition[i].type())) {
-						matches = false;
-						break;
-					}
-				}
-				if (matches) {
-					try {
-						Object[] parameters = loadParameters(properties, definition);
-						if (parameters == null) {
-							return null;
+		Object[] parameters = loadParameters(properties, definition);
+
+		if (parameters != null) {
+			for (Constructor<?> constructor : writerClass.getConstructors()) {
+				Class<?>[] parameterTypes = constructor.getParameterTypes();
+				boolean matches = true;
+				if (parameterTypes.length <= definition.length) {
+					for (int i = 0; i < definition.length; ++i) {
+						if (i < parameterTypes.length) {
+							if (!parameterTypes[i].equals(definition[i].type())) {
+								matches = false;
+								break;
+							}
 						} else {
-							return (LoggingWriter) constructor.newInstance(parameters);
+							if (!definition[i].optional() || parameters[i] != null) {
+								matches = false;
+								break;
+							}
 						}
-					} catch (IllegalArgumentException ex) {
-						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
-						return null;
-					} catch (InstantiationException ex) {
-						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
-						return null;
-					} catch (IllegalAccessException ex) {
-						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
-						return null;
-					} catch (InvocationTargetException ex) {
-						InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
-						return null;
+					}
+					if (matches) {
+						try {
+							if (parameters.length > parameterTypes.length) {
+								parameters = Arrays.copyOf(parameters, parameterTypes.length);
+							}
+							return (LoggingWriter) constructor.newInstance(parameters);
+						} catch (IllegalArgumentException ex) {
+							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							return null;
+						} catch (InstantiationException ex) {
+							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							return null;
+						} catch (IllegalAccessException ex) {
+							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							return null;
+						} catch (InvocationTargetException ex) {
+							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							return null;
+						}
 					}
 				}
 			}
@@ -279,7 +289,7 @@ final class PropertiesLoader {
 			String value = properties.getProperty(WRITER_PROPERTY + "." + name);
 			if (value == null) {
 				if (definition[i].optional()) {
-					definition[i] = null;
+					parameters[i] = null;
 				} else {
 					return null;
 				}

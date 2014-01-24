@@ -15,9 +15,11 @@ package org.pmw.tinylog.writers;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -76,6 +78,56 @@ public class FileWriterTest extends AbstractTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		file.delete();
+	}
+
+	/**
+	 * Test if unbuffered file writer writes log entries immediately.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testUnbufferedWriting() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath(), false);
+		writer.init();
+		assertFalse(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
+
+		writer.close();
+	}
+
+	/**
+	 * Test if buffered file writer caches log entries.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testBufferedWriting() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath(), true);
+		writer.init();
+		assertTrue(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertNull(reader.readLine());
+		reader.close();
+
+		writer.close();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
 	}
 
 	/**
