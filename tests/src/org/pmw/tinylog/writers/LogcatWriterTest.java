@@ -79,6 +79,8 @@ public class LogcatWriterTest extends AbstractTest {
 		} catch (IllegalArgumentException ex) {
 			// Expected
 		}
+
+		writer.close();
 	}
 
 }

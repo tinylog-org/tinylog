@@ -40,6 +40,11 @@ public final class ConsoleWriter implements LoggingWriter {
 		getPrintStream(logEntry.getLoggingLevel()).print(logEntry.getRenderedLogEntry());
 	}
 
+	@Override
+	public void close() {
+		// Do nothing
+	}
+
 	private static PrintStream getPrintStream(final LoggingLevel level) {
 		if (level == LoggingLevel.ERROR || level == LoggingLevel.WARNING) {
 			return System.err;

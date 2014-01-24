@@ -255,6 +255,11 @@ public class ConfigurationTest extends AbstractTest {
 			// Just ignore
 		}
 
+		@Override
+		public void close() {
+			// Do nothing
+		}
+
 	}
 
 }

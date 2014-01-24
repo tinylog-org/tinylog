@@ -64,6 +64,11 @@ public final class LogcatWriter implements LoggingWriter {
 		}
 	}
 
+	@Override
+	public void close() {
+		// Do nothing
+	}
+
 	private String shorten(final String className) {
 		int index = className.lastIndexOf('.');
 		return index >= 0 ? className.substring(index + 1) : className;

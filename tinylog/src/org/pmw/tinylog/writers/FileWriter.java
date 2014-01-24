@@ -83,6 +83,7 @@ public final class FileWriter implements LoggingWriter {
 		} else {
 			stream = new FileOutputStream(filename);
 		}
+		VMShutdownHook.register(this);
 	}
 
 	@Override
@@ -96,13 +97,10 @@ public final class FileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
-	public void close() throws IOException {
-		stream.close();
-	}
-
 	@Override
-	protected void finalize() throws Throwable {
-		close();
+	public void close() throws IOException {
+		VMShutdownHook.unregister(this);
+		stream.close();
 	}
 
 }

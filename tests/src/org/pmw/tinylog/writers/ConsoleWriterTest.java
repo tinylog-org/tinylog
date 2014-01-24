@@ -60,6 +60,8 @@ public class ConsoleWriterTest extends AbstractTest {
 			StringListOutputStream errorStream = getSystemErrorStream();
 			assertTrue(errorStream.hasLines());
 			assertEquals("Hello", errorStream.nextLine());
+
+			writer.close();
 		}
 	}
 
@@ -79,6 +81,8 @@ public class ConsoleWriterTest extends AbstractTest {
 
 			StringListOutputStream errorStream = getSystemErrorStream();
 			assertFalse(errorStream.hasLines());
+
+			writer.close();
 		}
 	}
 

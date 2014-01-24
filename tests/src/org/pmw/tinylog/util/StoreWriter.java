@@ -75,6 +75,11 @@ public final class StoreWriter implements LoggingWriter {
 		this.logEntry = logEntry;
 	}
 
+	@Override
+	public void close() {
+		// Do nothing
+	}
+
 	/**
 	 * Get and remove the last written log entry.
 	 * 

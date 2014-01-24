@@ -40,4 +40,9 @@ public final class NullWriter implements LoggingWriter {
 		// Just ignore
 	}
 
+	@Override
+	public void close() {
+		// Do nothing
+	}
+
 }

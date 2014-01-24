@@ -237,6 +237,7 @@ public final class RollingFileWriter implements LoggingWriter {
 		} else {
 			stream = new FileOutputStream(file, true);
 		}
+		VMShutdownHook.register(this);
 	}
 
 	@Override
@@ -264,13 +265,9 @@ public final class RollingFileWriter implements LoggingWriter {
 	@Override
 	public void close() throws IOException {
 		synchronized (mutex) {
+			VMShutdownHook.unregister(this);
 			stream.close();
 		}
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		close();
 	}
 
 	private void initCheckPolicies() throws IOException {

@@ -62,6 +62,7 @@ public final class SharedFileWriter implements LoggingWriter {
 			file.delete();
 		}
 		stream = new FileOutputStream(file, true);
+		VMShutdownHook.register(this);
 	}
 
 	@Override
@@ -83,15 +84,12 @@ public final class SharedFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
+	@Override
 	public void close() throws IOException {
 		synchronized (mutex) {
+			VMShutdownHook.unregister(this);
 			stream.close();
 		}
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		close();
 	}
 
 }

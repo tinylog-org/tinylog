@@ -40,4 +40,9 @@ public final class EvilWriter implements LoggingWriter {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public void close() {
+		// Do nothing
+	}
+
 }

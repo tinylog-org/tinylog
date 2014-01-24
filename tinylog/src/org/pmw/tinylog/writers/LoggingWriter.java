@@ -19,9 +19,9 @@ import java.util.Set;
  * Logging writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.
  * 
  * <p>
- * The annotation {@link org.pmw.tinylog.writers.PropertiesSupport PropertiesSupport} must be added to the implemented writer class and the implemented writer
- * must be registered as service in "META-INF/services/org.pmw.tinylog.writers" in order to make the writer available by
- * properties files and system properties.
+ * The annotation {@link org.pmw.tinylog.writers.PropertiesSupport PropertiesSupport} must be added to the implemented
+ * writer class and the implemented writer must be registered as service in "META-INF/services/org.pmw.tinylog.writers"
+ * in order to make the writer available by properties files and system properties.
  * </p>
  * 
  * <p>
@@ -64,5 +64,15 @@ public interface LoggingWriter {
 	 *             Failed to write the log entry
 	 */
 	void write(LogEntry logEntry) throws Exception;
+
+	/**
+	 * Close the writer and release all resources. If a writer required a <code>close()</code> call, it should be
+	 * registered in the <code>init()</code> method at {@link org.pmw.tinylog.writers.VMShutdownHook VMShutdownHook} for
+	 * automatically shutdown when VM will be shutdown.
+	 * 
+	 * @throws Exception
+	 *             Failed to close the writer
+	 */
+	void close() throws Exception;
 
 }
