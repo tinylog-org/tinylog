@@ -197,7 +197,6 @@ public class VMShutdownHookTest extends AbstractTest {
 		private final List<Thread> threads;
 
 		public RuntimeMock() {
-			super(Runtime.getRuntime().getClass());
 			threads = new ArrayList<>();
 		}
 

@@ -26,7 +26,7 @@ public final class VMShutdownHook extends Thread {
 
 	private static final ShutdownThread shutdownThread = new ShutdownThread();
 	private static final Collection<LoggingWriter> writers;
-	private static volatile boolean shutdown;
+	private static boolean shutdown;
 
 	static {
 		writers = new ArrayList<LoggingWriter>();
