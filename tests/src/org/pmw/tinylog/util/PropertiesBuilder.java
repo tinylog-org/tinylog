@@ -20,7 +20,12 @@ import java.util.Properties;
  */
 public final class PropertiesBuilder {
 
-	private final Properties properties = new Properties();
+	private final Properties properties;
+
+	/** */
+	public PropertiesBuilder() {
+		this.properties = new Properties();
+	}
 
 	/**
 	 * Set a property.
@@ -46,6 +51,20 @@ public final class PropertiesBuilder {
 	public PropertiesBuilder remove(final String key) {
 		properties.remove(key);
 		return this;
+	}
+
+	/**
+	 * Create a copy of the current properties builder.
+	 * 
+	 * @return Copy of the current properties builder
+	 */
+	public PropertiesBuilder copy() {
+		PropertiesBuilder copy = new PropertiesBuilder();
+		for (Object key : properties.keySet()) {
+			String keyAsString = (String) key;
+			copy.set(keyAsString, properties.getProperty(keyAsString));
+		}
+		return copy;
 	}
 
 	/**

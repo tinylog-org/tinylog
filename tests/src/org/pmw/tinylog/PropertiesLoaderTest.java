@@ -239,83 +239,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRollingFileLoggingWriter() throws IOException {
-		File file = FileHelper.createTemporaryFile("log");
-
-		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile"));
-		assertNotNull(configuration.getWriter());
-		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath()));
-		assertNotNull(configuration.getWriter());
-		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.backups", "1"));
-		assertNotNull(configuration.getWriter());
-		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		RollingFileWriter rollingFileWriter = (RollingFileWriter) configuration.getWriter();
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(1, rollingFileWriter.getNumberOfBackups());
-		Labeller labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(CountLabeller.class, labeller.getClass());
-		List<? extends Policy> policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.backups", "2").set("tinylog.writer.label", "pid"));
-		assertNotNull(configuration.getWriter());
-		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(2, rollingFileWriter.getNumberOfBackups());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(ProcessIdLabeller.class, labeller.getClass());
-		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.backups", "3").set("tinylog.writer.label", "timestamp: yyyy").set("tinylog.writer.policies", "size: 1"));
-		assertNotNull(configuration.getWriter());
-		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(3, rollingFileWriter.getNumberOfBackups());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(TimestampLabeller.class, labeller.getClass());
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log"))
-				.getAbsoluteFile());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(SizePolicy.class, policies.get(0).getClass());
-		assertTrue(policies.get(0).check(null, "1"));
-		assertFalse(policies.get(0).check(null, "2"));
-
-		configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.backups", "4").set("tinylog.writer.label", "timestamp").set("tinylog.writer.policies", "startup, daily"));
-		assertNotNull(configuration.getWriter());
-		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
-		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(4, rollingFileWriter.getNumberOfBackups());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(TimestampLabeller.class, labeller.getClass());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(2, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-		assertEquals(DailyPolicy.class, policies.get(1).getClass());
-
-		file.delete();
+		testRollingFileLoggingWriter(null);
+		testRollingFileLoggingWriter(false);
+		testRollingFileLoggingWriter(true);
 	}
 
 	/**
@@ -369,6 +295,102 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWritingThread());
 		assertNull(configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(1, configuration.getWritingThread().getPriority());
+	}
+
+	private void testRollingFileLoggingWriter(final Boolean buffered) throws IOException {
+		File file = FileHelper.createTemporaryFile("log");
+		boolean expectBuffered = Boolean.TRUE.equals(buffered);
+
+		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile"));
+		assertNotNull(configuration.getWriter());
+		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
+
+		PropertiesBuilder defaultProperties = new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename",
+				file.getAbsolutePath());
+		if (Boolean.TRUE.equals(buffered)) {
+			defaultProperties.set("tinylog.writer.buffered", "true");
+		} else if (Boolean.FALSE.equals(buffered)) {
+			defaultProperties.set("tinylog.writer.buffered", "false");
+		}
+
+		PropertiesBuilder properties = defaultProperties.copy();
+		configuration = load(properties);
+		assertNotNull(configuration.getWriter());
+		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
+
+		properties = defaultProperties.copy().set("tinylog.writer.backups", "1");
+		configuration = load(properties);
+		assertNotNull(configuration.getWriter());
+		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
+		RollingFileWriter rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(1, rollingFileWriter.getNumberOfBackups());
+		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
+		Labeller labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(CountLabeller.class, labeller.getClass());
+		List<? extends Policy> policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(1, policies.size());
+		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+
+		properties = defaultProperties.copy().set("tinylog.writer.backups", "2").set("tinylog.writer.label", "pid");
+		configuration = load(properties);
+		assertNotNull(configuration.getWriter());
+		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
+		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(2, rollingFileWriter.getNumberOfBackups());
+		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
+		labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(ProcessIdLabeller.class, labeller.getClass());
+		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
+		policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(1, policies.size());
+		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+
+		properties = defaultProperties.copy().set("tinylog.writer.backups", "3").set("tinylog.writer.label", "timestamp: yyyy")
+				.set("tinylog.writer.policies", "size: 1");
+		configuration = load(properties);
+		assertNotNull(configuration.getWriter());
+		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
+		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(3, rollingFileWriter.getNumberOfBackups());
+		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
+		labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(TimestampLabeller.class, labeller.getClass());
+		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log"))
+				.getAbsoluteFile());
+		policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(1, policies.size());
+		assertEquals(SizePolicy.class, policies.get(0).getClass());
+		assertTrue(policies.get(0).check(null, "1"));
+		assertFalse(policies.get(0).check(null, "2"));
+
+		properties = defaultProperties.copy().set("tinylog.writer.backups", "4").set("tinylog.writer.label", "timestamp")
+				.set("tinylog.writer.policies", "startup, daily");
+		configuration = load(properties);
+		assertNotNull(configuration.getWriter());
+		assertEquals(RollingFileWriter.class, configuration.getWriter().getClass());
+		rollingFileWriter = (RollingFileWriter) configuration.getWriter();
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(4, rollingFileWriter.getNumberOfBackups());
+		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
+		labeller = rollingFileWriter.getLabeller();
+		assertNotNull(labeller);
+		assertEquals(TimestampLabeller.class, labeller.getClass());
+		policies = rollingFileWriter.getPolicies();
+		assertNotNull(policies);
+		assertEquals(2, policies.size());
+		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+		assertEquals(DailyPolicy.class, policies.get(1).getClass());
+
+		file.delete();
 	}
 
 	private static Configuration load(final PropertiesBuilder propertiesBuilder) {

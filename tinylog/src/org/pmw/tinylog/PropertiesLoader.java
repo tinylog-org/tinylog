@@ -21,7 +21,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -239,16 +239,16 @@ final class PropertiesLoader {
 		if (parameters != null) {
 			for (Constructor<?> constructor : writerClass.getConstructors()) {
 				Class<?>[] parameterTypes = constructor.getParameterTypes();
-				boolean matches = true;
 				if (parameterTypes.length <= definition.length) {
+					BitSet skiped = new BitSet(definition.length);
+					boolean matches = true;
+					int offset = 0;
 					for (int i = 0; i < definition.length; ++i) {
-						if (i < parameterTypes.length) {
-							if (!parameterTypes[i].equals(definition[i].type())) {
-								matches = false;
-								break;
-							}
-						} else {
-							if (!definition[i].optional() || parameters[i] != null) {
+						if (i - offset >= parameterTypes.length || !parameterTypes[i - offset].equals(definition[i].type())) {
+							if (definition[i].optional() && parameters[i] == null) {
+								skiped.set(i);
+								++offset;
+							} else {
 								matches = false;
 								break;
 							}
@@ -257,7 +257,13 @@ final class PropertiesLoader {
 					if (matches) {
 						try {
 							if (parameters.length > parameterTypes.length) {
-								parameters = Arrays.copyOf(parameters, parameterTypes.length);
+								List<Object> list = new ArrayList<Object>();
+								for (int i = 0; i < parameters.length; ++i) {
+									if (!skiped.get(i)) {
+										list.add(parameters[i]);
+									}
+								}
+								parameters = list.toArray();
 							}
 							return (LoggingWriter) constructor.newInstance(parameters);
 						} catch (IllegalArgumentException ex) {

@@ -17,9 +17,11 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -66,6 +68,17 @@ public class RollingFileWriterTest extends AbstractTest {
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 10);
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(10, writer.getNumberOfBackups());
+		assertFalse(writer.isBuffered());
+		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 10, true);
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(10, writer.getNumberOfBackups());
+		assertTrue(writer.isBuffered());
 		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
 		assertThat(writer.getPolicies(), hasSize(1));
 		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
@@ -75,15 +88,37 @@ public class RollingFileWriterTest extends AbstractTest {
 		writer = new RollingFileWriter(file.getAbsolutePath(), 42, new ProcessIdLabeller());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
+		assertFalse(writer.isBuffered());
 		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
 		assertThat(writer.getPolicies(), hasSize(1));
 		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
-		writer = new RollingFileWriter(file.getAbsolutePath(), 42, null, new Policy[0]);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, true, new ProcessIdLabeller());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
+		assertTrue(writer.isBuffered());
+		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, new Policy[0]);
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertFalse(writer.isBuffered());
+		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(1));
+		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, true, new Policy[0]);
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertTrue(writer.isBuffered());
 		assertThat(writer.getLabeller(), instanceOf(CountLabeller.class));
 		assertThat(writer.getPolicies(), hasSize(1));
 		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
@@ -93,6 +128,18 @@ public class RollingFileWriterTest extends AbstractTest {
 		writer = new RollingFileWriter(file.getAbsolutePath(), 42, new ProcessIdLabeller(), new SizePolicy(1024), new DailyPolicy());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
+		assertFalse(writer.isBuffered());
+		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
+		assertThat(writer.getPolicies(), hasSize(2));
+		assertThat(writer.getPolicies().get(0), instanceOf(SizePolicy.class));
+		assertThat(writer.getPolicies().get(1), instanceOf(DailyPolicy.class));
+		file.delete();
+
+		file = FileHelper.createTemporaryFile(null);
+		writer = new RollingFileWriter(file.getAbsolutePath(), 42, true, new ProcessIdLabeller(), new SizePolicy(1024), new DailyPolicy());
+		assertEquals(file.getAbsolutePath(), writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
+		assertTrue(writer.isBuffered());
 		assertThat(writer.getLabeller(), instanceOf(ProcessIdLabeller.class));
 		assertThat(writer.getPolicies(), hasSize(2));
 		assertThat(writer.getPolicies().get(0), instanceOf(SizePolicy.class));
@@ -149,6 +196,56 @@ public class RollingFileWriterTest extends AbstractTest {
 		reader.close();
 
 		file.delete();
+	}
+
+	/**
+	 * Test if unbuffered rolling file writer writes log entries immediately.
+	 * 
+	 * @throws Exception
+	 *             Test failed
+	 */
+	@Test
+	public final void testUnbufferedWriting() throws Exception {
+		File file = FileHelper.createTemporaryFile(null);
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, false);
+		writer.init();
+		assertFalse(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
+
+		writer.close();
+	}
+
+	/**
+	 * Test if buffered rolling file writer caches log entries.
+	 * 
+	 * @throws Exception
+	 *             Test failed
+	 */
+	@Test
+	public final void testBufferedWriting() throws Exception {
+		File file = FileHelper.createTemporaryFile(null);
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, true);
+		writer.init();
+		assertTrue(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertNull(reader.readLine());
+		reader.close();
+
+		writer.close();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
 	}
 
 	/**
@@ -212,21 +309,8 @@ public class RollingFileWriterTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRollingWhileWriting() throws Exception {
-		File file = FileHelper.createTemporaryFile(null, "12");
-		File backup = new File(file.getAbsolutePath() + ".0");
-
-		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new SizePolicy(3));
-		writer.init();
-		writer.write(new LogEntryBuilder().renderedLogEntry("3").create());
-		writer.write(new LogEntryBuilder().renderedLogEntry("4").create());
-		writer.write(new LogEntryBuilder().renderedLogEntry("5").create());
-		writer.close();
-
-		assertEquals("45", FileHelper.read(file));
-		assertEquals("123", FileHelper.read(backup));
-
-		file.delete();
-		backup.delete();
+		testRollingWhileWriting(false);
+		testRollingWhileWriting(true);
 	}
 
 	/**
@@ -322,6 +406,24 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		writer.close();
 		file.delete();
+	}
+
+	private void testRollingWhileWriting(final boolean buffered) throws Exception {
+		File file = FileHelper.createTemporaryFile(null, "12");
+		File backup = new File(file.getAbsolutePath() + ".0");
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, buffered, new SizePolicy(3));
+		writer.init();
+		writer.write(new LogEntryBuilder().renderedLogEntry("3").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("4").create());
+		writer.write(new LogEntryBuilder().renderedLogEntry("5").create());
+		writer.close();
+
+		assertEquals("45", FileHelper.read(file));
+		assertEquals("123", FileHelper.read(backup));
+
+		file.delete();
+		backup.delete();
 	}
 
 }

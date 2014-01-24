@@ -13,9 +13,11 @@
 
 package org.pmw.tinylog.writers;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -29,20 +31,25 @@ import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
 /**
- * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter FileWriter} but keeps backups of old logging files.
+ * Writes log entries to a file like {@link org.pmw.tinylog.writers.FileWriter FileWriter} but keeps backups of old
+ * logging files.
  */
 @PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
-		@Property(name = "label", type = Labeller.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true) })
+		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "label", type = Labeller.class, optional = true),
+		@Property(name = "policies", type = Policy[].class, optional = true) })
 public final class RollingFileWriter implements LoggingWriter {
+
+	private static final int BUFFER_SIZE = 64 * 1024;
 
 	private final String filename;
 	private final int backups;
 	private final Labeller labeller;
 	private final List<? extends Policy> policies;
+	private final boolean buffered;
 
 	private final Object mutex;
 	private File file;
-	private FileOutputStream stream;
+	private OutputStream stream;
 
 	/**
 	 * Rolling log files once at startup.
@@ -55,7 +62,23 @@ public final class RollingFileWriter implements LoggingWriter {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) {
-		this(filename, backups, null, (Policy[]) null);
+		this(filename, backups, false, null, (Policy[]) null);
+	}
+
+	/**
+	 * Rolling log files once at startup.
+	 * 
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param buffered
+	 *            Buffered writing
+	 * 
+	 * @see org.pmw.tinylog.policies.StartupPolicy
+	 */
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered) {
+		this(filename, backups, buffered, null, (Policy[]) null);
 	}
 
 	/**
@@ -71,7 +94,25 @@ public final class RollingFileWriter implements LoggingWriter {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeller labeller) {
-		this(filename, backups, labeller, (Policy[]) null);
+		this(filename, backups, false, labeller, (Policy[]) null);
+	}
+
+	/**
+	 * Rolling log files once at startup.
+	 * 
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param buffered
+	 *            Buffered writing
+	 * @param labeller
+	 *            Labeller for naming backups
+	 * 
+	 * @see org.pmw.tinylog.policies.StartupPolicy
+	 */
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeller labeller) {
+		this(filename, backups, buffered, labeller, (Policy[]) null);
 	}
 
 	/**
@@ -83,7 +124,21 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Policy... policies) {
-		this(filename, backups, null, policies);
+		this(filename, backups, false, null, policies);
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param buffered
+	 *            Buffered writing
+	 * @param policies
+	 *            Rollover strategies
+	 */
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Policy... policies) {
+		this(filename, backups, buffered, null, policies);
 	}
 
 	/**
@@ -97,9 +152,26 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
+		this(filename, backups, false, labeller, policies);
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param buffered
+	 *            Buffered writing
+	 * @param labeller
+	 *            Labeller for naming backups
+	 * @param policies
+	 *            Rollover strategies
+	 */
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeller labeller, final Policy... policies) {
 		this.mutex = new Object();
 		this.filename = filename;
 		this.backups = Math.max(0, backups);
+		this.buffered = buffered;
 		this.labeller = labeller == null ? new CountLabeller() : labeller;
 		this.policies = policies == null || policies.length == 0 ? Arrays.asList(new StartupPolicy()) : Arrays.asList(policies);
 	}
@@ -118,6 +190,15 @@ public final class RollingFileWriter implements LoggingWriter {
 		synchronized (mutex) {
 			return file == null ? filename : file.getAbsolutePath();
 		}
+	}
+
+	/**
+	 * Check if buffered writing is enabled.
+	 * 
+	 * @return <code>true</code> if buffered writing is enabled, otherwise <code>false</code>
+	 */
+	public boolean isBuffered() {
+		return buffered;
 	}
 
 	/**
@@ -151,7 +232,11 @@ public final class RollingFileWriter implements LoggingWriter {
 	public void init() throws Exception {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
-		stream = new FileOutputStream(file, true);
+		if (buffered) {
+			stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
+		} else {
+			stream = new FileOutputStream(file, true);
+		}
 	}
 
 	@Override
@@ -160,7 +245,11 @@ public final class RollingFileWriter implements LoggingWriter {
 			if (!checkPolicies(logEntry.getLoggingLevel(), logEntry.getRenderedLogEntry())) {
 				stream.close();
 				file = labeller.roll(file, backups);
-				stream = new FileOutputStream(file);
+				if (buffered) {
+					stream = new BufferedOutputStream(new FileOutputStream(file), BUFFER_SIZE);
+				} else {
+					stream = new FileOutputStream(file);
+				}
 			}
 			stream.write(logEntry.getRenderedLogEntry().getBytes());
 		}
