@@ -43,9 +43,9 @@ public final class RollingFileWriter implements LoggingWriter {
 
 	private final String filename;
 	private final int backups;
+	private final boolean buffered;
 	private final Labeller labeller;
 	private final List<? extends Policy> policies;
-	private final boolean buffered;
 
 	private final Object mutex;
 	private File file;
@@ -229,7 +229,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() throws Exception {
+	public void init() throws IOException {
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
 		if (buffered) {
@@ -240,7 +240,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void write(final LogEntry logEntry) throws Exception {
+	public void write(final LogEntry logEntry) throws IOException {
 		synchronized (mutex) {
 			if (!checkPolicies(logEntry.getLoggingLevel(), logEntry.getRenderedLogEntry())) {
 				stream.close();
@@ -261,6 +261,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
+	@Override
 	public void close() throws IOException {
 		synchronized (mutex) {
 			stream.close();
@@ -272,7 +273,7 @@ public final class RollingFileWriter implements LoggingWriter {
 		close();
 	}
 
-	private void initCheckPolicies() throws Exception {
+	private void initCheckPolicies() throws IOException {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();

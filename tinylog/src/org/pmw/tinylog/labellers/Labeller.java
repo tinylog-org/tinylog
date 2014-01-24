@@ -14,6 +14,7 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * A labeller names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
@@ -58,9 +59,9 @@ public interface Labeller {
 	 *            Maximum number of backups to store
 	 * @return New log file
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed to roll log file
 	 */
-	File roll(File file, int maxBackups) throws Exception;
+	File roll(File file, int maxBackups) throws IOException;
 
 }
