@@ -244,7 +244,8 @@ final class PropertiesLoader {
 					boolean matches = true;
 					int offset = 0;
 					for (int i = 0; i < definition.length; ++i) {
-						if (i - offset >= parameterTypes.length || !parameterTypes[i - offset].equals(definition[i].type())) {
+						Class<?> parameterType = i - offset < parameterTypes.length ? parameterTypes[i - offset] : null;
+						if (parameterType == null || !parameterType.equals(definition[i].type())) {
 							if (definition[i].optional() && parameters[i] == null) {
 								skiped.set(i);
 								++offset;
@@ -252,6 +253,9 @@ final class PropertiesLoader {
 								matches = false;
 								break;
 							}
+						} else if (parameters[i] == null && parameterType.isPrimitive()) {
+							matches = false;
+							break;
 						}
 					}
 					if (matches) {
