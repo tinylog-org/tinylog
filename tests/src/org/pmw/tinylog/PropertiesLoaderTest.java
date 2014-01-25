@@ -77,25 +77,25 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading special logging levels for packages.
+	 * Test reading custom logging levels for packages and classes.
 	 */
 	@Test
-	public final void testPackageLevels() {
+	public final void testCustomLevels() {
 		StringListOutputStream errorStream = getSystemErrorStream();
 		PropertiesBuilder builder = new PropertiesBuilder().set("tinylog.level", "INFO");
 
 		Configuration configuration = load(builder.set("tinylog.level@a.b", "WARNING"));
-		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("a.b"));
+		assertEquals(LoggingLevel.WARNING, configuration.getLevel("a.b"));
 
 		configuration = load(builder.set("tinylog.level@a.b.c", "TRACE"));
-		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfPackage("a.b.c"));
+		assertEquals(LoggingLevel.TRACE, configuration.getLevel("a.b.c"));
 
 		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "ERROR"));
-		assertEquals(LoggingLevel.ERROR, configuration.getLevelOfPackage("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.ERROR, configuration.getLevel("org.pmw.tinylog"));
 
 		assertFalse(errorStream.hasLines());
 		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "invalid"));
-		assertEquals(LoggingLevel.INFO, configuration.getLevelOfPackage("org.pmw.tinylog"));
+		assertEquals(LoggingLevel.INFO, configuration.getLevel("org.pmw.tinylog"));
 		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("logging level")));
 	}

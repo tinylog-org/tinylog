@@ -43,7 +43,7 @@ public final class Configurator {
 	private static final Object lock = new Object();
 
 	private LoggingLevel level;
-	private Map<String, LoggingLevel> packageLevels;
+	private Map<String, LoggingLevel> customLevels;
 	private String formatPattern;
 	private Locale locale;
 	private LoggingWriter writer;
@@ -53,8 +53,8 @@ public final class Configurator {
 	/**
 	 * @param level
 	 *            Logging level
-	 * @param packageLevels
-	 *            Separate logging levels for particular packages
+	 * @param customLevels
+	 *            Custom logging levels for specific packages and classes
 	 * @param formatPattern
 	 *            Format pattern for log entries
 	 * @param locale
@@ -66,10 +66,10 @@ public final class Configurator {
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configurator(final LoggingLevel level, final Map<String, LoggingLevel> packageLevels, final String formatPattern, final Locale locale,
+	Configurator(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
 			final LoggingWriter writer, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
-		this.packageLevels = packageLevels;
+		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
 		this.writer = writer;
@@ -165,40 +165,70 @@ public final class Configurator {
 	}
 
 	/**
-	 * Set a separate logging level for a particular package.
+	 * Set a custom logging level for a package.
 	 * 
 	 * This will override the default logging level for this package.
 	 * 
-	 * @param packageName
-	 *            Name of the package
+	 * @param packageObject
+	 *            Package
 	 * @param level
 	 *            The logging level (or <code>null</code> to reset it to the default logging level)
 	 * @return The current configurator
 	 */
-	public Configurator level(final String packageName, final LoggingLevel level) {
+	public Configurator level(final Package packageObject, final LoggingLevel level) {
+		return level(packageObject.getName(), level);
+	}
+
+	/**
+	 * Set a custom logging level for a class.
+	 * 
+	 * This will override the default logging level for this class.
+	 * 
+	 * @param classObject
+	 *            Class
+	 * @param level
+	 *            The logging level (or <code>null</code> to reset it to the default logging level)
+	 * @return The current configurator
+	 */
+	public Configurator level(final Class<?> classObject, final LoggingLevel level) {
+		return level(classObject.getName(), level);
+	}
+
+	/**
+	 * Set a custom logging level for a package or class.
+	 * 
+	 * This will override the default logging level for this package respectively class.
+	 * 
+	 * @param nameOfpackageOrClass
+	 *            Name of a package or class
+	 * @param level
+	 *            The logging level (or <code>null</code> to reset it to the default logging level)
+	 * @return The current configurator
+	 */
+	public Configurator level(final String nameOfpackageOrClass, final LoggingLevel level) {
 		if (level == null) {
-			if (!packageLevels.isEmpty()) {
-				packageLevels.remove(packageName);
-				if (packageLevels.isEmpty()) {
-					packageLevels = Collections.emptyMap();
+			if (!customLevels.isEmpty()) {
+				customLevels.remove(nameOfpackageOrClass);
+				if (customLevels.isEmpty()) {
+					customLevels = Collections.emptyMap();
 				}
 			}
 		} else {
-			if (packageLevels.isEmpty()) {
-				packageLevels = new HashMap<String, LoggingLevel>();
+			if (customLevels.isEmpty()) {
+				customLevels = new HashMap<String, LoggingLevel>();
 			}
-			packageLevels.put(packageName, level);
+			customLevels.put(nameOfpackageOrClass, level);
 		}
 		return this;
 	}
 
 	/**
-	 * Reset all package depending logging levels (to use the default logging level again).
+	 * Reset all custom logging levels (to use the default logging level again).
 	 * 
 	 * @return The current configurator
 	 */
-	public Configurator resetAllLevelsForPackages() {
-		packageLevels = Collections.emptyMap();
+	public Configurator resetCustomLevels() {
+		customLevels = Collections.emptyMap();
 		return this;
 	}
 
@@ -442,7 +472,7 @@ public final class Configurator {
 	Configurator copy() {
 		WritingThreadData writingThreadDataCopy = writingThreadData == null ? null : new WritingThreadData(writingThreadData.threadToObserve,
 				writingThreadData.priority);
-		return new Configurator(level, packageLevels, formatPattern, locale, writer, writingThreadDataCopy, maxStackTraceElements);
+		return new Configurator(level, customLevels, formatPattern, locale, writer, writingThreadDataCopy, maxStackTraceElements);
 	}
 
 	/**
@@ -462,7 +492,7 @@ public final class Configurator {
 			}
 		}
 
-		return new Configuration(level, packageLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
+		return new Configuration(level, customLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
 	}
 
 	/**

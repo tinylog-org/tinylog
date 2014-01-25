@@ -80,15 +80,39 @@ public final class Logger {
 	}
 
 	/**
-	 * Get the current logging level for a particular package.
+	 * Get the current logging level for a specific package.
 	 * 
-	 * @param packageName
-	 *            Name of the package
+	 * @param packageObject
+	 *            Package
 	 * 
-	 * @return Logging level for package
+	 * @return Logging level for the package
 	 */
-	public static LoggingLevel getLoggingLevel(final String packageName) {
-		return configuration.getLevelOfPackage(packageName);
+	public static LoggingLevel getLoggingLevel(final Package packageObject) {
+		return configuration.getLevel(packageObject.getName());
+	}
+
+	/**
+	 * Get the current logging level for a specific class.
+	 * 
+	 * @param classObject
+	 *            Name of the class
+	 * 
+	 * @return Logging level for the class
+	 */
+	public static LoggingLevel getLoggingLevel(final Class<?> classObject) {
+		return configuration.getLevel(classObject.getName());
+	}
+
+	/**
+	 * Get the current logging level for a specific package or class.
+	 * 
+	 * @param packageOrClass
+	 *            Name of the package respectively class
+	 * 
+	 * @return Logging level for the package respectively class
+	 */
+	public static LoggingLevel getLoggingLevel(final String packageOrClass) {
+		return configuration.getLevel(packageOrClass);
 	}
 
 	/**
@@ -602,9 +626,9 @@ public final class Logger {
 			StackTraceElement stackTraceElement = null;
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
+			if (currentConfiguration.hasCustomLoggingLevels()) {
 				stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
-				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
+				activeLoggingLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
@@ -629,8 +653,8 @@ public final class Logger {
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
-				activeLoggingLevel = currentConfiguration.getLevelOfClass(callerClass.getName());
+			if (currentConfiguration.hasCustomLoggingLevels()) {
+				activeLoggingLevel = currentConfiguration.getLevel(callerClass.getName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {
@@ -656,8 +680,8 @@ public final class Logger {
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
-			if (currentConfiguration.hasCustomLoggingLevelsForPackages()) {
-				activeLoggingLevel = currentConfiguration.getLevelOfClass(stackTraceElement.getClassName());
+			if (currentConfiguration.hasCustomLoggingLevels()) {
+				activeLoggingLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 			}
 
 			if (activeLoggingLevel.ordinal() <= level.ordinal()) {

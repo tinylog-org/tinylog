@@ -186,9 +186,9 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testMinimalConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
-		assertFalse(configuration.hasCustomLoggingLevelsForPackages());
-		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
-		assertEquals(LoggingLevel.TRACE, configuration.getLevelOfPackage(ConfigurationTest.class.getPackage().getName()));
+		assertFalse(configuration.hasCustomLoggingLevels());
+		assertEquals(LoggingLevel.TRACE, configuration.getLevel(ConfigurationTest.class.getName()));
+		assertEquals(LoggingLevel.TRACE, configuration.getLevel(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("", configuration.getFormatPattern());
 		assertEquals(Collections.emptyList(), configuration.getFormatTokens());
 		assertEquals(Locale.ROOT, configuration.getLocale());
@@ -208,11 +208,11 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testDetailedConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.WARNING, configuration.getLevel());
-		assertTrue(configuration.hasCustomLoggingLevelsForPackages());
-		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfClass("invalid"));
-		assertEquals(LoggingLevel.INFO, configuration.getLevelOfClass(ConfigurationTest.class.getName()));
-		assertEquals(LoggingLevel.WARNING, configuration.getLevelOfPackage("invalid"));
-		assertEquals(LoggingLevel.INFO, configuration.getLevelOfPackage(ConfigurationTest.class.getPackage().getName()));
+		assertTrue(configuration.hasCustomLoggingLevels());
+		assertEquals(LoggingLevel.WARNING, configuration.getLevel("invalid"));
+		assertEquals(LoggingLevel.INFO, configuration.getLevel(ConfigurationTest.class.getName()));
+		assertEquals(LoggingLevel.WARNING, configuration.getLevel("invalid"));
+		assertEquals(LoggingLevel.INFO, configuration.getLevel(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("{class}{method}", configuration.getFormatPattern());
 		assertEquals(2, configuration.getFormatTokens().size());
 		assertEquals(Locale.GERMANY, configuration.getLocale());

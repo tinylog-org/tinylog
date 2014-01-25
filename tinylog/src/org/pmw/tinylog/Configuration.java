@@ -33,7 +33,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 public final class Configuration {
 
 	private final LoggingLevel level;
-	private final Map<String, LoggingLevel> packageLevels;
+	private final Map<String, LoggingLevel> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
 	private final LoggingWriter writer;
@@ -47,8 +47,8 @@ public final class Configuration {
 	/**
 	 * @param level
 	 *            Logging level
-	 * @param packageLevels
-	 *            Separate logging levels for particular packages
+	 * @param customLevels
+	 *            Custom logging levels for specific packages and classes
 	 * @param formatPattern
 	 *            Format pattern for log entries
 	 * @param locale
@@ -60,10 +60,10 @@ public final class Configuration {
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> packageLevels, final String formatPattern, final Locale locale,
+	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
 			final LoggingWriter writer, final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
-		this.packageLevels = packageLevels;
+		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
 		this.writer = writer;
@@ -72,7 +72,7 @@ public final class Configuration {
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
 		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
-		this.requiredStackTraceInformation = getRequiredStackTraceInformation(packageLevels, requiredLogEntryValues);
+		this.requiredStackTraceInformation = getRequiredStackTraceInformation(customLevels, requiredLogEntryValues);
 	}
 
 	/**
@@ -85,49 +85,32 @@ public final class Configuration {
 	}
 
 	/**
-	 * Check if there are custom logging levels for one or more packages.
+	 * Check if there are custom logging levels.
 	 * 
 	 * @return <code>true</code> if custom logging levels exist, <code>false</code> if not
 	 */
-	public boolean hasCustomLoggingLevelsForPackages() {
-		return !packageLevels.isEmpty();
+	public boolean hasCustomLoggingLevels() {
+		return !customLevels.isEmpty();
 	}
 
 	/**
-	 * Get the logging level for a class.
+	 * Get the logging level for a package or class.
 	 * 
-	 * @param className
-	 *            Name of the class
+	 * @param packageOrClass
+	 *            Name of the package respectively class
 	 * 
-	 * @return Logging level for class
+	 * @return Logging level for the package respectively class
 	 */
-	public LoggingLevel getLevelOfClass(final String className) {
-		int index = className.lastIndexOf('.');
-		if (index > 0) {
-			return getLevelOfPackage(className.substring(0, index));
-		} else {
-			return level;
-		}
-	}
-
-	/**
-	 * Get the logging level for a package.
-	 * 
-	 * @param packageName
-	 *            Name of the package
-	 * 
-	 * @return Logging level for package
-	 */
-	public LoggingLevel getLevelOfPackage(final String packageName) {
-		String packageKey = packageName;
+	public LoggingLevel getLevel(final String packageOrClass) {
+		String key = packageOrClass;
 		while (true) {
-			LoggingLevel levelOfPackage = packageLevels.get(packageKey);
-			if (levelOfPackage != null) {
-				return levelOfPackage;
+			LoggingLevel customLevel = customLevels.get(key);
+			if (customLevel != null) {
+				return customLevel;
 			}
-			int index = packageKey.lastIndexOf('.');
+			int index = key.lastIndexOf('.');
 			if (index > 0) {
-				packageKey = packageKey.substring(0, index);
+				key = key.substring(0, index);
 			} else {
 				return level;
 			}
@@ -212,11 +195,11 @@ public final class Configuration {
 	 * @return Copy of this configuration
 	 */
 	Configurator copy() {
-		Map<String, LoggingLevel> copyOfPackageLevels = packageLevels.isEmpty() ? Collections.<String, LoggingLevel> emptyMap()
-				: new HashMap<String, LoggingLevel>(packageLevels);
+		Map<String, LoggingLevel> copyOfCustomLevels = customLevels.isEmpty() ? Collections.<String, LoggingLevel> emptyMap()
+				: new HashMap<String, LoggingLevel>(customLevels);
 		WritingThreadData writingThreadData = writingThread == null ? null : new WritingThreadData(writingThread.getNameOfThreadToObserve(),
 				writingThread.getPriority());
-		return new Configurator(level, copyOfPackageLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
+		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
 	}
 
 	private static Set<LogEntryValue> requiredLogEntryValues(final LoggingWriter writer, final Collection<Token> formatTokens) {
@@ -241,10 +224,10 @@ public final class Configuration {
 		}
 	}
 
-	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, LoggingLevel> packageLevels, final Set<LogEntryValue> logEntryValues) {
+	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, LoggingLevel> customLevels, final Set<LogEntryValue> logEntryValues) {
 		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE_NUMBER)) {
 			return StackTraceInformation.FULL;
-		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !packageLevels.isEmpty()) {
+		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !customLevels.isEmpty()) {
 			return StackTraceInformation.CLASS_NAME;
 		} else {
 			return StackTraceInformation.NONE;

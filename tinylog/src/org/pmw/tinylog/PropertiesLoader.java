@@ -49,7 +49,7 @@ final class PropertiesLoader {
 	private static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
 
 	private static final String SERVICES_PREFIX = "META-INF/services/";
-	private static final String PACKAGE_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
+	private static final String CUSTOM_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
 
 	private PropertiesLoader() {
 	}
@@ -88,15 +88,15 @@ final class PropertiesLoader {
 		Enumeration<Object> keys = properties.keys();
 		while (keys.hasMoreElements()) {
 			String key = (String) keys.nextElement();
-			if (key.startsWith(PACKAGE_LEVEL_PREFIX)) {
-				String packageName = key.substring(PACKAGE_LEVEL_PREFIX.length());
+			if (key.startsWith(CUSTOM_LEVEL_PREFIX)) {
+				String packageOrClass = key.substring(CUSTOM_LEVEL_PREFIX.length());
 				String value = properties.getProperty(key);
 				try {
 					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
-					configurator.level(packageName, loggingLevel);
+					configurator.level(packageOrClass, loggingLevel);
 				} catch (IllegalArgumentException ex) {
 					InternalLogger.warn("\"{0}\" is an invalid logging level and will be ignored", value);
-					configurator.level(packageName, null);
+					configurator.level(packageOrClass, null);
 				}
 			}
 		}

@@ -59,16 +59,27 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
-	 * Test getter for logging level for particular packages.
+	 * Test getter for custom logging level for specific packages and classes.
 	 */
 	@Test
-	public final void testLoggingLevelForPackages() {
+	public final void testCustomLoggingLevel() {
 		Configurator.defaultConfig().level("a", LoggingLevel.TRACE).level("a.b", LoggingLevel.INFO).activate();
+
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a"));
 		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c"));
 		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b.d"));
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c.d"));
+
+		Configurator.defaultConfig().level(LoggerTest.class.getPackage(), LoggingLevel.TRACE).activate();
+
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class.getPackage()));
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class));
+
+		Configurator.defaultConfig().level(LoggerTest.class, LoggingLevel.TRACE).activate();
+
+		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel(LoggerTest.class.getPackage()));
+		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class));
 	}
 
 	/**
