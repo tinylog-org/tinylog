@@ -16,6 +16,7 @@ package org.pmw.tinylog.labellers;
 import java.io.File;
 import java.io.IOException;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.InternalLogger;
 
 /**
@@ -26,6 +27,11 @@ public final class CountLabeller implements Labeller {
 
 	private String filenameWithoutExtension;
 	private String filenameExtension;
+
+	@Override
+	public void init(final Configuration configuration) {
+		// Do nothing
+	}
 
 	@Override
 	public File getLogFile(final File baseFile) {

@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
@@ -63,7 +64,7 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public void init(final Configuration configuration) {
 		// Do nothing
 	}
 

@@ -20,6 +20,8 @@ import java.io.OutputStream;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * Writes log entries to a file.
  */
@@ -77,7 +79,7 @@ public final class FileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() throws IOException {
+	public void init(final Configuration configuration) throws IOException {
 		if (buffered) {
 			stream = new BufferedOutputStream(new FileOutputStream(filename), BUFFER_SIZE);
 		} else {

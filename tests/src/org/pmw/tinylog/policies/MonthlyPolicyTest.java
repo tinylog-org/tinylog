@@ -13,14 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.FileHelper;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for monthly policy.
@@ -37,16 +37,16 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		setTime(DAY * 30 + DAY / 2); // 31th January 1970 12:00
 
 		Policy policy = new MonthlyPolicy();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY / 2L); // 31th January 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 27); // 27th February 1970 24:00
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY); // 28th February 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -63,18 +63,18 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 
 		Policy policy = new MonthlyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY - 1L); // 31th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // 31th January 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		increaseTime(-1L); // 31th January 1970 23:59:59,999
 		policy = new MonthlyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // 31th January 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**

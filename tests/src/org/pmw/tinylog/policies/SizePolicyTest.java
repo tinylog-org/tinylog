@@ -46,13 +46,13 @@ public class SizePolicyTest extends AbstractTest {
 
 		Policy policy = new SizePolicy(10);
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, "0123456789"));
-		assertFalse(policy.check(null, "0"));
+		assertTrue(policy.check("0123456789"));
+		assertFalse(policy.check("0"));
 
 		policy.reset();
-		assertTrue(policy.check(null, "0"));
-		assertTrue(policy.check(null, "123456789"));
-		assertFalse(policy.check(null, "0"));
+		assertTrue(policy.check("0"));
+		assertTrue(policy.check("123456789"));
+		assertFalse(policy.check("0"));
 	}
 
 	/**
@@ -68,8 +68,8 @@ public class SizePolicyTest extends AbstractTest {
 
 		Policy policy = new SizePolicy(10);
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, "56789"));
-		assertFalse(policy.check(null, "0"));
+		assertTrue(policy.check("56789"));
+		assertFalse(policy.check("0"));
 
 		file.delete();
 	}
@@ -96,9 +96,9 @@ public class SizePolicyTest extends AbstractTest {
 	@Test
 	public final void testStringParameterForBytes() {
 		Policy policy = new SizePolicy("1024");
-		assertTrue(policy.check(null, createString(512)));
-		assertTrue(policy.check(null, createString(512)));
-		assertFalse(policy.check(null, createString(1)));
+		assertTrue(policy.check(createString(512)));
+		assertTrue(policy.check(createString(512)));
+		assertFalse(policy.check(createString(1)));
 	}
 
 	/**
@@ -109,9 +109,9 @@ public class SizePolicyTest extends AbstractTest {
 		String filler = createString(1024); // 1 KB
 		Policy policy = new SizePolicy("32KB");
 		for (int i = 0; i < 32; ++i) {
-			assertTrue(policy.check(null, filler));
+			assertTrue(policy.check(filler));
 		}
-		assertFalse(policy.check(null, createString(1)));
+		assertFalse(policy.check(createString(1)));
 	}
 
 	/**
@@ -122,9 +122,9 @@ public class SizePolicyTest extends AbstractTest {
 		String filler = createString(1024); // 1 KB
 		Policy policy = new SizePolicy("2 MB");
 		for (int i = 0; i < 2048; ++i) {
-			assertTrue(policy.check(null, filler));
+			assertTrue(policy.check(filler));
 		}
-		assertFalse(policy.check(null, createString(1)));
+		assertFalse(policy.check(createString(1)));
 	}
 
 	/**
@@ -149,9 +149,9 @@ public class SizePolicyTest extends AbstractTest {
 			String filler = createString(size); // 1 MB
 			Policy policy = new SizePolicy("4GB");
 			for (int i = 0; i < 4 * 1024; ++i) {
-				assertTrue(policy.check(null, filler));
+				assertTrue(policy.check(filler));
 			}
-			assertFalse(policy.check(null, createString(1)));
+			assertFalse(policy.check(createString(1)));
 		} finally {
 			mock.tearDown();
 		}

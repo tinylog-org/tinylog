@@ -54,7 +54,7 @@ public class LogcatWriterTest extends AbstractTest {
 		String newLine = EnvironmentHelper.getNewLine();
 
 		LogcatWriter writer = new LogcatWriter();
-		writer.init();
+		writer.init(null);
 
 		assertEquals(0, Log.consumeEntries().size());
 

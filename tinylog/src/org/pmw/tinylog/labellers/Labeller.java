@@ -16,6 +16,8 @@ package org.pmw.tinylog.labellers;
 import java.io.File;
 import java.io.IOException;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * A labeller names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
@@ -40,6 +42,14 @@ import java.io.IOException;
  * </p>
  */
 public interface Labeller {
+
+	/**
+	 * Initialize the labeller.
+	 * 
+	 * @param configuration
+	 *            Configuration of logger
+	 */
+	void init(Configuration configuration);
 
 	/**
 	 * Returns the real log file.

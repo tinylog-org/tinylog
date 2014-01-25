@@ -16,6 +16,7 @@ package org.pmw.tinylog.writers;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
 
 import android.util.Log;
@@ -34,7 +35,7 @@ public final class LogcatWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public void init(final Configuration configuration) {
 		// Do nothing
 	}
 

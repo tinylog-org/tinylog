@@ -344,6 +344,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
 		labeller = rollingFileWriter.getLabeller();
 		assertNotNull(labeller);
+		labeller.init(configuration);
 		assertEquals(ProcessIdLabeller.class, labeller.getClass());
 		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
@@ -363,14 +364,15 @@ public class PropertiesLoaderTest extends AbstractTest {
 		labeller = rollingFileWriter.getLabeller();
 		assertNotNull(labeller);
 		assertEquals(TimestampLabeller.class, labeller.getClass());
+		labeller.init(configuration);
 		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log"))
 				.getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(1, policies.size());
 		assertEquals(SizePolicy.class, policies.get(0).getClass());
-		assertTrue(policies.get(0).check(null, "1"));
-		assertFalse(policies.get(0).check(null, "2"));
+		assertTrue(policies.get(0).check("1"));
+		assertFalse(policies.get(0).check("2"));
 
 		properties = defaultProperties.copy().set("tinylog.writer.backups", "4").set("tinylog.writer.label", "timestamp")
 				.set("tinylog.writer.policies", "startup, daily");

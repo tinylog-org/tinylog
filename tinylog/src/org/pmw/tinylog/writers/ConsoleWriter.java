@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.LoggingLevel;
 
 /**
@@ -31,7 +32,7 @@ public final class ConsoleWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() {
+	public void init(final Configuration configuration) {
 		// Do nothing
 	}
 

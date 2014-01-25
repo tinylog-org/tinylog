@@ -24,7 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.labellers.CountLabeller;
 import org.pmw.tinylog.labellers.Labeller;
 import org.pmw.tinylog.policies.Policy;
@@ -229,7 +229,8 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() throws IOException {
+	public void init(final Configuration configuration) throws IOException {
+		labeller.init(configuration);
 		file = labeller.getLogFile(new File(filename));
 		initCheckPolicies();
 		if (buffered) {
@@ -243,7 +244,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		synchronized (mutex) {
-			if (!checkPolicies(logEntry.getLoggingLevel(), logEntry.getRenderedLogEntry())) {
+			if (!checkPolicies(logEntry.getRenderedLogEntry())) {
 				stream.close();
 				file = labeller.roll(file, backups);
 				if (buffered) {
@@ -280,9 +281,9 @@ public final class RollingFileWriter implements LoggingWriter {
 		}
 	}
 
-	private boolean checkPolicies(final LoggingLevel level, final String logEntry) {
+	private boolean checkPolicies(final String logEntry) {
 		for (Policy policy : policies) {
-			if (!policy.check(level, logEntry)) {
+			if (!policy.check(logEntry)) {
 				resetPolicies();
 				return false;
 			}

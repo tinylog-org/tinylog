@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.InternalLogger;
 
@@ -44,6 +45,11 @@ public final class ProcessIdLabeller implements Labeller {
 	 */
 	public String getProcessId() {
 		return pid;
+	}
+
+	@Override
+	public void init(final Configuration configuration) {
+		// Do nothing
 	}
 
 	@Override

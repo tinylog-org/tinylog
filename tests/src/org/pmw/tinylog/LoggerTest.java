@@ -26,7 +26,6 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.Locale;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
@@ -70,21 +69,6 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c"));
 		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b.d"));
 		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c.d"));
-	}
-
-	/**
-	 * Test getter for locale.
-	 */
-	@Test
-	public final void testLocale() {
-		Configurator.defaultConfig().locale(Locale.US).activate();
-		assertEquals(Locale.US, Logger.getLocale());
-
-		Configurator.currentConfig().locale(Locale.GERMANY).activate();
-		assertEquals(Locale.GERMANY, Logger.getLocale());
-
-		Configurator.currentConfig().locale(null).activate();
-		assertEquals(Locale.getDefault(), Logger.getLocale());
 	}
 
 	/**

@@ -15,15 +15,13 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
-import org.pmw.tinylog.LoggingLevel;
-
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
  * <p>
- * The annotation {@link org.pmw.tinylog.policies.PropertiesSupport PropertiesSupport} must be added to the implemented policy class and the implemented policy
- * must be registered as service in "META-INF/services/org.pmw.tinylog.policies" in order to make the policy available
- * by properties files and system properties.
+ * The annotation {@link org.pmw.tinylog.policies.PropertiesSupport PropertiesSupport} must be added to the implemented
+ * policy class and the implemented policy must be registered as service in "META-INF/services/org.pmw.tinylog.policies"
+ * in order to make the policy available by properties files and system properties.
  * </p>
  * 
  * <p>
@@ -53,13 +51,11 @@ public interface Policy {
 	/**
 	 * Determine if a rollover should occur.
 	 * 
-	 * @param level
-	 *            Logging level of log entry to write
 	 * @param logEntry
 	 *            Log entry to write
 	 * @return <code>true</code> to continue the current log file, <code>false</code> to trigger a rollover
 	 */
-	boolean check(LoggingLevel level, String logEntry);
+	boolean check(String logEntry);
 
 	/**
 	 * The log file was rolled and reset the policy.

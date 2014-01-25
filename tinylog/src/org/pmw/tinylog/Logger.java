@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntry;
@@ -90,15 +89,6 @@ public final class Logger {
 	 */
 	public static LoggingLevel getLoggingLevel(final String packageName) {
 		return configuration.getLevelOfPackage(packageName);
-	}
-
-	/**
-	 * Get the current locale, which is used in format patterns for log entries.
-	 * 
-	 * @return Locale for format patterns
-	 */
-	public static Locale getLocale() {
-		return configuration.getLocale();
 	}
 
 	/**
@@ -560,19 +550,11 @@ public final class Logger {
 		LoggingWriter newWriter = configuration.getWriter();
 		LoggingWriter oldWriter = previousConfiguration == null ? null : previousConfiguration.getWriter();
 
-		if (newWriter == null || newWriter == oldWriter) {
-			Logger.configuration = configuration;
-		} else {
-			synchronized (newWriter) {
-				Logger.configuration = configuration;
-				try {
-					newWriter.init();
-				} catch (Exception ex) {
-					Logger.configuration = previousConfiguration;
-					throw ex;
-				}
-			}
+		if (newWriter != null && newWriter != oldWriter) {
+			newWriter.init(configuration);
 		}
+
+		Logger.configuration = configuration;
 	}
 
 	/**
@@ -614,7 +596,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = getWriter(currentConfiguration);
+		LoggingWriter writer = currentConfiguration.getWriter();
 
 		if (writer != null) {
 			StackTraceElement stackTraceElement = null;
@@ -642,7 +624,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final Class<?> callerClass, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = getWriter(currentConfiguration);
+		LoggingWriter writer = currentConfiguration.getWriter();
 
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
@@ -669,7 +651,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final StackTraceElement stackTraceElement, final LoggingLevel level,
 			final Throwable exception, final Object message, final Object[] arguments) {
-		LoggingWriter writer = getWriter(currentConfiguration);
+		LoggingWriter writer = currentConfiguration.getWriter();
 
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
@@ -829,17 +811,6 @@ public final class Logger {
 		}
 
 		return new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception, renderedLogEntry);
-	}
-
-	private static LoggingWriter getWriter(final Configuration configuration) {
-		LoggingWriter writer = configuration.getWriter();
-		if (writer == null) {
-			return null;
-		} else {
-			synchronized (writer) {
-				return writer;
-			}
-		}
 	}
 
 	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {

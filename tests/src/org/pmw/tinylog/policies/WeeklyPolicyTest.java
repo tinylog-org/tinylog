@@ -13,14 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.FileHelper;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for weekly policy.
@@ -37,11 +37,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Monday, 5th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -52,18 +52,18 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		setTime(DAY); // Friday, 2nd January 1970
 
 		Policy policy = new WeeklyPolicy(1);
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 3 - 1L); // Sunday, 4th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Monday, 5th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 7 - 1L); // Sunday, 11th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Monday, 12th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -74,18 +74,18 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		setTime(DAY); // Friday, 2nd January 1970
 
 		Policy policy = new WeeklyPolicy(7);
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 2 - 1L); // Saturday, 3rd January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 4th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 7 - 1L); // Saturday, 10th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 11th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -112,11 +112,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("1");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Monday, 5th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -127,11 +127,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("7");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 3 - 1L); // Saturday, 3th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 4th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -142,11 +142,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("monday");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Monday, 5th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -157,11 +157,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("tuesday");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 5 - 1L); // Monday, 5th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Tuesday, 6th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -172,11 +172,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("wednesday");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 6 - 1L); // Tuesday, 6th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Wednesday, 7th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -187,11 +187,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("thursday");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 7 - 1L); // Wednesday, 7th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Thursday, 8th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -202,11 +202,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("FRIDAY");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY - 1L); // Thursday, 1st January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Friday, 2nd January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -217,11 +217,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("Saturday");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 2 - 1L); // Friday, 2nd January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Saturday, 3rd January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -232,11 +232,11 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		// Thursday, 1st January 1970
 
 		Policy policy = new WeeklyPolicy("SunDaY");
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY * 3 - 1L); // Saturday, 3rd January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 4th January 1970
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -269,18 +269,18 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 
 		Policy policy = new WeeklyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(DAY / 2L - 1L); // Sunday, 4th January 1970 23:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 4th January 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		increaseTime(-1L); // Sunday, 4th January 1970 23:59:59,999
 		policy = new WeeklyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // Sunday, 4th January 1970 24:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**

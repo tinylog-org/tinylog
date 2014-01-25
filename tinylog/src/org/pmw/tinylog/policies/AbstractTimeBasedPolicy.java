@@ -16,8 +16,6 @@ package org.pmw.tinylog.policies;
 import java.io.File;
 import java.util.Calendar;
 
-import org.pmw.tinylog.LoggingLevel;
-
 /**
  * Base class for time based policies.
  */
@@ -56,7 +54,7 @@ public abstract class AbstractTimeBasedPolicy implements Policy {
 	}
 
 	@Override
-	public final boolean check(final LoggingLevel level, final String logEntry) {
+	public final boolean check(final String logEntry) {
 		return System.currentTimeMillis() < nextTime;
 	}
 

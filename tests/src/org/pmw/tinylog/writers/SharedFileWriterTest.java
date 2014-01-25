@@ -88,7 +88,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	public final void testSingleThreadedWriting() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
@@ -122,7 +122,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 
 		List<WritingThread> threads = new ArrayList<WritingThread>();
 		for (int i = 0; i < 5; ++i) {
@@ -213,7 +213,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	 */
 	public static void main(final String[] arguments) throws IOException {
 		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
-		writer.init();
+		writer.init(null);
 		for (int i = 0; i < 10000; ++i) {
 			writer.write(new LogEntryBuilder().renderedLogEntry(WritingThread.LINE + "\n").create());
 		}
@@ -240,7 +240,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		reader.close();
 
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 		writer.close();
 
 		reader = new BufferedReader(new FileReader(file));
@@ -250,11 +250,11 @@ public class SharedFileWriterTest extends AbstractTest {
 		/* But no overwriting by second writer */
 
 		SharedFileWriter writer1 = new SharedFileWriter(file.getAbsolutePath());
-		writer1.init();
+		writer1.init(null);
 		writer1.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
 		SharedFileWriter writer2 = new SharedFileWriter(file.getAbsolutePath());
-		writer2.init();
+		writer2.init(null);
 		writer2.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 
 		writer1.close();
@@ -282,7 +282,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		File folder = file.getAbsoluteFile().getParentFile();
 		SharedFileWriter writer = new SharedFileWriter(folder.getAbsolutePath());
 		try {
-			writer.init(); // A folder can't be open as file
+			writer.init(null); // A folder can't be open as file
 			fail("IOException expected");
 		} catch (IOException ex) {
 			// Expected
@@ -301,7 +301,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	public final void testWritingFails() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 
 		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
 

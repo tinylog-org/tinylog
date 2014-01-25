@@ -27,9 +27,10 @@ import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
- * Configuration for {@link org.pmw.tinylog.Logger Logger}.
+ * Configuration for {@link org.pmw.tinylog.Logger Logger}. Use {@link org.pmw.tinylog.Configurator Configurator} to
+ * create a configuration.
  */
-final class Configuration {
+public final class Configuration {
 
 	private final LoggingLevel level;
 	private final Map<String, LoggingLevel> packageLevels;

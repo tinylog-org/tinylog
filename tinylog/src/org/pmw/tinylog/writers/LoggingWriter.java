@@ -15,6 +15,8 @@ package org.pmw.tinylog.writers;
 
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * Logging writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.
  * 
@@ -49,10 +51,13 @@ public interface LoggingWriter {
 	/**
 	 * Initialize the writer (open a file for example).
 	 * 
+	 * @param configuration
+	 *            Configuration of logger
+	 * 
 	 * @throws Exception
 	 *             Failed to initialize the writer
 	 */
-	void init() throws Exception;
+	void init(Configuration configuration) throws Exception;
 
 	/**
 	 * Write a log entry.

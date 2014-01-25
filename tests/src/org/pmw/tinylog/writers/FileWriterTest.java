@@ -91,7 +91,7 @@ public class FileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath(), false);
-		writer.init();
+		writer.init(null);
 		assertFalse(writer.isBuffered());
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
@@ -114,7 +114,7 @@ public class FileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath(), true);
-		writer.init();
+		writer.init(null);
 		assertTrue(writer.isBuffered());
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
@@ -140,7 +140,7 @@ public class FileWriterTest extends AbstractTest {
 	public final void testSingleThreadedWriting() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
@@ -174,7 +174,7 @@ public class FileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 
 		List<WritingThread> threads = new ArrayList<WritingThread>();
 		for (int i = 0; i < 5; ++i) {
@@ -232,7 +232,7 @@ public class FileWriterTest extends AbstractTest {
 		reader.close();
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 		writer.close();
 
 		reader = new BufferedReader(new FileReader(file));
@@ -255,7 +255,7 @@ public class FileWriterTest extends AbstractTest {
 		File folder = file.getAbsoluteFile().getParentFile();
 		FileWriter writer = new FileWriter(folder.getAbsolutePath());
 		try {
-			writer.init(); // A folder can't be open as file
+			writer.init(null); // A folder can't be open as file
 			fail("IOException expected");
 		} catch (IOException ex) {
 			// Expected
@@ -274,7 +274,7 @@ public class FileWriterTest extends AbstractTest {
 	public final void testWritingFails() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
-		writer.init();
+		writer.init(null);
 
 		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
 

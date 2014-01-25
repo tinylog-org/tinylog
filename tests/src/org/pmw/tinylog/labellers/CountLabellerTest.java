@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
 
@@ -51,6 +52,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		File backupFile3 = getBackupFile(baseFile, "tmp", "2");
 
 		CountLabeller labeller = new CountLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
@@ -97,6 +99,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		File backupFile2 = getBackupFile(baseFile, null, "1");
 
 		CountLabeller labeller = new CountLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
@@ -126,6 +129,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
 
 		CountLabeller labeller = new CountLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
@@ -153,6 +157,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		FileInputStream stream = new FileInputStream(backupFile);
 
 		CountLabeller labeller = new CountLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 		try {
 			labeller.roll(baseFile, 2);
@@ -180,6 +185,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		FileInputStream stream = new FileInputStream(baseFile);
 
 		CountLabeller labeller = new CountLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
 		StringListOutputStream errorStream = getSystemErrorStream();

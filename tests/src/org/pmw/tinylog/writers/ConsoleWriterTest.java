@@ -51,7 +51,7 @@ public class ConsoleWriterTest extends AbstractTest {
 	public final void testErrorStream() {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
 			ConsoleWriter writer = new ConsoleWriter();
-			writer.init();
+			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			StringListOutputStream outputStream = getSystemOutputStream();
@@ -72,7 +72,7 @@ public class ConsoleWriterTest extends AbstractTest {
 	public final void testOutputStream() {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
 			ConsoleWriter writer = new ConsoleWriter();
-			writer.init();
+			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			StringListOutputStream outputStream = getSystemOutputStream();

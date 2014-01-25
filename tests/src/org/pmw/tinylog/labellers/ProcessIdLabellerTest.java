@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.EnvironmentHelper;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
 
@@ -58,6 +59,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		File realFile = getBackupFile(baseFile, "tmp", EnvironmentHelper.getProcessId().toString());
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 
 		assertEquals(realFile, labeller.getLogFile(baseFile));
 
@@ -83,6 +85,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		File realFile = getBackupFile(baseFile, null, EnvironmentHelper.getProcessId().toString());
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 
 		assertEquals(realFile, labeller.getLogFile(baseFile));
 
@@ -110,6 +113,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		targetFile.createNewFile();
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(targetFile, labeller.getLogFile(baseFile));
 		assertTrue(targetFile.exists());
 		assertEquals(targetFile, labeller.roll(targetFile, 0));
@@ -138,6 +142,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		backupFile3.setLastModified(0L);
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		labeller.roll(labeller.getLogFile(baseFile), 1);
 
 		assertFalse(backupFile1.exists());
@@ -158,6 +163,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeller.getLogFile(baseFile);
 		currentFile.createNewFile();
 		FileInputStream stream = new FileInputStream(currentFile);
@@ -188,6 +194,7 @@ public class ProcessIdLabellerTest extends AbstractLabellerTest {
 		FileInputStream stream = new FileInputStream(backupFile);
 
 		ProcessIdLabeller labeller = new ProcessIdLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeller.getLogFile(baseFile);
 
 		StringListOutputStream errorStream = getSystemErrorStream();

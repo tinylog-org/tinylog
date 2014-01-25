@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.mocks.SystemTimeMock;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
 
@@ -79,6 +80,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		File targetFile1 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
 		TimestampLabeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
@@ -135,6 +137,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		File targetFile1 = getBackupFile(baseFile, null, formatCurrentTime());
 
 		TimestampLabeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
@@ -180,6 +183,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		targetFile1.deleteOnExit();
 
 		TimestampLabeller labeller = new TimestampLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(targetFile1, labeller.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
@@ -212,6 +216,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		FileInputStream stream = new FileInputStream(backupFile);
 
 		TimestampLabeller labeller = new TimestampLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeller.getLogFile(baseFile);
 
 		StringListOutputStream errorStream = getSystemErrorStream();

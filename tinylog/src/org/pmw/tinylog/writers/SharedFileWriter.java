@@ -21,6 +21,8 @@ import java.nio.channels.FileLock;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * Writes log entries to a shared file.
  * 
@@ -57,7 +59,7 @@ public final class SharedFileWriter implements LoggingWriter {
 	}
 
 	@Override
-	public void init() throws IOException {
+	public void init(final Configuration configuration) throws IOException {
 		if (file.isFile()) {
 			file.delete();
 		}

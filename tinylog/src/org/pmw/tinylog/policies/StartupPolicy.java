@@ -15,8 +15,6 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
-import org.pmw.tinylog.LoggingLevel;
-
 /**
  * Policy for rolling log files once at startup.
  */
@@ -29,7 +27,7 @@ public final class StartupPolicy implements Policy {
 	}
 
 	@Override
-	public boolean check(final LoggingLevel level, final String logEntry) {
+	public boolean check(final String logEntry) {
 		return true;
 	}
 

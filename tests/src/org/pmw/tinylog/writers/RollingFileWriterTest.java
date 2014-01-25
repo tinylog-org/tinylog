@@ -38,13 +38,13 @@ import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.labellers.CountLabeller;
 import org.pmw.tinylog.labellers.ProcessIdLabeller;
 import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.WritingThread;
@@ -176,7 +176,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		file.delete();
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
@@ -209,7 +209,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, false);
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		assertFalse(writer.isBuffered());
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
@@ -232,7 +232,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, true);
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		assertTrue(writer.isBuffered());
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
@@ -259,7 +259,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 1);
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		List<WritingThread> threads = new ArrayList<WritingThread>();
@@ -325,7 +325,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File backup = new File(file.getAbsolutePath() + ".0");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, new StartupPolicy());
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		writer.close();
 
 		assertEquals("", FileHelper.read(file));
@@ -354,7 +354,7 @@ public class RollingFileWriterTest extends AbstractTest {
 			}
 
 			@Override
-			public boolean check(final LoggingLevel level, final String logEntry) {
+			public boolean check(final String logEntry) {
 				return true;
 			}
 
@@ -365,7 +365,7 @@ public class RollingFileWriterTest extends AbstractTest {
 
 		});
 		try {
-			writer.init(); // A folder can't be open as file
+			writer.init(ConfigurationCreator.getDummyConfiguration()); // A folder can't be open as file
 			fail("IOException expected");
 		} catch (IOException ex) {
 			// Expected
@@ -384,7 +384,7 @@ public class RollingFileWriterTest extends AbstractTest {
 	public final void testWritingFails() throws Exception {
 		File file = FileHelper.createTemporaryFile(null);
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 
 		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
 
@@ -413,7 +413,7 @@ public class RollingFileWriterTest extends AbstractTest {
 		File backup = new File(file.getAbsolutePath() + ".0");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 100, buffered, new SizePolicy(3));
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		writer.write(new LogEntryBuilder().renderedLogEntry("3").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("4").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("5").create());

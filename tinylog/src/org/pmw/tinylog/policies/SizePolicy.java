@@ -15,8 +15,6 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
-import org.pmw.tinylog.LoggingLevel;
-
 /**
  * Policy for limiting the size of log files.
  */
@@ -78,7 +76,7 @@ public final class SizePolicy implements Policy {
 	}
 
 	@Override
-	public boolean check(final LoggingLevel level, final String logEntry) {
+	public boolean check(final String logEntry) {
 		size += logEntry.getBytes().length;
 		return size <= maxSize;
 	}

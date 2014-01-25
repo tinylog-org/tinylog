@@ -41,19 +41,19 @@ public class StartupPolicyTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile(null);
 		Policy policy = new StartupPolicy();
 		assertFalse(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
+		assertTrue(policy.check(null));
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 
 		file.delete();
 
 		policy = new StartupPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
+		assertTrue(policy.check(null));
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 	}
 
 }

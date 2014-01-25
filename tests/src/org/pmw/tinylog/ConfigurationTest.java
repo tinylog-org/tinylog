@@ -246,7 +246,7 @@ public class ConfigurationTest extends AbstractTest {
 		}
 
 		@Override
-		public void init() {
+		public void init(final Configuration configuration) {
 			// Do nothing
 		}
 

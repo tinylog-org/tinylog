@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.pmw.tinylog.labellers.TimestampLabeller;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
@@ -69,12 +70,12 @@ public class RegressionsTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile("tmp");
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		writer.write(new LogEntryBuilder().renderedLogEntry("12345").create());
 		writer.close();
 
 		writer = new RollingFileWriter(file.getAbsolutePath(), 0, new SizePolicy(10));
-		writer.init();
+		writer.init(ConfigurationCreator.getDummyConfiguration());
 		writer.write(new LogEntryBuilder().renderedLogEntry("123456").create());
 		writer.close();
 
@@ -149,6 +150,7 @@ public class RegressionsTest extends AbstractTest {
 		assertTrue(file.exists());
 
 		TimestampLabeller labeller = new TimestampLabeller();
+		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		file = labeller.getLogFile(file);
 		labeller.roll(file, 10); // Failed
 

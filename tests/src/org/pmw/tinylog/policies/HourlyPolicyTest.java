@@ -13,14 +13,14 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.FileHelper;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for hourly policy.
@@ -37,16 +37,16 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		setTime(HOUR / 2L); // 00:30
 
 		Policy policy = new HourlyPolicy();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(HOUR / 2L); // 01:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		policy.reset();
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(HOUR / 2L); // 01:30
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(HOUR / 2L); // 02:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**
@@ -63,18 +63,18 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 
 		Policy policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(HOUR / 2L - 1L); // 01:59:59,999
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // 02:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 
 		increaseTime(-1L); // 01:59:59,999
 		policy = new HourlyPolicy();
 		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null, null));
+		assertTrue(policy.check(null));
 		increaseTime(1L); // 02:00
-		assertFalse(policy.check(null, null));
+		assertFalse(policy.check(null));
 	}
 
 	/**

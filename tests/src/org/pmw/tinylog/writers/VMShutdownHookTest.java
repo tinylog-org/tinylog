@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.Configuration;
 
 /**
  * Tests for the VM shutdown hook.
@@ -176,7 +177,7 @@ public class VMShutdownHookTest extends AbstractTest {
 		}
 
 		@Override
-		public void init() {
+		public void init(final Configuration configuration) {
 			// Do nothing
 		}
 

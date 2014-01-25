@@ -14,14 +14,15 @@
 package org.pmw.tinylog.labellers;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.InternalLogger;
-import org.pmw.tinylog.Logger;
 
 /**
  * Adds a timestamp to the real log file and the backups.
@@ -32,6 +33,7 @@ public final class TimestampLabeller implements Labeller {
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
 	private final String timestampFormat;
+	private DateFormat dateFormat;
 
 	private LogFileFilter logFileFilter;
 
@@ -54,6 +56,11 @@ public final class TimestampLabeller implements Labeller {
 	 */
 	public TimestampLabeller(final String timestampFormat) {
 		this.timestampFormat = timestampFormat;
+	}
+
+	@Override
+	public void init(final Configuration configuration) {
+		dateFormat = new SimpleDateFormat(timestampFormat, configuration.getLocale());
 	}
 
 	@Override
@@ -91,8 +98,7 @@ public final class TimestampLabeller implements Labeller {
 	}
 
 	private File createFile() {
-		String timestamp = new SimpleDateFormat(timestampFormat, Logger.getLocale()).format(new Date());
-		return new File(directory, filenameWithoutExtension + "." + timestamp + filenameExtension);
+		return new File(directory, filenameWithoutExtension + "." + dateFormat.format(new Date()) + filenameExtension);
 	}
 
 }
