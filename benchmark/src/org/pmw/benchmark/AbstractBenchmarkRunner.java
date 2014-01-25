@@ -48,10 +48,9 @@ public abstract class AbstractBenchmarkRunner {
 
 			long start = System.currentTimeMillis();
 			run(benchmark);
+			benchmark.dispose();
 			long finished = System.currentTimeMillis();
 			times[i] = finished - start;
-
-			benchmark.dispose();
 		}
 
 		long time = calcTime(times);
