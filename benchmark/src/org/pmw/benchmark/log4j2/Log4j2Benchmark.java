@@ -14,7 +14,6 @@
 package org.pmw.benchmark.log4j2;
 
 import java.io.File;
-import java.text.MessageFormat;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -37,11 +36,11 @@ public class Log4j2Benchmark implements IBenchmark {
 
 	@Override
 	public void log(final int index) {
-		logger.trace(MessageFormat.format("Trace: {0}, PI: {1}", index, Math.PI));
-		logger.debug(MessageFormat.format("Debug: {0}, PI: {1}", index, Math.PI));
-		logger.info(MessageFormat.format("Info: {0}, PI: {1}", index, Math.PI));
-		logger.warn(MessageFormat.format("Warning: {0}, PI: {1}", index, Math.PI));
-		logger.error(MessageFormat.format("Error: {0}, PI: {1}", index, Math.PI));
+		logger.trace("Trace: {}, PI: {}", index, Math.PI);
+		logger.debug("Debug: {}, PI: {}", index, Math.PI);
+		logger.info("Info: {}, PI: {}", index, Math.PI);
+		logger.warn("Warning: {}, PI: {}", index, Math.PI);
+		logger.error("Error: {}, PI: {}", index, Math.PI);
 	}
 
 	@Override
