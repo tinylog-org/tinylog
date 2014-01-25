@@ -45,6 +45,9 @@ import org.pmw.tinylog.util.WritingThread;
  */
 public class SharedFileWriterTest extends AbstractTest {
 
+	private static final int NUMBER_OF_JVMS = 5;
+	private static final int LOG_ENTRIES = 20000;
+
 	/**
 	 * Test required log entry values.
 	 * 
@@ -182,7 +185,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		processBuilder.redirectErrorStream(true);
 
 		List<Process> processes = new ArrayList<>();
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < NUMBER_OF_JVMS; ++i) {
 			processes.add(processBuilder.start());
 		}
 
@@ -198,7 +201,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		}
 		reader.close();
 
-		assertEquals(5 * 10000, readLines);
+		assertEquals(NUMBER_OF_JVMS * LOG_ENTRIES, readLines);
 
 		file.delete();
 	}
@@ -214,7 +217,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	public static void main(final String[] arguments) throws IOException {
 		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
 		writer.init(null);
-		for (int i = 0; i < 10000; ++i) {
+		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			writer.write(new LogEntryBuilder().renderedLogEntry(WritingThread.LINE + "\n").create());
 		}
 		writer.close();
