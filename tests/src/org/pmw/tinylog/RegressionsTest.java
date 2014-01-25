@@ -168,6 +168,7 @@ public class RegressionsTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile("log");
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new TimestampLabeller(), new StartupPolicy());
 		Configurator.defaultConfig().writer(writer).activate(); // Failed
+		writer.close();
 		file.delete();
 	}
 
