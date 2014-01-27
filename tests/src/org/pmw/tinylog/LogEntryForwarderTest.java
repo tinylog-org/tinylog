@@ -28,6 +28,16 @@ import org.pmw.tinylog.writers.LogEntryValue;
 public class LogEntryForwarderTest extends AbstractTest {
 
 	/**
+	 * Test if the class is a valid utility class.
+	 * 
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(LogEntryForwarder.class);
+	}
+
+	/**
 	 * Test the default forward methods.
 	 */
 	@Test
