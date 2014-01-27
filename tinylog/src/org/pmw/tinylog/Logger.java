@@ -846,12 +846,7 @@ public final class Logger {
 			}
 		}
 
-		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
-		if (stackTraceElements.length > deep) {
-			return stackTraceElements[deep];
-		} else {
-			return new StackTraceElement("<unknown>", "<unknown>", "<unknown>", -1);
-		}
+		return new Throwable().getStackTrace()[deep];
 	}
 
 	private static String getNameOfClass(final String fullyQualifiedClassName) {

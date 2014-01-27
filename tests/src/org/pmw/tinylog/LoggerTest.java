@@ -27,12 +27,16 @@ import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.RegexMatcher.contains;
 import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
 
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.StoreWriter;
@@ -943,6 +947,35 @@ public class LoggerTest extends AbstractTest {
 		Logger.setConfirguration(configuration);
 		assertSame(writer, Logger.getConfiguration().create().getWriter());
 		assertEquals(1, writer.numberOfInits);
+	}
+
+	/**
+	 * Test if tinylog get the right stack trace element if JVM doesn't support reflection.
+	 */
+	@Test
+	public final void testJvmWithoutReflection() {
+		MockUp<Method> mock = new MockUp<Method>() {
+
+			@Mock
+			public Object invoke(final Object instance, final Object... arguments) {
+				throw new UnsupportedOperationException();
+			}
+
+		};
+
+		try {
+			StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
+			Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{class}.{method}()").activate();
+
+			Logger.info("Hello");
+
+			LogEntry logEntry = writer.consumeLogEntry();
+			assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
+			assertEquals("testJvmWithoutReflection", logEntry.getMethodName());
+			assertEquals(LoggerTest.class.getName() + ".testJvmWithoutReflection()" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+		} finally {
+			mock.tearDown();
+		}
 	}
 
 	private WritingThread findWritingThread() {
