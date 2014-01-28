@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +31,6 @@ import org.junit.Test;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.mocks.SleepHandledThreadMock;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for configuration observer.
@@ -71,8 +71,18 @@ public class ConfigurationObserverTest extends AbstractTest {
 	 */
 	@Test
 	public final void testFileConfigurationObserver() throws IOException, InterruptedException {
+		Properties properties = new Properties();
+
+		Properties systemProperties = System.getProperties();
+		for (String key : systemProperties.stringPropertyNames()) {
+			if (key.startsWith("tinylog.")) {
+				properties.put(key, systemProperties.getProperty(key));
+			}
+		}
+
 		File file = FileHelper.createTemporaryFile("properties");
-		ConfigurationObserver observer = ConfigurationObserver.createFileConfigurationObserver(Configurator.defaultConfig(), file.getAbsolutePath());
+		ConfigurationObserver observer = ConfigurationObserver
+				.createFileConfigurationObserver(Configurator.defaultConfig(), properties, file.getAbsolutePath());
 		testObserver(observer, file);
 		file.delete();
 	}
@@ -94,14 +104,23 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testResourceConfigurationObserver() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
 			InterruptedException {
+		Properties properties = new Properties();
+
+		Properties systemProperties = System.getProperties();
+		for (String key : systemProperties.stringPropertyNames()) {
+			if (key.startsWith("tinylog.")) {
+				properties.put(key, systemProperties.getProperty(key));
+			}
+		}
+
 		File file = classLoaderMock.set("config/tinylog.properties");
-		ConfigurationObserver observer = ConfigurationObserver.createResourceConfigurationObserver(Configurator.defaultConfig(), "config/tinylog.properties");
+		ConfigurationObserver observer = ConfigurationObserver.createResourceConfigurationObserver(Configurator.defaultConfig(), properties,
+				"config/tinylog.properties");
 		testObserver(observer, file);
 		file.delete();
 	}
 
 	private void testObserver(final ConfigurationObserver observer, final File file) throws IOException, InterruptedException {
-		StringListOutputStream systemErrorStream = getSystemErrorStream();
 		Configuration defaultConfiguration = Configurator.defaultConfig().create();
 		String loggingFormat = defaultConfiguration.getFormatPattern();
 		int maxStackTraceElements = defaultConfiguration.getMaxStackTraceElements();
@@ -114,53 +133,54 @@ public class ConfigurationObserverTest extends AbstractTest {
 		assertTrue(observer.isAlive());
 		assertEquals(threadCount + 1, Thread.activeCount());
 
-		threadMock.waitForSleep();
-		Configuration currentConfiguration = Logger.getConfiguration().create();
-		assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
-		assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
+		try {
+			threadMock.waitForSleep();
+			Configuration currentConfiguration = Logger.getConfiguration().create();
+			assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
+			assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
 
-		FileHelper.write(file, "tinylog.format=TEST");
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals("TEST", currentConfiguration.getFormatPattern());
-		assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
+			FileHelper.write(file, "tinylog.format=TEST");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			assertEquals("TEST", currentConfiguration.getFormatPattern());
+			assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
 
-		FileHelper.write(file, "tinylog.stacktrace=42");
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
-		assertEquals(42, currentConfiguration.getMaxStackTraceElements());
+			FileHelper.write(file, "tinylog.stacktrace=42");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
+			assertEquals(42, currentConfiguration.getMaxStackTraceElements());
 
-		FileHelper.write(file, "");
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
-		assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
+			FileHelper.write(file, "");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
+			assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
 
-		FileHelper.write(file, "tinylog.format=TEST", "tinylog.stacktrace=42");
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals("TEST", currentConfiguration.getFormatPattern());
-		assertEquals(42, currentConfiguration.getMaxStackTraceElements());
+			FileHelper.write(file, "tinylog.format=TEST", "tinylog.stacktrace=42");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			assertEquals("TEST", currentConfiguration.getFormatPattern());
+			assertEquals(42, currentConfiguration.getMaxStackTraceElements());
 
-		file.delete();
-		assertFalse(systemErrorStream.hasLines());
-		threadMock.awake();
-		threadMock.waitForSleep();
-		currentConfiguration = Logger.getConfiguration().create();
-		assertEquals(loggingFormat, currentConfiguration.getFormatPattern());
-		assertEquals(maxStackTraceElements, currentConfiguration.getMaxStackTraceElements());
+			file.delete();
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			assertEquals("TEST", currentConfiguration.getFormatPattern());
+			assertEquals(42, currentConfiguration.getMaxStackTraceElements());
+		} finally {
+			threadMock.disable();
 
-		threadMock.disable();
-
-		observer.shutdown();
-		observer.join();
-		assertFalse(observer.isAlive());
-		assertEquals(threadCount, Thread.activeCount());
+			observer.shutdown();
+			observer.join();
+			assertFalse(observer.isAlive());
+			assertEquals(threadCount, Thread.activeCount());
+		}
 	}
 
 }

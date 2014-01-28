@@ -449,19 +449,28 @@ public final class Configurator {
 			}
 		}
 
-		if (stream != null && (isObserveEnabled(properties) || isObserveEnabled(System.getProperties()))) {
-			Configurator configurator = PropertiesLoader.readProperties(System.getProperties());
-			if (isResource) {
-				ConfigurationObserver.createResourceConfigurationObserver(configurator, file).start();
-			} else {
-				ConfigurationObserver.createFileConfigurationObserver(configurator, file).start();
-			}
-			configurator = configurator.copy();
-			PropertiesLoader.readProperties(configurator, properties);
-			return configurator;
+		if (stream == null) {
+			return Configurator.defaultConfig();
 		} else {
-			properties.putAll(System.getProperties());
-			return PropertiesLoader.readProperties(properties);
+			Properties systemProperties = System.getProperties();
+			for (Object key : systemProperties.keySet()) {
+				String name = (String) key;
+				if (name.startsWith("tinylog.")) {
+					properties.put(name, systemProperties.getProperty(name));
+				}
+			}
+
+			if ("true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"))) {
+				Configurator configurator = PropertiesLoader.readProperties(properties);
+				if (isResource) {
+					ConfigurationObserver.createResourceConfigurationObserver(configurator, properties, file).start();
+				} else {
+					ConfigurationObserver.createFileConfigurationObserver(configurator, properties, file).start();
+				}
+				return configurator;
+			} else {
+				return PropertiesLoader.readProperties(properties);
+			}
 		}
 	}
 
@@ -494,10 +503,6 @@ public final class Configurator {
 		}
 
 		return new Configuration(level, customLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
-	}
-
-	private static boolean isObserveEnabled(final Properties properties) {
-		return "true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"));
 	}
 
 	/**

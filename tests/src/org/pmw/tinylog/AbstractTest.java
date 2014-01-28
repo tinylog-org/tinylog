@@ -43,6 +43,7 @@ public abstract class AbstractTest {
 	 */
 	@Before
 	public final void setUp() {
+		Configurator.defaultConfig().activate();
 		originProperties = (Properties) System.getProperties().clone();
 		originOutStream = System.out;
 		originErrStream = System.err;

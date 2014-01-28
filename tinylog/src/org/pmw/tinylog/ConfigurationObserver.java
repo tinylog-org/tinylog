@@ -17,7 +17,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -27,12 +30,15 @@ import java.util.Set;
 abstract class ConfigurationObserver extends Thread {
 
 	private static final String THREAD_NAME = "tinylog-ConfigurationObserver";
+	private static final Configuration DEFAULT_CONFIGURATION = Configurator.defaultConfig().create();
 
 	private final Configurator basisConfigurator;
+	private final Properties basisProperties;
 	private volatile boolean shutdown;
 
-	private ConfigurationObserver(final Configurator basisConfigurator) {
+	private ConfigurationObserver(final Configurator basisConfigurator, final Properties basisProperties) {
 		this.basisConfigurator = basisConfigurator;
+		this.basisProperties = basisProperties;
 		this.shutdown = false;
 		setName(THREAD_NAME);
 		setPriority((NORM_PRIORITY + MIN_PRIORITY) / 2);
@@ -42,14 +48,16 @@ abstract class ConfigurationObserver extends Thread {
 	/**
 	 * Create a thread to observe a file from file system.
 	 * 
-	 * @param basisConfigurator
-	 *            Plain basis configuration
+	 * @param configurator
+	 *            Basis configuration
+	 * @param properties
+	 *            Basis properties
 	 * @param file
 	 *            Configuration file to observe
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
-	static ConfigurationObserver createFileConfigurationObserver(final Configurator basisConfigurator, final String file) {
-		return new ConfigurationObserver(basisConfigurator) {
+	static ConfigurationObserver createFileConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
+		return new ConfigurationObserver(configurator, properties) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -66,14 +74,16 @@ abstract class ConfigurationObserver extends Thread {
 	/**
 	 * Create a thread to observe a file from classpath.
 	 * 
-	 * @param basisConfigurator
-	 *            Plain basis configuration
+	 * @param configurator
+	 *            Basis configuration
+	 * @param properties
+	 *            Basis properties
 	 * @param file
 	 *            Configuration file to observe
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
-	static ConfigurationObserver createResourceConfigurationObserver(final Configurator basisConfigurator, final String file) {
-		return new ConfigurationObserver(basisConfigurator) {
+	static ConfigurationObserver createResourceConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
+		return new ConfigurationObserver(configurator, properties) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -85,16 +95,58 @@ abstract class ConfigurationObserver extends Thread {
 
 	@Override
 	public final void run() {
-		Properties oldProperties = null;
+		Properties oldProperties = basisProperties;
+		Configurator oldConfigurator = basisConfigurator;
 		while (!shutdown) {
 			Properties properties = readProperties();
+
+			if (properties != null) {
+				Properties systemProperties = System.getProperties();
+				for (Object key : systemProperties.keySet()) {
+					String name = (String) key;
+					if (name.startsWith("tinylog.")) {
+						properties.put(key, systemProperties.getProperty(name));
+					}
+				}
+			}
+
 			if (changed(properties, oldProperties)) {
-				Configurator configurator = basisConfigurator.copy();
+				Configurator configurator = oldConfigurator.copy();
 				if (properties != null) {
-					PropertiesLoader.readProperties(configurator, properties);
+					if (levelHasChanged(properties, oldProperties)) {
+						configurator.level(DEFAULT_CONFIGURATION.getLevel()).resetCustomLevels();
+						PropertiesLoader.readLevel(configurator, properties);
+					}
+					if (formatPaternHasChanged(properties, oldProperties)) {
+						configurator.formatPattern(DEFAULT_CONFIGURATION.getFormatPattern());
+						PropertiesLoader.readFormatPattern(configurator, properties);
+					}
+					if (localeHasChanged(properties, oldProperties)) {
+						configurator.locale(DEFAULT_CONFIGURATION.getLocale());
+						PropertiesLoader.readLocale(configurator, properties);
+					}
+					if (maxStackTraceElementsHasChanged(properties, oldProperties)) {
+						configurator.maxStackTraceElements(DEFAULT_CONFIGURATION.getMaxStackTraceElements());
+						PropertiesLoader.readMaxStackTraceElements(configurator, properties);
+					}
+					if (writerHasChanged(properties, oldProperties)) {
+						configurator.writer(DEFAULT_CONFIGURATION.getWriter());
+						PropertiesLoader.readWriter(configurator, properties);
+					}
+					if (writingThreadHasChanged(properties, oldProperties)) {
+						WritingThread writingThread = DEFAULT_CONFIGURATION.getWritingThread();
+						if (writingThread == null) {
+							configurator.writingThread(false);
+						} else {
+							configurator.writingThread(writingThread.getNameOfThreadToObserve(), writingThread.getPriority());
+						}
+						PropertiesLoader.readWritingThread(configurator, properties);
+					}
 				}
 				configurator.activate();
+				oldConfigurator = configurator;
 			}
+
 			oldProperties = properties;
 
 			try {
@@ -112,6 +164,13 @@ abstract class ConfigurationObserver extends Thread {
 		shutdown = true;
 		interrupt();
 	}
+
+	/**
+	 * Open the configuration file.
+	 * 
+	 * @return Stream of configuration file or <code>null</code> if not exists.
+	 */
+	protected abstract InputStream openInputStream();
 
 	private boolean changed(final Properties properties, final Properties oldProperties) {
 		if (oldProperties == null) {
@@ -160,11 +219,58 @@ abstract class ConfigurationObserver extends Thread {
 		}
 	}
 
-	/**
-	 * Open the configuration file.
-	 * 
-	 * @return Stream of configuration file or <code>null</code> if not exists.
-	 */
-	protected abstract InputStream openInputStream();
+	private boolean levelHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.LEVEL_PROPERTY),
+				Collections.singletonList(PropertiesLoader.CUSTOM_LEVEL_PREFIX));
+	}
+
+	private boolean formatPaternHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.FORMAT_PROPERTY), Collections.<String> emptyList());
+	}
+
+	private boolean localeHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.LOCALE_PROPERTY), Collections.<String> emptyList());
+	}
+
+	private boolean maxStackTraceElementsHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.STACKTRACE_PROPERTY), Collections.<String> emptyList());
+	}
+
+	private boolean writerHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.WRITER_PROPERTY),
+				Collections.singletonList(PropertiesLoader.WRITER_PROPERTY + "."));
+	}
+
+	private boolean writingThreadHasChanged(final Properties properties, final Properties oldProperties) {
+		return compare(properties, oldProperties, Arrays.asList(PropertiesLoader.WRITING_THREAD_PROPERTY, PropertiesLoader.WRITING_THREAD_OBSERVE_PROPERTY,
+				PropertiesLoader.WRITING_THREAD_PRIORITY_PROPERTY), Collections.<String> emptyList());
+	}
+
+	private boolean compare(final Properties a, final Properties b, final List<String> fullKeys, final List<String> startPatterns) {
+		Properties relevantA = extract(a, fullKeys, startPatterns);
+		Properties relevantB = extract(b, fullKeys, startPatterns);
+		return !relevantA.equals(relevantB);
+	}
+
+	private Properties extract(final Properties properties, final List<String> fullKeys, final List<String> startPatterns) {
+		Properties relevantProperties = new Properties();
+
+		for (String key : fullKeys) {
+			if (properties.containsKey(key)) {
+				relevantProperties.put(key, properties.get(key));
+			}
+		}
+
+		for (String startPattern : startPatterns) {
+			for (Object key : properties.keySet()) {
+				String name = (String) key;
+				if (name.startsWith(startPattern)) {
+					relevantProperties.put(name, properties.get(name));
+				}
+			}
+		}
+
+		return relevantProperties;
+	}
 
 }

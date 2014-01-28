@@ -451,7 +451,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(threadCount + 1, Thread.activeCount());
 		Configurator.shutdownWritingThread(false);
 		assertEquals(threadCount + 1, Thread.activeCount());
-		Thread.sleep(10L); // Wait for shutdown of writing thread
+		Thread.sleep(100L); // Wait for shutdown of writing thread
 		assertEquals(threadCount, Thread.activeCount());
 	}
 

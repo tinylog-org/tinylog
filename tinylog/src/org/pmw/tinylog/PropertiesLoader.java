@@ -39,17 +39,55 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 final class PropertiesLoader {
 
-	private static final String LEVEL_PROPERTY = "tinylog.level";
-	private static final String FORMAT_PROPERTY = "tinylog.format";
-	private static final String LOCALE_PROPERTY = "tinylog.locale";
-	private static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
-	private static final String WRITER_PROPERTY = "tinylog.writer";
-	private static final String WRITING_THREAD_PROPERTY = "tinylog.writingthread";
-	private static final String WRITING_THREAD_OBSERVE_PROPERTY = WRITING_THREAD_PROPERTY + ".observe";
-	private static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
+	/**
+	 * Name of property for logging level
+	 */
+	static final String LEVEL_PROPERTY = "tinylog.level";
 
-	private static final String SERVICES_PREFIX = "META-INF/services/";
-	private static final String CUSTOM_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
+	/**
+	 * Name of property for format pattern
+	 */
+	static final String FORMAT_PROPERTY = "tinylog.format";
+
+	/**
+	 * Name of property for locale
+	 */
+	static final String LOCALE_PROPERTY = "tinylog.locale";
+
+	/**
+	 * Name of property for max stack trace elements
+	 */
+	static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
+
+	/**
+	 * Name of property for writer
+	 */
+	static final String WRITER_PROPERTY = "tinylog.writer";
+
+	/**
+	 * Name of property for writing thread
+	 */
+	static final String WRITING_THREAD_PROPERTY = "tinylog.writingthread";
+
+	/**
+	 * Name of property for thread to observe by writing thread
+	 */
+	static final String WRITING_THREAD_OBSERVE_PROPERTY = WRITING_THREAD_PROPERTY + ".observe";
+
+	/**
+	 * Name of property for priority by writing thread
+	 */
+	static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
+
+	/**
+	 * Prefix for path to services
+	 */
+	static final String SERVICES_PREFIX = "META-INF/services/";
+
+	/**
+	 * Name prefix of properties for custom logging levels
+	 */
+	static final String CUSTOM_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
 
 	private PropertiesLoader() {
 	}
@@ -63,19 +101,24 @@ final class PropertiesLoader {
 	 */
 	static Configurator readProperties(final Properties properties) {
 		Configurator configurator = Configurator.defaultConfig();
-		readProperties(configurator, properties);
+		readLevel(configurator, properties);
+		readFormatPattern(configurator, properties);
+		readLocale(configurator, properties);
+		readMaxStackTraceElements(configurator, properties);
+		readWriter(configurator, properties);
+		readWritingThread(configurator, properties);
 		return configurator;
 	}
 
 	/**
-	 * Load configuration from properties.
+	 * Load default logging level and custom logging levels from properties.
 	 * 
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
 	 *            Properties with configuration
 	 */
-	static void readProperties(final Configurator configurator, final Properties properties) {
+	static void readLevel(final Configurator configurator, final Properties properties) {
 		String level = properties.getProperty(LEVEL_PROPERTY);
 		if (level != null && level.length() > 0) {
 			try {
@@ -100,12 +143,32 @@ final class PropertiesLoader {
 				}
 			}
 		}
+	}
 
+	/**
+	 * Load format pattern from properties.
+	 * 
+	 * @param configurator
+	 *            Configurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readFormatPattern(final Configurator configurator, final Properties properties) {
 		String format = properties.getProperty(FORMAT_PROPERTY);
 		if (format != null && format.length() > 0) {
 			configurator.formatPattern(format);
 		}
+	}
 
+	/**
+	 * Load locale from properties.
+	 * 
+	 * @param configurator
+	 *            Configurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readLocale(final Configurator configurator, final Properties properties) {
 		String localeString = properties.getProperty(LOCALE_PROPERTY);
 		if (localeString != null && localeString.length() > 0) {
 			String[] localeArray = localeString.split("_", 3);
@@ -117,7 +180,17 @@ final class PropertiesLoader {
 				configurator.locale(new Locale(localeArray[0], localeArray[1], localeArray[2]));
 			}
 		}
+	}
 
+	/**
+	 * Load number of max stack trace elements from properties.
+	 * 
+	 * @param configurator
+	 *            Configurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readMaxStackTraceElements(final Configurator configurator, final Properties properties) {
 		String stacktace = properties.getProperty(STACKTRACE_PROPERTY);
 		if (stacktace != null && stacktace.length() > 0) {
 			try {
@@ -127,7 +200,17 @@ final class PropertiesLoader {
 				InternalLogger.warn("\"{0}\" is an invalid stack trace size and will be ignored", stacktace);
 			}
 		}
+	}
 
+	/**
+	 * Load writer from properties.
+	 * 
+	 * @param configurator
+	 *            Configurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readWriter(final Configurator configurator, final Properties properties) {
 		String writer = properties.getProperty(WRITER_PROPERTY);
 		if (writer != null && writer.length() > 0) {
 			if (writer.equalsIgnoreCase("null")) {
@@ -147,7 +230,17 @@ final class PropertiesLoader {
 				}
 			}
 		}
+	}
 
+	/**
+	 * Load writing thread data from properties.
+	 * 
+	 * @param configurator
+	 *            Configurator to update
+	 * @param properties
+	 *            Properties with configuration
+	 */
+	static void readWritingThread(final Configurator configurator, final Properties properties) {
 		String writingThread = properties.getProperty(WRITING_THREAD_PROPERTY);
 		if ("true".equalsIgnoreCase(writingThread) || "1".equalsIgnoreCase(writingThread)) {
 			String observedThread = properties.getProperty(WRITING_THREAD_OBSERVE_PROPERTY);
