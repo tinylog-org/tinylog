@@ -362,9 +362,9 @@
 				<path refid="junit.classpath" />
 			</classpath>
 			<batchtest>
-				<fileset dir="${tests.src}">
-					<include name="**/*Test*.java" />
-					<exclude name="**/Abstract*.java" />
+				<fileset dir="${tests.bin}">
+					<include name="**/*Test.class" />
+					<exclude name="**/Abstract*.class" />
 				</fileset>
 			</batchtest>
 		</junit>
