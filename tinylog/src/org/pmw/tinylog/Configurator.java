@@ -377,6 +377,7 @@ public final class Configurator {
 				Logger.setConfirguration(configuration);
 			} catch (Exception ex) {
 				InternalLogger.error(ex, "Failed to activate configuration");
+				return false;
 			}
 
 			if (activeWritingThread == null && writingThreadData != null) {
@@ -448,7 +449,7 @@ public final class Configurator {
 			}
 		}
 
-		if (stream != null && "true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"))) {
+		if (stream != null && (isObserveEnabled(properties) || isObserveEnabled(System.getProperties()))) {
 			Configurator configurator = PropertiesLoader.readProperties(System.getProperties());
 			if (isResource) {
 				ConfigurationObserver.createResourceConfigurationObserver(configurator, file).start();
@@ -487,12 +488,16 @@ public final class Configurator {
 		} else {
 			writingThread = new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
 			if (writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
-				InternalLogger.warn("Thread \"{0}\" couldn't be found, writing thread won't be used");
+				InternalLogger.warn("Thread \"{0}\" couldn't be found, writing thread won't be used", writingThreadData.threadToObserve);
 				writingThread = null;
 			}
 		}
 
 		return new Configuration(level, customLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
+	}
+
+	private static boolean isObserveEnabled(final Properties properties) {
+		return "true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"));
 	}
 
 	/**

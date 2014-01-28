@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.hamcrest.number.OrderingComparison.lessThan;
@@ -25,21 +26,30 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.Configurator.WritingThreadData;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
+import org.pmw.tinylog.util.EvilWriter;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
+import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for configurator.
@@ -125,7 +135,7 @@ public class ConfiguratorTest extends AbstractTest {
 		Configurator.currentConfig().formatPattern("TEST").create();
 		assertNotEquals("TEST", configuration.getFormatPattern());
 
-		Configurator.currentConfig().formatPattern("TEST").activate();
+		assertTrue(Configurator.currentConfig().formatPattern("TEST").activate());
 		configuration = Configurator.currentConfig().create();
 		assertEquals("TEST", configuration.getFormatPattern());
 	}
@@ -169,6 +179,62 @@ public class ConfiguratorTest extends AbstractTest {
 		configuration = Configurator.init().create();
 		assertEquals("TEST1", configuration.getFormatPattern());
 		assertEquals(threadCount + 1, Thread.activeCount());
+
+		file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST3");
+		System.setProperty("tinylog.configuration", file.getAbsolutePath());
+		System.setProperty("tinylog.configuration.observe", "true");
+		configuration = Configurator.init().create();
+		assertEquals("TEST3", configuration.getFormatPattern());
+		assertEquals(threadCount + 2, Thread.activeCount());
+		System.clearProperty("tinylog.configuration");
+		System.clearProperty("tinylog.configuration.observe");
+		file.delete();
+	}
+
+	/**
+	 * Test initialization with a nonexistent properties file.
+	 */
+	@Test
+	public final void testInitWithNonexistentFile() {
+		System.setProperty("tinylog.configuration", "invalid.properties");
+
+		try {
+			Configurator.init();
+			String line = getSystemErrorStream().nextLine();
+			assertThat(line, allOf(containsString("ERROR"), containsString(FileNotFoundException.class.getName()), containsString("invalid.properties")));
+		} finally {
+			System.clearProperty("tinylog.configuration");
+		}
+	}
+
+	/**
+	 * Test initialization if reading of properties file failed.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testInitIfReadingFailed() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		System.setProperty("tinylog.configuration", file.getAbsolutePath());
+
+		MockUp<Properties> mock = new MockUp<Properties>() {
+
+			@Mock
+			public void load(final InputStream inStream) throws IOException {
+				throw new IOException();
+			}
+
+		};
+
+		try {
+			Configurator.init();
+			String line = getSystemErrorStream().nextLine();
+			assertThat(line, allOf(containsString("ERROR"), containsString(IOException.class.getName()), containsString(file.getName())));
+		} finally {
+			System.clearProperty("tinylog.configuration");
+			mock.tearDown();
+		}
 	}
 
 	/**
@@ -181,6 +247,15 @@ public class ConfiguratorTest extends AbstractTest {
 	public final void testLoadFromResource() throws IOException {
 		classLoaderMock.set("my/package/tinylog.properties", "tinylog.format=TEST");
 		Configuration configuration = Configurator.fromResource("my/package/tinylog.properties").create();
+		assertEquals("TEST", configuration.getFormatPattern());
+
+		classLoaderMock.remove("my/package/tinylog.properties");
+		try {
+			configuration = Configurator.fromResource("my/package/tinylog.properties").create();
+			fail("FileNotFoundException expected");
+		} catch (FileNotFoundException ex) {
+			// Expected
+		}
 		assertEquals("TEST", configuration.getFormatPattern());
 	}
 
@@ -195,7 +270,15 @@ public class ConfiguratorTest extends AbstractTest {
 		File file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST");
 		Configuration configuration = Configurator.fromFile(file).create();
 		assertEquals("TEST", configuration.getFormatPattern());
-		file.delete();
+
+		assertTrue(file.delete());
+		try {
+			configuration = Configurator.fromFile(file).create();
+			fail("FileNotFoundException expected");
+		} catch (FileNotFoundException ex) {
+			// Expected
+		}
+		assertEquals("TEST", configuration.getFormatPattern());
 	}
 
 	/**
@@ -291,6 +374,12 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = Configurator.defaultConfig().writer(null).create();
 		assertEquals(null, configuration.getWriter());
+
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
+		assertFalse(Configurator.defaultConfig().writer(new EvilWriter()).activate());
+		assertTrue(errorStream.hasLines());
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
 	}
 
 	/**
@@ -322,7 +411,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertThat(configuration.getWritingThread().getPriority(), lessThan(Thread.NORM_PRIORITY));
 
 		assertEquals(threadCount, Thread.activeCount());
-		configurator.activate();
+		assertTrue(configurator.activate());
 		assertEquals(threadCount + 1, Thread.activeCount());
 
 		configurator = Configurator.defaultConfig().writingThread(false);
@@ -330,25 +419,39 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(null, configuration.getWritingThread());
 
 		assertEquals(threadCount + 1, Thread.activeCount());
-		configurator.activate();
+		assertTrue(configurator.activate());
 		Thread.sleep(10L); // Wait for shutdown of writing thread
 		assertEquals(threadCount, Thread.activeCount());
 
+		configurator = Configurator.defaultConfig().writingThread("!!! NONEXISTING THREAD !!!");
+		StringListOutputStream errorStream = getSystemErrorStream();
+		assertFalse(errorStream.hasLines());
+		configuration = configurator.create();
+		assertTrue(errorStream.hasLines());
+		assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("thread"), containsString("!!! NONEXISTING THREAD !!!")));
 	}
 
 	/**
 	 * Test manual shutdown of writing thread.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
 	 */
 	@Test
-	public final void testShutdownWritingThread() {
+	public final void testShutdownWritingThread() throws InterruptedException {
 		int threadCount = Thread.activeCount();
 
 		assertEquals(threadCount, Thread.activeCount());
-		Configurator.defaultConfig().writingThread(null).activate();
-		assertEquals(threadCount + 1, Thread.activeCount());
-
+		assertTrue(Configurator.defaultConfig().writingThread(null).activate());
 		assertEquals(threadCount + 1, Thread.activeCount());
 		Configurator.shutdownWritingThread(true);
+		assertEquals(threadCount, Thread.activeCount());
+
+		assertTrue(Configurator.defaultConfig().writingThread(null).activate());
+		assertEquals(threadCount + 1, Thread.activeCount());
+		Configurator.shutdownWritingThread(false);
+		assertEquals(threadCount + 1, Thread.activeCount());
+		Thread.sleep(10L); // Wait for shutdown of writing thread
 		assertEquals(threadCount, Thread.activeCount());
 	}
 

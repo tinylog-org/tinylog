@@ -33,7 +33,7 @@ public final class EvilWriter implements LoggingWriter {
 
 	@Override
 	public void init(final Configuration configuration) throws Exception {
-		// Do nothing
+		throw new IllegalArgumentException();
 	}
 
 	@Override
