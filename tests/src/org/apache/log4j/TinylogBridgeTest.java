@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configurator;
+import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntry;
@@ -54,15 +55,20 @@ public class TinylogBridgeTest extends AbstractTest {
 	public final void testLoggingLevel() {
 		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
 		assertEquals(Level.TRACE, logger.getLoggingLevel());
+		assertEquals(Level.TRACE, logger.getLoggingLevel(TinylogBridgeTest.class));
 
 		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
 		assertEquals(Level.ERROR, logger.getLoggingLevel());
+		assertEquals(Level.ERROR, logger.getLoggingLevel(TinylogBridgeTest.class));
 
 		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
 		assertEquals(Level.OFF, logger.getLoggingLevel());
+		assertEquals(Level.OFF, logger.getLoggingLevel(TinylogBridgeTest.class));
 
-		Configurator.currentConfig().level("org.apache", LoggingLevel.WARNING).activate();
+		Configurator.currentConfig().level(LoggingLevel.DEBUG).level("org.apache", LoggingLevel.WARNING).activate();
 		assertEquals(Level.WARN, logger.getLoggingLevel());
+		assertEquals(Level.WARN, logger.getLoggingLevel(TinylogBridgeTest.class));
+		assertEquals(Level.DEBUG, logger.getLoggingLevel(Logger.class));
 	}
 
 	/**
@@ -72,35 +78,65 @@ public class TinylogBridgeTest extends AbstractTest {
 	public final void testLoggingLevelEnabled() {
 		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Level.ERROR));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.ERROR));
 		assertTrue(logger.isEnabled(Level.WARN));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.WARN));
 		assertTrue(logger.isEnabled(Level.INFO));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.INFO));
 		assertTrue(logger.isEnabled(Level.DEBUG));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.DEBUG));
 		assertTrue(logger.isEnabled(Level.TRACE));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
 		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Level.ERROR));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.ERROR));
 		assertFalse(logger.isEnabled(Level.WARN));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.WARN));
 		assertFalse(logger.isEnabled(Level.INFO));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.INFO));
 		assertFalse(logger.isEnabled(Level.DEBUG));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.DEBUG));
 		assertFalse(logger.isEnabled(Level.TRACE));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
 		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
 		assertFalse(logger.isEnabled(Level.FATAL));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertFalse(logger.isEnabled(Level.ERROR));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.ERROR));
 		assertFalse(logger.isEnabled(Level.WARN));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.WARN));
 		assertFalse(logger.isEnabled(Level.INFO));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.INFO));
 		assertFalse(logger.isEnabled(Level.DEBUG));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.DEBUG));
 		assertFalse(logger.isEnabled(Level.TRACE));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
-		Configurator.currentConfig().level("org.apache", LoggingLevel.WARNING).activate();
+		Configurator.currentConfig().level(LoggingLevel.DEBUG).level("org.apache", LoggingLevel.WARNING).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
+		assertTrue(logger.isEnabled(Logger.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Level.ERROR));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.ERROR));
+		assertTrue(logger.isEnabled(Logger.class, Level.ERROR));
 		assertTrue(logger.isEnabled(Level.WARN));
+		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.WARN));
+		assertTrue(logger.isEnabled(Logger.class, Level.WARN));
 		assertFalse(logger.isEnabled(Level.INFO));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.INFO));
+		assertTrue(logger.isEnabled(Logger.class, Level.INFO));
 		assertFalse(logger.isEnabled(Level.DEBUG));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.DEBUG));
+		assertTrue(logger.isEnabled(Logger.class, Level.DEBUG));
 		assertFalse(logger.isEnabled(Level.TRACE));
+		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
+		assertFalse(logger.isEnabled(Logger.class, Level.TRACE));
 	}
 
 	/**

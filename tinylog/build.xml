@@ -85,7 +85,9 @@
 			</fileset>
 		</copy>
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
+			<classpath location="${environment.bin}" />
 			<classpath location="${tinylog.bin}" />
+			<compilerarg value="-Xbootclasspath/p:${environment.bin}"/>
 		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
@@ -250,10 +252,12 @@
 			<doctitle>Log4j Facade ${version} - API Specification</doctitle>
 			<packageset dir="${log4j.src}" />
 			<classpath>
+				<dirset dir="${environment.bin}" />
 				<dirset dir="${log4j.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
-			<link href="http://download.oracle.com/javase/6/docs/api/" offline="true" packagelistloc="${ext.conf}" />
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 		
 		<echo file="${dist.maven}/log4j-facade-${version}.pom"><![CDATA[<project>
@@ -324,6 +328,7 @@
 				<dirset dir="${environment.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
+			<arg line="-XDignore.symbol.file" />
 			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${ext.conf}" />
 		</javadoc>
 	</target>

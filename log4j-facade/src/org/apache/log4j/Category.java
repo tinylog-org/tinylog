@@ -15,6 +15,8 @@ package org.apache.log4j;
 
 import org.pmw.tinylog.Logger;
 
+import sun.reflect.Reflection;
+
 /**
  * Deprecated log4j logging API (use {@link Logger} instead).
  * 
@@ -78,7 +80,11 @@ public class Category {
 	 */
 	@Deprecated
 	public final Level getPriority() {
-		return TinylogBride.getLoggingLevel();
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+		} else {
+			return TinylogBride.getLoggingLevel();
+		}
 	}
 
 	/**
@@ -86,7 +92,11 @@ public class Category {
 	 */
 	@Deprecated
 	public Priority getChainedPriority() {
-		return TinylogBride.getLoggingLevel();
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+		} else {
+			return TinylogBride.getLoggingLevel();
+		}
 	}
 
 	/**
@@ -96,7 +106,11 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public final Level getLevel() {
-		return TinylogBride.getLoggingLevel();
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+		} else {
+			return TinylogBride.getLoggingLevel();
+		}
 	}
 
 	/**
@@ -106,7 +120,11 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public Level getEffectiveLevel() {
-		return TinylogBride.getLoggingLevel();
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+		} else {
+			return TinylogBride.getLoggingLevel();
+		}
 	}
 
 	/**
@@ -115,7 +133,11 @@ public class Category {
 	 * @return <code>true</code> if debug log entries will be output, <code>false</code> if not
 	 */
 	public boolean isDebugEnabled() {
-		return TinylogBride.isEnabled(Level.DEBUG);
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.isEnabled(Reflection.getCallerClass(), Level.DEBUG);
+		} else {
+			return TinylogBride.isEnabled(Level.DEBUG);
+		}
 	}
 
 	/**
@@ -146,7 +168,11 @@ public class Category {
 	 * @return <code>true</code> if info log entries will be output, <code>false</code> if not
 	 */
 	public boolean isInfoEnabled() {
-		return TinylogBride.isEnabled(Level.INFO);
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.isEnabled(Reflection.getCallerClass(), Level.INFO);
+		} else {
+			return TinylogBride.isEnabled(Level.INFO);
+		}
 	}
 
 	/**
@@ -245,7 +271,11 @@ public class Category {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public boolean isEnabledFor(final Priority level) {
-		return TinylogBride.isEnabled(level);
+		if (TinylogBride.hasSunReflection()) {
+			return TinylogBride.isEnabled(Reflection.getCallerClass(), level);
+		} else {
+			return TinylogBride.isEnabled(level);
+		}
 	}
 
 	/**

@@ -18,13 +18,15 @@ import java.lang.reflect.Method;
 import org.pmw.tinylog.LogEntryForwarder;
 import org.pmw.tinylog.LoggingLevel;
 
+import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
+
 /**
  * Bridge to tinylog.
  */
 class TinylogBride {
 
 	private static Method stackTraceMethod;
-	private static Method callerClassMethod;
+	private static boolean hasSunReflection;
 
 	static {
 		try {
@@ -39,19 +41,18 @@ class TinylogBride {
 		}
 
 		try {
-			Class<?> reflectionClass = Class.forName("sun.reflect.Reflection");
-			callerClassMethod = reflectionClass.getDeclaredMethod("getCallerClass", int.class);
-			callerClassMethod.setAccessible(true);
-			Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, 1);
-			if (!TinylogBride.class.getName().equals(callerClass.getName())) {
-				callerClassMethod = null;
-			}
+			Reflection.getCallerClass();
+			hasSunReflection = true;
 		} catch (Exception ex) {
-			callerClassMethod = null;
+			hasSunReflection = false;
 		}
 	}
 
 	private TinylogBride() {
+	}
+
+	public static boolean hasSunReflection() {
+		return hasSunReflection;
 	}
 
 	/**
@@ -60,9 +61,20 @@ class TinylogBride {
 	 * @return Active logging level
 	 */
 	public static Level getLoggingLevel() {
-		Package affectedPackage = getPackageFromStackTrace(3);
-		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger.getLoggingLevel(affectedPackage
-				.getName());
+		String className = getFullyQualifiedClassNameFromStackTrace(3);
+		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(className);
+		return toLog4jLevel(activeLevel);
+	}
+
+	/**
+	 * Get the active logging level for the caller class.
+	 * 
+	 * @param callerClass
+	 *            Class that has called this method
+	 * @return Active logging level
+	 */
+	public static Level getLoggingLevel(final Class<?> callerClass) {
+		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(callerClass.getName());
 		return toLog4jLevel(activeLevel);
 	}
 
@@ -74,9 +86,22 @@ class TinylogBride {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public static boolean isEnabled(final Priority level) {
-		Package affectedPackage = getPackageFromStackTrace(3);
-		LoggingLevel activeLevel = affectedPackage == null ? org.pmw.tinylog.Logger.getLoggingLevel() : org.pmw.tinylog.Logger.getLoggingLevel(affectedPackage
-				.getName());
+		String className = getFullyQualifiedClassNameFromStackTrace(3);
+		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(className);
+		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
+	}
+
+	/**
+	 * Check if a given logging level will be output.
+	 * 
+	 * @param callerClass
+	 *            Class that has called this method
+	 * @param level
+	 *            Logging level to test
+	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
+	 */
+	public static boolean isEnabled(final Class<?> callerClass, final Priority level) {
+		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(callerClass.getName());
 		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
 	}
 
@@ -139,44 +164,17 @@ class TinylogBride {
 
 	}
 
-	private static Package getPackageFromStackTrace(final int deep) {
-		if (callerClassMethod != null) {
-			try {
-				Class<?> callerClass = (Class<?>) callerClassMethod.invoke(null, deep + 1);
-				return callerClass.getPackage();
-			} catch (Exception ex) {
-				// Fallback
-			}
-		}
-
+	private static String getFullyQualifiedClassNameFromStackTrace(final int deep) {
 		if (stackTraceMethod != null) {
 			try {
-				return getPackageFromStackTraceElement((StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep));
+				return ((StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep)).getClassName();
 			} catch (Exception ex) {
 				// Fallback
 			}
 		}
 
 		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
-		return getPackageFromStackTraceElement(stackTraceElements[deep]);
-	}
-
-	private static Package getPackageFromStackTraceElement(final StackTraceElement stackTraceElement) {
-		if (stackTraceElement == null) {
-			return null;
-		} else {
-			String className = stackTraceElement.getClassName();
-			if (className == null) {
-				return null;
-			} else {
-				int index = className.lastIndexOf('.');
-				if (index == -1) {
-					return Package.getPackage("");
-				} else {
-					return Package.getPackage(className.substring(0, index));
-				}
-			}
-		}
+		return stackTraceElements[deep].getClassName();
 	}
 
 }

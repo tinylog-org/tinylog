@@ -28,6 +28,17 @@ class SimpleLog4Facade {
 	}
 
 	/**
+	 * Get the active logging level for the caller class.
+	 * 
+	 * @param callerClass
+	 *            Class that has called this method
+	 * @return Active logging level
+	 */
+	Level getLoggingLevel(final Class<?> callerClass) {
+		return TinylogBride.getLoggingLevel(callerClass);
+	}
+
+	/**
 	 * Check if a given logging level will be output.
 	 * 
 	 * @param level
@@ -36,6 +47,19 @@ class SimpleLog4Facade {
 	 */
 	boolean isEnabled(final Priority level) {
 		return TinylogBride.isEnabled(level);
+	}
+
+	/**
+	 * Check if a given logging level will be output.
+	 * 
+	 * @param callerClass
+	 *            Class that has called this method
+	 * @param level
+	 *            Logging level to test
+	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
+	 */
+	boolean isEnabled(final Class<?> callerClass, final Priority level) {
+		return TinylogBride.isEnabled(callerClass, level);
 	}
 
 	/**
