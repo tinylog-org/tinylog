@@ -34,11 +34,14 @@ abstract class ConfigurationObserver extends Thread {
 
 	private final Configurator basisConfigurator;
 	private final Properties basisProperties;
+	private final String file;
+
 	private volatile boolean shutdown;
 
-	private ConfigurationObserver(final Configurator basisConfigurator, final Properties basisProperties) {
+	private ConfigurationObserver(final Configurator basisConfigurator, final Properties basisProperties, final String file) {
 		this.basisConfigurator = basisConfigurator;
 		this.basisProperties = basisProperties;
+		this.file = file;
 		this.shutdown = false;
 		setName(THREAD_NAME);
 		setPriority((NORM_PRIORITY + MIN_PRIORITY) / 2);
@@ -57,7 +60,7 @@ abstract class ConfigurationObserver extends Thread {
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createFileConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
-		return new ConfigurationObserver(configurator, properties) {
+		return new ConfigurationObserver(configurator, properties, file) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -83,7 +86,7 @@ abstract class ConfigurationObserver extends Thread {
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createResourceConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
-		return new ConfigurationObserver(configurator, properties) {
+		return new ConfigurationObserver(configurator, properties, file) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -199,6 +202,7 @@ abstract class ConfigurationObserver extends Thread {
 		try {
 			stream = openInputStream();
 			if (stream == null) {
+				InternalLogger.error("Failed to open \"{0}\"", file);
 				return null;
 			} else {
 				Properties properties = new Properties();

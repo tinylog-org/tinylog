@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
@@ -73,20 +74,7 @@ public class ConfiguratorTest extends AbstractTest {
 	 */
 	@After
 	public final void dispose() {
-		for (Thread thread : Thread.getAllStackTraces().keySet()) {
-			if (thread instanceof ConfigurationObserver) {
-				ConfigurationObserver observer = (ConfigurationObserver) thread;
-				observer.shutdown();
-				while (true) {
-					try {
-						observer.join();
-						break;
-					} catch (InterruptedException ex) {
-						continue;
-					}
-				}
-			}
-		}
+		shutdownConfigurationObservers();
 
 		classLoaderMock.tearDown();
 		classLoaderMock.close();
@@ -128,7 +116,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(defaultConfiguration.hasCustomLoggingLevels(), configuration.hasCustomLoggingLevels());
 		assertEquals(defaultConfiguration.getFormatPattern(), configuration.getFormatPattern());
 		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
-		assertSame(getClass(defaultConfiguration.getWriter()), getClass(configuration.getWriter()));
+		assertThat(configuration.getWriter(), instanceOf(defaultConfiguration.getWriter().getClass()));
 		assertSame(defaultConfiguration.getWritingThread(), configuration.getWritingThread());
 		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
 
@@ -179,15 +167,17 @@ public class ConfiguratorTest extends AbstractTest {
 		configuration = Configurator.init().create();
 		assertEquals("TEST1", configuration.getFormatPattern());
 		assertEquals(threadCount + 1, Thread.activeCount());
+		shutdownConfigurationObservers();
 
 		file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST3");
 		System.setProperty("tinylog.configuration", file.getAbsolutePath());
 		System.setProperty("tinylog.configuration.observe", "true");
 		configuration = Configurator.init().create();
 		assertEquals("TEST3", configuration.getFormatPattern());
-		assertEquals(threadCount + 2, Thread.activeCount());
+		assertEquals(threadCount + 1, Thread.activeCount());
 		System.clearProperty("tinylog.configuration");
 		System.clearProperty("tinylog.configuration.observe");
+		shutdownConfigurationObservers();
 		file.delete();
 	}
 
@@ -470,11 +460,20 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
 	}
 
-	private static Class<?> getClass(final Object instance) {
-		if (instance == null) {
-			return null;
-		} else {
-			return instance.getClass();
+	private static void shutdownConfigurationObservers() {
+		for (Thread thread : Thread.getAllStackTraces().keySet()) {
+			if (thread instanceof ConfigurationObserver) {
+				ConfigurationObserver observer = (ConfigurationObserver) thread;
+				observer.shutdown();
+				while (true) {
+					try {
+						observer.join();
+						break;
+					} catch (InterruptedException ex) {
+						continue;
+					}
+				}
+			}
 		}
 	}
 
