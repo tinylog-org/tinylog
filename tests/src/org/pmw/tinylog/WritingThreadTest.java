@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.pmw.tinylog.util.EvilWriter;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.LogEntry;
 
 /**
@@ -97,9 +96,7 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
-		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
 	}
 
 	/**

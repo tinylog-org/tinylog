@@ -222,7 +222,6 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		StringListOutputStream errorStream = getSystemErrorStream();
 		assertFalse(errorStream.hasLines());
 		labeller.roll(currentFile, 0);
-		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
 
 		stream.close();

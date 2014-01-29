@@ -991,7 +991,9 @@ public class LoggerTest extends AbstractTest {
 
 		@Override
 		public String toString() {
-			throw new RuntimeException();
+			/* Generate an individual error message */
+			String message = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+			throw new RuntimeException(message);
 		}
 
 	}

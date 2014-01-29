@@ -368,7 +368,6 @@ public class ConfiguratorTest extends AbstractTest {
 		StringListOutputStream errorStream = getSystemErrorStream();
 		assertFalse(errorStream.hasLines());
 		assertFalse(Configurator.defaultConfig().writer(new EvilWriter()).activate());
-		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
 	}
 
@@ -417,7 +416,6 @@ public class ConfiguratorTest extends AbstractTest {
 		StringListOutputStream errorStream = getSystemErrorStream();
 		assertFalse(errorStream.hasLines());
 		configuration = configurator.create();
-		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("thread"), containsString("!!! NONEXISTING THREAD !!!")));
 	}
 

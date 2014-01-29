@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.LogEntryBuilder;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for the console logging writer.
@@ -54,12 +52,8 @@ public class ConsoleWriterTest extends AbstractTest {
 			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
-			StringListOutputStream outputStream = getSystemOutputStream();
-			assertFalse(outputStream.hasLines());
-
-			StringListOutputStream errorStream = getSystemErrorStream();
-			assertTrue(errorStream.hasLines());
-			assertEquals("Hello", errorStream.nextLine());
+			assertFalse(getSystemOutputStream().hasLines());
+			assertEquals("Hello", getSystemErrorStream().nextLine());
 
 			writer.close();
 		}
@@ -75,12 +69,8 @@ public class ConsoleWriterTest extends AbstractTest {
 			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
-			StringListOutputStream outputStream = getSystemOutputStream();
-			assertTrue(outputStream.hasLines());
-			assertEquals("Hello", outputStream.nextLine());
-
-			StringListOutputStream errorStream = getSystemErrorStream();
-			assertFalse(errorStream.hasLines());
+			assertEquals("Hello", getSystemOutputStream().nextLine());
+			assertFalse(getSystemErrorStream().hasLines());
 
 			writer.close();
 		}

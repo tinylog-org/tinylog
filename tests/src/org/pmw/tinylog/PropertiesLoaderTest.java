@@ -72,7 +72,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertFalse(errorStream.hasLines());
 		configuration = load(new PropertiesBuilder().set("tinylog.level", "invalid"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevel());
-		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("logging level")));
 	}
 
@@ -94,10 +93,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(LoggingLevel.ERROR, configuration.getLevel("org.pmw.tinylog"));
 
 		assertFalse(errorStream.hasLines());
-		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "invalid"));
+		configuration = load(builder.set("tinylog.level@org.pmw.tinylog", "nonsense"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevel("org.pmw.tinylog"));
-		assertTrue(errorStream.hasLines());
-		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("logging level")));
+		assertThat(errorStream.nextLine(), allOf(containsString("nonsense"), containsString("logging level")));
 	}
 
 	/**
@@ -156,7 +154,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		configuration = load(new PropertiesBuilder().set("tinylog.stacktrace", "invalid"));
 		int defaultValue = Configurator.defaultConfig().create().getMaxStackTraceElements();
 		assertEquals(defaultValue, configuration.getMaxStackTraceElements());
-		assertTrue(errorStream.hasLines());
 		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("stack trace")));
 	}
 

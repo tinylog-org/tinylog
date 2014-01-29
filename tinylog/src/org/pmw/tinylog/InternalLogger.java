@@ -25,6 +25,8 @@ public final class InternalLogger {
 	private static final String PREFIX_WARNING = "LOGGING WARNING: ";
 	private static final String PREFIX_ERROR = "LOGGING ERROR: ";
 
+	private static volatile String lastLogEntry = null;
+
 	private InternalLogger() {
 	}
 
@@ -35,7 +37,11 @@ public final class InternalLogger {
 	 *            Text to log
 	 */
 	public static void warn(final String message) {
-		System.err.println(PREFIX_WARNING + message);
+		String logEntry = PREFIX_WARNING + message;
+		if (!logEntry.equals(lastLogEntry)) {
+			System.err.println(logEntry);
+			lastLogEntry = logEntry;
+		}
 	}
 
 	/**
@@ -107,7 +113,11 @@ public final class InternalLogger {
 	 *            Text to log
 	 */
 	public static void error(final String message) {
-		System.err.println(PREFIX_ERROR + message);
+		String logEntry = PREFIX_ERROR + message;
+		if (!logEntry.equals(lastLogEntry)) {
+			System.err.println(logEntry);
+			lastLogEntry = logEntry;
+		}
 	}
 
 	/**
