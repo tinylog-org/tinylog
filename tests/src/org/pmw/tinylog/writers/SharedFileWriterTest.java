@@ -46,7 +46,7 @@ import org.pmw.tinylog.util.WritingThread;
 public class SharedFileWriterTest extends AbstractTest {
 
 	private static final int NUMBER_OF_JVMS = 5;
-	private static final int LOG_ENTRIES = 20000;
+	private static final int LOG_ENTRIES = 1000;
 
 	/**
 	 * Test required log entry values.
@@ -177,6 +177,7 @@ public class SharedFileWriterTest extends AbstractTest {
 	@Test
 	public final void testMultiJvmWriting() throws IOException, InterruptedException {
 		File file = FileHelper.createTemporaryFile(null);
+		file.delete();
 
 		String separator = System.getProperty("file.separator");
 		String classpath = System.getProperty("java.class.path");
@@ -189,6 +190,7 @@ public class SharedFileWriterTest extends AbstractTest {
 			processes.add(processBuilder.start());
 		}
 
+		file.createNewFile();
 		for (Process process : processes) {
 			process.waitFor();
 		}
@@ -215,7 +217,14 @@ public class SharedFileWriterTest extends AbstractTest {
 	 *             Logging failed
 	 */
 	public static void main(final String[] arguments) throws IOException {
-		SharedFileWriter writer = new SharedFileWriter(arguments[0]);
+		String filename = arguments[0];
+
+		File file = new File(filename);
+		while (!file.exists()) {
+			Thread.yield();
+		}
+
+		SharedFileWriter writer = new SharedFileWriter(filename);
 		writer.init(null);
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			writer.write(new LogEntryBuilder().renderedLogEntry(WritingThread.LINE + "\n").create());
