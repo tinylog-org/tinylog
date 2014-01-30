@@ -32,6 +32,9 @@ abstract class ConfigurationObserver extends Thread {
 	private static final String THREAD_NAME = "tinylog-ConfigurationObserver";
 	private static final Configuration DEFAULT_CONFIGURATION = Configurator.defaultConfig().create();
 
+	private static final Object mutex = new Object();
+	private static ConfigurationObserver activeObserver;
+
 	private final Configurator basisConfigurator;
 	private final Properties basisProperties;
 	private final String file;
@@ -94,6 +97,26 @@ abstract class ConfigurationObserver extends Thread {
 			}
 
 		};
+	}
+
+	/**
+	 * Get the active configuration observer.
+	 * 
+	 * @return Active configuration observer or <code>null</code> if there is no active configuration observer
+	 */
+	public static ConfigurationObserver getActiveObserver() {
+		synchronized (mutex) {
+			return activeObserver;
+		}
+	}
+
+	@Override
+	public void start() {
+		synchronized (mutex) {
+			Configurator.shutdownConfigurationObserver(true);
+			super.start();
+			activeObserver = this;
+		}
 	}
 
 	@Override
@@ -166,6 +189,12 @@ abstract class ConfigurationObserver extends Thread {
 	public void shutdown() {
 		shutdown = true;
 		interrupt();
+
+		synchronized (mutex) {
+			if (activeObserver == this) {
+				activeObserver = null;
+			}
+		}
 	}
 
 	/**

@@ -113,6 +113,7 @@ public final class Configurator {
 			throw new FileNotFoundException(file);
 		} else {
 			try {
+				shutdownWritingThread(true);
 				properties.load(stream);
 			} finally {
 				stream.close();
@@ -137,6 +138,7 @@ public final class Configurator {
 		InputStream stream = null;
 		try {
 			stream = new FileInputStream(file);
+			shutdownWritingThread(true);
 			properties.load(stream);
 		} finally {
 			if (stream != null) {
@@ -416,6 +418,29 @@ public final class Configurator {
 	}
 
 	/**
+	 * Manually shutdown of configuration observer.
+	 * 
+	 * @param wait
+	 *            <code>true</code> to wait for the successful shutdown, <code>false</code> for an asynchronous shutdown
+	 */
+	public static void shutdownConfigurationObserver(final boolean wait) {
+		ConfigurationObserver observer = ConfigurationObserver.getActiveObserver();
+		if (observer != null) {
+			observer.shutdown();
+			if (wait) {
+				while (true) {
+					try {
+						observer.join();
+						break;
+					} catch (InterruptedException ex) {
+						continue;
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Load properties from environment variables (also know as "-D" parameter) and from the default properties file
 	 * "tinylog.properties", which must be placed in the default package.
 	 * 
@@ -461,6 +486,7 @@ public final class Configurator {
 			}
 
 			if ("true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"))) {
+				shutdownWritingThread(true);
 				Configurator configurator = PropertiesLoader.readProperties(properties);
 				if (isResource) {
 					ConfigurationObserver.createResourceConfigurationObserver(configurator, properties, file).start();
@@ -469,6 +495,7 @@ public final class Configurator {
 				}
 				return configurator;
 			} else {
+				shutdownWritingThread(true);
 				return PropertiesLoader.readProperties(properties);
 			}
 		}

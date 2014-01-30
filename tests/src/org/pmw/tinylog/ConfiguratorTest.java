@@ -74,8 +74,7 @@ public class ConfiguratorTest extends AbstractTest {
 	 */
 	@After
 	public final void dispose() {
-		shutdownConfigurationObservers();
-
+		Configurator.shutdownConfigurationObserver(true);
 		classLoaderMock.tearDown();
 		classLoaderMock.close();
 	}
@@ -167,7 +166,6 @@ public class ConfiguratorTest extends AbstractTest {
 		configuration = Configurator.init().create();
 		assertEquals("TEST1", configuration.getFormatPattern());
 		assertEquals(threadCount + 1, Thread.activeCount());
-		shutdownConfigurationObservers();
 
 		file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST3");
 		System.setProperty("tinylog.configuration", file.getAbsolutePath());
@@ -177,7 +175,8 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(threadCount + 1, Thread.activeCount());
 		System.clearProperty("tinylog.configuration");
 		System.clearProperty("tinylog.configuration.observe");
-		shutdownConfigurationObservers();
+		Configurator.shutdownConfigurationObserver(true);
+		assertEquals(threadCount, Thread.activeCount());
 		file.delete();
 	}
 
@@ -456,23 +455,6 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = Configurator.defaultConfig().maxStackTraceElements(-1).create();
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
-	}
-
-	private static void shutdownConfigurationObservers() {
-		for (Thread thread : Thread.getAllStackTraces().keySet()) {
-			if (thread instanceof ConfigurationObserver) {
-				ConfigurationObserver observer = (ConfigurationObserver) thread;
-				observer.shutdown();
-				while (true) {
-					try {
-						observer.join();
-						break;
-					} catch (InterruptedException ex) {
-						continue;
-					}
-				}
-			}
-		}
 	}
 
 	/**

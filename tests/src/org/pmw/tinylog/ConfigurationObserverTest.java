@@ -20,6 +20,7 @@ import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -160,7 +161,11 @@ public class ConfigurationObserverTest extends AbstractTest {
 		assertTrue(observer.isDaemon());
 
 		int threadCount = Thread.activeCount();
+		assertNull(ConfigurationObserver.getActiveObserver());
+
 		observer.start();
+
+		assertSame(observer, ConfigurationObserver.getActiveObserver());
 		assertTrue(observer.isAlive());
 		assertEquals(threadCount + 1, Thread.activeCount());
 
@@ -168,6 +173,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 		observer.shutdown();
 		observer.join();
 
+		assertNull(ConfigurationObserver.getActiveObserver());
 		assertFalse(observer.isAlive());
 		assertEquals(threadCount, Thread.activeCount());
 	}
