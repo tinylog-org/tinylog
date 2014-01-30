@@ -16,7 +16,9 @@ package org.pmw.tinylog;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
 
 import java.lang.management.ManagementFactory;
@@ -40,6 +42,24 @@ public class EnvironmentHelperTest extends AbstractTest {
 	@Test
 	public final void testIfValidUtilityClass() {
 		testIfValidUtilityClass(EnvironmentHelper.class);
+	}
+
+	/**
+	 * Test if Android will be detected.
+	 */
+	@Test
+	public final void testIsAndroid() {
+		String runtime = System.getProperty("java.runtime.name");
+		try {
+			System.setProperty("java.runtime.name", "Java(TM) 2 Runtime Environment, Standard Edition");
+			assertFalse(EnvironmentHelper.isAndroid());
+			System.setProperty("java.runtime.name", "Android Runtime");
+			assertTrue(EnvironmentHelper.isAndroid());
+			System.clearProperty("java.runtime.name");
+			assertFalse(EnvironmentHelper.isAndroid());
+		} finally {
+			System.setProperty("java.runtime.name", runtime);
+		}
 	}
 
 	/**
