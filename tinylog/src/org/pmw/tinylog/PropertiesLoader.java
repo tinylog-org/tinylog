@@ -221,13 +221,16 @@ final class PropertiesLoader {
 					if (propertiesSupport != null) {
 						if (writer.equalsIgnoreCase(propertiesSupport.name())) {
 							LoggingWriter loggingWriter = loadAndSetWriter(properties, propertiesSupport.properties(), implementation);
-							if (loggingWriter != null) {
+							if (loggingWriter == null) {
+								InternalLogger.error("Failed to initialize {0} writer", writer);
+							} else {
 								configurator.writer(loggingWriter);
-								break;
 							}
+							return;
 						}
 					}
 				}
+				InternalLogger.error("Cannot find a writer for the name \"{0}\"", writer);
 			}
 		}
 	}
@@ -394,6 +397,7 @@ final class PropertiesLoader {
 				if (definition[i].optional()) {
 					parameters[i] = null;
 				} else {
+					InternalLogger.error("Missing required property \"{0}\"", WRITER_PROPERTY + "." + name);
 					return null;
 				}
 			} else {
@@ -404,7 +408,7 @@ final class PropertiesLoader {
 					try {
 						parameters[i] = Integer.parseInt(value);
 					} catch (NumberFormatException ex) {
-						InternalLogger.warn("\"{1}\" for \"{0}\" is an invalid number and will be ignored", WRITER_PROPERTY + "." + name, value);
+						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
 				} else if (boolean.class.equals(type)) {
@@ -413,7 +417,7 @@ final class PropertiesLoader {
 					} else if ("false".equalsIgnoreCase(value)) {
 						parameters[i] = Boolean.FALSE;
 					} else {
-						InternalLogger.warn("\"{1}\" for \"{0}\" is an invalid boolean and will be ignored", WRITER_PROPERTY + "." + name, value);
+						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
 				} else if (Labeller.class.equals(type)) {
@@ -473,6 +477,7 @@ final class PropertiesLoader {
 			}
 		}
 
+		InternalLogger.error("Cannot find a policy for the name \"{0}\"", name);
 		return null;
 	}
 
@@ -490,6 +495,7 @@ final class PropertiesLoader {
 			}
 		}
 
+		InternalLogger.error("Cannot find a labeller for the name \"{0}\"", name);
 		return null;
 	}
 
