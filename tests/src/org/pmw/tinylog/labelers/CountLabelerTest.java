@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
@@ -32,31 +32,31 @@ import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
- * Tests for count labeller.
+ * Tests for count labeler.
  * 
- * @see CountLabeller
+ * @see CountLabeler
  */
-public class CountLabellerTest extends AbstractLabellerTest {
+public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
-	 * Test labelling for log file with file extension.
+	 * Test labeling for log file with file extension.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithFileExtension() throws IOException {
+	public final void testLabelingWithFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		File backupFile1 = getBackupFile(baseFile, "tmp", "0");
 		File backupFile2 = getBackupFile(baseFile, "tmp", "1");
 		File backupFile3 = getBackupFile(baseFile, "tmp", "2");
 
-		CountLabeller labeller = new CountLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeller.getLogFile(baseFile));
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
-		assertSame(baseFile, labeller.roll(baseFile, 2));
+		assertSame(baseFile, labeler.roll(baseFile, 2));
 		assertFalse(baseFile.exists());
 		assertTrue(backupFile1.exists());
 		assertEquals("1", FileHelper.read(backupFile1));
@@ -64,7 +64,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		assertFalse(backupFile3.exists());
 
 		FileHelper.write(baseFile, "2");
-		assertSame(baseFile, labeller.roll(baseFile, 2));
+		assertSame(baseFile, labeler.roll(baseFile, 2));
 		assertFalse(baseFile.exists());
 		assertTrue(backupFile1.exists());
 		assertEquals("2", FileHelper.read(backupFile1));
@@ -73,7 +73,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		assertFalse(backupFile3.exists());
 
 		FileHelper.write(baseFile, "3");
-		assertSame(baseFile, labeller.roll(baseFile, 2));
+		assertSame(baseFile, labeler.roll(baseFile, 2));
 		assertFalse(baseFile.exists());
 		assertTrue(backupFile1.exists());
 		assertEquals("3", FileHelper.read(backupFile1));
@@ -87,29 +87,29 @@ public class CountLabellerTest extends AbstractLabellerTest {
 	}
 
 	/**
-	 * Test labelling for log file without file extension.
+	 * Test labeling for log file without file extension.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithoutFileExtension() throws IOException {
+	public final void testLabelingWithoutFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile(null);
 		File backupFile1 = getBackupFile(baseFile, null, "0");
 		File backupFile2 = getBackupFile(baseFile, null, "1");
 
-		CountLabeller labeller = new CountLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeller.getLogFile(baseFile));
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
-		assertSame(baseFile, labeller.roll(baseFile, 1));
+		assertSame(baseFile, labeler.roll(baseFile, 1));
 		assertTrue(backupFile1.exists());
 		assertEquals("1", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
 
 		FileHelper.write(baseFile, "2");
-		assertSame(baseFile, labeller.roll(baseFile, 1));
+		assertSame(baseFile, labeler.roll(baseFile, 1));
 		assertTrue(backupFile1.exists());
 		assertEquals("2", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
@@ -118,23 +118,23 @@ public class CountLabellerTest extends AbstractLabellerTest {
 	}
 
 	/**
-	 * Test labelling without storing backups.
+	 * Test labeling without storing backups.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithoutBackups() throws IOException {
+	public final void testLabelingWithoutBackups() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
 
-		CountLabeller labeller = new CountLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeller.getLogFile(baseFile));
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile));
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 
-		assertSame(baseFile, labeller.roll(baseFile, 0));
+		assertSame(baseFile, labeler.roll(baseFile, 0));
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 
@@ -156,11 +156,11 @@ public class CountLabellerTest extends AbstractLabellerTest {
 
 		FileInputStream stream = new FileInputStream(backupFile);
 
-		CountLabeller labeller = new CountLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeller.getLogFile(baseFile));
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile));
 		try {
-			labeller.roll(baseFile, 2);
+			labeler.roll(baseFile, 2);
 			fail("IOException expected: Renaming should fail");
 		} catch (IOException ex) {
 			assertThat(ex.getMessage(), containsString("rename"));
@@ -184,13 +184,13 @@ public class CountLabellerTest extends AbstractLabellerTest {
 
 		FileInputStream stream = new FileInputStream(baseFile);
 
-		CountLabeller labeller = new CountLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeller.getLogFile(baseFile));
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
-		labeller.roll(baseFile, 0);
+		labeler.roll(baseFile, 0);
 		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
 
 		stream.close();

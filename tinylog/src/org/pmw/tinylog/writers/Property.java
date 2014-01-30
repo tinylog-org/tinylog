@@ -36,7 +36,7 @@ public @interface Property {
 	 * <li><code>String.class</code></li>
 	 * <li><code>int.class</code></li>
 	 * <li><code>boolean.class</code></li>
-	 * <li><code>Labeller.class</code></li>
+	 * <li><code>Labeler.class</code></li>
 	 * <li><code>Policy.class</code></li>
 	 * <li><code>Policy[].class</code></li>
 	 * </ul>

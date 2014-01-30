@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.pmw.tinylog.InternalLogger;
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
  */
 @PropertiesSupport(name = "count")
-public final class CountLabeller implements Labeller {
+public final class CountLabeler implements Labeler {
 
 	private String filenameWithoutExtension;
 	private String filenameExtension;

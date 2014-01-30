@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.pmw.tinylog.labellers.Labeller;
+import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.writers.LoggingWriter;
 
@@ -420,12 +420,12 @@ final class PropertiesLoader {
 						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
-				} else if (Labeller.class.equals(type)) {
-					Object labeller = parseLabeller(value);
-					if (labeller == null) {
+				} else if (Labeler.class.equals(type)) {
+					Object labeler = parseLabeler(value);
+					if (labeler == null) {
 						return null;
 					} else {
-						parameters[i] = labeller;
+						parameters[i] = labeler;
 					}
 				} else if (Policy.class.equals(type)) {
 					Object policy = parsePolicy(value);
@@ -481,21 +481,21 @@ final class PropertiesLoader {
 		return null;
 	}
 
-	private static Labeller parseLabeller(final String string) {
+	private static Labeler parseLabeler(final String string) {
 		int separator = string.indexOf(':');
 		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
 		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
 
-		for (Class<?> implementation : findImplementations(Labeller.class)) {
-			org.pmw.tinylog.labellers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labellers.PropertiesSupport.class);
+		for (Class<?> implementation : findImplementations(Labeler.class)) {
+			org.pmw.tinylog.labelers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labelers.PropertiesSupport.class);
 			if (propertiesSupport != null) {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
-					return (Labeller) createInstance(implementation, parameter);
+					return (Labeler) createInstance(implementation, parameter);
 				}
 			}
 		}
 
-		InternalLogger.error("Cannot find a labeller for the name \"{0}\"", name);
+		InternalLogger.error("Cannot find a labeler for the name \"{0}\"", name);
 		return null;
 	}
 

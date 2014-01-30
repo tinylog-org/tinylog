@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -28,7 +28,7 @@ import org.pmw.tinylog.InternalLogger;
  * Adds a timestamp to the real log file and the backups.
  */
 @PropertiesSupport(name = "timestamp")
-public final class TimestampLabeller implements Labeller {
+public final class TimestampLabeler implements Labeler {
 
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
@@ -44,7 +44,7 @@ public final class TimestampLabeller implements Labeller {
 	/**
 	 * Use the default timestamp: yyyy-MM-dd HH-mm-ss.
 	 */
-	public TimestampLabeller() {
+	public TimestampLabeler() {
 		this(DEFAULT_TIMESTAMP_FORMAT);
 	}
 
@@ -54,7 +54,7 @@ public final class TimestampLabeller implements Labeller {
 	 * @param timestampFormat
 	 *            Timestamp pattern for formatting the time-based identify
 	 */
-	public TimestampLabeller(final String timestampFormat) {
+	public TimestampLabeler(final String timestampFormat) {
 		this.timestampFormat = timestampFormat;
 	}
 

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.junit.Test;
-import org.pmw.tinylog.labellers.TimestampLabeller;
+import org.pmw.tinylog.labelers.TimestampLabeler;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.ConfigurationCreator;
@@ -132,43 +132,43 @@ public class RegressionsTest extends AbstractTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testTimestampLabellerAtStartup() throws Exception {
+	public final void testTimestampLabelerAtStartup() throws Exception {
 		Configurator.defaultConfig().locale(null).activate();
-		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeller()); // Failed
+		new RollingFileWriter(FileHelper.createTemporaryFile("txt").getName(), 0, new TimestampLabeler()); // Failed
 	}
 
 	/**
-	 * Bug: Rolling fails for files without a parent path in timestamp labeller.
+	 * Bug: Rolling fails for files without a parent path in timestamp labeler.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testTimestampLabellerRolling() throws IOException {
+	public final void testTimestampLabelerRolling() throws IOException {
 		File file = FileHelper.createTemporaryFileInWorkspace("log");
 		file = new File(file.getName());
 		assertTrue(file.exists());
 
-		TimestampLabeller labeller = new TimestampLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		file = labeller.getLogFile(file);
-		labeller.roll(file, 10); // Failed
+		TimestampLabeler labeler = new TimestampLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		file = labeler.getLogFile(file);
+		labeler.roll(file, 10); // Failed
 
 		file.delete();
 	}
 
 	/**
-	 * Bug: Initialization of a rolling file writer with a timestamp labeller fails if there is no previous
+	 * Bug: Initialization of a rolling file writer with a timestamp labeler fails if there is no previous
 	 * configuration.
 	 * 
 	 * @throws Exception
 	 *             Test failed
 	 */
 	@Test
-	public final void testTimestampLabellerWithoutPreviousLocale() throws Exception {
+	public final void testTimestampLabelerWithoutPreviousLocale() throws Exception {
 		resetLogger();
 		File file = FileHelper.createTemporaryFile("log");
-		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new TimestampLabeller(), new StartupPolicy());
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, new TimestampLabeler(), new StartupPolicy());
 		Configurator.defaultConfig().writer(writer).activate(); // Failed
 		writer.close();
 		file.delete();

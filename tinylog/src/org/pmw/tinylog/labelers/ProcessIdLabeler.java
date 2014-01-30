@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,14 @@ import org.pmw.tinylog.InternalLogger;
  * Add the process ID (PID) to log files.
  */
 @PropertiesSupport(name = "pid")
-public final class ProcessIdLabeller implements Labeller {
+public final class ProcessIdLabeler implements Labeler {
 
 	private final String pid;
 	private LogFileFilter logFileFilter;
 
 	/**
 	 */
-	public ProcessIdLabeller() {
+	public ProcessIdLabeler() {
 		pid = EnvironmentHelper.getProcessId().toString();
 	}
 

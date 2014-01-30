@@ -11,18 +11,18 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.io.File;
 
 import org.pmw.tinylog.AbstractTest;
 
 /**
- * Abstract test class for labellers.
+ * Abstract test class for labelers.
  * 
- * @see Labeller
+ * @see Labeler
  */
-public class AbstractLabellerTest extends AbstractTest {
+public class AbstractLabelerTest extends AbstractTest {
 
 	/**
 	 * Generate a backup file for a given log file.

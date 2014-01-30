@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
-import org.pmw.tinylog.labellers.CountLabeller;
-import org.pmw.tinylog.labellers.Labeller;
+import org.pmw.tinylog.labelers.CountLabeler;
+import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
 
@@ -35,7 +35,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
  * logging files.
  */
 @PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
-		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "label", type = Labeller.class, optional = true),
+		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "label", type = Labeler.class, optional = true),
 		@Property(name = "policies", type = Policy[].class, optional = true) })
 public final class RollingFileWriter implements LoggingWriter {
 
@@ -44,7 +44,7 @@ public final class RollingFileWriter implements LoggingWriter {
 	private final String filename;
 	private final int backups;
 	private final boolean buffered;
-	private final Labeller labeller;
+	private final Labeler labeler;
 	private final List<? extends Policy> policies;
 
 	private final Object mutex;
@@ -88,13 +88,13 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
-	 * @param labeller
-	 *            Labeller for naming backups
+	 * @param labeler
+	 *            Labeler for naming backups
 	 * 
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
-	public RollingFileWriter(final String filename, final int backups, final Labeller labeller) {
-		this(filename, backups, false, labeller, (Policy[]) null);
+	public RollingFileWriter(final String filename, final int backups, final Labeler labeler) {
+		this(filename, backups, false, labeler, (Policy[]) null);
 	}
 
 	/**
@@ -106,13 +106,13 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Number of backups
 	 * @param buffered
 	 *            Buffered writing
-	 * @param labeller
-	 *            Labeller for naming backups
+	 * @param labeler
+	 *            Labeler for naming backups
 	 * 
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
-	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeller labeller) {
-		this(filename, backups, buffered, labeller, (Policy[]) null);
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler) {
+		this(filename, backups, buffered, labeler, (Policy[]) null);
 	}
 
 	/**
@@ -146,13 +146,13 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
-	 * @param labeller
-	 *            Labeller for naming backups
+	 * @param labeler
+	 *            Labeler for naming backups
 	 * @param policies
 	 *            Rollover strategies
 	 */
-	public RollingFileWriter(final String filename, final int backups, final Labeller labeller, final Policy... policies) {
-		this(filename, backups, false, labeller, policies);
+	public RollingFileWriter(final String filename, final int backups, final Labeler labeler, final Policy... policies) {
+		this(filename, backups, false, labeler, policies);
 	}
 
 	/**
@@ -162,17 +162,17 @@ public final class RollingFileWriter implements LoggingWriter {
 	 *            Number of backups
 	 * @param buffered
 	 *            Buffered writing
-	 * @param labeller
-	 *            Labeller for naming backups
+	 * @param labeler
+	 *            Labeler for naming backups
 	 * @param policies
 	 *            Rollover strategies
 	 */
-	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeller labeller, final Policy... policies) {
+	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler, final Policy... policies) {
 		this.mutex = new Object();
 		this.filename = filename;
 		this.backups = Math.max(0, backups);
 		this.buffered = buffered;
-		this.labeller = labeller == null ? new CountLabeller() : labeller;
+		this.labeler = labeler == null ? new CountLabeler() : labeler;
 		this.policies = policies == null || policies.length == 0 ? Arrays.asList(new StartupPolicy()) : Arrays.asList(policies);
 	}
 
@@ -211,12 +211,12 @@ public final class RollingFileWriter implements LoggingWriter {
 	}
 
 	/**
-	 * Get the labeller for naming backups.
+	 * Get the labeler for naming backups.
 	 * 
-	 * @return Labeller for naming backups
+	 * @return Labeler for naming backups
 	 */
-	public Labeller getLabeller() {
-		return labeller;
+	public Labeler getLabeler() {
+		return labeler;
 	}
 
 	/**
@@ -230,8 +230,8 @@ public final class RollingFileWriter implements LoggingWriter {
 
 	@Override
 	public void init(final Configuration configuration) throws IOException {
-		labeller.init(configuration);
-		file = labeller.getLogFile(new File(filename));
+		labeler.init(configuration);
+		file = labeler.getLogFile(new File(filename));
 		initCheckPolicies();
 		if (buffered) {
 			stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
@@ -246,7 +246,7 @@ public final class RollingFileWriter implements LoggingWriter {
 		synchronized (mutex) {
 			if (!checkPolicies(logEntry.getRenderedLogEntry())) {
 				stream.close();
-				file = labeller.roll(file, backups);
+				file = labeler.roll(file, backups);
 				if (buffered) {
 					stream = new BufferedOutputStream(new FileOutputStream(file), BUFFER_SIZE);
 				} else {
@@ -275,7 +275,7 @@ public final class RollingFileWriter implements LoggingWriter {
 		for (Policy policy : policies) {
 			if (!policy.initCheck(file)) {
 				resetPolicies();
-				file = labeller.roll(file, backups);
+				file = labeler.roll(file, backups);
 				return;
 			}
 		}

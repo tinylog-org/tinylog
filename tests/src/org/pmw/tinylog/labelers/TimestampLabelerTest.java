@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
@@ -37,11 +37,11 @@ import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
- * Tests for timestamp labeller.
+ * Tests for timestamp labeler.
  * 
- * @see TimestampLabeller
+ * @see TimestampLabeler
  */
-public class TimestampLabellerTest extends AbstractLabellerTest {
+public class TimestampLabelerTest extends AbstractLabelerTest {
 
 	private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
@@ -66,29 +66,29 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 	}
 
 	/**
-	 * Test labelling for log file with file extension.
+	 * Test labeling for log file with file extension.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithFileExtension() throws IOException {
+	public final void testLabelingWithFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.delete();
 
 		systemTimeMock.setCurrentTimeMillis(0L);
 		File targetFile1 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		TimestampLabeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeller.getLogFile(baseFile));
+		TimestampLabeler labeler = new TimestampLabeler(TIMESTAMP_FORMAT);
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertEquals(targetFile1, labeler.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
 		systemTimeMock.setCurrentTimeMillis(1000L);
 		File targetFile2 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile2, labeller.roll(targetFile1, 2));
+		assertEquals(targetFile2, labeler.roll(targetFile1, 2));
 		targetFile2.createNewFile();
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -97,7 +97,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		systemTimeMock.setCurrentTimeMillis(2000L);
 		File targetFile3 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile3, labeller.roll(targetFile2, 2));
+		assertEquals(targetFile3, labeler.roll(targetFile2, 2));
 		targetFile3.createNewFile();
 		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -107,7 +107,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		systemTimeMock.setCurrentTimeMillis(3000L);
 		File targetFile4 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile4, labeller.roll(targetFile3, 2));
+		assertEquals(targetFile4, labeler.roll(targetFile3, 2));
 		targetFile4.createNewFile();
 		targetFile4.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
@@ -123,29 +123,29 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 	}
 
 	/**
-	 * Test labelling for log file without file extension.
+	 * Test labeling for log file without file extension.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithoutFileExtension() throws IOException {
+	public final void testLabelingWithoutFileExtension() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile(null);
 		baseFile.delete();
 
 		systemTimeMock.setCurrentTimeMillis(0L);
 		File targetFile1 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		TimestampLabeller labeller = new TimestampLabeller(TIMESTAMP_FORMAT);
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeller.getLogFile(baseFile));
+		TimestampLabeler labeler = new TimestampLabeler(TIMESTAMP_FORMAT);
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertEquals(targetFile1, labeler.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
 		systemTimeMock.setCurrentTimeMillis(1000L);
 		File targetFile2 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		assertEquals(targetFile2, labeller.roll(targetFile1, 1));
+		assertEquals(targetFile2, labeler.roll(targetFile1, 1));
 		targetFile2.createNewFile();
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -154,7 +154,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		systemTimeMock.setCurrentTimeMillis(2000L);
 		File targetFile3 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		assertEquals(targetFile3, labeller.roll(targetFile2, 1));
+		assertEquals(targetFile3, labeler.roll(targetFile2, 1));
 		targetFile3.createNewFile();
 		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
@@ -168,13 +168,13 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 	}
 
 	/**
-	 * Test labelling without storing backups.
+	 * Test labeling without storing backups.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testLabellingWithoutBackups() throws IOException {
+	public final void testLabelingWithoutBackups() throws IOException {
 		File baseFile = File.createTempFile("test", ".tmp");
 		baseFile.delete();
 
@@ -182,9 +182,9 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		File targetFile1 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 		targetFile1.deleteOnExit();
 
-		TimestampLabeller labeller = new TimestampLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeller.getLogFile(baseFile));
+		TimestampLabeler labeler = new TimestampLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertEquals(targetFile1, labeler.getLogFile(baseFile));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
@@ -193,7 +193,7 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 
 		assertTrue(targetFile1.exists());
-		assertEquals(targetFile2, labeller.roll(targetFile1, 0));
+		assertEquals(targetFile2, labeler.roll(targetFile1, 0));
 		assertFalse(targetFile1.exists());
 
 		baseFile.delete();
@@ -215,13 +215,13 @@ public class TimestampLabellerTest extends AbstractLabellerTest {
 		backupFile.createNewFile();
 		FileInputStream stream = new FileInputStream(backupFile);
 
-		TimestampLabeller labeller = new TimestampLabeller();
-		labeller.init(ConfigurationCreator.getDummyConfiguration());
-		File currentFile = labeller.getLogFile(baseFile);
+		TimestampLabeler labeler = new TimestampLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		File currentFile = labeler.getLogFile(baseFile);
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
-		labeller.roll(currentFile, 0);
+		labeler.roll(currentFile, 0);
 		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
 
 		stream.close();

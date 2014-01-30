@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,14 +19,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation makes a {@link org.pmw.tinylog.labellers.Labeller Labeller} configurable by properties.
+ * This annotation makes a {@link org.pmw.tinylog.labelers.Labeler Labeler} configurable by properties.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertiesSupport {
 
 	/**
-	 * Name of the labeller for the properties.
+	 * Name of the labeler for the properties.
 	 */
 	String name();
 

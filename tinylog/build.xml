@@ -150,7 +150,7 @@
 				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
 				<attribute name="Bundle-Version" value="${version}" />
 				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.pmw.tinylog;version=${version}, org.pmw.tinylog.labellers;version=${version}, org.pmw.tinylog.policies;version=${version}, org.pmw.tinylog.writers;version=${version}" />
+				<attribute name="Export-Package" value="org.pmw.tinylog;version=${version}, org.pmw.tinylog.labelers;version=${version}, org.pmw.tinylog.policies;version=${version}, org.pmw.tinylog.writers;version=${version}" />
 			</manifest>
 			<zipfileset dir="${tinylog.bin}" />
 		</jar>

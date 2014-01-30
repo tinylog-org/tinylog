@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.labellers;
+package org.pmw.tinylog.labelers;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +19,12 @@ import java.io.IOException;
 import org.pmw.tinylog.Configuration;
 
 /**
- * A labeller names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
+ * A labeler names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
  * 
  * <p>
- * The annotation {@link org.pmw.tinylog.labellers.PropertiesSupport PropertiesSupport} must be added to the implemented
- * labeller class and the implemented labeller must be registered as service in
- * "META-INF/services/org.pmw.tinylog.labellers" in order to make the labeller available by properties files and system
+ * The annotation {@link org.pmw.tinylog.labelers.PropertiesSupport PropertiesSupport} must be added to the implemented
+ * labeler class and the implemented labeler must be registered as service in
+ * "META-INF/services/org.pmw.tinylog.labelers" in order to make the labeler available by properties files and system
  * properties.
  * </p>
  * 
@@ -32,19 +32,19 @@ import org.pmw.tinylog.Configuration;
  * Example:<br />
  * <code>
  * {@literal @}PropertiesSupport(name = "count")<br />
- * public final class CountLabeller implements Labeller {
+ * public final class CountLabeler implements Labeler {
  * </code>
  * </p>
  * 
  * <p>
- * A labeller must have a default constructor without any parameters. Optionally it can have an additional constructor
- * with a string parameter if the labeller supports parameters.
+ * A labeler must have a default constructor without any parameters. Optionally it can have an additional constructor
+ * with a string parameter if the labeler supports parameters.
  * </p>
  */
-public interface Labeller {
+public interface Labeler {
 
 	/**
-	 * Initialize the labeller.
+	 * Initialize the labeler.
 	 * 
 	 * @param configuration
 	 *            Configuration of logger

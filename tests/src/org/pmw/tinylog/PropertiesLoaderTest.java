@@ -32,10 +32,10 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.pmw.tinylog.labellers.CountLabeller;
-import org.pmw.tinylog.labellers.Labeller;
-import org.pmw.tinylog.labellers.ProcessIdLabeller;
-import org.pmw.tinylog.labellers.TimestampLabeller;
+import org.pmw.tinylog.labelers.CountLabeler;
+import org.pmw.tinylog.labelers.Labeler;
+import org.pmw.tinylog.labelers.ProcessIdLabeler;
+import org.pmw.tinylog.labelers.TimestampLabeler;
 import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
@@ -332,9 +332,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(1, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		Labeller labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(CountLabeller.class, labeller.getClass());
+		Labeler labeler = rollingFileWriter.getLabeler();
+		assertNotNull(labeler);
+		assertEquals(CountLabeler.class, labeler.getClass());
 		List<? extends Policy> policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(1, policies.size());
@@ -348,11 +348,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(2, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		labeller.init(configuration);
-		assertEquals(ProcessIdLabeller.class, labeller.getClass());
-		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log")).getAbsoluteFile());
+		labeler = rollingFileWriter.getLabeler();
+		assertNotNull(labeler);
+		labeler.init(configuration);
+		assertEquals(ProcessIdLabeler.class, labeler.getClass());
+		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeler.getLogFile(new File("my.log")).getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(1, policies.size());
@@ -367,11 +367,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(3, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(TimestampLabeller.class, labeller.getClass());
-		labeller.init(configuration);
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeller.getLogFile(new File("my.log"))
+		labeler = rollingFileWriter.getLabeler();
+		assertNotNull(labeler);
+		assertEquals(TimestampLabeler.class, labeler.getClass());
+		labeler.init(configuration);
+		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeler.getLogFile(new File("my.log"))
 				.getAbsoluteFile());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
@@ -389,9 +389,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(4, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeller = rollingFileWriter.getLabeller();
-		assertNotNull(labeller);
-		assertEquals(TimestampLabeller.class, labeller.getClass());
+		labeler = rollingFileWriter.getLabeler();
+		assertNotNull(labeler);
+		assertEquals(TimestampLabeler.class, labeler.getClass());
 		policies = rollingFileWriter.getPolicies();
 		assertNotNull(policies);
 		assertEquals(2, policies.size());
