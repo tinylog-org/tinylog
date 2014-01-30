@@ -40,7 +40,7 @@ public final class Logger {
 
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
-	private static volatile Configuration configuration;
+	private static volatile Configuration configuration = Configurator.defaultConfig().create();
 
 	private static Method stackTraceMethod;
 	private static boolean hasSunReflection;
