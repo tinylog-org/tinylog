@@ -52,8 +52,8 @@ public class ConsoleWriterTest extends AbstractTest {
 			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
-			assertFalse(getSystemOutputStream().hasLines());
-			assertEquals("Hello", getSystemErrorStream().nextLine());
+			assertFalse(getOutputStream().hasLines());
+			assertEquals("Hello", getErrorStream().nextLine());
 
 			writer.close();
 		}
@@ -69,8 +69,8 @@ public class ConsoleWriterTest extends AbstractTest {
 			writer.init(null);
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
-			assertEquals("Hello", getSystemOutputStream().nextLine());
-			assertFalse(getSystemErrorStream().hasLines());
+			assertEquals("Hello", getOutputStream().nextLine());
+			assertFalse(getErrorStream().hasLines());
 
 			writer.close();
 		}

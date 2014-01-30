@@ -188,7 +188,7 @@ public class CountLabellerTest extends AbstractLabellerTest {
 		labeller.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeller.getLogFile(baseFile));
 
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		labeller.roll(baseFile, 0);
 		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));

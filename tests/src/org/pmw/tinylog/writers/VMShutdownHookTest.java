@@ -126,7 +126,7 @@ public class VMShutdownHookTest extends AbstractTest {
 		VMShutdownHook.register(writer2);
 
 		runtimeMock.threads.get(0).run();
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("Shutdown failed")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("Shutdown failed")));
 		assertEquals(1, writer1.closeCalls);
 		assertEquals(1, writer2.closeCalls);
 	}

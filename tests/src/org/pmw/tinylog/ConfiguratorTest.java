@@ -228,7 +228,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		try {
 			Configurator.init();
-			String line = getSystemErrorStream().nextLine();
+			String line = getErrorStream().nextLine();
 			assertThat(line, allOf(containsString("ERROR"), containsString(FileNotFoundException.class.getName()), containsString("invalid.properties")));
 		} finally {
 			System.clearProperty("tinylog.configuration");
@@ -257,7 +257,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		try {
 			Configurator.init();
-			String line = getSystemErrorStream().nextLine();
+			String line = getErrorStream().nextLine();
 			assertThat(line, allOf(containsString("ERROR"), containsString(IOException.class.getName()), containsString(file.getName())));
 		} finally {
 			System.clearProperty("tinylog.configuration");
@@ -403,7 +403,7 @@ public class ConfiguratorTest extends AbstractTest {
 		configuration = Configurator.defaultConfig().writer(null).create();
 		assertEquals(null, configuration.getWriter());
 
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		assertFalse(Configurator.defaultConfig().writer(new EvilWriter()).activate());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
@@ -451,7 +451,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(threadCount, Thread.activeCount());
 
 		configurator = Configurator.defaultConfig().writingThread("!!! NONEXISTING THREAD !!!");
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		configuration = configurator.create();
 		assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("thread"), containsString("!!! NONEXISTING THREAD !!!")));

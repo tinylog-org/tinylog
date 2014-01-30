@@ -42,7 +42,7 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testWarnings() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		InternalLogger.warn("Hello World!");
 		String nextLine = errorStream.nextLine();
@@ -90,7 +90,7 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRepeatingWarnings() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		InternalLogger.warn("Hello World!");
 		String nextLine = errorStream.nextLine();
@@ -116,7 +116,7 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testError() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		InternalLogger.error("Hello World!");
 		String nextLine = errorStream.nextLine();
@@ -164,7 +164,7 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRepeatingErrors() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		InternalLogger.error("Hello World!");
 		String nextLine = errorStream.nextLine();

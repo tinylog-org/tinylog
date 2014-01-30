@@ -61,7 +61,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLevel() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.level", "TRACE"));
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
@@ -80,7 +80,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testCustomLevels() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		PropertiesBuilder builder = new PropertiesBuilder().set("tinylog.level", "INFO");
 
 		Configuration configuration = load(builder.set("tinylog.level@a.b", "WARNING"));
@@ -136,7 +136,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testStackTrace() {
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.stacktrace", "0"));
 		assertEquals(0, configuration.getMaxStackTraceElements());
@@ -189,8 +189,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "file"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
 
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath()));
 		assertNotNull(configuration.getWriter());
@@ -221,8 +221,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
 
 		configuration = load(new PropertiesBuilder().set("tinylog.writer", "sharedfile").set("tinylog.writer.filename", file.getAbsolutePath()));
 		assertNotNull(configuration.getWriter());
@@ -266,7 +266,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "invalid"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("invalid")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("invalid")));
 	}
 
 	/**
@@ -306,8 +306,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		Configuration configuration = load(new PropertiesBuilder().set("tinylog.writer", "rollingfile"));
 		assertNotNull(configuration.getWriter());
 		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
 
 		PropertiesBuilder defaultProperties = new PropertiesBuilder().set("tinylog.writer", "rollingfile").set("tinylog.writer.filename",
 				file.getAbsolutePath());
@@ -321,8 +321,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		configuration = load(properties);
 		assertNotNull(configuration.getWriter());
 		assertEquals(ConsoleWriter.class, configuration.getWriter().getClass());
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
 
 		properties = defaultProperties.copy().set("tinylog.writer.backups", "1");
 		configuration = load(properties);

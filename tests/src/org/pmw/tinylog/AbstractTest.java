@@ -70,7 +70,7 @@ public abstract class AbstractTest {
 	 * 
 	 * @return Result stream of {@link System#out}
 	 */
-	public final StringListOutputStream getSystemOutputStream() {
+	public final StringListOutputStream getOutputStream() {
 		return systemOutputStream;
 	}
 
@@ -79,7 +79,7 @@ public abstract class AbstractTest {
 	 * 
 	 * @return Result stream of {@link System#err}
 	 */
-	public final StringListOutputStream getSystemErrorStream() {
+	public final StringListOutputStream getErrorStream() {
 		return systemErrorStream;
 	}
 

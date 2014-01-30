@@ -534,7 +534,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 		observer.join();
 
 		Configuration currentConfiguration = Logger.getConfiguration().create();
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("open"), containsString(".properties")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("open"), containsString(".properties")));
 		assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 		assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 		assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
@@ -572,7 +572,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			observer.join();
 
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("read"), containsString(IOException.class.getName())));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("read"), containsString(IOException.class.getName())));
 			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());

@@ -96,7 +96,7 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertThat(getSystemErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
 	}
 
 	/**

@@ -425,7 +425,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
@@ -519,7 +519,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("com.test", null).activate();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
@@ -611,7 +611,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level(LoggerTest.class.getPackage(), null).activate();
 
-		StringListOutputStream errorStream = getSystemErrorStream();
+		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		Logger.info("Hello {0}!", new EvilObject());
 		assertNull(writer.consumeLogEntry());
