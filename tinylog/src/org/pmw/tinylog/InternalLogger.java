@@ -22,8 +22,8 @@ import java.text.MessageFormat;
  */
 public final class InternalLogger {
 
-	private static final String PREFIX_WARNING = "LOGGING WARNING: ";
-	private static final String PREFIX_ERROR = "LOGGING ERROR: ";
+	private static final String PREFIX_WARNING = "LOGGER WARNING: ";
+	private static final String PREFIX_ERROR = "LOGGER ERROR: ";
 
 	private static volatile String lastLogEntry = null;
 
