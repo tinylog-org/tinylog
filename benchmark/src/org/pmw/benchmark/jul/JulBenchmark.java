@@ -37,16 +37,6 @@ public class JulBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void log(final int index) {
-		logger.log(Level.FINE, "Trace: {0}, PI: {1}", new Object[] { index, Math.PI });
-		logger.log(Level.CONFIG, "Debug: {0}, PI: {1}", new Object[] { index, Math.PI });
-		logger.log(Level.INFO, "Info: {0}, PI: {1}", new Object[] { index, Math.PI });
-		logger.log(Level.WARNING, "Warning: {0}, PI: {1}", new Object[] { index, Math.PI });
-		logger.log(Level.SEVERE, "Error: {0}, PI: {1}", new Object[] { index, Math.PI });
-
-	}
-
-	@Override
 	public void init(final File file) throws Exception {
 		logger = Logger.getAnonymousLogger();
 		handler = new FileHandler(file.getAbsolutePath());
@@ -54,6 +44,31 @@ public class JulBenchmark implements IBenchmark {
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
 		logger.setLevel(Level.INFO);
+	}
+
+	@Override
+	public void trace(final int index) {
+		logger.log(Level.FINE, "Trace: {0}, PI: {1}", new Object[] { index, Math.PI });
+	}
+
+	@Override
+	public void debug(final int index) {
+		logger.log(Level.CONFIG, "Debug: {0}, PI: {1}", new Object[] { index, Math.PI });
+	}
+
+	@Override
+	public void info(final int index) {
+		logger.log(Level.INFO, "Info: {0}, PI: {1}", new Object[] { index, Math.PI });
+	}
+
+	@Override
+	public void warning(final int index) {
+		logger.log(Level.WARNING, "Warning: {0}, PI: {1}", new Object[] { index, Math.PI });
+	}
+
+	@Override
+	public void error(final int index) {
+		logger.log(Level.SEVERE, "Error: {0}, PI: {1}", new Object[] { index, Math.PI });
 	}
 
 	@Override

@@ -35,21 +35,37 @@ public class Log4jBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void log(final int index) {
-		logger.trace(MessageFormat.format("Trace: {0}, PI: {1}", index, Math.PI));
-		logger.debug(MessageFormat.format("Debug: {0}, PI: {1}", index, Math.PI));
-		logger.info(MessageFormat.format("Info: {0}, PI: {1}", index, Math.PI));
-		logger.warn(MessageFormat.format("Warning: {0}, PI: {1}", index, Math.PI));
-		logger.error(MessageFormat.format("Error: {0}, PI: {1}", index, Math.PI));
-	}
-
-	@Override
 	public void init(final File file) throws Exception {
 		logger = Logger.getRootLogger();
 		logger.removeAllAppenders();
 		appender = createAppender(file);
 		logger.addAppender(appender);
 		logger.setLevel(Level.INFO);
+	}
+
+	@Override
+	public void trace(final int index) {
+		logger.trace(MessageFormat.format("Trace: {0}, PI: {1}", index, Math.PI));
+	}
+
+	@Override
+	public void debug(final int index) {
+		logger.debug(MessageFormat.format("Debug: {0}, PI: {1}", index, Math.PI));
+	}
+
+	@Override
+	public void info(final int index) {
+		logger.info(MessageFormat.format("Info: {0}, PI: {1}", index, Math.PI));
+	}
+
+	@Override
+	public void warning(final int index) {
+		logger.warn(MessageFormat.format("Warning: {0}, PI: {1}", index, Math.PI));
+	}
+
+	@Override
+	public void error(final int index) {
+		logger.error(MessageFormat.format("Error: {0}, PI: {1}", index, Math.PI));
 	}
 
 	@Override

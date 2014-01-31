@@ -31,19 +31,35 @@ public class TinylogBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void log(final int index) {
-		Logger.trace("Trace: {0}, PI: {1}", index, Math.PI);
-		Logger.debug("Debug: {0}, PI: {1}", index, Math.PI);
-		Logger.info("Info: {0}, PI: {1}", index, Math.PI);
-		Logger.warn("Warning: {0}, PI: {1}", index, Math.PI);
-		Logger.error("Error: {0}, PI: {1}", index, Math.PI);
-	}
-
-	@Override
 	public void init(final File file) throws Exception {
 		writer = new FileWriter(file.getAbsolutePath());
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
 				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}").activate();
+	}
+
+	@Override
+	public void trace(final int index) {
+		Logger.trace("Trace: {0}, PI: {1}", index, Math.PI);
+	}
+
+	@Override
+	public void debug(final int index) {
+		Logger.debug("Debug: {0}, PI: {1}", index, Math.PI);
+	}
+
+	@Override
+	public void info(final int index) {
+		Logger.info("Info: {0}, PI: {1}", index, Math.PI);
+	}
+
+	@Override
+	public void warning(final int index) {
+		Logger.warn("Warning: {0}, PI: {1}", index, Math.PI);
+	}
+
+	@Override
+	public void error(final int index) {
+		Logger.error("Error: {0}, PI: {1}", index, Math.PI);
 	}
 
 	@Override

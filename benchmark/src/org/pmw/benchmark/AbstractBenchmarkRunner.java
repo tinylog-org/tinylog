@@ -68,13 +68,27 @@ public abstract class AbstractBenchmarkRunner {
 			reader.close();
 		}
 
-		long expected = BENCHMARK_ITERATIONS * countLogEntries() * 3L / 5L; // three of five log entries will be written
+		long expected = BENCHMARK_ITERATIONS * countLogEntries();
 		if (lines != expected) {
 			System.err.println(MessageFormat.format(ERROR_MESSAGE, lines, expected));
 		}
 
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
 			files[i].delete();
+		}
+	}
+
+	protected static IBenchmark createBenchmark(final String[] arguments) {
+		if (arguments.length == 0) {
+			System.out.println("Require name of benchmark class as first argument");
+			return null;
+		}
+
+		try {
+			return (IBenchmark) Class.forName(arguments[0]).newInstance();
+		} catch (ReflectiveOperationException ex) {
+			ex.printStackTrace();
+			return null;
 		}
 	}
 

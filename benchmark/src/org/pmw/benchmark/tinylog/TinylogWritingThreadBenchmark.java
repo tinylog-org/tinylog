@@ -11,14 +11,29 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.log4j;
+package org.pmw.benchmark.tinylog;
 
-import org.pmw.benchmark.SingleThreadBenchmarkRunner;
+import java.io.File;
 
-public class Log4jSingleThreadBenchmarkApplication {
+import org.pmw.tinylog.Configurator;
 
-	public static void main(final String[] args) throws Exception {
-		new SingleThreadBenchmarkRunner(new Log4jBenchmark()).start();
+public class TinylogWritingThreadBenchmark extends TinylogBenchmark {
+
+	@Override
+	public String getName() {
+		return "tinylog with writing thread";
+	}
+
+	@Override
+	public void init(final File file) throws Exception {
+		super.init(file);
+		Configurator.currentConfig().writingThread(true).activate();
+	}
+
+	@Override
+	public void dispose() throws Exception {
+		Configurator.shutdownWritingThread(true);
+		super.dispose();
 	}
 
 }

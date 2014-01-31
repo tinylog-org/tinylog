@@ -35,15 +35,6 @@ public class Log4j2Benchmark implements IBenchmark {
 	}
 
 	@Override
-	public void log(final int index) {
-		logger.trace("Trace: {}, PI: {}", index, Math.PI);
-		logger.debug("Debug: {}, PI: {}", index, Math.PI);
-		logger.info("Info: {}, PI: {}", index, Math.PI);
-		logger.warn("Warning: {}, PI: {}", index, Math.PI);
-		logger.error("Error: {}, PI: {}", index, Math.PI);
-	}
-
-	@Override
 	public void init(final File file) throws Exception {
 		logger = createLogger();
 		Configuration configuration = logger.getContext().getConfiguration();
@@ -55,6 +46,31 @@ public class Log4j2Benchmark implements IBenchmark {
 		logger.addAppender(appender);
 
 		logger.setLevel(Level.INFO);
+	}
+
+	@Override
+	public void trace(final int index) {
+		logger.trace("Trace: {}, PI: {}", index, Math.PI);
+	}
+
+	@Override
+	public void debug(final int index) {
+		logger.debug("Debug: {}, PI: {}", index, Math.PI);
+	}
+
+	@Override
+	public void info(final int index) {
+		logger.info("Info: {}, PI: {}", index, Math.PI);
+	}
+
+	@Override
+	public void warning(final int index) {
+		logger.warn("Warning: {}, PI: {}", index, Math.PI);
+	}
+
+	@Override
+	public void error(final int index) {
+		logger.error("Error: {}, PI: {}", index, Math.PI);
 	}
 
 	@Override

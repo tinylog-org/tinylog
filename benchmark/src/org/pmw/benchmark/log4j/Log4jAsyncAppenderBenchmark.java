@@ -11,14 +11,26 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.log4j2;
+package org.pmw.benchmark.log4j;
 
-import org.pmw.benchmark.MultiThreadBenchmarkRunner;
+import java.io.File;
+import java.io.IOException;
 
-public class Log4j2WithAsyncLoggerMultiThreadBenchmarkApplication {
+import org.apache.log4j.Appender;
+import org.apache.log4j.AsyncAppender;
 
-	public static void main(final String[] args) throws Exception {
-		new MultiThreadBenchmarkRunner(new Log4j2WithAsyncLoggerBenchmark()).start();
+public class Log4jAsyncAppenderBenchmark extends Log4jBenchmark {
+
+	@Override
+	public String getName() {
+		return "log4j with async appender";
+	}
+
+	@Override
+	protected Appender createAppender(final File file) throws IOException {
+		AsyncAppender appender = new AsyncAppender();
+		appender.addAppender(super.createAppender(file));
+		return appender;
 	}
 
 }

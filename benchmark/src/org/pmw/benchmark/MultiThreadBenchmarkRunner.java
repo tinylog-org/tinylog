@@ -22,9 +22,17 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 		super(benchmark.getName() + " (multi threaded)", benchmark);
 	}
 
+	public static void main(final String[] arguments) throws Exception {
+		IBenchmark benchmark = createBenchmark(arguments);
+		if (benchmark != null) {
+			new MultiThreadBenchmarkRunner(benchmark).start();
+		}
+	}
+
 	@Override
 	protected final long countLogEntries() {
-		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 5L;
+		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 3L; // INFO, WARNING and ERROR will be output
+
 	}
 
 	@Override
@@ -36,7 +44,11 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 				@Override
 				public void run() {
 					for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
-						benchmark.log(i + 1);
+						benchmark.trace(i + 1);
+						benchmark.debug(i + 1);
+						benchmark.info(i + 1);
+						benchmark.warning(i + 1);
+						benchmark.error(i + 1);
 					}
 				}
 

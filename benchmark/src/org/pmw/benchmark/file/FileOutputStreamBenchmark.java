@@ -38,19 +38,46 @@ public class FileOutputStreamBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void log(final int index) {
+	public void init(final File file) throws Exception {
+		stream = new FileOutputStream(file.getAbsolutePath());
+	}
+
+	@Override
+	public void trace(final int index) {
+		// Ignore
+	}
+
+	@Override
+	public void debug(final int index) {
+		// Ignore
+
+	}
+
+	@Override
+	public void info(final int index) {
 		try {
 			stream.write(INFO_LINE);
-			stream.write(WARNING_LINE);
-			stream.write(ERROR_LINE);
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	@Override
-	public void init(final File file) throws Exception {
-		stream = new FileOutputStream(file.getAbsolutePath());
+	public void warning(final int index) {
+		try {
+			stream.write(WARNING_LINE);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	@Override
+	public void error(final int index) {
+		try {
+			stream.write(ERROR_LINE);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	@Override

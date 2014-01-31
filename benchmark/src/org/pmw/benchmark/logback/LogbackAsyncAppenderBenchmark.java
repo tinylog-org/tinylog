@@ -22,7 +22,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 
-public class LogbackWithAsyncAppenderBenchmark extends LogbackBenchmark {
+public class LogbackAsyncAppenderBenchmark extends LogbackBenchmark {
 
 	@Override
 	public String getName() {

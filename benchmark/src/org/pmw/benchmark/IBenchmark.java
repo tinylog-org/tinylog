@@ -19,9 +19,17 @@ public interface IBenchmark {
 
 	String getName();
 
-	void log(int index);
-
 	void init(File file) throws Exception;
+
+	void trace(int index);
+
+	void debug(int index);
+
+	void info(int index);
+
+	void warning(int index);
+
+	void error(int index);
 
 	void dispose() throws Exception;
 

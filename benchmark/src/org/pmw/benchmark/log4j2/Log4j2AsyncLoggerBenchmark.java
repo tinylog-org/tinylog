@@ -16,7 +16,7 @@ package org.pmw.benchmark.log4j2;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.async.AsyncLogger;
 
-public class Log4j2WithAsyncLoggerBenchmark extends Log4j2Benchmark {
+public class Log4j2AsyncLoggerBenchmark extends Log4j2Benchmark {
 
 	@Override
 	public String getName() {

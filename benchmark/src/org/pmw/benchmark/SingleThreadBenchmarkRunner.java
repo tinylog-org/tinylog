@@ -21,15 +21,26 @@ public class SingleThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 		super(benchmark.getName() + " (single threaded)", benchmark);
 	}
 
+	public static void main(final String[] arguments) throws Exception {
+		IBenchmark benchmark = createBenchmark(arguments);
+		if (benchmark != null) {
+			new SingleThreadBenchmarkRunner(benchmark).start();
+		}
+	}
+
 	@Override
 	protected final long countLogEntries() {
-		return LOGGING_ITERATIONS * 5L;
+		return LOGGING_ITERATIONS * 3L; // INFO, WARNING and ERROR will be output
 	}
 
 	@Override
 	protected final void run(final IBenchmark benchmark) {
 		for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
-			benchmark.log(i + 1);
+			benchmark.trace(i + 1);
+			benchmark.debug(i + 1);
+			benchmark.info(i + 1);
+			benchmark.warning(i + 1);
+			benchmark.error(i + 1);
 		}
 	}
 
