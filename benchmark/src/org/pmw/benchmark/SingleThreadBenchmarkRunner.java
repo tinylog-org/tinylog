@@ -29,7 +29,12 @@ public class SingleThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	}
 
 	@Override
-	protected final long countLogEntries() {
+	protected long countTriggeredLogEntries() {
+		return LOGGING_ITERATIONS * 5L; // TRACE, DEBUG, INFO, WARNING and ERROR
+	}
+
+	@Override
+	protected long countWrittenLogEntries() {
 		return LOGGING_ITERATIONS * 3L; // INFO, WARNING and ERROR will be output
 	}
 

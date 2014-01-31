@@ -30,9 +30,13 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	}
 
 	@Override
-	protected final long countLogEntries() {
-		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 3L; // INFO, WARNING and ERROR will be output
+	protected long countTriggeredLogEntries() {
+		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 5L; // TRACE, DEBUG, INFO, WARNING and ERROR
+	}
 
+	@Override
+	protected long countWrittenLogEntries() {
+		return (long) PARALLEL_THREADS * (long) LOGGING_ITERATIONS * 3L; // INFO, WARNING and ERROR will be output
 	}
 
 	@Override

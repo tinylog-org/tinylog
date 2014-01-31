@@ -56,7 +56,7 @@ public abstract class AbstractBenchmarkRunner {
 		}
 
 		long time = calcTime(times);
-		long iterations = (BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2) * countLogEntries();
+		long iterations = (BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2) * countTriggeredLogEntries();
 		long iterationsPerSecond = Math.round(iterations * 1000d / time);
 
 		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
@@ -70,7 +70,7 @@ public abstract class AbstractBenchmarkRunner {
 			reader.close();
 		}
 
-		long expected = BENCHMARK_ITERATIONS * countLogEntries();
+		long expected = BENCHMARK_ITERATIONS * countWrittenLogEntries();
 		if (lines != expected) {
 			System.err.println(MessageFormat.format(ERROR_MESSAGE, lines, expected));
 		}
@@ -94,7 +94,9 @@ public abstract class AbstractBenchmarkRunner {
 		}
 	}
 
-	protected abstract long countLogEntries();
+	protected abstract long countTriggeredLogEntries();
+
+	protected abstract long countWrittenLogEntries();
 
 	protected abstract void run(IBenchmark benchmark);
 
