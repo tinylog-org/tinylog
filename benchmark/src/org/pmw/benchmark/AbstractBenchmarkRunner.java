@@ -21,8 +21,10 @@ import java.util.Arrays;
 
 public abstract class AbstractBenchmarkRunner {
 
-	private static final int BENCHMARK_ITERATIONS = 120;
-	private static final int OUTLIERS_CUT = 10;
+	private static final int BENCHMARK_ITERATIONS = 120; // Number of benchmark to run
+	private static final int OUTLIERS_CUT = 10; // Number of best and worst results to exclude
+	private static final int STACK_TRACE_DEEP = 20; // Stack trace deep to add for more realistic results
+
 	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
 	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";
 
@@ -47,7 +49,7 @@ public abstract class AbstractBenchmarkRunner {
 			benchmark.init(files[i]);
 
 			long start = System.currentTimeMillis();
-			run(benchmark);
+			run(benchmark, STACK_TRACE_DEEP);
 			benchmark.dispose();
 			long finished = System.currentTimeMillis();
 			times[i] = finished - start;
@@ -95,6 +97,14 @@ public abstract class AbstractBenchmarkRunner {
 	protected abstract long countLogEntries();
 
 	protected abstract void run(IBenchmark benchmark);
+
+	private void run(final IBenchmark benchmark, final int stackTraceDeep) {
+		if (stackTraceDeep == 0) {
+			run(benchmark);
+		} else {
+			run(benchmark, stackTraceDeep - 1);
+		}
+	}
 
 	private long calcTime(final long[] times) {
 		Arrays.sort(times);
