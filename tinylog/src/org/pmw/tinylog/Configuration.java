@@ -37,6 +37,7 @@ public final class Configuration {
 	private final String formatPattern;
 	private final Locale locale;
 	private final LoggingWriter writer;
+	private final LoggingWriter effectiveWriter;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
@@ -67,12 +68,14 @@ public final class Configuration {
 		this.formatPattern = formatPattern;
 		this.locale = locale;
 		this.writer = writer;
+		this.effectiveWriter = writer == null || (level == LoggingLevel.OFF && customLevels.isEmpty()) ? null : writer;
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
 		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
-		this.requiredStackTraceInformation = getRequiredStackTraceInformation(customLevels, requiredLogEntryValues);
+		this.requiredStackTraceInformation = effectiveWriter == null ? StackTraceInformation.NONE : getRequiredStackTraceInformation(customLevels,
+				requiredLogEntryValues);
 	}
 
 	/**
@@ -187,6 +190,15 @@ public final class Configuration {
 	 */
 	public StackTraceInformation getRequiredStackTraceInformation() {
 		return requiredStackTraceInformation;
+	}
+
+	/**
+	 * Get the effective logging writer to be used by the logger.
+	 * 
+	 * @return Effective logging writer
+	 */
+	LoggingWriter getEffectiveWriter() {
+		return effectiveWriter;
 	}
 
 	/**

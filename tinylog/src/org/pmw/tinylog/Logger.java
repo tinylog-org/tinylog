@@ -620,7 +620,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getWriter();
+		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 
 		if (writer != null) {
 			StackTraceElement stackTraceElement = null;
@@ -648,7 +648,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final Class<?> callerClass, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getWriter();
+		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
@@ -675,7 +675,7 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final StackTraceElement stackTraceElement, final LoggingLevel level,
 			final Throwable exception, final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getWriter();
+		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 
 		if (writer != null) {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
