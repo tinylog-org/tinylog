@@ -39,7 +39,7 @@ public class SingleThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	}
 
 	@Override
-	protected final void run(final IBenchmark benchmark) {
+	protected final void doRun(final IBenchmark benchmark) {
 		for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
 			benchmark.trace(i + 1);
 			benchmark.debug(i + 1);

@@ -44,28 +44,28 @@ public class Log4jBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void trace(final int index) {
-		logger.trace(MessageFormat.format("Trace: {0}, PI: {1}", index, Math.PI));
+	public void trace(final Object obj) {
+		logger.trace(MessageFormat.format("Trace: {0}", obj));
 	}
 
 	@Override
-	public void debug(final int index) {
-		logger.debug(MessageFormat.format("Debug: {0}, PI: {1}", index, Math.PI));
+	public void debug(final Object obj) {
+		logger.debug(MessageFormat.format("Debug: {0}", obj));
 	}
 
 	@Override
-	public void info(final int index) {
-		logger.info(MessageFormat.format("Info: {0}, PI: {1}", index, Math.PI));
+	public void info(final Object obj) {
+		logger.info(MessageFormat.format("Info: {0}", obj));
 	}
 
 	@Override
-	public void warning(final int index) {
-		logger.warn(MessageFormat.format("Warning: {0}, PI: {1}", index, Math.PI));
+	public void warning(final Object obj) {
+		logger.warn(MessageFormat.format("Warning: {0}", obj));
 	}
 
 	@Override
-	public void error(final int index) {
-		logger.error(MessageFormat.format("Error: {0}, PI: {1}", index, Math.PI));
+	public void error(final Object obj) {
+		logger.error(MessageFormat.format("Error: {0}", obj));
 	}
 
 	@Override

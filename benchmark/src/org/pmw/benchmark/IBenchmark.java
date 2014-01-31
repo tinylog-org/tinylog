@@ -21,15 +21,15 @@ public interface IBenchmark {
 
 	void init(File file) throws Exception;
 
-	void trace(int index);
+	void trace(Object obj);
 
-	void debug(int index);
+	void debug(Object obj);
 
-	void info(int index);
+	void info(Object obj);
 
-	void warning(int index);
+	void warning(Object obj);
 
-	void error(int index);
+	void error(Object obj);
 
 	void dispose() throws Exception;
 

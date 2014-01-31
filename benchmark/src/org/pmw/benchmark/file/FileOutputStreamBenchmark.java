@@ -22,9 +22,9 @@ import org.pmw.benchmark.IBenchmark;
 
 public class FileOutputStreamBenchmark implements IBenchmark {
 
-	private static final String INFO_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.log(): Info: 1, PI: 3,142";
-	private static final String WARNING_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.log(): WARNING: 100, PI: 3,142";
-	private static final String ERROR_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.log(): ERROR: 20.000, PI: 3,142";
+	private static final String INFO_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.info(): Info: ???";
+	private static final String WARNING_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.warn(): WARNING: ???";
+	private static final String ERROR_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.error(): ERROR: ???";
 
 	private static final byte[] INFO_LINE = (INFO_STRING + System.getProperty("line.separator")).getBytes();
 	private static final byte[] WARNING_LINE = (WARNING_STRING + System.getProperty("line.separator")).getBytes();
@@ -43,18 +43,18 @@ public class FileOutputStreamBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void trace(final int index) {
+	public void trace(final Object obj) {
 		// Ignore
 	}
 
 	@Override
-	public void debug(final int index) {
+	public void debug(final Object obj) {
 		// Ignore
 
 	}
 
 	@Override
-	public void info(final int index) {
+	public void info(final Object obj) {
 		try {
 			stream.write(INFO_LINE);
 		} catch (IOException ex) {
@@ -63,7 +63,7 @@ public class FileOutputStreamBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void warning(final int index) {
+	public void warning(final Object obj) {
 		try {
 			stream.write(WARNING_LINE);
 		} catch (IOException ex) {
@@ -72,7 +72,7 @@ public class FileOutputStreamBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void error(final int index) {
+	public void error(final Object obj) {
 		try {
 			stream.write(ERROR_LINE);
 		} catch (IOException ex) {

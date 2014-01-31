@@ -40,7 +40,7 @@ public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
 	}
 
 	@Override
-	protected final void run(final IBenchmark benchmark) {
+	protected final void doRun(final IBenchmark benchmark) {
 		ThreadGroup threadGroup = new ThreadGroup("logging");
 		for (int i = 0; i < PARALLEL_THREADS; ++i) {
 			new Thread(threadGroup, "logging-" + i) {

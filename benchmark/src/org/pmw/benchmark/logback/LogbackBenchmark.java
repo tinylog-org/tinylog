@@ -51,28 +51,28 @@ public class LogbackBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void trace(final int index) {
-		logger.trace("Trace: {}, PI: {}", index, Math.PI);
+	public void trace(final Object obj) {
+		logger.trace("Trace: {}", obj);
 	}
 
 	@Override
-	public void debug(final int index) {
-		logger.debug("Debug: {}, PI: {}", index, Math.PI);
+	public void debug(final Object obj) {
+		logger.debug("Debug: {}", obj);
 	}
 
 	@Override
-	public void info(final int index) {
-		logger.info("Info: {}, PI: {}", index, Math.PI);
+	public void info(final Object obj) {
+		logger.info("Info: {}", obj);
 	}
 
 	@Override
-	public void warning(final int index) {
-		logger.warn("Warning: {}, PI: {}", index, Math.PI);
+	public void warning(final Object obj) {
+		logger.warn("Warning: {}", obj);
 	}
 
 	@Override
-	public void error(final int index) {
-		logger.error("Error: {}, PI: {}", index, Math.PI);
+	public void error(final Object obj) {
+		logger.error("Error: {}", obj);
 	}
 
 	@Override

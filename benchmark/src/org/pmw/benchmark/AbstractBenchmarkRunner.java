@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Martin Winandy
+ * Copyright 2014 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,107 +13,27 @@
 
 package org.pmw.benchmark;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.text.MessageFormat;
-import java.util.Arrays;
+public abstract class AbstractBenchmarkRunner extends AbstractRunner {
 
-public abstract class AbstractBenchmarkRunner {
-
-	private static final int BENCHMARK_ITERATIONS = 120; // Number of benchmark to run
-	private static final int OUTLIERS_CUT = 10; // Number of best and worst results to exclude
 	private static final int STACK_TRACE_DEEP = 20; // Stack trace deep to add for more realistic results
 
-	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
-	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";
-
-	private final String name;
-	private final IBenchmark benchmark;
-
-	AbstractBenchmarkRunner(final String name, final IBenchmark benchmark) {
-		this.name = name;
-		this.benchmark = benchmark;
+	public AbstractBenchmarkRunner(final String name, final IBenchmark benchmark) {
+		super(name, benchmark);
 	}
 
-	public final void start() throws Exception {
-		File[] files = new File[BENCHMARK_ITERATIONS];
-		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			File file = File.createTempFile("log", ".txt");
-			file.deleteOnExit();
-			files[i] = file;
-		}
+	protected abstract void doRun(final IBenchmark benchmark);
 
-		long[] times = new long[BENCHMARK_ITERATIONS];
-		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			benchmark.init(files[i]);
-
-			long start = System.currentTimeMillis();
-			run(benchmark, STACK_TRACE_DEEP);
-			benchmark.dispose();
-			long finished = System.currentTimeMillis();
-			times[i] = finished - start;
-		}
-
-		long time = calcTime(times);
-		long iterations = (BENCHMARK_ITERATIONS - OUTLIERS_CUT * 2) * countTriggeredLogEntries();
-		long iterationsPerSecond = Math.round(iterations * 1000d / time);
-
-		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
-
-		long lines = 0;
-		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			BufferedReader reader = new BufferedReader(new FileReader(files[i]));
-			while (reader.readLine() != null) {
-				++lines;
-			}
-			reader.close();
-		}
-
-		long expected = BENCHMARK_ITERATIONS * countWrittenLogEntries();
-		if (lines != expected) {
-			System.err.println(MessageFormat.format(ERROR_MESSAGE, lines, expected));
-		}
-
-		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			files[i].delete();
-		}
+	@Override
+	protected void run(final IBenchmark benchmark) {
+		run(benchmark, STACK_TRACE_DEEP);
 	}
-
-	protected static IBenchmark createBenchmark(final String[] arguments) {
-		if (arguments.length == 0) {
-			System.out.println("Require name of benchmark class as first argument");
-			return null;
-		}
-
-		try {
-			return (IBenchmark) Class.forName(arguments[0]).newInstance();
-		} catch (ReflectiveOperationException ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
-
-	protected abstract long countTriggeredLogEntries();
-
-	protected abstract long countWrittenLogEntries();
-
-	protected abstract void run(IBenchmark benchmark);
 
 	private void run(final IBenchmark benchmark, final int stackTraceDeep) {
 		if (stackTraceDeep == 0) {
-			run(benchmark);
+			doRun(benchmark);
 		} else {
 			run(benchmark, stackTraceDeep - 1);
 		}
 	}
 
-	private long calcTime(final long[] times) {
-		Arrays.sort(times);
-		long time = 0L;
-		for (int i = OUTLIERS_CUT; i < BENCHMARK_ITERATIONS - OUTLIERS_CUT; ++i) {
-			time += times[i];
-		}
-		return time;
-	}
 }

@@ -47,28 +47,28 @@ public class JulBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void trace(final int index) {
-		logger.log(Level.FINE, "Trace: {0}, PI: {1}", new Object[] { index, Math.PI });
+	public void trace(final Object obj) {
+		logger.log(Level.FINE, "Trace: {0}", obj);
 	}
 
 	@Override
-	public void debug(final int index) {
-		logger.log(Level.CONFIG, "Debug: {0}, PI: {1}", new Object[] { index, Math.PI });
+	public void debug(final Object obj) {
+		logger.log(Level.CONFIG, "Debug: {0}", obj);
 	}
 
 	@Override
-	public void info(final int index) {
-		logger.log(Level.INFO, "Info: {0}, PI: {1}", new Object[] { index, Math.PI });
+	public void info(final Object obj) {
+		logger.log(Level.INFO, "Info: {0}", obj);
 	}
 
 	@Override
-	public void warning(final int index) {
-		logger.log(Level.WARNING, "Warning: {0}, PI: {1}", new Object[] { index, Math.PI });
+	public void warning(final Object obj) {
+		logger.log(Level.WARNING, "Warning: {0}", obj);
 	}
 
 	@Override
-	public void error(final int index) {
-		logger.log(Level.SEVERE, "Error: {0}, PI: {1}", new Object[] { index, Math.PI });
+	public void error(final Object obj) {
+		logger.log(Level.SEVERE, "Error: {0}", obj);
 	}
 
 	@Override

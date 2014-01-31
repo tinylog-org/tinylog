@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Martin Winandy
+ * Copyright 2014 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,60 +11,52 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.tinylog;
+package org.pmw.benchmark.dummy;
 
 import java.io.File;
 
 import org.pmw.benchmark.IBenchmark;
-import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.Logger;
-import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.writers.FileWriter;
 
-public class TinylogBenchmark implements IBenchmark {
-
-	private FileWriter writer;
+public class DummyBenchmark implements IBenchmark {
 
 	@Override
 	public String getName() {
-		return "tinylog";
+		return "dummy";
 	}
 
 	@Override
 	public void init(final File file) throws Exception {
-		writer = new FileWriter(file.getAbsolutePath());
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
-				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}").activate();
+		// Do nothing
 	}
 
 	@Override
 	public void trace(final Object obj) {
-		Logger.trace("Trace: {0}", obj);
+		// Ignore
 	}
 
 	@Override
 	public void debug(final Object obj) {
-		Logger.debug("Debug: {0}", obj);
+		// Ignore
 	}
 
 	@Override
 	public void info(final Object obj) {
-		Logger.info("Info: {0}", obj);
+		// Ignore
 	}
 
 	@Override
 	public void warning(final Object obj) {
-		Logger.warn("Warning: {0}", obj);
+		// Ignore
 	}
 
 	@Override
 	public void error(final Object obj) {
-		Logger.error("Error: {0}", obj);
+		// Ignore
 	}
 
 	@Override
 	public void dispose() throws Exception {
-		writer.close();
+		// Do nothing
 	}
 
 }
