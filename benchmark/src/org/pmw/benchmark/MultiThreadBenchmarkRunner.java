@@ -13,7 +13,7 @@
 
 package org.pmw.benchmark;
 
-public class MultiThreadBenchmarkRunner extends AbstractBenchmarkRunner {
+public class MultiThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 
 	private static final int PARALLEL_THREADS = 10;
 	private static final int LOGGING_ITERATIONS = 2000;
