@@ -29,8 +29,7 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 
 	private static final long MAX_NUMBER = 10_000_000L;
 
-	private static IBenchmark benchmark;
-	private static long primes;
+	private long primes;
 
 	public PrimesCalculatorRunner(final IBenchmark benchmark) {
 		super(benchmark.getName() + " (primes)", benchmark);
@@ -55,9 +54,7 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 
 	@Override
 	protected void run(final IBenchmark benchmark) throws InterruptedException, ExecutionException {
-		PrimesCalculatorRunner.benchmark = benchmark;
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 10);
-
 		List<Long> primes = new ArrayList<>();
 		benchmark.trace(1L);
 
@@ -66,7 +63,7 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 
 		long limit = Math.min(number * number - 1, MAX_NUMBER);
 		for (; number <= limit; ++number) {
-			runningCalculators.add(executorService.submit(new PrimesCalculator(new SubList<Long>(primes, 0, primes.size()), number)));
+			runningCalculators.add(executorService.submit(new PrimesCalculator(benchmark, new SubList<Long>(primes, 0, primes.size()), number)));
 		}
 
 		for (long i = 2L; i <= limit; ++i) {
@@ -76,21 +73,22 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 			}
 			limit = Math.min(i * i - 1, MAX_NUMBER);
 			for (; number <= limit; ++number) {
-				runningCalculators.add(executorService.submit(new PrimesCalculator(new SubList<Long>(primes, 0, primes.size()), number)));
+				runningCalculators.add(executorService.submit(new PrimesCalculator(benchmark, new SubList<Long>(primes, 0, primes.size()), number)));
 			}
 		}
 
 		executorService.shutdown();
-
-		PrimesCalculatorRunner.primes = primes.size();
+		this.primes = primes.size();
 	}
 
 	private class PrimesCalculator implements Callable<Boolean> {
 
+		private final IBenchmark benchmark;
 		private final List<Long> primes;
 		private final long number;
 
-		public PrimesCalculator(final List<Long> primes, final long number) {
+		public PrimesCalculator(final IBenchmark benchmark, final List<Long> primes, final long number) {
+			this.benchmark = benchmark;
 			this.primes = primes;
 			this.number = number;
 		}
