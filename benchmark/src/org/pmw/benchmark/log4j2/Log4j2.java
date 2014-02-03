@@ -14,10 +14,12 @@
 package org.pmw.benchmark.log4j2;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -82,9 +84,13 @@ public class Log4j2 implements ILoggingFramework {
 		return (Logger) LogManager.getRootLogger();
 	}
 
+	protected Layout<? extends Serializable> createLayout(final Configuration configuration) {
+		return PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null);
+	}
+
 	protected Appender createAppender(final File file, final Configuration configuration) {
-		PatternLayout layout = PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null);
-		return FileAppender.createAppender(file.getAbsolutePath(), null, null, "File", null, null, null, layout, null, null, null, configuration);
+		return FileAppender.createAppender(file.getAbsolutePath(), "false", null, "File", null, null, "false", createLayout(configuration), null, null, null,
+				configuration);
 	}
 
 }

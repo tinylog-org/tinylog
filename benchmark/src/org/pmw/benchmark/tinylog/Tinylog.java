@@ -32,7 +32,7 @@ public class Tinylog implements ILoggingFramework {
 
 	@Override
 	public void init(final File file) throws Exception {
-		writer = new FileWriter(file.getAbsolutePath());
+		writer = createWriter(file);
 		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
 				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}").activate();
 	}
@@ -65,6 +65,10 @@ public class Tinylog implements ILoggingFramework {
 	@Override
 	public void dispose() throws Exception {
 		writer.close();
+	}
+
+	protected FileWriter createWriter(final File file) {
+		return new FileWriter(file.getAbsolutePath(), false);
 	}
 
 }

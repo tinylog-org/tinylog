@@ -16,6 +16,7 @@ package org.pmw.benchmark.tinylog;
 import java.io.File;
 
 import org.pmw.tinylog.Configurator;
+import org.pmw.tinylog.writers.FileWriter;
 
 public class TinylogWithWritingThread extends Tinylog {
 
@@ -34,6 +35,11 @@ public class TinylogWithWritingThread extends Tinylog {
 	public void dispose() throws Exception {
 		Configurator.shutdownWritingThread(true);
 		super.dispose();
+	}
+
+	@Override
+	protected FileWriter createWriter(final File file) {
+		return new FileWriter(file.getAbsolutePath(), true);
 	}
 
 }

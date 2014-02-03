@@ -25,6 +25,8 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.encoder.Encoder;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 
 public class Logback implements ILoggingFramework {
 
@@ -80,15 +82,21 @@ public class Logback implements ILoggingFramework {
 		appender.stop();
 	}
 
+	protected LayoutWrappingEncoder<ILoggingEvent> createEncoder(final LoggerContext context) {
+		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+		encoder.setContext(context);
+		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		encoder.setImmediateFlush(false);
+		return encoder;
+	}
+
 	protected Appender<ILoggingEvent> createAppender(final File file, final LoggerContext context) {
 		FileAppender<ILoggingEvent> appender = new FileAppender<ILoggingEvent>();
 		appender.setContext(context);
 		appender.setAppend(false);
 		appender.setFile(file.getAbsolutePath());
 
-		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-		encoder.setContext(context);
-		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		Encoder<ILoggingEvent> encoder = createEncoder(context);
 		encoder.start();
 		appender.setEncoder(encoder);
 		return appender;

@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -37,7 +38,7 @@ public class Log4j implements ILoggingFramework {
 	public void init(final File file) throws Exception {
 		logger = Logger.getRootLogger();
 		logger.removeAllAppenders();
-		appender = createAppender(file);
+		appender = new FileAppender(createLayout(), file.getAbsolutePath(), false);
 		logger.addAppender(appender);
 		logger.setLevel(Level.INFO);
 	}
@@ -73,7 +74,11 @@ public class Log4j implements ILoggingFramework {
 	}
 
 	protected Appender createAppender(final File file) throws IOException {
-		return new FileAppender(new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n"), file.getAbsolutePath(), false);
+		return new FileAppender(createLayout(), file.getAbsolutePath(), false, false, 0);
+	}
+
+	protected Layout createLayout() {
+		return new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
 	}
 
 }

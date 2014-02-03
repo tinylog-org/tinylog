@@ -21,6 +21,7 @@ import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 
 public class LogbackWithAsyncAppender extends Logback {
 
@@ -47,6 +48,13 @@ public class LogbackWithAsyncAppender extends Logback {
 		appender.addAppender(subAppender);
 
 		return appender;
+	}
+
+	@Override
+	protected LayoutWrappingEncoder<ILoggingEvent> createEncoder(final LoggerContext context) {
+		LayoutWrappingEncoder<ILoggingEvent> encoder = super.createEncoder(context);
+		encoder.setImmediateFlush(true);
+		return encoder;
 	}
 
 }

@@ -13,8 +13,13 @@
 
 package org.pmw.benchmark.log4j2;
 
+import java.io.File;
+
+import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.async.AsyncLogger;
+import org.apache.logging.log4j.core.config.Configuration;
 
 public class Log4j2WithAsyncLogger extends Log4j2 {
 
@@ -33,6 +38,12 @@ public class Log4j2WithAsyncLogger extends Log4j2 {
 	protected Logger createLogger() {
 		Logger logger = super.createLogger();
 		return new AsyncLogger(logger.getContext(), logger.getName(), null);
+	}
+
+	@Override
+	protected Appender createAppender(final File file, final Configuration configuration) {
+		return FileAppender.createAppender(file.getAbsolutePath(), "false", null, "File", null, null, "true", createLayout(configuration), null, null, null,
+				configuration);
 	}
 
 }

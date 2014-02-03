@@ -39,7 +39,7 @@ public class Jul implements ILoggingFramework {
 	@Override
 	public void init(final File file) throws Exception {
 		logger = Logger.getAnonymousLogger();
-		handler = new FileHandler(file.getAbsolutePath());
+		handler = new FileHandler(file.getAbsolutePath(), false);
 		handler.setFormatter(new MyFormatter("yyyy-MM-dd HH:mm:ss"));
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);

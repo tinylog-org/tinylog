@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.FileAppender;
 
 public class Log4jWithAsyncAppender extends Log4j {
 
@@ -29,7 +30,7 @@ public class Log4jWithAsyncAppender extends Log4j {
 	@Override
 	protected Appender createAppender(final File file) throws IOException {
 		AsyncAppender appender = new AsyncAppender();
-		appender.addAppender(super.createAppender(file));
+		appender.addAppender(new FileAppender(createLayout(), file.getAbsolutePath(), false, true, 64 * 1024));
 		return appender;
 	}
 
