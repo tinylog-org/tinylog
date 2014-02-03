@@ -23,28 +23,27 @@
 	<property name="tests.bin" location="${tests}/bin" />
 	<property name="tests.src" location="${tests}/src" />
 		
-	<property name="ext" location="${root}/ext" />
-	<property name="ext.conf" location="${ext}/conf" />
-	<property name="ext.lib" location="${ext}/lib" />
-	<property name="ext.lib.checkstyle" location="${ext.lib}/checkstyle" />
-	<property name="ext.lib.findbugs" location="${ext.lib}/findbugs" />
-	<property name="ext.lib.junit" location="${ext.lib}/junit" />
+	<property name="conf" location="${root}/configuration" />
+	<property name="lib" location="${root}/libraries" />
+	<property name="lib.checkstyle" location="${lib}/checkstyle" />
+	<property name="lib.findbugs" location="${lib}/findbugs" />
+	<property name="lib.junit" location="${lib}/junit" />
 	
-	<property name="dist" location="${root}/dist" />
+	<property name="dist" location="${root}/distribution" />
 	<property name="dist.docs" location="${dist}/docs" />
 	<property name="dist.jar" location="${dist}/jar" />
 	<property name="dist.bundle" location="${dist}/bundle" />
 	<property name="dist.maven" location="${dist}/maven" />
 
 	<path id="junit.classpath">
-		<fileset dir="${ext.lib.junit}">
+		<fileset dir="${lib.junit}">
 			<include name="*.jar" />
 		</fileset>
 	</path>
 
 	<taskdef resource="checkstyletask.properties">
 		<classpath>
-			<fileset dir="${ext.lib.checkstyle}">
+			<fileset dir="${lib.checkstyle}">
 				<include name="*.jar" />
 			</fileset>
 		</classpath>
@@ -52,7 +51,7 @@
 
 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
 		<classpath>
-			<fileset dir="${ext.lib.findbugs}">
+			<fileset dir="${lib.findbugs}">
 				<include name="*.jar" />
 			</fileset>
 		</classpath>
@@ -257,7 +256,7 @@
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${ext.conf}" />
+			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${conf}" />
 		</javadoc>
 		
 		<echo file="${dist.maven}/log4j-facade-${version}.pom"><![CDATA[<project>
@@ -329,18 +328,18 @@
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${ext.conf}" />
+			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${conf}" />
 		</javadoc>
 	</target>
 
 	<target name="check" depends="compile">
-		<checkstyle config="${ext.conf}/tinylog-checkstyle.xml">
+		<checkstyle config="${conf}/tinylog-checkstyle.xml">
 			<fileset dir="${environment.src}" includes="**/*.java" />
 			<fileset dir="${tinylog.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
-		<findbugs home="${ext.lib.findbugs}" output="text" excludefilter="${ext.conf}/tinylog-findbugs.xml">
+		<findbugs home="${lib.findbugs}" output="text" excludefilter="${conf}/tinylog-findbugs.xml">
 			<auxclasspath refid="junit.classpath" />
 			<sourcepath location="${environment.src}" />
 			<class location="${environment.bin}" />

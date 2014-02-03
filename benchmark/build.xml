@@ -5,7 +5,7 @@
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="lib" location="lib" />
-	<property name="dist" location="${root}/dist" />
+	<property name="dist" location="${root}/distribution" />
 	<property name="dist.jar" location="${dist}/jar" />
 
 	<path id="log4j.classpath">
