@@ -17,22 +17,22 @@ public abstract class AbstractDeepStackTraceRunner extends AbstractRunner {
 
 	private static final int STACK_TRACE_DEEP = 20; // Stack trace deep to add for more realistic results
 
-	public AbstractDeepStackTraceRunner(final String name, final IBenchmark benchmark) {
-		super(name, benchmark);
+	public AbstractDeepStackTraceRunner(final String name, final ILoggingFramework framework) {
+		super(name, framework);
 	}
 
-	protected abstract void doRun(final IBenchmark benchmark);
+	protected abstract void doRun(final ILoggingFramework framework);
 
 	@Override
-	protected void run(final IBenchmark benchmark) {
-		run(benchmark, STACK_TRACE_DEEP);
+	protected void run(final ILoggingFramework framework) {
+		run(framework, STACK_TRACE_DEEP);
 	}
 
-	private void run(final IBenchmark benchmark, final int stackTraceDeep) {
+	private void run(final ILoggingFramework framework, final int stackTraceDeep) {
 		if (stackTraceDeep == 0) {
-			doRun(benchmark);
+			doRun(framework);
 		} else {
-			run(benchmark, stackTraceDeep - 1);
+			run(framework, stackTraceDeep - 1);
 		}
 	}
 

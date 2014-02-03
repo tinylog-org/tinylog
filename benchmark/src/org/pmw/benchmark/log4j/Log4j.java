@@ -22,9 +22,9 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 
-public class Log4jBenchmark implements IBenchmark {
+public class Log4j implements ILoggingFramework {
 
 	private Logger logger;
 	private Appender appender;

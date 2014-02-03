@@ -22,9 +22,9 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 
-public class Log4j2Benchmark implements IBenchmark {
+public class Log4j2 implements ILoggingFramework {
 
 	private Logger logger;
 	private Appender appender;

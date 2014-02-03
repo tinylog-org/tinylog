@@ -19,7 +19,7 @@ import java.io.FileReader;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-import org.pmw.benchmark.dummy.DummyBenchmark;
+import org.pmw.benchmark.dummy.Dummy;
 
 public abstract class AbstractRunner {
 
@@ -30,11 +30,11 @@ public abstract class AbstractRunner {
 	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";
 
 	private final String name;
-	private final IBenchmark benchmark;
+	private final ILoggingFramework framework;
 
-	AbstractRunner(final String name, final IBenchmark benchmark) {
+	AbstractRunner(final String name, final ILoggingFramework framework) {
 		this.name = name;
-		this.benchmark = benchmark;
+		this.framework = framework;
 	}
 
 	public final void start() throws Exception {
@@ -47,11 +47,11 @@ public abstract class AbstractRunner {
 
 		long[] times = new long[BENCHMARK_ITERATIONS];
 		for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
-			benchmark.init(files[i]);
+			framework.init(files[i]);
 
 			long start = System.currentTimeMillis();
-			run(benchmark);
-			benchmark.dispose();
+			run(framework);
+			framework.dispose();
 			long finished = System.currentTimeMillis();
 			times[i] = finished - start;
 		}
@@ -62,7 +62,7 @@ public abstract class AbstractRunner {
 
 		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
 
-		if (!(benchmark instanceof DummyBenchmark)) {
+		if (!(framework instanceof Dummy)) {
 			long lines = 0;
 			for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
 				BufferedReader reader = new BufferedReader(new FileReader(files[i]));
@@ -83,16 +83,16 @@ public abstract class AbstractRunner {
 		}
 	}
 
-	protected abstract void run(final IBenchmark benchmark) throws Exception;
+	protected abstract void run(final ILoggingFramework framework) throws Exception;
 
-	protected static IBenchmark createBenchmark(final String[] arguments) {
+	protected static ILoggingFramework createLoggingFramework(final String[] arguments) {
 		if (arguments.length == 0) {
-			System.out.println("Require name of benchmark class as first argument");
+			System.out.println("Require name of logging framework class as first argument");
 			return null;
 		}
 
 		try {
-			return (IBenchmark) Class.forName(arguments[0]).newInstance();
+			return (ILoggingFramework) Class.forName(arguments[0]).newInstance();
 		} catch (ReflectiveOperationException ex) {
 			ex.printStackTrace();
 			return null;

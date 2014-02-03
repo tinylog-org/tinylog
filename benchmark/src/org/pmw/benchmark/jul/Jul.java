@@ -24,9 +24,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 
-public class JulBenchmark implements IBenchmark {
+public class Jul implements ILoggingFramework {
 
 	private Logger logger;
 	private FileHandler handler;

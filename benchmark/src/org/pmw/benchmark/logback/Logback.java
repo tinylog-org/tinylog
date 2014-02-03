@@ -15,7 +15,7 @@ package org.pmw.benchmark.logback;
 
 import java.io.File;
 
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
@@ -26,7 +26,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 
-public class LogbackBenchmark implements IBenchmark {
+public class Logback implements ILoggingFramework {
 
 	private Logger logger;
 	private Appender<ILoggingEvent> appender;

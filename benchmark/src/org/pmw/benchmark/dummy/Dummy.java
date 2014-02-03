@@ -11,26 +11,52 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.log4j;
+package org.pmw.benchmark.dummy;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AsyncAppender;
+import org.pmw.benchmark.ILoggingFramework;
 
-public class Log4jAsyncAppenderBenchmark extends Log4jBenchmark {
+public class Dummy implements ILoggingFramework {
 
 	@Override
 	public String getName() {
-		return "log4j with async appender";
+		return "dummy";
 	}
 
 	@Override
-	protected Appender createAppender(final File file) throws IOException {
-		AsyncAppender appender = new AsyncAppender();
-		appender.addAppender(super.createAppender(file));
-		return appender;
+	public void init(final File file) throws Exception {
+		// Do nothing
+	}
+
+	@Override
+	public void trace(final Object obj) {
+		// Ignore
+	}
+
+	@Override
+	public void debug(final Object obj) {
+		// Ignore
+	}
+
+	@Override
+	public void info(final Object obj) {
+		// Ignore
+	}
+
+	@Override
+	public void warning(final Object obj) {
+		// Ignore
+	}
+
+	@Override
+	public void error(final Object obj) {
+		// Ignore
+	}
+
+	@Override
+	public void dispose() throws Exception {
+		// Do nothing
 	}
 
 }

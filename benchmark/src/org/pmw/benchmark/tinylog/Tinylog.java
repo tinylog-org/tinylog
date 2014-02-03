@@ -15,13 +15,13 @@ package org.pmw.benchmark.tinylog;
 
 import java.io.File;
 
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.writers.FileWriter;
 
-public class TinylogBenchmark implements IBenchmark {
+public class Tinylog implements ILoggingFramework {
 
 	private FileWriter writer;
 

@@ -11,28 +11,26 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.log4j2;
+package org.pmw.benchmark.log4j;
 
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.async.AsyncLogger;
+import java.io.File;
+import java.io.IOException;
 
-public class Log4j2AsyncLoggerBenchmark extends Log4j2Benchmark {
+import org.apache.log4j.Appender;
+import org.apache.log4j.AsyncAppender;
+
+public class Log4jWithAsyncAppender extends Log4j {
 
 	@Override
 	public String getName() {
-		return "log4j 2 with async logger";
+		return "log4j with async appender";
 	}
 
 	@Override
-	public void dispose() throws Exception {
-		AsyncLogger.stop();
-		super.dispose();
-	}
-
-	@Override
-	protected Logger createLogger() {
-		Logger logger = super.createLogger();
-		return new AsyncLogger(logger.getContext(), logger.getName(), null);
+	protected Appender createAppender(final File file) throws IOException {
+		AsyncAppender appender = new AsyncAppender();
+		appender.addAppender(super.createAppender(file));
+		return appender;
 	}
 
 }

@@ -18,14 +18,14 @@ public class MultiThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 	private static final int PARALLEL_THREADS = 10;
 	private static final int LOGGING_ITERATIONS = 2000;
 
-	public MultiThreadBenchmarkRunner(final IBenchmark benchmark) {
-		super(benchmark.getName() + " (multi threaded)", benchmark);
+	public MultiThreadBenchmarkRunner(final ILoggingFramework framework) {
+		super(framework.getName() + " (multi threaded)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
-		IBenchmark benchmark = createBenchmark(arguments);
-		if (benchmark != null) {
-			new MultiThreadBenchmarkRunner(benchmark).start();
+		ILoggingFramework framework = createLoggingFramework(arguments);
+		if (framework != null) {
+			new MultiThreadBenchmarkRunner(framework).start();
 		}
 	}
 
@@ -40,7 +40,7 @@ public class MultiThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 	}
 
 	@Override
-	protected final void doRun(final IBenchmark benchmark) {
+	protected final void doRun(final ILoggingFramework framework) {
 		ThreadGroup threadGroup = new ThreadGroup("logging");
 		for (int i = 0; i < PARALLEL_THREADS; ++i) {
 			new Thread(threadGroup, "logging-" + i) {
@@ -48,11 +48,11 @@ public class MultiThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 				@Override
 				public void run() {
 					for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
-						benchmark.trace(i + 1);
-						benchmark.debug(i + 1);
-						benchmark.info(i + 1);
-						benchmark.warning(i + 1);
-						benchmark.error(i + 1);
+						framework.trace(i + 1);
+						framework.debug(i + 1);
+						framework.info(i + 1);
+						framework.warning(i + 1);
+						framework.error(i + 1);
 					}
 				}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Martin Winandy
+ * Copyright 2012 Martin Winandy
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,52 +11,29 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.dummy;
+package org.pmw.benchmark.tinylog;
 
 import java.io.File;
 
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.tinylog.Configurator;
 
-public class DummyBenchmark implements IBenchmark {
+public class TinylogWithWritingThread extends Tinylog {
 
 	@Override
 	public String getName() {
-		return "dummy";
+		return "tinylog with writing thread";
 	}
 
 	@Override
 	public void init(final File file) throws Exception {
-		// Do nothing
-	}
-
-	@Override
-	public void trace(final Object obj) {
-		// Ignore
-	}
-
-	@Override
-	public void debug(final Object obj) {
-		// Ignore
-	}
-
-	@Override
-	public void info(final Object obj) {
-		// Ignore
-	}
-
-	@Override
-	public void warning(final Object obj) {
-		// Ignore
-	}
-
-	@Override
-	public void error(final Object obj) {
-		// Ignore
+		super.init(file);
+		Configurator.currentConfig().writingThread(true).activate();
 	}
 
 	@Override
 	public void dispose() throws Exception {
-		// Do nothing
+		Configurator.shutdownWritingThread(true);
+		super.dispose();
 	}
 
 }

@@ -17,14 +17,14 @@ public class SingleThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 
 	private static final int LOGGING_ITERATIONS = 20000;
 
-	public SingleThreadBenchmarkRunner(final IBenchmark benchmark) {
-		super(benchmark.getName() + " (single threaded)", benchmark);
+	public SingleThreadBenchmarkRunner(final ILoggingFramework framework) {
+		super(framework.getName() + " (single threaded)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
-		IBenchmark benchmark = createBenchmark(arguments);
-		if (benchmark != null) {
-			new SingleThreadBenchmarkRunner(benchmark).start();
+		ILoggingFramework framework = createLoggingFramework(arguments);
+		if (framework != null) {
+			new SingleThreadBenchmarkRunner(framework).start();
 		}
 	}
 
@@ -39,13 +39,13 @@ public class SingleThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
 	}
 
 	@Override
-	protected final void doRun(final IBenchmark benchmark) {
+	protected final void doRun(final ILoggingFramework framework) {
 		for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
-			benchmark.trace(i + 1);
-			benchmark.debug(i + 1);
-			benchmark.info(i + 1);
-			benchmark.warning(i + 1);
-			benchmark.error(i + 1);
+			framework.trace(i + 1);
+			framework.debug(i + 1);
+			framework.info(i + 1);
+			framework.warning(i + 1);
+			framework.error(i + 1);
 		}
 	}
 

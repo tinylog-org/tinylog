@@ -15,7 +15,7 @@ package org.pmw.benchmark;
 
 import java.io.File;
 
-public interface IBenchmark {
+public interface ILoggingFramework {
 
 	String getName();
 

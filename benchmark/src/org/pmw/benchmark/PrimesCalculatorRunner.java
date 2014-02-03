@@ -31,14 +31,14 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 
 	private long primes;
 
-	public PrimesCalculatorRunner(final IBenchmark benchmark) {
-		super(benchmark.getName() + " (primes)", benchmark);
+	public PrimesCalculatorRunner(final ILoggingFramework framework) {
+		super(framework.getName() + " (primes)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
-		IBenchmark benchmark = createBenchmark(arguments);
-		if (benchmark != null) {
-			new PrimesCalculatorRunner(benchmark).start();
+		ILoggingFramework framework = createLoggingFramework(arguments);
+		if (framework != null) {
+			new PrimesCalculatorRunner(framework).start();
 		}
 	}
 
@@ -53,17 +53,17 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 	}
 
 	@Override
-	protected void run(final IBenchmark benchmark) throws InterruptedException, ExecutionException {
+	protected void run(final ILoggingFramework framework) throws InterruptedException, ExecutionException {
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 10);
 		List<Long> primes = new ArrayList<>();
-		benchmark.trace(1L);
+		framework.trace(1L);
 
 		Queue<Future<Boolean>> runningCalculators = new LinkedList<>();
 		long number = 2L;
 
 		long limit = Math.min(number * number - 1, MAX_NUMBER);
 		for (; number <= limit; ++number) {
-			runningCalculators.add(executorService.submit(new PrimesCalculator(benchmark, new SubList<Long>(primes, 0, primes.size()), number)));
+			runningCalculators.add(executorService.submit(new PrimesCalculator(framework, new SubList<Long>(primes, 0, primes.size()), number)));
 		}
 
 		for (long i = 2L; i <= limit; ++i) {
@@ -73,7 +73,7 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 			}
 			limit = Math.min(i * i - 1, MAX_NUMBER);
 			for (; number <= limit; ++number) {
-				runningCalculators.add(executorService.submit(new PrimesCalculator(benchmark, new SubList<Long>(primes, 0, primes.size()), number)));
+				runningCalculators.add(executorService.submit(new PrimesCalculator(framework, new SubList<Long>(primes, 0, primes.size()), number)));
 			}
 		}
 
@@ -83,12 +83,12 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 
 	private class PrimesCalculator implements Callable<Boolean> {
 
-		private final IBenchmark benchmark;
+		private final ILoggingFramework framework;
 		private final List<Long> primes;
 		private final long number;
 
-		public PrimesCalculator(final IBenchmark benchmark, final List<Long> primes, final long number) {
-			this.benchmark = benchmark;
+		public PrimesCalculator(final ILoggingFramework framework, final List<Long> primes, final long number) {
+			this.framework = framework;
 			this.primes = primes;
 			this.number = number;
 		}
@@ -97,11 +97,11 @@ public class PrimesCalculatorRunner extends AbstractRunner {
 		public Boolean call() {
 			for (Long prime : primes) {
 				if (number % prime == 0L) {
-					benchmark.trace(number);
+					framework.trace(number);
 					return Boolean.FALSE;
 				}
 			}
-			benchmark.info(number);
+			framework.info(number);
 			return Boolean.TRUE;
 		}
 	}

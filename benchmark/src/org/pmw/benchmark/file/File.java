@@ -13,14 +13,13 @@
 
 package org.pmw.benchmark.file;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.pmw.benchmark.IBenchmark;
+import org.pmw.benchmark.ILoggingFramework;
 
-public class FileOutputStreamBenchmark implements IBenchmark {
+public class File implements ILoggingFramework {
 
 	private static final String INFO_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.info(): Info: ???";
 	private static final String WARNING_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.warn(): WARNING: ???";
@@ -38,7 +37,7 @@ public class FileOutputStreamBenchmark implements IBenchmark {
 	}
 
 	@Override
-	public void init(final File file) throws Exception {
+	public void init(final java.io.File file) throws Exception {
 		stream = new FileOutputStream(file.getAbsolutePath());
 	}
 
