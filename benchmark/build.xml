@@ -54,122 +54,122 @@
 	<target name="run" depends="dummy, file, jul, log4j, log4j2, logback, tinylog" />
 	
 	<target name="dummy" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.dummy.DummyBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.dummy.Dummy" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.dummy.DummyBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.dummy.Dummy" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.dummy.DummyBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.dummy.Dummy" />
 		</java>
 	</target>
 	
 	<target name="file" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.file.FileOutputStreamBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.file.File" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.file.FileOutputStreamBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.file.File" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.file.FileOutputStreamBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.file.File" />
 		</java>
 	</target>
 	
 	<target name="jul" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.jul.JulBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.jul.Jul" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.jul.JulBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.jul.Jul" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" fork="true">
-			<arg value="org.pmw.benchmark.jul.JulBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" fork="true">
+			<arg value="org.pmw.benchmark.jul.Jul" />
 		</java>
 	</target>
 	
 	<target name="log4j" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4j" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4j" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4j" />
 		</java>
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4jWithAsyncAppender" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4jWithAsyncAppender" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j.Log4jAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="log4j.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j.Log4jWithAsyncAppender" />
 		</java>
 	</target>
 	
 	<target name="log4j2" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2Benchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2Benchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2Benchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2" />
 		</java>
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2AsyncLoggerBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2AsyncLoggerBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="org.pmw.benchmark.log4j2.Log4j2AsyncLoggerBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
+			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
 		</java>
 	</target>
 	
 	<target name="logback" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.Logback" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.Logback" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.Logback" />
 		</java>
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.LogbackWithAsyncAppender" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.LogbackWithAsyncAppender" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="org.pmw.benchmark.logback.LogbackAsyncAppenderBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="logback.classpath" fork="true">
+			<arg value="org.pmw.benchmark.logback.LogbackWithAsyncAppender" />
 		</java>
 	</target>
 	
 	<target name="tinylog" depends="compile">
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
+			<arg value="org.pmw.benchmark.tinylog.Tinylog" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
+			<arg value="org.pmw.benchmark.tinylog.Tinylog" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
+			<arg value="org.pmw.benchmark.tinylog.Tinylog" />
 		</java>
-		<java classname="org.pmw.benchmark.SingleThreadBenchmarkRunner" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogWritingThreadBenchmark" />
+		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="tinylog.classpath"  fork="true">
+			<arg value="org.pmw.benchmark.tinylog.TinylogWithWritingThread" />
 		</java>
-		<java classname="org.pmw.benchmark.MultiThreadBenchmarkRunner" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogWritingThreadBenchmark" />
+		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
+			<arg value="org.pmw.benchmark.tinylog.TinylogWithWritingThread" />
 		</java>
-		<java classname="org.pmw.benchmark.PrimesCalculatorRunner" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
-			<arg value="org.pmw.benchmark.tinylog.TinylogWritingThreadBenchmark" />
+		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
+			<arg value="org.pmw.benchmark.tinylog.TinylogWithWritingThread" />
 		</java>
 	</target>
 

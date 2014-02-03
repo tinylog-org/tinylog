@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import org.pmw.benchmark.dummy.Dummy;
 
-public abstract class AbstractRunner {
+public abstract class AbstractBenchmark {
 
 	private static final int BENCHMARK_ITERATIONS = 1; // Number of benchmark to run
 	private static final int OUTLIERS_CUT = 0; // Number of best and worst results to exclude
@@ -32,7 +32,7 @@ public abstract class AbstractRunner {
 	private final String name;
 	private final ILoggingFramework framework;
 
-	AbstractRunner(final String name, final ILoggingFramework framework) {
+	AbstractBenchmark(final String name, final ILoggingFramework framework) {
 		this.name = name;
 		this.framework = framework;
 	}

@@ -13,19 +13,19 @@
 
 package org.pmw.benchmark;
 
-public class MultiThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
+public class MultiThreadBenchmark extends AbstractDeepStackTraceBenchmark {
 
 	private static final int PARALLEL_THREADS = 10;
 	private static final int LOGGING_ITERATIONS = 2000;
 
-	public MultiThreadBenchmarkRunner(final ILoggingFramework framework) {
+	public MultiThreadBenchmark(final ILoggingFramework framework) {
 		super(framework.getName() + " (multi threaded)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
 		ILoggingFramework framework = createLoggingFramework(arguments);
 		if (framework != null) {
-			new MultiThreadBenchmarkRunner(framework).start();
+			new MultiThreadBenchmark(framework).start();
 		}
 	}
 

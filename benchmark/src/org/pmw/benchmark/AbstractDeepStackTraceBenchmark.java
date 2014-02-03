@@ -13,11 +13,11 @@
 
 package org.pmw.benchmark;
 
-public abstract class AbstractDeepStackTraceRunner extends AbstractRunner {
+public abstract class AbstractDeepStackTraceBenchmark extends AbstractBenchmark {
 
 	private static final int STACK_TRACE_DEEP = 20; // Stack trace deep to add for more realistic results
 
-	public AbstractDeepStackTraceRunner(final String name, final ILoggingFramework framework) {
+	public AbstractDeepStackTraceBenchmark(final String name, final ILoggingFramework framework) {
 		super(name, framework);
 	}
 

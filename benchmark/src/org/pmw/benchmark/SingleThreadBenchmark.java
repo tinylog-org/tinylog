@@ -13,18 +13,18 @@
 
 package org.pmw.benchmark;
 
-public class SingleThreadBenchmarkRunner extends AbstractDeepStackTraceRunner {
+public class SingleThreadBenchmark extends AbstractDeepStackTraceBenchmark {
 
 	private static final int LOGGING_ITERATIONS = 20000;
 
-	public SingleThreadBenchmarkRunner(final ILoggingFramework framework) {
+	public SingleThreadBenchmark(final ILoggingFramework framework) {
 		super(framework.getName() + " (single threaded)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
 		ILoggingFramework framework = createLoggingFramework(arguments);
 		if (framework != null) {
-			new SingleThreadBenchmarkRunner(framework).start();
+			new SingleThreadBenchmark(framework).start();
 		}
 	}
 

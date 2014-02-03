@@ -25,20 +25,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class PrimesCalculatorRunner extends AbstractRunner {
+public class PrimesBenchmark extends AbstractBenchmark {
 
 	private static final long MAX_NUMBER = 10_000_000L;
 
 	private long primes;
 
-	public PrimesCalculatorRunner(final ILoggingFramework framework) {
+	public PrimesBenchmark(final ILoggingFramework framework) {
 		super(framework.getName() + " (primes)", framework);
 	}
 
 	public static void main(final String[] arguments) throws Exception {
 		ILoggingFramework framework = createLoggingFramework(arguments);
 		if (framework != null) {
-			new PrimesCalculatorRunner(framework).start();
+			new PrimesBenchmark(framework).start();
 		}
 	}
 
