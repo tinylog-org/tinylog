@@ -16,14 +16,20 @@ package org.pmw.benchmark.file;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.pmw.benchmark.ILoggingFramework;
 
 public class File implements ILoggingFramework {
 
-	private static final String INFO_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.info(): Info: ???";
-	private static final String WARNING_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.warn(): WARNING: ???";
-	private static final String ERROR_STRING = "2014-01-01 11:11:00 [main] org.pmw.benchmark.file.FileOutputStreamBenchmark.error(): ERROR: ???";
+	private static final String TIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	private static final String THREAD = Thread.currentThread().getName();
+	private static final String CLASS = File.class.getName();
+
+	private static final String INFO_STRING = TIME + " [" + THREAD + "] " + CLASS + ".info(): Info: ???";
+	private static final String WARNING_STRING = TIME + " [" + THREAD + "] " + CLASS + ".warn(): WARNING: ???";
+	private static final String ERROR_STRING = TIME + " [" + THREAD + "] " + CLASS + ".error(): ERROR: ???";
 
 	private static final byte[] INFO_LINE = (INFO_STRING + System.getProperty("line.separator")).getBytes();
 	private static final byte[] WARNING_LINE = (WARNING_STRING + System.getProperty("line.separator")).getBytes();
