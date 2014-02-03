@@ -23,8 +23,8 @@ import org.pmw.benchmark.dummy.Dummy;
 
 public abstract class AbstractBenchmark {
 
-	private static final int BENCHMARK_ITERATIONS = 1; // Number of benchmark to run
-	private static final int OUTLIERS_CUT = 0; // Number of best and worst results to exclude
+	private static final int BENCHMARK_ITERATIONS = 12; // Number of benchmark to run
+	private static final int OUTLIERS_CUT = 1; // Number of best and worst results to exclude
 
 	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
 	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";

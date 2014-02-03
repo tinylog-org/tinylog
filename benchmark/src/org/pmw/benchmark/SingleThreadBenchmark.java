@@ -15,7 +15,7 @@ package org.pmw.benchmark;
 
 public class SingleThreadBenchmark extends AbstractDeepStackTraceBenchmark {
 
-	private static final int LOGGING_ITERATIONS = 20000;
+	private static final long LOGGING_ITERATIONS = 2_000_000L;
 
 	public SingleThreadBenchmark(final ILoggingFramework framework) {
 		super(framework.getName() + " (single threaded)", framework);
@@ -40,7 +40,7 @@ public class SingleThreadBenchmark extends AbstractDeepStackTraceBenchmark {
 
 	@Override
 	protected final void doRun(final ILoggingFramework framework) {
-		for (int i = 0; i < LOGGING_ITERATIONS; ++i) {
+		for (long i = 0; i < LOGGING_ITERATIONS; ++i) {
 			framework.trace(i + 1);
 			framework.debug(i + 1);
 			framework.info(i + 1);
