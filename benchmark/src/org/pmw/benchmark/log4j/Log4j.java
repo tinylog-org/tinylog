@@ -15,7 +15,6 @@ package org.pmw.benchmark.log4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
@@ -45,27 +44,27 @@ public class Log4j implements ILoggingFramework {
 
 	@Override
 	public void trace(final Object obj) {
-		logger.trace(MessageFormat.format("Trace: {0}", obj));
+		logger.trace("Trace: " + obj);
 	}
 
 	@Override
 	public void debug(final Object obj) {
-		logger.debug(MessageFormat.format("Debug: {0}", obj));
+		logger.debug("Debug: " + obj);
 	}
 
 	@Override
 	public void info(final Object obj) {
-		logger.info(MessageFormat.format("Info: {0}", obj));
+		logger.info("Info: " + obj);
 	}
 
 	@Override
 	public void warning(final Object obj) {
-		logger.warn(MessageFormat.format("Warning: {0}", obj));
+		logger.warn("Warning: " + obj);
 	}
 
 	@Override
 	public void error(final Object obj) {
-		logger.error(MessageFormat.format("Error: {0}", obj));
+		logger.error("Error: " + obj);
 	}
 
 	@Override
