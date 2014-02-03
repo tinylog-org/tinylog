@@ -27,7 +27,8 @@ public abstract class AbstractBenchmark {
 	private static final int OUTLIERS_CUT = 1; // Number of best and worst results to exclude
 
 	private static final String RESULT_MESSAGE = "{0}: {1} log entries in {2}ms = {3} log entries per second";
-	private static final String ERROR_MESSAGE = "{0} lines has been written, but {1} lines expected";
+	private static final String ERROR_LINES_COUNT_MESSAGE = "{0} lines have been written, but {1} lines expected";
+	private static final String ERROR_INVALID_LINES_MESSAGE = "Found {0} invalid log entries";
 
 	private final String name;
 	private final ILoggingFramework framework;
@@ -63,18 +64,25 @@ public abstract class AbstractBenchmark {
 		System.out.println(MessageFormat.format(RESULT_MESSAGE, name, iterations, time, iterationsPerSecond));
 
 		if (!(framework instanceof Dummy)) {
-			long lines = 0;
+			long totalLines = 0;
+			long invalidLines = 0;
 			for (int i = 0; i < BENCHMARK_ITERATIONS; ++i) {
 				BufferedReader reader = new BufferedReader(new FileReader(files[i]));
-				while (reader.readLine() != null) {
-					++lines;
+				for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+					++totalLines;
+					if (!isValidLogEntry(line)) {
+						++invalidLines;
+					}
 				}
 				reader.close();
 			}
 
 			long expected = BENCHMARK_ITERATIONS * countWrittenLogEntries();
-			if (lines != expected) {
-				System.err.println(MessageFormat.format(ERROR_MESSAGE, lines, expected));
+			if (totalLines != expected) {
+				System.err.println(MessageFormat.format(ERROR_LINES_COUNT_MESSAGE, totalLines, expected));
+			}
+			if (invalidLines > 0) {
+				System.err.println(MessageFormat.format(ERROR_INVALID_LINES_MESSAGE, invalidLines));
 			}
 		}
 
@@ -102,6 +110,11 @@ public abstract class AbstractBenchmark {
 	protected abstract long countTriggeredLogEntries();
 
 	protected abstract long countWrittenLogEntries();
+
+	private static boolean isValidLogEntry(final String line) {
+		return (line.contains("Trace") || line.contains("Debug") || line.contains("Info") || line.contains("Warning") || line.contains("Error"))
+				&& line.contains(AbstractBenchmark.class.getPackage().getName());
+	}
 
 	private long calcTime(final long[] times) {
 		Arrays.sort(times);

@@ -38,6 +38,7 @@ public class LogbackWithAsyncAppender extends Logback {
 	@Override
 	protected Appender<ILoggingEvent> createAppender(final File file, final LoggerContext context) {
 		AsyncAppender appender = new AsyncAppender();
+		appender.setIncludeCallerData(true);
 		appender.setDiscardingThreshold(0);
 		appender.setContext(context);
 

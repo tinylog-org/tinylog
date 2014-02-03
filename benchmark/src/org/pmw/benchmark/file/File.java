@@ -28,8 +28,8 @@ public class File implements ILoggingFramework {
 	private static final String CLASS = File.class.getName();
 
 	private static final String INFO_STRING = TIME + " [" + THREAD + "] " + CLASS + ".info(): Info: ???";
-	private static final String WARNING_STRING = TIME + " [" + THREAD + "] " + CLASS + ".warn(): WARNING: ???";
-	private static final String ERROR_STRING = TIME + " [" + THREAD + "] " + CLASS + ".error(): ERROR: ???";
+	private static final String WARNING_STRING = TIME + " [" + THREAD + "] " + CLASS + ".warn(): Warning: ???";
+	private static final String ERROR_STRING = TIME + " [" + THREAD + "] " + CLASS + ".error(): Error: ???";
 
 	private static final byte[] INFO_LINE = (INFO_STRING + System.getProperty("line.separator")).getBytes();
 	private static final byte[] WARNING_LINE = (WARNING_STRING + System.getProperty("line.separator")).getBytes();
