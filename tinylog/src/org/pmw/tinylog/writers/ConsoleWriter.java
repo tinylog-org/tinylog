@@ -22,6 +22,10 @@ import org.pmw.tinylog.LoggingLevel;
 
 /**
  * Writes log entries to the console.
+ * 
+ * <p>
+ * <strong>Not available for Android</strong>
+ * </p>
  */
 @PropertiesSupport(name = "console", properties = { })
 public final class ConsoleWriter implements LoggingWriter {
