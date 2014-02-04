@@ -228,6 +228,11 @@ public class SharedFileWriterTest extends AbstractTest {
 		writer.init(null);
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			writer.write(new LogEntryBuilder().renderedLogEntry(LoopWritingThread.LINE + "\n").create());
+			try {
+				Thread.sleep(1L);
+			} catch (InterruptedException ex) {
+				// No problem
+			}
 		}
 		writer.close();
 	}
