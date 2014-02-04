@@ -19,7 +19,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * Writes the specified line in a loop to a given logging writer until shutdown command.
  */
-public final class WritingThread extends Thread {
+public final class LoopWritingThread extends Thread {
 
 	/**
 	 * Line to write
@@ -34,7 +34,7 @@ public final class WritingThread extends Thread {
 	 * @param writer
 	 *            Logging writer to write line
 	 */
-	public WritingThread(final LoggingWriter writer) {
+	public LoopWritingThread(final LoggingWriter writer) {
 		this.writer = writer;
 		this.writtenLines = 0L;
 		this.shutdown = false;

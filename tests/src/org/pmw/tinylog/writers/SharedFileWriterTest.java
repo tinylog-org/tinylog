@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
-import org.pmw.tinylog.util.WritingThread;
+import org.pmw.tinylog.util.LoopWritingThread;
 
 /**
  * Tests for the shared file logging writer.
@@ -127,34 +127,34 @@ public class SharedFileWriterTest extends AbstractTest {
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		writer.init(null);
 
-		List<WritingThread> threads = new ArrayList<WritingThread>();
+		List<LoopWritingThread> threads = new ArrayList<LoopWritingThread>();
 		for (int i = 0; i < 5; ++i) {
-			threads.add(new WritingThread(writer));
+			threads.add(new LoopWritingThread(writer));
 		}
 
-		for (WritingThread thread : threads) {
+		for (LoopWritingThread thread : threads) {
 			thread.start();
 		}
 
 		Thread.sleep(100L);
 
-		for (WritingThread thread : threads) {
+		for (LoopWritingThread thread : threads) {
 			thread.shutdown();
 		}
 
-		for (WritingThread thread : threads) {
+		for (LoopWritingThread thread : threads) {
 			thread.join();
 		}
 
 		long writtenLines = 0L;
-		for (WritingThread thread : threads) {
+		for (LoopWritingThread thread : threads) {
 			writtenLines += thread.getWrittenLines();
 		}
 
 		long readLines = 0L;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(WritingThread.LINE, line);
+			assertEquals(LoopWritingThread.LINE, line);
 			++readLines;
 		}
 		reader.close();
@@ -198,7 +198,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		long readLines = 0L;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(WritingThread.LINE, line);
+			assertEquals(LoopWritingThread.LINE, line);
 			++readLines;
 		}
 		reader.close();
@@ -227,7 +227,7 @@ public class SharedFileWriterTest extends AbstractTest {
 		SharedFileWriter writer = new SharedFileWriter(filename);
 		writer.init(null);
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
-			writer.write(new LogEntryBuilder().renderedLogEntry(WritingThread.LINE + "\n").create());
+			writer.write(new LogEntryBuilder().renderedLogEntry(LoopWritingThread.LINE + "\n").create());
 		}
 		writer.close();
 	}
