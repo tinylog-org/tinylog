@@ -307,8 +307,16 @@
 		</delete>
 		<zip destfile="${dist}/tinylog-${version}-src.zip" level="9">
 			<zipfileset dir="${root}">
-				<exclude name=".*/**" />
-				<exclude name="dist/**" />
+				<include name="benchmark/**" />
+				<include name="configuration/**" />
+				<include name="environment-stubs/**" />
+				<include name="libraries/**" />
+				<include name="log4j-facade/**" />
+				<include name="tests/**" />
+				<include name="tinylog/**" />
+				<include name="*.txt" />
+				<exclude name="**/bin/" />
+				<exclude name="**/.settings/" />
 			</zipfileset>
 		</zip>
 	</target>
