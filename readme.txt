@@ -19,7 +19,7 @@ specific language governing permissions and limitations under the License.
 benchmark:
 	Contains a benchmark with an ANT script for multiple logging frameworks
 
-runtime-environment-stubs:
+environment-stubs:
 	Contains non-standard VM APIs (e.g. for Android)
 
 log4j-facade:
