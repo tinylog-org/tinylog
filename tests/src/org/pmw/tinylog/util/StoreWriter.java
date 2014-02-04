@@ -77,6 +77,11 @@ public final class StoreWriter implements LoggingWriter {
 	}
 
 	@Override
+	public void flush() {
+		// Do nothing
+	}
+
+	@Override
 	public void close() {
 		// Do nothing
 	}

@@ -71,6 +71,14 @@ public interface LoggingWriter {
 	void write(LogEntry logEntry) throws Exception;
 
 	/**
+	 * Flush this writer and force any buffered data to output.
+	 * 
+	 * @throws Exception
+	 *             Failed to flush
+	 */
+	void flush() throws Exception;
+
+	/**
 	 * Close the writer and release all resources. If a writer required a <code>close()</code> call, it should be
 	 * registered in the <code>init()</code> method at {@link org.pmw.tinylog.writers.VMShutdownHook VMShutdownHook} for
 	 * automatically shutdown when VM will be shutdown.

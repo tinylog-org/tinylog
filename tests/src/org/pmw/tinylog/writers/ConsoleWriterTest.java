@@ -50,6 +50,7 @@ public class ConsoleWriterTest extends AbstractTest {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init(null);
+
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			assertFalse(getOutputStream().hasLines());
@@ -67,6 +68,7 @@ public class ConsoleWriterTest extends AbstractTest {
 		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init(null);
+
 			writer.write(new LogEntryBuilder().level(loggingLevel).renderedLogEntry("Hello\n").create());
 
 			assertEquals("Hello", getOutputStream().nextLine());
@@ -74,6 +76,23 @@ public class ConsoleWriterTest extends AbstractTest {
 
 			writer.close();
 		}
+	}
+
+	/**
+	 * Test flushing.
+	 */
+	@Test
+	public final void testFlush() {
+		ConsoleWriter writer = new ConsoleWriter();
+		writer.init(null);
+
+		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).renderedLogEntry("Hello").create());
+		writer.flush();
+
+		assertEquals("Hello", getOutputStream().nextLine());
+		assertFalse(getErrorStream().hasLines());
+
+		writer.close();
 	}
 
 }

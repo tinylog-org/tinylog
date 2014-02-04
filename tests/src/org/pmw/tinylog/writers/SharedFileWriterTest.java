@@ -233,6 +233,29 @@ public class SharedFileWriterTest extends AbstractTest {
 	}
 
 	/**
+	 * Test flushing.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFlush() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		writer.init(null);
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+		writer.flush();
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
+
+		writer.close();
+	}
+
+	/**
 	 * Test overwriting of existing log file.
 	 * 
 	 * @throws IOException

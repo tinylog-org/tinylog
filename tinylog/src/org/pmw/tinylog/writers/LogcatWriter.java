@@ -66,6 +66,11 @@ public final class LogcatWriter implements LoggingWriter {
 	}
 
 	@Override
+	public void flush() {
+		// Do nothing
+	}
+
+	@Override
 	public void close() {
 		// Do nothing
 	}

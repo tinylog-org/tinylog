@@ -14,6 +14,7 @@
 package org.pmw.tinylog;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.pmw.tinylog.writers.LogEntry;
@@ -87,13 +88,28 @@ final class WritingThread extends Thread {
 
 			List<WritingTask> writingTasks = getWritingTasks();
 			while (writingTasks != null) {
+				Collection<LoggingWriter> writers = new ArrayList<LoggingWriter>();
+
 				for (WritingTask writingTask : writingTasks) {
 					try {
-						writingTask.writer.write(writingTask.logEntry);
+						LoggingWriter writer = writingTask.writer;
+						writer.write(writingTask.logEntry);
+						if (!writers.contains(writer)) {
+							writers.add(writer);
+						}
 					} catch (Exception ex) {
 						InternalLogger.error(ex, "Failed to write log entry");
 					}
 				}
+
+				for (LoggingWriter writer : writers) {
+					try {
+						writer.flush();
+					} catch (Exception ex) {
+						InternalLogger.error(ex, "Failed to flush writer");
+					}
+				}
+
 				writingTasks = getWritingTasks();
 			}
 

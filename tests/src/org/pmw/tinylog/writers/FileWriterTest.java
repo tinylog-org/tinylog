@@ -104,7 +104,7 @@ public class FileWriterTest extends AbstractTest {
 	}
 
 	/**
-	 * Test if buffered file writer caches log entries.
+	 * Test if buffered file writer writes log entries after close.
 	 * 
 	 * @throws IOException
 	 *             Test failed
@@ -128,6 +128,35 @@ public class FileWriterTest extends AbstractTest {
 		reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
 		reader.close();
+	}
+
+	/**
+	 * Test if buffered file writer writes log entries after flush.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFlush() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath(), true);
+		writer.init(null);
+		assertTrue(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertNull(reader.readLine());
+		reader.close();
+
+		writer.flush();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
+
+		writer.close();
 	}
 
 	/**

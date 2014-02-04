@@ -80,6 +80,11 @@ public final class SharedFileWriter implements LoggingWriter {
 		}
 	}
 
+	@Override
+	public void flush() {
+		// Do nothing
+	}
+
 	/**
 	 * Close the log file.
 	 * 

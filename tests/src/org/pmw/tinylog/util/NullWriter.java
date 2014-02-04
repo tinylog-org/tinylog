@@ -24,10 +24,10 @@ import org.pmw.tinylog.writers.LoggingWriter;
 /**
  * This writer does nothing and just ignores all log entries.
  */
-public final class NullWriter implements LoggingWriter {
+public class NullWriter implements LoggingWriter {
 
 	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
+	public final Set<LogEntryValue> getRequiredLogEntryValues() {
 		return Collections.emptySet();
 	}
 
@@ -39,6 +39,11 @@ public final class NullWriter implements LoggingWriter {
 	@Override
 	public void write(final LogEntry logEntry) {
 		// Just ignore
+	}
+
+	@Override
+	public void flush() {
+		// Do nothing
 	}
 
 	@Override

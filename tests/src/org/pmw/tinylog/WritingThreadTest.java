@@ -22,8 +22,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.pmw.tinylog.util.EvilWriter;
 import org.pmw.tinylog.util.LogEntryBuilder;
+import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntry;
 
@@ -81,6 +81,31 @@ public class WritingThreadTest extends AbstractTest {
 	}
 
 	/**
+	 * Test if writing thread flushes after an iteration.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFlush() throws InterruptedException {
+		DummyWriter writer1 = new DummyWriter();
+		DummyWriter writer2 = new DummyWriter();
+
+		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
+		writingThread.start();
+
+		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("one").create());
+		writingThread.putLogEntry(writer2, new LogEntryBuilder().message("two").create());
+		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("three").create());
+
+		writingThread.shutdown();
+		writingThread.join();
+
+		assertEquals(1, writer1.numberOfFlushes);
+		assertEquals(1, writer2.numberOfFlushes);
+	}
+
+	/**
 	 * Test exceptions for writing log entries by writing thread.
 	 * 
 	 * @throws InterruptedException
@@ -91,7 +116,40 @@ public class WritingThreadTest extends AbstractTest {
 		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
 		writingThread.start();
 
-		writingThread.putLogEntry(new EvilWriter(), new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+		writingThread.putLogEntry(new NullWriter() {
+
+			@Override
+			public void write(final LogEntry logEntry) {
+				throw new UnsupportedOperationException();
+			}
+
+		}, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+
+		writingThread.shutdown();
+		writingThread.join();
+
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+	}
+
+	/**
+	 * Test exceptions for flushing writer.
+	 * 
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFailedFlushWriter() throws InterruptedException {
+		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
+		writingThread.start();
+
+		writingThread.putLogEntry(new NullWriter() {
+
+			@Override
+			public void flush() {
+				throw new UnsupportedOperationException();
+			}
+
+		}, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
 
 		writingThread.shutdown();
 		writingThread.join();
@@ -148,6 +206,17 @@ public class WritingThreadTest extends AbstractTest {
 				yield();
 			}
 		};
+
+	}
+
+	private static final class DummyWriter extends NullWriter {
+
+		private int numberOfFlushes = 0;
+
+		@Override
+		public void flush() {
+			++numberOfFlushes;
+		}
 
 	}
 

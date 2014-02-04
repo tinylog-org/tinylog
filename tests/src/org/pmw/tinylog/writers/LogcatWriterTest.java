@@ -83,4 +83,20 @@ public class LogcatWriterTest extends AbstractTest {
 		writer.close();
 	}
 
+	/**
+	 * Test flushing.
+	 */
+	@Test
+	public final void testFlush() {
+		LogcatWriter writer = new LogcatWriter();
+		writer.init(null);
+
+		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).className("MyClass").renderedLogEntry("Hello").create());
+		writer.flush();
+
+		assertThat(Log.consumeEntries(), is(Collections.singletonList("I\tMyClass\tHello")));
+
+		writer.close();
+	}
+
 }

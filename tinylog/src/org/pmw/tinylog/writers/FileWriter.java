@@ -93,6 +93,13 @@ public final class FileWriter implements LoggingWriter {
 		stream.write(logEntry.getRenderedLogEntry().getBytes());
 	}
 
+	@Override
+	public void flush() throws IOException {
+		if (buffered) {
+			stream.flush();
+		}
+	}
+
 	/**
 	 * Close the log file.
 	 * 

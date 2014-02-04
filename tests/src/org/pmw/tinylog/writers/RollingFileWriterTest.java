@@ -222,13 +222,13 @@ public class RollingFileWriterTest extends AbstractTest {
 	}
 
 	/**
-	 * Test if buffered rolling file writer caches log entries.
+	 * Test if buffered rolling file writer writes log entries after close.
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testBufferedWriting() throws Exception {
+	public final void testBufferedWriting() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, true);
@@ -246,6 +246,35 @@ public class RollingFileWriterTest extends AbstractTest {
 		reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello", reader.readLine());
 		reader.close();
+	}
+
+	/**
+	 * Test if buffered rolling file writer writes log entries after flush.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testFlush() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0, true);
+		writer.init(ConfigurationCreator.getDummyConfiguration());
+		assertTrue(writer.isBuffered());
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertNull(reader.readLine());
+		reader.close();
+
+		writer.flush();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		reader.close();
+
+		writer.close();
 	}
 
 	/**

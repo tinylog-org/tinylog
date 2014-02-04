@@ -257,6 +257,15 @@ public final class RollingFileWriter implements LoggingWriter {
 		}
 	}
 
+	@Override
+	public void flush() throws IOException {
+		if (buffered) {
+			synchronized (mutex) {
+				stream.flush();
+			}
+		}
+	}
+
 	/**
 	 * Close the log file.
 	 * 

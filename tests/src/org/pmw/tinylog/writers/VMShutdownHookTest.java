@@ -187,6 +187,11 @@ public class VMShutdownHookTest extends AbstractTest {
 		}
 
 		@Override
+		public void flush() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public void close() throws Exception {
 			++closeCalls;
 		}

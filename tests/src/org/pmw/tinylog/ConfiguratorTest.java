@@ -47,7 +47,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.Configurator.WritingThreadData;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
-import org.pmw.tinylog.util.EvilWriter;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
@@ -405,7 +404,14 @@ public class ConfiguratorTest extends AbstractTest {
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
-		assertFalse(Configurator.defaultConfig().writer(new EvilWriter()).activate());
+		assertFalse(Configurator.defaultConfig().writer(new NullWriter() {
+
+			@Override
+			public void init(final Configuration configuration) {
+				throw new IllegalArgumentException();
+			}
+
+		}).activate());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
 	}
 

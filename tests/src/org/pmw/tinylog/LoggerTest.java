@@ -30,7 +30,6 @@ import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
@@ -39,11 +38,11 @@ import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
+import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Tests for the logger.
@@ -937,7 +936,7 @@ public class LoggerTest extends AbstractTest {
 
 		/* Call init() method only once */
 
-		LoggingWriterDummy writer = new LoggingWriterDummy();
+		DummyWriter writer = new DummyWriter();
 		configuration = Configurator.defaultConfig().writer(writer).create();
 		Logger.setConfirguration(configuration);
 		assertSame(writer, Logger.getConfiguration().create().getWriter());
@@ -998,28 +997,13 @@ public class LoggerTest extends AbstractTest {
 
 	}
 
-	private static final class LoggingWriterDummy implements LoggingWriter {
+	private static final class DummyWriter extends NullWriter {
 
 		private int numberOfInits = 0;
 
 		@Override
-		public Set<LogEntryValue> getRequiredLogEntryValues() {
-			return Collections.emptySet();
-		}
-
-		@Override
 		public void init(final Configuration configuration) {
 			++numberOfInits;
-		}
-
-		@Override
-		public void write(final LogEntry logEntry) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void close() {
-			// Do nothing
 		}
 
 	}
