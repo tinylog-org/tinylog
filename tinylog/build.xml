@@ -90,7 +90,6 @@
 		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
-			<classpath location="${environment.bin}" />
 			<classpath location="${tinylog.bin}" />
 			<classpath location="${log4j.bin}" />
 		</javac>
@@ -251,7 +250,6 @@
 			<doctitle>Log4j Facade ${version} - API Specification</doctitle>
 			<packageset dir="${log4j.src}" />
 			<classpath>
-				<dirset dir="${environment.bin}" />
 				<dirset dir="${log4j.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
@@ -324,7 +322,6 @@
 			<doctitle>tinylog ${version} - API Specification</doctitle>
 			<packageset dir="${tinylog.src}" />
 			<classpath>
-				<dirset dir="${environment.bin}" />
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
@@ -354,7 +351,6 @@
 		<junit fork="true" failureproperty="junit.tests.failure" errorproperty="junit.tests.error">
 			<formatter type="plain" usefile="false" />
 			<classpath>
-				<path location="${environment.bin}" />
 				<path location="${tinylog.bin}" />
 				<path location="${log4j.bin}" />
 				<path location="${tests.bin}" />
