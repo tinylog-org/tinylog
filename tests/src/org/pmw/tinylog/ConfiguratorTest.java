@@ -50,7 +50,6 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
-import org.pmw.tinylog.writers.LogcatWriter;
 
 /**
  * Tests for configurator.
@@ -80,10 +79,10 @@ public class ConfiguratorTest extends AbstractTest {
 	}
 
 	/**
-	 * Test creating configurations based on the default configuration for normal Oracle Java.
+	 * Test creating configurations based on the default configuration.
 	 */
 	@Test
-	public final void testDefaultForNormalJava() {
+	public final void testDefault() {
 		String runtime = System.getProperty("java.runtime.name");
 		try {
 			System.setProperty("java.runtime.name", "Java(TM) 2 Runtime Environment, Standard Edition");
@@ -94,37 +93,6 @@ public class ConfiguratorTest extends AbstractTest {
 			assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
 			assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
 			assertNotNull(defaultConfiguration.getWriter());
-			assertNull(defaultConfiguration.getWritingThread());
-			assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
-
-			Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
-			assertNotSame(defaultConfiguration, configuration);
-			assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
-			assertEquals(defaultConfiguration.hasCustomLoggingLevels(), configuration.hasCustomLoggingLevels());
-			assertEquals("TEST", configuration.getFormatPattern());
-			assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
-			assertNull(configuration.getWriter());
-			assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
-		} finally {
-			System.setProperty("java.runtime.name", runtime);
-		}
-	}
-
-	/**
-	 * Test creating configurations based on the default configuration for Android.
-	 */
-	@Test
-	public final void testDefaultForAndroid() {
-		String runtime = System.getProperty("java.runtime.name");
-		try {
-			System.setProperty("java.runtime.name", "Android Runtime");
-
-			Configuration defaultConfiguration = Configurator.defaultConfig().create();
-			assertEquals(LoggingLevel.TRACE, defaultConfiguration.getLevel());
-			assertFalse(defaultConfiguration.hasCustomLoggingLevels());
-			assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
-			assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
-			assertThat(defaultConfiguration.getWriter(), instanceOf(LogcatWriter.class));
 			assertNull(defaultConfiguration.getWritingThread());
 			assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
 

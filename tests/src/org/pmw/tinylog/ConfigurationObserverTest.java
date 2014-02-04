@@ -46,8 +46,8 @@ import org.junit.runners.Parameterized.Parameters;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.mocks.SleepHandledThreadMock;
 import org.pmw.tinylog.util.FileHelper;
+import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.LogcatWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -383,11 +383,11 @@ public class ConfigurationObserverTest extends AbstractTest {
 		try {
 			/* Test new writer without arguments */
 
-			FileHelper.write(file, "tinylog.writer=logcat");
+			FileHelper.write(file, "tinylog.writer=console");
 			threadMock.awake();
 			threadMock.waitForSleep();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertThat(currentConfiguration.getWriter(), instanceOf(LogcatWriter.class));
+			assertThat(currentConfiguration.getWriter(), instanceOf(ConsoleWriter.class));
 
 			/* Test remove writer */
 

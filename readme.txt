@@ -20,10 +20,10 @@ benchmark:
 	Contains a benchmark with an ANT script for multiple logging frameworks
 
 environment-stubs:
-	Contains non-standard VM APIs (e.g. for Android)
+	Contains non-standard VM APIs
 
 log4j-facade:
-	Contains the log4j facade (Log4j 1.x compatible logging API.)
+	Contains the log4j facade (Log4j 1.x compatible logging API)
 
 tests:
 	Contains all JUnit tests

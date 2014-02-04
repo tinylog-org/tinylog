@@ -26,15 +26,6 @@ public final class EnvironmentHelper {
 	}
 
 	/**
-	 * Check if running on Android.
-	 * 
-	 * @return <code>true</code> if we running on Android, <code>false</code> if not
-	 */
-	public static boolean isAndroid() {
-		return "Android Runtime".equalsIgnoreCase(System.getProperty("java.runtime.name"));
-	}
-
-	/**
 	 * Get the line separator.
 	 * 
 	 * @return Line separator
@@ -49,16 +40,12 @@ public final class EnvironmentHelper {
 	 * @return ID of the current process
 	 */
 	public static Object getProcessId() {
-		if (isAndroid()) {
-			return android.os.Process.myPid();
+		String name = ManagementFactory.getRuntimeMXBean().getName();
+		int index = name.indexOf('@');
+		if (index > 0) {
+			return name.substring(0, index);
 		} else {
-			String name = ManagementFactory.getRuntimeMXBean().getName();
-			int index = name.indexOf('@');
-			if (index > 0) {
-				return name.substring(0, index);
-			} else {
-				return name;
-			}
+			return name;
 		}
 	}
 

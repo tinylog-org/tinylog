@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.LogcatWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
@@ -84,13 +83,8 @@ public final class Configurator {
 	 * @return A new configurator
 	 */
 	public static Configurator defaultConfig() {
-		if (EnvironmentHelper.isAndroid()) {
-			return new Configurator(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{message}", Locale.getDefault(), new LogcatWriter(),
-					null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
-		} else {
-			return new Configurator(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
-					new ConsoleWriter(), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
-		}
+		return new Configurator(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
+				new ConsoleWriter(), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
 	}
 
 	/**
