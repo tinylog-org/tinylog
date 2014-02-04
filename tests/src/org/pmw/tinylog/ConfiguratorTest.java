@@ -83,30 +83,23 @@ public class ConfiguratorTest extends AbstractTest {
 	 */
 	@Test
 	public final void testDefault() {
-		String runtime = System.getProperty("java.runtime.name");
-		try {
-			System.setProperty("java.runtime.name", "Java(TM) 2 Runtime Environment, Standard Edition");
+		Configuration defaultConfiguration = Configurator.defaultConfig().create();
+		assertEquals(LoggingLevel.INFO, defaultConfiguration.getLevel());
+		assertFalse(defaultConfiguration.hasCustomLoggingLevels());
+		assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
+		assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
+		assertNotNull(defaultConfiguration.getWriter());
+		assertNull(defaultConfiguration.getWritingThread());
+		assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
 
-			Configuration defaultConfiguration = Configurator.defaultConfig().create();
-			assertEquals(LoggingLevel.INFO, defaultConfiguration.getLevel());
-			assertFalse(defaultConfiguration.hasCustomLoggingLevels());
-			assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
-			assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
-			assertNotNull(defaultConfiguration.getWriter());
-			assertNull(defaultConfiguration.getWritingThread());
-			assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
-
-			Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
-			assertNotSame(defaultConfiguration, configuration);
-			assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
-			assertEquals(defaultConfiguration.hasCustomLoggingLevels(), configuration.hasCustomLoggingLevels());
-			assertEquals("TEST", configuration.getFormatPattern());
-			assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
-			assertNull(configuration.getWriter());
-			assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
-		} finally {
-			System.setProperty("java.runtime.name", runtime);
-		}
+		Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("TEST").create();
+		assertNotSame(defaultConfiguration, configuration);
+		assertEquals(defaultConfiguration.getLevel(), configuration.getLevel());
+		assertEquals(defaultConfiguration.hasCustomLoggingLevels(), configuration.hasCustomLoggingLevels());
+		assertEquals("TEST", configuration.getFormatPattern());
+		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
+		assertNull(configuration.getWriter());
+		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
 	}
 
 	/**
