@@ -627,7 +627,7 @@ public final class Logger {
 			LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
 
 			if (currentConfiguration.hasCustomLoggingLevels()) {
-				stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+				stackTraceElement = getStackTraceElement(strackTraceDeep);
 				activeLoggingLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 			}
 
@@ -729,28 +729,28 @@ public final class Logger {
 
 				case CLASS:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					fullyQualifiedClassName = stackTraceElement.getClassName();
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					method = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					filename = stackTraceElement.getFileName();
 					break;
 
 				case LINE_NUMBER:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(currentConfiguration, strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
 					line = stackTraceElement.getLineNumber();
 					break;
@@ -837,7 +837,7 @@ public final class Logger {
 		return new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception, renderedLogEntry);
 	}
 
-	private static StackTraceElement getStackTraceElement(final Configuration currentConfiguration, final int deep) {
+	private static StackTraceElement getStackTraceElement(final int deep) {
 		if (stackTraceMethod != null) {
 			try {
 				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
