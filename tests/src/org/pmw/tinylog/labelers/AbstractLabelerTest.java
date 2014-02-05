@@ -22,7 +22,7 @@ import org.pmw.tinylog.AbstractTest;
  * 
  * @see Labeler
  */
-public class AbstractLabelerTest extends AbstractTest {
+public abstract class AbstractLabelerTest extends AbstractTest {
 
 	/**
 	 * Generate a backup file for a given log file.

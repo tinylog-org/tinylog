@@ -90,4 +90,5 @@ public class LogFileComparatorTest extends AbstractTest {
 		/* Less than 0 means that the second file is the youngest */
 		assertThat(comparator.compare(file1, file2), lessThan(0));
 	}
+
 }
