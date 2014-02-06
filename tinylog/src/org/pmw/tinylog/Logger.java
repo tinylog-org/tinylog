@@ -842,7 +842,7 @@ public final class Logger {
 			try {
 				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
 			} catch (Exception ex) {
-				// Fallback
+				InternalLogger.warn(ex, "Failed to get single stack trace element from throwable");
 			}
 		}
 
