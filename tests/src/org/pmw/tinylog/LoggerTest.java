@@ -966,7 +966,10 @@ public class LoggerTest extends AbstractTest {
 			StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
 			Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{class}.{method}()").activate();
 
+			StringListOutputStream errorStream = getErrorStream();
+			assertFalse(errorStream.hasLines());
 			Logger.info("Hello");
+			assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("stack trace element")));
 
 			LogEntry logEntry = writer.consumeLogEntry();
 			assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
