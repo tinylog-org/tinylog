@@ -245,7 +245,7 @@ final class PropertiesLoader {
 	 */
 	static void readWritingThread(final Configurator configurator, final Properties properties) {
 		String writingThread = properties.getProperty(WRITING_THREAD_PROPERTY);
-		if ("true".equalsIgnoreCase(writingThread) || "1".equalsIgnoreCase(writingThread)) {
+		if ("true".equalsIgnoreCase(writingThread)) {
 			String observedThread = properties.getProperty(WRITING_THREAD_OBSERVE_PROPERTY);
 			boolean observedThreadDefined = observedThread != null;
 			if (observedThreadDefined && observedThread.equalsIgnoreCase("null")) {
@@ -376,7 +376,7 @@ final class PropertiesLoader {
 							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 							return null;
 						} catch (InvocationTargetException ex) {
-							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{0}\"", writerClass.getName());
 							return null;
 						}
 					}
@@ -438,12 +438,12 @@ final class PropertiesLoader {
 					Policy[] policies = parsePolicies(value);
 					if (policies == null) {
 						return null;
-					} else if (policies.length == 0) {
-						return null;
 					} else {
 						parameters[i] = policies;
 					}
 				} else {
+					InternalLogger.error("\"{1}\" for \"{0}\" is an unsupported type (String, int, boolean, Labeler, Policy and Policy[] are supported)",
+							WRITER_PROPERTY + "." + name, type.getName());
 					return null;
 				}
 			}
@@ -452,11 +452,35 @@ final class PropertiesLoader {
 		return parameters;
 	}
 
+	private static Labeler parseLabeler(final String string) {
+		int separator = string.indexOf(':');
+		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
+		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
+
+		for (Class<?> implementation : findImplementations(Labeler.class)) {
+			org.pmw.tinylog.labelers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labelers.PropertiesSupport.class);
+			if (propertiesSupport != null) {
+				if (name.equalsIgnoreCase(propertiesSupport.name())) {
+					Labeler labeler = (Labeler) createInstance(implementation, parameter);
+					if (labeler == null) {
+						InternalLogger.error("Failed to initialize {0} labeler", name);
+					}
+					return labeler;
+				}
+			}
+		}
+
+		InternalLogger.error("Cannot find a labeler for the name \"{0}\"", name);
+		return null;
+	}
+
 	private static Policy[] parsePolicies(final String string) {
 		List<Policy> policies = new ArrayList<Policy>();
 		for (String part : string.split(Pattern.quote(","))) {
 			Policy policy = parsePolicy(part.trim());
-			if (policy != null) {
+			if (policy == null) {
+				return null;
+			} else {
 				policies.add(policy);
 			}
 		}
@@ -472,30 +496,16 @@ final class PropertiesLoader {
 			org.pmw.tinylog.policies.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.policies.PropertiesSupport.class);
 			if (propertiesSupport != null) {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
-					return (Policy) createInstance(implementation, parameter);
+					Policy policy = (Policy) createInstance(implementation, parameter);
+					if (policy == null) {
+						InternalLogger.error("Failed to initialize {0} policy", name);
+					}
+					return policy;
 				}
 			}
 		}
 
 		InternalLogger.error("Cannot find a policy for the name \"{0}\"", name);
-		return null;
-	}
-
-	private static Labeler parseLabeler(final String string) {
-		int separator = string.indexOf(':');
-		String name = separator > 0 ? string.substring(0, separator).trim() : string.trim();
-		String parameter = separator > 0 ? string.substring(separator + 1).trim() : null;
-
-		for (Class<?> implementation : findImplementations(Labeler.class)) {
-			org.pmw.tinylog.labelers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labelers.PropertiesSupport.class);
-			if (propertiesSupport != null) {
-				if (name.equalsIgnoreCase(propertiesSupport.name())) {
-					return (Labeler) createInstance(implementation, parameter);
-				}
-			}
-		}
-
-		InternalLogger.error("Cannot find a labeler for the name \"{0}\"", name);
 		return null;
 	}
 
@@ -520,12 +530,11 @@ final class PropertiesLoader {
 			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (InvocationTargetException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		} catch (NoSuchMethodException ex) {
 			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
 			return null;
 		}
 	}
-
 }

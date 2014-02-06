@@ -92,10 +92,19 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	 *             Failed to create a temporary file for resource
 	 */
 	public File set(final String resource, final String content) throws IOException {
-		File file = getOrCreateFile(resource);
-		FileHelper.write(file, content);
-		resources.put(resource, file);
-		return file;
+		if (content == null) {
+			File file = resources.get(resource);
+			if (file != null) {
+				file.delete();
+			}
+			resources.put(resource, null);
+			return null;
+		} else {
+			File file = getOrCreateFile(resource);
+			FileHelper.write(file, content);
+			resources.put(resource, file);
+			return file;
+		}
 	}
 
 	/**
@@ -114,7 +123,9 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	@Override
 	public void close() {
 		for (File file : resources.values()) {
-			file.delete();
+			if (file != null) {
+				file.delete();
+			}
 		}
 	}
 
@@ -131,12 +142,16 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	protected URL findResource(final Invocation invocation, final String name) {
 		URL url = invocation.proceed(name);
 		if (url == null && classLoader == invocation.getInvokedInstance()) {
-			File file = resources.get(name);
-			if (file != null) {
-				try {
-					url = file.toURI().toURL();
-				} catch (MalformedURLException ex) {
-					ex.printStackTrace();
+			if (resources.containsKey(name)) {
+				File file = resources.get(name);
+				if (file == null) {
+					url = null;
+				} else {
+					try {
+						url = file.toURI().toURL();
+					} catch (MalformedURLException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
 		}
@@ -159,12 +174,16 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 		if (classLoader == invocation.getInvokedInstance()) {
 			Enumeration<URL> enumeration = invocation.proceed(name);
 			List<URL> urls = new ArrayList<URL>(Collections.list(enumeration));
-			File file = resources.get(name);
-			if (file != null) {
-				try {
-					urls.add(file.toURI().toURL());
-				} catch (MalformedURLException ex) {
-					ex.printStackTrace();
+			if (resources.containsKey(name)) {
+				File file = resources.get(name);
+				if (file == null) {
+					urls.clear();
+				} else {
+					try {
+						urls.add(file.toURI().toURL());
+					} catch (MalformedURLException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
 			return Collections.enumeration(urls);
