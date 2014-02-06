@@ -38,7 +38,9 @@ public final class StringListOutputStream extends OutputStream {
 	 * @return <code>true</code> if there are any lines, <code>false</code> if not
 	 */
 	public boolean hasLines() {
-		return lines.size() > 0;
+		synchronized (lines) {
+			return lines.size() > 0;
+		}
 	}
 
 	/**
@@ -47,11 +49,13 @@ public final class StringListOutputStream extends OutputStream {
 	 * @return The first line or <code>null</code> if there is no line
 	 */
 	public String nextLine() {
-		CharSequence line = lines.pollFirst();
-		if (line == null) {
-			return null;
-		} else {
-			return line.toString();
+		synchronized (lines) {
+			CharSequence line = lines.pollFirst();
+			if (line == null) {
+				return null;
+			} else {
+				return line.toString();
+			}
 		}
 	}
 
@@ -59,36 +63,42 @@ public final class StringListOutputStream extends OutputStream {
 	 * Remove all lines.
 	 */
 	public void clear() {
-		lines.clear();
+		synchronized (lines) {
+			lines.clear();
+		}
 	}
 
 	@Override
 	public void write(final int b) throws IOException {
-		CharSequence lastLine = lines.peekLast();
-		if (lastLine == null || lastLine instanceof String) {
-			lastLine = new StringBuilder();
-			lines.add(lastLine);
-		}
+		synchronized (lines) {
+			CharSequence lastLine = lines.peekLast();
+			if (lastLine == null || lastLine instanceof String) {
+				lastLine = new StringBuilder();
+				lines.add(lastLine);
+			}
 
-		if (b == '\n') {
-			lines.removeLast();
-			lines.add(lastLine.toString());
-		} else if (b != '\r') {
-			((StringBuilder) lastLine).append((char) b);
+			if (b == '\n') {
+				lines.removeLast();
+				lines.add(lastLine.toString());
+			} else if (b != '\r') {
+				((StringBuilder) lastLine).append((char) b);
+			}
 		}
 	}
 
 	@Override
 	public String toString() {
-		String[] array = lines.toArray(new String[0]);
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < array.length; ++i) {
-			if (i > 0) {
-				builder.append(EnvironmentHelper.getNewLine());
+		synchronized (lines) {
+			String[] array = lines.toArray(new String[0]);
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i < array.length; ++i) {
+				if (i > 0) {
+					builder.append(EnvironmentHelper.getNewLine());
+				}
+				builder.append(array[i]);
 			}
-			builder.append(array[i]);
+			return builder.toString();
 		}
-		return builder.toString();
 	}
 
 }
