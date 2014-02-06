@@ -81,7 +81,7 @@ public final class VMShutdownHook extends Thread {
 					try {
 						writer.close();
 					} catch (Exception ex) {
-						InternalLogger.error(ex, "Failed to shutdown longging writer");
+						InternalLogger.error(ex, "Failed to shutdown logging writer");
 					}
 				}
 
