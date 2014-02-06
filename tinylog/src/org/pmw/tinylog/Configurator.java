@@ -524,7 +524,7 @@ public final class Configurator {
 		} else {
 			writingThread = new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
 			if (writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
-				InternalLogger.warn("Thread \"{0}\" couldn't be found, writing thread won't be used", writingThreadData.threadToObserve);
+				InternalLogger.warn("Thread \"{0}\" could not be found, writing thread will not be used", writingThreadData.threadToObserve);
 				writingThread = null;
 			}
 		}
