@@ -907,7 +907,7 @@ public final class Logger {
 		}
 
 		StackTraceElement[] stackTrace = exception.getStackTrace();
-		int length = Math.max(1, Math.min(stackTrace.length, countStackTraceElements));
+		int length = Math.min(stackTrace.length, Math.max(1, countStackTraceElements));
 		for (int i = 0; i < length; ++i) {
 			builder.append(NEW_LINE);
 			builder.append('\t');

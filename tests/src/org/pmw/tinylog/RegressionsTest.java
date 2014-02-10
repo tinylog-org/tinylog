@@ -14,6 +14,7 @@
 package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -172,6 +173,24 @@ public class RegressionsTest extends AbstractTest {
 		Configurator.defaultConfig().writer(writer).activate(); // Failed
 		writer.close();
 		file.delete();
+	}
+
+	/**
+	 * Bug: Exceptions with an empty stack trace cause an {@link java.lang.ArrayIndexOutOfBoundsException
+	 * ArrayIndexOutOfBoundsException}.
+	 */
+	@Test
+	public final void testLogExceptionWithEmptyStackTrace() {
+		StoreWriter writer = new StoreWriter(LogEntryValue.RENDERED_LOG_ENTRY);
+		Configurator.defaultConfig().writer(writer).formatPattern("{message}").activate();
+
+		Exception exception = new Exception();
+		exception.setStackTrace(new StackTraceElement[0]);
+		Logger.error(exception); // Failed (java.lang.ArrayIndexOutOfBoundsException)
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertNotNull(logEntry);
+		assertEquals(exception.getClass().getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	private void resetLogger() throws Exception {
