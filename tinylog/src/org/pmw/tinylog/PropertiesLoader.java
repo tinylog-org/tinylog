@@ -402,16 +402,7 @@ final class PropertiesLoader {
 				}
 			} else {
 				Class<?> type = definition[i].type();
-				if (String.class.equals(type)) {
-					parameters[i] = value;
-				} else if (int.class.equals(type)) {
-					try {
-						parameters[i] = Integer.parseInt(value);
-					} catch (NumberFormatException ex) {
-						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", WRITER_PROPERTY + "." + name, value);
-						return null;
-					}
-				} else if (boolean.class.equals(type)) {
+				if (boolean.class.equals(type)) {
 					if ("true".equalsIgnoreCase(value)) {
 						parameters[i] = Boolean.TRUE;
 					} else if ("false".equalsIgnoreCase(value)) {
@@ -420,6 +411,17 @@ final class PropertiesLoader {
 						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", WRITER_PROPERTY + "." + name, value);
 						return null;
 					}
+				} else if (int.class.equals(type)) {
+					try {
+						parameters[i] = Integer.parseInt(value);
+					} catch (NumberFormatException ex) {
+						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", WRITER_PROPERTY + "." + name, value);
+						return null;
+					}
+				} else if (String.class.equals(type)) {
+					parameters[i] = value;
+				} else if (String[].class.equals(type)) {
+					parameters[i] = parseStrings(value);
 				} else if (Labeler.class.equals(type)) {
 					Object labeler = parseLabeler(value);
 					if (labeler == null) {
@@ -450,6 +452,30 @@ final class PropertiesLoader {
 		}
 
 		return parameters;
+	}
+
+	private static String[] parseStrings(final String value) {
+		int size = 1;
+		for (int i = 0; i < value.length(); ++i) {
+			if (value.charAt(i) == ',') {
+				++size;
+			}
+		}
+
+		String[] values = new String[size];
+
+		int start = 0;
+		int counter = 0;
+		for (int i = 0; i < value.length(); ++i) {
+			if (value.charAt(i) == ',') {
+				values[counter] = start >= i ? "" : value.substring(start, i).trim();
+				start = i + 1;
+				++counter;
+			}
+		}
+		values[counter] = start >= value.length() ? "" : value.substring(start).trim();
+
+		return values;
 	}
 
 	private static Labeler parseLabeler(final String string) {

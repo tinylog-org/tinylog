@@ -33,9 +33,10 @@ public @interface Property {
 	 * Type of the property. Currently are supported:
 	 * 
 	 * <ul>
-	 * <li><code>String.class</code></li>
-	 * <li><code>int.class</code></li>
 	 * <li><code>boolean.class</code></li>
+	 * <li><code>int.class</code></li>
+	 * <li><code>String.class</code></li>
+	 * <li><code>String[].class</code></li>
 	 * <li><code>Labeler.class</code></li>
 	 * <li><code>Policy.class</code></li>
 	 * <li><code>Policy[].class</code></li>

@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -290,36 +291,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 
-			/* With string property */
-
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.string", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals("abc", ((PropertiesWriter) writer).stringValue);
-
-			/* With integer property */
-
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "42");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals(Integer.valueOf(42), ((PropertiesWriter) writer).intValue);
-
-			assertFalse(errorStream.hasLines());
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
-
 			/* With boolean property */
 
 			configurator = Configurator.defaultConfig();
@@ -347,6 +318,70 @@ public class PropertiesLoaderTest extends AbstractTest {
 			assertEquals(ConsoleWriter.class, writer.getClass());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.boolean"), containsString("abc")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+
+			/* With integer property */
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "42");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertEquals(Integer.valueOf(42), ((PropertiesWriter) writer).intValue);
+
+			assertFalse(errorStream.hasLines());
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "abc");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(ConsoleWriter.class, writer.getClass());
+			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
+			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+
+			/* With string property */
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.string", "abc");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertEquals("abc", ((PropertiesWriter) writer).stringValue);
+
+			/* With strings properties */
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "abc");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertArrayEquals(new String[] { "abc" }, ((PropertiesWriter) writer).stringsValue);
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "abc, test");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertArrayEquals(new String[] { "abc", "test" }, ((PropertiesWriter) writer).stringsValue);
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertArrayEquals(new String[] { "" }, ((PropertiesWriter) writer).stringsValue);
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", ",,");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			assertArrayEquals(new String[] { "", "", "" }, ((PropertiesWriter) writer).stringsValue);
 
 			/* With labeler property */
 
@@ -1162,55 +1197,62 @@ public class PropertiesLoaderTest extends AbstractTest {
 		file.delete();
 	}
 
-	@PropertiesSupport(name = "properties", properties = { @Property(name = "string", type = String.class, optional = true),
-			@Property(name = "int", type = int.class, optional = true), @Property(name = "boolean", type = boolean.class, optional = true),
-			@Property(name = "labeler", type = Labeler.class, optional = true), @Property(name = "policy", type = Policy.class, optional = true),
-			@Property(name = "policies", type = Policy[].class, optional = true) })
+	@PropertiesSupport(name = "properties", properties = { @Property(name = "boolean", type = boolean.class, optional = true),
+			@Property(name = "int", type = int.class, optional = true), @Property(name = "string", type = String.class, optional = true),
+			@Property(name = "strings", type = String[].class, optional = true), @Property(name = "labeler", type = Labeler.class, optional = true),
+			@Property(name = "policy", type = Policy.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true) })
 	private static final class PropertiesWriter extends NullWriter {
 
-		private final String stringValue;
-		private final Integer intValue;
 		private final Boolean booleanValue;
+		private final Integer intValue;
+		private final String stringValue;
+		private final String[] stringsValue;
 		private final Labeler labeler;
 		private final Policy policy;
 		private final Policy[] policies;
 
 		@SuppressWarnings("unused")
-		public PropertiesWriter(final String stringValue, final Labeler labeler, final Policy policy, final Policy[] policies) {
-			this.stringValue = stringValue;
-			this.intValue = null;
+		public PropertiesWriter(final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy, final Policy[] policies) {
 			this.booleanValue = null;
-			this.labeler = labeler;
-			this.policy = policy;
-			this.policies = policies;
-		}
-
-		@SuppressWarnings("unused")
-		public PropertiesWriter(final String stringValue, final int intValue, final Labeler labeler, final Policy policy, final Policy[] policies) {
-			this.stringValue = stringValue;
-			this.intValue = intValue;
-			this.booleanValue = null;
-			this.labeler = labeler;
-			this.policy = policy;
-			this.policies = policies;
-		}
-
-		@SuppressWarnings("unused")
-		public PropertiesWriter(final String stringValue, final boolean booleanValue, final Labeler labeler, final Policy policy, final Policy[] policies) {
-			this.stringValue = stringValue;
 			this.intValue = null;
-			this.booleanValue = booleanValue;
+			this.stringValue = stringValue;
+			this.stringsValue = stringsValue;
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
 		}
 
 		@SuppressWarnings("unused")
-		public PropertiesWriter(final String stringValue, final int intValue, final boolean booleanValue, final Labeler labeler, final Policy policy,
+		public PropertiesWriter(final int intValue, final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy,
 				final Policy[] policies) {
-			this.stringValue = stringValue;
+			this.booleanValue = null;
 			this.intValue = intValue;
+			this.stringValue = stringValue;
+			this.stringsValue = stringsValue;
+			this.labeler = labeler;
+			this.policy = policy;
+			this.policies = policies;
+		}
+
+		@SuppressWarnings("unused")
+		public PropertiesWriter(final boolean booleanValue, final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy,
+				final Policy[] policies) {
 			this.booleanValue = booleanValue;
+			this.intValue = null;
+			this.stringValue = stringValue;
+			this.stringsValue = stringsValue;
+			this.labeler = labeler;
+			this.policy = policy;
+			this.policies = policies;
+		}
+
+		@SuppressWarnings("unused")
+		public PropertiesWriter(final boolean booleanValue, final int intValue, final String stringValue, final String[] stringsValue, final Labeler labeler,
+				final Policy policy, final Policy[] policies) {
+			this.booleanValue = booleanValue;
+			this.intValue = intValue;
+			this.stringValue = stringValue;
+			this.stringsValue = stringsValue;
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
