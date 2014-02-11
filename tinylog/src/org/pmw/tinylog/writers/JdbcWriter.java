@@ -276,7 +276,7 @@ public final class JdbcWriter implements LoggingWriter {
 	}
 
 	private static List<Value> renderValues(final String[] strings) {
-		List<Value> values = new ArrayList<>(strings.length);
+		List<Value> values = new ArrayList<Value>(strings.length);
 		for (String string : strings) {
 			if ("date".equalsIgnoreCase(string)) {
 				values.add(Value.DATE);
@@ -327,7 +327,7 @@ public final class JdbcWriter implements LoggingWriter {
 		builder.append("INSERT INTO ");
 
 		String quote = connection.getMetaData().getIdentifierQuoteString();
-		if (quote == null || quote.trim().isEmpty()) {
+		if (quote == null || quote.trim().length() == 0) {
 			for (int i = 0; i < table.length(); ++i) {
 				char c = table.charAt(i);
 				if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
