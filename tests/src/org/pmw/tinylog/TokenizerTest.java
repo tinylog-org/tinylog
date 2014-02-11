@@ -87,7 +87,7 @@ public class TokenizerTest extends AbstractTest {
 
 		tokens = Tokenizer.parse("{thread}", locale);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.THREAD, tokens.get(0).getType());
+		assertEquals(TokenType.THREAD_NAME, tokens.get(0).getType());
 
 		tokens = Tokenizer.parse("{thread_id}", locale);
 		assertEquals(1, tokens.size());
@@ -97,13 +97,13 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.CLASS, tokens.get(0).getType());
 
-		tokens = Tokenizer.parse("{package}", locale);
-		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PACKAGE, tokens.get(0).getType());
-
 		tokens = Tokenizer.parse("{class_name}", locale);
 		assertEquals(1, tokens.size());
 		assertEquals(TokenType.CLASS_NAME, tokens.get(0).getType());
+
+		tokens = Tokenizer.parse("{package}", locale);
+		assertEquals(1, tokens.size());
+		assertEquals(TokenType.PACKAGE, tokens.get(0).getType());
 
 		tokens = Tokenizer.parse("{method}", locale);
 		assertEquals(1, tokens.size());
@@ -135,7 +135,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(6, tokens.size());
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
 		assertEquals("Hello ", tokens.get(0).getData());
-		assertEquals(TokenType.THREAD, tokens.get(1).getType());
+		assertEquals(TokenType.THREAD_NAME, tokens.get(1).getType());
 		assertEquals(TokenType.PLAIN_TEXT, tokens.get(2).getType());
 		assertEquals("!" + EnvironmentHelper.getNewLine() + "I'm ", tokens.get(2).getData());
 		assertEquals(TokenType.METHOD, tokens.get(3).getType());

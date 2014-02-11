@@ -224,7 +224,7 @@ public final class Configuration {
 			} else if (logEntryValuesOfWriter.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
 				Set<LogEntryValue> requiredLogEntryValues = EnumSet.copyOf(logEntryValuesOfWriter);
 				for (Token token : formatTokens) {
-					LogEntryValue logEntryValue = getRequiredLogEntryValue(token);
+					LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
 					if (logEntryValue != null) {
 						requiredLogEntryValues.add(logEntryValue);
 					}
@@ -243,40 +243,6 @@ public final class Configuration {
 			return StackTraceInformation.CLASS_NAME;
 		} else {
 			return StackTraceInformation.NONE;
-		}
-	}
-
-	private static LogEntryValue getRequiredLogEntryValue(final Token token) {
-		switch (token.getType()) {
-			case THREAD:
-			case THREAD_ID:
-				return LogEntryValue.THREAD;
-
-			case CLASS:
-			case CLASS_NAME:
-			case PACKAGE:
-				return LogEntryValue.CLASS;
-
-			case METHOD:
-				return LogEntryValue.METHOD;
-
-			case FILE:
-				return LogEntryValue.FILE;
-
-			case LINE_NUMBER:
-				return LogEntryValue.LINE_NUMBER;
-
-			case LOGGING_LEVEL:
-				return LogEntryValue.LOGGING_LEVEL;
-
-			case DATE:
-				return LogEntryValue.DATE;
-
-			case MESSAGE:
-				return LogEntryValue.MESSAGE;
-
-			default:
-				return null;
 		}
 	}
 

@@ -76,18 +76,26 @@ final class Tokenizer {
 	}
 
 	private static Token getToken(final String text, final Locale locale) {
-		if ("{pid}".equals(text)) {
+		if (text.startsWith("{date") && text.endsWith("}")) {
+			String dateFormatPattern;
+			if (text.length() > 6) {
+				dateFormatPattern = text.substring(6, text.length() - 1);
+			} else {
+				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
+			}
+			return new Token(TokenType.DATE, new SimpleDateFormat(dateFormatPattern, locale));
+		} else if ("{pid}".equals(text)) {
 			return new Token(TokenType.PLAIN_TEXT, EnvironmentHelper.getProcessId().toString());
 		} else if ("{thread}".equals(text)) {
-			return new Token(TokenType.THREAD);
+			return new Token(TokenType.THREAD_NAME);
 		} else if ("{thread_id}".equals(text)) {
 			return new Token(TokenType.THREAD_ID);
 		} else if ("{class}".equals(text)) {
 			return new Token(TokenType.CLASS);
-		} else if ("{package}".equals(text)) {
-			return new Token(TokenType.PACKAGE);
 		} else if ("{class_name}".equals(text)) {
 			return new Token(TokenType.CLASS_NAME);
+		} else if ("{package}".equals(text)) {
+			return new Token(TokenType.PACKAGE);
 		} else if ("{method}".equals(text)) {
 			return new Token(TokenType.METHOD);
 		} else if ("{file}".equals(text)) {
@@ -98,14 +106,6 @@ final class Tokenizer {
 			return new Token(TokenType.LOGGING_LEVEL);
 		} else if ("{message}".equals(text)) {
 			return new Token(TokenType.MESSAGE);
-		} else if (text.startsWith("{date") && text.endsWith("}")) {
-			String dateFormatPattern;
-			if (text.length() > 6) {
-				dateFormatPattern = text.substring(6, text.length() - 1);
-			} else {
-				dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
-			}
-			return new Token(TokenType.DATE, new SimpleDateFormat(dateFormatPattern, locale));
 		} else {
 			String plainText = NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE);
 			plainText = TAB_REPLACER.matcher(plainText).replaceAll(TAB);

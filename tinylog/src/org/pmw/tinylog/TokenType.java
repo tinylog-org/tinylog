@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog;
 
+import org.pmw.tinylog.writers.LogEntryValue;
+
 /**
  * Token types.
  */
@@ -21,63 +23,78 @@ enum TokenType {
 	/**
 	 * Plain text
 	 */
-	PLAIN_TEXT,
+	PLAIN_TEXT(null),
 
 	/**
 	 * The current date
 	 */
-	DATE,
+	DATE(LogEntryValue.DATE),
 
 	/**
 	 * The name of the current thread
 	 */
-	THREAD,
+	THREAD_NAME(LogEntryValue.THREAD),
 
 	/**
 	 * The ID of the current thread
 	 */
-	THREAD_ID,
+	THREAD_ID(LogEntryValue.THREAD),
 
 	/**
 	 * The fully qualified class name of the caller
 	 */
-	CLASS,
+	CLASS(LogEntryValue.CLASS),
 
 	/**
 	 * The class name of the caller
 	 */
-	CLASS_NAME,
+	CLASS_NAME(LogEntryValue.CLASS),
 
 	/**
 	 * The package name of the caller
 	 */
-	PACKAGE,
+	PACKAGE(LogEntryValue.CLASS),
 
 	/**
 	 * The method name of the caller
 	 */
-	METHOD,
+	METHOD(LogEntryValue.METHOD),
 
 	/**
 	 * The source filename of the caller
 	 */
-	FILE,
+	FILE(LogEntryValue.FILE),
 
 	/**
 	 * The line number of calling
 	 */
-	LINE_NUMBER,
+	LINE_NUMBER(LogEntryValue.LINE_NUMBER),
 
 	/**
 	 * The logging level
 	 * 
 	 * @see LoggingLevel
 	 */
-	LOGGING_LEVEL,
+	LOGGING_LEVEL(LogEntryValue.LOGGING_LEVEL),
 
 	/**
 	 * The logging message (including a possible exception stack trace)
 	 */
-	MESSAGE;
+	MESSAGE(LogEntryValue.MESSAGE);
+
+	private final LogEntryValue requiredLogEntryValue;
+
+	private TokenType(final LogEntryValue requiredLogEntryValue) {
+		this.requiredLogEntryValue = requiredLogEntryValue;
+	}
+
+	/**
+	 * Get the required log entry value.
+	 * 
+	 * @return Required log entry value
+	 */
+	LogEntryValue getRequiredLogEntryValue() {
+		return requiredLogEntryValue;
+	}
 
 }

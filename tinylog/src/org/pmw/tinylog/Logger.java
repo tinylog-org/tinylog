@@ -771,7 +771,11 @@ public final class Logger {
 			StringBuilder builder = new StringBuilder();
 			for (Token token : currentConfiguration.getFormatTokens()) {
 				switch (token.getType()) {
-					case THREAD:
+					case DATE:
+						builder.append(getRenderedDate(now, token));
+						break;
+
+					case THREAD_NAME:
 						builder.append(thread.getName());
 						break;
 
@@ -805,10 +809,6 @@ public final class Logger {
 
 					case LOGGING_LEVEL:
 						builder.append(level);
-						break;
-
-					case DATE:
-						builder.append(getRenderedDate(now, token));
 						break;
 
 					case MESSAGE:
