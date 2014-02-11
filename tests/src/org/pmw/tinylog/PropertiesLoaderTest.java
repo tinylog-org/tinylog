@@ -32,6 +32,7 @@ import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -55,6 +56,8 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
+import org.pmw.tinylog.writers.JdbcWriter;
+import org.pmw.tinylog.writers.JdbcWriter.Value;
 import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
@@ -475,6 +478,136 @@ public class PropertiesLoaderTest extends AbstractTest {
 		LoggingWriter writer = configurator.create().getWriter();
 		assertNotNull(writer);
 		assertEquals(ConsoleWriter.class, writer.getClass());
+	}
+
+	/**
+	 * Test reading JDBC logging writer.
+	 */
+	@Test
+	public final void testReadJdbcLoggingWriter() {
+		StringListOutputStream errorStream = getErrorStream();
+
+		Configurator configurator = Configurator.defaultConfig();
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		LoggingWriter writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(ConsoleWriter.class, writer.getClass());
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.url")));
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
+		assertFalse(errorStream.hasLines());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(ConsoleWriter.class, writer.getClass());
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.table")));
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
+		assertFalse(errorStream.hasLines());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(ConsoleWriter.class, writer.getClass());
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.values")));
+		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
+		assertFalse(errorStream.hasLines());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		JdbcWriter jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertFalse(jdbcWriter.isBatch());
+		assertNull(jdbcWriter.getUsername());
+		assertNull(jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry").set("batch", "false");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertFalse(jdbcWriter.isBatch());
+		assertNull(jdbcWriter.getUsername());
+		assertNull(jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "true");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertTrue(jdbcWriter.isBatch());
+		assertNull(jdbcWriter.getUsername());
+		assertNull(jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.username", "admin").set("tinylog.writer.password", "123");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertFalse(jdbcWriter.isBatch());
+		assertEquals("admin", jdbcWriter.getUsername());
+		assertEquals("123", jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "false").set("tinylog.writer.username", "admin")
+				.set("tinylog.writer.password", "123");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertFalse(jdbcWriter.isBatch());
+		assertEquals("admin", jdbcWriter.getUsername());
+		assertEquals("123", jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "true").set("tinylog.writer.username", "admin")
+				.set("tinylog.writer.password", "123");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertTrue(jdbcWriter.isBatch());
+		assertEquals("admin", jdbcWriter.getUsername());
+		assertEquals("123", jdbcWriter.getPassword());
 	}
 
 	/**

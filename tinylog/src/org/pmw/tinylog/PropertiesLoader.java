@@ -333,7 +333,7 @@ final class PropertiesLoader {
 		Object[] parameters = loadParameters(properties, definition);
 
 		if (parameters != null) {
-			for (Constructor<?> constructor : writerClass.getConstructors()) {
+			for (Constructor<?> constructor : writerClass.getDeclaredConstructors()) {
 				Class<?>[] parameterTypes = constructor.getParameterTypes();
 				if (parameterTypes.length <= definition.length) {
 					BitSet skiped = new BitSet(definition.length);
@@ -365,6 +365,7 @@ final class PropertiesLoader {
 								}
 								parameters = list.toArray();
 							}
+							constructor.setAccessible(true);
 							return (LoggingWriter) constructor.newInstance(parameters);
 						} catch (IllegalArgumentException ex) {
 							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());

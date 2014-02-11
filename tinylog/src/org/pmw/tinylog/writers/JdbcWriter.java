@@ -35,8 +35,8 @@ import org.pmw.tinylog.LoggingLevel;
 /**
  * Writes log entries to a SQL database.
  */
-@PropertiesSupport(name = "jdbc", properties = { @Property(name = "driver", type = String.class, optional = true),
-		@Property(name = "url", type = String.class), @Property(name = "batch", type = boolean.class, optional = true),
+@PropertiesSupport(name = "jdbc", properties = { @Property(name = "url", type = String.class), @Property(name = "table", type = String.class),
+		@Property(name = "values", type = String[].class), @Property(name = "batch", type = boolean.class, optional = true),
 		@Property(name = "username", type = String.class, optional = true), @Property(name = "password", type = String.class, optional = true) })
 public final class JdbcWriter implements LoggingWriter {
 
