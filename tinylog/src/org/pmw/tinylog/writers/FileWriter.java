@@ -70,7 +70,7 @@ public final class FileWriter implements LoggingWriter {
 	}
 
 	/**
-	 * Check if buffered writing is enabled.
+	 * Determine whether buffered writing is enabled.
 	 * 
 	 * @return <code>true</code> if buffered writing is enabled, otherwise <code>false</code>
 	 */
