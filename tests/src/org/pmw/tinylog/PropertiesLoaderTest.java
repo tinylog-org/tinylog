@@ -527,6 +527,23 @@ public class PropertiesLoaderTest extends AbstractTest {
 		JdbcWriter jdbcWriter = (JdbcWriter) writer;
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
+		assertNull(jdbcWriter.getColumns());
+		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
+		assertFalse(jdbcWriter.isBatchMode());
+		assertNull(jdbcWriter.getUsername());
+		assertNull(jdbcWriter.getPassword());
+
+		configurator = Configurator.defaultConfig();
+		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
+				.set("tinylog.writer.columns", "ENTRY").set("tinylog.writer.values", "log_entry");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(JdbcWriter.class, writer.getClass());
+		jdbcWriter = (JdbcWriter) writer;
+		assertEquals("jdbc:", jdbcWriter.getUrl());
+		assertEquals("log", jdbcWriter.getTable());
+		assertEquals(Collections.singletonList("ENTRY"), jdbcWriter.getColumns());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
@@ -542,6 +559,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		jdbcWriter = (JdbcWriter) writer;
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
+		assertNull(jdbcWriter.getColumns());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
@@ -557,6 +575,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		jdbcWriter = (JdbcWriter) writer;
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
+		assertNull(jdbcWriter.getColumns());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
 		assertTrue(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
@@ -572,40 +591,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 		jdbcWriter = (JdbcWriter) writer;
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
+		assertNull(jdbcWriter.getColumns());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
 		assertFalse(jdbcWriter.isBatchMode());
-		assertEquals("admin", jdbcWriter.getUsername());
-		assertEquals("123", jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "false").set("tinylog.writer.username", "admin")
-				.set("tinylog.writer.password", "123");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatchMode());
-		assertEquals("admin", jdbcWriter.getUsername());
-		assertEquals("123", jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "true").set("tinylog.writer.username", "admin")
-				.set("tinylog.writer.password", "123");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertTrue(jdbcWriter.isBatchMode());
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
 	}

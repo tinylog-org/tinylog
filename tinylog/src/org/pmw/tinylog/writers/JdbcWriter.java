@@ -20,10 +20,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -36,8 +38,9 @@ import org.pmw.tinylog.LoggingLevel;
  * Writes log entries to a SQL database.
  */
 @PropertiesSupport(name = "jdbc", properties = { @Property(name = "url", type = String.class), @Property(name = "table", type = String.class),
-		@Property(name = "values", type = String[].class), @Property(name = "batch", type = boolean.class, optional = true),
-		@Property(name = "username", type = String.class, optional = true), @Property(name = "password", type = String.class, optional = true) })
+		@Property(name = "columns", type = String[].class, optional = true), @Property(name = "values", type = String[].class),
+		@Property(name = "batch", type = boolean.class, optional = true), @Property(name = "username", type = String.class, optional = true),
+		@Property(name = "password", type = String.class, optional = true) })
 public final class JdbcWriter implements LoggingWriter {
 
 	private static final int MAX_BATCH_SIZE = 128;
@@ -45,6 +48,7 @@ public final class JdbcWriter implements LoggingWriter {
 
 	private final String url;
 	private final String table;
+	private final List<String> columns;
 	private final List<Value> values;
 	private final Set<LogEntryValue> requiredLogEntryValues;
 	private final boolean batchMode;
@@ -67,7 +71,7 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            Values to insert
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values) {
-		this(url, table, values, false, null, null);
+		this(url, table, null, values, false, null, null);
 	}
 
 	/**
@@ -82,7 +86,7 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            <code>false</code> to execute SQL statements immediately (default)
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values, final boolean batch) {
-		this(url, table, values, batch, null, null);
+		this(url, table, null, values, batch, null, null);
 	}
 
 	/**
@@ -98,7 +102,7 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            Password for database log in
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values, final String username, final String password) {
-		this(url, table, values, false, username, password);
+		this(url, table, null, values, false, username, password);
 	}
 
 	/**
@@ -117,8 +121,80 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            Password for database log in
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values, final boolean batch, final String username, final String password) {
+		this(url, table, null, values, batch, username, password);
+	}
+
+	/**
+	 * @param url
+	 *            JDBC connection URL
+	 * @param table
+	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
+	 * @param values
+	 *            Values to insert
+	 */
+	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values) {
+		this(url, table, columns, values, false, null, null);
+	}
+
+	/**
+	 * @param url
+	 *            JDBC connection URL
+	 * @param table
+	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
+	 * @param values
+	 *            Values to insert
+	 * @param batch
+	 *            <code>true</code> for collecting SQL statements and execute them in a batch process,
+	 *            <code>false</code> to execute SQL statements immediately (default)
+	 */
+	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values, final boolean batch) {
+		this(url, table, columns, values, batch, null, null);
+	}
+
+	/**
+	 * @param url
+	 *            JDBC connection URL
+	 * @param table
+	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
+	 * @param values
+	 *            Values to insert
+	 * @param username
+	 *            User name for database log in
+	 * @param password
+	 *            Password for database log in
+	 */
+	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values, final String username, final String password) {
+		this(url, table, columns, values, false, username, password);
+	}
+
+	/**
+	 * @param url
+	 *            JDBC connection URL
+	 * @param table
+	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
+	 * @param values
+	 *            Values to insert
+	 * @param batch
+	 *            <code>true</code> for collecting SQL statements and execute them in a batch process,
+	 *            <code>false</code> to execute SQL statements immediately (default)
+	 * @param username
+	 *            User name for database log in
+	 * @param password
+	 *            Password for database log in
+	 */
+	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values, final boolean batch, final String username,
+			final String password) {
 		this.url = url;
 		this.table = table;
+		this.columns = columns;
 		this.values = values;
 		this.requiredLogEntryValues = calculateRequiredLogEntryValues(values);
 		this.batchMode = batch;
@@ -131,6 +207,8 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            JDBC connection URL
 	 * @param table
 	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
 	 * @param values
 	 *            Values to insert
 	 * @param username
@@ -138,8 +216,8 @@ public final class JdbcWriter implements LoggingWriter {
 	 * @param password
 	 *            Password for database log in
 	 */
-	JdbcWriter(final String url, final String table, final String[] values, final String username, final String password) {
-		this(url, table, renderValues(values), false, username, password);
+	JdbcWriter(final String url, final String table, final String[] columns, final String[] values, final String username, final String password) {
+		this(url, table, columns == null ? null : Arrays.asList(columns), renderValues(values), false, username, password);
 	}
 
 	/**
@@ -147,6 +225,8 @@ public final class JdbcWriter implements LoggingWriter {
 	 *            JDBC connection URL
 	 * @param table
 	 *            Name of table
+	 * @param columns
+	 *            Columns of table to use for insert
 	 * @param values
 	 *            Values to insert
 	 * @param batch
@@ -157,8 +237,9 @@ public final class JdbcWriter implements LoggingWriter {
 	 * @param password
 	 *            Password for database log in
 	 */
-	JdbcWriter(final String url, final String table, final String[] values, final boolean batch, final String username, final String password) {
-		this(url, table, renderValues(values), batch, username, password);
+	JdbcWriter(final String url, final String table, final String[] columns, final String[] values, final boolean batch, final String username,
+			final String password) {
+		this(url, table, columns == null ? null : Arrays.asList(columns), renderValues(values), batch, username, password);
 	}
 
 	/**
@@ -177,6 +258,15 @@ public final class JdbcWriter implements LoggingWriter {
 	 */
 	public String getTable() {
 		return table;
+	}
+
+	/**
+	 * Get the columns of the table, which are used for the insert statement.
+	 * 
+	 * @return Columns of the table, which are used for the insert statement
+	 */
+	public List<String> getColumns() {
+		return columns == null ? null : Collections.unmodifiableList(columns);
 	}
 
 	/**
@@ -228,7 +318,11 @@ public final class JdbcWriter implements LoggingWriter {
 			connection = DriverManager.getConnection(url, username, password);
 		}
 
-		sql = renderSql(connection, table, values);
+		if (columns != null && columns.size() != values.size()) {
+			throw new SQLException("Number of columns and values must be equal, but columns = " + columns.size() + " and values = " + values.size());
+		}
+
+		sql = renderSql(connection, table, columns, values);
 
 		if (batchMode) {
 			batchStatement = connection.prepareStatement(sql);
@@ -275,6 +369,14 @@ public final class JdbcWriter implements LoggingWriter {
 		connection.close();
 	}
 
+	private static Set<LogEntryValue> calculateRequiredLogEntryValues(final List<Value> values) {
+		Set<LogEntryValue> logEntryValues = EnumSet.noneOf(LogEntryValue.class);
+		for (Value value : values) {
+			logEntryValues.add(value.requiredLogEntryValue);
+		}
+		return logEntryValues;
+	}
+
 	private static List<Value> renderValues(final String[] strings) {
 		List<Value> values = new ArrayList<Value>(strings.length);
 		for (String string : strings) {
@@ -313,15 +415,7 @@ public final class JdbcWriter implements LoggingWriter {
 		return values;
 	}
 
-	private static Set<LogEntryValue> calculateRequiredLogEntryValues(final List<Value> values) {
-		Set<LogEntryValue> logEntryValues = EnumSet.noneOf(LogEntryValue.class);
-		for (Value value : values) {
-			logEntryValues.add(value.requiredLogEntryValue);
-		}
-		return logEntryValues;
-	}
-
-	private static String renderSql(final Connection connection, final String table, final List<Value> values) throws SQLException {
+	private static String renderSql(final Connection connection, final String table, final List<String> columns, final List<Value> values) throws SQLException {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("INSERT INTO ");
@@ -335,6 +429,25 @@ public final class JdbcWriter implements LoggingWriter {
 				}
 			}
 			builder.append(table);
+
+			if (columns != null) {
+				builder.append(" (");
+				ListIterator<String> iterator = columns.listIterator();
+				while (iterator.hasNext()) {
+					if (iterator.hasPrevious()) {
+						builder.append(", ");
+					}
+					String column = iterator.next();
+					for (int i = 0; i < column.length(); ++i) {
+						char c = column.charAt(i);
+						if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
+							throw new SQLException("Illegal column name: " + column);
+						}
+					}
+					builder.append(column);
+				}
+				builder.append(")");
+			}
 		} else {
 			for (int i = 0; i < table.length(); ++i) {
 				char c = table.charAt(i);
@@ -343,6 +456,25 @@ public final class JdbcWriter implements LoggingWriter {
 				}
 			}
 			builder.append(quote).append(table.replaceAll(Pattern.quote(quote), quote + quote)).append(quote);
+
+			if (columns != null) {
+				builder.append(" (");
+				ListIterator<String> iterator = columns.listIterator();
+				while (iterator.hasNext()) {
+					if (iterator.hasPrevious()) {
+						builder.append(", ");
+					}
+					String column = iterator.next();
+					for (int i = 0; i < column.length(); ++i) {
+						char c = column.charAt(i);
+						if (c == '\n' || c == '\r') {
+							throw new SQLException("Column name contains line breaks: " + column);
+						}
+					}
+					builder.append(quote).append(column.replaceAll(Pattern.quote(quote), quote + quote)).append(quote);
+				}
+				builder.append(")");
+			}
 		}
 
 		builder.append(" VALUES (");
