@@ -127,7 +127,7 @@ abstract class ConfigurationObserver extends Thread {
 			Properties properties = readProperties();
 
 			if (properties != null) {
-				Properties systemProperties = System.getProperties();
+				Properties systemProperties = (Properties) System.getProperties().clone();
 				for (Object key : systemProperties.keySet()) {
 					String name = (String) key;
 					if (name.startsWith("tinylog.")) {
