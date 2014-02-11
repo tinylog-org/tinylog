@@ -445,7 +445,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test new writing thread */
 
 			FileHelper.write(file, "tinylog.writingthread=true", "tinylog.writingthread.priority=9");
-			for (int i = 0; i < 100; ++i) { // Make sure that configuration observer and writing thread can run
+			for (int i = 0; i < 1000; ++i) { // Make sure that configuration observer and writing thread can run
 				threadMock.awake();
 				threadMock.waitForSleep();
 			}
@@ -457,7 +457,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test remove writing thread */
 
 			FileHelper.write(file, "");
-			for (int i = 0; i < 100; ++i) { // Make sure that configuration observer and writing thread can run
+			for (int i = 0; i < 1000; ++i) { // Make sure that configuration observer and writing thread can run
 				threadMock.awake();
 				threadMock.waitForSleep();
 			}
