@@ -528,7 +528,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatch());
+		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
 
@@ -543,7 +543,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatch());
+		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
 
@@ -558,7 +558,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertTrue(jdbcWriter.isBatch());
+		assertTrue(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
 
@@ -573,7 +573,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatch());
+		assertFalse(jdbcWriter.isBatchMode());
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
 
@@ -589,7 +589,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatch());
+		assertFalse(jdbcWriter.isBatchMode());
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
 
@@ -605,7 +605,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertTrue(jdbcWriter.isBatch());
+		assertTrue(jdbcWriter.isBatchMode());
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
 	}

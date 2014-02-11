@@ -47,7 +47,7 @@ public final class JdbcWriter implements LoggingWriter {
 	private final String table;
 	private final List<Value> values;
 	private final Set<LogEntryValue> requiredLogEntryValues;
-	private final boolean batch;
+	private final boolean batchMode;
 	private final String username;
 	private final String password;
 
@@ -121,7 +121,7 @@ public final class JdbcWriter implements LoggingWriter {
 		this.table = table;
 		this.values = values;
 		this.requiredLogEntryValues = calculateRequiredLogEntryValues(values);
-		this.batch = batch;
+		this.batchMode = batch;
 		this.username = username;
 		this.password = password;
 	}
@@ -189,6 +189,15 @@ public final class JdbcWriter implements LoggingWriter {
 	}
 
 	/**
+	 * Determine whether batch mode is enabled.
+	 * 
+	 * @return <code>true</code> if batch mode is enabled, <code>false</code> if not
+	 */
+	public boolean isBatchMode() {
+		return batchMode;
+	}
+
+	/**
 	 * Get the user name for database log in.
 	 * 
 	 * @return User name for log in
@@ -206,15 +215,6 @@ public final class JdbcWriter implements LoggingWriter {
 		return password;
 	}
 
-	/**
-	 * Determine whether batch mode is enabled.
-	 * 
-	 * @return <code>true</code> if batch mode is enabled, <code>false</code> if not
-	 */
-	public boolean isBatch() {
-		return batch;
-	}
-
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
 		return requiredLogEntryValues;
@@ -230,7 +230,7 @@ public final class JdbcWriter implements LoggingWriter {
 
 		sql = renderSql(connection, table, values);
 
-		if (batch) {
+		if (batchMode) {
 			batchStatement = connection.prepareStatement(sql);
 			batchCount = 0;
 		}
@@ -238,7 +238,7 @@ public final class JdbcWriter implements LoggingWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) throws SQLException {
-		if (batch) {
+		if (batchMode) {
 			synchronized (lock) {
 				if (batchCount >= MAX_BATCH_SIZE) {
 					executeBatch();
@@ -260,7 +260,7 @@ public final class JdbcWriter implements LoggingWriter {
 
 	@Override
 	public void flush() throws SQLException {
-		if (batch) {
+		if (batchMode) {
 			synchronized (lock) {
 				if (batchCount > 0) {
 					executeBatch();
