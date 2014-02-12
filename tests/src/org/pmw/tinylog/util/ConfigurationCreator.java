@@ -37,22 +37,22 @@ public final class ConfigurationCreator {
 		try {
 			Method method = Configurator.class.getDeclaredMethod("create");
 			method.setAccessible(true);
-			return (Configuration) method.invoke(Configurator.defaultConfig().writer(null).locale(Locale.ROOT));
+			return (Configuration) method.invoke(Configurator.defaultConfig().formatPattern("{message}").writer(null).locale(Locale.ROOT));
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	/**
-	 * Get a copy of the current configuration.
+	 * Get a copy of the default configuration.
 	 * 
-	 * @return Current configuration
+	 * @return Default configuration
 	 */
-	public static Configuration getCurrentConfiguration() {
+	public static Configuration getDefaultConfiguration() {
 		try {
 			Method method = Configurator.class.getDeclaredMethod("create");
 			method.setAccessible(true);
-			return (Configuration) method.invoke(Configurator.currentConfig());
+			return (Configuration) method.invoke(Configurator.defaultConfig());
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
 		}

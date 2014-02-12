@@ -37,11 +37,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy();
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - DAY); // 31th December 1970
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // 1st January 1971
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -52,18 +53,19 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		increaseTime(YEAR - DAY); // 31th December 1970
 
 		Policy policy = new YearlyPolicy(1);
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 31th December 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // / 1st January 1971
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 1L); // 31th December 1971 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st January 1972
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -74,18 +76,19 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		increaseTime(YEAR - 31 * DAY - DAY); // 30th November 1970
 
 		Policy policy = new YearlyPolicy(12);
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 30th November 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // / 1st December 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 1L); // 30th November 1971 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st December 1971
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -112,11 +115,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("1");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 1L); // 31th December 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st January 1971
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -127,11 +131,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("12");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 31 * DAY - 1L); // 30th November 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st December 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -142,11 +147,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("january");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 1L); // 31th December 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st January 1971
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -157,11 +163,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("february");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 31 - 1L); // 31th January 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st February 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -172,11 +179,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("march");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28) - 1L); // 28th February 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st March 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -187,11 +195,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("april");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31) - 1L); // 31th March 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st April 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -202,11 +211,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("may");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30) - 1L); // 30th April 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st May 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -217,11 +227,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("june");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31) - 1L); // 31th May 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st June 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -232,11 +243,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("july");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30) - 1L); // 30th June 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st July 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -247,11 +259,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("august");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31) - 1L); // 31th July 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st August 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -262,11 +275,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("september");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31) - 1L); // 31th August 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st September 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -277,11 +291,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("OCTOBER");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30) - 1L); // 30th September 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st October 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -292,11 +307,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("NovemBer");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31) - 1L); // 31th October 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st November 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -307,11 +323,12 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		// 1st January 1970
 
 		Policy policy = new YearlyPolicy("December");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(YEAR - 31 * DAY - 1L); // 30th November 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st December 1970
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -343,19 +360,21 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		file.setLastModified(getTime());
 
 		Policy policy = new YearlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 31th December 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st January 1971 00:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		increaseTime(-1L); // 31th December 1970 23:59:59,999
 		policy = new YearlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 1st January 1971 00:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -370,9 +389,15 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		assertTrue(new YearlyPolicy().initCheck(file));
+		Policy policy = new YearlyPolicy();
+		policy.init(null);
+		assertTrue(policy.check(file));
+
 		increaseTime(DAY); // 1st January 1971
-		assertFalse(new YearlyPolicy().initCheck(file));
+
+		policy = new YearlyPolicy();
+		policy.init(null);
+		assertFalse(policy.check(file));
 
 		file.delete();
 	}
@@ -389,7 +414,8 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		file.delete();
 
 		Policy policy = new YearlyPolicy();
-		assertTrue(policy.initCheck(file));
+		policy.init(null);
+		assertTrue(policy.check(file));
 	}
 
 }

@@ -16,6 +16,8 @@ package org.pmw.tinylog.policies;
 import java.io.File;
 import java.util.Calendar;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * Base class for time based policies.
  */
@@ -43,7 +45,12 @@ public abstract class AbstractTimeBasedPolicy implements Policy {
 	}
 
 	@Override
-	public final boolean initCheck(final File logFile) {
+	public void init(final Configuration configuration) {
+		// Do nothing
+	}
+
+	@Override
+	public final boolean check(final File logFile) {
 		if (logFile.exists()) {
 			Calendar clone = (Calendar) calendar.clone();
 			clone.add(field, -1);

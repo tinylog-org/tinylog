@@ -40,20 +40,22 @@ public class StartupPolicyTest extends AbstractTest {
 	public final void testRolling() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		Policy policy = new StartupPolicy();
-		assertFalse(policy.initCheck(file));
-		assertTrue(policy.check(null));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertFalse(policy.check(file));
+		assertTrue(policy.check((String) null));
+		assertTrue(policy.check((String) null));
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 
 		file.delete();
 
 		policy = new StartupPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
+		assertTrue(policy.check((String) null));
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 	}
 
 }

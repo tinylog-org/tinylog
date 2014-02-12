@@ -37,16 +37,17 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		setTime(DAY * 30 + DAY / 2); // 31th January 1970 12:00
 
 		Policy policy = new MonthlyPolicy();
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY / 2L); // 31th January 1970 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 27); // 27th February 1970 24:00
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // 28th February 1970 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -62,19 +63,21 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		file.setLastModified(getTime());
 
 		Policy policy = new MonthlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 31th January 1970 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 31th January 1970 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		increaseTime(-1L); // 31th January 1970 23:59:59,999
 		policy = new MonthlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 31th January 1970 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -89,9 +92,15 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		assertTrue(new MonthlyPolicy().initCheck(file));
+		Policy policy = new MonthlyPolicy();
+		policy.init(null);
+		assertTrue(policy.check(file));
+
 		increaseTime(DAY); // 1st February 1970
-		assertFalse(new MonthlyPolicy().initCheck(file));
+
+		policy = new MonthlyPolicy();
+		policy.init(null);
+		assertFalse(policy.check(file));
 
 		file.delete();
 	}
@@ -108,7 +117,8 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		file.delete();
 
 		Policy policy = new MonthlyPolicy();
-		assertTrue(policy.initCheck(file));
+		policy.init(null);
+		assertTrue(policy.check(file));
 	}
 
 }

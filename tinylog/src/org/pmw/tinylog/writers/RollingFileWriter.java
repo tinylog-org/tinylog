@@ -232,12 +232,24 @@ public final class RollingFileWriter implements LoggingWriter {
 	public void init(final Configuration configuration) throws IOException {
 		labeler.init(configuration);
 		file = labeler.getLogFile(new File(filename));
-		initCheckPolicies();
+
+		for (Policy policy : policies) {
+			policy.init(configuration);
+		}
+		for (Policy policy : policies) {
+			if (!policy.check(file)) {
+				resetPolicies();
+				file = labeler.roll(file, backups);
+				break;
+			}
+		}
+
 		if (buffered) {
 			stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
 		} else {
 			stream = new FileOutputStream(file, true);
 		}
+
 		VMShutdownHook.register(this);
 	}
 
@@ -277,16 +289,6 @@ public final class RollingFileWriter implements LoggingWriter {
 		synchronized (mutex) {
 			VMShutdownHook.unregister(this);
 			stream.close();
-		}
-	}
-
-	private void initCheckPolicies() throws IOException {
-		for (Policy policy : policies) {
-			if (!policy.initCheck(file)) {
-				resetPolicies();
-				file = labeler.roll(file, backups);
-				return;
-			}
 		}
 	}
 

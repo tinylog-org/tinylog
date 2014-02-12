@@ -15,6 +15,8 @@ package org.pmw.tinylog.policies;
 
 import java.io.File;
 
+import org.pmw.tinylog.Configuration;
+
 /**
  * Policy for rolling log files once at startup.
  */
@@ -22,7 +24,12 @@ import java.io.File;
 public final class StartupPolicy implements Policy {
 
 	@Override
-	public boolean initCheck(final File logFile) {
+	public void init(final Configuration configuration) {
+		// Do nothing
+	}
+
+	@Override
+	public boolean check(final File logFile) {
 		return !logFile.exists();
 	}
 

@@ -35,11 +35,12 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	@Test
 	public final void testDefaultRollingAtMidnight() {
 		Policy policy = new DailyPolicy();
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -50,18 +51,19 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		setTime(DAY / 2L); // 12:00
 
 		Policy policy = new DailyPolicy(24, 0);
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY / 2 - 1L); // 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -94,11 +96,12 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	@Test
 	public final void testStringParameterForMidnight() {
 		Policy policy = new DailyPolicy("24:00");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY - 1L); // 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -107,11 +110,12 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	@Test
 	public final void testStringParameterForTwelveAM() {
 		Policy policy = new DailyPolicy("12");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR * 12 - 1L); // 11:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 12:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -120,11 +124,12 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 	@Test
 	public final void testStringParameterForHalfPastNine() {
 		Policy policy = new DailyPolicy("09:30");
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR * 9 + MINUTE * 30 - 1L); // 09:29:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 09:30
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -156,19 +161,21 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		file.setLastModified(getTime());
 
 		Policy policy = new DailyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(DAY / 2L - 1L); // 23:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		increaseTime(-1L); // 23:59:59,999
 		policy = new DailyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -183,9 +190,15 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		assertTrue(new DailyPolicy().initCheck(file));
+		Policy policy = new DailyPolicy();
+		policy.init(null);
+		assertTrue(policy.check(file));
+
 		increaseTime(DAY); // Next day 12:00
-		assertFalse(new DailyPolicy().initCheck(file));
+
+		policy = new DailyPolicy();
+		policy.init(null);
+		assertFalse(policy.check(file));
 
 		file.delete();
 	}
@@ -202,7 +215,8 @@ public class DailyPolicyTest extends AbstractTimeBasedTest {
 		file.delete();
 
 		Policy policy = new DailyPolicy();
-		assertTrue(policy.initCheck(file));
+		policy.init(null);
+		assertTrue(policy.check(file));
 	}
 
 }

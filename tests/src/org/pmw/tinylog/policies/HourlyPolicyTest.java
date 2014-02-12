@@ -37,16 +37,17 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		setTime(HOUR / 2L); // 00:30
 
 		Policy policy = new HourlyPolicy();
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR / 2L); // 01:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		policy.reset();
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR / 2L); // 01:30
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR / 2L); // 02:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -62,19 +63,21 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		file.setLastModified(getTime());
 
 		Policy policy = new HourlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(HOUR / 2L - 1L); // 01:59:59,999
-		assertTrue(policy.check(null));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 02:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 
 		increaseTime(-1L); // 01:59:59,999
 		policy = new HourlyPolicy();
-		assertTrue(policy.initCheck(file));
-		assertTrue(policy.check(null));
+		policy.init(null);
+		assertTrue(policy.check(file));
+		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 02:00
-		assertFalse(policy.check(null));
+		assertFalse(policy.check((String) null));
 	}
 
 	/**
@@ -89,9 +92,15 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		assertTrue(new HourlyPolicy().initCheck(file));
+		Policy policy = new HourlyPolicy();
+		policy.init(null);
+		assertTrue(policy.check(file));
+
 		increaseTime(HOUR); // 01:30
-		assertFalse(new HourlyPolicy().initCheck(file));
+
+		policy = new HourlyPolicy();
+		policy.init(null);
+		assertFalse(policy.check(file));
 
 		file.delete();
 	}
@@ -108,7 +117,8 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		file.delete();
 
 		Policy policy = new HourlyPolicy();
-		assertTrue(policy.initCheck(file));
+		policy.init(null);
+		assertTrue(policy.check(file));
 	}
 
 }

@@ -1434,7 +1434,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 		}
 
 		@Override
-		public boolean initCheck(final File logFile) {
+		public void init(final Configuration configuration) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean check(final File logFile) {
 			throw new UnsupportedOperationException();
 		}
 

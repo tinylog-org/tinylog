@@ -38,6 +38,7 @@ import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.ProcessIdLabeler;
 import org.pmw.tinylog.policies.DailyPolicy;
@@ -378,7 +379,12 @@ public class RollingFileWriterTest extends AbstractTest {
 		RollingFileWriter writer = new RollingFileWriter(folder.getAbsolutePath(), 0, new Policy() {
 
 			@Override
-			public boolean initCheck(final File logFile) {
+			public void init(final Configuration configuration) {
+				// Do nothing
+			}
+
+			@Override
+			public boolean check(final File logFile) {
 				return true;
 			}
 

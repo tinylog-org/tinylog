@@ -45,7 +45,8 @@ public class SizePolicyTest extends AbstractTest {
 		file.delete();
 
 		Policy policy = new SizePolicy(10);
-		assertTrue(policy.initCheck(file));
+		policy.init(null);
+		assertTrue(policy.check(file));
 		assertTrue(policy.check("0123456789"));
 		assertFalse(policy.check("0"));
 
@@ -64,10 +65,16 @@ public class SizePolicyTest extends AbstractTest {
 	@Test
 	public final void testRollingWithExistingLogFile() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
-		FileHelper.write(file, "01234");
 
-		Policy policy = new SizePolicy(10);
-		assertTrue(policy.initCheck(file));
+		FileHelper.write(file, "01234");
+		Policy policy = new SizePolicy(3);
+		policy.init(null);
+		assertFalse(policy.check(file));
+
+		FileHelper.write(file, "01234");
+		policy = new SizePolicy(10);
+		policy.init(null);
+		assertTrue(policy.check(file));
 		assertTrue(policy.check("56789"));
 		assertFalse(policy.check("0"));
 
@@ -96,6 +103,7 @@ public class SizePolicyTest extends AbstractTest {
 	@Test
 	public final void testStringParameterForBytes() {
 		Policy policy = new SizePolicy("1024");
+		policy.init(null);
 		assertTrue(policy.check(createString(512)));
 		assertTrue(policy.check(createString(512)));
 		assertFalse(policy.check(createString(1)));
@@ -108,6 +116,7 @@ public class SizePolicyTest extends AbstractTest {
 	public final void testStringParameterForKB() {
 		String filler = createString(1024); // 1 KB
 		Policy policy = new SizePolicy("32KB");
+		policy.init(null);
 		for (int i = 0; i < 32; ++i) {
 			assertTrue(policy.check(filler));
 		}
@@ -121,6 +130,7 @@ public class SizePolicyTest extends AbstractTest {
 	public final void testStringParameterForMB() {
 		String filler = createString(1024); // 1 KB
 		Policy policy = new SizePolicy("2 MB");
+		policy.init(null);
 		for (int i = 0; i < 2048; ++i) {
 			assertTrue(policy.check(filler));
 		}
@@ -148,6 +158,7 @@ public class SizePolicyTest extends AbstractTest {
 		try {
 			String filler = createString(size); // 1 MB
 			Policy policy = new SizePolicy("4GB");
+			policy.init(null);
 			for (int i = 0; i < 4 * 1024; ++i) {
 				assertTrue(policy.check(filler));
 			}
@@ -161,7 +172,7 @@ public class SizePolicyTest extends AbstractTest {
 	 * Test exception for "-1".
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public final void testStringParameterForMinueOne() {
+	public final void testStringParameterForMinus() {
 		new SizePolicy("-1");
 	}
 

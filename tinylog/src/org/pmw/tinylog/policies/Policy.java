@@ -14,6 +14,9 @@
 package org.pmw.tinylog.policies;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.pmw.tinylog.Configuration;
 
 /**
  * Policies define rollover strategies for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
@@ -40,16 +43,27 @@ import java.io.File;
 public interface Policy {
 
 	/**
-	 * Determine if a rollover should occur at startup.
+	 * Initialize the policy.
+	 * 
+	 * @param configuration
+	 *            Configuration of logger
+	 */
+	void init(Configuration configuration);
+
+	/**
+	 * Determine whether a log file can be continued.
 	 * 
 	 * @param logFile
 	 *            Log file to continue
 	 * @return <code>true</code> to continue the log file, <code>false</code> to trigger a rollover
+	 * 
+	 * @throws IOException
+	 *             Failed to handle log file
 	 */
-	boolean initCheck(File logFile);
+	boolean check(File logFile) throws IOException;
 
 	/**
-	 * Determine if a rollover should occur.
+	 * Determine whether a log entry can be written into the current log file.
 	 * 
 	 * @param logEntry
 	 *            Log entry to write
