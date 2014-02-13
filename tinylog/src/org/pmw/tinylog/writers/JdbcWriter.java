@@ -328,6 +328,8 @@ public final class JdbcWriter implements LoggingWriter {
 			batchStatement = connection.prepareStatement(sql);
 			batchCount = 0;
 		}
+
+		VMShutdownHook.register(this);
 	}
 
 	@Override
@@ -365,6 +367,7 @@ public final class JdbcWriter implements LoggingWriter {
 
 	@Override
 	public void close() throws SQLException {
+		VMShutdownHook.unregister(this);
 		flush();
 		connection.close();
 	}
