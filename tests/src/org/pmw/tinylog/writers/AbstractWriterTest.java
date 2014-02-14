@@ -34,7 +34,7 @@ public abstract class AbstractWriterTest extends AbstractTest {
 	 * 
 	 * @param properties
 	 *            Properties with writer definition
-	 * @return Created logging writer.
+	 * @return Created logging writer
 	 */
 	protected final LoggingWriter createFromProperties(final Properties properties) {
 		try {

@@ -14,8 +14,22 @@
 package org.pmw.tinylog.labelers;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLClassLoader;
+import java.util.Properties;
 
 import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.Configurator;
+import org.pmw.tinylog.mocks.ClassLoaderMock;
+import org.pmw.tinylog.util.ConfigurationCreator;
+import org.pmw.tinylog.util.NullWriter;
+import org.pmw.tinylog.util.PropertiesBuilder;
+import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.PropertiesSupport;
+import org.pmw.tinylog.writers.Property;
 
 /**
  * Abstract test class for labelers.
@@ -46,6 +60,50 @@ public abstract class AbstractLabelerTest extends AbstractTest {
 			file.deleteOnExit();
 			return file;
 		}
+	}
+
+	/**
+	 * Create a labeler from properties.
+	 * 
+	 * @param property
+	 *            Property value with labeler definition
+	 * @return Created labeler
+	 */
+	protected final Labeler createFromProperties(final String property) {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
+			PropertiesBuilder properties = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", property);
+
+			Class<?> propertiesLoaderClass = Class.forName("org.pmw.tinylog.PropertiesLoader");
+			Method readWriterMethod = propertiesLoaderClass.getDeclaredMethod("readWriter", Configurator.class, Properties.class);
+			readWriterMethod.setAccessible(true);
+			readWriterMethod.invoke(null, configurator, properties.create());
+
+			Method createMethod = Configurator.class.getDeclaredMethod("create");
+			createMethod.setAccessible(true);
+			Configuration configuration = (Configuration) createMethod.invoke(configurator);
+			LoggingWriter writer = configuration.getWriter();
+			return writer instanceof PropertiesWriter ? ((PropertiesWriter) writer).labeler : null;
+		} catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	@PropertiesSupport(name = "properties", properties = { @Property(name = "labeler", type = Labeler.class, optional = true) })
+	private static final class PropertiesWriter extends NullWriter {
+
+		private final Labeler labeler;
+
+		@SuppressWarnings("unused")
+		public PropertiesWriter(final Labeler labeler) {
+			this.labeler = labeler;
+		}
+
 	}
 
 }

@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -204,6 +205,16 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		stream.close();
 		backupFile.delete();
+	}
+
+	/**
+	 * Test reading process ID labeler from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Labeler labeler = createFromProperties("pid");
+		assertNotNull(labeler);
+		assertEquals(ProcessIdLabeler.class, labeler.getClass());
 	}
 
 }
