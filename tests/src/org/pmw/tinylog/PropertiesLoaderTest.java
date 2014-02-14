@@ -268,7 +268,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testReadWriterWithoutnProperties() throws IOException {
+	public final void testReadWriterWithoutProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
