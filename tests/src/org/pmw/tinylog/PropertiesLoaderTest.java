@@ -23,18 +23,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
-import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import mockit.Mock;
@@ -43,26 +40,19 @@ import mockit.MockUp;
 import org.junit.Test;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.Labeler;
-import org.pmw.tinylog.labelers.ProcessIdLabeler;
 import org.pmw.tinylog.labelers.TimestampLabeler;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
-import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.JdbcWriter;
-import org.pmw.tinylog.writers.JdbcWriter.Value;
 import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
-import org.pmw.tinylog.writers.RollingFileWriter;
-import org.pmw.tinylog.writers.SharedFileWriter;
 
 /**
  * Test properties loader.
@@ -272,98 +262,155 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading a writer with all potential properties.
+	 * Test reading a writer without any properties.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testReadWriterWithProperties() throws IOException {
+	public final void testReadWriterWithoutnProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
-			PropertiesBuilder defaultPropertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
-
-			/* Without any properties */
 
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "properties").create());
 			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
 
-			/* With boolean property */
+	/**
+	 * Test reading a writer with boolean properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithBooleanProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.boolean", "true");
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.boolean", "true");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
+			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertEquals(Boolean.TRUE, ((PropertiesWriter) writer).booleanValue);
 
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.boolean", "false");
+			propertiesBuilder.set("tinylog.writer.boolean", "false");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertEquals(Boolean.FALSE, ((PropertiesWriter) writer).booleanValue);
 
-			assertFalse(errorStream.hasLines());
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.boolean", "abc");
+			propertiesBuilder.set("tinylog.writer.boolean", "abc");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(ConsoleWriter.class, writer.getClass());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.boolean"), containsString("abc")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.boolean"), containsString("abc")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
-			/* With integer property */
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
 
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "42");
+	/**
+	 * Test reading a writer with integer properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithIntegerProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
+
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder = propertiesBuilder.set("tinylog.writer.int", "42");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
+			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertEquals(Integer.valueOf(42), ((PropertiesWriter) writer).intValue);
 
-			assertFalse(errorStream.hasLines());
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.int", "abc");
+			propertiesBuilder = propertiesBuilder.set("tinylog.writer.int", "abc");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(ConsoleWriter.class, writer.getClass());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
 
-			/* With string property */
+	/**
+	 * Test reading a writer with string properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithStringProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
 
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.string", "abc");
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.string", "abc");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
+			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertEquals("abc", ((PropertiesWriter) writer).stringValue);
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
 
-			/* With strings properties */
+	/**
+	 * Test reading a writer with string array properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithStringArrayProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "abc");
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.strings", "abc");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
+			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertArrayEquals(new String[] { "abc" }, ((PropertiesWriter) writer).stringsValue);
 
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "abc, test");
+			propertiesBuilder.set("tinylog.writer.strings", "abc, test");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
@@ -371,7 +418,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 			assertArrayEquals(new String[] { "abc", "test" }, ((PropertiesWriter) writer).stringsValue);
 
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", "");
+			propertiesBuilder.set("tinylog.writer.strings", "");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
@@ -379,53 +426,152 @@ public class PropertiesLoaderTest extends AbstractTest {
 			assertArrayEquals(new String[] { "" }, ((PropertiesWriter) writer).stringsValue);
 
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.strings", ",,");
+			propertiesBuilder.set("tinylog.writer.strings", ",,");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			assertArrayEquals(new String[] { "", "", "" }, ((PropertiesWriter) writer).stringsValue);
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
 
-			/* With labeler property */
+	/**
+	 * Test reading a writer with labeler properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithLabelerProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.labeler", "count");
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.labeler", "count");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
+			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
 			assertNotNull(propertiesWriter.labeler);
 			assertEquals(CountLabeler.class, propertiesWriter.labeler.getClass());
 
-			/* With policy property */
-
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.policy", "startup");
+			propertiesBuilder.set("tinylog.writer.labeler", "timestamp: yyyy");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			propertiesWriter = (PropertiesWriter) writer;
+			Labeler labeler = propertiesWriter.labeler;
+			assertNotNull(labeler);
+			assertEquals(TimestampLabeler.class, labeler.getClass());
+			labeler.init(configurator.create());
+			assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test reading a writer with policy properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithPolicyProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
+
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.policy", "startup");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			LoggingWriter writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
 			assertNotNull(propertiesWriter.policy);
 			assertEquals(StartupPolicy.class, propertiesWriter.policy.getClass());
 
-			/* With policies property */
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.policy", "size: 10");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			propertiesWriter = (PropertiesWriter) writer;
+			Policy policy = propertiesWriter.policy;
+			assertNotNull(policy);
+			assertEquals(SizePolicy.class, policy.getClass());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test reading a writer with policy array properties.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithPolicyArrayProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
+
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.policies", "startup");
+			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			LoggingWriter writer = configurator.create().getWriter();
+			assertNotNull(writer);
+			assertEquals(PropertiesWriter.class, writer.getClass());
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
+			assertNotNull(propertiesWriter.policies);
+			assertEquals(1, propertiesWriter.policies.length);
+			assertEquals(StartupPolicy.class, propertiesWriter.policies[0].getClass());
 
 			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.policies", "startup");
+			propertiesBuilder.set("tinylog.writer.policies", "startup, daily");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			writer = configurator.create().getWriter();
 			assertNotNull(writer);
 			assertEquals(PropertiesWriter.class, writer.getClass());
 			propertiesWriter = (PropertiesWriter) writer;
 			assertNotNull(propertiesWriter.policies);
-			assertEquals(1, propertiesWriter.policies.length);
+			assertEquals(2, propertiesWriter.policies.length);
 			assertEquals(StartupPolicy.class, propertiesWriter.policies[0].getClass());
+			assertEquals(DailyPolicy.class, propertiesWriter.policies[1].getClass());
 		} finally {
 			mock.tearDown();
 			mock.close();
 		}
+	}
+
+	/**
+	 * Test reading a writer with missing required property.
+	 */
+	@Test
+	public final void testReadWriterWithMissingProperty() {
+		Configurator configurator = Configurator.defaultConfig();
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
+		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+		LoggingWriter writer = configurator.create().getWriter();
+		assertNotNull(writer);
+		assertEquals(ConsoleWriter.class, writer.getClass());
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
 	}
 
 	/**
@@ -439,271 +585,19 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), ClassPropertyWriter.class.getName());
-			PropertiesBuilder defaultPropertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
-
-			/* Without any properties */
 
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.class", "MyClass");
 			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
 			LoggingWriter writer = configurator.create().getWriter();
 			assertNotNull(writer);
-			assertEquals(ClassPropertyWriter.class, writer.getClass());
-
-			/* With class property */
-
-			StringListOutputStream errorStream = getErrorStream();
-			assertFalse(errorStream.hasLines());
-			configurator = Configurator.defaultConfig();
-			propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.class", "MyClass");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
 			assertEquals(ConsoleWriter.class, writer.getClass());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.class"), containsString("unsupported")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.class"), containsString("unsupported")));
+			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
 			mock.tearDown();
 			mock.close();
 		}
-	}
-
-	/**
-	 * Test reading console logging writer.
-	 */
-	@Test
-	public final void testReadConsoleLoggingWriter() {
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-	}
-
-	/**
-	 * Test reading JDBC logging writer.
-	 */
-	@Test
-	public final void testReadJdbcLoggingWriter() {
-		StringListOutputStream errorStream = getErrorStream();
-
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.url")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.table")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.values")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		JdbcWriter jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertNull(jdbcWriter.getColumns());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatchMode());
-		assertNull(jdbcWriter.getUsername());
-		assertNull(jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.columns", "ENTRY").set("tinylog.writer.values", "log_entry");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertEquals(Collections.singletonList("ENTRY"), jdbcWriter.getColumns());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatchMode());
-		assertNull(jdbcWriter.getUsername());
-		assertNull(jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry").set("batch", "false");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertNull(jdbcWriter.getColumns());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatchMode());
-		assertNull(jdbcWriter.getUsername());
-		assertNull(jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.batch", "true");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertNull(jdbcWriter.getColumns());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertTrue(jdbcWriter.isBatchMode());
-		assertNull(jdbcWriter.getUsername());
-		assertNull(jdbcWriter.getPassword());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc").set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log")
-				.set("tinylog.writer.values", "log_entry").set("tinylog.writer.username", "admin").set("tinylog.writer.password", "123");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
-		assertEquals("jdbc:", jdbcWriter.getUrl());
-		assertEquals("log", jdbcWriter.getTable());
-		assertNull(jdbcWriter.getColumns());
-		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), jdbcWriter.getValues());
-		assertFalse(jdbcWriter.isBatchMode());
-		assertEquals("admin", jdbcWriter.getUsername());
-		assertEquals("123", jdbcWriter.getPassword());
-	}
-
-	/**
-	 * Test reading file logging writer.
-	 * 
-	 * @throws IOException
-	 *             Test failed
-	 */
-	@Test
-	public final void testReadFileLoggingWriter() throws IOException {
-		StringListOutputStream errorStream = getErrorStream();
-		File file = FileHelper.createTemporaryFile("log");
-
-		assertFalse(errorStream.hasLines());
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath());
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(file.getAbsolutePath(), ((FileWriter) writer).getFilename());
-		assertFalse(((FileWriter) writer).isBuffered());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.buffered", "true");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(file.getAbsolutePath(), ((FileWriter) writer).getFilename());
-		assertTrue(((FileWriter) writer).isBuffered());
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file").set("tinylog.writer.filename", file.getAbsolutePath())
-				.set("tinylog.writer.buffered", "false");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(file.getAbsolutePath(), ((FileWriter) writer).getFilename());
-		assertFalse(((FileWriter) writer).isBuffered());
-
-		file.delete();
-	}
-
-	/**
-	 * Test reading shared file logging writer.
-	 * 
-	 * @throws IOException
-	 *             Test failed
-	 */
-	@Test
-	public final void testReadSharedFileLoggingWriter() throws IOException {
-		StringListOutputStream errorStream = getErrorStream();
-		File file = FileHelper.createTemporaryFile("log");
-
-		assertFalse(errorStream.hasLines());
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
-
-		configurator = Configurator.defaultConfig();
-		propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile").set("tinylog.writer.filename", file.getAbsolutePath());
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(SharedFileWriter.class, writer.getClass());
-		assertEquals(file.getAbsolutePath(), ((SharedFileWriter) writer).getFilename());
-
-		file.delete();
-
-	}
-
-	/**
-	 * Test reading rolling file logging writer.
-	 * 
-	 * @throws IOException
-	 *             Test failed
-	 */
-	@Test
-	public final void testReadRollingFileLoggingWriter() throws IOException {
-		StringListOutputStream errorStream = getErrorStream();
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
-
-		testReadRollingFileLoggingWriter(null); // Default
-		testReadRollingFileLoggingWriter(false); // Non buffered
-		testReadRollingFileLoggingWriter(true); // Buffered
 	}
 
 	/**
@@ -1205,117 +1099,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWritingThread());
 		assertNull(configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(1, configuration.getWritingThread().getPriority());
-	}
-
-	private void testReadRollingFileLoggingWriter(final Boolean buffered) throws IOException {
-		File file = FileHelper.createTemporaryFile("log");
-		boolean expectBuffered = Boolean.TRUE.equals(buffered);
-
-		PropertiesBuilder defaultPropertiesBuilder = new PropertiesBuilder();
-		defaultPropertiesBuilder.set("tinylog.writer", "rollingfile");
-		defaultPropertiesBuilder.set("tinylog.writer.filename", file.getAbsolutePath());
-		if (Boolean.TRUE.equals(buffered)) {
-			defaultPropertiesBuilder.set("tinylog.writer.buffered", "true");
-		} else if (Boolean.FALSE.equals(buffered)) {
-			defaultPropertiesBuilder.set("tinylog.writer.buffered", "false");
-		}
-
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
-		PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
-		Configurator configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
-
-		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "1");
-		configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		RollingFileWriter rollingFileWriter = (RollingFileWriter) writer;
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(1, rollingFileWriter.getNumberOfBackups());
-		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		Labeler labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(CountLabeler.class, labeler.getClass());
-		List<? extends Policy> policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-
-		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "2").set("tinylog.writer.label", "pid");
-		configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		Configuration configuration = configurator.create();
-		writer = configuration.getWriter();
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(2, rollingFileWriter.getNumberOfBackups());
-		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		labeler.init(configuration);
-		assertEquals(ProcessIdLabeler.class, labeler.getClass());
-		assertEquals(new File("my." + EnvironmentHelper.getProcessId() + ".log").getAbsoluteFile(), labeler.getLogFile(new File("my.log")).getAbsoluteFile());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-
-		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "3").set("tinylog.writer.label", "timestamp: yyyy")
-				.set("tinylog.writer.policies", "size: 1");
-		configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		configuration = configurator.create();
-		writer = configuration.getWriter();
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(3, rollingFileWriter.getNumberOfBackups());
-		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(TimestampLabeler.class, labeler.getClass());
-		labeler.init(configuration);
-		assertEquals(new File("my." + new SimpleDateFormat("yyyy").format(new Date()) + ".log").getAbsoluteFile(), labeler.getLogFile(new File("my.log"))
-				.getAbsoluteFile());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(SizePolicy.class, policies.get(0).getClass());
-		assertTrue(policies.get(0).check("1"));
-		assertFalse(policies.get(0).check("2"));
-
-		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "4").set("tinylog.writer.label", "timestamp")
-				.set("tinylog.writer.policies", "startup, daily");
-		configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
-		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
-		assertEquals(4, rollingFileWriter.getNumberOfBackups());
-		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
-		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(TimestampLabeler.class, labeler.getClass());
-		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(2, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-		assertEquals(DailyPolicy.class, policies.get(1).getClass());
-
-		file.delete();
 	}
 
 	@PropertiesSupport(name = "properties", properties = { @Property(name = "boolean", type = boolean.class, optional = true),

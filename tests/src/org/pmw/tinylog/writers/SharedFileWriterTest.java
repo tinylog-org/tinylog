@@ -13,9 +13,12 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -33,17 +36,17 @@ import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.LoopWritingThread;
+import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
  * Tests for the shared file logging writer.
  * 
  * @see SharedFileWriter
  */
-public class SharedFileWriterTest extends AbstractTest {
+public class SharedFileWriterTest extends AbstractWriterTest {
 
 	private static final int NUMBER_OF_JVMS = 5;
 	private static final int LOG_ENTRIES = 1000;
@@ -364,4 +367,30 @@ public class SharedFileWriterTest extends AbstractTest {
 		writer.close();
 		file.delete();
 	}
+
+	/**
+	 * Test reading shared file logging writer from properties.
+	 * 
+	 * @throws IOException
+	 *             Failed to create log file
+	 */
+	@Test
+	public final void testFromProperties() throws IOException {
+		File file = FileHelper.createTemporaryFile("log");
+
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile");
+		LoggingWriter writer = createFromProperties(propertiesBuilder.create());
+		assertNull(writer);
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
+
+		propertiesBuilder.set("tinylog.writer.filename", file.getAbsolutePath());
+		writer = createFromProperties(propertiesBuilder.create());
+		assertNotNull(writer);
+		assertEquals(SharedFileWriter.class, writer.getClass());
+		assertEquals(file.getAbsolutePath(), ((SharedFileWriter) writer).getFilename());
+
+		file.delete();
+	}
+
 }

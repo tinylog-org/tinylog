@@ -29,7 +29,16 @@ public final class ConfigurationCreator {
 	}
 
 	/**
-	 * Get a copy of an empty dummy configuration.
+	 * Get an empty dummy configurator.
+	 * 
+	 * @return Configurator with an empty dummy configuration
+	 */
+	public static Configurator getDummyConfigurator() {
+		return Configurator.defaultConfig().formatPattern("{message}").writer(null).locale(Locale.ROOT);
+	}
+
+	/**
+	 * Get an empty dummy configuration.
 	 * 
 	 * @return Dummy configuration
 	 */
@@ -37,8 +46,8 @@ public final class ConfigurationCreator {
 		try {
 			Method method = Configurator.class.getDeclaredMethod("create");
 			method.setAccessible(true);
-			return (Configuration) method.invoke(Configurator.defaultConfig().formatPattern("{message}").writer(null).locale(Locale.ROOT));
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+			return (Configuration) method.invoke(getDummyConfigurator());
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -53,7 +62,7 @@ public final class ConfigurationCreator {
 			Method method = Configurator.class.getDeclaredMethod("create");
 			method.setAccessible(true);
 			return (Configuration) method.invoke(Configurator.defaultConfig());
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
 		}
 	}

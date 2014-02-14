@@ -16,22 +16,23 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.LogEntryBuilder;
+import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
  * Tests for the console logging writer.
  * 
  * @see ConsoleWriter
  */
-public class ConsoleWriterTest extends AbstractTest {
+public class ConsoleWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
@@ -93,6 +94,16 @@ public class ConsoleWriterTest extends AbstractTest {
 		assertFalse(getErrorStream().hasLines());
 
 		writer.close();
+	}
+
+	/**
+	 * Test reading console logging writer from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		LoggingWriter writer = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "console").create());
+		assertNotNull(writer);
+		assertEquals(ConsoleWriter.class, writer.getClass());
 	}
 
 }
