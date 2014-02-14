@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,7 +29,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see MonthlyPolicy
  */
-public class MonthlyPolicyTest extends AbstractTimeBasedTest {
+public class MonthlyPolicyTest extends AbstractTimeBasedPolicyTest {
 
 	/**
 	 * Test rolling after at 1st of next month.
@@ -119,6 +121,22 @@ public class MonthlyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new MonthlyPolicy();
 		policy.init(null);
 		assertTrue(policy.check(file));
+	}
+
+	/**
+	 * Test reading monthly policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("monthly");
+		assertNotNull(policy);
+		assertEquals(MonthlyPolicy.class, policy.getClass());
+
+		policy.init(null);
+		increaseTime(DAY * 30); // 31th January 1970
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // 1st February 1970
+		assertFalse(policy.check((String) null));
 	}
 
 }

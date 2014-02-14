@@ -17,13 +17,14 @@ import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.Before;
-import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.mocks.SystemTimeMock;
 
 /**
  * Basis class for time based tests.
+ * 
+ * @see AbstractTimeBasedPolicy
  */
-public abstract class AbstractTimeBasedTest extends AbstractTest {
+public abstract class AbstractTimeBasedPolicyTest extends AbstractPolicyTest {
 
 	/**
 	 * Milliseconds of a second

@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -23,7 +25,7 @@ import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 
 /**
@@ -31,7 +33,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see SizePolicy
  */
-public class SizePolicyTest extends AbstractTest {
+public class SizePolicyTest extends AbstractPolicyTest {
 
 	/**
 	 * Test rolling with non-existent log file.
@@ -182,6 +184,30 @@ public class SizePolicyTest extends AbstractTest {
 	@Test(expected = IllegalArgumentException.class)
 	public final void testStringParameterForInvalidString() {
 		new SizePolicy("abc");
+	}
+
+	/**
+	 * Test reading size policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("size: 3");
+		assertNotNull(policy);
+		assertEquals(SizePolicy.class, policy.getClass());
+		policy.init(ConfigurationCreator.getDummyConfiguration());
+		assertTrue(policy.check("1"));
+		assertTrue(policy.check("2"));
+		assertTrue(policy.check("3"));
+		assertFalse(policy.check("4"));
+
+		policy = createFromProperties("size: 1 KB");
+		assertNotNull(policy);
+		assertEquals(SizePolicy.class, policy.getClass());
+		policy.init(ConfigurationCreator.getDummyConfiguration());
+		for (int i = 0; i < 1024; ++i) {
+			assertTrue(policy.check("0"));
+		}
+		assertFalse(policy.check("0"));
 	}
 
 	private static String createString(final int size) {

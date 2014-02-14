@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,7 +29,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see HourlyPolicy
  */
-public class HourlyPolicyTest extends AbstractTimeBasedTest {
+public class HourlyPolicyTest extends AbstractTimeBasedPolicyTest {
 
 	/**
 	 * Test rolling at first full hour.
@@ -119,6 +121,22 @@ public class HourlyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new HourlyPolicy();
 		policy.init(null);
 		assertTrue(policy.check(file));
+	}
+
+	/**
+	 * Test reading hourly policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("hourly");
+		assertNotNull(policy);
+		assertEquals(HourlyPolicy.class, policy.getClass());
+
+		policy.init(null);
+		increaseTime(HOUR - 1L); // 00:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // 01:00
+		assertFalse(policy.check((String) null));
 	}
 
 }

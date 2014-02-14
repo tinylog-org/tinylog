@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,7 +29,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see WeeklyPolicy
  */
-public class WeeklyPolicyTest extends AbstractTimeBasedTest {
+public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 
 	/**
 	 * Test rolling at the end of the week by default constructor.
@@ -336,6 +338,42 @@ public class WeeklyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new WeeklyPolicy();
 		policy.init(null);
 		assertTrue(policy.check(file));
+	}
+
+	/**
+	 * Test reading weekly policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("weekly");
+		assertNotNull(policy);
+		assertEquals(WeeklyPolicy.class, policy.getClass());
+		policy.init(null);
+		increaseTime(DAY * 3); // Sunday, 4th January 1970
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // Monday, 5th January 1970
+		assertFalse(policy.check((String) null));
+
+		setTime(0L);
+
+		policy = createFromProperties("weekly: friday");
+		assertNotNull(policy);
+		assertEquals(WeeklyPolicy.class, policy.getClass());
+		policy.init(null);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // Friday, 2nd January 1970
+		assertFalse(policy.check((String) null));
+
+		setTime(0L);
+
+		policy = createFromProperties("weekly: sunday");
+		assertNotNull(policy);
+		assertEquals(WeeklyPolicy.class, policy.getClass());
+		policy.init(null);
+		increaseTime(DAY * 2); // Saturday, 3rd January 1970
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // Sunday, 4th January 1970
+		assertFalse(policy.check((String) null));
 	}
 
 }

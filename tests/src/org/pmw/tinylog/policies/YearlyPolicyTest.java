@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,7 +29,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see YearlyPolicy
  */
-public class YearlyPolicyTest extends AbstractTimeBasedTest {
+public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 
 	/**
 	 * Test rolling at the end of the year by default constructor.
@@ -416,6 +418,43 @@ public class YearlyPolicyTest extends AbstractTimeBasedTest {
 		Policy policy = new YearlyPolicy();
 		policy.init(null);
 		assertTrue(policy.check(file));
+	}
+
+	/**
+	 * Test reading yearly policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("yearly");
+		assertNotNull(policy);
+		assertEquals(YearlyPolicy.class, policy.getClass());
+		policy.init(null);
+		increaseTime(YEAR - DAY);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY);
+		assertFalse(policy.check((String) null));
+
+		setTime(0L);
+
+		policy = createFromProperties("yearly: 2");
+		assertNotNull(policy);
+		assertEquals(YearlyPolicy.class, policy.getClass());
+		policy.init(null);
+		increaseTime(DAY * 30); // 31th January
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // 1st February
+		assertFalse(policy.check((String) null));
+
+		setTime(0L);
+
+		policy = createFromProperties("yearly: march");
+		assertNotNull(policy);
+		assertEquals(YearlyPolicy.class, policy.getClass());
+		policy.init(null);
+		increaseTime(DAY * 30 + DAY * 28); // 28th February
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // 1st March
+		assertFalse(policy.check((String) null));
 	}
 
 }

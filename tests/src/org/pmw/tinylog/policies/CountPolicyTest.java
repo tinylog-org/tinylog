@@ -13,14 +13,15 @@
 
 package org.pmw.tinylog.policies;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 
@@ -29,7 +30,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see CountPolicy
  */
-public class CountPolicyTest extends AbstractTest {
+public class CountPolicyTest extends AbstractPolicyTest {
 
 	/**
 	 * Test rolling with non-existent log file.
@@ -131,6 +132,22 @@ public class CountPolicyTest extends AbstractTest {
 	@Test(expected = IllegalArgumentException.class)
 	public final void testStringParameterForInvalidString() {
 		new CountPolicy("abc");
+	}
+
+	/**
+	 * Test reading count policy from properties.
+	 */
+	@Test
+	public final void testFromProperties() {
+		Policy policy = createFromProperties("count: 3");
+		assertNotNull(policy);
+		assertEquals(CountPolicy.class, policy.getClass());
+
+		policy.init(ConfigurationCreator.getDummyConfiguration());
+		assertTrue(policy.check("1"));
+		assertTrue(policy.check("2"));
+		assertTrue(policy.check("3"));
+		assertFalse(policy.check("4"));
 	}
 
 }
