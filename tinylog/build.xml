@@ -234,12 +234,29 @@
 </project>]]></echo>
 		
 		<jar destfile="${dist.maven}/tinylog-${version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.tinylog;version=${version}, org.pmw.tinylog.labelers;version=${version}, org.pmw.tinylog.policies;version=${version}, org.pmw.tinylog.writers;version=${version}" />
+			</manifest>
 			<zipfileset dir="${tinylog.bin}" />
 			<zipfileset dir="${dist.maven}" includes="tinylog-${version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
-		<zip destfile="${dist.maven}/tinylog-${version}-sources.jar">
+		<jar destfile="${dist.maven}/tinylog-${version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${version}" />
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
 			<zipfileset dir="${tinylog.src}" />
-		</zip>
+		</jar>
 		<zip destfile="${dist.maven}/tinylog-${version}-javadoc.jar">
 			<zipfileset dir="${dist.docs}" />
 		</zip>
@@ -286,12 +303,30 @@
 </project>]]></echo>
 		
 		<jar destfile="${dist.maven}/log4j-facade-${version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.apache.log4j;version=${version}" />
+				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${version}" />
+			</manifest>
 			<zipfileset dir="${log4j.bin}" />
 			<zipfileset dir="${dist.maven}" includes="log4j-facade-${version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
-		<zip destfile="${dist.maven}/log4j-facade-${version}-sources.jar">
+		<jar destfile="${dist.maven}/log4j-facade-${version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${version}" />
+				<attribute name="Bundle-Vendor" value="Martin Winandy" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
 			<zipfileset dir="${log4j.src}" />
-		</zip>
+		</jar>
 		<zip destfile="${dist.maven}/log4j-facade-${version}-javadoc.jar">
 			<zipfileset dir="${dist.maven}/log4j-facade" />
 		</zip>
