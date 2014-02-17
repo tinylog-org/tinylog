@@ -369,7 +369,7 @@ public class LoggerTest extends AbstractTest {
 		/* Test logging without writer */
 
 		Configurator.defaultConfig().writer(null).activate();
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, null, null, null, null);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, null, null);
 
 		/* Initialize writer */
 
@@ -459,7 +459,7 @@ public class LoggerTest extends AbstractTest {
 		/* Test logging without writer */
 
 		Configurator.defaultConfig().writer(null).activate();
-		Logger.output(stackTraceElement, null, null, null, null);
+		Logger.output(stackTraceElement, LoggingLevel.INFO, null, null, null);
 
 		/* Initialize writer */
 

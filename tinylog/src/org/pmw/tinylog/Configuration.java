@@ -33,6 +33,7 @@ import org.pmw.tinylog.writers.LoggingWriter;
 public final class Configuration {
 
 	private final LoggingLevel level;
+	private final LoggingLevel lowestLevel;
 	private final Map<String, LoggingLevel> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
@@ -64,16 +65,17 @@ public final class Configuration {
 	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
 			final LoggingWriter writer, final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
+		this.lowestLevel = writer == null ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
 		this.writer = writer;
-		this.effectiveWriter = writer == null || (level == LoggingLevel.OFF && customLevels.isEmpty()) ? null : writer;
+		this.effectiveWriter = writer == null || lowestLevel == LoggingLevel.OFF ? null : writer;
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
-		this.requiredLogEntryValues = requiredLogEntryValues(writer, formatTokens);
+		this.requiredLogEntryValues = getRequiredLogEntryValues(writer, formatTokens);
 		this.requiredStackTraceInformation = effectiveWriter == null ? StackTraceInformation.NONE : getRequiredStackTraceInformation(customLevels,
 				requiredLogEntryValues);
 	}
@@ -92,7 +94,7 @@ public final class Configuration {
 	 * 
 	 * @return <code>true</code> if custom logging levels exist, <code>false</code> if not
 	 */
-	public boolean hasCustomLoggingLevels() {
+	public boolean hasCustomLevels() {
 		return !customLevels.isEmpty();
 	}
 
@@ -193,6 +195,17 @@ public final class Configuration {
 	}
 
 	/**
+	 * Fast check if output is possible.
+	 * 
+	 * @param level
+	 *            Logging level to check
+	 * @return <code>true</code> if log entries with the defined logging level can be output, <code>false</code> if not
+	 */
+	boolean isOutputPossible(final LoggingLevel level) {
+		return lowestLevel.ordinal() <= level.ordinal();
+	}
+
+	/**
 	 * Get the effective logging writer to be used by the logger.
 	 * 
 	 * @return Effective logging writer
@@ -214,7 +227,17 @@ public final class Configuration {
 		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
 	}
 
-	private static Set<LogEntryValue> requiredLogEntryValues(final LoggingWriter writer, final Collection<Token> formatTokens) {
+	private static LoggingLevel getLowestLevel(final LoggingLevel level, final Map<String, LoggingLevel> customLevels) {
+		LoggingLevel lowestLevel = level;
+		for (LoggingLevel customLevel : customLevels.values()) {
+			if (lowestLevel.ordinal() > customLevel.ordinal()) {
+				lowestLevel = customLevel;
+			}
+		}
+		return lowestLevel;
+	}
+
+	private static Set<LogEntryValue> getRequiredLogEntryValues(final LoggingWriter writer, final Collection<Token> formatTokens) {
 		if (writer == null) {
 			return Collections.emptySet();
 		} else {

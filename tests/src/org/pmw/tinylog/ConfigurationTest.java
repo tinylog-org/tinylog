@@ -78,6 +78,58 @@ public class ConfigurationTest extends AbstractTest {
 	}
 
 	/**
+	 * Test check if output of log entries is possible.
+	 */
+	@Test
+	public final void testOutputPossible() {
+		Configuration configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, null, null, 0);
+		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.ERROR));
+
+		configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.ERROR));
+
+		configuration = new Configuration(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
+
+		configuration = new Configuration(LoggingLevel.INFO, Collections.singletonMap("a", LoggingLevel.ERROR), "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
+
+		configuration = new Configuration(LoggingLevel.INFO, Collections.singletonMap("a", LoggingLevel.DEBUG), "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
+
+		Map<String, LoggingLevel> customLevels = new HashMap<String, LoggingLevel>();
+		customLevels.put("a", LoggingLevel.OFF);
+		customLevels.put("b", LoggingLevel.TRACE);
+		customLevels.put("c", LoggingLevel.DEBUG);
+		configuration = new Configuration(LoggingLevel.INFO, customLevels, "", Locale.ROOT, new DummyWriter(), null, 0);
+		assertTrue(configuration.isOutputPossible(LoggingLevel.TRACE));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.DEBUG));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.WARNING));
+		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
+	}
+
+	/**
 	 * Test calculating effective logging writer.
 	 */
 	@Test
@@ -217,7 +269,7 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testMinimalConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel());
-		assertFalse(configuration.hasCustomLoggingLevels());
+		assertFalse(configuration.hasCustomLevels());
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.TRACE, configuration.getLevel(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("", configuration.getFormatPattern());
@@ -240,7 +292,7 @@ public class ConfigurationTest extends AbstractTest {
 
 	private void testDetailedConfigurationSample(final Configuration configuration) {
 		assertEquals(LoggingLevel.WARNING, configuration.getLevel());
-		assertTrue(configuration.hasCustomLoggingLevels());
+		assertTrue(configuration.hasCustomLevels());
 		assertEquals(LoggingLevel.WARNING, configuration.getLevel("invalid"));
 		assertEquals(LoggingLevel.INFO, configuration.getLevel(ConfigurationTest.class.getName()));
 		assertEquals(LoggingLevel.WARNING, configuration.getLevel("invalid"));
