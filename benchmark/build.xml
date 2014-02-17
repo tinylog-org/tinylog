@@ -122,12 +122,15 @@
 		</java>
 		<java classname="org.pmw.benchmark.SingleThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
 			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
+			<sysproperty key="Log4jContextSelector" value="org.apache.logging.log4j.core.async.AsyncLoggerContextSelector" />
 		</java>
 		<java classname="org.pmw.benchmark.MultiThreadBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
 			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
+			<sysproperty key="Log4jContextSelector" value="org.apache.logging.log4j.core.async.AsyncLoggerContextSelector" />
 		</java>
 		<java classname="org.pmw.benchmark.PrimesBenchmark" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
 			<arg value="org.pmw.benchmark.log4j2.Log4j2WithAsyncLogger" />
+			<sysproperty key="Log4jContextSelector" value="org.apache.logging.log4j.core.async.AsyncLoggerContextSelector" />
 		</java>
 	</target>
 	

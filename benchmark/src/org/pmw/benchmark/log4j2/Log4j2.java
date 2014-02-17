@@ -38,13 +38,14 @@ public class Log4j2 implements ILoggingFramework {
 
 	@Override
 	public void init(final File file) throws Exception {
-		logger = createLogger();
+		logger = (Logger) LogManager.getLogger();
 		Configuration configuration = logger.getContext().getConfiguration();
 
 		for (Appender appender : configuration.getAppenders().values()) {
 			logger.removeAppender(appender);
 		}
 		appender = createAppender(file, configuration);
+		appender.start();
 		logger.addAppender(appender);
 
 		logger.setLevel(Level.INFO);
@@ -80,17 +81,13 @@ public class Log4j2 implements ILoggingFramework {
 		appender.stop();
 	}
 
-	protected Logger createLogger() {
-		return (Logger) LogManager.getRootLogger();
-	}
-
 	protected Layout<? extends Serializable> createLayout(final Configuration configuration) {
-		return PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null);
+		return PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null, null);
 	}
 
 	protected Appender createAppender(final File file, final Configuration configuration) {
-		return FileAppender.createAppender(file.getAbsolutePath(), "false", null, "File", null, null, "false", createLayout(configuration), null, null, null,
-				configuration);
+		return FileAppender.createAppender(file.getAbsolutePath(), "false", null, "File", null, null, "false", null, createLayout(configuration), null, null,
+				null, configuration);
 	}
 
 }
