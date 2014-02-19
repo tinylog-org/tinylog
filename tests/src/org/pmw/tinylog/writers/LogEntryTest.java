@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 
 /**
  * Tests the log entry data class.
@@ -41,7 +41,7 @@ public class LogEntryTest extends AbstractTest {
 		String method = "myMethod";
 		String file = "myFile";
 		int lineNumber = 42;
-		LoggingLevel level = LoggingLevel.DEBUG;
+		Level level = Level.DEBUG;
 		String message = "Hello World!";
 		RuntimeException exception = new RuntimeException("Hello from Exception!");
 		String renderedLogEntry = "My log entry";
@@ -55,7 +55,7 @@ public class LogEntryTest extends AbstractTest {
 		assertEquals(method, logEntry.getMethodName());
 		assertEquals(file, logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
-		assertEquals(level, logEntry.getLoggingLevel());
+		assertEquals(level, logEntry.getLevel());
 		assertEquals(message, logEntry.getMessage());
 		assertSame(exception, logEntry.getException());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());

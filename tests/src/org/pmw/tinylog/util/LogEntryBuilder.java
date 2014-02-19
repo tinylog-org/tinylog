@@ -15,7 +15,7 @@ package org.pmw.tinylog.util;
 
 import java.util.Date;
 
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 import org.pmw.tinylog.writers.LogEntry;
 
 /**
@@ -30,7 +30,7 @@ public final class LogEntryBuilder {
 	private String method = null;
 	private String file = null;
 	private int lineNumber = -1;
-	private LoggingLevel level = null;
+	private Level level = null;
 	private String message = null;
 	private Throwable exception = null;
 	private String renderedLogEntry = null;
@@ -126,7 +126,7 @@ public final class LogEntryBuilder {
 	 *            Logging level
 	 * @return The current log entry builder
 	 */
-	public LogEntryBuilder level(final LoggingLevel level) {
+	public LogEntryBuilder level(final Level level) {
 		this.level = level;
 		return this;
 	}

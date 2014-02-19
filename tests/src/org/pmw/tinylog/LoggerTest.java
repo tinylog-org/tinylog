@@ -66,17 +66,17 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLoggingLevel() {
-		Configurator.defaultConfig().level(LoggingLevel.TRACE).activate();
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel());
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertEquals(Level.TRACE, Logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
-		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
+		Configurator.currentConfig().level(Level.OFF).activate();
+		assertEquals(Level.OFF, Logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
-		assertEquals(LoggingLevel.ERROR, Logger.getLoggingLevel());
+		Configurator.currentConfig().level(Level.ERROR).activate();
+		assertEquals(Level.ERROR, Logger.getLevel());
 
 		Configurator.currentConfig().level(null).activate();
-		assertEquals(LoggingLevel.OFF, Logger.getLoggingLevel());
+		assertEquals(Level.OFF, Logger.getLevel());
 	}
 
 	/**
@@ -84,23 +84,23 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testCustomLoggingLevel() {
-		Configurator.defaultConfig().level("a", LoggingLevel.TRACE).level("a.b", LoggingLevel.INFO).activate();
+		Configurator.defaultConfig().level("a", Level.TRACE).level("a.b", Level.INFO).activate();
 
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a"));
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b"));
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c"));
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel("a.b.d"));
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel("a.c.d"));
+		assertEquals(Level.TRACE, Logger.getLevel("a"));
+		assertEquals(Level.INFO, Logger.getLevel("a.b"));
+		assertEquals(Level.TRACE, Logger.getLevel("a.c"));
+		assertEquals(Level.INFO, Logger.getLevel("a.b.d"));
+		assertEquals(Level.TRACE, Logger.getLevel("a.c.d"));
 
-		Configurator.defaultConfig().level(LoggerTest.class.getPackage(), LoggingLevel.TRACE).activate();
+		Configurator.defaultConfig().level(LoggerTest.class.getPackage(), Level.TRACE).activate();
 
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class.getPackage()));
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class));
+		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class.getPackage()));
+		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class));
 
-		Configurator.defaultConfig().level(LoggerTest.class, LoggingLevel.TRACE).activate();
+		Configurator.defaultConfig().level(LoggerTest.class, Level.TRACE).activate();
 
-		assertEquals(LoggingLevel.INFO, Logger.getLoggingLevel(LoggerTest.class.getPackage()));
-		assertEquals(LoggingLevel.TRACE, Logger.getLoggingLevel(LoggerTest.class));
+		assertEquals(Level.INFO, Logger.getLevel(LoggerTest.class.getPackage()));
+		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class));
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testTrace() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
 				requiredLogEntryValue.add(LogEntryValue.CLASS);
@@ -118,37 +118,37 @@ public class LoggerTest extends AbstractTest {
 			}
 
 			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
+			Configurator.defaultConfig().writer(writer).level(Level.TRACE).activate();
 
 			Logger.trace(new StringBuilder("Hello!"));
 			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.trace("Hello!");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.trace("Hello {0}!", "World");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
 
 			Exception exception = new Exception();
 
 			Logger.trace(exception);
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
 			Logger.trace(exception, "Test");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Test", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
-			Configurator.currentConfig().level(LoggingLevel.DEBUG).activate();
+			Configurator.currentConfig().level(Level.DEBUG).activate();
 			Logger.trace("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
@@ -160,7 +160,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testDebug() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
 				requiredLogEntryValue.add(LogEntryValue.CLASS);
@@ -169,37 +169,37 @@ public class LoggerTest extends AbstractTest {
 			}
 
 			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.DEBUG).activate();
+			Configurator.defaultConfig().writer(writer).level(Level.DEBUG).activate();
 
 			Logger.debug(new StringBuilder("Hello!"));
 			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.debug("Hello!");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.debug("Hello {0}!", "World");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
 
 			Exception exception = new Exception();
 
 			Logger.debug(exception);
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
 			Logger.debug(exception, "Test");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Test", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
-			Configurator.currentConfig().level(LoggingLevel.INFO).activate();
+			Configurator.currentConfig().level(Level.INFO).activate();
 			Logger.debug("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
@@ -211,7 +211,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testInfo() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
 				requiredLogEntryValue.add(LogEntryValue.CLASS);
@@ -220,37 +220,37 @@ public class LoggerTest extends AbstractTest {
 			}
 
 			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).activate();
+			Configurator.defaultConfig().writer(writer).level(Level.INFO).activate();
 
 			Logger.info(new StringBuilder("Hello!"));
 			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.info("Hello!");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.info("Hello {0}!", "World");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
 
 			Exception exception = new Exception();
 
 			Logger.info(exception);
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
 			Logger.info(exception, "Test");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Test", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
-			Configurator.currentConfig().level(LoggingLevel.WARNING).activate();
+			Configurator.currentConfig().level(Level.WARNING).activate();
 			Logger.info("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
@@ -262,7 +262,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testWarning() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
 				requiredLogEntryValue.add(LogEntryValue.CLASS);
@@ -271,37 +271,37 @@ public class LoggerTest extends AbstractTest {
 			}
 
 			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.WARNING).activate();
+			Configurator.defaultConfig().writer(writer).level(Level.WARNING).activate();
 
 			Logger.warn(new StringBuilder("Hello!"));
 			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.warn("Hello!");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.warn("Hello {0}!", "World");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
 
 			Exception exception = new Exception();
 
 			Logger.warn(exception);
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
 			Logger.warn(exception, "Test");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Test", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
-			Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
+			Configurator.currentConfig().level(Level.ERROR).activate();
 			Logger.warn("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
@@ -313,7 +313,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testError() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
 				requiredLogEntryValue.add(LogEntryValue.CLASS);
@@ -322,37 +322,37 @@ public class LoggerTest extends AbstractTest {
 			}
 
 			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.ERROR).activate();
+			Configurator.defaultConfig().writer(writer).level(Level.ERROR).activate();
 
 			Logger.error(new StringBuilder("Hello!"));
 			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.error("Hello!");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
 			Logger.error("Hello {0}!", "World");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
 
 			Exception exception = new Exception();
 
 			Logger.error(exception);
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
 			Logger.error(exception, "Test");
 			logEntry = writer.consumeLogEntry();
-			assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Test", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
-			Configurator.currentConfig().level(LoggingLevel.OFF).activate();
+			Configurator.currentConfig().level(Level.OFF).activate();
 			Logger.error("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
@@ -369,55 +369,55 @@ public class LoggerTest extends AbstractTest {
 		/* Test logging without writer */
 
 		Configurator.defaultConfig().writer(null).activate();
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, null, null);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, null, null);
 
 		/* Initialize writer */
 
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.DEBUG).activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS);
+		Configurator.defaultConfig().writer(writer).level(Level.DEBUG).activate();
 
 		/* Test logging of class */
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 
 		/* Test logging of plain texts */
 
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {0}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		/* Test logging of exceptions */
 
 		Exception exception = new Exception();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.WARNING, exception, null, new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, exception, "Test", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		/* Test different logging level of an particular package */
 
-		Configurator.currentConfig().level("org.pmw.tinylog", LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level("org.pmw.tinylog", Level.DEBUG).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+		assertEquals(Level.DEBUG, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		/* Test failure of creating log entry */
@@ -425,7 +425,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
 		getErrorStream().clear();
@@ -435,7 +435,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().writer(new EvilWriter()).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.ERROR, null, "Hello!", new Object[0]);
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
 		getErrorStream().clear();
 
@@ -445,12 +445,12 @@ public class LoggerTest extends AbstractTest {
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 		writingThread.shutdown();
 		writingThread.join();
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -467,59 +467,59 @@ public class LoggerTest extends AbstractTest {
 		/* Test logging without writer */
 
 		Configurator.defaultConfig().writer(null).activate();
-		Logger.output(stackTraceElement, LoggingLevel.INFO, null, null, null);
+		Logger.output(stackTraceElement, Level.INFO, null, null, null);
 
 		/* Initialize writer */
 
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS);
 		Configurator.defaultConfig().writer(writer).activate();
 
 		/* Test logging of class */
 
-		Configurator.currentConfig().level(LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level(Level.DEBUG).activate();
 
-		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("com.test.MyClass", logEntry.getClassName());
 
 		/* Test logging of plain texts */
 
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE);
-		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
+		Configurator.currentConfig().writer(writer).level(Level.INFO).activate();
 
-		Logger.output(stackTraceElement, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(stackTraceElement, Level.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { "World" });
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello {0}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		/* Test logging of exceptions */
 
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
-		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+		Configurator.currentConfig().writer(writer).level(Level.INFO).activate();
 
 		Exception exception = new Exception();
-		Logger.output(stackTraceElement, LoggingLevel.WARNING, exception, null, new Object[0]);
+		Logger.output(stackTraceElement, Level.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
 
-		Logger.output(stackTraceElement, LoggingLevel.ERROR, exception, "Test", new Object[0]);
+		Logger.output(stackTraceElement, Level.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		/* Test different logging level of an particular package */
 
-		Configurator.currentConfig().level("com.test", LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level("com.test", Level.DEBUG).activate();
 
-		Logger.output(stackTraceElement, LoggingLevel.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(stackTraceElement, Level.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+		assertEquals(Level.DEBUG, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		/* Test failure of creating log entry */
@@ -527,7 +527,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().level("com.test", null).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
 		getErrorStream().clear();
@@ -537,7 +537,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().writer(new EvilWriter()).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(stackTraceElement, LoggingLevel.ERROR, null, "Hello!", new Object[0]);
+		Logger.output(stackTraceElement, Level.ERROR, null, "Hello!", new Object[0]);
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
 		getErrorStream().clear();
 
@@ -547,12 +547,12 @@ public class LoggerTest extends AbstractTest {
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
-		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello!", new Object[0]);
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 		writingThread.shutdown();
 		writingThread.join();
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -566,60 +566,60 @@ public class LoggerTest extends AbstractTest {
 	public final void testOutputWithClassName() throws InterruptedException {
 		/* Test logging without writer */
 
-		Configurator.defaultConfig().level(LoggerTest.class, LoggingLevel.TRACE).writer(null).activate();
+		Configurator.defaultConfig().level(LoggerTest.class, Level.TRACE).writer(null).activate();
 		Logger.info("Hello!");
 
 		/* Initialize writer */
 
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS);
 		Configurator.defaultConfig().writer(writer).activate();
 
 		/* Test logging of class */
 
-		Configurator.currentConfig().level(LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level(Level.DEBUG).activate();
 
 		Logger.info("Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 
 		/* Test logging of plain texts */
 
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
-		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
+		Configurator.currentConfig().writer(writer).level(Level.INFO).activate();
 
 		Logger.debug("Hello!");
 		assertNull(writer.consumeLogEntry());
 
 		Logger.info("Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		/* Test logging of exceptions */
 
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
-		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+		Configurator.currentConfig().writer(writer).level(Level.INFO).activate();
 
 		Exception exception = new Exception();
 		Logger.warn(exception, null);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
 
 		Logger.error(exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		/* Test different logging level of an particular package */
 
-		Configurator.currentConfig().level(LoggerTest.class.getPackage(), LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level(LoggerTest.class.getPackage(), Level.DEBUG).activate();
 
 		Logger.debug("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+		assertEquals(Level.DEBUG, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		/* Test failure of creating log entry */
@@ -652,7 +652,7 @@ public class LoggerTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -662,7 +662,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithProcessId() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.PROCESS_ID, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{pid}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{pid}").activate();
 
 		Logger.info("Hello");
 
@@ -677,7 +677,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithThread() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{thread}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{thread}").activate();
 
 		Logger.info("Hello");
 
@@ -692,7 +692,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithThreadId() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{thread_id}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{thread_id}").activate();
 
 		Logger.info("Hello");
 
@@ -707,7 +707,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithFullyQualifiedClassName() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{class}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}").activate();
 
 		Logger.info("Hello");
 
@@ -722,7 +722,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithPackageName() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{package}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{package}").activate();
 
 		Logger.info("Hello");
 
@@ -730,13 +730,13 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 		assertEquals(LoggerTest.class.getPackage().getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
-		Logger.output(new StackTraceElement("com.test.MyClass", "unknown", "unknown", -1), LoggingLevel.INFO, null, "Hello", new Object[0]);
+		Logger.output(new StackTraceElement("com.test.MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("com.test.MyClass", logEntry.getClassName());
 		assertEquals("com.test" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
-		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), LoggingLevel.INFO, null, "Hello", new Object[0]);
+		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("MyClass", logEntry.getClassName());
@@ -749,7 +749,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithClassName() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{class_name}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class_name}").activate();
 
 		Logger.info("Hello");
 
@@ -757,13 +757,13 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 		assertEquals(LoggerTest.class.getSimpleName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
-		Logger.output(new StackTraceElement("com.test.MyClass", "unknown", "unknown", -1), LoggingLevel.INFO, null, "Hello", new Object[0]);
+		Logger.output(new StackTraceElement("com.test.MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("com.test.MyClass", logEntry.getClassName());
 		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
-		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), LoggingLevel.INFO, null, "Hello", new Object[0]);
+		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("MyClass", logEntry.getClassName());
@@ -776,7 +776,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithMethodName() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{method}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{method}").activate();
 
 		Logger.info("Hello");
 
@@ -791,7 +791,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithFileName() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.FILE, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{file}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{file}").activate();
 
 		Logger.info("Hello");
 
@@ -806,7 +806,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithLineNumber() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{line}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{line}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
@@ -822,13 +822,13 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithLoggingLevel() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{level}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{level}").activate();
 
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
-		assertEquals(LoggingLevel.INFO + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+		assertEquals(Level.INFO, logEntry.getLevel());
+		assertEquals(Level.INFO + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	/**
@@ -837,7 +837,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithDate() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.DATE, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{date:yyyy-MM-dd}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{date:yyyy-MM-dd}").activate();
 
 		Logger.info("Hello");
 
@@ -852,7 +852,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testLogEntryWithMessage() {
 		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{message}").activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{message}").activate();
 
 		Logger.info("Hello");
 
@@ -876,7 +876,7 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter(EnumSet.allOf(LogEntryValue.class));
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
+		Configurator.defaultConfig().writer(writer).level(Level.INFO)
 				.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
@@ -889,14 +889,14 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("testFullLogEntry", logEntry.getMethodName());
 		assertEquals("LoggerTest.java", logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(new Date().getTime(), logEntry.getDate().getTime(), 10 * 1000d /* delta of 10 seconds */);
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 
 		String renderedLogEntry = MessageFormat.format("{0}#{1}#{2}#{3}#{4}#{5}#testFullLogEntry#LoggerTest.java#{6}#{7}#{8}#Hello{9}",
 				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
-				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, LoggingLevel.INFO,
+				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
 				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
@@ -907,9 +907,9 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testExceptions() {
 		String newLine = EnvironmentHelper.getNewLine();
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.EXCEPTION, LogEntryValue.RENDERED_LOG_ENTRY);
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.EXCEPTION, LogEntryValue.RENDERED_LOG_ENTRY);
 
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.ERROR).formatPattern("{message}").maxStackTraceElements(0).activate();
+		Configurator.defaultConfig().writer(writer).level(Level.ERROR).formatPattern("{message}").maxStackTraceElements(0).activate();
 
 		Throwable exception = new Throwable();
 		Logger.error(exception);
@@ -1003,7 +1003,7 @@ public class LoggerTest extends AbstractTest {
 
 		try {
 			StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
-			Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).formatPattern("{class}.{method}()").activate();
+			Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
 
 			StringListOutputStream errorStream = getErrorStream();
 			assertFalse(errorStream.hasLines());

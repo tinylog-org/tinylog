@@ -103,7 +103,7 @@ final class Tokenizer {
 		} else if ("{line}".equals(text)) {
 			return new Token(TokenType.LINE_NUMBER);
 		} else if ("{level}".equals(text)) {
-			return new Token(TokenType.LOGGING_LEVEL);
+			return new Token(TokenType.LEVEL);
 		} else if ("{message}".equals(text)) {
 			return new Token(TokenType.MESSAGE);
 		} else {

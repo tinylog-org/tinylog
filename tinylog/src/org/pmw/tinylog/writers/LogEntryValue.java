@@ -15,7 +15,7 @@ package org.pmw.tinylog.writers;
 
 import java.util.Date;
 
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 
 /**
  * Supported log entry values in {@link org.pmw.tinylog.writers.LogEntry LogEntry}.
@@ -62,11 +62,11 @@ public enum LogEntryValue {
 	LINE_NUMBER,
 
 	/**
-	 * The logging level
+	 * The severity level
 	 * 
-	 * @see LoggingLevel
+	 * @see Level
 	 */
-	LOGGING_LEVEL,
+	LEVEL,
 
 	/**
 	 * The message of the logging event

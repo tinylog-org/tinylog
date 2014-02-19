@@ -70,13 +70,13 @@ public class WritingThreadTest extends AbstractTest {
 		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
 		writingThread.start();
 
-		writingThread.putLogEntry(writer, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+		writingThread.putLogEntry(writer, new LogEntryBuilder().level(Level.INFO).message("sample").create());
 
 		writingThread.shutdown();
 		writingThread.join();
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("sample", logEntry.getMessage());
 	}
 
@@ -123,7 +123,7 @@ public class WritingThreadTest extends AbstractTest {
 				throw new UnsupportedOperationException();
 			}
 
-		}, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+		}, new LogEntryBuilder().level(Level.INFO).message("sample").create());
 
 		writingThread.shutdown();
 		writingThread.join();
@@ -149,7 +149,7 @@ public class WritingThreadTest extends AbstractTest {
 				throw new UnsupportedOperationException();
 			}
 
-		}, new LogEntryBuilder().level(LoggingLevel.INFO).message("sample").create());
+		}, new LogEntryBuilder().level(Level.INFO).message("sample").create());
 
 		writingThread.shutdown();
 		writingThread.join();

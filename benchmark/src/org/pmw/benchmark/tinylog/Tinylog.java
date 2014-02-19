@@ -18,7 +18,7 @@ import java.io.File;
 import org.pmw.benchmark.ILoggingFramework;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 import org.pmw.tinylog.writers.FileWriter;
 
 public class Tinylog implements ILoggingFramework {
@@ -33,7 +33,7 @@ public class Tinylog implements ILoggingFramework {
 	@Override
 	public void init(final File file) throws Exception {
 		writer = createWriter(file);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO)
+		Configurator.defaultConfig().writer(writer).level(Level.INFO)
 				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}").activate();
 	}
 

@@ -44,19 +44,19 @@ public class RegressionsTest extends AbstractTest {
 	 */
 	@Test
 	public final void testWrongClass() {
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS);
+		Configurator.defaultConfig().writer(writer).level(Level.TRACE).activate();
 
-		Configurator.currentConfig().level("org", LoggingLevel.TRACE).activate();
+		Configurator.currentConfig().level("org", Level.TRACE).activate();
 		Logger.info("");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Was already OK
 
 		Configurator.currentConfig().level("org", null).activate();
 		Logger.info("");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(RegressionsTest.class.getName(), logEntry.getClassName()); // Failed
 	}
 
@@ -95,7 +95,7 @@ public class RegressionsTest extends AbstractTest {
 		Logger.info("{TEST}"); // Failed (java.lang.IllegalArgumentException)
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("{TEST}", logEntry.getMessage());
 	}
 
@@ -105,12 +105,12 @@ public class RegressionsTest extends AbstractTest {
 	@Test
 	public final void testLoggingLevel() {
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).activate();
 
 		Logger.error("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello", logEntry.getMessage());
 	}
 
@@ -121,7 +121,7 @@ public class RegressionsTest extends AbstractTest {
 	@Test
 	public final void testLowerCustomLoggingLevelsForPackages() {
 		StoreWriter writer = new StoreWriter();
-		Configurator.defaultConfig().level(LoggingLevel.INFO).level(RegressionsTest.class.getPackage().getName(), LoggingLevel.OFF).activate();
+		Configurator.defaultConfig().level(Level.INFO).level(RegressionsTest.class.getPackage().getName(), Level.OFF).activate();
 		Logger.info("should be ignored"); // Was output
 		assertNull(writer.consumeLogEntry());
 	}

@@ -13,7 +13,7 @@
 
 package org.pmw.tinylog.util;
 
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 import org.pmw.tinylog.writers.Writer;
 
 /**
@@ -53,7 +53,7 @@ public final class LoopWritingThread extends Thread {
 	public void run() {
 		try {
 			while (!shutdown) {
-				writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).renderedLogEntry(LINE + "\n").create());
+				writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry(LINE + "\n").create());
 				++writtenLines;
 			}
 		} catch (Exception ex) {

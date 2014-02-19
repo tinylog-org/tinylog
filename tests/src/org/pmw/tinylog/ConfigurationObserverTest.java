@@ -229,7 +229,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertEquals(LoggingLevel.ERROR, currentConfiguration.getLevel());
+			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 
 			/* Test remove logging level */
 
@@ -245,7 +245,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			assertEquals(LoggingLevel.TRACE, currentConfiguration.getLevel(ConfigurationObserverTest.class.getName()));
+			assertEquals(Level.TRACE, currentConfiguration.getLevel(ConfigurationObserverTest.class.getName()));
 
 			/* Test remove custom logging level */
 
@@ -569,7 +569,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertEquals(LoggingLevel.ERROR, currentConfiguration.getLevel());
+			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 
 			/* Overriding properties by system properties. */
 
@@ -577,7 +577,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			assertEquals(LoggingLevel.TRACE, currentConfiguration.getLevel());
+			assertEquals(Level.TRACE, currentConfiguration.getLevel());
 
 			/* Without system properties */
 
@@ -585,7 +585,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			assertEquals(LoggingLevel.ERROR, currentConfiguration.getLevel());
+			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 		} finally {
 			threadMock.disable();
 			observer.shutdown();

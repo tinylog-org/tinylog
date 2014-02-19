@@ -24,7 +24,7 @@ class SimpleLog4Facade {
 	 * @return Active logging level
 	 */
 	Level getLoggingLevel() {
-		return TinylogBride.getLoggingLevel();
+		return TinylogBride.getLevel();
 	}
 
 	/**
@@ -35,7 +35,7 @@ class SimpleLog4Facade {
 	 * @return Active logging level
 	 */
 	Level getLoggingLevel(final Class<?> callerClass) {
-		return TinylogBride.getLoggingLevel(callerClass);
+		return TinylogBride.getLevel(callerClass);
 	}
 
 	/**

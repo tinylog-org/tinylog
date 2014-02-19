@@ -27,11 +27,11 @@ public final class LogEntryForwarder {
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param obj
 	 *            The result of the <code>toString()</code> method will be logged
 	 */
-	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Object obj) {
+	public static void forward(final int deepOfStackTrace, final Level level, final Object obj) {
 		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, null, obj, null);
 	}
 
@@ -41,13 +41,13 @@ public final class LogEntryForwarder {
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final String message, final Object... arguments) {
+	public static void forward(final int deepOfStackTrace, final Level level, final String message, final Object... arguments) {
 		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, null, message, arguments);
 	}
 
@@ -57,7 +57,7 @@ public final class LogEntryForwarder {
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param exception
 	 *            Exception to log
 	 * @param message
@@ -65,7 +65,7 @@ public final class LogEntryForwarder {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	public static void forward(final int deepOfStackTrace, final LoggingLevel level, final Throwable exception, final String message, final Object... arguments) {
+	public static void forward(final int deepOfStackTrace, final Level level, final Throwable exception, final String message, final Object... arguments) {
 		Logger.output(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level, exception, message, arguments);
 	}
 
@@ -75,11 +75,11 @@ public final class LogEntryForwarder {
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param obj
 	 *            The result of the <code>toString()</code> method will be logged
 	 */
-	public static void forward(final StackTraceElement stackTraceElement, final LoggingLevel level, final Object obj) {
+	public static void forward(final StackTraceElement stackTraceElement, final Level level, final Object obj) {
 		Logger.output(stackTraceElement, level, null, obj, null);
 	}
 
@@ -89,13 +89,13 @@ public final class LogEntryForwarder {
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	public static void forward(final StackTraceElement stackTraceElement, final LoggingLevel level, final String message, final Object... arguments) {
+	public static void forward(final StackTraceElement stackTraceElement, final Level level, final String message, final Object... arguments) {
 		Logger.output(stackTraceElement, level, null, message, arguments);
 	}
 
@@ -105,7 +105,7 @@ public final class LogEntryForwarder {
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param exception
 	 *            Exception to log
 	 * @param message
@@ -113,7 +113,7 @@ public final class LogEntryForwarder {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	public static void forward(final StackTraceElement stackTraceElement, final LoggingLevel level, final Throwable exception, final String message,
+	public static void forward(final StackTraceElement stackTraceElement, final Level level, final Throwable exception, final String message,
 			final Object... arguments) {
 		Logger.output(stackTraceElement, level, exception, message, arguments);
 	}

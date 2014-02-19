@@ -14,9 +14,9 @@
 package org.pmw.tinylog;
 
 /**
- * Logging levels of {@link org.pmw.tinylog.Logger Logger}.
+ * Severity levels of {@link org.pmw.tinylog.Logger Logger}.
  */
-public enum LoggingLevel {
+public enum Level {
 
 	/**
 	 * Output all log entries

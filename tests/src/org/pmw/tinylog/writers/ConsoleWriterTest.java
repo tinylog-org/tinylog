@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 
@@ -41,7 +41,7 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testRequiredLogEntryValue() {
 		Set<LogEntryValue> requiredLogEntryValues = new ConsoleWriter().getRequiredLogEntryValues();
-		assertThat(requiredLogEntryValues, contains(LogEntryValue.LOGGING_LEVEL, LogEntryValue.RENDERED_LOG_ENTRY));
+		assertThat(requiredLogEntryValues, contains(LogEntryValue.LEVEL, LogEntryValue.RENDERED_LOG_ENTRY));
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testErrorStream() {
-		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.ERROR, LoggingLevel.WARNING)) {
+		for (Level loggingLevel : Arrays.asList(Level.ERROR, Level.WARNING)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init(null);
 
@@ -67,7 +67,7 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testOutputStream() {
-		for (LoggingLevel loggingLevel : Arrays.asList(LoggingLevel.INFO, LoggingLevel.DEBUG, LoggingLevel.TRACE)) {
+		for (Level loggingLevel : Arrays.asList(Level.INFO, Level.DEBUG, Level.TRACE)) {
 			ConsoleWriter writer = new ConsoleWriter();
 			writer.init(null);
 
@@ -88,7 +88,7 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 		ConsoleWriter writer = new ConsoleWriter();
 		writer.init(null);
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.INFO).renderedLogEntry("Hello").create());
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello").create());
 		writer.flush();
 
 		assertEquals("Hello", getOutputStream().nextLine());

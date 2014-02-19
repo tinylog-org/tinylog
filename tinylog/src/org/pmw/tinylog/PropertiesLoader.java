@@ -42,7 +42,7 @@ import org.pmw.tinylog.writers.Writer;
 final class PropertiesLoader {
 
 	/**
-	 * Name of property for logging level
+	 * Name of property for severity level
 	 */
 	static final String LEVEL_PROPERTY = "tinylog.level";
 
@@ -87,7 +87,7 @@ final class PropertiesLoader {
 	static final String SERVICES_PREFIX = "META-INF/services/";
 
 	/**
-	 * Name prefix of properties for custom logging levels
+	 * Name prefix of properties for custom severity levels
 	 */
 	static final String CUSTOM_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
 
@@ -113,7 +113,7 @@ final class PropertiesLoader {
 	}
 
 	/**
-	 * Load default logging level and custom logging levels from properties.
+	 * Load default severity level and custom severity levels from properties.
 	 * 
 	 * @param configurator
 	 *            Configurator to update
@@ -121,12 +121,12 @@ final class PropertiesLoader {
 	 *            Properties with configuration
 	 */
 	static void readLevel(final Configurator configurator, final Properties properties) {
-		String level = properties.getProperty(LEVEL_PROPERTY);
-		if (level != null && level.length() > 0) {
+		String levelName = properties.getProperty(LEVEL_PROPERTY);
+		if (levelName != null && levelName.length() > 0) {
 			try {
-				configurator.level(LoggingLevel.valueOf(level.toUpperCase(Locale.ENGLISH)));
+				configurator.level(Level.valueOf(levelName.toUpperCase(Locale.ENGLISH)));
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.warn("\"{0}\" is an invalid logging level and will be ignored", level);
+				InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", levelName);
 			}
 		}
 
@@ -137,10 +137,10 @@ final class PropertiesLoader {
 				String packageOrClass = key.substring(CUSTOM_LEVEL_PREFIX.length());
 				String value = properties.getProperty(key);
 				try {
-					LoggingLevel loggingLevel = LoggingLevel.valueOf(value.toUpperCase(Locale.ENGLISH));
-					configurator.level(packageOrClass, loggingLevel);
+					Level level = Level.valueOf(value.toUpperCase(Locale.ENGLISH));
+					configurator.level(packageOrClass, level);
 				} catch (IllegalArgumentException ex) {
-					InternalLogger.warn("\"{0}\" is an invalid logging level and will be ignored", value);
+					InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", value);
 					configurator.level(packageOrClass, null);
 				}
 			}
@@ -357,8 +357,8 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static Writer loadAndSetWriter(final Properties properties, final String propertiesPrefix,
-			final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
+	private static Writer loadAndSetWriter(final Properties properties, final String propertiesPrefix, final org.pmw.tinylog.writers.Property[] definition,
+			final Class<?> writerClass) {
 		Object[] parameters = loadParameters(properties, propertiesPrefix, definition);
 
 		if (parameters != null) {

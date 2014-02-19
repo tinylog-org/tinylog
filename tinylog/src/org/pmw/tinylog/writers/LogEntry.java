@@ -15,7 +15,7 @@ package org.pmw.tinylog.writers;
 
 import java.util.Date;
 
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 
 /**
  * Log entry object for {@link org.pmw.tinylog.writers.Writer#write(LogEntry) Writer.write(LogEntry)}.
@@ -29,7 +29,7 @@ public final class LogEntry {
 	private final String methodName;
 	private final String filename;
 	private final int lineNumber;
-	private final LoggingLevel loggingLevel;
+	private final Level level;
 	private final String message;
 	private final Throwable exception;
 	private final String renderedLogEntry;
@@ -49,8 +49,8 @@ public final class LogEntry {
 	 *            The source filename
 	 * @param lineNumber
 	 *            The line number
-	 * @param loggingLevel
-	 *            The logging level
+	 * @param level
+	 *            The severity level
 	 * @param message
 	 *            The message of the logging event
 	 * @param exception
@@ -59,7 +59,7 @@ public final class LogEntry {
 	 *            The rendered log entry
 	 */
 	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String methodName, final String filename,
-			final int lineNumber, final LoggingLevel loggingLevel, final String message, final Throwable exception, final String renderedLogEntry) {
+			final int lineNumber, final Level level, final String message, final Throwable exception, final String renderedLogEntry) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
@@ -67,7 +67,7 @@ public final class LogEntry {
 		this.methodName = methodName;
 		this.filename = filename;
 		this.lineNumber = lineNumber;
-		this.loggingLevel = loggingLevel;
+		this.level = level;
 		this.message = message;
 		this.exception = exception;
 		this.renderedLogEntry = renderedLogEntry;
@@ -137,12 +137,12 @@ public final class LogEntry {
 	}
 
 	/**
-	 * Get the logging level.
+	 * Get the severity level.
 	 * 
-	 * @return Logging level
+	 * @return Severity level
 	 */
-	public LoggingLevel getLoggingLevel() {
-		return loggingLevel;
+	public Level getLevel() {
+		return level;
 	}
 
 	/**

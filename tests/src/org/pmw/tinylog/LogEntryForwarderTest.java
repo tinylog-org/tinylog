@@ -42,25 +42,25 @@ public class LogEntryForwarderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.FILE, LogEntryValue.MESSAGE);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.FILE, LogEntryValue.MESSAGE);
+		Configurator.defaultConfig().writer(writer).level(Level.TRACE).activate();
 
-		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello!");
+		LogEntryForwarder.forward(0, Level.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Hello!", logEntry.getMessage());
 
-		LogEntryForwarder.forward(0, LoggingLevel.INFO, "Hello {0}!", "World");
+		LogEntryForwarder.forward(0, Level.INFO, "Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
-		LogEntryForwarder.forward(0, LoggingLevel.ERROR, exception, "Test");
+		LogEntryForwarder.forward(0, Level.ERROR, exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("LogEntryForwarderTest.java", logEntry.getFilename());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
@@ -72,25 +72,25 @@ public class LogEntryForwarderTest extends AbstractTest {
 	@Test
 	public final void testLoggingWithStackTraceElement() {
 		StackTraceElement stackTraceElement = new StackTraceElement("MyClass", "?", "?", -1);
-		StoreWriter writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
-		Configurator.defaultConfig().writer(writer).level(LoggingLevel.TRACE).activate();
+		StoreWriter writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
+		Configurator.defaultConfig().writer(writer).level(Level.TRACE).activate();
 
-		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello!");
+		LogEntryForwarder.forward(stackTraceElement, Level.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Hello!", logEntry.getMessage());
 
-		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.INFO, "Hello {0}!", "World");
+		LogEntryForwarder.forward(stackTraceElement, Level.INFO, "Hello {0}!", "World");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Hello World!", logEntry.getMessage());
 
 		Exception exception = new Exception();
-		LogEntryForwarder.forward(stackTraceElement, LoggingLevel.ERROR, exception, "Test");
+		LogEntryForwarder.forward(stackTraceElement, Level.ERROR, exception, "Test");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("Test", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());

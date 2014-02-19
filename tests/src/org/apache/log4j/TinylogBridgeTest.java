@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
@@ -53,19 +52,19 @@ public class TinylogBridgeTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLoggingLevel() {
-		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
 		assertEquals(Level.TRACE, logger.getLoggingLevel());
 		assertEquals(Level.TRACE, logger.getLoggingLevel(TinylogBridgeTest.class));
 
-		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.ERROR).activate();
 		assertEquals(Level.ERROR, logger.getLoggingLevel());
 		assertEquals(Level.ERROR, logger.getLoggingLevel(TinylogBridgeTest.class));
 
-		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.OFF).activate();
 		assertEquals(Level.OFF, logger.getLoggingLevel());
 		assertEquals(Level.OFF, logger.getLoggingLevel(TinylogBridgeTest.class));
 
-		Configurator.currentConfig().level(LoggingLevel.DEBUG).level("org.apache", LoggingLevel.WARNING).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.DEBUG).level("org.apache", org.pmw.tinylog.Level.WARNING).activate();
 		assertEquals(Level.WARN, logger.getLoggingLevel());
 		assertEquals(Level.WARN, logger.getLoggingLevel(TinylogBridgeTest.class));
 		assertEquals(Level.DEBUG, logger.getLoggingLevel(Logger.class));
@@ -76,7 +75,7 @@ public class TinylogBridgeTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLoggingLevelEnabled() {
-		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
 		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Level.ERROR));
@@ -90,7 +89,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertTrue(logger.isEnabled(Level.TRACE));
 		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
-		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.ERROR).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
 		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Level.ERROR));
@@ -104,7 +103,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertFalse(logger.isEnabled(Level.TRACE));
 		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
-		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.OFF).activate();
 		assertFalse(logger.isEnabled(Level.FATAL));
 		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertFalse(logger.isEnabled(Level.ERROR));
@@ -118,7 +117,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertFalse(logger.isEnabled(Level.TRACE));
 		assertFalse(logger.isEnabled(TinylogBridgeTest.class, Level.TRACE));
 
-		Configurator.currentConfig().level(LoggingLevel.DEBUG).level("org.apache", LoggingLevel.WARNING).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.DEBUG).level("org.apache", org.pmw.tinylog.Level.WARNING).activate();
 		assertTrue(logger.isEnabled(Level.FATAL));
 		assertTrue(logger.isEnabled(TinylogBridgeTest.class, Level.FATAL));
 		assertTrue(logger.isEnabled(Logger.class, Level.FATAL));
@@ -144,7 +143,7 @@ public class TinylogBridgeTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
-		Configurator.currentConfig().level(LoggingLevel.INFO).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
 		Exception exception = new Exception();
 
 		logger.log(Level.TRACE, "Hello!");
@@ -157,22 +156,22 @@ public class TinylogBridgeTest extends AbstractTest {
 
 		logger.log(Level.INFO, "Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		logger.log(Level.WARN, null, exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
 
 		logger.log(Level.ERROR, new StringBuilder("Hello!"));
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		logger.log(Level.FATAL, "Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 
@@ -181,17 +180,17 @@ public class TinylogBridgeTest extends AbstractTest {
 	 */
 	@Test
 	public final void testClassName() {
-		writer = new StoreWriter(LogEntryValue.LOGGING_LEVEL, LogEntryValue.CLASS);
-		Configurator.currentConfig().writer(writer).level(LoggingLevel.INFO).activate();
+		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS);
+		Configurator.currentConfig().writer(writer).level(org.pmw.tinylog.Level.INFO).activate();
 
 		logger.log(Level.INFO, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 
 		logger.log(Level.ERROR, "Hello!", new Exception());
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 	}
 

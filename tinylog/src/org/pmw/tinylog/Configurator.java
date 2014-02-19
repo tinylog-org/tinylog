@@ -44,8 +44,8 @@ public final class Configurator {
 	private static WritingThread activeWritingThread = null;
 	private static final Object lock = new Object();
 
-	private LoggingLevel level;
-	private Map<String, LoggingLevel> customLevels;
+	private Level level;
+	private Map<String, Level> customLevels;
 	private String formatPattern;
 	private Locale locale;
 	private final List<Writer> writers;
@@ -54,9 +54,9 @@ public final class Configurator {
 
 	/**
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param customLevels
-	 *            Custom logging levels for specific packages and classes
+	 *            Custom severity levels for specific packages and classes
 	 * @param formatPattern
 	 *            Format pattern for log entries
 	 * @param locale
@@ -68,8 +68,8 @@ public final class Configurator {
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configurator(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final List<Writer> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
+	Configurator(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale, final List<Writer> writers,
+			final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
@@ -85,7 +85,7 @@ public final class Configurator {
 	 * @return A new configurator
 	 */
 	public static Configurator defaultConfig() {
-		return new Configurator(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
+		return new Configurator(Level.INFO, Collections.<String, Level> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
 				Collections.<Writer> singletonList(new ConsoleWriter()), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
 	}
 
@@ -152,16 +152,16 @@ public final class Configurator {
 	}
 
 	/**
-	 * Change the logging level. The logger creates and outputs only log entries for the current logging level and
+	 * Change the severity level. The logger creates and outputs only log entries for the current severity level and
 	 * higher.
 	 * 
 	 * @param level
-	 *            New logging level
+	 *            New severity level
 	 * @return The current configurator
 	 */
-	public Configurator level(final LoggingLevel level) {
+	public Configurator level(final Level level) {
 		if (level == null) {
-			this.level = LoggingLevel.OFF;
+			this.level = Level.OFF;
 		} else {
 			this.level = level;
 		}
@@ -169,47 +169,47 @@ public final class Configurator {
 	}
 
 	/**
-	 * Set a custom logging level for a package.
+	 * Set a custom severity level for a package.
 	 * 
-	 * This will override the default logging level for this package.
+	 * This will override the default severity level for this package.
 	 * 
 	 * @param packageObject
 	 *            Package
 	 * @param level
-	 *            The logging level (or <code>null</code> to reset it to the default logging level)
+	 *            The severity level (or <code>null</code> to reset it to the default severity level)
 	 * @return The current configurator
 	 */
-	public Configurator level(final Package packageObject, final LoggingLevel level) {
+	public Configurator level(final Package packageObject, final Level level) {
 		return level(packageObject.getName(), level);
 	}
 
 	/**
-	 * Set a custom logging level for a class.
+	 * Set a custom severity level for a class.
 	 * 
-	 * This will override the default logging level for this class.
+	 * This will override the default severity level for this class.
 	 * 
 	 * @param classObject
 	 *            Class
 	 * @param level
-	 *            The logging level (or <code>null</code> to reset it to the default logging level)
+	 *            The severity level (or <code>null</code> to reset it to the default severity level)
 	 * @return The current configurator
 	 */
-	public Configurator level(final Class<?> classObject, final LoggingLevel level) {
+	public Configurator level(final Class<?> classObject, final Level level) {
 		return level(classObject.getName(), level);
 	}
 
 	/**
-	 * Set a custom logging level for a package or class.
+	 * Set a custom severity level for a package or class.
 	 * 
-	 * This will override the default logging level for this package respectively class.
+	 * This will override the default severity level for this package respectively class.
 	 * 
 	 * @param nameOfpackageOrClass
 	 *            Name of a package or class
 	 * @param level
-	 *            The logging level (or <code>null</code> to reset it to the default logging level)
+	 *            The severity level (or <code>null</code> to reset it to the default severity level)
 	 * @return The current configurator
 	 */
-	public Configurator level(final String nameOfpackageOrClass, final LoggingLevel level) {
+	public Configurator level(final String nameOfpackageOrClass, final Level level) {
 		if (level == null) {
 			if (!customLevels.isEmpty()) {
 				customLevels.remove(nameOfpackageOrClass);
@@ -219,7 +219,7 @@ public final class Configurator {
 			}
 		} else {
 			if (customLevels.isEmpty()) {
-				customLevels = new HashMap<String, LoggingLevel>();
+				customLevels = new HashMap<String, Level>();
 			}
 			customLevels.put(nameOfpackageOrClass, level);
 		}
@@ -227,7 +227,7 @@ public final class Configurator {
 	}
 
 	/**
-	 * Reset all custom logging levels (to use the default logging level again).
+	 * Reset all custom severity levels (to use the default severity level again).
 	 * 
 	 * @return The current configurator
 	 */

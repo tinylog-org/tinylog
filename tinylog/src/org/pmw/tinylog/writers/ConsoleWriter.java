@@ -18,7 +18,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 
 /**
  * Writes log entries to the console.
@@ -28,7 +28,7 @@ public final class ConsoleWriter implements Writer {
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.RENDERED_LOG_ENTRY);
+		return EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.RENDERED_LOG_ENTRY);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public final class ConsoleWriter implements Writer {
 
 	@Override
 	public void write(final LogEntry logEntry) {
-		getPrintStream(logEntry.getLoggingLevel()).print(logEntry.getRenderedLogEntry());
+		getPrintStream(logEntry.getLevel()).print(logEntry.getRenderedLogEntry());
 	}
 
 	@Override
@@ -51,8 +51,8 @@ public final class ConsoleWriter implements Writer {
 		// Do nothing
 	}
 
-	private static PrintStream getPrintStream(final LoggingLevel level) {
-		if (level == LoggingLevel.ERROR || level == LoggingLevel.WARNING) {
+	private static PrintStream getPrintStream(final Level level) {
+		if (level == Level.ERROR || level == Level.WARNING) {
 			return System.err;
 		} else {
 			return System.out;

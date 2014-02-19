@@ -81,9 +81,9 @@ public class Category {
 	@Deprecated
 	public final Level getPriority() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass());
 		} else {
-			return TinylogBride.getLoggingLevel();
+			return TinylogBride.getLevel();
 		}
 	}
 
@@ -93,9 +93,9 @@ public class Category {
 	@Deprecated
 	public Priority getChainedPriority() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass());
 		} else {
-			return TinylogBride.getLoggingLevel();
+			return TinylogBride.getLevel();
 		}
 	}
 
@@ -107,9 +107,9 @@ public class Category {
 	 */
 	public final Level getLevel() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass());
 		} else {
-			return TinylogBride.getLoggingLevel();
+			return TinylogBride.getLevel();
 		}
 	}
 
@@ -121,9 +121,9 @@ public class Category {
 	 */
 	public Level getEffectiveLevel() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLoggingLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass());
 		} else {
-			return TinylogBride.getLoggingLevel();
+			return TinylogBride.getLevel();
 		}
 	}
 

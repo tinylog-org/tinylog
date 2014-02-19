@@ -119,7 +119,7 @@ public class TokenizerTest extends AbstractTest {
 
 		tokens = Tokenizer.parse("{level}", locale);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.LOGGING_LEVEL, tokens.get(0).getType());
+		assertEquals(TokenType.LEVEL, tokens.get(0).getType());
 
 		tokens = Tokenizer.parse("{message}", locale);
 		assertEquals(1, tokens.size());

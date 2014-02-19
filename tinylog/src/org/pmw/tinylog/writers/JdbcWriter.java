@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.InternalLogger;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 
 /**
  * Writes log entries to a SQL database.
@@ -404,7 +404,7 @@ public final class JdbcWriter implements Writer {
 			} else if ("line".equalsIgnoreCase(string)) {
 				values.add(Value.LINE_NUMBER);
 			} else if ("level".equalsIgnoreCase(string)) {
-				values.add(Value.LOGGING_LEVEL);
+				values.add(Value.LEVEL);
 			} else if ("message".equalsIgnoreCase(string)) {
 				values.add(Value.MESSAGE);
 			} else if ("exception".equalsIgnoreCase(string)) {
@@ -589,8 +589,8 @@ public final class JdbcWriter implements Writer {
 						statement.setInt(i + 1, logEntry.getLineNumber());
 					}
 					break;
-				case LOGGING_LEVEL:
-					statement.setString(i + 1, logEntry.getLoggingLevel().name());
+				case LEVEL:
+					statement.setString(i + 1, logEntry.getLevel().name());
 					break;
 				case MESSAGE:
 					if (logEntry.getMessage() == null) {
@@ -684,11 +684,11 @@ public final class JdbcWriter implements Writer {
 		LINE_NUMBER(LogEntryValue.LINE_NUMBER),
 
 		/**
-		 * The logging level
+		 * The severity level
 		 * 
-		 * @see LoggingLevel
+		 * @see Level
 		 */
-		LOGGING_LEVEL(LogEntryValue.LOGGING_LEVEL),
+		LEVEL(LogEntryValue.LEVEL),
 
 		/**
 		 * The message of the logging event

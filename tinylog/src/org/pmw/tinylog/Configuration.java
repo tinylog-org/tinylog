@@ -33,9 +33,9 @@ import org.pmw.tinylog.writers.Writer;
  */
 public final class Configuration {
 
-	private final LoggingLevel level;
-	private final LoggingLevel lowestLevel;
-	private final Map<String, LoggingLevel> customLevels;
+	private final Level level;
+	private final Level lowestLevel;
+	private final Map<String, Level> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
 	private final List<Writer> writers;
@@ -49,9 +49,9 @@ public final class Configuration {
 
 	/**
 	 * @param level
-	 *            Logging level
+	 *            Severity level
 	 * @param customLevels
-	 *            Custom logging levels for specific packages and classes
+	 *            Custom severity levels for specific packages and classes
 	 * @param formatPattern
 	 *            Format pattern for log entries
 	 * @param locale
@@ -63,15 +63,15 @@ public final class Configuration {
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final List<Writer> writers, final WritingThread writingThread, final int maxStackTraceElements) {
+	Configuration(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale, final List<Writer> writers,
+			final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
-		this.lowestLevel = writers.isEmpty() ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
+		this.lowestLevel = writers.isEmpty() ? Level.OFF : getLowestLevel(level, customLevels);
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
 		this.writers = writers.isEmpty() ? Collections.<Writer> emptyList() : new ArrayList<Writer>(writers);
-		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == LoggingLevel.OFF ? Collections.<Writer> emptyList() : this.writers;
+		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == Level.OFF ? Collections.<Writer> emptyList() : this.writers;
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
@@ -82,35 +82,35 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the global logging level.
+	 * Get the global severity level.
 	 * 
-	 * @return Global logging level
+	 * @return Global severity level
 	 */
-	public LoggingLevel getLevel() {
+	public Level getLevel() {
 		return level;
 	}
 
 	/**
-	 * Check if there are custom logging levels.
+	 * Check if there are custom severity levels.
 	 * 
-	 * @return <code>true</code> if custom logging levels exist, <code>false</code> if not
+	 * @return <code>true</code> if custom severity levels exist, <code>false</code> if not
 	 */
 	public boolean hasCustomLevels() {
 		return !customLevels.isEmpty();
 	}
 
 	/**
-	 * Get the logging level for a package or class.
+	 * Get the severity level for a package or class.
 	 * 
 	 * @param packageOrClass
 	 *            Name of the package respectively class
 	 * 
-	 * @return Logging level for the package respectively class
+	 * @return Severity level for the package respectively class
 	 */
-	public LoggingLevel getLevel(final String packageOrClass) {
+	public Level getLevel(final String packageOrClass) {
 		String key = packageOrClass;
 		while (true) {
-			LoggingLevel customLevel = customLevels.get(key);
+			Level customLevel = customLevels.get(key);
 			if (customLevel != null) {
 				return customLevel;
 			}
@@ -199,10 +199,10 @@ public final class Configuration {
 	 * Fast check if output is possible.
 	 * 
 	 * @param level
-	 *            Logging level to check
-	 * @return <code>true</code> if log entries with the defined logging level can be output, <code>false</code> if not
+	 *            Severity level to check
+	 * @return <code>true</code> if log entries with the defined severity level can be output, <code>false</code> if not
 	 */
-	boolean isOutputPossible(final LoggingLevel level) {
+	boolean isOutputPossible(final Level level) {
 		return lowestLevel.ordinal() <= level.ordinal();
 	}
 
@@ -211,7 +211,6 @@ public final class Configuration {
 	 * 
 	 * @return Effective writers
 	 */
-	// TODO LoggingLevel-Uebergabe
 	List<Writer> getEffectiveWriters() {
 		return effectiveWriters;
 	}
@@ -222,11 +221,11 @@ public final class Configuration {
 	 * @return Copy of this configuration
 	 */
 	Configurator copy() {
-		Map<String, LoggingLevel> copyOfCustomLevels;
+		Map<String, Level> copyOfCustomLevels;
 		if (customLevels.isEmpty()) {
 			copyOfCustomLevels = Collections.emptyMap();
 		} else {
-			copyOfCustomLevels = new HashMap<String, LoggingLevel>(customLevels);
+			copyOfCustomLevels = new HashMap<String, Level>(customLevels);
 		}
 
 		WritingThreadData writingThreadData;
@@ -239,9 +238,9 @@ public final class Configuration {
 		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writers, writingThreadData, maxStackTraceElements);
 	}
 
-	private static LoggingLevel getLowestLevel(final LoggingLevel level, final Map<String, LoggingLevel> customLevels) {
-		LoggingLevel lowestLevel = level;
-		for (LoggingLevel customLevel : customLevels.values()) {
+	private static Level getLowestLevel(final Level level, final Map<String, Level> customLevels) {
+		Level lowestLevel = level;
+		for (Level customLevel : customLevels.values()) {
 			if (lowestLevel.ordinal() > customLevel.ordinal()) {
 				lowestLevel = customLevel;
 			}
@@ -272,7 +271,7 @@ public final class Configuration {
 		}
 	}
 
-	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, LoggingLevel> customLevels, final Set<LogEntryValue> logEntryValues) {
+	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, Level> customLevels, final Set<LogEntryValue> logEntryValues) {
 		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE_NUMBER)) {
 			return StackTraceInformation.FULL;
 		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !customLevels.isEmpty()) {

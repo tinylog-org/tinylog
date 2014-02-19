@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.LoggingLevel;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntry;
 
@@ -89,7 +88,7 @@ public class LoggerTest extends AbstractTest {
 	public final void testLoggingLevel() {
 		Logger logger = Logger.getRootLogger();
 
-		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
 		assertTrue(logger.isTraceEnabled());
 		assertTrue(logger.isDebugEnabled());
 		assertTrue(logger.isInfoEnabled());
@@ -99,7 +98,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.TRACE, logger.getEffectiveLevel());
 		assertEquals(Level.TRACE, logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.DEBUG).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.DEBUG).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertTrue(logger.isDebugEnabled());
 		assertTrue(logger.isInfoEnabled());
@@ -109,7 +108,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.DEBUG, logger.getEffectiveLevel());
 		assertEquals(Level.DEBUG, logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.INFO).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isDebugEnabled());
 		assertTrue(logger.isInfoEnabled());
@@ -119,7 +118,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.INFO, logger.getEffectiveLevel());
 		assertEquals(Level.INFO, logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.WARNING).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.WARNING).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isDebugEnabled());
 		assertFalse(logger.isInfoEnabled());
@@ -129,7 +128,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.WARN, logger.getEffectiveLevel());
 		assertEquals(Level.WARN, logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.ERROR).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.ERROR).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isDebugEnabled());
 		assertFalse(logger.isInfoEnabled());
@@ -139,7 +138,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.ERROR, logger.getEffectiveLevel());
 		assertEquals(Level.ERROR, logger.getLevel());
 
-		Configurator.currentConfig().level(LoggingLevel.OFF).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.OFF).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isDebugEnabled());
 		assertFalse(logger.isInfoEnabled());
@@ -155,85 +154,85 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogging() {
-		Configurator.currentConfig().level(LoggingLevel.TRACE).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
 
 		Logger logger = Logger.getRootLogger();
 		Exception exception = new Exception();
 
 		logger.trace("Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.TRACE, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.trace("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.TRACE, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.TRACE, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		logger.debug("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.DEBUG, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.debug("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.DEBUG, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.DEBUG, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		logger.info("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.info("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.INFO, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		logger.warn("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.warn("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.WARNING, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		logger.error("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.error("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
 		logger.fatal("Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 		logger.fatal("Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 
-		Configurator.currentConfig().level(LoggingLevel.INFO).activate();
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
 
 		logger.log(Level.TRACE, "Hello!");
 		assertNull(writer.consumeLogEntry());
 		logger.log(Level.FATAL, "Hello!");
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
 		logger.log(Level.TRACE, "Failed", exception);
 		assertNull(writer.consumeLogEntry());
 		logger.log(Level.FATAL, "Failed", exception);
 		logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
 	}
@@ -250,7 +249,7 @@ public class LoggerTest extends AbstractTest {
 
 		logger.assertLog(false, "Hello!");
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggingLevel.ERROR, logEntry.getLoggingLevel());
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
 

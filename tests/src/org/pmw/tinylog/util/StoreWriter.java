@@ -31,11 +31,11 @@ public final class StoreWriter implements Writer {
 	private LogEntry logEntry;
 
 	/**
-	 * Create a new instance of this writer that required {@link LogEntryValue#LOGGING_LEVEL},
+	 * Create a new instance of this writer that required {@link LogEntryValue#LEVEL},
 	 * {@link LogEntryValue#MESSAGE} and {@link LogEntryValue#EXCEPTION}.
 	 */
 	public StoreWriter() {
-		this.requiredLogEntryValue = EnumSet.of(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+		this.requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 	}
 
 	/**

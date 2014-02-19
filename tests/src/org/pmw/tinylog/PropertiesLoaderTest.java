@@ -90,7 +90,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configurator);
 
 		Configuration configuration = configurator.create();
-		assertEquals(LoggingLevel.WARNING, configuration.getLevel());
+		assertEquals(Level.WARNING, configuration.getLevel());
 		assertEquals("{message}", configuration.getFormatPattern());
 		assertEquals(new Locale("de"), configuration.getLocale());
 		assertNotSame(Locale.getDefault(), configuration.getLocale());
@@ -104,34 +104,34 @@ public class PropertiesLoaderTest extends AbstractTest {
 	 */
 	@Test
 	public final void testReadLevel() {
-		LoggingLevel defaulLevel = Configurator.defaultConfig().create().getLevel();
+		Level defaultLevel = Configurator.defaultConfig().create().getLevel();
 
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().create());
-		assertEquals(defaulLevel, configurator.create().getLevel());
+		assertEquals(defaultLevel, configurator.create().getLevel());
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "").create());
-		assertEquals(defaulLevel, configurator.create().getLevel());
+		assertEquals(defaultLevel, configurator.create().getLevel());
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "TRACE").create());
-		assertEquals(LoggingLevel.TRACE, configurator.create().getLevel());
+		assertEquals(Level.TRACE, configurator.create().getLevel());
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "warning").create());
-		assertEquals(LoggingLevel.WARNING, configurator.create().getLevel());
+		assertEquals(Level.WARNING, configurator.create().getLevel());
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "ErrOr").create());
-		assertEquals(LoggingLevel.ERROR, configurator.create().getLevel());
+		assertEquals(Level.ERROR, configurator.create().getLevel());
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "invalid").create());
-		assertEquals(defaulLevel, configurator.create().getLevel());
-		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("logging level")));
+		assertEquals(defaultLevel, configurator.create().getLevel());
+		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("level")));
 	}
 
 	/**
@@ -141,22 +141,22 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadCustomLevels() {
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@a.b", "WARNING").create());
-		assertEquals(LoggingLevel.WARNING, configurator.create().getLevel("a.b"));
+		assertEquals(Level.WARNING, configurator.create().getLevel("a.b"));
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@a.b.c", "trace").create());
-		assertEquals(LoggingLevel.TRACE, configurator.create().getLevel("a.b.c"));
+		assertEquals(Level.TRACE, configurator.create().getLevel("a.b.c"));
 
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@org.pmw.tinylog", "ErrOr").create());
-		assertEquals(LoggingLevel.ERROR, configurator.create().getLevel("org.pmw.tinylog"));
+		assertEquals(Level.ERROR, configurator.create().getLevel("org.pmw.tinylog"));
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@org.pmw.tinylog", "nonsense").create());
 		assertEquals(configurator.create().getLevel(), configurator.create().getLevel("org.pmw.tinylog"));
-		assertThat(errorStream.nextLine(), allOf(containsString("nonsense"), containsString("logging level")));
+		assertThat(errorStream.nextLine(), allOf(containsString("nonsense"), containsString("level")));
 	}
 
 	/**

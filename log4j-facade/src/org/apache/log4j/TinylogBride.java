@@ -16,7 +16,6 @@ package org.apache.log4j;
 import java.lang.reflect.Method;
 
 import org.pmw.tinylog.LogEntryForwarder;
-import org.pmw.tinylog.LoggingLevel;
 
 import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
 
@@ -60,9 +59,9 @@ class TinylogBride {
 	 * 
 	 * @return Active logging level
 	 */
-	public static Level getLoggingLevel() {
+	public static Level getLevel() {
 		String className = getFullyQualifiedClassNameFromStackTrace(3);
-		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(className);
+		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
 		return toLog4jLevel(activeLevel);
 	}
 
@@ -73,8 +72,8 @@ class TinylogBride {
 	 *            Class that has called this method
 	 * @return Active logging level
 	 */
-	public static Level getLoggingLevel(final Class<?> callerClass) {
-		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(callerClass.getName());
+	public static Level getLevel(final Class<?> callerClass) {
+		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(callerClass.getName());
 		return toLog4jLevel(activeLevel);
 	}
 
@@ -87,7 +86,7 @@ class TinylogBride {
 	 */
 	public static boolean isEnabled(final Priority level) {
 		String className = getFullyQualifiedClassNameFromStackTrace(3);
-		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(className);
+		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
 		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
 	}
 
@@ -101,7 +100,7 @@ class TinylogBride {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public static boolean isEnabled(final Class<?> callerClass, final Priority level) {
-		LoggingLevel activeLevel = org.pmw.tinylog.Logger.getLoggingLevel(callerClass.getName());
+		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(callerClass.getName());
 		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
 	}
 
@@ -131,32 +130,32 @@ class TinylogBride {
 		LogEntryForwarder.forward(2, toTinylogLevel(level), throwable, message == null ? null : message.toString());
 	}
 
-	private static LoggingLevel toTinylogLevel(final Priority level) {
+	private static org.pmw.tinylog.Level toTinylogLevel(final Priority level) {
 		if (level.isGreaterOrEqual(Level.OFF)) {
-			return LoggingLevel.OFF;
+			return org.pmw.tinylog.Level.OFF;
 		} else if (level.isGreaterOrEqual(Level.ERROR)) {
-			return LoggingLevel.ERROR;
+			return org.pmw.tinylog.Level.ERROR;
 		} else if (level.isGreaterOrEqual(Level.WARN)) {
-			return LoggingLevel.WARNING;
+			return org.pmw.tinylog.Level.WARNING;
 		} else if (level.isGreaterOrEqual(Level.INFO)) {
-			return LoggingLevel.INFO;
+			return org.pmw.tinylog.Level.INFO;
 		} else if (level.isGreaterOrEqual(Level.DEBUG)) {
-			return LoggingLevel.DEBUG;
+			return org.pmw.tinylog.Level.DEBUG;
 		} else {
-			return LoggingLevel.TRACE;
+			return org.pmw.tinylog.Level.TRACE;
 		}
 	}
 
-	private static Level toLog4jLevel(final LoggingLevel level) {
-		if (level.ordinal() >= LoggingLevel.OFF.ordinal()) {
+	private static Level toLog4jLevel(final org.pmw.tinylog.Level level) {
+		if (level.ordinal() >= org.pmw.tinylog.Level.OFF.ordinal()) {
 			return Level.OFF;
-		} else if (level.ordinal() >= LoggingLevel.ERROR.ordinal()) {
+		} else if (level.ordinal() >= org.pmw.tinylog.Level.ERROR.ordinal()) {
 			return Level.ERROR;
-		} else if (level.ordinal() >= LoggingLevel.WARNING.ordinal()) {
+		} else if (level.ordinal() >= org.pmw.tinylog.Level.WARNING.ordinal()) {
 			return Level.WARN;
-		} else if (level.ordinal() >= LoggingLevel.INFO.ordinal()) {
+		} else if (level.ordinal() >= org.pmw.tinylog.Level.INFO.ordinal()) {
 			return Level.INFO;
-		} else if (level.ordinal() >= LoggingLevel.DEBUG.ordinal()) {
+		} else if (level.ordinal() >= org.pmw.tinylog.Level.DEBUG.ordinal()) {
 			return Level.DEBUG;
 		} else {
 			return Level.TRACE;

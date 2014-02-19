@@ -71,11 +71,11 @@ enum TokenType {
 	LINE_NUMBER(LogEntryValue.LINE_NUMBER),
 
 	/**
-	 * The logging level
+	 * The severity level
 	 * 
-	 * @see LoggingLevel
+	 * @see Level
 	 */
-	LOGGING_LEVEL(LogEntryValue.LOGGING_LEVEL),
+	LEVEL(LogEntryValue.LEVEL),
 
 	/**
 	 * The logging message (including a possible exception stack trace)

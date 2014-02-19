@@ -46,7 +46,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.EnvironmentHelper;
-import org.pmw.tinylog.LoggingLevel;
+import org.pmw.tinylog.Level;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
@@ -107,110 +107,110 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testCreateInstance() {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), false);
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), true);
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), false, "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), true, "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), false);
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), true);
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), false, "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), true, "admin", "123");
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
@@ -219,7 +219,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
@@ -228,7 +228,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
@@ -237,7 +237,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
-		assertEquals(Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE), writer.getValues());
+		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
@@ -251,8 +251,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		JdbcWriter writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList());
 		assertEquals(Collections.<LogEntryValue> emptySet(), writer.getRequiredLogEntryValues());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
-		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE));
+		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE));
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.values()));
 		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.values()));
@@ -314,9 +314,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(Collections.singletonList(Value.LINE_NUMBER), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "level" }, null, null);
-		assertEquals(Collections.singletonList(Value.LOGGING_LEVEL), writer.getValues());
+		assertEquals(Collections.singletonList(Value.LEVEL), writer.getValues());
 		writer = new JdbcWriter(URL, "log", null, new String[] { "LEVEL" }, null, null);
-		assertEquals(Collections.singletonList(Value.LOGGING_LEVEL), writer.getValues());
+		assertEquals(Collections.singletonList(Value.LEVEL), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "message" }, null, null);
 		assertEquals(Collections.singletonList(Value.MESSAGE), writer.getValues());
@@ -524,7 +524,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			writer.close();
 		}
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		try {
 			writer.init(null);
 			fail("SQLException expected");
@@ -534,7 +534,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			writer.close();
 		}
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		try {
 			writer.init(null);
 		} finally {
@@ -784,10 +784,10 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testLoggingLevel() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LOGGING_LEVEL));
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL));
 		writer.init(null);
 
-		writer.write(new LogEntryBuilder().level(LoggingLevel.ERROR).create());
+		writer.write(new LogEntryBuilder().level(Level.ERROR).create());
 		assertEquals(Arrays.asList("ERROR"), getLogEntries());
 
 		writer.close();
@@ -897,9 +897,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		/* Without column defining */
 
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE, Value.LOGGING_LEVEL));
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE, Value.LEVEL));
 		writer.init(null);
-		writer.write(new LogEntryBuilder().message("Hello World").level(LoggingLevel.ERROR).create());
+		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
 		assertEquals(Arrays.asList("ERROR"), getLogEntries("level"));
 		writer.close();
@@ -908,18 +908,18 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		/* With column defining */
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("entry", "level"), Arrays.asList(Value.MESSAGE, Value.LOGGING_LEVEL));
+		writer = new JdbcWriter(URL, "log", Arrays.asList("entry", "level"), Arrays.asList(Value.MESSAGE, Value.LEVEL));
 		writer.init(null);
-		writer.write(new LogEntryBuilder().message("Hello World").level(LoggingLevel.ERROR).create());
+		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
 		assertEquals(Arrays.asList("ERROR"), getLogEntries("level"));
 		writer.close();
 
 		clearEntries();
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("level", "entry"), Arrays.asList(Value.LOGGING_LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(URL, "log", Arrays.asList("level", "entry"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		writer.init(null);
-		writer.write(new LogEntryBuilder().message("Hello World").level(LoggingLevel.ERROR).create());
+		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
 		assertEquals(Arrays.asList("ERROR"), getLogEntries("level"));
 		writer.close();
