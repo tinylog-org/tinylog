@@ -18,7 +18,7 @@ import java.util.Set;
 import org.pmw.tinylog.Configuration;
 
 /**
- * Logging writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.
+ * Writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.
  * 
  * <p>
  * The annotation {@link org.pmw.tinylog.writers.PropertiesSupport PropertiesSupport} must be added to the implemented
@@ -31,18 +31,18 @@ import org.pmw.tinylog.Configuration;
  * <code>
  * {@literal @}PropertiesSupport(name = "example",
  * properties = { {@literal @}Property(name = "filename", type = String.class), {@literal @}Property(name = "backups", type = int.class) })<br />
- * public final class ExampleWriter implements LoggingWriter {
+ * public final class ExampleWriter implements Writer {
  * </code>
  * </p>
  * 
  * <p>
- * A logging writer must have a constructor that matches to the defined properties.
+ * A writer must have a constructor that matches to the defined properties.
  * </p>
  */
-public interface LoggingWriter {
+public interface Writer {
 
 	/**
-	 * Get all log entry values that are required by this logging writer.
+	 * Get all log entry values that are required by this writer.
 	 * 
 	 * @return Required values for log entry
 	 */

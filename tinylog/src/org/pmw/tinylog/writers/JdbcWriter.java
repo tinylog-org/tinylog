@@ -41,7 +41,7 @@ import org.pmw.tinylog.LoggingLevel;
 		@Property(name = "columns", type = String[].class, optional = true), @Property(name = "values", type = String[].class),
 		@Property(name = "batch", type = boolean.class, optional = true), @Property(name = "username", type = String.class, optional = true),
 		@Property(name = "password", type = String.class, optional = true) })
-public final class JdbcWriter implements LoggingWriter {
+public final class JdbcWriter implements Writer {
 
 	private static final int MAX_BATCH_SIZE = 128;
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
 
@@ -623,14 +623,14 @@ public final class Logger {
 		Configuration previousConfiguration = Logger.configuration;
 
 		if (previousConfiguration == null) {
-			for (LoggingWriter writer : configuration.getWriters()) {
+			for (Writer writer : configuration.getWriters()) {
 				writer.init(configuration);
 			}
 		} else {
-			List<LoggingWriter> newWriters = configuration.getWriters();
-			List<LoggingWriter> oldWriters = previousConfiguration.getWriters();
+			List<Writer> newWriters = configuration.getWriters();
+			List<Writer> oldWriters = previousConfiguration.getWriters();
 
-			for (LoggingWriter writer : newWriters) {
+			for (Writer writer : newWriters) {
 				if (!oldWriters.contains(writer)) {
 					writer.init(configuration);
 				}
@@ -687,7 +687,7 @@ public final class Logger {
 			final Object message, final Object[] arguments) {
 		StackTraceElement stackTraceElement = null;
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
-		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
+		List<Writer> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			stackTraceElement = getStackTraceElement(strackTraceDeep);
@@ -698,7 +698,7 @@ public final class Logger {
 			try {
 				LogEntry logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						try {
 							writer.write(logEntry);
 						} catch (Exception ex) {
@@ -706,7 +706,7 @@ public final class Logger {
 						}
 					}
 				} else {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
 					}
 				}
@@ -719,7 +719,7 @@ public final class Logger {
 	private static void output(final Configuration currentConfiguration, final Class<?> callerClass, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
-		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
+		List<Writer> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			activeLoggingLevel = currentConfiguration.getLevel(callerClass.getName());
@@ -730,7 +730,7 @@ public final class Logger {
 				StackTraceElement stackTraceElement = new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
 				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						try {
 							writer.write(logEntry);
 						} catch (Exception ex) {
@@ -738,7 +738,7 @@ public final class Logger {
 						}
 					}
 				} else {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
 					}
 				}
@@ -751,7 +751,7 @@ public final class Logger {
 	private static void output(final Configuration currentConfiguration, final StackTraceElement stackTraceElement, final LoggingLevel level,
 			final Throwable exception, final Object message, final Object[] arguments) {
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
-		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
+		List<Writer> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			activeLoggingLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
@@ -761,7 +761,7 @@ public final class Logger {
 			try {
 				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						try {
 							writer.write(logEntry);
 						} catch (Exception ex) {
@@ -769,7 +769,7 @@ public final class Logger {
 						}
 					}
 				} else {
-					for (LoggingWriter writer : writers) {
+					for (Writer writer : writers) {
 						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
 					}
 				}

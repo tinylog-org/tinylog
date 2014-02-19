@@ -29,7 +29,7 @@ import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
- * Tests for the console logging writer.
+ * Tests for the console writer.
  * 
  * @see ConsoleWriter
  */
@@ -98,11 +98,11 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test reading console logging writer from properties.
+	 * Test reading console writer from properties.
 	 */
 	@Test
 	public final void testFromProperties() {
-		List<LoggingWriter> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "console").create());
+		List<Writer> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "console").create());
 		assertThat(writers, types(ConsoleWriter.class));
 	}
 

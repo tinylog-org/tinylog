@@ -26,7 +26,7 @@ import org.pmw.tinylog.util.ConfigurationCreator;
 /**
  * Basis class for all writer tests.
  * 
- * @see LoggingWriter
+ * @see Writer
  */
 public abstract class AbstractWriterTest extends AbstractTest {
 
@@ -35,9 +35,9 @@ public abstract class AbstractWriterTest extends AbstractTest {
 	 * 
 	 * @param properties
 	 *            Properties with writer definition
-	 * @return Created logging writer
+	 * @return Created writer
 	 */
-	protected final List<LoggingWriter> createFromProperties(final Properties properties) {
+	protected final List<Writer> createFromProperties(final Properties properties) {
 		try {
 			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
 

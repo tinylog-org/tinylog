@@ -53,7 +53,7 @@ import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.JdbcWriter.Value;
 
 /**
- * Tests for the SQL database logging writer.
+ * Tests for the SQL database writer.
  * 
  * @see JdbcWriter
  */
@@ -971,14 +971,14 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test reading JDBC logging writer from properties.
+	 * Test reading JDBC writer from properties.
 	 */
 	@Test
 	public final void testFromProperties() {
 		StringListOutputStream errorStream = getErrorStream();
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc");
-		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.url")));
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));

@@ -30,7 +30,7 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.pmw.tinylog.util.StringListOutputStream;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 import org.pmw.tinylog.writers.VMShutdownHook;
 
 /**
@@ -72,8 +72,8 @@ public abstract class AbstractTest {
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
 
 		try {
-			Collection<LoggingWriter> openWriters = getOpenWriters();
-			for (LoggingWriter writer : openWriters) {
+			Collection<Writer> openWriters = getOpenWriters();
+			for (Writer writer : openWriters) {
 				try {
 					writer.close();
 				} catch (Exception ex) {
@@ -128,10 +128,10 @@ public abstract class AbstractTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<LoggingWriter> getOpenWriters() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	private Collection<Writer> getOpenWriters() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		Field field = VMShutdownHook.class.getDeclaredField("writers");
 		field.setAccessible(true);
-		return new ArrayList<LoggingWriter>((Collection<LoggingWriter>) field.get(null));
+		return new ArrayList<Writer>((Collection<Writer>) field.get(null));
 	}
 
 }

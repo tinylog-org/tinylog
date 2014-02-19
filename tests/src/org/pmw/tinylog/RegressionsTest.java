@@ -100,7 +100,7 @@ public class RegressionsTest extends AbstractTest {
 	}
 
 	/**
-	 * Bug: Logging writer gets active logging level instead of the logging level of the log entry.
+	 * Bug: Writer gets active logging level instead of the logging level of the log entry.
 	 */
 	@Test
 	public final void testLoggingLevel() {

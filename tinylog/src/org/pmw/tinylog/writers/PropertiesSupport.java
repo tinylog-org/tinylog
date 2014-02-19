@@ -19,20 +19,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation makes a {@link org.pmw.tinylog.writers.LoggingWriter LoggingWriter} configurable by properties.
+ * This annotation makes a {@link org.pmw.tinylog.writers.Writer Writer} configurable by properties.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertiesSupport {
 
 	/**
-	 * Name of the logging writer that can be used for the "tinylog.writer" property.
+	 * Name of the writer that can be used for the "tinylog.writer" property.
 	 */
 	String name();
 
 	/**
-	 * Properties to configure the logging writer (for example a filename of the log file). The constructor of the
-	 * logging writer will be called according to the defined properties.
+	 * Properties to configure the writer (for example a filename of the log file). The constructor of the writer will
+	 * be called according to the defined properties.
 	 */
 	Property[] properties();
 

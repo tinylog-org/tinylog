@@ -29,7 +29,7 @@ import org.pmw.tinylog.Configuration;
  * Multiple instances of a program are allowed to log into the same file.
  */
 @PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
-public final class SharedFileWriter implements LoggingWriter {
+public final class SharedFileWriter implements Writer {
 
 	private final File file;
 	private final Object mutex;

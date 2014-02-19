@@ -20,12 +20,12 @@ import java.util.Set;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
- * A logging writer that just save the written log entry as string.
+ * A writer that just save the written log entry as string.
  */
-public final class StoreWriter implements LoggingWriter {
+public final class StoreWriter implements Writer {
 
 	private final Set<LogEntryValue> requiredLogEntryValue;
 	private LogEntry logEntry;

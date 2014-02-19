@@ -19,12 +19,12 @@ import java.util.Set;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * This writer does nothing and just ignores all log entries.
  */
-public class NullWriter implements LoggingWriter {
+public class NullWriter implements Writer {
 
 	private final Set<LogEntryValue> requiredLogEntryValues;
 

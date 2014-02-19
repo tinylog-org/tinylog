@@ -43,7 +43,7 @@ import org.pmw.tinylog.util.LoopWritingThread;
 import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
- * Tests for the shared file logging writer.
+ * Tests for the shared file writer.
  * 
  * @see SharedFileWriter
  */
@@ -216,7 +216,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	 * Main method for {@link #testMultiJvmWriting()}.
 	 * 
 	 * @param arguments
-	 *            Contains the file name for logging writer
+	 *            Contains the file name for writer
 	 * @throws IOException
 	 *             Logging failed
 	 */
@@ -370,7 +370,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test reading shared file logging writer from properties.
+	 * Test reading shared file writer from properties.
 	 * 
 	 * @throws IOException
 	 *             Failed to create log file
@@ -380,7 +380,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		File file = FileHelper.createTemporaryFile("log");
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile");
-		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));

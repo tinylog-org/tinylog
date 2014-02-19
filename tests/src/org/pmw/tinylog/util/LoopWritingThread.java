@@ -14,10 +14,10 @@
 package org.pmw.tinylog.util;
 
 import org.pmw.tinylog.LoggingLevel;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
- * Writes the specified line in a loop to a given logging writer until shutdown command.
+ * Writes the specified line in a loop to a given writer until shutdown command.
  */
 public final class LoopWritingThread extends Thread {
 
@@ -26,15 +26,15 @@ public final class LoopWritingThread extends Thread {
 	 */
 	public static final String LINE = "!!! Hello World! !!! qwertzuiopasdfghjklyxcvbnm !!!";
 
-	private final LoggingWriter writer;
+	private final Writer writer;
 	private long writtenLines;
 	private volatile boolean shutdown;
 
 	/**
 	 * @param writer
-	 *            Logging writer to write line
+	 *            Writer to output lines
 	 */
-	public LoopWritingThread(final LoggingWriter writer) {
+	public LoopWritingThread(final Writer writer) {
 		this.writer = writer;
 		this.writtenLines = 0L;
 		this.shutdown = false;

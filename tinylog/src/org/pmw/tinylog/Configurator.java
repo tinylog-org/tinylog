@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Configurator to configure {@link org.pmw.tinylog.Logger Logger}.
@@ -48,7 +48,7 @@ public final class Configurator {
 	private Map<String, LoggingLevel> customLevels;
 	private String formatPattern;
 	private Locale locale;
-	private final List<LoggingWriter> writers;
+	private final List<Writer> writers;
 	private WritingThreadData writingThreadData;
 	private int maxStackTraceElements;
 
@@ -62,19 +62,19 @@ public final class Configurator {
 	 * @param locale
 	 *            Locale for format pattern
 	 * @param writers
-	 *            Logging writers (can be <code>null</code> or <code>empty</code> to disable any output)
+	 *            Writers (can be <code>empty</code> to disable any output)
 	 * @param writingThreadData
 	 *            Data for writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
 	Configurator(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final List<LoggingWriter> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
+			final List<Writer> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writers = writers.isEmpty() ? new ArrayList<LoggingWriter>() : new ArrayList<LoggingWriter>(writers);
+		this.writers = writers.isEmpty() ? new ArrayList<Writer>() : new ArrayList<Writer>(writers);
 		this.writingThreadData = writingThreadData;
 		this.maxStackTraceElements = maxStackTraceElements;
 	}
@@ -86,7 +86,7 @@ public final class Configurator {
 	 */
 	public static Configurator defaultConfig() {
 		return new Configurator(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
-				Collections.<LoggingWriter> singletonList(new ConsoleWriter()), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
+				Collections.<Writer> singletonList(new ConsoleWriter()), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
 	}
 
 	/**
@@ -275,13 +275,13 @@ public final class Configurator {
 	}
 
 	/**
-	 * Set a logging writer for outputting the created log entries. All existing writers will be replaced.
+	 * Set a writer to output created log entries. All existing writers will be replaced.
 	 * 
 	 * @param writer
-	 *            Logging writer (can be <code>null</code> to disable any output)
+	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @return The current configurator
 	 */
-	public Configurator writer(final LoggingWriter writer) {
+	public Configurator writer(final Writer writer) {
 		writers.clear();
 		if (writer != null) {
 			writers.add(writer);
@@ -290,13 +290,13 @@ public final class Configurator {
 	}
 
 	/**
-	 * Add an additional logging writer for outputting the created log entries.
+	 * Add an additional writer for outputting the created log entries.
 	 * 
 	 * @param writer
-	 *            Logging writer to add
+	 *            Writer to add
 	 * @return The current configurator
 	 */
-	public Configurator addWriter(final LoggingWriter writer) {
+	public Configurator addWriter(final Writer writer) {
 		if (writer == null) {
 			throw new NullPointerException("writer is null");
 		}
@@ -305,19 +305,19 @@ public final class Configurator {
 	}
 
 	/**
-	 * Remove a logging writers.
+	 * Remove a writer.
 	 * 
 	 * @param writer
-	 *            Logging writer to remove
+	 *            Writer to remove
 	 * @return The current configurator
 	 */
-	public Configurator removeWriter(final LoggingWriter writer) {
+	public Configurator removeWriter(final Writer writer) {
 		writers.remove(writer);
 		return this;
 	}
 
 	/**
-	 * Remove all logging writers.
+	 * Remove all writers.
 	 * 
 	 * @return The current configurator
 	 */

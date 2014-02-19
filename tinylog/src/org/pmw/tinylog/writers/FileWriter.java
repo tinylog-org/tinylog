@@ -27,7 +27,7 @@ import org.pmw.tinylog.Configuration;
  */
 @PropertiesSupport(name = "file", properties = { @Property(name = "filename", type = String.class),
 		@Property(name = "buffered", type = boolean.class, optional = true) })
-public final class FileWriter implements LoggingWriter {
+public final class FileWriter implements Writer {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 

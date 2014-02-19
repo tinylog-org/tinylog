@@ -37,7 +37,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
 @PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
 		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "label", type = Labeler.class, optional = true),
 		@Property(name = "policies", type = Policy[].class, optional = true) })
-public final class RollingFileWriter implements LoggingWriter {
+public final class RollingFileWriter implements Writer {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 

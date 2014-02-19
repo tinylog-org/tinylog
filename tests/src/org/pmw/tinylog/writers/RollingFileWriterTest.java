@@ -56,7 +56,7 @@ import org.pmw.tinylog.util.LoopWritingThread;
 import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
- * Tests for the rolling file logging writer.
+ * Tests for the rolling file writer.
  * 
  * @see RollingFileWriter
  */
@@ -439,14 +439,14 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test reading rolling file logging writer from properties.
+	 * Test reading rolling file writer from properties.
 	 * 
 	 * @throws IOException
 	 *             Failed to create log file
 	 */
 	@Test
 	public final void testFromProperties() throws IOException {
-		List<LoggingWriter> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
+		List<Writer> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
 		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
@@ -488,7 +488,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		}
 
 		PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
-		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));

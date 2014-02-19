@@ -45,7 +45,7 @@ import org.pmw.tinylog.util.LoopWritingThread;
 import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
- * Tests for the file logging writer.
+ * Tests for the file writer.
  * 
  * @see FileWriter
  */
@@ -332,7 +332,7 @@ public class FileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test reading file logging writer from properties.
+	 * Test reading file writer from properties.
 	 * 
 	 * @throws IOException
 	 *             Failed to create log file
@@ -343,7 +343,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		String filename = file.getAbsolutePath();
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
-		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));

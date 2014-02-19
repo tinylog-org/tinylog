@@ -27,7 +27,7 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
 
@@ -48,7 +48,7 @@ public abstract class AbstractPolicyTest extends AbstractTest {
 	protected final Policy createFromProperties(final String property) {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
 			PropertiesBuilder properties = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", property);
 
@@ -60,7 +60,7 @@ public abstract class AbstractPolicyTest extends AbstractTest {
 			Method createMethod = Configurator.class.getDeclaredMethod("create");
 			createMethod.setAccessible(true);
 			Configuration configuration = (Configuration) createMethod.invoke(configurator);
-			LoggingWriter writer = configuration.getWriters().get(0);
+			Writer writer = configuration.getWriters().get(0);
 			return writer instanceof PropertiesWriter ? ((PropertiesWriter) writer).policy : null;
 		} catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);

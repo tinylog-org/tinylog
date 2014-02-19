@@ -57,9 +57,9 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Test properties loader.
@@ -259,23 +259,23 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading <code>null</code> as logging writer (no logging writer).
+	 * Test reading <code>null</code> as writer (no writer).
 	 */
 	@Test
-	public final void testReadNullLoggingWriter() {
+	public final void testReadNullWriter() {
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "null").create());
 		assertThat(configurator.create().getWriters(), empty());
 	}
 
 	/**
-	 * Test reading multiple logging writers.
+	 * Test reading multiple writers.
 	 * 
 	 * @throws IOException
 	 *             Failed to create temporary file
 	 */
 	@Test
-	public final void testReadMultipleLoggingWriters() throws IOException {
+	public final void testReadMultipleWriters() throws IOException {
 		File logFile = FileHelper.createTemporaryFile("log");
 
 		Configurator configurator = Configurator.defaultConfig().writer(null);
@@ -284,7 +284,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath());
 		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 
-		List<LoggingWriter> writers = configurator.create().getWriters();
+		List<Writer> writers = configurator.create().getWriters();
 		assertThat(writers, types(ConsoleWriter.class, FileWriter.class));
 		FileWriter fileWriter = (FileWriter) writers.get(1);
 		assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
@@ -302,11 +302,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithoutProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "properties").create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 		} finally {
 			mock.tearDown();
@@ -324,13 +324,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithBooleanProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.boolean", "true");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertEquals(Boolean.TRUE, propertiesWriter.booleanValue);
@@ -367,13 +367,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithIntegerProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder = propertiesBuilder.set("tinylog.writer.int", "42");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertEquals(Integer.valueOf(42), propertiesWriter.intValue);
@@ -401,12 +401,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithStringProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.string", "abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertEquals("abc", propertiesWriter.stringValue);
@@ -426,13 +426,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithStringArrayProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.strings", "abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertArrayEquals(new String[] { "abc" }, propertiesWriter.stringsValue);
@@ -476,13 +476,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithLabelerProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.labeler", "count");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertThat(propertiesWriter.labeler, type(CountLabeler.class));
@@ -513,13 +513,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithPolicyProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policy", "startup");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertThat(propertiesWriter.policy, type(StartupPolicy.class));
@@ -547,13 +547,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithPolicyArrayProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policies", "startup");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
 			assertThat(propertiesWriter.policies, ArrayMatchers.types(StartupPolicy.class));
@@ -579,7 +579,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
 		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-		List<LoggingWriter> writers = configurator.create().getWriters();
+		List<Writer> writers = configurator.create().getWriters();
 		assertThat(writers, types(ConsoleWriter.class));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
@@ -595,12 +595,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithUnsupportedProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), ClassPropertyWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), ClassPropertyWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.class", "MyClass");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.class"), containsString("unsupported")));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -611,13 +611,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading a nonexistent logging writer.
+	 * Test reading a nonexistent writer.
 	 */
 	@Test
-	public final void testReadInvalidLoggingWriter() {
+	public final void testReadInvalidWriter() {
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "invalid").create());
-		List<LoggingWriter> writers = configurator.create().getWriters();
+		List<Writer> writers = configurator.create().getWriters();
 		assertThat(writers, types(ConsoleWriter.class));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("writer")));
 	}
@@ -633,7 +633,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "invalid");
@@ -657,7 +657,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "invalid");
@@ -677,7 +677,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading a writer if there is no file with registered logging writers.
+	 * Test reading a writer if there is no file with registered writers.
 	 * 
 	 * @throws IOException
 	 *             Test failed
@@ -686,12 +686,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterIfNoRegistered() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), (String) null);
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), (String) null);
 
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
 		} finally {
@@ -711,7 +711,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), (String) null);
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -736,7 +736,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), (String) null);
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -757,7 +757,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading a writer if failed to open and read the file with registered logging writers.
+	 * Test reading a writer if failed to open and read the file with registered writers.
 	 * 
 	 * @throws IOException
 	 *             Test failed
@@ -777,7 +777,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("read"), containsString("services")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
@@ -796,12 +796,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithMissingClass() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), "a.b.c.MyWriter");
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), "a.b.c.MyWriter");
 
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "mywriter").create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyWriter")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("writer"), containsString("mywriter")));
@@ -822,7 +822,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), "a.b.c.MyLabeler");
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -848,7 +848,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), "a.b.c.MyPolicy");
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -881,11 +881,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			classLoaderMock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), EvilWriter.class.getName());
+			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), EvilWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
-			List<LoggingWriter> writers = configurator.create().getWriters();
+			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString(EvilWriter.class.getName()), containsString(UnsupportedOperationException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("writer"), containsString("evil")));
@@ -927,7 +927,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			classLoaderMock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			classLoaderMock.set("META-INF/services/" + Labeler.class.getPackage().getName(), EvilLabeler.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -982,7 +982,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
 			StringListOutputStream errorStream = getErrorStream();
-			classLoaderMock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
+			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			classLoaderMock.set("META-INF/services/" + Policy.class.getPackage().getName(), EvilPolicy.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();

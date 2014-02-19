@@ -163,7 +163,7 @@ public class VMShutdownHookTest extends AbstractTest {
 		assertEquals(1, writer2.closeCalls);
 	}
 
-	private static class ShutdownWriter implements LoggingWriter {
+	private static class ShutdownWriter implements Writer {
 
 		private int closeCalls;
 

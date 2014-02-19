@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pmw.tinylog.writers.LogEntry;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Thread to write log entries asynchronously.
@@ -77,7 +77,7 @@ final class WritingThread extends Thread {
 	 * @param logEntry
 	 *            Log entry to write
 	 */
-	public synchronized void putLogEntry(final LoggingWriter writer, final LogEntry logEntry) {
+	public synchronized void putLogEntry(final Writer writer, final LogEntry logEntry) {
 		entries.add(new WritingTask(writer, logEntry));
 	}
 
@@ -88,11 +88,11 @@ final class WritingThread extends Thread {
 
 			List<WritingTask> writingTasks = getWritingTasks();
 			while (writingTasks != null) {
-				Collection<LoggingWriter> writers = new ArrayList<LoggingWriter>();
+				Collection<Writer> writers = new ArrayList<Writer>();
 
 				for (WritingTask writingTask : writingTasks) {
 					try {
-						LoggingWriter writer = writingTask.writer;
+						Writer writer = writingTask.writer;
 						writer.write(writingTask.logEntry);
 						if (!writers.contains(writer)) {
 							writers.add(writer);
@@ -102,7 +102,7 @@ final class WritingThread extends Thread {
 					}
 				}
 
-				for (LoggingWriter writer : writers) {
+				for (Writer writer : writers) {
 					try {
 						writer.flush();
 					} catch (Exception ex) {
@@ -174,10 +174,10 @@ final class WritingThread extends Thread {
 
 	private static final class WritingTask {
 
-		private final LoggingWriter writer;
+		private final Writer writer;
 		private final LogEntry logEntry;
 
-		public WritingTask(final LoggingWriter writer, final LogEntry logEntry) {
+		public WritingTask(final Writer writer, final LogEntry logEntry) {
 			this.writer = writer;
 			this.logEntry = logEntry;
 		}

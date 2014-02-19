@@ -54,7 +54,7 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configurator.
@@ -280,7 +280,7 @@ public class ConfiguratorTest extends AbstractTest {
 	@Test
 	public final void testCopy() {
 		Map<String, LoggingLevel> packageLevels = Collections.singletonMap("a", LoggingLevel.DEBUG);
-		List<LoggingWriter> writers = Collections.<LoggingWriter> singletonList(new NullWriter());
+		List<Writer> writers = Collections.<Writer> singletonList(new NullWriter());
 		WritingThreadData writingThreadData = new WritingThreadData(Thread.currentThread().getName(), Thread.NORM_PRIORITY);
 		Configurator configurator = new Configurator(LoggingLevel.WARNING, packageLevels, "TEST", Locale.US, writers, writingThreadData, 42);
 

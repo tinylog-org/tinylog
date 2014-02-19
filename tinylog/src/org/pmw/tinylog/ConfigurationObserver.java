@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Thread to observe a configuration file and reload changes.
@@ -159,7 +159,7 @@ abstract class ConfigurationObserver extends Thread {
 						PropertiesLoader.readMaxStackTraceElements(configurator, properties);
 					}
 					if (writerHasChanged(properties, oldProperties)) {
-						Iterator<LoggingWriter> iterator = DEFAULT_CONFIGURATION.getWriters().iterator();
+						Iterator<Writer> iterator = DEFAULT_CONFIGURATION.getWriters().iterator();
 						configurator.writer(iterator.hasNext() ? iterator.next() : null);
 						while (iterator.hasNext()) {
 							configurator.addWriter(iterator.next());

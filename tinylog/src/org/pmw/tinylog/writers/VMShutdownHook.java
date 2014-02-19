@@ -19,17 +19,17 @@ import java.util.Collection;
 import org.pmw.tinylog.InternalLogger;
 
 /**
- * Thread to shutdown logging writers at VM shutdown. The {@link org.pmw.tinylog.writers.LoggingWriter#close() close()}
- * method of all registered logging writers will be called.
+ * Thread to shutdown writers at VM shutdown. The {@link org.pmw.tinylog.writers.Writer#close() close()} method of all
+ * registered writers will be called.
  */
 public final class VMShutdownHook extends Thread {
 
 	private static final ShutdownThread shutdownThread = new ShutdownThread();
-	private static final Collection<LoggingWriter> writers;
+	private static final Collection<Writer> writers;
 	private static boolean shutdown;
 
 	static {
-		writers = new ArrayList<LoggingWriter>();
+		writers = new ArrayList<Writer>();
 		shutdown = false;
 	}
 
@@ -37,12 +37,12 @@ public final class VMShutdownHook extends Thread {
 	}
 
 	/**
-	 * Register a logging writer, which should be shutdown automatically when VM will be shutdown.
+	 * Register a writer, which should be shutdown automatically when VM will be shutdown.
 	 * 
 	 * @param writer
-	 *            Logging writer to shutdown
+	 *            Writer to shutdown
 	 */
-	public static void register(final LoggingWriter writer) {
+	public static void register(final Writer writer) {
 		synchronized (writers) {
 			if (!shutdown) {
 				if (writers.isEmpty()) {
@@ -54,12 +54,12 @@ public final class VMShutdownHook extends Thread {
 	}
 
 	/**
-	 * Remove a logging writer from the shutdown list.
+	 * Remove a writer from the shutdown list.
 	 * 
 	 * @param writer
-	 *            Logging writer to remove
+	 *            Writer to remove
 	 */
-	public static void unregister(final LoggingWriter writer) {
+	public static void unregister(final Writer writer) {
 		synchronized (writers) {
 			if (!shutdown) {
 				writers.remove(writer);
@@ -77,11 +77,11 @@ public final class VMShutdownHook extends Thread {
 			synchronized (writers) {
 				shutdown = true;
 
-				for (LoggingWriter writer : writers) {
+				for (Writer writer : writers) {
 					try {
 						writer.close();
 					} catch (Exception ex) {
-						InternalLogger.error(ex, "Failed to shutdown logging writer");
+						InternalLogger.error(ex, "Failed to shutdown writer");
 					}
 				}
 

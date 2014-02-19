@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.pmw.tinylog.Configurator.WritingThreadData;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Configuration for {@link org.pmw.tinylog.Logger Logger}. Use {@link org.pmw.tinylog.Configurator Configurator} to
@@ -38,8 +38,8 @@ public final class Configuration {
 	private final Map<String, LoggingLevel> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
-	private final List<LoggingWriter> writers;
-	private final List<LoggingWriter> effectiveWriters;
+	private final List<Writer> writers;
+	private final List<Writer> effectiveWriters;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
@@ -57,21 +57,21 @@ public final class Configuration {
 	 * @param locale
 	 *            Locale for format pattern
 	 * @param writers
-	 *            Logging writers (can be <code>null</code> or <code>empty</code> to disable any output)
+	 *            Writers (can be <code>empty</code> to disable any output)
 	 * @param writingThread
 	 *            Writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
 	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final List<LoggingWriter> writers, final WritingThread writingThread, final int maxStackTraceElements) {
+			final List<Writer> writers, final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
-		this.lowestLevel = writers == null || writers.isEmpty() ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
+		this.lowestLevel = writers.isEmpty() ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writers = writers == null || writers.isEmpty() ? Collections.<LoggingWriter> emptyList() : new ArrayList<LoggingWriter>(writers);
-		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == LoggingLevel.OFF ? Collections.<LoggingWriter> emptyList() : this.writers;
+		this.writers = writers.isEmpty() ? Collections.<Writer> emptyList() : new ArrayList<Writer>(writers);
+		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == LoggingLevel.OFF ? Collections.<Writer> emptyList() : this.writers;
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
@@ -151,11 +151,11 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the logging writers.
+	 * Get the writers to output created log entries.
 	 * 
-	 * @return Logging writers
+	 * @return Writers to output log entries
 	 */
-	public List<LoggingWriter> getWriters() {
+	public List<Writer> getWriters() {
 		return writers;
 	}
 
@@ -178,7 +178,7 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get all log entry values that are required by logging writer.
+	 * Get all log entry values that are required by the writers.
 	 * 
 	 * @return Required values for log entry
 	 */
@@ -207,12 +207,12 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the effective logging writers to be used by the logger.
+	 * Get the effective writers to be used by the logger.
 	 * 
-	 * @return Effective logging writers
+	 * @return Effective writers
 	 */
 	// TODO LoggingLevel-Uebergabe
-	List<LoggingWriter> getEffectiveWriters() {
+	List<Writer> getEffectiveWriters() {
 		return effectiveWriters;
 	}
 
@@ -249,12 +249,12 @@ public final class Configuration {
 		return lowestLevel;
 	}
 
-	private static Set<LogEntryValue> requiredLogEntryValues(final List<LoggingWriter> writers, final Collection<Token> formatTokens) {
+	private static Set<LogEntryValue> requiredLogEntryValues(final List<Writer> writers, final Collection<Token> formatTokens) {
 		if (writers.isEmpty()) {
 			return Collections.emptySet();
 		} else {
 			Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
-			for (LoggingWriter writer : writers) {
+			for (Writer writer : writers) {
 				Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
 				if (requiredLogEntryValuesOfWriter != null) {
 					requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);

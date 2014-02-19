@@ -35,7 +35,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configuration.
@@ -84,7 +84,7 @@ public class ConfigurationTest extends AbstractTest {
 	@Test
 	public final void testOutputPossible() {
 		Configuration configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> emptyList(), null, 0);
+				Collections.<Writer> emptyList(), null, 0);
 		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -92,7 +92,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertFalse(configuration.isOutputPossible(LoggingLevel.ERROR));
 
 		configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -100,7 +100,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertFalse(configuration.isOutputPossible(LoggingLevel.ERROR));
 
 		configuration = new Configuration(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -108,7 +108,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
 
 		configuration = new Configuration(LoggingLevel.INFO, Collections.singletonMap("a", LoggingLevel.ERROR), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertFalse(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -116,7 +116,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertTrue(configuration.isOutputPossible(LoggingLevel.ERROR));
 
 		configuration = new Configuration(LoggingLevel.INFO, Collections.singletonMap("a", LoggingLevel.DEBUG), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertFalse(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -127,8 +127,7 @@ public class ConfigurationTest extends AbstractTest {
 		customLevels.put("a", LoggingLevel.OFF);
 		customLevels.put("b", LoggingLevel.TRACE);
 		customLevels.put("c", LoggingLevel.DEBUG);
-		configuration = new Configuration(LoggingLevel.INFO, customLevels, "", Locale.ROOT, Collections.<LoggingWriter> singletonList(new DummyWriter()), null,
-				0);
+		configuration = new Configuration(LoggingLevel.INFO, customLevels, "", Locale.ROOT, Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertTrue(configuration.isOutputPossible(LoggingLevel.TRACE));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.DEBUG));
 		assertTrue(configuration.isOutputPossible(LoggingLevel.INFO));
@@ -137,24 +136,24 @@ public class ConfigurationTest extends AbstractTest {
 	}
 
 	/**
-	 * Test calculating effective logging writer.
+	 * Test calculating the effective writers.
 	 */
 	@Test
 	public final void testEffectiveWriter() {
 		Configuration configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertThat(configuration.getEffectiveWriters(), empty());
 
 		configuration = new Configuration(LoggingLevel.OFF, Collections.singletonMap("a", LoggingLevel.INFO), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertThat(configuration.getEffectiveWriters(), types(DummyWriter.class));
 
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> emptyList(), null, 0);
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, Collections.<Writer> emptyList(),
+				null, 0);
 		assertThat(configuration.getEffectiveWriters(), empty());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertThat(configuration.getEffectiveWriters(), types(DummyWriter.class));
 	}
 
@@ -164,11 +163,11 @@ public class ConfigurationTest extends AbstractTest {
 	@Test
 	public final void testEmptyRequiredLogEntryValues() {
 		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter((Set<LogEntryValue>) null)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter((Set<LogEntryValue>) null)), null, 0);
 		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(Collections.<LogEntryValue> emptySet())), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(Collections.<LogEntryValue> emptySet())), null, 0);
 		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues());
 	}
 
@@ -179,7 +178,7 @@ public class ConfigurationTest extends AbstractTest {
 	public final void testAllRequiredLogEntryValues() {
 		DummyWriter writer = new DummyWriter(EnumSet.allOf(LogEntryValue.class));
 		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(writer), null, 0);
+				Collections.<Writer> singletonList(writer), null, 0);
 		assertEquals(EnumSet.allOf(LogEntryValue.class), configuration.getRequiredLogEntryValues());
 	}
 
@@ -192,7 +191,7 @@ public class ConfigurationTest extends AbstractTest {
 		DummyWriter writer = new DummyWriter(EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY));
 
 		Configuration configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), formatPattern, Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(writer), null, 0);
+				Collections.<Writer> singletonList(writer), null, 0);
 
 		Set<LogEntryValue> expected = EnumSet.of(LogEntryValue.DATE, LogEntryValue.THREAD, LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.FILE,
 				LogEntryValue.LINE_NUMBER, LogEntryValue.LOGGING_LEVEL, LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY);
@@ -207,79 +206,78 @@ public class ConfigurationTest extends AbstractTest {
 		/* Disabled logging */
 
 		Configuration configuration = new Configuration(LoggingLevel.OFF, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.OFF, Collections.singletonMap("a", LoggingLevel.INFO), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
-		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> emptyList(), null, 0);
+		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, Collections.<Writer> emptyList(),
+				null, 0);
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 
 		/* No requirements defined */
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.singletonMap("a", LoggingLevel.OFF), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter()), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter()), null, 0);
 		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
 
-		/* Requirement from logging writer */
+		/* Requirement from writer */
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.THREAD)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.THREAD)), null, 0);
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.CLASS)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.CLASS)), null, 0);
 		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.METHOD)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.FILE)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.FILE)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.LINE_NUMBER)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.LINE_NUMBER)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		/* Requirement from format pattern */
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{thread}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{class}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.CLASS_NAME, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{method}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{file}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "{line}", Locale.ROOT,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 	}
 
 	private Configuration createMinimalConfigurationSample() {
-		return new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, Collections.<LoggingWriter> emptyList(),
-				null, 0);
+		return new Configuration(LoggingLevel.TRACE, Collections.<String, LoggingLevel> emptyMap(), "", Locale.ROOT, Collections.<Writer> emptyList(), null, 0);
 	}
 
 	private void testMinimalConfigurationSample(final Configuration configuration) {
@@ -301,9 +299,8 @@ public class ConfigurationTest extends AbstractTest {
 	private Configuration createDetailedConfigurationSample() {
 		Map<String, LoggingLevel> packageLevels = new HashMap<String, LoggingLevel>();
 		packageLevels.put(ConfigurationTest.class.getPackage().getName(), LoggingLevel.INFO);
-		return new Configuration(LoggingLevel.WARNING, packageLevels, "{class}{method}", Locale.GERMANY,
-				Collections.<LoggingWriter> singletonList(new DummyWriter(LogEntryValue.RENDERED_LOG_ENTRY)), new WritingThread(null, Thread.MIN_PRIORITY),
-				Integer.MAX_VALUE);
+		return new Configuration(LoggingLevel.WARNING, packageLevels, "{class}{method}", Locale.GERMANY, Collections.<Writer> singletonList(new DummyWriter(
+				LogEntryValue.RENDERED_LOG_ENTRY)), new WritingThread(null, Thread.MIN_PRIORITY), Integer.MAX_VALUE);
 	}
 
 	private void testDetailedConfigurationSample(final Configuration configuration) {
@@ -325,7 +322,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 	}
 
-	private static final class DummyWriter implements LoggingWriter {
+	private static final class DummyWriter implements Writer {
 
 		private final Set<LogEntryValue> requiredLogEntryValue;
 

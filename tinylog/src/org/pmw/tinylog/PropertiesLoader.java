@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Loads configuration for {@link org.pmw.tinylog.Logger Logger} from properties.
@@ -223,21 +223,21 @@ final class PropertiesLoader {
 
 		boolean first = true;
 		for (String propertyName : writerProperties) {
-			String writer = properties.getProperty(propertyName);
-			if (writer != null && writer.length() > 0) {
-				if (writer.equalsIgnoreCase("null")) {
+			String writerName = properties.getProperty(propertyName);
+			if (writerName != null && writerName.length() > 0) {
+				if (writerName.equalsIgnoreCase("null")) {
 					if (first) {
 						configurator.removeAllWriters();
 						first = false;
 					}
 				} else {
-					LoggingWriter loggingWriter = readWriter(properties, propertyName, writer);
-					if (loggingWriter != null) {
+					Writer writer = readWriter(properties, propertyName, writerName);
+					if (writer != null) {
 						if (first) {
-							configurator.writer(loggingWriter);
+							configurator.writer(writer);
 							first = false;
 						} else {
-							configurator.addWriter(loggingWriter);
+							configurator.addWriter(writer);
 						}
 					}
 				}
@@ -287,21 +287,21 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static LoggingWriter readWriter(final Properties properties, final String propertyName, final String writer) {
-		for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
+	private static Writer readWriter(final Properties properties, final String propertyName, final String writerName) {
+		for (Class<?> implementation : findImplementations(Writer.class)) {
 			org.pmw.tinylog.writers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.writers.PropertiesSupport.class);
 			if (propertiesSupport != null) {
-				if (writer.equalsIgnoreCase(propertiesSupport.name())) {
-					LoggingWriter loggingWriter = loadAndSetWriter(properties, propertyName, propertiesSupport.properties(), implementation);
-					if (loggingWriter == null) {
-						InternalLogger.error("Failed to initialize {0} writer", writer);
+				if (writerName.equalsIgnoreCase(propertiesSupport.name())) {
+					Writer writer = loadAndSetWriter(properties, propertyName, propertiesSupport.properties(), implementation);
+					if (writer == null) {
+						InternalLogger.error("Failed to initialize {0} writer", writerName);
 					}
-					return loggingWriter;
+					return writer;
 				}
 			}
 		}
 
-		InternalLogger.error("Cannot find a writer for the name \"{0}\"", writer);
+		InternalLogger.error("Cannot find a writer for the name \"{0}\"", writerName);
 		return null;
 	}
 
@@ -357,7 +357,7 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static LoggingWriter loadAndSetWriter(final Properties properties, final String propertiesPrefix,
+	private static Writer loadAndSetWriter(final Properties properties, final String propertiesPrefix,
 			final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
 		Object[] parameters = loadParameters(properties, propertiesPrefix, definition);
 
@@ -395,7 +395,7 @@ final class PropertiesLoader {
 								parameters = list.toArray();
 							}
 							constructor.setAccessible(true);
-							return (LoggingWriter) constructor.newInstance(parameters);
+							return (Writer) constructor.newInstance(parameters);
 						} catch (IllegalArgumentException ex) {
 							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
 							return null;

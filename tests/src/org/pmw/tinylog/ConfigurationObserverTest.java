@@ -50,7 +50,7 @@ import org.pmw.tinylog.mocks.SleepHandledThreadMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
-import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configuration observer.
@@ -407,7 +407,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			List<LoggingWriter> writers = currentConfiguration.getWriters();
+			List<Writer> writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class));
 			FileWriter fileWriter = (FileWriter) writers.get(0);
 			assertEquals(logFile1.getAbsolutePath(), fileWriter.getFilename());
@@ -454,7 +454,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			List<LoggingWriter> writers = currentConfiguration.getWriters();
+			List<Writer> writers = currentConfiguration.getWriters();
 			assertThat(writers, types(ConsoleWriter.class, FileWriter.class));
 			FileWriter fileWriter = (FileWriter) writers.get(1);
 			assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
