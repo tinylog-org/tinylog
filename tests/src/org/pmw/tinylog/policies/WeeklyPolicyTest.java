@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -346,8 +346,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("weekly");
-		assertNotNull(policy);
-		assertEquals(WeeklyPolicy.class, policy.getClass());
+		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 3); // Sunday, 4th January 1970
 		assertTrue(policy.check((String) null));
@@ -357,8 +356,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		setTime(0L);
 
 		policy = createFromProperties("weekly: friday");
-		assertNotNull(policy);
-		assertEquals(WeeklyPolicy.class, policy.getClass());
+		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // Friday, 2nd January 1970
@@ -367,8 +365,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		setTime(0L);
 
 		policy = createFromProperties("weekly: sunday");
-		assertNotNull(policy);
-		assertEquals(WeeklyPolicy.class, policy.getClass());
+		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 2); // Saturday, 3rd January 1970
 		assertTrue(policy.check((String) null));

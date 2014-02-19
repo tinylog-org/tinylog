@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,8 +129,7 @@ public class HourlyPolicyTest extends AbstractTimeBasedPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("hourly");
-		assertNotNull(policy);
-		assertEquals(HourlyPolicy.class, policy.getClass());
+		assertThat(policy, type(HourlyPolicy.class));
 
 		policy.init(null);
 		increaseTime(HOUR - 1L); // 00:59:59,999

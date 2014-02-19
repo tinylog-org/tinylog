@@ -16,14 +16,15 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -977,31 +978,30 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		StringListOutputStream errorStream = getErrorStream();
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc");
-		LoggingWriter writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.url")));
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
 		assertFalse(errorStream.hasLines());
 
 		propertiesBuilder.set("tinylog.writer.url", "jdbc:");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.table")));
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
 		assertFalse(errorStream.hasLines());
 
 		propertiesBuilder.set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.values")));
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
 		assertFalse(errorStream.hasLines());
 
 		propertiesBuilder.set("tinylog.writer.values", "log_entry");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		JdbcWriter jdbcWriter = (JdbcWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(JdbcWriter.class));
+		JdbcWriter jdbcWriter = (JdbcWriter) writers.get(0);
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertNull(jdbcWriter.getColumns());
@@ -1011,10 +1011,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(jdbcWriter.getPassword());
 
 		propertiesBuilder.set("tinylog.writer.columns", "ENTRY");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(JdbcWriter.class));
+		jdbcWriter = (JdbcWriter) writers.get(0);
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertEquals(Collections.singletonList("ENTRY"), jdbcWriter.getColumns());
@@ -1024,10 +1023,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(jdbcWriter.getPassword());
 
 		propertiesBuilder.remove("tinylog.writer.columns").set("batch", "false");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(JdbcWriter.class));
+		jdbcWriter = (JdbcWriter) writers.get(0);
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertNull(jdbcWriter.getColumns());
@@ -1037,10 +1035,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(jdbcWriter.getPassword());
 
 		propertiesBuilder.set("tinylog.writer.batch", "true");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(JdbcWriter.class));
+		jdbcWriter = (JdbcWriter) writers.get(0);
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertNull(jdbcWriter.getColumns());
@@ -1050,10 +1047,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(jdbcWriter.getPassword());
 
 		propertiesBuilder.remove("tinylog.writer.batch").set("tinylog.writer.username", "admin").set("tinylog.writer.password", "123");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(JdbcWriter.class, writer.getClass());
-		jdbcWriter = (JdbcWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(JdbcWriter.class));
+		jdbcWriter = (JdbcWriter) writers.get(0);
 		assertEquals("jdbc:", jdbcWriter.getUrl());
 		assertEquals("log", jdbcWriter.getTable());
 		assertNull(jdbcWriter.getColumns());

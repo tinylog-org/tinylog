@@ -16,14 +16,15 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -342,31 +343,31 @@ public class FileWriterTest extends AbstractWriterTest {
 		String filename = file.getAbsolutePath();
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
-		LoggingWriter writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
 
 		propertiesBuilder.set("tinylog.writer.filename", filename);
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(filename, ((FileWriter) writer).getFilename());
-		assertFalse(((FileWriter) writer).isBuffered());
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		FileWriter fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertFalse(fileWriter.isBuffered());
 
 		propertiesBuilder.set("tinylog.writer.buffered", "true");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(filename, ((FileWriter) writer).getFilename());
-		assertTrue(((FileWriter) writer).isBuffered());
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertTrue(fileWriter.isBuffered());
 
 		propertiesBuilder.set("tinylog.writer.buffered", "false");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(FileWriter.class, writer.getClass());
-		assertEquals(filename, ((FileWriter) writer).getFilename());
-		assertFalse(((FileWriter) writer).isBuffered());
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertFalse(fileWriter.isBuffered());
 
 		file.delete();
 	}

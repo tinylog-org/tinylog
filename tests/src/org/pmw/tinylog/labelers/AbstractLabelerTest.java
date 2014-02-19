@@ -77,14 +77,14 @@ public abstract class AbstractLabelerTest extends AbstractTest {
 			PropertiesBuilder properties = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", property);
 
 			Class<?> propertiesLoaderClass = Class.forName("org.pmw.tinylog.PropertiesLoader");
-			Method readWriterMethod = propertiesLoaderClass.getDeclaredMethod("readWriter", Configurator.class, Properties.class);
+			Method readWriterMethod = propertiesLoaderClass.getDeclaredMethod("readWriters", Configurator.class, Properties.class);
 			readWriterMethod.setAccessible(true);
 			readWriterMethod.invoke(null, configurator, properties.create());
 
 			Method createMethod = Configurator.class.getDeclaredMethod("create");
 			createMethod.setAccessible(true);
 			Configuration configuration = (Configuration) createMethod.invoke(configurator);
-			LoggingWriter writer = configuration.getWriter();
+			LoggingWriter writer = configuration.getWriters().get(0);
 			return writer instanceof PropertiesWriter ? ((PropertiesWriter) writer).labeler : null;
 		} catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);

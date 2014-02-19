@@ -16,16 +16,16 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,9 +75,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(10, writer.getNumberOfBackups());
 		assertFalse(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(CountLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(CountLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -85,9 +84,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(10, writer.getNumberOfBackups());
 		assertTrue(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(CountLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(CountLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -95,9 +93,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertFalse(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(ProcessIdLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(ProcessIdLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -105,9 +102,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertTrue(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(ProcessIdLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(ProcessIdLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -115,9 +111,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertFalse(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(CountLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(CountLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -125,9 +120,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertTrue(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(CountLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(1));
-		assertThat(writer.getPolicies().get(0), instanceOf(StartupPolicy.class));
+		assertThat(writer.getLabeler(), type(CountLabeler.class));
+		assertThat(writer.getPolicies(), types(StartupPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -135,10 +129,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertFalse(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(ProcessIdLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(2));
-		assertThat(writer.getPolicies().get(0), instanceOf(SizePolicy.class));
-		assertThat(writer.getPolicies().get(1), instanceOf(DailyPolicy.class));
+		assertThat(writer.getLabeler(), type(ProcessIdLabeler.class));
+		assertThat(writer.getPolicies(), types(SizePolicy.class, DailyPolicy.class));
 		file.delete();
 
 		file = FileHelper.createTemporaryFile(null);
@@ -146,10 +138,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 		assertEquals(42, writer.getNumberOfBackups());
 		assertTrue(writer.isBuffered());
-		assertThat(writer.getLabeler(), instanceOf(ProcessIdLabeler.class));
-		assertThat(writer.getPolicies(), hasSize(2));
-		assertThat(writer.getPolicies().get(0), instanceOf(SizePolicy.class));
-		assertThat(writer.getPolicies().get(1), instanceOf(DailyPolicy.class));
+		assertThat(writer.getLabeler(), type(ProcessIdLabeler.class));
+		assertThat(writer.getPolicies(), types(SizePolicy.class, DailyPolicy.class));
 		file.delete();
 	}
 
@@ -456,8 +446,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testFromProperties() throws IOException {
-		LoggingWriter writer = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
-		assertNull(writer);
+		List<LoggingWriter> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
+		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
 
@@ -498,76 +488,59 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		}
 
 		PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
-		LoggingWriter writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
 
 		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "1");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		RollingFileWriter rollingFileWriter = (RollingFileWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(RollingFileWriter.class));
+		RollingFileWriter rollingFileWriter = (RollingFileWriter) writers.get(0);
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(1, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
 		Labeler labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(CountLabeler.class, labeler.getClass());
+		assertThat(labeler, type(CountLabeler.class));
 		List<? extends Policy> policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+		assertThat(policies, types(StartupPolicy.class));
 
 		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "2").set("tinylog.writer.label", "pid");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(RollingFileWriter.class));
+		rollingFileWriter = (RollingFileWriter) writers.get(0);
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(2, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
 		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(ProcessIdLabeler.class, labeler.getClass());
+		assertThat(labeler, type(ProcessIdLabeler.class));
 		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
+		assertThat(policies, types(StartupPolicy.class));
 
 		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "3").set("tinylog.writer.policies", "daily");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(RollingFileWriter.class));
+		rollingFileWriter = (RollingFileWriter) writers.get(0);
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(3, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
 		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(CountLabeler.class, labeler.getClass());
+		assertThat(labeler, type(CountLabeler.class));
 		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(1, policies.size());
-		assertEquals(DailyPolicy.class, policies.get(0).getClass());
+		assertThat(policies, types(DailyPolicy.class));
 
 		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "4").set("tinylog.writer.label", "timestamp")
 				.set("tinylog.writer.policies", "startup, daily");
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(RollingFileWriter.class, writer.getClass());
-		rollingFileWriter = (RollingFileWriter) writer;
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(RollingFileWriter.class));
+		rollingFileWriter = (RollingFileWriter) writers.get(0);
 		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
 		assertEquals(4, rollingFileWriter.getNumberOfBackups());
 		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
 		labeler = rollingFileWriter.getLabeler();
-		assertNotNull(labeler);
-		assertEquals(TimestampLabeler.class, labeler.getClass());
+		assertThat(labeler, type(TimestampLabeler.class));
 		policies = rollingFileWriter.getPolicies();
-		assertNotNull(policies);
-		assertEquals(2, policies.size());
-		assertEquals(StartupPolicy.class, policies.get(0).getClass());
-		assertEquals(DailyPolicy.class, policies.get(1).getClass());
+		assertThat(policies, types(StartupPolicy.class, DailyPolicy.class));
 
 		file.delete();
 	}

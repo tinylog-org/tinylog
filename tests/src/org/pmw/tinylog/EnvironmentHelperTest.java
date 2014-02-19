@@ -17,7 +17,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
+import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
 import java.lang.management.ManagementFactory;
 

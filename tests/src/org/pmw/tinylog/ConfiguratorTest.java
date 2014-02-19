@@ -15,7 +15,8 @@ package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
@@ -28,6 +29,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -50,6 +54,7 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Tests for configurator.
@@ -88,7 +93,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertFalse(defaultConfiguration.hasCustomLevels());
 		assertThat(defaultConfiguration.getFormatPattern(), containsString("{message}"));
 		assertEquals(Locale.getDefault(), defaultConfiguration.getLocale());
-		assertNotNull(defaultConfiguration.getWriter());
+		assertThat(defaultConfiguration.getWriters(), not(empty()));
 		assertNull(defaultConfiguration.getWritingThread());
 		assertThat(defaultConfiguration.getMaxStackTraceElements(), greaterThanOrEqualTo(-1));
 
@@ -98,7 +103,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(defaultConfiguration.hasCustomLevels(), configuration.hasCustomLevels());
 		assertEquals("TEST", configuration.getFormatPattern());
 		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
-		assertNull(configuration.getWriter());
+		assertThat(configuration.getWriters(), empty());
 		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
 	}
 
@@ -114,7 +119,7 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(defaultConfiguration.hasCustomLevels(), configuration.hasCustomLevels());
 		assertEquals(defaultConfiguration.getFormatPattern(), configuration.getFormatPattern());
 		assertEquals(defaultConfiguration.getLocale(), configuration.getLocale());
-		assertThat(configuration.getWriter(), instanceOf(defaultConfiguration.getWriter().getClass()));
+		assertThat(configuration.getWriters(), sameTypes(defaultConfiguration.getWriters()));
 		assertSame(defaultConfiguration.getWritingThread(), configuration.getWritingThread());
 		assertEquals(defaultConfiguration.getMaxStackTraceElements(), configuration.getMaxStackTraceElements());
 
@@ -275,16 +280,16 @@ public class ConfiguratorTest extends AbstractTest {
 	@Test
 	public final void testCopy() {
 		Map<String, LoggingLevel> packageLevels = Collections.singletonMap("a", LoggingLevel.DEBUG);
-		NullWriter writer = new NullWriter();
+		List<LoggingWriter> writers = Collections.<LoggingWriter> singletonList(new NullWriter());
 		WritingThreadData writingThreadData = new WritingThreadData(Thread.currentThread().getName(), Thread.NORM_PRIORITY);
-		Configurator configurator = new Configurator(LoggingLevel.WARNING, packageLevels, "TEST", Locale.US, writer, writingThreadData, 42);
+		Configurator configurator = new Configurator(LoggingLevel.WARNING, packageLevels, "TEST", Locale.US, writers, writingThreadData, 42);
 
 		Configuration copy = configurator.copy().create();
 		assertEquals(LoggingLevel.WARNING, copy.getLevel());
 		assertEquals(LoggingLevel.DEBUG, copy.getLevel("a"));
 		assertEquals("TEST", copy.getFormatPattern());
 		assertEquals(Locale.US, copy.getLocale());
-		assertSame(writer, copy.getWriter());
+		assertEquals(writers, copy.getWriters());
 		assertEquals(Thread.currentThread().getName(), copy.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(Thread.NORM_PRIORITY, copy.getWritingThread().getPriority());
 		assertEquals(42, copy.getMaxStackTraceElements());
@@ -355,13 +360,36 @@ public class ConfiguratorTest extends AbstractTest {
 	 * Test setting writers.
 	 */
 	@Test
-	public final void testWriter() {
-		Configuration configuration = Configurator.defaultConfig().writer(new NullWriter()).create();
-		assertNotNull(configuration.getWriter());
-		assertEquals(NullWriter.class, configuration.getWriter().getClass());
+	public final void testWriters() {
+		Configurator configurator = Configurator.defaultConfig();
+		NullWriter nullWriter1 = new NullWriter();
+		NullWriter nullWriter2 = new NullWriter();
+		NullWriter nullWriter3 = new NullWriter();
 
-		configuration = Configurator.defaultConfig().writer(null).create();
-		assertEquals(null, configuration.getWriter());
+		Configuration configuration = configurator.writer(nullWriter1).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1));
+
+		configuration = configurator.writer(null).create();
+		assertThat(configuration.getWriters(), empty());
+
+		configuration = configurator.writer(nullWriter1).addWriter(nullWriter2).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2));
+
+		configuration = configurator.addWriter(nullWriter3).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
+
+		try {
+			configuration = configurator.addWriter(null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		}
+
+		configuration = configurator.removeWriter(nullWriter2).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter3));
+
+		configuration = configurator.removeAllWriters().create();
+		assertThat(configuration.getWriters(), empty());
 
 		StringListOutputStream errorStream = getErrorStream();
 		assertFalse(errorStream.hasLines());

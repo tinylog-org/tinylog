@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -426,8 +426,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("yearly");
-		assertNotNull(policy);
-		assertEquals(YearlyPolicy.class, policy.getClass());
+		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
 		increaseTime(YEAR - DAY);
 		assertTrue(policy.check((String) null));
@@ -437,8 +436,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 		setTime(0L);
 
 		policy = createFromProperties("yearly: 2");
-		assertNotNull(policy);
-		assertEquals(YearlyPolicy.class, policy.getClass());
+		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 30); // 31th January
 		assertTrue(policy.check((String) null));
@@ -448,8 +446,7 @@ public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 		setTime(0L);
 
 		policy = createFromProperties("yearly: march");
-		assertNotNull(policy);
-		assertEquals(YearlyPolicy.class, policy.getClass());
+		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 30 + DAY * 28); // 28th February
 		assertTrue(policy.check((String) null));

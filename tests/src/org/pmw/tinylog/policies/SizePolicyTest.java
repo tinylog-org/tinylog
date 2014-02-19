@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,8 +192,7 @@ public class SizePolicyTest extends AbstractPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("size: 3");
-		assertNotNull(policy);
-		assertEquals(SizePolicy.class, policy.getClass());
+		assertThat(policy, type(SizePolicy.class));
 		policy.init(ConfigurationCreator.getDummyConfiguration());
 		assertTrue(policy.check("1"));
 		assertTrue(policy.check("2"));
@@ -201,8 +200,7 @@ public class SizePolicyTest extends AbstractPolicyTest {
 		assertFalse(policy.check("4"));
 
 		policy = createFromProperties("size: 1 KB");
-		assertNotNull(policy);
-		assertEquals(SizePolicy.class, policy.getClass());
+		assertThat(policy, type(SizePolicy.class));
 		policy.init(ConfigurationCreator.getDummyConfiguration());
 		for (int i = 0; i < 1024; ++i) {
 			assertTrue(policy.check("0"));

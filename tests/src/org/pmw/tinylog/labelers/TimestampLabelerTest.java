@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -236,12 +236,10 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	@Test
 	public final void testFromProperties() {
 		Labeler labeler = createFromProperties("timestamp");
-		assertNotNull(labeler);
-		assertEquals(TimestampLabeler.class, labeler.getClass());
+		assertThat(labeler, type(TimestampLabeler.class));
 
 		labeler = createFromProperties("timestamp: yyyy");
-		assertNotNull(labeler);
-		assertEquals(TimestampLabeler.class, labeler.getClass());
+		assertThat(labeler, type(TimestampLabeler.class));
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
 	}

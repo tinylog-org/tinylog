@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,8 +65,7 @@ public class StartupPolicyTest extends AbstractPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("startup");
-		assertNotNull(policy);
-		assertEquals(StartupPolicy.class, policy.getClass());
+		assertThat(policy, type(StartupPolicy.class));
 	}
 
 }

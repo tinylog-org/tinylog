@@ -26,9 +26,24 @@ import org.pmw.tinylog.writers.LoggingWriter;
  */
 public class NullWriter implements LoggingWriter {
 
+	private final Set<LogEntryValue> requiredLogEntryValues;
+
+	/** */
+	public NullWriter() {
+		this.requiredLogEntryValues = Collections.emptySet();
+	}
+
+	/**
+	 * @param requiredLogEntryValues
+	 *            Required log entry values
+	 */
+	public NullWriter(final Set<LogEntryValue> requiredLogEntryValues) {
+		this.requiredLogEntryValues = requiredLogEntryValues;
+	}
+
 	@Override
 	public final Set<LogEntryValue> getRequiredLogEntryValues() {
-		return Collections.emptySet();
+		return requiredLogEntryValues;
 	}
 
 	@Override

@@ -13,10 +13,10 @@
 
 package org.pmw.tinylog.policies;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,8 +140,7 @@ public class CountPolicyTest extends AbstractPolicyTest {
 	@Test
 	public final void testFromProperties() {
 		Policy policy = createFromProperties("count: 3");
-		assertNotNull(policy);
-		assertEquals(CountPolicy.class, policy.getClass());
+		assertThat(policy, type(CountPolicy.class));
 
 		policy.init(ConfigurationCreator.getDummyConfiguration());
 		assertTrue(policy.check("1"));

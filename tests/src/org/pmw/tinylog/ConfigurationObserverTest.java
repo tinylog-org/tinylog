@@ -15,7 +15,6 @@ package org.pmw.tinylog;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,6 +23,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -198,7 +200,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
 			assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
-			assertThat(currentConfiguration.getWriter(), instanceOf(DEFAULT_CONFIGURATION.getWriter().getClass()));
+			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 		} finally {
 			threadMock.disable();
@@ -377,6 +379,8 @@ public class ConfigurationObserverTest extends AbstractTest {
 	 */
 	@Test
 	public final void testWriter() throws IOException, InterruptedException {
+		File logFile1 = FileHelper.createTemporaryFile("log");
+		File logFile2 = FileHelper.createTemporaryFile("log");
 		observer.start();
 		threadMock.waitForSleep();
 
@@ -387,7 +391,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertThat(currentConfiguration.getWriter(), instanceOf(ConsoleWriter.class));
+			assertThat(currentConfiguration.getWriters(), types(ConsoleWriter.class));
 
 			/* Test remove writer */
 
@@ -395,37 +399,112 @@ public class ConfigurationObserverTest extends AbstractTest {
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			assertThat(currentConfiguration.getWriter(), instanceOf(DEFAULT_CONFIGURATION.getWriter().getClass()));
+			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 
 			/* Test new writer with arguments */
 
-			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=log1.txt");
+			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=" + logFile1.getAbsolutePath());
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			LoggingWriter writer = currentConfiguration.getWriter();
-			assertThat(writer, instanceOf(FileWriter.class));
-			FileWriter fileWriter = (FileWriter) writer;
-			assertEquals("log1.txt", fileWriter.getFilename());
+			List<LoggingWriter> writers = currentConfiguration.getWriters();
+			assertThat(writers, types(FileWriter.class));
+			FileWriter fileWriter = (FileWriter) writers.get(0);
+			assertEquals(logFile1.getAbsolutePath(), fileWriter.getFilename());
 			fileWriter.close();
-			new File(fileWriter.getFilename()).delete();
 
 			/* Argument of writer has changed */
 
-			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=log2.txt");
+			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=" + logFile2.getAbsolutePath());
 			threadMock.awake();
 			threadMock.waitForSleep();
 			currentConfiguration = Logger.getConfiguration().create();
-			writer = currentConfiguration.getWriter();
-			assertThat(writer, instanceOf(FileWriter.class));
-			fileWriter = (FileWriter) writer;
-			assertEquals("log2.txt", fileWriter.getFilename());
+			writers = currentConfiguration.getWriters();
+			assertThat(writers, types(FileWriter.class));
+			fileWriter = (FileWriter) writers.get(0);
+			assertEquals(logFile2.getAbsolutePath(), fileWriter.getFilename());
 			fileWriter.close();
-			new File(fileWriter.getFilename()).delete();
 		} finally {
 			threadMock.disable();
 			observer.shutdown();
 			observer.join();
+			logFile2.delete();
+			logFile1.delete();
+		}
+	}
+
+	/**
+	 * Test reading of multiple writers.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 * @throws InterruptedException
+	 *             Test failed
+	 */
+	@Test
+	public final void testMultipleWriters() throws IOException, InterruptedException {
+		File logFile = FileHelper.createTemporaryFile("log");
+		observer.start();
+		threadMock.waitForSleep();
+
+		try {
+			/* Test new writers */
+
+			FileHelper.write(file, "tinylog.writer=console", "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath());
+			threadMock.awake();
+			threadMock.waitForSleep();
+			Configuration currentConfiguration = Logger.getConfiguration().create();
+			List<LoggingWriter> writers = currentConfiguration.getWriters();
+			assertThat(writers, types(ConsoleWriter.class, FileWriter.class));
+			FileWriter fileWriter = (FileWriter) writers.get(1);
+			assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
+			assertFalse(fileWriter.isBuffered());
+			fileWriter.close();
+
+			/* Test remove first writer */
+
+			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath());
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			writers = currentConfiguration.getWriters();
+			assertThat(writers, types(FileWriter.class));
+			fileWriter = (FileWriter) writers.get(0);
+			assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
+			assertFalse(fileWriter.isBuffered());
+			fileWriter.close();
+
+			/* Test change existing writer */
+
+			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath(), "tinylog.writer2.buffered=true");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			writers = currentConfiguration.getWriters();
+			assertThat(writers, types(FileWriter.class));
+			fileWriter = (FileWriter) writers.get(0);
+			assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
+			assertTrue(fileWriter.isBuffered());
+			fileWriter.close();
+
+			/* Test add additional writer */
+
+			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath(), "tinylog.writer2.buffered=true",
+					"tinylog.writerNew=console");
+			threadMock.awake();
+			threadMock.waitForSleep();
+			currentConfiguration = Logger.getConfiguration().create();
+			writers = currentConfiguration.getWriters();
+			assertThat(writers, types(FileWriter.class, ConsoleWriter.class));
+			fileWriter = (FileWriter) writers.get(0);
+			assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
+			assertTrue(fileWriter.isBuffered());
+			fileWriter.close();
+		} finally {
+			threadMock.disable();
+			observer.shutdown();
+			observer.join();
+			file.delete();
 		}
 	}
 
@@ -539,7 +618,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 		assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 		assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
 		assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
-		assertThat(currentConfiguration.getWriter(), instanceOf(DEFAULT_CONFIGURATION.getWriter().getClass()));
+		assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 		assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 
 	}
@@ -577,7 +656,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
 			assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
-			assertThat(currentConfiguration.getWriter(), instanceOf(DEFAULT_CONFIGURATION.getWriter().getClass()));
+			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 		} finally {
 			mock.tearDown();

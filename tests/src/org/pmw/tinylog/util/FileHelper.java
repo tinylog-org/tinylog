@@ -160,7 +160,7 @@ public final class FileHelper {
 			if (i > 0) {
 				builder.append(EnvironmentHelper.getNewLine());
 			}
-			builder.append(lines[i]);
+			builder.append(lines[i].replace("\\", "\\\\"));
 		}
 		return builder.toString();
 	}

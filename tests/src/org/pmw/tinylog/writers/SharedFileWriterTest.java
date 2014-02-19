@@ -16,12 +16,13 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -379,16 +380,16 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		File file = FileHelper.createTemporaryFile("log");
 
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile");
-		LoggingWriter writer = createFromProperties(propertiesBuilder.create());
-		assertNull(writer);
+		List<LoggingWriter> writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, empty());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
 
 		propertiesBuilder.set("tinylog.writer.filename", file.getAbsolutePath());
-		writer = createFromProperties(propertiesBuilder.create());
-		assertNotNull(writer);
-		assertEquals(SharedFileWriter.class, writer.getClass());
-		assertEquals(file.getAbsolutePath(), ((SharedFileWriter) writer).getFilename());
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(SharedFileWriter.class));
+		SharedFileWriter sharedFileWriter = (SharedFileWriter) writers.get(0);
+		assertEquals(file.getAbsolutePath(), sharedFileWriter.getFilename());
 
 		file.delete();
 	}

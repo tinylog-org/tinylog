@@ -28,6 +28,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.pmw.tinylog.labelers.Labeler;
@@ -105,7 +107,7 @@ final class PropertiesLoader {
 		readFormatPattern(configurator, properties);
 		readLocale(configurator, properties);
 		readMaxStackTraceElements(configurator, properties);
-		readWriter(configurator, properties);
+		readWriters(configurator, properties);
 		readWritingThread(configurator, properties);
 		return configurator;
 	}
@@ -203,34 +205,42 @@ final class PropertiesLoader {
 	}
 
 	/**
-	 * Load writer from properties.
+	 * Load writers from properties.
 	 * 
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
 	 *            Properties with configuration
 	 */
-	static void readWriter(final Configurator configurator, final Properties properties) {
-		String writer = properties.getProperty(WRITER_PROPERTY);
-		if (writer != null && writer.length() > 0) {
-			if (writer.equalsIgnoreCase("null")) {
-				configurator.writer(null);
-			} else {
-				for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
-					org.pmw.tinylog.writers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.writers.PropertiesSupport.class);
-					if (propertiesSupport != null) {
-						if (writer.equalsIgnoreCase(propertiesSupport.name())) {
-							LoggingWriter loggingWriter = loadAndSetWriter(properties, propertiesSupport.properties(), implementation);
-							if (loggingWriter == null) {
-								InternalLogger.error("Failed to initialize {0} writer", writer);
-							} else {
-								configurator.writer(loggingWriter);
-							}
-							return;
+	static void readWriters(final Configurator configurator, final Properties properties) {
+		Set<String> writerProperties = new TreeSet<String>(); // Sorted
+		for (Object key : properties.keySet()) {
+			String propertyName = (String) key;
+			if (propertyName.startsWith(WRITER_PROPERTY) && propertyName.indexOf('.', WRITER_PROPERTY.length()) == -1) {
+				writerProperties.add(propertyName);
+			}
+		}
+
+		boolean first = true;
+		for (String propertyName : writerProperties) {
+			String writer = properties.getProperty(propertyName);
+			if (writer != null && writer.length() > 0) {
+				if (writer.equalsIgnoreCase("null")) {
+					if (first) {
+						configurator.removeAllWriters();
+						first = false;
+					}
+				} else {
+					LoggingWriter loggingWriter = readWriter(properties, propertyName, writer);
+					if (loggingWriter != null) {
+						if (first) {
+							configurator.writer(loggingWriter);
+							first = false;
+						} else {
+							configurator.addWriter(loggingWriter);
 						}
 					}
 				}
-				InternalLogger.error("Cannot find a writer for the name \"{0}\"", writer);
 			}
 		}
 	}
@@ -275,6 +285,24 @@ final class PropertiesLoader {
 		} else {
 			configurator.writingThread(false);
 		}
+	}
+
+	private static LoggingWriter readWriter(final Properties properties, final String propertyName, final String writer) {
+		for (Class<?> implementation : findImplementations(LoggingWriter.class)) {
+			org.pmw.tinylog.writers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.writers.PropertiesSupport.class);
+			if (propertiesSupport != null) {
+				if (writer.equalsIgnoreCase(propertiesSupport.name())) {
+					LoggingWriter loggingWriter = loadAndSetWriter(properties, propertyName, propertiesSupport.properties(), implementation);
+					if (loggingWriter == null) {
+						InternalLogger.error("Failed to initialize {0} writer", writer);
+					}
+					return loggingWriter;
+				}
+			}
+		}
+
+		InternalLogger.error("Cannot find a writer for the name \"{0}\"", writer);
+		return null;
 	}
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {
@@ -329,8 +357,9 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static LoggingWriter loadAndSetWriter(final Properties properties, final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
-		Object[] parameters = loadParameters(properties, definition);
+	private static LoggingWriter loadAndSetWriter(final Properties properties, final String propertiesPrefix,
+			final org.pmw.tinylog.writers.Property[] definition, final Class<?> writerClass) {
+		Object[] parameters = loadParameters(properties, propertiesPrefix, definition);
 
 		if (parameters != null) {
 			for (Constructor<?> constructor : writerClass.getDeclaredConstructors()) {
@@ -388,17 +417,17 @@ final class PropertiesLoader {
 		return null;
 	}
 
-	private static Object[] loadParameters(final Properties properties, final org.pmw.tinylog.writers.Property[] definition) {
+	private static Object[] loadParameters(final Properties properties, final String propertiesPrefix, final org.pmw.tinylog.writers.Property[] definition) {
 		Object[] parameters = new Object[definition.length];
 
 		for (int i = 0; i < definition.length; ++i) {
 			String name = definition[i].name();
-			String value = properties.getProperty(WRITER_PROPERTY + "." + name);
+			String value = properties.getProperty(propertiesPrefix + "." + name);
 			if (value == null) {
 				if (definition[i].optional()) {
 					parameters[i] = null;
 				} else {
-					InternalLogger.error("Missing required property \"{0}\"", WRITER_PROPERTY + "." + name);
+					InternalLogger.error("Missing required property \"{0}\"", propertiesPrefix + "." + name);
 					return null;
 				}
 			} else {
@@ -409,14 +438,14 @@ final class PropertiesLoader {
 					} else if ("false".equalsIgnoreCase(value)) {
 						parameters[i] = Boolean.FALSE;
 					} else {
-						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", WRITER_PROPERTY + "." + name, value);
+						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", propertiesPrefix + "." + name, value);
 						return null;
 					}
 				} else if (int.class.equals(type)) {
 					try {
 						parameters[i] = Integer.parseInt(value);
 					} catch (NumberFormatException ex) {
-						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", WRITER_PROPERTY + "." + name, value);
+						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", propertiesPrefix + "." + name, value);
 						return null;
 					}
 				} else if (String.class.equals(type)) {
@@ -446,7 +475,7 @@ final class PropertiesLoader {
 					}
 				} else {
 					InternalLogger.error("\"{1}\" for \"{0}\" is an unsupported type (String, int, boolean, Labeler, Policy and Policy[] are supported)",
-							WRITER_PROPERTY + "." + name, type.getName());
+							propertiesPrefix + "." + name, type.getName());
 					return null;
 				}
 			}

@@ -15,6 +15,7 @@ package org.pmw.tinylog.writers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Properties;
 
 import org.pmw.tinylog.AbstractTest;
@@ -36,19 +37,19 @@ public abstract class AbstractWriterTest extends AbstractTest {
 	 *            Properties with writer definition
 	 * @return Created logging writer
 	 */
-	protected final LoggingWriter createFromProperties(final Properties properties) {
+	protected final List<LoggingWriter> createFromProperties(final Properties properties) {
 		try {
 			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
 
 			Class<?> propertiesLoaderClass = Class.forName("org.pmw.tinylog.PropertiesLoader");
-			Method readWriterMethod = propertiesLoaderClass.getDeclaredMethod("readWriter", Configurator.class, Properties.class);
+			Method readWriterMethod = propertiesLoaderClass.getDeclaredMethod("readWriters", Configurator.class, Properties.class);
 			readWriterMethod.setAccessible(true);
 			readWriterMethod.invoke(null, configurator, properties);
 
 			Method createMethod = Configurator.class.getDeclaredMethod("create");
 			createMethod.setAccessible(true);
 			Configuration configuration = (Configuration) createMethod.invoke(configurator);
-			return configuration.getWriter();
+			return configuration.getWriters();
 		} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
 		}

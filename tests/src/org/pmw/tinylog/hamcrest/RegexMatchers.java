@@ -24,9 +24,9 @@ import org.hamcrest.TypeSafeMatcher;
  * 
  * @see Pattern
  */
-public final class RegexMatcher {
+public final class RegexMatchers {
 
-	private RegexMatcher() {
+	private RegexMatchers() {
 	}
 
 	private abstract static class AbstractRegexpMatcher extends TypeSafeMatcher<String> {

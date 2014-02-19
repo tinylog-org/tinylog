@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -23,6 +24,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,12 +35,14 @@ import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
+import org.pmw.tinylog.hamcrest.ArrayMatchers;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.labelers.TimestampLabeler;
@@ -46,10 +51,12 @@ import org.pmw.tinylog.policies.DailyPolicy;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.SizePolicy;
 import org.pmw.tinylog.policies.StartupPolicy;
+import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.writers.FileWriter;
 import org.pmw.tinylog.writers.LoggingWriter;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
@@ -88,7 +95,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals(new Locale("de"), configuration.getLocale());
 		assertNotSame(Locale.getDefault(), configuration.getLocale());
 		assertEquals(42, configuration.getMaxStackTraceElements());
-		assertNull(configuration.getWriter());
+		assertThat(configuration.getWriters(), empty());
 		assertNotNull(configuration.getWritingThread());
 	}
 
@@ -257,8 +264,32 @@ public class PropertiesLoaderTest extends AbstractTest {
 	@Test
 	public final void testReadNullLoggingWriter() {
 		Configurator configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "null").create());
-		assertNull(configurator.create().getWriter());
+		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "null").create());
+		assertThat(configurator.create().getWriters(), empty());
+	}
+
+	/**
+	 * Test reading multiple logging writers.
+	 * 
+	 * @throws IOException
+	 *             Failed to create temporary file
+	 */
+	@Test
+	public final void testReadMultipleLoggingWriters() throws IOException {
+		File logFile = FileHelper.createTemporaryFile("log");
+
+		Configurator configurator = Configurator.defaultConfig().writer(null);
+
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer1", "console");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath());
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		List<LoggingWriter> writers = configurator.create().getWriters();
+		assertThat(writers, types(ConsoleWriter.class, FileWriter.class));
+		FileWriter fileWriter = (FileWriter) writers.get(1);
+		assertEquals(logFile.getAbsolutePath(), fileWriter.getFilename());
+
+		logFile.delete();
 	}
 
 	/**
@@ -274,10 +305,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 			mock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "properties").create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "properties").create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -299,26 +329,25 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.boolean", "true");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals(Boolean.TRUE, ((PropertiesWriter) writer).booleanValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertEquals(Boolean.TRUE, propertiesWriter.booleanValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.boolean", "false");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals(Boolean.FALSE, ((PropertiesWriter) writer).booleanValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertEquals(Boolean.FALSE, propertiesWriter.booleanValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.boolean", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.boolean"), containsString("abc")));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
@@ -343,18 +372,17 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder = propertiesBuilder.set("tinylog.writer.int", "42");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals(Integer.valueOf(42), ((PropertiesWriter) writer).intValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertEquals(Integer.valueOf(42), propertiesWriter.intValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = propertiesBuilder.set("tinylog.writer.int", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -377,11 +405,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.string", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertEquals("abc", ((PropertiesWriter) writer).stringValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertEquals("abc", propertiesWriter.stringValue);
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -403,35 +431,35 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.strings", "abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertArrayEquals(new String[] { "abc" }, ((PropertiesWriter) writer).stringsValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertArrayEquals(new String[] { "abc" }, propertiesWriter.stringsValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.strings", "abc, test");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertArrayEquals(new String[] { "abc", "test" }, ((PropertiesWriter) writer).stringsValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertArrayEquals(new String[] { "abc", "test" }, propertiesWriter.stringsValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.strings", "");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertArrayEquals(new String[] { "" }, ((PropertiesWriter) writer).stringsValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertArrayEquals(new String[] { "" }, propertiesWriter.stringsValue);
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.strings", ",,");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			assertArrayEquals(new String[] { "", "", "" }, ((PropertiesWriter) writer).stringsValue);
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertArrayEquals(new String[] { "", "", "" }, propertiesWriter.stringsValue);
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -453,24 +481,20 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.labeler", "count");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
-			assertNotNull(propertiesWriter.labeler);
-			assertEquals(CountLabeler.class, propertiesWriter.labeler.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.labeler, type(CountLabeler.class));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.labeler", "timestamp: yyyy");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			propertiesWriter = (PropertiesWriter) writer;
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
 			Labeler labeler = propertiesWriter.labeler;
-			assertNotNull(labeler);
-			assertEquals(TimestampLabeler.class, labeler.getClass());
+			assertThat(labeler, type(TimestampLabeler.class));
 			labeler.init(configurator.create());
 			assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
 		} finally {
@@ -494,24 +518,19 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policy", "startup");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
-			assertNotNull(propertiesWriter.policy);
-			assertEquals(StartupPolicy.class, propertiesWriter.policy.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.policy, type(StartupPolicy.class));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policy", "size: 10");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			propertiesWriter = (PropertiesWriter) writer;
-			Policy policy = propertiesWriter.policy;
-			assertNotNull(policy);
-			assertEquals(SizePolicy.class, policy.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.policy, type(SizePolicy.class));
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -533,26 +552,19 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policies", "startup");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			PropertiesWriter propertiesWriter = (PropertiesWriter) writer;
-			assertNotNull(propertiesWriter.policies);
-			assertEquals(1, propertiesWriter.policies.length);
-			assertEquals(StartupPolicy.class, propertiesWriter.policies[0].getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.policies, ArrayMatchers.types(StartupPolicy.class));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policies", "startup, daily");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(PropertiesWriter.class, writer.getClass());
-			propertiesWriter = (PropertiesWriter) writer;
-			assertNotNull(propertiesWriter.policies);
-			assertEquals(2, propertiesWriter.policies.length);
-			assertEquals(StartupPolicy.class, propertiesWriter.policies[0].getClass());
-			assertEquals(DailyPolicy.class, propertiesWriter.policies[1].getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.policies, ArrayMatchers.types(StartupPolicy.class, DailyPolicy.class));
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -566,10 +578,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithMissingProperty() {
 		Configurator configurator = Configurator.defaultConfig();
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
-		PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+		List<LoggingWriter> writers = configurator.create().getWriters();
+		assertThat(writers, types(ConsoleWriter.class));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
 	}
@@ -588,10 +599,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.class", "MyClass");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.class"), containsString("unsupported")));
 			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -606,10 +616,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 	@Test
 	public final void testReadInvalidLoggingWriter() {
 		Configurator configurator = Configurator.defaultConfig();
-		PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "invalid").create());
-		LoggingWriter writer = configurator.create().getWriter();
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
+		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "invalid").create());
+		List<LoggingWriter> writers = configurator.create().getWriters();
+		assertThat(writers, types(ConsoleWriter.class));
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("writer")));
 	}
 
@@ -628,7 +637,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "invalid");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("labeler")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -652,13 +661,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "invalid");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("policy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "invalid");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("policy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -681,10 +690,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
 		} finally {
 			mock.tearDown();
@@ -708,7 +716,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "count");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("count"), containsString("labeler")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -733,13 +741,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "startup");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("startup"), containsString("policy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "startup");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("startup"), containsString("policy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 		} finally {
@@ -768,10 +776,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 		try {
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("read"), containsString("services")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
 		} finally {
@@ -793,10 +800,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "mywriter").create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "mywriter").create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyWriter")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("writer"), containsString("mywriter")));
 		} finally {
@@ -821,7 +827,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "mylabeler");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyLabeler")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("labeler"), containsString("mylabeler")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -847,14 +853,14 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "mypolicy");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyPolicy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("policy"), containsString("mypolicy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "mypolicy");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyPolicy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("policy"), containsString("mypolicy")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -878,10 +884,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 			classLoaderMock.set("META-INF/services/" + LoggingWriter.class.getPackage().getName(), EvilWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
-			LoggingWriter writer = configurator.create().getWriter();
-			assertNotNull(writer);
-			assertEquals(ConsoleWriter.class, writer.getClass());
+			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
+			List<LoggingWriter> writers = configurator.create().getWriters();
+			assertThat(writers, types(ConsoleWriter.class));
 			assertThat(errorStream.nextLine(), allOf(containsString(EvilWriter.class.getName()), containsString(UnsupportedOperationException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("writer"), containsString("evil")));
 
@@ -896,10 +901,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 				};
 				try {
 					configurator = Configurator.defaultConfig();
-					PropertiesLoader.readWriter(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
-					writer = configurator.create().getWriter();
-					assertNotNull(writer);
-					assertEquals(ConsoleWriter.class, writer.getClass());
+					PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
+					writers = configurator.create().getWriters();
+					assertThat(writers, types(ConsoleWriter.class));
 					assertThat(errorStream.nextLine(), allOf(containsString(EvilWriter.class.getName()), containsString(exception.getClass().getName())));
 					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("writer"), containsString("evil")));
 				} finally {
@@ -928,7 +932,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(),
 					allOf(containsString(EvilLabeler.class.getName()), containsString(UnsupportedOperationException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
@@ -936,7 +940,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil: abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString(EvilLabeler.class.getName()), containsString(NoSuchMethodException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -953,7 +957,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 				try {
 					configurator = Configurator.defaultConfig();
 					propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil");
-					PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+					PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 					assertThat(errorStream.nextLine(), allOf(containsString(EvilLabeler.class.getName()), containsString(exception.getClass().getName())));
 					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
 					assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -983,14 +987,14 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString(EvilPolicy.class.getName()), containsString(UnsupportedOperationException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil: abc");
-			PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertThat(errorStream.nextLine(), allOf(containsString(PropertiesLoader.class.getName()), containsString(NoSuchMethodException.class.getName())));
 			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
 			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
@@ -1007,7 +1011,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 				try {
 					configurator = Configurator.defaultConfig();
 					propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil");
-					PropertiesLoader.readWriter(configurator, propertiesBuilder.create());
+					PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 					assertThat(errorStream.nextLine(), allOf(containsString(EvilPolicy.class.getName()), containsString(exception.getClass().getName())));
 					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
 					assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));

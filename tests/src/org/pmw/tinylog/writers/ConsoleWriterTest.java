@@ -16,10 +16,11 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -101,9 +102,8 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testFromProperties() {
-		LoggingWriter writer = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "console").create());
-		assertNotNull(writer);
-		assertEquals(ConsoleWriter.class, writer.getClass());
+		List<LoggingWriter> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "console").create());
+		assertThat(writers, types(ConsoleWriter.class));
 	}
 
 }

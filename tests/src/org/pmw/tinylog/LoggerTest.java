@@ -21,12 +21,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.contains;
-import static org.pmw.tinylog.hamcrest.RegexMatcher.matches;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
+import static org.pmw.tinylog.hamcrest.RegexMatchers.contains;
+import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -424,16 +424,24 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
+		assertFalse(getErrorStream().hasLines());
 		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
-		assertTrue(errorStream.hasLines());
-		errorStream.clear();
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
+		getErrorStream().clear();
+
+		/* Test failure of writing log entry */
+
+		Configurator.currentConfig().writer(new EvilWriter()).activate();
+
+		assertFalse(getErrorStream().hasLines());
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, LoggingLevel.ERROR, null, "Hello!", new Object[0]);
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
+		getErrorStream().clear();
 
 		/* Test using writing thread */
 
-		Configurator.currentConfig().writingThread(null).activate();
+		Configurator.currentConfig().writer(writer).writingThread(null).activate();
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
@@ -518,16 +526,24 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("com.test", null).activate();
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
+		assertFalse(getErrorStream().hasLines());
 		Logger.output(stackTraceElement, LoggingLevel.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
-		assertTrue(errorStream.hasLines());
-		errorStream.clear();
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
+		getErrorStream().clear();
+
+		/* Test failure of writing log entry */
+
+		Configurator.currentConfig().writer(new EvilWriter()).activate();
+
+		assertFalse(getErrorStream().hasLines());
+		Logger.output(stackTraceElement, LoggingLevel.ERROR, null, "Hello!", new Object[0]);
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
+		getErrorStream().clear();
 
 		/* Test using writing thread */
 
-		Configurator.currentConfig().writingThread(null).activate();
+		Configurator.currentConfig().writer(writer).writingThread(null).activate();
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
@@ -610,16 +626,24 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level(LoggerTest.class.getPackage(), null).activate();
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
+		assertFalse(getErrorStream().hasLines());
 		Logger.info("Hello {0}!", new EvilObject());
 		assertNull(writer.consumeLogEntry());
-		assertTrue(errorStream.hasLines());
-		errorStream.clear();
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
+		getErrorStream().clear();
+
+		/* Test failure of writing log entry */
+
+		Configurator.currentConfig().writer(new EvilWriter(writer.getRequiredLogEntryValues())).activate();
+
+		assertFalse(getErrorStream().hasLines());
+		Logger.error("Hello!");
+		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
+		getErrorStream().clear();
 
 		/* Test using writing thread */
 
-		Configurator.currentConfig().writingThread(null).activate();
+		Configurator.currentConfig().writer(writer).writingThread(null).activate();
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
@@ -934,17 +958,32 @@ public class LoggerTest extends AbstractTest {
 		Logger.setConfirguration(configuration);
 		assertEquals("Hello World", Logger.getConfiguration().create().getFormatPattern());
 
+		/* Reset logger */
+
+		Field field = Logger.class.getDeclaredField("configuration");
+		field.setAccessible(true);
+		field.set(null, null);
+
 		/* Call init() method only once */
 
 		DummyWriter writer = new DummyWriter();
+
 		configuration = Configurator.defaultConfig().writer(writer).create();
 		Logger.setConfirguration(configuration);
-		assertSame(writer, Logger.getConfiguration().create().getWriter());
+		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
 
 		configuration = Configurator.defaultConfig().writer(writer).create();
 		Logger.setConfirguration(configuration);
-		assertSame(writer, Logger.getConfiguration().create().getWriter());
+		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
+		assertEquals(1, writer.numberOfInits);
+
+		writer = new DummyWriter();
+
+		assertEquals(0, writer.numberOfInits);
+		configuration = Configurator.defaultConfig().writer(writer).create();
+		Logger.setConfirguration(configuration);
+		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
 	}
 
@@ -996,6 +1035,23 @@ public class LoggerTest extends AbstractTest {
 			/* Generate an individual error message */
 			String message = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
 			throw new RuntimeException(message);
+		}
+
+	}
+
+	private static final class EvilWriter extends NullWriter {
+
+		public EvilWriter() {
+			super();
+		}
+
+		public EvilWriter(final Set<LogEntryValue> requiredLogEntryValues) {
+			super(requiredLogEntryValues);
+		}
+
+		@Override
+		public void write(final LogEntry logEntry) {
+			throw new UnsupportedOperationException();
 		}
 
 	}

@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntry;
@@ -621,11 +622,19 @@ public final class Logger {
 	static void setConfirguration(final Configuration configuration) throws Exception {
 		Configuration previousConfiguration = Logger.configuration;
 
-		LoggingWriter newWriter = configuration.getWriter();
-		LoggingWriter oldWriter = previousConfiguration == null ? null : previousConfiguration.getWriter();
+		if (previousConfiguration == null) {
+			for (LoggingWriter writer : configuration.getWriters()) {
+				writer.init(configuration);
+			}
+		} else {
+			List<LoggingWriter> newWriters = configuration.getWriters();
+			List<LoggingWriter> oldWriters = previousConfiguration.getWriters();
 
-		if (newWriter != null && newWriter != oldWriter) {
-			newWriter.init(configuration);
+			for (LoggingWriter writer : newWriters) {
+				if (!oldWriters.contains(writer)) {
+					writer.init(configuration);
+				}
+			}
 		}
 
 		Logger.configuration = configuration;
@@ -676,9 +685,9 @@ public final class Logger {
 
 	private static void output(final Configuration currentConfiguration, final int strackTraceDeep, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 		StackTraceElement stackTraceElement = null;
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
+		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			stackTraceElement = getStackTraceElement(strackTraceDeep);
@@ -689,20 +698,28 @@ public final class Logger {
 			try {
 				LogEntry logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					writer.write(logEntry);
+					for (LoggingWriter writer : writers) {
+						try {
+							writer.write(logEntry);
+						} catch (Exception ex) {
+							InternalLogger.error(ex, "Failed to write log entry");
+						}
+					}
 				} else {
-					currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (LoggingWriter writer : writers) {
+						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					}
 				}
 			} catch (Exception ex) {
-				InternalLogger.error(ex, "Failed to write log entry");
+				InternalLogger.error(ex, "Failed to create log entry");
 			}
 		}
 	}
 
 	private static void output(final Configuration currentConfiguration, final Class<?> callerClass, final LoggingLevel level, final Throwable exception,
 			final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
+		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			activeLoggingLevel = currentConfiguration.getLevel(callerClass.getName());
@@ -713,20 +730,28 @@ public final class Logger {
 				StackTraceElement stackTraceElement = new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
 				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					writer.write(logEntry);
+					for (LoggingWriter writer : writers) {
+						try {
+							writer.write(logEntry);
+						} catch (Exception ex) {
+							InternalLogger.error(ex, "Failed to write log entry");
+						}
+					}
 				} else {
-					currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (LoggingWriter writer : writers) {
+						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					}
 				}
 			} catch (Exception ex) {
-				InternalLogger.error(ex, "Failed to write log entry");
+				InternalLogger.error(ex, "Failed to create log entry");
 			}
 		}
 	}
 
 	private static void output(final Configuration currentConfiguration, final StackTraceElement stackTraceElement, final LoggingLevel level,
 			final Throwable exception, final Object message, final Object[] arguments) {
-		LoggingWriter writer = currentConfiguration.getEffectiveWriter();
 		LoggingLevel activeLoggingLevel = currentConfiguration.getLevel();
+		List<LoggingWriter> writers = currentConfiguration.getEffectiveWriters();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			activeLoggingLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
@@ -736,12 +761,20 @@ public final class Logger {
 			try {
 				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					writer.write(logEntry);
+					for (LoggingWriter writer : writers) {
+						try {
+							writer.write(logEntry);
+						} catch (Exception ex) {
+							InternalLogger.error(ex, "Failed to write log entry");
+						}
+					}
 				} else {
-					currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (LoggingWriter writer : writers) {
+						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					}
 				}
 			} catch (Exception ex) {
-				InternalLogger.error(ex, "Failed to write log entry");
+				InternalLogger.error(ex, "Failed to create log entry");
 			}
 		}
 	}

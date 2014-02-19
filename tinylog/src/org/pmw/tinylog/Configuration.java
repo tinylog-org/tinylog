@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -37,8 +38,8 @@ public final class Configuration {
 	private final Map<String, LoggingLevel> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
-	private final LoggingWriter writer;
-	private final LoggingWriter effectiveWriter;
+	private final List<LoggingWriter> writers;
+	private final List<LoggingWriter> effectiveWriters;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
@@ -55,28 +56,28 @@ public final class Configuration {
 	 *            Format pattern for log entries
 	 * @param locale
 	 *            Locale for format pattern
-	 * @param writer
-	 *            Logging writer (can be <code>null</code> to disable any output)
+	 * @param writers
+	 *            Logging writers (can be <code>null</code> or <code>empty</code> to disable any output)
 	 * @param writingThread
 	 *            Writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
 	Configuration(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final LoggingWriter writer, final WritingThread writingThread, final int maxStackTraceElements) {
+			final List<LoggingWriter> writers, final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
-		this.lowestLevel = writer == null ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
+		this.lowestLevel = writers == null || writers.isEmpty() ? LoggingLevel.OFF : getLowestLevel(level, customLevels);
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writer = writer;
-		this.effectiveWriter = writer == null || lowestLevel == LoggingLevel.OFF ? null : writer;
+		this.writers = writers == null || writers.isEmpty() ? Collections.<LoggingWriter> emptyList() : new ArrayList<LoggingWriter>(writers);
+		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == LoggingLevel.OFF ? Collections.<LoggingWriter> emptyList() : this.writers;
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
-		this.requiredLogEntryValues = getRequiredLogEntryValues(writer, formatTokens);
-		this.requiredStackTraceInformation = effectiveWriter == null ? StackTraceInformation.NONE : getRequiredStackTraceInformation(customLevels,
+		this.requiredLogEntryValues = requiredLogEntryValues(this.effectiveWriters, this.formatTokens);
+		this.requiredStackTraceInformation = this.effectiveWriters.isEmpty() ? StackTraceInformation.NONE : getRequiredStackTraceInformation(customLevels,
 				requiredLogEntryValues);
 	}
 
@@ -150,12 +151,12 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the logging writer.
+	 * Get the logging writers.
 	 * 
-	 * @return Logging writer
+	 * @return Logging writers
 	 */
-	public LoggingWriter getWriter() {
-		return writer;
+	public List<LoggingWriter> getWriters() {
+		return writers;
 	}
 
 	/**
@@ -206,12 +207,13 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the effective logging writer to be used by the logger.
+	 * Get the effective logging writers to be used by the logger.
 	 * 
-	 * @return Effective logging writer
+	 * @return Effective logging writers
 	 */
-	LoggingWriter getEffectiveWriter() {
-		return effectiveWriter;
+	// TODO LoggingLevel-Uebergabe
+	List<LoggingWriter> getEffectiveWriters() {
+		return effectiveWriters;
 	}
 
 	/**
@@ -220,11 +222,21 @@ public final class Configuration {
 	 * @return Copy of this configuration
 	 */
 	Configurator copy() {
-		Map<String, LoggingLevel> copyOfCustomLevels = customLevels.isEmpty() ? Collections.<String, LoggingLevel> emptyMap()
-				: new HashMap<String, LoggingLevel>(customLevels);
-		WritingThreadData writingThreadData = writingThread == null ? null : new WritingThreadData(writingThread.getNameOfThreadToObserve(),
-				writingThread.getPriority());
-		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writer, writingThreadData, maxStackTraceElements);
+		Map<String, LoggingLevel> copyOfCustomLevels;
+		if (customLevels.isEmpty()) {
+			copyOfCustomLevels = Collections.emptyMap();
+		} else {
+			copyOfCustomLevels = new HashMap<String, LoggingLevel>(customLevels);
+		}
+
+		WritingThreadData writingThreadData;
+		if (writingThread == null) {
+			writingThreadData = null;
+		} else {
+			writingThreadData = new WritingThreadData(writingThread.getNameOfThreadToObserve(), writingThread.getPriority());
+		}
+
+		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writers, writingThreadData, maxStackTraceElements);
 	}
 
 	private static LoggingLevel getLowestLevel(final LoggingLevel level, final Map<String, LoggingLevel> customLevels) {
@@ -237,25 +249,26 @@ public final class Configuration {
 		return lowestLevel;
 	}
 
-	private static Set<LogEntryValue> getRequiredLogEntryValues(final LoggingWriter writer, final Collection<Token> formatTokens) {
-		if (writer == null) {
+	private static Set<LogEntryValue> requiredLogEntryValues(final List<LoggingWriter> writers, final Collection<Token> formatTokens) {
+		if (writers.isEmpty()) {
 			return Collections.emptySet();
 		} else {
-			Set<LogEntryValue> logEntryValuesOfWriter = writer.getRequiredLogEntryValues();
-			if (logEntryValuesOfWriter == null || logEntryValuesOfWriter.isEmpty()) {
-				return Collections.emptySet();
-			} else if (logEntryValuesOfWriter.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
-				Set<LogEntryValue> requiredLogEntryValues = EnumSet.copyOf(logEntryValuesOfWriter);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
+			for (LoggingWriter writer : writers) {
+				Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
+				if (requiredLogEntryValuesOfWriter != null) {
+					requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);
+				}
+			}
+			if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
 				for (Token token : formatTokens) {
 					LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
 					if (logEntryValue != null) {
 						requiredLogEntryValues.add(logEntryValue);
 					}
 				}
-				return requiredLogEntryValues;
-			} else {
-				return logEntryValuesOfWriter;
 			}
+			return requiredLogEntryValues.isEmpty() ? Collections.<LogEntryValue> emptySet() : requiredLogEntryValues;
 		}
 	}
 

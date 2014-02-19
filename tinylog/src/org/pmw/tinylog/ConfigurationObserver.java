@@ -20,9 +20,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import org.pmw.tinylog.writers.LoggingWriter;
 
 /**
  * Thread to observe a configuration file and reload changes.
@@ -156,8 +159,12 @@ abstract class ConfigurationObserver extends Thread {
 						PropertiesLoader.readMaxStackTraceElements(configurator, properties);
 					}
 					if (writerHasChanged(properties, oldProperties)) {
-						configurator.writer(DEFAULT_CONFIGURATION.getWriter());
-						PropertiesLoader.readWriter(configurator, properties);
+						Iterator<LoggingWriter> iterator = DEFAULT_CONFIGURATION.getWriters().iterator();
+						configurator.writer(iterator.hasNext() ? iterator.next() : null);
+						while (iterator.hasNext()) {
+							configurator.addWriter(iterator.next());
+						}
+						PropertiesLoader.readWriters(configurator, properties);
 					}
 					if (writingThreadHasChanged(properties, oldProperties)) {
 						WritingThread writingThread = DEFAULT_CONFIGURATION.getWritingThread();
@@ -270,8 +277,7 @@ abstract class ConfigurationObserver extends Thread {
 	}
 
 	private boolean writerHasChanged(final Properties properties, final Properties oldProperties) {
-		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.WRITER_PROPERTY),
-				Collections.singletonList(PropertiesLoader.WRITER_PROPERTY + "."));
+		return compare(properties, oldProperties, Collections.<String> emptyList(), Collections.singletonList(PropertiesLoader.WRITER_PROPERTY));
 	}
 
 	private boolean writingThreadHasChanged(final Properties properties, final Properties oldProperties) {

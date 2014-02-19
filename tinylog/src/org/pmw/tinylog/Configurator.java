@@ -19,8 +19,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -46,7 +48,7 @@ public final class Configurator {
 	private Map<String, LoggingLevel> customLevels;
 	private String formatPattern;
 	private Locale locale;
-	private LoggingWriter writer;
+	private final List<LoggingWriter> writers;
 	private WritingThreadData writingThreadData;
 	private int maxStackTraceElements;
 
@@ -59,20 +61,20 @@ public final class Configurator {
 	 *            Format pattern for log entries
 	 * @param locale
 	 *            Locale for format pattern
-	 * @param writer
-	 *            Logging writer (can be <code>null</code> to disable any output)
+	 * @param writers
+	 *            Logging writers (can be <code>null</code> or <code>empty</code> to disable any output)
 	 * @param writingThreadData
 	 *            Data for writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
 	Configurator(final LoggingLevel level, final Map<String, LoggingLevel> customLevels, final String formatPattern, final Locale locale,
-			final LoggingWriter writer, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
+			final List<LoggingWriter> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writer = writer;
+		this.writers = writers.isEmpty() ? new ArrayList<LoggingWriter>() : new ArrayList<LoggingWriter>(writers);
 		this.writingThreadData = writingThreadData;
 		this.maxStackTraceElements = maxStackTraceElements;
 	}
@@ -84,7 +86,7 @@ public final class Configurator {
 	 */
 	public static Configurator defaultConfig() {
 		return new Configurator(LoggingLevel.INFO, Collections.<String, LoggingLevel> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
-				new ConsoleWriter(), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
+				Collections.<LoggingWriter> singletonList(new ConsoleWriter()), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
 	}
 
 	/**
@@ -273,14 +275,54 @@ public final class Configurator {
 	}
 
 	/**
-	 * Set a logging writer for outputting the created log entries.
+	 * Set a logging writer for outputting the created log entries. All existing writers will be replaced.
 	 * 
 	 * @param writer
 	 *            Logging writer (can be <code>null</code> to disable any output)
 	 * @return The current configurator
 	 */
 	public Configurator writer(final LoggingWriter writer) {
-		this.writer = writer;
+		writers.clear();
+		if (writer != null) {
+			writers.add(writer);
+		}
+		return this;
+	}
+
+	/**
+	 * Add an additional logging writer for outputting the created log entries.
+	 * 
+	 * @param writer
+	 *            Logging writer to add
+	 * @return The current configurator
+	 */
+	public Configurator addWriter(final LoggingWriter writer) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		writers.add(writer);
+		return this;
+	}
+
+	/**
+	 * Remove a logging writers.
+	 * 
+	 * @param writer
+	 *            Logging writer to remove
+	 * @return The current configurator
+	 */
+	public Configurator removeWriter(final LoggingWriter writer) {
+		writers.remove(writer);
+		return this;
+	}
+
+	/**
+	 * Remove all logging writers.
+	 * 
+	 * @return The current configurator
+	 */
+	public Configurator removeAllWriters() {
+		writers.clear();
 		return this;
 	}
 
@@ -509,7 +551,7 @@ public final class Configurator {
 	Configurator copy() {
 		WritingThreadData writingThreadDataCopy = writingThreadData == null ? null : new WritingThreadData(writingThreadData.threadToObserve,
 				writingThreadData.priority);
-		return new Configurator(level, customLevels, formatPattern, locale, writer, writingThreadDataCopy, maxStackTraceElements);
+		return new Configurator(level, customLevels, formatPattern, locale, writers, writingThreadDataCopy, maxStackTraceElements);
 	}
 
 	/**
@@ -529,7 +571,7 @@ public final class Configurator {
 			}
 		}
 
-		return new Configuration(level, customLevels, formatPattern, locale, writer, writingThread, maxStackTraceElements);
+		return new Configuration(level, customLevels, formatPattern, locale, writers, writingThread, maxStackTraceElements);
 	}
 
 	/**
