@@ -13,18 +13,25 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
 import org.pmw.tinylog.util.StringListOutputStream;
+import org.pmw.tinylog.writers.LoggingWriter;
+import org.pmw.tinylog.writers.VMShutdownHook;
 
 /**
  * Base class for all tests.
@@ -63,6 +70,20 @@ public abstract class AbstractTest {
 		System.setErr(originErrStream);
 		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
+
+		try {
+			Collection<LoggingWriter> openWriters = getOpenWriters();
+			for (LoggingWriter writer : openWriters) {
+				try {
+					writer.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			assertThat("All writers must be closed", openWriters, empty());
+		} catch (Exception ex) {
+			fail(ex.getMessage());
+		}
 	}
 
 	/**
@@ -104,6 +125,13 @@ public abstract class AbstractTest {
 		} catch (Exception ex) {
 			fail("Failed to call constructor: " + ex.getMessage());
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Collection<LoggingWriter> getOpenWriters() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		Field field = VMShutdownHook.class.getDeclaredField("writers");
+		field.setAccessible(true);
+		return new ArrayList<LoggingWriter>((Collection<LoggingWriter>) field.get(null));
 	}
 
 }
