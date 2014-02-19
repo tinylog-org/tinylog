@@ -115,7 +115,7 @@ public class TokenizerTest extends AbstractTest {
 
 		tokens = Tokenizer.parse("{line}", locale);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.LINE_NUMBER, tokens.get(0).getType());
+		assertEquals(TokenType.LINE, tokens.get(0).getType());
 
 		tokens = Tokenizer.parse("{level}", locale);
 		assertEquals(1, tokens.size());

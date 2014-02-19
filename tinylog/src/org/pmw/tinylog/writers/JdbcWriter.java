@@ -402,7 +402,7 @@ public final class JdbcWriter implements Writer {
 			} else if ("file".equalsIgnoreCase(string)) {
 				values.add(Value.FILE);
 			} else if ("line".equalsIgnoreCase(string)) {
-				values.add(Value.LINE_NUMBER);
+				values.add(Value.LINE);
 			} else if ("level".equalsIgnoreCase(string)) {
 				values.add(Value.LEVEL);
 			} else if ("message".equalsIgnoreCase(string)) {
@@ -582,7 +582,7 @@ public final class JdbcWriter implements Writer {
 						statement.setString(i + 1, logEntry.getFilename());
 					}
 					break;
-				case LINE_NUMBER:
+				case LINE:
 					if (logEntry.getLineNumber() < 0) {
 						statement.setNull(i + 1, Types.VARCHAR);
 					} else {
@@ -681,7 +681,7 @@ public final class JdbcWriter implements Writer {
 		/**
 		 * The line number of calling
 		 */
-		LINE_NUMBER(LogEntryValue.LINE_NUMBER),
+		LINE(LogEntryValue.LINE),
 
 		/**
 		 * The severity level

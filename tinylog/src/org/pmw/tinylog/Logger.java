@@ -827,7 +827,7 @@ public final class Logger {
 					filename = stackTraceElement.getFileName();
 					break;
 
-				case LINE_NUMBER:
+				case LINE:
 					if (stackTraceElement == null) {
 						stackTraceElement = getStackTraceElement(strackTraceDeep);
 					}
@@ -882,7 +882,7 @@ public final class Logger {
 						builder.append(filename);
 						break;
 
-					case LINE_NUMBER:
+					case LINE:
 						builder.append(line);
 						break;
 

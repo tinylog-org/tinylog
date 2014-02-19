@@ -101,7 +101,7 @@ final class Tokenizer {
 		} else if ("{file}".equals(text)) {
 			return new Token(TokenType.FILE);
 		} else if ("{line}".equals(text)) {
-			return new Token(TokenType.LINE_NUMBER);
+			return new Token(TokenType.LINE);
 		} else if ("{level}".equals(text)) {
 			return new Token(TokenType.LEVEL);
 		} else if ("{message}".equals(text)) {

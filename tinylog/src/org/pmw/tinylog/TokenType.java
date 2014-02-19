@@ -68,7 +68,7 @@ enum TokenType {
 	/**
 	 * The line number of calling
 	 */
-	LINE_NUMBER(LogEntryValue.LINE_NUMBER),
+	LINE(LogEntryValue.LINE),
 
 	/**
 	 * The severity level

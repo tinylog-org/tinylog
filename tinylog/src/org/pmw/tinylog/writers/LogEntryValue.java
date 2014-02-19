@@ -59,7 +59,7 @@ public enum LogEntryValue {
 	/**
 	 * The line number of calling
 	 */
-	LINE_NUMBER,
+	LINE,
 
 	/**
 	 * The severity level

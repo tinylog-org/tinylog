@@ -309,9 +309,9 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(Collections.singletonList(Value.FILE), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "line" }, null, null);
-		assertEquals(Collections.singletonList(Value.LINE_NUMBER), writer.getValues());
+		assertEquals(Collections.singletonList(Value.LINE), writer.getValues());
 		writer = new JdbcWriter(URL, "log", null, new String[] { "line" }, null, null);
-		assertEquals(Collections.singletonList(Value.LINE_NUMBER), writer.getValues());
+		assertEquals(Collections.singletonList(Value.LINE), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "level" }, null, null);
 		assertEquals(Collections.singletonList(Value.LEVEL), writer.getValues());
@@ -762,7 +762,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testLineNumber() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LINE_NUMBER));
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LINE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().lineNumber(-1).create());

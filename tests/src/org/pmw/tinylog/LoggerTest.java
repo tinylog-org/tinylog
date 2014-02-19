@@ -805,7 +805,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithLineNumber() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY));
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{line}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
@@ -821,7 +821,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithLoggingLevel() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE_NUMBER, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY));
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{level}").activate();
 
 		Logger.info("Hello");

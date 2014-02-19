@@ -194,7 +194,7 @@ public class ConfigurationTest extends AbstractTest {
 				Collections.<Writer> singletonList(writer), null, 0);
 
 		Set<LogEntryValue> expected = EnumSet.of(LogEntryValue.DATE, LogEntryValue.THREAD, LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.FILE,
-				LogEntryValue.LINE_NUMBER, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY);
+				LogEntryValue.LINE, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY);
 		assertEquals(expected, configuration.getRequiredLogEntryValues());
 	}
 
@@ -246,7 +246,7 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		configuration = new Configuration(Level.TRACE, Collections.<String, Level> emptyMap(), "", Locale.ROOT,
-				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.LINE_NUMBER)), null, 0);
+				Collections.<Writer> singletonList(new DummyWriter(LogEntryValue.LINE)), null, 0);
 		assertEquals(StackTraceInformation.FULL, configuration.getRequiredStackTraceInformation());
 
 		/* Requirement from format pattern */

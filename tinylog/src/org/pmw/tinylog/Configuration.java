@@ -272,7 +272,7 @@ public final class Configuration {
 	}
 
 	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, Level> customLevels, final Set<LogEntryValue> logEntryValues) {
-		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE_NUMBER)) {
+		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE)) {
 			return StackTraceInformation.FULL;
 		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !customLevels.isEmpty()) {
 			return StackTraceInformation.CLASS_NAME;
