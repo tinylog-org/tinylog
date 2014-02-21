@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,10 +46,10 @@ public final class Configurator {
 	private static final Object lock = new Object();
 
 	private Level level;
-	private Map<String, Level> customLevels;
+	private final Map<String, Level> customLevels;
 	private String formatPattern;
 	private Locale locale;
-	private final List<Writer> writers;
+	private final List<WriterDefinition> writers;
 	private WritingThreadData writingThreadData;
 	private int maxStackTraceElements;
 
@@ -62,19 +63,19 @@ public final class Configurator {
 	 * @param locale
 	 *            Locale for format pattern
 	 * @param writers
-	 *            Writers (can be <code>empty</code> to disable any output)
+	 *            Writer definitions (can be <code>empty</code> to disable any output)
 	 * @param writingThreadData
 	 *            Data for writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configurator(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale, final List<Writer> writers,
-			final WritingThreadData writingThreadData, final int maxStackTraceElements) {
+	Configurator(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
+			final List<WriterDefinition> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
-		this.customLevels = customLevels;
+		this.customLevels = new HashMap<String, Level>(customLevels);
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writers = writers.isEmpty() ? new ArrayList<Writer>() : new ArrayList<Writer>(writers);
+		this.writers = new ArrayList<WriterDefinition>(writers);
 		this.writingThreadData = writingThreadData;
 		this.maxStackTraceElements = maxStackTraceElements;
 	}
@@ -86,7 +87,7 @@ public final class Configurator {
 	 */
 	public static Configurator defaultConfig() {
 		return new Configurator(Level.INFO, Collections.<String, Level> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
-				Collections.<Writer> singletonList(new ConsoleWriter()), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
+				Collections.<WriterDefinition> singletonList(new WriterDefinition(new ConsoleWriter())), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
 	}
 
 	/**
@@ -203,25 +204,17 @@ public final class Configurator {
 	 * 
 	 * This will override the default severity level for this package respectively class.
 	 * 
-	 * @param nameOfpackageOrClass
+	 * @param packageOrClass
 	 *            Name of a package or class
 	 * @param level
 	 *            The severity level (or <code>null</code> to reset it to the default severity level)
 	 * @return The current configurator
 	 */
-	public Configurator level(final String nameOfpackageOrClass, final Level level) {
+	public Configurator level(final String packageOrClass, final Level level) {
 		if (level == null) {
-			if (!customLevels.isEmpty()) {
-				customLevels.remove(nameOfpackageOrClass);
-				if (customLevels.isEmpty()) {
-					customLevels = Collections.emptyMap();
-				}
-			}
+			customLevels.remove(packageOrClass);
 		} else {
-			if (customLevels.isEmpty()) {
-				customLevels = new HashMap<String, Level>();
-			}
-			customLevels.put(nameOfpackageOrClass, level);
+			customLevels.put(packageOrClass, level);
 		}
 		return this;
 	}
@@ -232,7 +225,7 @@ public final class Configurator {
 	 * @return The current configurator
 	 */
 	public Configurator resetCustomLevels() {
-		customLevels = Collections.emptyMap();
+		customLevels.clear();
 		return this;
 	}
 
@@ -284,8 +277,29 @@ public final class Configurator {
 	public Configurator writer(final Writer writer) {
 		writers.clear();
 		if (writer != null) {
-			writers.add(writer);
+			writers.add(new WriterDefinition(writer));
 		}
+		return this;
+	}
+
+	/**
+	 * Set a writer to output created log entries. All existing writers will be replaced.
+	 * 
+	 * @param writer
+	 *            Writer to set (can be <code>null</code> to disable any output)
+	 * @param level
+	 *            Writer will output entries with the same or higher severity level
+	 * @return The current configurator
+	 */
+	public Configurator writer(final Writer writer, final Level level) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (level == null) {
+			throw new NullPointerException("level is null");
+		}
+		writers.clear();
+		writers.add(new WriterDefinition(writer, level));
 		return this;
 	}
 
@@ -300,7 +314,28 @@ public final class Configurator {
 		if (writer == null) {
 			throw new NullPointerException("writer is null");
 		}
-		writers.add(writer);
+
+		writers.add(new WriterDefinition(writer));
+		return this;
+	}
+
+	/**
+	 * Add an additional writer for outputting the created log entries.
+	 * 
+	 * @param writer
+	 *            Writer to add
+	 * @param level
+	 *            Writer will output entries with the same or higher severity level
+	 * @return The current configurator
+	 */
+	public Configurator addWriter(final Writer writer, final Level level) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (level == null) {
+			throw new NullPointerException("level is null");
+		}
+		writers.add(new WriterDefinition(writer, level));
 		return this;
 	}
 
@@ -312,7 +347,12 @@ public final class Configurator {
 	 * @return The current configurator
 	 */
 	public Configurator removeWriter(final Writer writer) {
-		writers.remove(writer);
+		Iterator<WriterDefinition> iterator = writers.iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().getWriter() == writer) {
+				iterator.remove();
+			}
+		}
 		return this;
 	}
 

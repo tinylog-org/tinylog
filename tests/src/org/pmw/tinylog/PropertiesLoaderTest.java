@@ -280,7 +280,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		Configurator configurator = Configurator.defaultConfig().writer(null);
 
-		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer1", "console");
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console");
 		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath());
 		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 
@@ -312,6 +313,72 @@ public class PropertiesLoaderTest extends AbstractTest {
 			mock.tearDown();
 			mock.close();
 		}
+	}
+
+	/**
+	 * Test reading a writer with custom severity levels.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithCustomLevels() throws IOException {
+
+		/* One writer with custom severity level */
+
+		Configurator configurator = Configurator.defaultConfig().writer(null);
+
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer", "console").set("tinylog.writer.level", "info");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		Configuration configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class));
+
+		/* Two writers, one with custom severity level */
+
+		configurator = Configurator.defaultConfig().writer(null);
+		File logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath()).set("tinylog.writer2.level", "info");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class, FileWriter.class));
+
+		logFile.delete();
+
+		/* Two writers, both with custom severity level */
+
+		configurator = Configurator.defaultConfig().writer(null);
+		logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console").set("tinylog.writer1.level", "debug");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath()).set("tinylog.writer2.level", "info");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class, FileWriter.class));
+
+		logFile.delete();
 	}
 
 	/**

@@ -109,15 +109,15 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testTrace() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
-				requiredLogEntryValue.add(LogEntryValue.CLASS);
+				requiredLogEntryValues.add(LogEntryValue.CLASS);
 			} else {
 				/* Get stack trace from a throwable if necessary */
 			}
 
-			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
+			StoreWriter writer = new StoreWriter(requiredLogEntryValues);
 			Configurator.defaultConfig().writer(writer).level(Level.TRACE).activate();
 
 			Logger.trace(new StringBuilder("Hello!"));
@@ -160,15 +160,15 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testDebug() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
-				requiredLogEntryValue.add(LogEntryValue.CLASS);
+				requiredLogEntryValues.add(LogEntryValue.CLASS);
 			} else {
 				/* Get stack trace from a throwable if necessary */
 			}
 
-			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
+			StoreWriter writer = new StoreWriter(requiredLogEntryValues);
 			Configurator.defaultConfig().writer(writer).level(Level.DEBUG).activate();
 
 			Logger.debug(new StringBuilder("Hello!"));
@@ -211,15 +211,15 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testInfo() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
-				requiredLogEntryValue.add(LogEntryValue.CLASS);
+				requiredLogEntryValues.add(LogEntryValue.CLASS);
 			} else {
 				/* Get stack trace from a throwable if necessary */
 			}
 
-			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
+			StoreWriter writer = new StoreWriter(requiredLogEntryValues);
 			Configurator.defaultConfig().writer(writer).level(Level.INFO).activate();
 
 			Logger.info(new StringBuilder("Hello!"));
@@ -262,15 +262,15 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testWarning() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
-				requiredLogEntryValue.add(LogEntryValue.CLASS);
+				requiredLogEntryValues.add(LogEntryValue.CLASS);
 			} else {
 				/* Get stack trace from a throwable if necessary */
 			}
 
-			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
+			StoreWriter writer = new StoreWriter(requiredLogEntryValues);
 			Configurator.defaultConfig().writer(writer).level(Level.WARNING).activate();
 
 			Logger.warn(new StringBuilder("Hello!"));
@@ -313,15 +313,15 @@ public class LoggerTest extends AbstractTest {
 	@Test
 	public final void testError() {
 		for (boolean mode : new boolean[] { false, true }) {
-			Set<LogEntryValue> requiredLogEntryValue = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			Set<LogEntryValue> requiredLogEntryValues = EnumSet.of(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 			if (mode) {
 				/* Get stack trace from sun reflection */
-				requiredLogEntryValue.add(LogEntryValue.CLASS);
+				requiredLogEntryValues.add(LogEntryValue.CLASS);
 			} else {
 				/* Get stack trace from a throwable if necessary */
 			}
 
-			StoreWriter writer = new StoreWriter(requiredLogEntryValue);
+			StoreWriter writer = new StoreWriter(requiredLogEntryValues);
 			Configurator.defaultConfig().writer(writer).level(Level.ERROR).activate();
 
 			Logger.error(new StringBuilder("Hello!"));
@@ -657,11 +657,31 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test output of log entries if writer accept only log entries of a defined severity level.
+	 */
+	@Test
+	public final void testOutputIfWriterHasSeverityLevel() {
+		StoreWriter writer = new StoreWriter(LogEntryValue.MESSAGE);
+		Configurator.defaultConfig().writer(writer, Level.INFO).level(Level.TRACE).activate();
+
+		Logger.trace(1);
+		assertNull(writer.consumeLogEntry());
+		Logger.debug(2);
+		assertNull(writer.consumeLogEntry());
+		Logger.info(3);
+		assertNotNull(writer.consumeLogEntry());
+		Logger.warn(4);
+		assertNotNull(writer.consumeLogEntry());
+		Logger.error(5);
+		assertNotNull(writer.consumeLogEntry());
+	}
+
+	/**
 	 * Test a log entry with a process ID pattern.
 	 */
 	@Test
 	public final void testLogEntryWithProcessId() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.PROCESS_ID, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.PROCESS_ID, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{pid}").activate();
 
 		Logger.info("Hello");
@@ -676,7 +696,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithThread() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{thread}").activate();
 
 		Logger.info("Hello");
@@ -691,7 +711,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithThreadId() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.THREAD, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{thread_id}").activate();
 
 		Logger.info("Hello");
@@ -706,7 +726,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithFullyQualifiedClassName() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}").activate();
 
 		Logger.info("Hello");
@@ -721,7 +741,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithPackageName() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{package}").activate();
 
 		Logger.info("Hello");
@@ -748,7 +768,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithClassName() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class_name}").activate();
 
 		Logger.info("Hello");
@@ -775,7 +795,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithMethodName() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{method}").activate();
 
 		Logger.info("Hello");
@@ -790,7 +810,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithFileName() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.FILE, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.FILE, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{file}").activate();
 
 		Logger.info("Hello");
@@ -805,7 +825,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithLineNumber() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{line}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
@@ -821,7 +841,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithLoggingLevel() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.LINE, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{level}").activate();
 
 		Logger.info("Hello");
@@ -836,7 +856,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithDate() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.DATE, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.DATE, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{date:yyyy-MM-dd}").activate();
 
 		Logger.info("Hello");
@@ -851,7 +871,7 @@ public class LoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testLogEntryWithMessage() {
-		StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY));
+		StoreWriter writer = new StoreWriter(LogEntryValue.MESSAGE, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{message}").activate();
 
 		Logger.info("Hello");
@@ -1002,7 +1022,7 @@ public class LoggerTest extends AbstractTest {
 		};
 
 		try {
-			StoreWriter writer = new StoreWriter(EnumSet.of(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY));
+			StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
 			Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
 
 			StringListOutputStream errorStream = getErrorStream();

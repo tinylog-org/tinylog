@@ -280,16 +280,17 @@ public class ConfiguratorTest extends AbstractTest {
 	@Test
 	public final void testCopy() {
 		Map<String, Level> packageLevels = Collections.singletonMap("a", Level.DEBUG);
-		List<Writer> writers = Collections.<Writer> singletonList(new NullWriter());
+		Writer writer = new NullWriter();
 		WritingThreadData writingThreadData = new WritingThreadData(Thread.currentThread().getName(), Thread.NORM_PRIORITY);
-		Configurator configurator = new Configurator(Level.WARNING, packageLevels, "TEST", Locale.US, writers, writingThreadData, 42);
+		List<WriterDefinition> writerDefinitions = Collections.singletonList(new WriterDefinition(writer));
+		Configurator configurator = new Configurator(Level.WARNING, packageLevels, "TEST", Locale.US, writerDefinitions, writingThreadData, 42);
 
 		Configuration copy = configurator.copy().create();
 		assertEquals(Level.WARNING, copy.getLevel());
 		assertEquals(Level.DEBUG, copy.getLevel("a"));
 		assertEquals("TEST", copy.getFormatPattern());
 		assertEquals(Locale.US, copy.getLocale());
-		assertEquals(writers, copy.getWriters());
+		assertThat(copy.getWriters(), sameContent(writer));
 		assertEquals(Thread.currentThread().getName(), copy.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(Thread.NORM_PRIORITY, copy.getWritingThread().getPriority());
 		assertEquals(42, copy.getMaxStackTraceElements());
@@ -402,6 +403,75 @@ public class ConfiguratorTest extends AbstractTest {
 
 		}).activate());
 		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
+	}
+
+	/**
+	 * Test setting writers with specified severity level.
+	 */
+	@Test
+	public final void testWritersWithLevel() {
+		Configurator configurator = Configurator.defaultConfig();
+		NullWriter nullWriter1 = new NullWriter();
+		NullWriter nullWriter2 = new NullWriter();
+		NullWriter nullWriter3 = new NullWriter();
+
+		Configuration configuration = configurator.writer(nullWriter1, Level.INFO).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1));
+
+		try {
+			configuration = configurator.writer(null, Level.ERROR).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(nullWriter1));
+		}
+
+		try {
+			configuration = configurator.writer(new NullWriter(), null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(nullWriter1));
+		}
+
+		configuration = configurator.writer(nullWriter1, Level.DEBUG).addWriter(nullWriter2, Level.WARNING).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1, nullWriter2));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1, nullWriter2));
+
+		configuration = configurator.addWriter(nullWriter3, Level.INFO).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1, nullWriter2, nullWriter3));
+
+		try {
+			configuration = configurator.addWriter(null, Level.ERROR).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		}
+
+		try {
+			configuration = configurator.addWriter(new NullWriter(), null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		}
+
+		configuration = configurator.removeWriter(nullWriter2).create();
+		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter3));
+
+		configuration = configurator.removeAllWriters().create();
+		assertThat(configuration.getWriters(), empty());
 	}
 
 	/**

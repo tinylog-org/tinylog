@@ -42,34 +42,39 @@ import org.pmw.tinylog.writers.Writer;
 final class PropertiesLoader {
 
 	/**
+	 * tinylog prefix of properties
+	 */
+	static final String TINYLOG_PREFIX = "tinylog";
+
+	/**
 	 * Name of property for severity level
 	 */
-	static final String LEVEL_PROPERTY = "tinylog.level";
+	static final String LEVEL_PROPERTY = TINYLOG_PREFIX + ".level";
 
 	/**
 	 * Name of property for format pattern
 	 */
-	static final String FORMAT_PROPERTY = "tinylog.format";
+	static final String FORMAT_PROPERTY = TINYLOG_PREFIX + ".format";
 
 	/**
 	 * Name of property for locale
 	 */
-	static final String LOCALE_PROPERTY = "tinylog.locale";
+	static final String LOCALE_PROPERTY = TINYLOG_PREFIX + ".locale";
 
 	/**
 	 * Name of property for max stack trace elements
 	 */
-	static final String STACKTRACE_PROPERTY = "tinylog.stacktrace";
+	static final String STACKTRACE_PROPERTY = TINYLOG_PREFIX + ".stacktrace";
 
 	/**
 	 * Name of property for writer
 	 */
-	static final String WRITER_PROPERTY = "tinylog.writer";
+	static final String WRITER_PROPERTY = TINYLOG_PREFIX + ".writer";
 
 	/**
 	 * Name of property for writing thread
 	 */
-	static final String WRITING_THREAD_PROPERTY = "tinylog.writingthread";
+	static final String WRITING_THREAD_PROPERTY = TINYLOG_PREFIX + ".writingthread";
 
 	/**
 	 * Name of property for thread to observe by writing thread
@@ -121,13 +126,9 @@ final class PropertiesLoader {
 	 *            Properties with configuration
 	 */
 	static void readLevel(final Configurator configurator, final Properties properties) {
-		String levelName = properties.getProperty(LEVEL_PROPERTY);
-		if (levelName != null && levelName.length() > 0) {
-			try {
-				configurator.level(Level.valueOf(levelName.toUpperCase(Locale.ENGLISH)));
-			} catch (IllegalArgumentException ex) {
-				InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", levelName);
-			}
+		Level level = readLevel(properties, LEVEL_PROPERTY);
+		if (level != null) {
+			configurator.level(level);
 		}
 
 		Enumeration<Object> keys = properties.keys();
@@ -135,14 +136,7 @@ final class PropertiesLoader {
 			String key = (String) keys.nextElement();
 			if (key.startsWith(CUSTOM_LEVEL_PREFIX)) {
 				String packageOrClass = key.substring(CUSTOM_LEVEL_PREFIX.length());
-				String value = properties.getProperty(key);
-				try {
-					Level level = Level.valueOf(value.toUpperCase(Locale.ENGLISH));
-					configurator.level(packageOrClass, level);
-				} catch (IllegalArgumentException ex) {
-					InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", value);
-					configurator.level(packageOrClass, null);
-				}
+				configurator.level(packageOrClass, readLevel(properties, key));
 			}
 		}
 	}
@@ -233,11 +227,20 @@ final class PropertiesLoader {
 				} else {
 					Writer writer = readWriter(properties, propertyName, writerName);
 					if (writer != null) {
+						Level level = readLevel(properties, propertyName + LEVEL_PROPERTY.substring(TINYLOG_PREFIX.length()));
 						if (first) {
-							configurator.writer(writer);
+							if (level == null) {
+								configurator.writer(writer);
+							} else {
+								configurator.writer(writer, level);
+							}
 							first = false;
 						} else {
-							configurator.addWriter(writer);
+							if (level == null) {
+								configurator.addWriter(writer);
+							} else {
+								configurator.addWriter(writer, level);
+							}
 						}
 					}
 				}
@@ -284,6 +287,20 @@ final class PropertiesLoader {
 			}
 		} else {
 			configurator.writingThread(false);
+		}
+	}
+
+	private static Level readLevel(final Properties properties, final String propertyName) {
+		String levelName = properties.getProperty(propertyName);
+		if (levelName != null && levelName.length() > 0) {
+			try {
+				return Level.valueOf(levelName.toUpperCase(Locale.ENGLISH));
+			} catch (IllegalArgumentException ex) {
+				InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", levelName);
+				return null;
+			}
+		} else {
+			return null;
 		}
 	}
 
@@ -474,7 +491,8 @@ final class PropertiesLoader {
 						parameters[i] = policies;
 					}
 				} else {
-					InternalLogger.error("\"{1}\" for \"{0}\" is an unsupported type (String, int, boolean, Labeler, Policy and Policy[] are supported)",
+					InternalLogger.error(
+							"\"{1}\" for \"{0}\" is an unsupported type (String, String[], int, boolean, Labeler, Policy and Policy[] are supported)",
 							propertiesPrefix + "." + name, type.getName());
 					return null;
 				}
@@ -593,4 +611,5 @@ final class PropertiesLoader {
 			return null;
 		}
 	}
+
 }

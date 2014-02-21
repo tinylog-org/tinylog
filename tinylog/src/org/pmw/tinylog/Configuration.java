@@ -16,11 +16,13 @@ package org.pmw.tinylog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.pmw.tinylog.Configurator.WritingThreadData;
@@ -38,14 +40,15 @@ public final class Configuration {
 	private final Map<String, Level> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
+	private final List<WriterDefinition> writerDefinitions;
 	private final List<Writer> writers;
-	private final List<Writer> effectiveWriters;
+	private final Map<Level, List<Writer>> effectiveWriters;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
 	private final List<Token> formatTokens;
-	private final Set<LogEntryValue> requiredLogEntryValues;
-	private final StackTraceInformation requiredStackTraceInformation;
+	private final Map<Level, Set<LogEntryValue>> requiredLogEntryValues;
+	private final Map<Level, StackTraceInformation> requiredStackTraceInformation;
 
 	/**
 	 * @param level
@@ -56,29 +59,29 @@ public final class Configuration {
 	 *            Format pattern for log entries
 	 * @param locale
 	 *            Locale for format pattern
-	 * @param writers
-	 *            Writers (can be <code>empty</code> to disable any output)
+	 * @param writerDefinitions
+	 *            Writer definitions (can be <code>empty</code> to disable any output)
 	 * @param writingThread
 	 *            Writing thread (can be <code>null</code> to write log entries synchronously)
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configuration(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale, final List<Writer> writers,
-			final WritingThread writingThread, final int maxStackTraceElements) {
+	Configuration(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
+			final List<WriterDefinition> writerDefinitions, final WritingThread writingThread, final int maxStackTraceElements) {
 		this.level = level;
-		this.lowestLevel = writers.isEmpty() ? Level.OFF : getLowestLevel(level, customLevels);
+		this.lowestLevel = getLowestLevel(level, customLevels, writerDefinitions);
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writers = writers.isEmpty() ? Collections.<Writer> emptyList() : new ArrayList<Writer>(writers);
-		this.effectiveWriters = this.writers.isEmpty() || lowestLevel == Level.OFF ? Collections.<Writer> emptyList() : this.writers;
+		this.writerDefinitions = new ArrayList<WriterDefinition>(writerDefinitions);
+		this.writers = getWriters(writerDefinitions);
+		this.effectiveWriters = getEffectiveWriters(writerDefinitions);
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
 		this.formatTokens = Tokenizer.parse(formatPattern, locale);
-		this.requiredLogEntryValues = requiredLogEntryValues(this.effectiveWriters, this.formatTokens);
-		this.requiredStackTraceInformation = this.effectiveWriters.isEmpty() ? StackTraceInformation.NONE : getRequiredStackTraceInformation(customLevels,
-				requiredLogEntryValues);
+		this.requiredLogEntryValues = getRequiredLogEntryValues(effectiveWriters, formatTokens);
+		this.requiredStackTraceInformation = getRequiredStackTraceInformation(requiredLogEntryValues, customLevels);
 	}
 
 	/**
@@ -178,24 +181,6 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get all log entry values that are required by the writers.
-	 * 
-	 * @return Required values for log entry
-	 */
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return requiredLogEntryValues;
-	}
-
-	/**
-	 * Get the required stack trace information.
-	 * 
-	 * @return Required stack trace information
-	 */
-	public StackTraceInformation getRequiredStackTraceInformation() {
-		return requiredStackTraceInformation;
-	}
-
-	/**
 	 * Fast check if output is possible.
 	 * 
 	 * @param level
@@ -209,10 +194,34 @@ public final class Configuration {
 	/**
 	 * Get the effective writers to be used by the logger.
 	 * 
+	 * @param level
+	 *            Severity level of log entry
 	 * @return Effective writers
 	 */
-	List<Writer> getEffectiveWriters() {
-		return effectiveWriters;
+	List<Writer> getEffectiveWriters(final Level level) {
+		return effectiveWriters.get(level);
+	}
+
+	/**
+	 * Get all log entry values that are required by the writers.
+	 * 
+	 * @param level
+	 *            Severity level of log entry
+	 * @return Required values for log entry
+	 */
+	Set<LogEntryValue> getRequiredLogEntryValues(final Level level) {
+		return requiredLogEntryValues.get(level);
+	}
+
+	/**
+	 * Get the required stack trace information.
+	 * 
+	 * @param level
+	 *            Severity level of log entry
+	 * @return Required stack trace information
+	 */
+	StackTraceInformation getRequiredStackTraceInformation(final Level level) {
+		return requiredStackTraceInformation.get(level);
 	}
 
 	/**
@@ -235,50 +244,96 @@ public final class Configuration {
 			writingThreadData = new WritingThreadData(writingThread.getNameOfThreadToObserve(), writingThread.getPriority());
 		}
 
-		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writers, writingThreadData, maxStackTraceElements);
+		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writerDefinitions, writingThreadData, maxStackTraceElements);
 	}
 
-	private static Level getLowestLevel(final Level level, final Map<String, Level> customLevels) {
+	private static Level getLowestLevel(final Level level, final Map<String, Level> customLevels, final List<WriterDefinition> definitions) {
 		Level lowestLevel = level;
 		for (Level customLevel : customLevels.values()) {
 			if (lowestLevel.ordinal() > customLevel.ordinal()) {
 				lowestLevel = customLevel;
 			}
 		}
-		return lowestLevel;
+
+		Level writerOutput = Level.OFF;
+		for (WriterDefinition definition : definitions) {
+			if (definition.getLevel().ordinal() < writerOutput.ordinal()) {
+				writerOutput = definition.getLevel();
+			}
+		}
+
+		return writerOutput.ordinal() > lowestLevel.ordinal() ? writerOutput : lowestLevel;
 	}
 
-	private static Set<LogEntryValue> requiredLogEntryValues(final List<Writer> writers, final Collection<Token> formatTokens) {
-		if (writers.isEmpty()) {
-			return Collections.emptySet();
-		} else {
-			Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
-			for (Writer writer : writers) {
-				Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
-				if (requiredLogEntryValuesOfWriter != null) {
-					requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);
+	private static List<Writer> getWriters(final List<WriterDefinition> definitions) {
+		List<Writer> writers = new ArrayList<Writer>();
+		for (WriterDefinition definition : definitions) {
+			writers.add(definition.getWriter());
+		}
+		return writers.isEmpty() ? Collections.<Writer> emptyList() : writers;
+	}
+
+	private static Map<Level, List<Writer>> getEffectiveWriters(final List<WriterDefinition> definitions) {
+		Map<Level, List<Writer>> map = new EnumMap<Level, List<Writer>>(Level.class);
+		for (Level level : Level.values()) {
+			List<Writer> writers = new ArrayList<Writer>();
+			for (WriterDefinition definition : definitions) {
+				if (level.ordinal() >= definition.getLevel().ordinal()) {
+					writers.add(definition.getWriter());
 				}
 			}
-			if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
-				for (Token token : formatTokens) {
-					LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
-					if (logEntryValue != null) {
-						requiredLogEntryValues.add(logEntryValue);
+			map.put(level, writers.isEmpty() ? Collections.<Writer> emptyList() : writers);
+		}
+		return map;
+	}
+
+	private static Map<Level, Set<LogEntryValue>> getRequiredLogEntryValues(final Map<Level, List<Writer>> writersMap, final Collection<Token> formatTokens) {
+		Map<Level, Set<LogEntryValue>> map = new EnumMap<Level, Set<LogEntryValue>>(Level.class);
+		for (Entry<Level, List<Writer>> entry : writersMap.entrySet()) {
+			Level level = entry.getKey();
+			List<Writer> writers = entry.getValue();
+			if (writers.isEmpty()) {
+				map.put(level, Collections.<LogEntryValue> emptySet());
+			} else {
+				Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
+				for (Writer writer : writers) {
+					Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
+					if (requiredLogEntryValuesOfWriter != null) {
+						requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);
 					}
 				}
+				if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
+					for (Token token : formatTokens) {
+						LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
+						if (logEntryValue != null) {
+							requiredLogEntryValues.add(logEntryValue);
+						}
+					}
+				}
+				if (requiredLogEntryValues.isEmpty()) {
+					map.put(level, Collections.<LogEntryValue> emptySet());
+				} else {
+					map.put(level, requiredLogEntryValues);
+				}
 			}
-			return requiredLogEntryValues.isEmpty() ? Collections.<LogEntryValue> emptySet() : requiredLogEntryValues;
 		}
+		return map;
 	}
 
-	private static StackTraceInformation getRequiredStackTraceInformation(final Map<String, Level> customLevels, final Set<LogEntryValue> logEntryValues) {
-		if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE)) {
-			return StackTraceInformation.FULL;
-		} else if (logEntryValues.contains(LogEntryValue.CLASS) || !customLevels.isEmpty()) {
-			return StackTraceInformation.CLASS_NAME;
-		} else {
-			return StackTraceInformation.NONE;
+	private static Map<Level, StackTraceInformation> getRequiredStackTraceInformation(final Map<Level, Set<LogEntryValue>> requiredLogEntryValues,
+			final Map<String, Level> customLevels) {
+		Map<Level, StackTraceInformation> map = new EnumMap<Level, StackTraceInformation>(Level.class);
+		for (Entry<Level, Set<LogEntryValue>> entry : requiredLogEntryValues.entrySet()) {
+			Level level = entry.getKey();
+			Set<LogEntryValue> logEntryValues = entry.getValue();
+			if (logEntryValues.contains(LogEntryValue.METHOD) || logEntryValues.contains(LogEntryValue.FILE) || logEntryValues.contains(LogEntryValue.LINE)) {
+				map.put(level, StackTraceInformation.FULL);
+			} else if (logEntryValues.contains(LogEntryValue.CLASS) || !customLevels.isEmpty()) {
+				map.put(level, StackTraceInformation.CLASS_NAME);
+			} else {
+				map.put(level, StackTraceInformation.NONE);
+			}
 		}
+		return map;
 	}
-
 }
