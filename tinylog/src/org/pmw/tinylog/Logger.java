@@ -58,12 +58,16 @@ public final class Logger {
 			}
 		} catch (Exception ex) {
 			stackTraceMethod = null;
+		} catch (Error ex) {
+			stackTraceMethod = null;
 		}
 
 		try {
 			Reflection.getCallerClass();
 			hasSunReflection = true;
 		} catch (Exception ex) {
+			hasSunReflection = false;
+		} catch (Error ex) {
 			hasSunReflection = false;
 		}
 	}
