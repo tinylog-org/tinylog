@@ -56,18 +56,14 @@ public final class Logger {
 			if (!Logger.class.getName().equals(stackTraceElement.getClassName())) {
 				stackTraceMethod = null;
 			}
-		} catch (Exception ex) {
-			stackTraceMethod = null;
-		} catch (Error ex) {
+		} catch (Throwable ex) {
 			stackTraceMethod = null;
 		}
 
 		try {
 			Reflection.getCallerClass();
 			hasSunReflection = true;
-		} catch (Exception ex) {
-			hasSunReflection = false;
-		} catch (Error ex) {
+		} catch (Throwable ex) {
 			hasSunReflection = false;
 		}
 	}
