@@ -5,7 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/tinylog"/>
 	<classpathentry kind="lib" path="../libraries/junit/jmockit-1.8.jar"/>
 	<classpathentry kind="lib" path="../libraries/junit/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="../libraries/junit/h2-1.3.175.jar"/>
+	<classpathentry kind="lib" path="../libraries/junit/h2-1.3.176.jar"/>
 	<classpathentry kind="lib" path="../libraries/junit/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="../libraries/junit/hamcrest-library-1.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/log4j-facade"/>
