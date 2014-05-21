@@ -304,6 +304,53 @@ public final class Configurator {
 	}
 
 	/**
+	 * Set a writer to output created log entries. All existing writers will be replaced.
+	 * 
+	 * @param writer
+	 *            Writer to set (can be <code>null</code> to disable any output)
+	 * @param formatPattern
+	 *            Format pattern to use instead of the global format pattern to render log entries
+	 * @return The current configurator
+	 */
+	public Configurator writer(final Writer writer, final String formatPattern) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (formatPattern == null) {
+			throw new NullPointerException("format pattern is null");
+		}
+		writers.clear();
+		writers.add(new WriterDefinition(writer, formatPattern));
+		return this;
+	}
+
+	/**
+	 * Set a writer to output created log entries. All existing writers will be replaced.
+	 * 
+	 * @param writer
+	 *            Writer to set (can be <code>null</code> to disable any output)
+	 * @param level
+	 *            Writer will output entries with the same or higher severity level
+	 * @param formatPattern
+	 *            Format pattern to use instead of the global format pattern to render log entries
+	 * @return The current configurator
+	 */
+	public Configurator writer(final Writer writer, final Level level, final String formatPattern) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (level == null) {
+			throw new NullPointerException("level is null");
+		}
+		if (formatPattern == null) {
+			throw new NullPointerException("format pattern is null");
+		}
+		writers.clear();
+		writers.add(new WriterDefinition(writer, level, formatPattern));
+		return this;
+	}
+
+	/**
 	 * Add an additional writer for outputting the created log entries.
 	 * 
 	 * @param writer
@@ -336,6 +383,51 @@ public final class Configurator {
 			throw new NullPointerException("level is null");
 		}
 		writers.add(new WriterDefinition(writer, level));
+		return this;
+	}
+
+	/**
+	 * Add an additional writer for outputting the created log entries.
+	 * 
+	 * @param writer
+	 *            Writer to add
+	 * @param formatPattern
+	 *            Format pattern to use instead of the global format pattern to render log entries
+	 * @return The current configurator
+	 */
+	public Configurator addWriter(final Writer writer, final String formatPattern) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (formatPattern == null) {
+			throw new NullPointerException("format pattern is null");
+		}
+		writers.add(new WriterDefinition(writer, formatPattern));
+		return this;
+	}
+
+	/**
+	 * Add an additional writer for outputting the created log entries.
+	 * 
+	 * @param writer
+	 *            Writer to set (can be <code>null</code> to disable any output)
+	 * @param level
+	 *            Writer will output entries with the same or higher severity level
+	 * @param formatPattern
+	 *            Format pattern to use instead of the global format pattern to render log entries
+	 * @return The current configurator
+	 */
+	public Configurator addWriter(final Writer writer, final Level level, final String formatPattern) {
+		if (writer == null) {
+			throw new NullPointerException("writer is null");
+		}
+		if (level == null) {
+			throw new NullPointerException("level is null");
+		}
+		if (formatPattern == null) {
+			throw new NullPointerException("format pattern is null");
+		}
+		writers.add(new WriterDefinition(writer, level, formatPattern));
 		return this;
 	}
 

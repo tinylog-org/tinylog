@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -24,6 +25,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.typesInArray;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
@@ -33,6 +36,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +46,6 @@ import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
-import org.pmw.tinylog.hamcrest.ArrayMatchers;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.labelers.TimestampLabeler;
@@ -264,8 +267,15 @@ public class PropertiesLoaderTest extends AbstractTest {
 	@Test
 	public final void testReadNullWriter() {
 		Configurator configurator = Configurator.defaultConfig();
+
 		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "null").create());
 		assertThat(configurator.create().getWriters(), empty());
+
+		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer1", "null").create());
+		assertThat(configurator.create().getWriters(), empty());
+
+		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer1", "console").set("tinylog.writer2", "null").create());
+		assertThat(configurator.create().getWriters(), types(ConsoleWriter.class));
 	}
 
 	/**
@@ -316,14 +326,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
-	 * Test reading a writer with custom severity levels.
+	 * Test reading a writer with custom severity level.
 	 * 
 	 * @throws IOException
 	 *             Test failed
 	 */
 	@Test
-	public final void testReadWriterWithCustomLevels() throws IOException {
-
+	public final void testReadWriterWithCustomLevel() throws IOException {
 		/* One writer with custom severity level */
 
 		Configurator configurator = Configurator.defaultConfig().writer(null);
@@ -334,11 +343,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		Configuration configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
-		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class));
 
 		/* Two writers, one with custom severity level */
 
@@ -352,11 +361,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
 
 		logFile.delete();
 
@@ -372,11 +381,159 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.INFO), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
+
+		logFile.delete();
+	}
+
+	/**
+	 * Test reading a writer with custom format pattern.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithCustomFormatPattern() throws IOException {
+		/* One writer with custom format pattern */
+
+		Configurator configurator = Configurator.defaultConfig().writer(null);
+
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer", "console").set("tinylog.writer.format", "123");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		Configuration configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+
+		/* Two writers, one with custom format pattern */
+
+		configurator = Configurator.defaultConfig().writer(null).formatPattern("abc");
+		File logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath()).set("tinylog.writer2.format", "xyz");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+
+		logFile.delete();
+
+		/* Two writers, both with custom format pattern */
+
+		configurator = Configurator.defaultConfig().writer(null);
+		logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console").set("tinylog.writer1.format", "abc");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath()).set("tinylog.writer2.format", "xyz");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+
+		logFile.delete();
+	}
+
+	/**
+	 * Test reading a writer with custom severity level and format pattern.
+	 * 
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithCustomLevelAndFormatPattern() throws IOException {
+		/* One writer with custom severity level and format pattern */
+
+		Configurator configurator = Configurator.defaultConfig().writer(null);
+
+		PropertiesBuilder propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer", "console").set("tinylog.writer.level", "info").set("tinylog.writer.format", "123");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		Configuration configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+
+		/* Two writers, one with custom severity level and format pattern */
+
+		configurator = Configurator.defaultConfig().writer(null).formatPattern("abc");
+		File logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath());
+		propertiesBuilder.set("tinylog.writer2.level", "info").set("tinylog.writer2.format", "xyz");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+
+		logFile.delete();
+
+		/* Two writers, both with custom severity level and format pattern */
+
+		configurator = Configurator.defaultConfig().writer(null);
+		logFile = FileHelper.createTemporaryFile("log");
+
+		propertiesBuilder = new PropertiesBuilder();
+		propertiesBuilder.set("tinylog.writer1", "console");
+		propertiesBuilder.set("tinylog.writer1.level", "debug").set("tinylog.writer1.format", "abc");
+		propertiesBuilder.set("tinylog.writer2", "file").set("tinylog.writer2.filename", logFile.getAbsolutePath());
+		propertiesBuilder.set("tinylog.writer2.level", "info").set("tinylog.writer2.format", "xyz");
+		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+
+		configuration = configurator.create();
+		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
 
 		logFile.delete();
 	}
@@ -623,7 +780,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
-			assertThat(propertiesWriter.policies, ArrayMatchers.types(StartupPolicy.class));
+			assertThat(propertiesWriter.policies, typesInArray(StartupPolicy.class));
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder.set("tinylog.writer.policies", "startup, daily");
@@ -631,7 +788,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 			writers = configurator.create().getWriters();
 			assertThat(writers, types(PropertiesWriter.class));
 			propertiesWriter = (PropertiesWriter) writers.get(0);
-			assertThat(propertiesWriter.policies, ArrayMatchers.types(StartupPolicy.class, DailyPolicy.class));
+			assertThat(propertiesWriter.policies, typesInArray(StartupPolicy.class, DailyPolicy.class));
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -1170,6 +1327,14 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWritingThread());
 		assertNull(configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(1, configuration.getWritingThread().getPriority());
+	}
+
+	private static List<Token> textTokens(final String... texts) {
+		List<Token> tokens = new ArrayList<Token>();
+		for (String text : texts) {
+			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
+		}
+		return tokens;
 	}
 
 	@PropertiesSupport(name = "properties", properties = { @Property(name = "boolean", type = boolean.class, optional = true),

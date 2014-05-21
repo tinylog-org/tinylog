@@ -22,6 +22,7 @@ final class WriterDefinition {
 
 	private final Writer writer;
 	private final Level level;
+	private final String formatPattern;
 
 	/**
 	 * @param writer
@@ -30,6 +31,7 @@ final class WriterDefinition {
 	WriterDefinition(final Writer writer) {
 		this.writer = writer;
 		this.level = Level.TRACE;
+		this.formatPattern = null;
 	}
 
 	/**
@@ -42,6 +44,35 @@ final class WriterDefinition {
 	WriterDefinition(final Writer writer, final Level level) {
 		this.writer = writer;
 		this.level = level;
+		this.formatPattern = null;
+	}
+
+	/**
+	 * 
+	 * @param writer
+	 *            Writer to output log entries with a specified severity level.
+	 * @param formatPattern
+	 *            Format pattern for log entries
+	 */
+	WriterDefinition(final Writer writer, final String formatPattern) {
+		this.writer = writer;
+		this.level = Level.TRACE;
+		this.formatPattern = formatPattern;
+	}
+
+	/**
+	 * 
+	 * @param writer
+	 *            Writer to output log entries with a specified severity level.
+	 * @param level
+	 *            Writer will output entries with the same or higher severity level
+	 * @param formatPattern
+	 *            Format pattern for log entries
+	 */
+	WriterDefinition(final Writer writer, final Level level, final String formatPattern) {
+		this.writer = writer;
+		this.level = level;
+		this.formatPattern = formatPattern;
 	}
 
 	/**
@@ -60,6 +91,15 @@ final class WriterDefinition {
 	 */
 	Level getLevel() {
 		return level;
+	}
+
+	/**
+	 * Get the format pattern for log entries.
+	 * 
+	 * @return Format pattern for log entries
+	 */
+	String getFormatPattern() {
+		return formatPattern;
 	}
 
 }

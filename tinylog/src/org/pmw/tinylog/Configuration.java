@@ -14,7 +14,6 @@
 package org.pmw.tinylog;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -42,11 +41,11 @@ public final class Configuration {
 	private final Locale locale;
 	private final List<WriterDefinition> writerDefinitions;
 	private final List<Writer> writers;
-	private final Map<Level, List<Writer>> effectiveWriters;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
 
-	private final List<Token> formatTokens;
+	private final Map<Level, Writer[]> effectiveWriters;
+	private final Map<Level, List<Token>[]> effectiveFormatTokens;
 	private final Map<Level, Set<LogEntryValue>> requiredLogEntryValues;
 	private final Map<Level, StackTraceInformation> requiredStackTraceInformation;
 
@@ -75,12 +74,12 @@ public final class Configuration {
 		this.locale = locale;
 		this.writerDefinitions = new ArrayList<WriterDefinition>(writerDefinitions);
 		this.writers = getWriters(writerDefinitions);
-		this.effectiveWriters = getEffectiveWriters(writerDefinitions);
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
 
-		this.formatTokens = Tokenizer.parse(formatPattern, locale);
-		this.requiredLogEntryValues = getRequiredLogEntryValues(effectiveWriters, formatTokens);
+		this.effectiveWriters = getEffectiveWriters(writerDefinitions);
+		this.effectiveFormatTokens = getEffectiveFormatTokens(writerDefinitions, formatPattern, locale);
+		this.requiredLogEntryValues = getRequiredLogEntryValues(effectiveWriters, effectiveFormatTokens);
 		this.requiredStackTraceInformation = getRequiredStackTraceInformation(requiredLogEntryValues, customLevels);
 	}
 
@@ -133,15 +132,6 @@ public final class Configuration {
 	 */
 	public String getFormatPattern() {
 		return formatPattern;
-	}
-
-	/**
-	 * Get the format tokens for log entries (= rendered format pattern).
-	 * 
-	 * @return Format tokens for log entries
-	 */
-	public List<Token> getFormatTokens() {
-		return formatTokens;
 	}
 
 	/**
@@ -198,8 +188,19 @@ public final class Configuration {
 	 *            Severity level of log entry
 	 * @return Effective writers
 	 */
-	List<Writer> getEffectiveWriters(final Level level) {
+	Writer[] getEffectiveWriters(final Level level) {
 		return effectiveWriters.get(level);
+	}
+
+	/**
+	 * Get the effective format tokens for all effective writers to be used by the logger.
+	 * 
+	 * @param level
+	 *            Severity level of log entry
+	 * @return Effective format tokens
+	 */
+	List<Token>[] getEffectiveFormatTokens(final Level level) {
+		return effectiveFormatTokens.get(level);
 	}
 
 	/**
@@ -273,8 +274,8 @@ public final class Configuration {
 		return writers.isEmpty() ? Collections.<Writer> emptyList() : writers;
 	}
 
-	private static Map<Level, List<Writer>> getEffectiveWriters(final List<WriterDefinition> definitions) {
-		Map<Level, List<Writer>> map = new EnumMap<Level, List<Writer>>(Level.class);
+	private static Map<Level, Writer[]> getEffectiveWriters(final List<WriterDefinition> definitions) {
+		Map<Level, Writer[]> map = new EnumMap<Level, Writer[]>(Level.class);
 		for (Level level : Level.values()) {
 			List<Writer> writers = new ArrayList<Writer>();
 			for (WriterDefinition definition : definitions) {
@@ -282,32 +283,67 @@ public final class Configuration {
 					writers.add(definition.getWriter());
 				}
 			}
-			map.put(level, writers.isEmpty() ? Collections.<Writer> emptyList() : writers);
+			map.put(level, writers.toArray(new Writer[writers.size()]));
 		}
 		return map;
 	}
 
-	private static Map<Level, Set<LogEntryValue>> getRequiredLogEntryValues(final Map<Level, List<Writer>> writersMap, final Collection<Token> formatTokens) {
-		Map<Level, Set<LogEntryValue>> map = new EnumMap<Level, Set<LogEntryValue>>(Level.class);
-		for (Entry<Level, List<Writer>> entry : writersMap.entrySet()) {
-			Level level = entry.getKey();
-			List<Writer> writers = entry.getValue();
-			if (writers.isEmpty()) {
-				map.put(level, Collections.<LogEntryValue> emptySet());
-			} else {
-				Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
-				for (Writer writer : writers) {
-					Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
-					if (requiredLogEntryValuesOfWriter != null) {
-						requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);
+	@SuppressWarnings("unchecked")
+	private static Map<Level, List<Token>[]> getEffectiveFormatTokens(final List<WriterDefinition> definitions, final String globalFormatPattern,
+			final Locale locale) {
+		Map<Writer, List<Token>> cache = new HashMap<Writer, List<Token>>();
+		List<Token> globalFormatTokens = Tokenizer.parse(globalFormatPattern, locale);
+
+		Map<Level, List<Token>[]> map = new EnumMap<Level, List<Token>[]>(Level.class);
+		for (Level level : Level.values()) {
+			List<List<Token>> formatTokensOfLevel = new ArrayList<List<Token>>();
+			for (WriterDefinition definition : definitions) {
+				if (level.ordinal() >= definition.getLevel().ordinal()) {
+					Writer writer = definition.getWriter();
+					if (cache.containsKey(writer)) {
+						formatTokensOfLevel.add(cache.get(writer));
+					} else {
+						Set<LogEntryValue> requiredLogEntryValuesOfWriter = writer.getRequiredLogEntryValues();
+						if (requiredLogEntryValuesOfWriter == null || !requiredLogEntryValuesOfWriter.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
+							formatTokensOfLevel.add(null);
+							cache.put(writer, null);
+						} else {
+							String formatPattern = definition.getFormatPattern();
+							List<Token> formatTokens = formatPattern == null ? globalFormatTokens : Tokenizer.parse(formatPattern, locale);
+							formatTokensOfLevel.add(formatTokens);
+							cache.put(writer, formatTokens);
+						}
 					}
 				}
-				if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
-					for (Token token : formatTokens) {
-						LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
-						if (logEntryValue != null) {
-							requiredLogEntryValues.add(logEntryValue);
+			}
+			map.put(level, formatTokensOfLevel.toArray(new List[formatTokensOfLevel.size()]));
+		}
+		return map;
+	}
+
+	private static Map<Level, Set<LogEntryValue>> getRequiredLogEntryValues(final Map<Level, Writer[]> writersMap,
+			final Map<Level, List<Token>[]> formatTokensMap) {
+		Map<Level, Set<LogEntryValue>> map = new EnumMap<Level, Set<LogEntryValue>>(Level.class);
+		for (Entry<Level, Writer[]> entry : writersMap.entrySet()) {
+			Level level = entry.getKey();
+			Writer[] writers = entry.getValue();
+			if (writers.length == 0) {
+				map.put(level, Collections.<LogEntryValue> emptySet());
+			} else {
+				List<Token>[] formatTokens = formatTokensMap.get(level);
+				Set<LogEntryValue> requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
+				for (int i = 0; i < writers.length; ++i) {
+					Set<LogEntryValue> requiredLogEntryValuesOfWriter = writers[i].getRequiredLogEntryValues();
+					if (requiredLogEntryValuesOfWriter != null) {
+						if (requiredLogEntryValuesOfWriter.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
+							for (Token token : formatTokens[i]) {
+								LogEntryValue logEntryValue = token.getType().getRequiredLogEntryValue();
+								if (logEntryValue != null) {
+									requiredLogEntryValuesOfWriter.add(logEntryValue);
+								}
+							}
 						}
+						requiredLogEntryValues.addAll(requiredLogEntryValuesOfWriter);
 					}
 				}
 				if (requiredLogEntryValues.isEmpty()) {
@@ -336,4 +372,5 @@ public final class Configuration {
 		}
 		return map;
 	}
+
 }

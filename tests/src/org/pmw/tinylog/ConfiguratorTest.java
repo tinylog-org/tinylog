@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.hamcrest.number.OrderingComparison.lessThan;
@@ -29,6 +30,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.sameContentInArray;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
 
@@ -37,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +58,7 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
+import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.Writer;
 
 /**
@@ -417,11 +422,11 @@ public class ConfiguratorTest extends AbstractTest {
 
 		Configuration configuration = configurator.writer(nullWriter1, Level.INFO).create();
 		assertThat(configuration.getWriters(), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
-		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(nullWriter1));
 
 		try {
 			configuration = configurator.writer(null, Level.ERROR).create();
@@ -431,7 +436,7 @@ public class ConfiguratorTest extends AbstractTest {
 		}
 
 		try {
-			configuration = configurator.writer(new NullWriter(), null).create();
+			configuration = configurator.writer(new NullWriter(), (Level) null).create();
 			fail("NullPointerException expected");
 		} catch (NullPointerException ex) {
 			assertThat(configuration.getWriters(), sameContent(nullWriter1));
@@ -439,19 +444,19 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = configurator.writer(nullWriter1, Level.DEBUG).addWriter(nullWriter2, Level.WARNING).create();
 		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1, nullWriter2));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1, nullWriter2));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(nullWriter1, nullWriter2));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(nullWriter1, nullWriter2));
 
 		configuration = configurator.addWriter(nullWriter3, Level.INFO).create();
 		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContent(nullWriter1));
-		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(nullWriter1, nullWriter3));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(nullWriter1, nullWriter2, nullWriter3));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(nullWriter1, nullWriter2, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(nullWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(nullWriter1, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(nullWriter1, nullWriter2, nullWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(nullWriter1, nullWriter2, nullWriter3));
 
 		try {
 			configuration = configurator.addWriter(null, Level.ERROR).create();
@@ -461,7 +466,7 @@ public class ConfiguratorTest extends AbstractTest {
 		}
 
 		try {
-			configuration = configurator.addWriter(new NullWriter(), null).create();
+			configuration = configurator.addWriter(new NullWriter(), (Level) null).create();
 			fail("NullPointerException expected");
 		} catch (NullPointerException ex) {
 			assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter2, nullWriter3));
@@ -469,6 +474,171 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = configurator.removeWriter(nullWriter2).create();
 		assertThat(configuration.getWriters(), sameContent(nullWriter1, nullWriter3));
+
+		configuration = configurator.removeAllWriters().create();
+		assertThat(configuration.getWriters(), empty());
+	}
+
+	/**
+	 * Test setting writers with specified format pattern.
+	 */
+	@Test
+	public final void testWritersWithFormatPattern() {
+		Configurator configurator = Configurator.defaultConfig();
+		ConsoleWriter consoleWriter1 = new ConsoleWriter();
+		ConsoleWriter consoleWriter2 = new ConsoleWriter();
+		ConsoleWriter consoleWriter3 = new ConsoleWriter();
+
+		Configuration configuration = configurator.writer(consoleWriter1, "123").create();
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+
+		try {
+			configuration = configurator.writer(null, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		}
+
+		try {
+			configuration = configurator.writer(new NullWriter(), (String) null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		}
+
+		configuration = configurator.writer(consoleWriter1, "abc").addWriter(consoleWriter2, "xyz").create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+
+		configuration = configurator.addWriter(consoleWriter3, "123").create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+
+		try {
+			configuration = configurator.addWriter(null, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		}
+
+		try {
+			configuration = configurator.addWriter(new NullWriter(), (String) null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		}
+
+		configuration = configurator.removeWriter(consoleWriter2).create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter3));
+
+		configuration = configurator.removeAllWriters().create();
+		assertThat(configuration.getWriters(), empty());
+	}
+
+	/**
+	 * Test setting writers with specified severity level and format pattern.
+	 */
+	@Test
+	public final void testWritersWithLevelAndFormatPattern() {
+		Configurator configurator = Configurator.defaultConfig();
+		ConsoleWriter consoleWriter1 = new ConsoleWriter();
+		ConsoleWriter consoleWriter2 = new ConsoleWriter();
+		ConsoleWriter consoleWriter3 = new ConsoleWriter();
+
+		Configuration configuration = configurator.writer(consoleWriter1, Level.INFO, "123").create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+
+		try {
+			configuration = configurator.writer(null, Level.ERROR, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		}
+
+		try {
+			configuration = configurator.writer(new NullWriter(), null, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		}
+
+		try {
+			configuration = configurator.writer(new NullWriter(), Level.ERROR, null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1));
+		}
+
+		configuration = configurator.writer(consoleWriter1, Level.DEBUG, "abc").addWriter(consoleWriter2, Level.WARNING, "xyz").create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1, consoleWriter2));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1, consoleWriter2));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+
+		configuration = configurator.addWriter(consoleWriter3, Level.INFO, "123").create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(consoleWriter1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1, consoleWriter3));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1, consoleWriter2, consoleWriter3));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1, consoleWriter2, consoleWriter3));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		try {
+			configuration = configurator.addWriter(null, Level.ERROR, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		}
+
+		try {
+			configuration = configurator.addWriter(new NullWriter(), null, "").create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		}
+
+		try {
+			configuration = configurator.addWriter(new NullWriter(), Level.ERROR, null).create();
+			fail("NullPointerException expected");
+		} catch (NullPointerException ex) {
+			assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
+		}
+
+		configuration = configurator.removeWriter(consoleWriter2).create();
+		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter3));
 
 		configuration = configurator.removeAllWriters().create();
 		assertThat(configuration.getWriters(), empty());
@@ -559,6 +729,14 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = Configurator.defaultConfig().maxStackTraceElements(-1).create();
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
+	}
+
+	private static List<Token> textTokens(final String... texts) {
+		List<Token> tokens = new ArrayList<Token>();
+		for (String text : texts) {
+			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
+		}
+		return tokens;
 	}
 
 	/**

@@ -30,15 +30,78 @@ public final class ArrayMatchers {
 	}
 
 	/**
-	 * Test if the items of an array are from the expected classes.
+	 * Test if an array has an equal content.
 	 * 
-	 * @param classes
-	 *            Expected classes
-	 * @return A matcher that matches the array
+	 * @param objects
+	 *            Expected objects
+	 * @return A matcher that matches the arrays
+	 * 
+	 * @param <E>
+	 *            Type of array elements
 	 */
 	@SafeVarargs
-	public static Matcher<Object[]> types(final Class<?>... classes) {
-		return new ClassMatcher(Arrays.asList(classes));
+	public static <E> Matcher<E[]> equalContentInArray(final Object... objects) {
+		return new ContentMatcher<E>(Arrays.asList(objects), false);
+	}
+
+	/**
+	 * Test if an array has exactly the same content.
+	 * 
+	 * @param objects
+	 *            Expected objects
+	 * @return A matcher that matches the arrays
+	 * 
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	@SafeVarargs
+	public static <E> Matcher<E[]> sameContentInArray(final Object... objects) {
+		return new ContentMatcher<E>(Arrays.asList(objects), true);
+	}
+
+	private static final class ContentMatcher<E> extends TypeSafeMatcher<E[]> {
+
+		private final Collection<?> collection;
+		private final boolean strict;
+
+		private ContentMatcher(final Collection<?> collection, final boolean strict) {
+			this.collection = collection;
+			this.strict = strict;
+		}
+
+		@Override
+		public boolean matchesSafely(final E[] array) {
+			if (collection == null || array == null) {
+				return false;
+			} else if (collection.size() != array.length) {
+				return false;
+			} else {
+				Iterator<?> iterator1 = collection.iterator();
+				Iterator<?> iterator2 = Arrays.asList(array).iterator();
+				while (iterator1.hasNext()) {
+					Object object1 = iterator1.next();
+					Object object2 = iterator2.next();
+					if (object1 != object2 && (strict || (object1 != null && !object1.equals(object2)))) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+
+		@Override
+		public void describeTo(final Description description) {
+			if (strict) {
+				description.appendText("contains exactly ");
+			} else {
+				description.appendText("contains ");
+			}
+			if (collection == null) {
+				description.appendValue(null);
+			} else {
+				description.appendValue(collection);
+			}
+		}
 	}
 
 	/**
@@ -46,13 +109,17 @@ public final class ArrayMatchers {
 	 * 
 	 * @param classes
 	 *            Expected classes
-	 * @return A matcher that matches the array
+	 * @return A matcher that matches the arrays
+	 * 
+	 * @param <E>
+	 *            Type of array elements
 	 */
-	public static Matcher<Object[]> types(final Collection<Class<?>> classes) {
-		return new ClassMatcher(classes);
+	@SafeVarargs
+	public static <E> Matcher<E[]> typesInArray(final Class<?>... classes) {
+		return new ClassMatcher<E>(Arrays.asList(classes));
 	}
 
-	private static final class ClassMatcher extends TypeSafeMatcher<Object[]> {
+	private static final class ClassMatcher<E> extends TypeSafeMatcher<E[]> {
 
 		private final Collection<Class<?>> classes;
 
@@ -61,13 +128,11 @@ public final class ArrayMatchers {
 		}
 
 		@Override
-		public boolean matchesSafely(final Object[] array) {
-			if (this.classes == null || array == null) {
-				return false;
-			} else if (this.classes.size() != array.length) {
+		public boolean matchesSafely(final E[] array) {
+			if (classes.size() != array.length) {
 				return false;
 			} else {
-				Iterator<Class<?>> classIterator = this.classes.iterator();
+				Iterator<Class<?>> classIterator = classes.iterator();
 				Iterator<?> objectIterator = Arrays.asList(array).iterator();
 				while (classIterator.hasNext()) {
 					Class<?> clazz = classIterator.next();
@@ -87,7 +152,6 @@ public final class ArrayMatchers {
 			description.appendText("contains exactly the types ");
 			description.appendValue(classes);
 		}
-
 	}
 
 }

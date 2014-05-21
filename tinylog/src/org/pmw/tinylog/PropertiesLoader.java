@@ -150,9 +150,9 @@ final class PropertiesLoader {
 	 *            Properties with configuration
 	 */
 	static void readFormatPattern(final Configurator configurator, final Properties properties) {
-		String format = properties.getProperty(FORMAT_PROPERTY);
-		if (format != null && format.length() > 0) {
-			configurator.formatPattern(format);
+		String formatPattern = readFormatPattern(properties, FORMAT_PROPERTY);
+		if (formatPattern != null) {
+			configurator.formatPattern(formatPattern);
 		}
 	}
 
@@ -228,19 +228,12 @@ final class PropertiesLoader {
 					Writer writer = readWriter(properties, propertyName, writerName);
 					if (writer != null) {
 						Level level = readLevel(properties, propertyName + LEVEL_PROPERTY.substring(TINYLOG_PREFIX.length()));
+						String formatPattern = readFormatPattern(properties, propertyName + FORMAT_PROPERTY.substring(TINYLOG_PREFIX.length()));
 						if (first) {
-							if (level == null) {
-								configurator.writer(writer);
-							} else {
-								configurator.writer(writer, level);
-							}
+							setWriter(configurator, writer, level, formatPattern);
 							first = false;
 						} else {
-							if (level == null) {
-								configurator.addWriter(writer);
-							} else {
-								configurator.addWriter(writer, level);
-							}
+							addWriter(configurator, writer, level, formatPattern);
 						}
 					}
 				}
@@ -290,6 +283,38 @@ final class PropertiesLoader {
 		}
 	}
 
+	private static void setWriter(final Configurator configurator, final Writer writer, final Level level, final String formatPattern) {
+		if (level == null) {
+			if (formatPattern == null) {
+				configurator.writer(writer);
+			} else {
+				configurator.writer(writer, formatPattern);
+			}
+		} else {
+			if (formatPattern == null) {
+				configurator.writer(writer, level);
+			} else {
+				configurator.writer(writer, level, formatPattern);
+			}
+		}
+	}
+
+	private static void addWriter(final Configurator configurator, final Writer writer, final Level level, final String formatPattern) {
+		if (level == null) {
+			if (formatPattern == null) {
+				configurator.addWriter(writer);
+			} else {
+				configurator.addWriter(writer, formatPattern);
+			}
+		} else {
+			if (formatPattern == null) {
+				configurator.addWriter(writer, level);
+			} else {
+				configurator.addWriter(writer, level, formatPattern);
+			}
+		}
+	}
+
 	private static Level readLevel(final Properties properties, final String propertyName) {
 		String levelName = properties.getProperty(propertyName);
 		if (levelName != null && levelName.length() > 0) {
@@ -304,12 +329,21 @@ final class PropertiesLoader {
 		}
 	}
 
+	private static String readFormatPattern(final Properties properties, final String propertyName) {
+		String formatPattern = properties.getProperty(propertyName);
+		if (formatPattern != null && formatPattern.length() > 0) {
+			return formatPattern;
+		} else {
+			return null;
+		}
+	}
+
 	private static Writer readWriter(final Properties properties, final String propertyName, final String writerName) {
 		for (Class<?> implementation : findImplementations(Writer.class)) {
 			org.pmw.tinylog.writers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.writers.PropertiesSupport.class);
 			if (propertiesSupport != null) {
 				if (writerName.equalsIgnoreCase(propertiesSupport.name())) {
-					Writer writer = loadAndSetWriter(properties, propertyName, propertiesSupport.properties(), implementation);
+					Writer writer = loadWriter(properties, propertyName, propertiesSupport.properties(), implementation);
 					if (writer == null) {
 						InternalLogger.error("Failed to initialize {0} writer", writerName);
 					}
@@ -374,7 +408,7 @@ final class PropertiesLoader {
 		}
 	}
 
-	private static Writer loadAndSetWriter(final Properties properties, final String propertiesPrefix, final org.pmw.tinylog.writers.Property[] definition,
+	private static Writer loadWriter(final Properties properties, final String propertiesPrefix, final org.pmw.tinylog.writers.Property[] definition,
 			final Class<?> writerClass) {
 		Object[] parameters = loadParameters(properties, propertiesPrefix, definition);
 

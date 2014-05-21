@@ -13,7 +13,9 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,10 +23,14 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.sameContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.typesInArray;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.lang.Thread.State;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -203,38 +209,178 @@ public class ConfigurationTest extends AbstractTest {
 		List<WriterDefinition> writerDefinition = emptyWriterDefinition();
 		Configuration configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertThat(configuration.getWriters(), empty());
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
-		assertThat(configuration.getEffectiveWriters(Level.INFO), empty());
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), empty());
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), empty());
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), emptyArray());
 
 		writerDefinition = singleWriterDefinition(dummyWriter);
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertThat(configuration.getWriters(), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), sameContentInArray(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(dummyWriter));
 
 		writerDefinition = singleWriterDefinition(dummyWriter, Level.WARNING);
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertThat(configuration.getWriters(), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
-		assertThat(configuration.getEffectiveWriters(Level.INFO), empty());
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(dummyWriter));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(dummyWriter));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(dummyWriter));
 
 		writerDefinition = pairWriterDefinition(dummyWriter, Level.WARNING, consoleWriter, Level.INFO);
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertThat(configuration.getWriters(), sameContent(dummyWriter, consoleWriter));
-		assertThat(configuration.getEffectiveWriters(Level.TRACE), empty());
-		assertThat(configuration.getEffectiveWriters(Level.DEBUG), empty());
-		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContent(consoleWriter));
-		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContent(dummyWriter, consoleWriter));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContent(dummyWriter, consoleWriter));
+		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter));
+		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(dummyWriter, consoleWriter));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(dummyWriter, consoleWriter));
+	}
+
+	/**
+	 * Test calculating the effective format tokens.
+	 */
+	@Test
+	public final void testFormatPatternAndTokens() {
+		/* No writers */
+
+		List<WriterDefinition> writerDefinition = emptyWriterDefinition();
+		Configuration configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), emptyArray());
+
+		/* Single dummy writer (doesn't use format pattern) */
+
+		writerDefinition = singleWriterDefinition(new DummyWriter());
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null));
+
+		writerDefinition = singleWriterDefinition(new DummyWriter(), Level.WARNING);
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null));
+
+		writerDefinition = singleWriterDefinition(new DummyWriter(), "abc");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null));
+
+		writerDefinition = singleWriterDefinition(new DummyWriter(), Level.WARNING, "abc");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null));
+
+		/* Single console writer (supports format pattern) */
+
+		writerDefinition = singleWriterDefinition(new ConsoleWriter());
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(Collections.emptyList()));
+
+		writerDefinition = singleWriterDefinition(new ConsoleWriter(), Level.WARNING);
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null));
+
+		writerDefinition = singleWriterDefinition(new ConsoleWriter(), "abc");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc")));
+
+		writerDefinition = singleWriterDefinition(new ConsoleWriter(), Level.WARNING, "abc");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc")));
+
+		/* Two writers */
+
+		writerDefinition = pairWriterDefinition(new DummyWriter(), new ConsoleWriter());
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null, Collections.emptyList()));
+
+		writerDefinition = pairWriterDefinition(new DummyWriter(), Level.WARNING, new ConsoleWriter(), Level.INFO);
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null, Collections.emptyList()));
+
+		writerDefinition = pairWriterDefinition(new DummyWriter(), Level.WARNING, new ConsoleWriter(), Level.INFO);
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null, Collections.emptyList()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null, Collections.emptyList()));
+
+		writerDefinition = pairWriterDefinition(new DummyWriter(), Level.WARNING, "abc", new ConsoleWriter(), Level.INFO, "xyz");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null, textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null, textTokens("xyz")));
+
+		writerDefinition = pairWriterDefinition(new ConsoleWriter(), Level.WARNING, "abc", new ConsoleWriter(), Level.INFO, "xyz");
+		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
+		assertEquals("", configuration.getFormatPattern());
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
 	}
 
 	/**
@@ -485,10 +631,10 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(Level.TRACE, configuration.getLevel(ConfigurationTest.class.getName()));
 		assertEquals(Level.TRACE, configuration.getLevel(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("", configuration.getFormatPattern());
-		assertEquals(Collections.emptyList(), configuration.getFormatTokens());
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), emptyArray());
 		assertEquals(Locale.ROOT, configuration.getLocale());
 		assertThat(configuration.getWriters(), empty());
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), empty());
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), emptyArray());
 		assertNull(configuration.getWritingThread());
 		assertEquals(0, configuration.getMaxStackTraceElements());
 		assertEquals(Collections.emptySet(), configuration.getRequiredLogEntryValues(Level.ERROR));
@@ -510,10 +656,10 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(Level.WARNING, configuration.getLevel("invalid"));
 		assertEquals(Level.INFO, configuration.getLevel(ConfigurationTest.class.getPackage().getName()));
 		assertEquals("{class}{method}", configuration.getFormatPattern());
-		assertEquals(2, configuration.getFormatTokens().size());
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), arrayWithSize(1));
 		assertEquals(Locale.GERMANY, configuration.getLocale());
 		assertThat(configuration.getWriters(), types(DummyWriter.class));
-		assertThat(configuration.getEffectiveWriters(Level.ERROR), types(DummyWriter.class));
+		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(DummyWriter.class));
 		assertNotNull(configuration.getWritingThread());
 		assertEquals(State.NEW, configuration.getWritingThread().getState());
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
@@ -545,8 +691,16 @@ public class ConfigurationTest extends AbstractTest {
 		return Collections.<WriterDefinition> singletonList(new WriterDefinition(writer));
 	}
 
+	private static List<WriterDefinition> singleWriterDefinition(final Writer writer, final String formatPattern) {
+		return Collections.<WriterDefinition> singletonList(new WriterDefinition(writer, formatPattern));
+	}
+
 	private static List<WriterDefinition> singleWriterDefinition(final Writer writer, final Level level) {
 		return Collections.<WriterDefinition> singletonList(new WriterDefinition(writer, level));
+	}
+
+	private static List<WriterDefinition> singleWriterDefinition(final Writer writer, final Level level, final String formatPattern) {
+		return Collections.<WriterDefinition> singletonList(new WriterDefinition(writer, level, formatPattern));
 	}
 
 	private static List<WriterDefinition> pairWriterDefinition(final Writer writer1, final Writer writer2) {
@@ -555,6 +709,19 @@ public class ConfigurationTest extends AbstractTest {
 
 	private static List<WriterDefinition> pairWriterDefinition(final Writer writer1, final Level level1, final Writer writer2, final Level level2) {
 		return Arrays.asList(new WriterDefinition(writer1, level1), new WriterDefinition(writer2, level2));
+	}
+
+	private static List<WriterDefinition> pairWriterDefinition(final Writer writer1, final Level level1, final String formatPattern1, final Writer writer2,
+			final Level level2, final String formatPattern2) {
+		return Arrays.asList(new WriterDefinition(writer1, level1, formatPattern1), new WriterDefinition(writer2, level2, formatPattern2));
+	}
+
+	private static List<Token> textTokens(final String... texts) {
+		List<Token> tokens = new ArrayList<Token>();
+		for (String text : texts) {
+			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
+		}
+		return tokens;
 	}
 
 	private static final class DummyWriter implements Writer {

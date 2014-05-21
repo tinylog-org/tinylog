@@ -42,17 +42,6 @@ public final class CollectionMatchers {
 		return new ContentMatcher(Arrays.asList(objects));
 	}
 
-	/**
-	 * Test if a collection has exactly the same content.
-	 * 
-	 * @param collection
-	 *            Expected objects
-	 * @return A matcher that matches the collections
-	 */
-	public static Matcher<? super Collection<?>> sameContent(final Collection<?> collection) {
-		return new ContentMatcher(collection);
-	}
-
 	private static final class ContentMatcher extends TypeSafeMatcher<Collection<?>> {
 
 		private final Collection<?> collection;
@@ -91,6 +80,55 @@ public final class CollectionMatchers {
 			} else {
 				description.appendValue(collection);
 			}
+		}
+	}
+
+	/**
+	 * Test if the items of a collection are from the expected classes.
+	 * 
+	 * @param classes
+	 *            Expected classes
+	 * @return A matcher that matches the collections
+	 */
+	@SafeVarargs
+	public static Matcher<? super Collection<?>> types(final Class<?>... classes) {
+		return new ClassMatcher(Arrays.asList(classes));
+	}
+
+	private static final class ClassMatcher extends TypeSafeMatcher<Collection<?>> {
+	
+		private final Collection<Class<?>> classes;
+	
+		private ClassMatcher(final Collection<Class<?>> classes) {
+			this.classes = classes;
+		}
+	
+		@Override
+		public boolean matchesSafely(final Collection<?> collection) {
+			if (this.classes == null || collection == null) {
+				return false;
+			} else if (this.classes.size() != collection.size()) {
+				return false;
+			} else {
+				Iterator<Class<?>> classIterator = this.classes.iterator();
+				Iterator<?> objectIterator = collection.iterator();
+				while (classIterator.hasNext()) {
+					Class<?> clazz = classIterator.next();
+					Object object = objectIterator.next();
+					if (clazz == null || object == null) {
+						return false;
+					} else if (!clazz.equals(object.getClass())) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+	
+		@Override
+		public void describeTo(final Description description) {
+			description.appendText("contains exactly the types ");
+			description.appendValue(classes);
 		}
 	}
 
@@ -163,66 +201,6 @@ public final class CollectionMatchers {
 				}
 				description.appendValue(classes);
 			}
-		}
-	}
-
-	/**
-	 * Test if the items of a collection are from the expected classes.
-	 * 
-	 * @param classes
-	 *            Expected classes
-	 * @return A matcher that matches the collections
-	 */
-	@SafeVarargs
-	public static Matcher<? super Collection<?>> types(final Class<?>... classes) {
-		return new ClassMatcher(Arrays.asList(classes));
-	}
-
-	/**
-	 * Test if the items of a collection are from the expected classes.
-	 * 
-	 * @param classes
-	 *            Expected classes
-	 * @return A matcher that matches the collections
-	 */
-	public static Matcher<? super Collection<?>> types(final Collection<Class<?>> classes) {
-		return new ClassMatcher(classes);
-	}
-
-	private static final class ClassMatcher extends TypeSafeMatcher<Collection<?>> {
-
-		private final Collection<Class<?>> classes;
-
-		private ClassMatcher(final Collection<Class<?>> classes) {
-			this.classes = classes;
-		}
-
-		@Override
-		public boolean matchesSafely(final Collection<?> collection) {
-			if (this.classes == null || collection == null) {
-				return false;
-			} else if (this.classes.size() != collection.size()) {
-				return false;
-			} else {
-				Iterator<Class<?>> classIterator = this.classes.iterator();
-				Iterator<?> objectIterator = collection.iterator();
-				while (classIterator.hasNext()) {
-					Class<?> clazz = classIterator.next();
-					Object object = objectIterator.next();
-					if (clazz == null || object == null) {
-						return false;
-					} else if (!clazz.equals(object.getClass())) {
-						return false;
-					}
-				}
-				return true;
-			}
-		}
-
-		@Override
-		public void describeTo(final Description description) {
-			description.appendText("contains exactly the types ");
-			description.appendValue(classes);
 		}
 	}
 

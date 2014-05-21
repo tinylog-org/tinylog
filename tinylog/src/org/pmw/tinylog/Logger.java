@@ -694,19 +694,19 @@ public final class Logger {
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			try {
-				List<Writer> writers = currentConfiguration.getEffectiveWriters(level);
-				LogEntry logEntry = createLogEntry(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
+				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
+				LogEntry[] logEntries = createLogEntries(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (Writer writer : writers) {
+					for (int i = 0; i < writers.length; ++i) {
 						try {
-							writer.write(logEntry);
+							writers[i].write(logEntries[i]);
 						} catch (Exception ex) {
 							InternalLogger.error(ex, "Failed to write log entry");
 						}
 					}
 				} else {
-					for (Writer writer : writers) {
-						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (int i = 0; i < writers.length; ++i) {
+						currentConfiguration.getWritingThread().putLogEntry(writers[i], logEntries[i]);
 					}
 				}
 			} catch (Exception ex) {
@@ -725,20 +725,20 @@ public final class Logger {
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			try {
-				List<Writer> writers = currentConfiguration.getEffectiveWriters(level);
+				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
 				StackTraceElement stackTraceElement = new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
-				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
+				LogEntry[] logEntries = createLogEntries(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (Writer writer : writers) {
+					for (int i = 0; i < writers.length; ++i) {
 						try {
-							writer.write(logEntry);
+							writers[i].write(logEntries[i]);
 						} catch (Exception ex) {
 							InternalLogger.error(ex, "Failed to write log entry");
 						}
 					}
 				} else {
-					for (Writer writer : writers) {
-						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (int i = 0; i < writers.length; ++i) {
+						currentConfiguration.getWritingThread().putLogEntry(writers[i], logEntries[i]);
 					}
 				}
 			} catch (Exception ex) {
@@ -757,19 +757,19 @@ public final class Logger {
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			try {
-				List<Writer> writers = currentConfiguration.getEffectiveWriters(level);
-				LogEntry logEntry = createLogEntry(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
+				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
+				LogEntry[] logEntries = createLogEntries(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
-					for (Writer writer : writers) {
+					for (int i = 0; i < writers.length; ++i) {
 						try {
-							writer.write(logEntry);
+							writers[i].write(logEntries[i]);
 						} catch (Exception ex) {
 							InternalLogger.error(ex, "Failed to write log entry");
 						}
 					}
 				} else {
-					for (Writer writer : writers) {
-						currentConfiguration.getWritingThread().putLogEntry(writer, logEntry);
+					for (int i = 0; i < writers.length; ++i) {
+						currentConfiguration.getWritingThread().putLogEntry(writers[i], logEntries[i]);
 					}
 				}
 			} catch (Exception ex) {
@@ -778,9 +778,11 @@ public final class Logger {
 		}
 	}
 
-	private static LogEntry createLogEntry(final Configuration currentConfiguration, final int strackTraceDeep, final Level level,
+	private static LogEntry[] createLogEntries(final Configuration currentConfiguration, final int strackTraceDeep, final Level level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		Set<LogEntryValue> requiredLogEntryValues = currentConfiguration.getRequiredLogEntryValues(level);
+		List<Token>[] formatTokens = currentConfiguration.getEffectiveFormatTokens(level);
+		LogEntry[] entries = new LogEntry[formatTokens.length];
 
 		Date now = null;
 		String processId = null;
@@ -845,75 +847,81 @@ public final class Logger {
 			}
 		}
 
-		String renderedLogEntry;
-		if (requiredLogEntryValues.contains(LogEntryValue.RENDERED_LOG_ENTRY)) {
-			StringBuilder builder = new StringBuilder();
-			for (Token token : currentConfiguration.getFormatTokens()) {
-				switch (token.getType()) {
-					case DATE:
-						builder.append(getRenderedDate(now, token));
-						break;
+		for (int i = 0; i < entries.length; ++i) {
+			List<Token> formatTokensOfWriter = formatTokens[i];
+			String renderedLogEntry;
+			if (formatTokensOfWriter != null) {
+				StringBuilder builder = new StringBuilder();
+				for (Token token : formatTokensOfWriter) {
+					switch (token.getType()) {
+						case DATE:
+							builder.append(getRenderedDate(now, token));
+							break;
 
-					case THREAD_NAME:
-						builder.append(thread.getName());
-						break;
+						case THREAD_NAME:
+							builder.append(thread.getName());
+							break;
 
-					case THREAD_ID:
-						builder.append(thread.getId());
-						break;
+						case THREAD_ID:
+							builder.append(thread.getId());
+							break;
 
-					case CLASS:
-						builder.append(fullyQualifiedClassName);
-						break;
+						case CLASS:
+							builder.append(fullyQualifiedClassName);
+							break;
 
-					case CLASS_NAME:
-						builder.append(getNameOfClass(fullyQualifiedClassName));
-						break;
+						case CLASS_NAME:
+							builder.append(getNameOfClass(fullyQualifiedClassName));
+							break;
 
-					case PACKAGE:
-						builder.append(getPackageOfClass(fullyQualifiedClassName));
-						break;
+						case PACKAGE:
+							builder.append(getPackageOfClass(fullyQualifiedClassName));
+							break;
 
-					case METHOD:
-						builder.append(method);
-						break;
+						case METHOD:
+							builder.append(method);
+							break;
 
-					case FILE:
-						builder.append(filename);
-						break;
+						case FILE:
+							builder.append(filename);
+							break;
 
-					case LINE:
-						builder.append(line);
-						break;
+						case LINE:
+							builder.append(line);
+							break;
 
-					case LEVEL:
-						builder.append(level);
-						break;
+						case LEVEL:
+							builder.append(level);
+							break;
 
-					case MESSAGE:
-						if (message != null) {
-							builder.append(renderedMessage);
-						}
-						if (exception != null) {
+						case MESSAGE:
 							if (message != null) {
-								builder.append(": ");
+								builder.append(renderedMessage);
 							}
-							formatException(builder, exception, currentConfiguration.getMaxStackTraceElements());
-						}
-						break;
+							if (exception != null) {
+								if (message != null) {
+									builder.append(": ");
+								}
+								formatException(builder, exception, currentConfiguration.getMaxStackTraceElements());
+							}
+							break;
 
-					default:
-						builder.append(token.getData());
-						break;
+						default:
+							builder.append(token.getData());
+							break;
+					}
 				}
+				builder.append(NEW_LINE);
+				renderedLogEntry = builder.toString();
+			} else {
+				renderedLogEntry = null;
 			}
-			builder.append(NEW_LINE);
-			renderedLogEntry = builder.toString();
-		} else {
-			renderedLogEntry = null;
+
+			entries[i] = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception,
+					renderedLogEntry);
 		}
 
-		return new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception, renderedLogEntry);
+		return entries;
 	}
 
 	private static StackTraceElement getStackTraceElement(final int deep) {
