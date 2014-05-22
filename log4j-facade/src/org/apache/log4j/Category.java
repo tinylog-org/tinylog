@@ -13,13 +13,11 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.Logger;
-
 import sun.reflect.Reflection;
 
 /**
  * Deprecated log4j logging API (use {@link Logger} instead).
- * 
+ *
  * @see Logger
  */
 public class Category {
@@ -59,7 +57,7 @@ public class Category {
 
 	/**
 	 * Get the parent logger.
-	 * 
+	 *
 	 * @return Parent logger
 	 */
 	public final Category getParent() {
@@ -68,7 +66,7 @@ public class Category {
 
 	/**
 	 * Get the name of the logger.
-	 * 
+	 *
 	 * @return Name of the logger
 	 */
 	public final String getName() {
@@ -102,7 +100,7 @@ public class Category {
 	/**
 	 * Get the active logging level for the caller class. In log4j-facade this method does exactly the same as
 	 * {@link Category#getEffectiveLevel()}.
-	 * 
+	 *
 	 * @return Active logging level
 	 */
 	public final Level getLevel() {
@@ -116,7 +114,7 @@ public class Category {
 	/**
 	 * Get the active logging level for the caller class. In log4j-facade this method does exactly the same as
 	 * {@link Category#getLevel()}.
-	 * 
+	 *
 	 * @return Active logging level
 	 */
 	public Level getEffectiveLevel() {
@@ -129,7 +127,7 @@ public class Category {
 
 	/**
 	 * Check if log entries with the logging level debug are output or not.
-	 * 
+	 *
 	 * @return <code>true</code> if debug log entries will be output, <code>false</code> if not
 	 */
 	public boolean isDebugEnabled() {
@@ -142,7 +140,7 @@ public class Category {
 
 	/**
 	 * Create a debug log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 */
@@ -152,7 +150,7 @@ public class Category {
 
 	/**
 	 * Create a debugr log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 * @param throwable
@@ -164,7 +162,7 @@ public class Category {
 
 	/**
 	 * Check if log entries with the logging level info are output or not.
-	 * 
+	 *
 	 * @return <code>true</code> if info log entries will be output, <code>false</code> if not
 	 */
 	public boolean isInfoEnabled() {
@@ -177,7 +175,7 @@ public class Category {
 
 	/**
 	 * Create an info log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 */
@@ -187,7 +185,7 @@ public class Category {
 
 	/**
 	 * Create an info log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 * @param throwable
@@ -199,7 +197,7 @@ public class Category {
 
 	/**
 	 * Create a warning log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 */
@@ -209,7 +207,7 @@ public class Category {
 
 	/**
 	 * Create a warning log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 * @param throwable
@@ -221,7 +219,7 @@ public class Category {
 
 	/**
 	 * Create an error log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 */
@@ -231,7 +229,7 @@ public class Category {
 
 	/**
 	 * Create an error log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 * @param throwable
@@ -243,7 +241,7 @@ public class Category {
 
 	/**
 	 * Create an error log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 */
@@ -253,7 +251,7 @@ public class Category {
 
 	/**
 	 * Create an error log entry.
-	 * 
+	 *
 	 * @param message
 	 *            Message to log
 	 * @param throwable
@@ -265,7 +263,7 @@ public class Category {
 
 	/**
 	 * Check if a given logging level will be output.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level to test
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
@@ -280,7 +278,7 @@ public class Category {
 
 	/**
 	 * Create an error log entry.
-	 * 
+	 *
 	 * @param assertion
 	 *            If <code>false</code> an error log entry will be generated, otherwise nothing will happen
 	 * @param message
@@ -294,7 +292,7 @@ public class Category {
 
 	/**
 	 * Create a log entry.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message
@@ -306,7 +304,7 @@ public class Category {
 
 	/**
 	 * Create a log entry.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message
