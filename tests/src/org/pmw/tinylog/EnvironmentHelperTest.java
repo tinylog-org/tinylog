@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 
 import mockit.NonStrictExpectations;
 
@@ -27,14 +28,14 @@ import org.junit.Test;
 
 /**
  * Tests the environment helper.
- * 
+ *
  * @see EnvironmentHelper
  */
 public class EnvironmentHelperTest extends AbstractTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 * 
+	 *
 	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
@@ -62,7 +63,7 @@ public class EnvironmentHelperTest extends AbstractTest {
 	}
 
 	/**
-	 * Test use case if {@link ManagementFactory.getRuntimeMXBean().getName()} returns only the process ID.
+	 * Test use case if {@link RuntimeMXBean#getName()} returns only the process ID.
 	 */
 	@Test
 	public final void testProcessIdWithoutHost() {
@@ -79,7 +80,7 @@ public class EnvironmentHelperTest extends AbstractTest {
 	}
 
 	/**
-	 * Test use case if {@link ManagementFactory.getRuntimeMXBean().getName()} returns process ID plus host name.
+	 * Test use case if {@link RuntimeMXBean#getName()} returns process ID plus host name.
 	 */
 	@Test
 	public final void testProcessIdWithHost() {
