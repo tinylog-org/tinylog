@@ -20,22 +20,22 @@ import org.pmw.tinylog.Configuration;
 
 /**
  * A labeler names log files and backups for {@link org.pmw.tinylog.writers.RollingFileWriter RollingFileWriter}.
- * 
+ *
  * <p>
  * The annotation {@link org.pmw.tinylog.labelers.PropertiesSupport PropertiesSupport} must be added to the implemented
  * labeler class and the implemented labeler must be registered as service in
  * "META-INF/services/org.pmw.tinylog.labelers" in order to make the labeler available by properties files and system
  * properties.
  * </p>
- * 
+ *
  * <p>
- * Example:<br />
+ * Example:<br>
  * <code>
- * {@literal @}PropertiesSupport(name = "count")<br />
+ * {@literal @}PropertiesSupport(name = "count")<br>
  * public final class CountLabeler implements Labeler {
  * </code>
  * </p>
- * 
+ *
  * <p>
  * A labeler must have a default constructor without any parameters. Optionally it can have an additional constructor
  * with a string parameter if the labeler supports parameters.
@@ -45,7 +45,7 @@ public interface Labeler {
 
 	/**
 	 * Initialize the labeler.
-	 * 
+	 *
 	 * @param configuration
 	 *            Configuration of logger
 	 */
@@ -53,7 +53,7 @@ public interface Labeler {
 
 	/**
 	 * Returns the real log file.
-	 * 
+	 *
 	 * @param baseFile
 	 *            Defined log file by user
 	 * @return Real log file
@@ -62,13 +62,13 @@ public interface Labeler {
 
 	/**
 	 * Rolls existing log files and backups and returns a new log file.
-	 * 
+	 *
 	 * @param file
 	 *            Current log file
 	 * @param maxBackups
 	 *            Maximum number of backups to store
 	 * @return New log file
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to roll log file
 	 */

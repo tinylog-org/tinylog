@@ -36,9 +36,9 @@ public final class CountPolicy implements Policy {
 
 	/**
 	 * @param limit
-	 *            Maximum number of log entries per file (must be > 0)
+	 *            Maximum number of log entries per file (must be &gt; 0)
 	 * @throws IllegalArgumentException
-	 *             if limit is <= 0
+	 *             if limit is &lt;= 0
 	 */
 	public CountPolicy(final long limit) throws IllegalArgumentException {
 		if (limit <= 0L) {
@@ -51,7 +51,7 @@ public final class CountPolicy implements Policy {
 
 	/**
 	 * String parameter for {@link org.pmw.tinylog.PropertiesLoader PropertiesLoader}.
-	 * 
+	 *
 	 * @param limit
 	 *            Maximum number of log entries per file (must be > 0)
 	 * @throws IllegalArgumentException
