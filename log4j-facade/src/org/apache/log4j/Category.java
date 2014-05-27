@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,14 +13,11 @@
 
 package org.apache.log4j;
 
-import sun.reflect.Reflection;
-
 /**
  * Deprecated log4j logging API (use {@link Logger} instead).
  *
  * @see Logger
  */
-@SuppressWarnings({ "restriction", "deprecation" })
 public class Category {
 
 	private final Category parent;
@@ -79,11 +76,7 @@ public class Category {
 	 */
 	@Deprecated
 	public final Level getPriority() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass(2));
-		} else {
-			return TinylogBride.getLevel();
-		}
+		return TinylogBride.getLevel();
 	}
 
 	/**
@@ -91,11 +84,7 @@ public class Category {
 	 */
 	@Deprecated
 	public Priority getChainedPriority() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass(2));
-		} else {
-			return TinylogBride.getLevel();
-		}
+		return TinylogBride.getLevel();
 	}
 
 	/**
@@ -105,11 +94,7 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public final Level getLevel() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass(2));
-		} else {
-			return TinylogBride.getLevel();
-		}
+		return TinylogBride.getLevel();
 	}
 
 	/**
@@ -119,11 +104,7 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public Level getEffectiveLevel() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass(2));
-		} else {
-			return TinylogBride.getLevel();
-		}
+		return TinylogBride.getLevel();
 	}
 
 	/**
@@ -132,11 +113,7 @@ public class Category {
 	 * @return <code>true</code> if debug log entries will be output, <code>false</code> if not
 	 */
 	public boolean isDebugEnabled() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(2), Level.DEBUG);
-		} else {
-			return TinylogBride.isEnabled(Level.DEBUG);
-		}
+		return TinylogBride.isEnabled(Level.DEBUG);
 	}
 
 	/**
@@ -167,11 +144,7 @@ public class Category {
 	 * @return <code>true</code> if info log entries will be output, <code>false</code> if not
 	 */
 	public boolean isInfoEnabled() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(2), Level.INFO);
-		} else {
-			return TinylogBride.isEnabled(Level.INFO);
-		}
+		return TinylogBride.isEnabled(Level.INFO);
 	}
 
 	/**
@@ -270,11 +243,7 @@ public class Category {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public boolean isEnabledFor(final Priority level) {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(2), level);
-		} else {
-			return TinylogBride.isEnabled(level);
-		}
+		return TinylogBride.isEnabled(level);
 	}
 
 	/**

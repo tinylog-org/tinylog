@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -15,14 +15,13 @@ package org.apache.log4j;
 
 import java.lang.reflect.Method;
 
+import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.LogEntryForwarder;
-
-import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
+import org.pmw.tinylog.Logger;
 
 /**
  * Bridge to tinylog.
  */
-@SuppressWarnings({ "restriction", "deprecation" })
 class TinylogBride {
 
 	private static Method stackTraceMethod;
@@ -41,8 +40,9 @@ class TinylogBride {
 		}
 
 		try {
-			Reflection.getCallerClass(2);
-			hasSunReflection = true;
+			@SuppressWarnings({ "restriction", "deprecation" })
+			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
+			hasSunReflection = Logger.class.equals(caller);
 		} catch (Exception ex) {
 			hasSunReflection = false;
 		}
@@ -51,17 +51,13 @@ class TinylogBride {
 	private TinylogBride() {
 	}
 
-	public static boolean hasSunReflection() {
-		return hasSunReflection;
-	}
-
 	/**
 	 * Get the active logging level for the caller class.
 	 *
 	 * @return Active logging level
 	 */
 	public static Level getLevel() {
-		String className = getFullyQualifiedClassNameFromStackTrace(3);
+		String className = getFullyQualifiedClassName(3);
 		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
 		return toLog4jLevel(activeLevel);
 	}
@@ -86,7 +82,7 @@ class TinylogBride {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public static boolean isEnabled(final Priority level) {
-		String className = getFullyQualifiedClassNameFromStackTrace(3);
+		String className = getFullyQualifiedClassName(3);
 		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
 		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
 	}
@@ -164,12 +160,21 @@ class TinylogBride {
 
 	}
 
-	private static String getFullyQualifiedClassNameFromStackTrace(final int deep) {
+	@SuppressWarnings({ "restriction", "deprecation" })
+	private static String getFullyQualifiedClassName(final int deep) {
+		if (hasSunReflection) {
+			try {
+				return sun.reflect.Reflection.getCallerClass(deep + 1).getName();
+			} catch (Exception ex) {
+				InternalLogger.warn(ex, "Failed to get caller class from ");
+			}
+		}
+
 		if (stackTraceMethod != null) {
 			try {
 				return ((StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep)).getClassName();
 			} catch (Exception ex) {
-				// Fallback
+				InternalLogger.warn(ex, "Failed to get single stack trace element from throwable");
 			}
 		}
 

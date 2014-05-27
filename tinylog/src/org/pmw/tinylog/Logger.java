@@ -24,15 +24,12 @@ import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 
-import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
-
 /**
  * Static class to create log entries.
  *
  * The default severity level is {@link org.pmw.tinylog.Level#INFO Level.INFO}, which ignores trace and debug log
  * entries.
  */
-@SuppressWarnings({ "restriction", "deprecation" })
 public final class Logger {
 
 	/**
@@ -62,7 +59,8 @@ public final class Logger {
 		}
 
 		try {
-			Class<?> caller = Reflection.getCallerClass(1);
+			@SuppressWarnings({ "restriction", "deprecation" })
+			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
 			hasSunReflection = Logger.class.equals(caller);
 		} catch (Throwable ex) {
 			hasSunReflection = false;
@@ -126,11 +124,7 @@ public final class Logger {
 	public static void trace(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.TRACE) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.TRACE, null, obj, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, obj, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, obj, null);
 		}
 	}
 
@@ -145,11 +139,7 @@ public final class Logger {
 	public static void trace(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.TRACE) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.TRACE, null, message, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, null);
 		}
 	}
 
@@ -166,11 +156,7 @@ public final class Logger {
 	public static void trace(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.TRACE) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.TRACE, null, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, arguments);
 		}
 	}
 
@@ -189,11 +175,7 @@ public final class Logger {
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.TRACE) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.TRACE, exception, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
 		}
 	}
 
@@ -206,11 +188,7 @@ public final class Logger {
 	public static void trace(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.TRACE) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.TRACE, exception, null, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, null, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, null, null);
 		}
 	}
 
@@ -223,11 +201,7 @@ public final class Logger {
 	public static void debug(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.DEBUG) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.DEBUG, null, obj, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, obj, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, obj, null);
 		}
 	}
 
@@ -242,11 +216,7 @@ public final class Logger {
 	public static void debug(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.DEBUG) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.DEBUG, null, message, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, null);
 		}
 	}
 
@@ -263,11 +233,7 @@ public final class Logger {
 	public static void debug(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.DEBUG) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.DEBUG, null, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, arguments);
 		}
 	}
 
@@ -286,11 +252,7 @@ public final class Logger {
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.DEBUG) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.DEBUG, exception, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
 		}
 	}
 
@@ -303,11 +265,7 @@ public final class Logger {
 	public static void debug(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.DEBUG) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.DEBUG, exception, null, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, null, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, null, null);
 		}
 	}
 
@@ -320,11 +278,7 @@ public final class Logger {
 	public static void info(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.INFO) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.INFO, null, obj, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, obj, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, obj, null);
 		}
 	}
 
@@ -339,11 +293,7 @@ public final class Logger {
 	public static void info(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.INFO) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.INFO, null, message, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, null);
 		}
 	}
 
@@ -360,11 +310,7 @@ public final class Logger {
 	public static void info(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.INFO) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.INFO, null, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, arguments);
 		}
 	}
 
@@ -383,11 +329,7 @@ public final class Logger {
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.INFO) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.INFO, exception, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, message, arguments);
 		}
 	}
 
@@ -400,11 +342,7 @@ public final class Logger {
 	public static void info(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.INFO) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.INFO, exception, null, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, null, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, null, null);
 		}
 	}
 
@@ -417,11 +355,7 @@ public final class Logger {
 	public static void warn(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.WARNING) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.WARNING, null, obj, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, obj, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, obj, null);
 		}
 	}
 
@@ -436,11 +370,7 @@ public final class Logger {
 	public static void warn(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.WARNING) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.WARNING, null, message, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, null);
 		}
 	}
 
@@ -457,11 +387,7 @@ public final class Logger {
 	public static void warn(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.WARNING) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.WARNING, null, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, arguments);
 		}
 	}
 
@@ -480,11 +406,7 @@ public final class Logger {
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.WARNING) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.WARNING, exception, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
 		}
 	}
 
@@ -497,11 +419,7 @@ public final class Logger {
 	public static void warn(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.WARNING) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.WARNING, exception, null, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, null);
 		}
 	}
 
@@ -514,11 +432,7 @@ public final class Logger {
 	public static void error(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.ERROR) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.ERROR, null, obj, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, obj, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, obj, null);
 		}
 	}
 
@@ -533,11 +447,7 @@ public final class Logger {
 	public static void error(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.ERROR) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.ERROR, null, message, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, null);
 		}
 	}
 
@@ -554,11 +464,7 @@ public final class Logger {
 	public static void error(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.ERROR) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.ERROR, null, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, arguments);
 		}
 	}
 
@@ -577,11 +483,7 @@ public final class Logger {
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.ERROR) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.ERROR, exception, message, arguments);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, message, arguments);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, message, arguments);
 		}
 	}
 
@@ -594,11 +496,7 @@ public final class Logger {
 	public static void error(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			if (currentConfiguration.getRequiredStackTraceInformation(Level.ERROR) == StackTraceInformation.CLASS_NAME && hasSunReflection) {
-				output(currentConfiguration, Reflection.getCallerClass(2), Level.ERROR, exception, null, null);
-			} else {
-				output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, null, null);
-			}
+			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, null, null);
 		}
 	}
 
@@ -689,7 +587,8 @@ public final class Logger {
 		Level activeLevel = currentConfiguration.getLevel();
 
 		if (currentConfiguration.hasCustomLevels()) {
-			stackTraceElement = getStackTraceElement(strackTraceDeep);
+			boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
+			stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 			activeLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 		}
 
@@ -697,38 +596,6 @@ public final class Logger {
 			try {
 				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
 				LogEntry[] logEntries = createLogEntries(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
-				if (currentConfiguration.getWritingThread() == null) {
-					for (int i = 0; i < writers.length; ++i) {
-						try {
-							writers[i].write(logEntries[i]);
-						} catch (Exception ex) {
-							InternalLogger.error(ex, "Failed to write log entry");
-						}
-					}
-				} else {
-					for (int i = 0; i < writers.length; ++i) {
-						currentConfiguration.getWritingThread().putLogEntry(writers[i], logEntries[i]);
-					}
-				}
-			} catch (Exception ex) {
-				InternalLogger.error(ex, "Failed to create log entry");
-			}
-		}
-	}
-
-	private static void output(final Configuration currentConfiguration, final Class<?> callerClass, final Level level, final Throwable exception,
-			final Object message, final Object[] arguments) {
-		Level activeLevel = currentConfiguration.getLevel();
-
-		if (currentConfiguration.hasCustomLevels()) {
-			activeLevel = currentConfiguration.getLevel(callerClass.getName());
-		}
-
-		if (activeLevel.ordinal() <= level.ordinal()) {
-			try {
-				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
-				StackTraceElement stackTraceElement = new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1);
-				LogEntry[] logEntries = createLogEntries(currentConfiguration, -1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
 					for (int i = 0; i < writers.length; ++i) {
 						try {
@@ -811,28 +678,29 @@ public final class Logger {
 
 				case CLASS:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
+						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
 					fullyQualifiedClassName = stackTraceElement.getClassName();
 					break;
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
 					}
 					method = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
 					}
 					filename = stackTraceElement.getFileName();
 					break;
 
 				case LINE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep);
+						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
 					}
 					line = stackTraceElement.getLineNumber();
 					break;
@@ -925,7 +793,16 @@ public final class Logger {
 		return entries;
 	}
 
-	private static StackTraceElement getStackTraceElement(final int deep) {
+	@SuppressWarnings({ "deprecation", "restriction" })
+	private static StackTraceElement getStackTraceElement(final int deep, final boolean onlyClassName) {
+		if (onlyClassName && hasSunReflection) {
+			try {
+				return new StackTraceElement(sun.reflect.Reflection.getCallerClass(deep + 1).getName(), "<unknown>", "<unknown>", -1);
+			} catch (Exception ex) {
+				InternalLogger.warn(ex, "Failed to get caller class from ");
+			}
+		}
+
 		if (stackTraceMethod != null) {
 			try {
 				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);

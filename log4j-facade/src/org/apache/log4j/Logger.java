@@ -13,12 +13,10 @@
 
 package org.apache.log4j;
 
-import sun.reflect.Reflection;
 
 /**
  * log4j logging API.
  */
-@SuppressWarnings({ "restriction", "deprecation" })
 public class Logger extends Category {
 
 	Logger(final Logger parent, final String name) {
@@ -63,11 +61,7 @@ public class Logger extends Category {
 	 * @return <code>true</code> if trace log entries will be output, <code>false</code> if not
 	 */
 	public boolean isTraceEnabled() {
-		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(2), Level.TRACE);
-		} else {
-			return TinylogBride.isEnabled(Level.TRACE);
-		}
+		return TinylogBride.isEnabled(Level.TRACE);
 	}
 
 	/**
