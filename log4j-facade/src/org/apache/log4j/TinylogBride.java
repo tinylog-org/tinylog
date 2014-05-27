@@ -22,6 +22,7 @@ import sun.reflect.Reflection; // SUPPRESS CHECKSTYLE Illegal Imports
 /**
  * Bridge to tinylog.
  */
+@SuppressWarnings({ "restriction", "deprecation" })
 class TinylogBride {
 
 	private static Method stackTraceMethod;
@@ -40,7 +41,7 @@ class TinylogBride {
 		}
 
 		try {
-			Reflection.getCallerClass();
+			Reflection.getCallerClass(2);
 			hasSunReflection = true;
 		} catch (Exception ex) {
 			hasSunReflection = false;
@@ -56,7 +57,7 @@ class TinylogBride {
 
 	/**
 	 * Get the active logging level for the caller class.
-	 * 
+	 *
 	 * @return Active logging level
 	 */
 	public static Level getLevel() {
@@ -67,7 +68,7 @@ class TinylogBride {
 
 	/**
 	 * Get the active logging level for the caller class.
-	 * 
+	 *
 	 * @param callerClass
 	 *            Class that has called this method
 	 * @return Active logging level
@@ -79,7 +80,7 @@ class TinylogBride {
 
 	/**
 	 * Check if a given logging level will be output.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level to test
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
@@ -92,7 +93,7 @@ class TinylogBride {
 
 	/**
 	 * Check if a given logging level will be output.
-	 * 
+	 *
 	 * @param callerClass
 	 *            Class that has called this method
 	 * @param level
@@ -106,7 +107,7 @@ class TinylogBride {
 
 	/**
 	 * Create a log entry.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message
@@ -118,7 +119,7 @@ class TinylogBride {
 
 	/**
 	 * Create a log entry.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message

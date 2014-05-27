@@ -5,10 +5,6 @@
 	
 	<property name="root" location=".." />
 	
-	<property name="environment" location="${root}/environment-stubs" />
-	<property name="environment.bin" location="${environment}/bin" />
-	<property name="environment.src" location="${environment}/src" />
-	
 	<property name="tinylog" location="${root}/tinylog" />
 	<property name="tinylog.files" location="${tinylog}/files" />
 	<property name="tinylog.bin" location="${tinylog}/bin" />
@@ -67,7 +63,6 @@
 	</taskdef>
 
 	<target name="clean">
-		<delete dir="${environment.bin}" />
 		<delete dir="${tinylog.bin}" />
 		<delete dir="${log4j.bin}" />
 		<delete dir="${tests.bin}" />
@@ -75,7 +70,6 @@
 	</target>
 
 	<target name="makedir">
-		<mkdir dir="${environment.bin}" />
 		<mkdir dir="${tinylog.bin}" />
 		<mkdir dir="${log4j.bin}" />
 		<mkdir dir="${tests.bin}" />
@@ -83,10 +77,7 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${environment.src}" destdir="${environment.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}" />
 		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
-			<classpath location="${environment.bin}" />
-			<compilerarg value="-Xbootclasspath/p:${environment.bin}"/>
 		</javac>
 		<copy todir="${tinylog.bin}">
 			<fileset dir="${tinylog.src}">
@@ -95,9 +86,7 @@
 			</fileset>
 		</copy>
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
-			<classpath location="${environment.bin}" />
 			<classpath location="${tinylog.bin}" />
-			<compilerarg value="-Xbootclasspath/p:${environment.bin}"/>
 		</javac>
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
@@ -319,7 +308,6 @@
 			<zipfileset dir="${root}">
 				<include name="benchmark/**" />
 				<include name="configuration/**" />
-				<include name="environment-stubs/**" />
 				<include name="libraries/**" />
 				<include name="log4j-facade/**" />
 				<include name="tests/**" />
@@ -349,15 +337,12 @@
 
 	<target name="check" depends="compile">
 		<checkstyle config="${conf}/tinylog-checkstyle.xml">
-			<fileset dir="${environment.src}" includes="**/*.java" />
 			<fileset dir="${tinylog.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
 		<findbugs home="${lib.findbugs}" output="text" excludefilter="${conf}/tinylog-findbugs.xml">
 			<auxclasspath refid="junit.classpath" />
-			<sourcepath location="${environment.src}" />
-			<class location="${environment.bin}" />
 			<sourcepath location="${tinylog.bin}" />
 			<class location="${tinylog.bin}" />
 			<sourcepath location="${log4j.src}" />

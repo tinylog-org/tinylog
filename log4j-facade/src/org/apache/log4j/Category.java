@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -20,6 +20,7 @@ import sun.reflect.Reflection;
  *
  * @see Logger
  */
+@SuppressWarnings({ "restriction", "deprecation" })
 public class Category {
 
 	private final Category parent;
@@ -79,7 +80,7 @@ public class Category {
 	@Deprecated
 	public final Level getPriority() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass(2));
 		} else {
 			return TinylogBride.getLevel();
 		}
@@ -91,7 +92,7 @@ public class Category {
 	@Deprecated
 	public Priority getChainedPriority() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass(2));
 		} else {
 			return TinylogBride.getLevel();
 		}
@@ -105,7 +106,7 @@ public class Category {
 	 */
 	public final Level getLevel() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass(2));
 		} else {
 			return TinylogBride.getLevel();
 		}
@@ -119,7 +120,7 @@ public class Category {
 	 */
 	public Level getEffectiveLevel() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.getLevel(Reflection.getCallerClass());
+			return TinylogBride.getLevel(Reflection.getCallerClass(2));
 		} else {
 			return TinylogBride.getLevel();
 		}
@@ -132,7 +133,7 @@ public class Category {
 	 */
 	public boolean isDebugEnabled() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(), Level.DEBUG);
+			return TinylogBride.isEnabled(Reflection.getCallerClass(2), Level.DEBUG);
 		} else {
 			return TinylogBride.isEnabled(Level.DEBUG);
 		}
@@ -167,7 +168,7 @@ public class Category {
 	 */
 	public boolean isInfoEnabled() {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(), Level.INFO);
+			return TinylogBride.isEnabled(Reflection.getCallerClass(2), Level.INFO);
 		} else {
 			return TinylogBride.isEnabled(Level.INFO);
 		}
@@ -270,7 +271,7 @@ public class Category {
 	 */
 	public boolean isEnabledFor(final Priority level) {
 		if (TinylogBride.hasSunReflection()) {
-			return TinylogBride.isEnabled(Reflection.getCallerClass(), level);
+			return TinylogBride.isEnabled(Reflection.getCallerClass(2), level);
 		} else {
 			return TinylogBride.isEnabled(level);
 		}

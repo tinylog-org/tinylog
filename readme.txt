@@ -19,9 +19,6 @@ specific language governing permissions and limitations under the License.
 benchmark:
 	Contains a benchmark with an ANT script for multiple logging frameworks
 
-environment-stubs:
-	Contains non-standard VM APIs
-
 log4j-facade:
 	Contains the log4j facade (Log4j 1.x compatible logging API)
 
