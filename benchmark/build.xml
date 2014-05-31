@@ -5,6 +5,7 @@
 	<property name="bin" location="bin" />
 	<property name="src" location="src" />
 	<property name="lib" location="lib" />
+	<property name="tinylog" location="${root}/tinylog" />
 	<property name="dist" location="${root}/distribution" />
 	<property name="dist.jar" location="${dist}/jar" />
 
@@ -34,15 +35,13 @@
 		</fileset>
 	</path>
 
-	<target name="clean">
+	<target name="create-tinylog-jar">
+		<ant antfile="${tinylog}/build.xml" inheritall="false" dir="${tinylog}" target="pack-jar" />
+	</target>
+
+	<target name="compile" depends="create-tinylog-jar">
 		<delete dir="${bin}" />
-	</target>
-
-	<target name="makedir">
 		<mkdir dir="${bin}" />
-	</target>
-
-	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
 			<classpath refid="log4j.classpath" />
 			<classpath refid="log4j2.classpath" />
