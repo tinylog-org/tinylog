@@ -63,20 +63,14 @@
 	</taskdef>
 
 	<target name="clean">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${dist}" includes="**/*" excludes=".*" />
+		</delete>
+	</target>
+
+	<target name="compile">
 		<delete dir="${tinylog.bin}" />
-		<delete dir="${log4j.bin}" />
-		<delete dir="${tests.bin}" />
-		<delete dir="${dist}" />
-	</target>
-
-	<target name="makedir">
 		<mkdir dir="${tinylog.bin}" />
-		<mkdir dir="${log4j.bin}" />
-		<mkdir dir="${tests.bin}" />
-		<mkdir dir="${dist}" />
-	</target>
-
-	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
 		</javac>
 		<copy todir="${tinylog.bin}">
@@ -85,9 +79,21 @@
 				<include name="META-INF/**" />
 			</fileset>
 		</copy>
+		
+		<delete dir="${log4j.bin}" />
+		<mkdir dir="${log4j.bin}" />
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
 			<classpath location="${tinylog.bin}" />
 		</javac>
+		<copy todir="${log4j.bin}">
+			<fileset dir="${log4j.src}">
+				<include name="**/*.properties" />
+				<include name="META-INF/**" />
+			</fileset>
+		</copy>
+	
+		<delete dir="${tests.bin}" />
+		<mkdir dir="${tests.bin}" />
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
 			<classpath refid="junit.classpath" />
 			<classpath location="${tinylog.bin}" />
@@ -299,6 +305,7 @@
 	</target>
 	
 	<target name="pack-sources">
+		<mkdir dir="${dist}" />
 		<delete>
 			<fileset dir="${dist}">
 				<include name="tinylog-*-src.zip" />
@@ -370,6 +377,6 @@
 		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
 	
-	<target name="all" depends="compile, docs, check, test, pack-all" />
+	<target name="all" depends="clean, check, test, pack-all, docs" />
 
 </project>
