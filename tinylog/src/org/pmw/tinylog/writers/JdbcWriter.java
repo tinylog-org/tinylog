@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -244,7 +244,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get the JDBC connection URL to database.
-	 * 
+	 *
 	 * @return JDBC connection URL
 	 */
 	public String getUrl() {
@@ -253,7 +253,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get the name of the database table.
-	 * 
+	 *
 	 * @return Name of the database table
 	 */
 	public String getTable() {
@@ -262,7 +262,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get the columns of the table, which are used for the insert statement.
-	 * 
+	 *
 	 * @return Columns of the table, which are used for the insert statement
 	 */
 	public List<String> getColumns() {
@@ -271,7 +271,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get all values to insert.
-	 * 
+	 *
 	 * @return Values to insert
 	 */
 	public List<Value> getValues() {
@@ -280,7 +280,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Determine whether batch mode is enabled.
-	 * 
+	 *
 	 * @return <code>true</code> if batch mode is enabled, <code>false</code> if not
 	 */
 	public boolean isBatchMode() {
@@ -289,7 +289,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get the user name for database log in.
-	 * 
+	 *
 	 * @return User name for log in
 	 */
 	public String getUsername() {
@@ -298,7 +298,7 @@ public final class JdbcWriter implements Writer {
 
 	/**
 	 * Get the password for database log in.
-	 * 
+	 *
 	 * @return Password for log in
 	 */
 	public String getPassword() {
@@ -629,11 +629,11 @@ public final class JdbcWriter implements Writer {
 	/**
 	 * Values to insert.
 	 */
-	public static enum Value {
+	static enum Value {
 
 		/**
 		 * The current date
-		 * 
+		 *
 		 * @see Date
 		 */
 		DATE(LogEntryValue.DATE),
@@ -685,7 +685,7 @@ public final class JdbcWriter implements Writer {
 
 		/**
 		 * The severity level
-		 * 
+		 *
 		 * @see Level
 		 */
 		LEVEL(LogEntryValue.LEVEL),
@@ -697,7 +697,7 @@ public final class JdbcWriter implements Writer {
 
 		/**
 		 * The exception of the log entry
-		 * 
+		 *
 		 * @see Throwable
 		 */
 		EXCEPTION(LogEntryValue.EXCEPTION),
