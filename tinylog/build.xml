@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="tinylog" default="all">
 	
-	<property name="version" value="0.9" />
+	<property name="version" value="0.9.1" />
 	
 	<property name="root" location=".." />
 	
