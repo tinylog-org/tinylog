@@ -627,7 +627,9 @@ public final class JdbcWriter implements Writer {
 	}
 
 	/**
-	 * Values to insert.
+	 * Values to insert into database.
+	 *
+	 * @see JdbcWriter
 	 */
 	public static enum Value {
 
