@@ -54,7 +54,7 @@ public class PrimesBenchmark extends AbstractBenchmark {
 
 	@Override
 	protected void run(final ILoggingFramework framework) throws InterruptedException, ExecutionException {
-		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 10);
+		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Long> primes = new ArrayList<>();
 		framework.trace(1L);
 
