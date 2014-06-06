@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import org.pmw.benchmark.dummy.Dummy;
 
@@ -70,7 +71,7 @@ public abstract class AbstractBenchmark {
 				BufferedReader reader = new BufferedReader(new FileReader(files[i]));
 				for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 					++totalLines;
-					if (!isValidLogEntry(line)) {
+					if (!isValidLogEntry(line, framework)) {
 						++invalidLines;
 					}
 				}
@@ -111,9 +112,40 @@ public abstract class AbstractBenchmark {
 
 	protected abstract long countWrittenLogEntries();
 
-	private static boolean isValidLogEntry(final String line) {
-		return (line.contains("Trace") || line.contains("Debug") || line.contains("Info") || line.contains("Warning") || line.contains("Error"))
-				&& line.contains(AbstractBenchmark.class.getPackage().getName());
+	private static boolean isValidLogEntry(final String line, final ILoggingFramework framework) {
+		if (!line.contains(Integer.toString(Calendar.getInstance().get(Calendar.YEAR)))) {
+			return false;
+		}
+
+		if (!line.contains(framework.getClass().getPackage().getName())) {
+			return false;
+		}
+
+		if (line.contains("Trace")) {
+			if (!line.contains("trace()")) {
+				return false;
+			}
+		} else if (line.contains("Debug")) {
+			if (!line.contains("debug()")) {
+				return false;
+			}
+		} else if (line.contains("Info")) {
+			if (!line.contains("info()")) {
+				return false;
+			}
+		} else if (line.contains("Warning")) {
+			if (!line.contains("warning()")) {
+				return false;
+			}
+		} else if (line.contains("Error")) {
+			if (!line.contains("error()")) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		return true;
 	}
 
 	private long calcTime(final long[] times) {
