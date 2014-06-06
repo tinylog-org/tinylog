@@ -28,7 +28,7 @@ public class TinylogWithWritingThread extends Tinylog {
 	@Override
 	public void init(final File file) throws Exception {
 		super.init(file);
-		Configurator.currentConfig().writingThread(true).activate();
+		Configurator.currentConfig().writingThread(null).activate();
 	}
 
 	@Override
