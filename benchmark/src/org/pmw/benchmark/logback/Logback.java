@@ -86,7 +86,7 @@ public class Logback implements ILoggingFramework {
 		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 		encoder.setContext(context);
 		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
-		encoder.setImmediateFlush(false);
+		encoder.setImmediateFlush(true);
 		return encoder;
 	}
 
