@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark;
+package org.pmw.benchmark.executors;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -25,45 +25,55 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class PrimesBenchmark extends AbstractBenchmark {
+import org.pmw.benchmark.Benchmark;
 
-	private static final long MAX_NUMBER = 10_000_000L;
+public final class PrimesBenchmarkExecutor extends AbstractBenchmarkExecutor {
 
+	private static final String NAME = "prime";
+
+	private final long maximum;
 	private long primes;
 
-	public PrimesBenchmark(final ILoggingFramework framework) {
-		super(framework.getName() + " (primes)", framework);
-	}
-
-	public static void main(final String[] arguments) throws Exception {
-		ILoggingFramework framework = createLoggingFramework(arguments);
-		if (framework != null) {
-			new PrimesBenchmark(framework).start();
-		}
+	public PrimesBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final long maximum) {
+		super(benchmark, runs, outliers);
+		this.maximum = maximum;
 	}
 
 	@Override
-	protected long countTriggeredLogEntries() {
-		return MAX_NUMBER;
+	public String getName() {
+		return NAME;
 	}
 
 	@Override
-	protected long countWrittenLogEntries() {
+	protected final long countTriggeredLogEntries() {
+		return maximum;
+	}
+
+	@Override
+	protected final long countWrittenLogEntries() {
 		return primes;
 	}
 
 	@Override
-	protected void run(final ILoggingFramework framework) throws InterruptedException, ExecutionException {
+	protected boolean isValidLogEntry(final String line) {
+		if (super.isValidLogEntry(line)) {
+			return line.contains("is prime");
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	protected void run() throws InterruptedException, ExecutionException {
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Long> primes = new ArrayList<>();
-		framework.trace(1L);
 
 		Queue<Future<Boolean>> runningCalculators = new LinkedList<>();
 		long number = 2L;
 
-		long limit = Math.min(number * number - 1, MAX_NUMBER);
+		long limit = Math.min(number * number - 1, maximum);
 		for (; number <= limit; ++number) {
-			runningCalculators.add(executorService.submit(new PrimesCalculator(framework, new SubList<Long>(primes, 0, primes.size()), number)));
+			runningCalculators.add(executorService.submit(new PrimesCalculator(new SubList<Long>(primes, 0, primes.size()), number)));
 		}
 
 		for (long i = 2L; i <= limit; ++i) {
@@ -71,9 +81,9 @@ public class PrimesBenchmark extends AbstractBenchmark {
 			if (calculator.get()) {
 				primes.add(i);
 			}
-			limit = Math.min(i * i - 1, MAX_NUMBER);
+			limit = Math.min(i * i - 1, maximum);
 			for (; number <= limit; ++number) {
-				runningCalculators.add(executorService.submit(new PrimesCalculator(framework, new SubList<Long>(primes, 0, primes.size()), number)));
+				runningCalculators.add(executorService.submit(new PrimesCalculator(new SubList<Long>(primes, 0, primes.size()), number)));
 			}
 		}
 
@@ -81,32 +91,24 @@ public class PrimesBenchmark extends AbstractBenchmark {
 		this.primes = primes.size();
 	}
 
-	private class PrimesCalculator implements Callable<Boolean> {
+	private final class PrimesCalculator implements Callable<Boolean> {
 
-		private final ILoggingFramework framework;
 		private final List<Long> primes;
 		private final long number;
 
-		public PrimesCalculator(final ILoggingFramework framework, final List<Long> primes, final long number) {
-			this.framework = framework;
+		public PrimesCalculator(final List<Long> primes, final long number) {
 			this.primes = primes;
 			this.number = number;
 		}
 
 		@Override
-		public Boolean call() {
-			for (Long prime : primes) {
-				if (number % prime == 0L) {
-					framework.trace(number);
-					return Boolean.FALSE;
-				}
-			}
-			framework.info(number);
-			return Boolean.TRUE;
+		public Boolean call() throws Exception {
+			return benchmark.calculate(primes, number);
 		}
+
 	}
 
-	private class SubList<T> extends AbstractList<T> implements RandomAccess {
+	private final static class SubList<T> extends AbstractList<T> implements RandomAccess {
 
 		private final List<T> parent;
 		private final int offset;
