@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -101,7 +101,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load configuration from properties.
-	 * 
+	 *
 	 * @param properties
 	 *            Properties with configuration
 	 * @return A new configurator
@@ -119,7 +119,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load default severity level and custom severity levels from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -143,7 +143,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load format pattern from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -158,7 +158,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load locale from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -180,7 +180,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load number of max stack trace elements from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -193,14 +193,14 @@ final class PropertiesLoader {
 				int limit = Integer.parseInt(stacktace);
 				configurator.maxStackTraceElements(limit);
 			} catch (NumberFormatException ex) {
-				InternalLogger.warn("\"{0}\" is an invalid stack trace size and will be ignored", stacktace);
+				InternalLogger.warn("\"{}\" is an invalid stack trace size and will be ignored", stacktace);
 			}
 		}
 	}
 
 	/**
 	 * Load writers from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -243,7 +243,7 @@ final class PropertiesLoader {
 
 	/**
 	 * Load writing thread data from properties.
-	 * 
+	 *
 	 * @param configurator
 	 *            Configurator to update
 	 * @param properties
@@ -266,7 +266,7 @@ final class PropertiesLoader {
 					priority = Integer.parseInt(priorityString.trim());
 				} catch (NumberFormatException ex) {
 					priority = null;
-					InternalLogger.warn("\"{0}\" is an invalid thread priority and will be ignored", priorityString);
+					InternalLogger.warn("\"{}\" is an invalid thread priority and will be ignored", priorityString);
 				}
 			}
 			if (priority != null && observedThreadDefined) {
@@ -321,7 +321,7 @@ final class PropertiesLoader {
 			try {
 				return Level.valueOf(levelName.toUpperCase(Locale.ENGLISH));
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.warn("\"{0}\" is an invalid severity level and will be ignored", levelName);
+				InternalLogger.warn("\"{}\" is an invalid severity level and will be ignored", levelName);
 				return null;
 			}
 		} else {
@@ -345,14 +345,14 @@ final class PropertiesLoader {
 				if (writerName.equalsIgnoreCase(propertiesSupport.name())) {
 					Writer writer = loadWriter(properties, propertyName, propertiesSupport.properties(), implementation);
 					if (writer == null) {
-						InternalLogger.error("Failed to initialize {0} writer", writerName);
+						InternalLogger.error("Failed to initialize {} writer", writerName);
 					}
 					return writer;
 				}
 			}
 		}
 
-		InternalLogger.error("Cannot find a writer for the name \"{0}\"", writerName);
+		InternalLogger.error("Cannot find a writer for the name \"{}\"", writerName);
 		return null;
 	}
 
@@ -379,7 +379,7 @@ final class PropertiesLoader {
 										services.add(implementation);
 									}
 								} catch (ClassNotFoundException ex) {
-									InternalLogger.warn("Cannot find class \"{0}\"", line);
+									InternalLogger.warn("Cannot find class \"{}\"", line);
 								}
 							}
 						}
@@ -403,7 +403,7 @@ final class PropertiesLoader {
 				return services;
 			}
 		} catch (IOException ex) {
-			InternalLogger.error(ex, "Failed to read services from \"{0}\"", SERVICES_PREFIX + service.getPackage().getName());
+			InternalLogger.error(ex, "Failed to read services from \"{}\"", SERVICES_PREFIX + service.getPackage().getName());
 			return Collections.emptyList();
 		}
 	}
@@ -448,16 +448,16 @@ final class PropertiesLoader {
 							constructor.setAccessible(true);
 							return (Writer) constructor.newInstance(parameters);
 						} catch (IllegalArgumentException ex) {
-							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							InternalLogger.error(ex, "Failed to create an instance of \"{}\"", writerClass.getName());
 							return null;
 						} catch (InstantiationException ex) {
-							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							InternalLogger.error(ex, "Failed to create an instance of \"{}\"", writerClass.getName());
 							return null;
 						} catch (IllegalAccessException ex) {
-							InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", writerClass.getName());
+							InternalLogger.error(ex, "Failed to create an instance of \"{}\"", writerClass.getName());
 							return null;
 						} catch (InvocationTargetException ex) {
-							InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{0}\"", writerClass.getName());
+							InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{}\"", writerClass.getName());
 							return null;
 						}
 					}
@@ -478,7 +478,7 @@ final class PropertiesLoader {
 				if (definition[i].optional()) {
 					parameters[i] = null;
 				} else {
-					InternalLogger.error("Missing required property \"{0}\"", propertiesPrefix + "." + name);
+					InternalLogger.error("Missing required property \"{}\"", propertiesPrefix + "." + name);
 					return null;
 				}
 			} else {
@@ -489,14 +489,14 @@ final class PropertiesLoader {
 					} else if ("false".equalsIgnoreCase(value)) {
 						parameters[i] = Boolean.FALSE;
 					} else {
-						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid boolean", propertiesPrefix + "." + name, value);
+						InternalLogger.error("\"{}\" for \"{}.{}\" is an invalid boolean", value, propertiesPrefix, name);
 						return null;
 					}
 				} else if (int.class.equals(type)) {
 					try {
 						parameters[i] = Integer.parseInt(value);
 					} catch (NumberFormatException ex) {
-						InternalLogger.error("\"{1}\" for \"{0}\" is an invalid number", propertiesPrefix + "." + name, value);
+						InternalLogger.error("\"{}\" for \"{}.{}\" is an invalid number", value, propertiesPrefix, name);
 						return null;
 					}
 				} else if (String.class.equals(type)) {
@@ -526,8 +526,8 @@ final class PropertiesLoader {
 					}
 				} else {
 					InternalLogger.error(
-							"\"{1}\" for \"{0}\" is an unsupported type (String, String[], int, boolean, Labeler, Policy and Policy[] are supported)",
-							propertiesPrefix + "." + name, type.getName());
+							"\"{}\" for \"{}.{}\" is an unsupported type (String, String[], int, boolean, Labeler, Policy and Policy[] are supported)",
+							type.getName(), propertiesPrefix, name);
 					return null;
 				}
 			}
@@ -571,14 +571,14 @@ final class PropertiesLoader {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
 					Labeler labeler = (Labeler) createInstance(implementation, parameter);
 					if (labeler == null) {
-						InternalLogger.error("Failed to initialize {0} labeler", name);
+						InternalLogger.error("Failed to initialize {} labeler", name);
 					}
 					return labeler;
 				}
 			}
 		}
 
-		InternalLogger.error("Cannot find a labeler for the name \"{0}\"", name);
+		InternalLogger.error("Cannot find a labeler for the name \"{}\"", name);
 		return null;
 	}
 
@@ -606,14 +606,14 @@ final class PropertiesLoader {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
 					Policy policy = (Policy) createInstance(implementation, parameter);
 					if (policy == null) {
-						InternalLogger.error("Failed to initialize {0} policy", name);
+						InternalLogger.error("Failed to initialize {} policy", name);
 					}
 					return policy;
 				}
 			}
 		}
 
-		InternalLogger.error("Cannot find a policy for the name \"{0}\"", name);
+		InternalLogger.error("Cannot find a policy for the name \"{}\"", name);
 		return null;
 	}
 
@@ -629,19 +629,19 @@ final class PropertiesLoader {
 				return constructor.newInstance(parameter);
 			}
 		} catch (InstantiationException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		} catch (IllegalAccessException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		} catch (IllegalArgumentException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		} catch (InvocationTargetException ex) {
-			InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		} catch (NoSuchMethodException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{0}\"", clazz.getName());
+			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		}
 	}

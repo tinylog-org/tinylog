@@ -13,11 +13,9 @@
 
 package org.pmw.tinylog;
 
-import java.text.MessageFormat;
-
 /**
  * Static logger for logging internal problems of tinylog.
- * 
+ *
  * Log entries will be always output into the console.
  */
 public final class InternalLogger {
@@ -32,7 +30,7 @@ public final class InternalLogger {
 
 	/**
 	 * Log an internal warning.
-	 * 
+	 *
 	 * @param message
 	 *            Text to log
 	 */
@@ -45,22 +43,20 @@ public final class InternalLogger {
 	}
 
 	/**
-	 * Log an internal warning.
-	 * 
+	 * Log an internal warning. "{}" placeholders will be replaced by the given arguments.
+	 *
 	 * @param message
 	 *            Formated text to log
 	 * @param arguments
 	 *            Arguments for the text message
-	 * 
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final String message, final Object... arguments) {
-		warn(MessageFormat.format(message, arguments));
+		warn(MessageFormatter.format(message, arguments));
 	}
 
 	/**
 	 * Log an internal warning.
-	 * 
+	 *
 	 * @param exception
 	 *            Exception to log
 	 */
@@ -75,7 +71,7 @@ public final class InternalLogger {
 
 	/**
 	 * Log an internal warning.
-	 * 
+	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
@@ -91,24 +87,22 @@ public final class InternalLogger {
 	}
 
 	/**
-	 * Log an internal warning.
-	 * 
+	 * Log an internal warning. "{}" placeholders will be replaced by the given arguments.
+	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
 	 *            Formated text to log
 	 * @param arguments
 	 *            Arguments for the text message
-	 * 
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
-		warn(exception, MessageFormat.format(message, arguments));
+		warn(exception, MessageFormatter.format(message, arguments));
 	}
 
 	/**
 	 * Log an internal error.
-	 * 
+	 *
 	 * @param message
 	 *            Text to log
 	 */
@@ -121,22 +115,20 @@ public final class InternalLogger {
 	}
 
 	/**
-	 * Log an internal error.
-	 * 
+	 * Log an internal error. "{}" placeholders will be replaced by the given arguments.
+	 *
 	 * @param message
 	 *            Formated text to log
 	 * @param arguments
 	 *            Arguments for the text message
-	 * 
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final String message, final Object... arguments) {
-		error(MessageFormat.format(message, arguments));
+		error(MessageFormatter.format(message, arguments));
 	}
 
 	/**
 	 * Log an internal error.
-	 * 
+	 *
 	 * @param exception
 	 *            Exception to log
 	 */
@@ -151,7 +143,7 @@ public final class InternalLogger {
 
 	/**
 	 * Log an internal error.
-	 * 
+	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
@@ -167,19 +159,17 @@ public final class InternalLogger {
 	}
 
 	/**
-	 * Log an internal error.
-	 * 
+	 * Log an internal error. "{}" placeholders will be replaced by the given arguments.
+	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
 	 *            Formated text to log
 	 * @param arguments
 	 *            Arguments for the text message
-	 * 
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
-		error(exception, MessageFormat.format(message, arguments));
+		error(exception, MessageFormatter.format(message, arguments));
 	}
 
 }

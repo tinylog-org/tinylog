@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -28,7 +28,6 @@ import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
@@ -45,14 +44,14 @@ import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Tests for the logger.
- * 
+ *
  * @see Logger
  */
 public class LoggerTest extends AbstractTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 * 
+	 *
 	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
@@ -129,7 +128,7 @@ public class LoggerTest extends AbstractTest {
 			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
-			Logger.trace("Hello {0}!", "World");
+			Logger.trace("Hello {}!", "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -180,7 +179,7 @@ public class LoggerTest extends AbstractTest {
 			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
-			Logger.debug("Hello {0}!", "World");
+			Logger.debug("Hello {}!", "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -231,7 +230,7 @@ public class LoggerTest extends AbstractTest {
 			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
-			Logger.info("Hello {0}!", "World");
+			Logger.info("Hello {}!", "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -282,7 +281,7 @@ public class LoggerTest extends AbstractTest {
 			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
-			Logger.warn("Hello {0}!", "World");
+			Logger.warn("Hello {}!", "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -333,7 +332,7 @@ public class LoggerTest extends AbstractTest {
 			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
-			Logger.error("Hello {0}!", "World");
+			Logger.error("Hello {}!", "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -359,7 +358,7 @@ public class LoggerTest extends AbstractTest {
 
 	/**
 	 * Test output method with stack trace deep.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -390,7 +389,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {0}!", new Object[] { "World" });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
@@ -424,7 +423,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
+		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
 		getErrorStream().clear();
@@ -455,7 +454,7 @@ public class LoggerTest extends AbstractTest {
 
 	/**
 	 * Test output method with stack trace element.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -490,7 +489,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.output(stackTraceElement, Level.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(stackTraceElement, Level.INFO, null, "Hello {0}!", new Object[] { "World" });
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello {}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
@@ -526,7 +525,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().level("com.test", null).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.output(stackTraceElement, Level.INFO, null, "Hello {0}!", new Object[] { new EvilObject() });
+		Logger.output(stackTraceElement, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
 		getErrorStream().clear();
@@ -557,7 +556,7 @@ public class LoggerTest extends AbstractTest {
 
 	/**
 	 * Test output method with class name.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -590,7 +589,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.debug("Hello!");
 		assertNull(writer.consumeLogEntry());
 
-		Logger.info("Hello {0}!", "World");
+		Logger.info("Hello {}!", "World");
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
@@ -626,7 +625,7 @@ public class LoggerTest extends AbstractTest {
 		Configurator.currentConfig().level(LoggerTest.class.getPackage(), null).activate();
 
 		assertFalse(getErrorStream().hasLines());
-		Logger.info("Hello {0}!", new EvilObject());
+		Logger.info("Hello {}!", new EvilObject());
 		assertNull(writer.consumeLogEntry());
 		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
 		getErrorStream().clear();
@@ -896,7 +895,7 @@ public class LoggerTest extends AbstractTest {
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter(EnumSet.allOf(LogEntryValue.class));
 		Configurator.defaultConfig().writer(writer).level(Level.INFO)
-				.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+		.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
@@ -913,10 +912,9 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 
-		String renderedLogEntry = MessageFormat.format("{0}#{1}#{2}#{3}#{4}#{5}#testFullLogEntry#LoggerTest.java#{6}#{7}#{8}#Hello{9}",
-				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
-				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
-				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
+		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}", EnvironmentHelper.getProcessId(),
+				Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(), LoggerTest.class.getPackage().getName(),
+				LoggerTest.class.getSimpleName(), lineNumber, Level.INFO, new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 
@@ -965,7 +963,7 @@ public class LoggerTest extends AbstractTest {
 
 	/**
 	 * Test getting and setting configuration.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */

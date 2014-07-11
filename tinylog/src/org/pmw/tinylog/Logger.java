@@ -14,7 +14,6 @@
 package org.pmw.tinylog;
 
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -131,8 +130,6 @@ public final class Logger {
 	 *
 	 * @param message
 	 *            Text message to log
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final String message) {
 		Configuration currentConfiguration = configuration;
@@ -142,14 +139,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a trace log entry.
+	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -159,7 +154,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a trace log entry.
+	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param exception
 	 *            Exception to log
@@ -167,8 +162,6 @@ public final class Logger {
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -208,8 +201,6 @@ public final class Logger {
 	 *
 	 * @param message
 	 *            Text message to log
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final String message) {
 		Configuration currentConfiguration = configuration;
@@ -219,14 +210,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a debug log entry.
+	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -236,7 +225,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a debug log entry.
+	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param exception
 	 *            Exception to log
@@ -244,8 +233,6 @@ public final class Logger {
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -285,8 +272,6 @@ public final class Logger {
 	 *
 	 * @param message
 	 *            Text message to log
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final String message) {
 		Configuration currentConfiguration = configuration;
@@ -296,14 +281,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry.
+	 * Create an info log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -313,7 +296,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry.
+	 * Create an info log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param exception
 	 *            Exception to log
@@ -321,8 +304,6 @@ public final class Logger {
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -362,8 +343,6 @@ public final class Logger {
 	 *
 	 * @param message
 	 *            Text message to log
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final String message) {
 		Configuration currentConfiguration = configuration;
@@ -373,14 +352,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a warning log entry.
+	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -390,7 +367,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a warning log entry.
+	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param exception
 	 *            Exception to log
@@ -398,8 +375,6 @@ public final class Logger {
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -439,8 +414,6 @@ public final class Logger {
 	 *
 	 * @param message
 	 *            Text message to log
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final String message) {
 		Configuration currentConfiguration = configuration;
@@ -450,14 +423,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry.
+	 * Create an error log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -467,7 +438,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry.
+	 * Create an error log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param exception
 	 *            Exception to log
@@ -475,8 +446,6 @@ public final class Logger {
 	 *            Formated text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
-	 *
-	 * @see MessageFormat#format(String, Object...)
 	 */
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
@@ -705,7 +674,11 @@ public final class Logger {
 
 				case MESSAGE:
 					if (message != null) {
-						renderedMessage = getRenderedMessage(currentConfiguration, message, arguments);
+						if (message instanceof String) {
+							renderedMessage = MessageFormatter.format((String) message, arguments);
+						} else {
+							renderedMessage = message.toString();
+						}
 					}
 					break;
 
@@ -750,16 +723,6 @@ public final class Logger {
 		}
 
 		return new Throwable().getStackTrace()[deep];
-	}
-
-	private static String getRenderedMessage(final Configuration currentConfiguration, final Object message, final Object[] arguments) {
-		String renderedMessage;
-		if (arguments == null || arguments.length == 0) {
-			renderedMessage = message.toString();
-		} else {
-			renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
-		}
-		return renderedMessage;
 	}
 
 }

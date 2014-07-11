@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -82,7 +82,7 @@ public final class Configurator {
 
 	/**
 	 * Create a new configurator, based on the default configuration.
-	 * 
+	 *
 	 * @return A new configurator
 	 */
 	public static Configurator defaultConfig() {
@@ -92,7 +92,7 @@ public final class Configurator {
 
 	/**
 	 * Create a new configurator, based on the current configuration.
-	 * 
+	 *
 	 * @return A new configurator
 	 */
 	public static Configurator currentConfig() {
@@ -101,7 +101,7 @@ public final class Configurator {
 
 	/**
 	 * Load a properties file from classpath.
-	 * 
+	 *
 	 * @param file
 	 *            Path to file to load
 	 * @return A new configurator
@@ -128,7 +128,7 @@ public final class Configurator {
 
 	/**
 	 * Load a properties file from file system.
-	 * 
+	 *
 	 * @param file
 	 *            File to load
 	 * @return A new configurator
@@ -155,7 +155,7 @@ public final class Configurator {
 	/**
 	 * Change the severity level. The logger creates and outputs only log entries for the current severity level and
 	 * higher.
-	 * 
+	 *
 	 * @param level
 	 *            New severity level
 	 * @return The current configurator
@@ -171,9 +171,9 @@ public final class Configurator {
 
 	/**
 	 * Set a custom severity level for a package.
-	 * 
+	 *
 	 * This will override the default severity level for this package.
-	 * 
+	 *
 	 * @param packageObject
 	 *            Package
 	 * @param level
@@ -186,9 +186,9 @@ public final class Configurator {
 
 	/**
 	 * Set a custom severity level for a class.
-	 * 
+	 *
 	 * This will override the default severity level for this class.
-	 * 
+	 *
 	 * @param classObject
 	 *            Class
 	 * @param level
@@ -201,9 +201,9 @@ public final class Configurator {
 
 	/**
 	 * Set a custom severity level for a package or class.
-	 * 
+	 *
 	 * This will override the default severity level for this package respectively class.
-	 * 
+	 *
 	 * @param packageOrClass
 	 *            Name of a package or class
 	 * @param level
@@ -221,7 +221,7 @@ public final class Configurator {
 
 	/**
 	 * Reset all custom severity levels (to use the default severity level again).
-	 * 
+	 *
 	 * @return The current configurator
 	 */
 	public Configurator resetCustomLevels() {
@@ -233,11 +233,11 @@ public final class Configurator {
 	 * Set the format pattern for log entries.
 	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"</code> is the default format
 	 * pattern. The date format pattern is compatible with {@link SimpleDateFormat}.
-	 * 
+	 *
 	 * @param formatPattern
 	 *            Format pattern for log entries (or <code>null</code> to reset to default)
 	 * @return The current configurator
-	 * 
+	 *
 	 * @see SimpleDateFormat
 	 */
 	public Configurator formatPattern(final String formatPattern) {
@@ -251,9 +251,9 @@ public final class Configurator {
 
 	/**
 	 * Set the locale that is used to render format patterns for log entries.
-	 * 
+	 *
 	 * It will be used e. g. to format numbers and dates.
-	 * 
+	 *
 	 * @param locale
 	 *            Locale for format patterns
 	 * @return The current configurator
@@ -269,7 +269,7 @@ public final class Configurator {
 
 	/**
 	 * Set a writer to output created log entries. All existing writers will be replaced.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @return The current configurator
@@ -284,7 +284,7 @@ public final class Configurator {
 
 	/**
 	 * Set a writer to output created log entries. All existing writers will be replaced.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @param level
@@ -305,7 +305,7 @@ public final class Configurator {
 
 	/**
 	 * Set a writer to output created log entries. All existing writers will be replaced.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @param formatPattern
@@ -326,7 +326,7 @@ public final class Configurator {
 
 	/**
 	 * Set a writer to output created log entries. All existing writers will be replaced.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @param level
@@ -352,7 +352,7 @@ public final class Configurator {
 
 	/**
 	 * Add an additional writer for outputting the created log entries.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to add
 	 * @return The current configurator
@@ -368,7 +368,7 @@ public final class Configurator {
 
 	/**
 	 * Add an additional writer for outputting the created log entries.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to add
 	 * @param level
@@ -388,7 +388,7 @@ public final class Configurator {
 
 	/**
 	 * Add an additional writer for outputting the created log entries.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to add
 	 * @param formatPattern
@@ -408,7 +408,7 @@ public final class Configurator {
 
 	/**
 	 * Add an additional writer for outputting the created log entries.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to set (can be <code>null</code> to disable any output)
 	 * @param level
@@ -433,7 +433,7 @@ public final class Configurator {
 
 	/**
 	 * Remove a writer.
-	 * 
+	 *
 	 * @param writer
 	 *            Writer to remove
 	 * @return The current configurator
@@ -450,7 +450,7 @@ public final class Configurator {
 
 	/**
 	 * Remove all writers.
-	 * 
+	 *
 	 * @return The current configurator
 	 */
 	public Configurator removeAllWriters() {
@@ -461,7 +461,7 @@ public final class Configurator {
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the main
 	 * thread is dead.
-	 * 
+	 *
 	 * @param enable
 	 *            <code>true</code> to enable the writing thread, <code>false</code> to disable it
 	 * @return The current configurator
@@ -478,7 +478,7 @@ public final class Configurator {
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the main
 	 * thread is dead.
-	 * 
+	 *
 	 * @param priority
 	 *            Priority of the writing thread (must be between {@link Thread#MIN_PRIORITY} and
 	 *            {@link Thread#MAX_PRIORITY})
@@ -491,7 +491,7 @@ public final class Configurator {
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the
 	 * observed thread is dead.
-	 * 
+	 *
 	 * @param threadToObserve
 	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
 	 *            automatic shutdown
@@ -504,7 +504,7 @@ public final class Configurator {
 	/**
 	 * The writing thread can writes log entries asynchronously. This thread will automatically shutdown, if the
 	 * observed thread is dead.
-	 * 
+	 *
 	 * @param threadToObserve
 	 *            Name of the tread to observe (e.g. "main" for the main thread) or <code>null</code> to disable
 	 *            automatic shutdown
@@ -521,7 +521,7 @@ public final class Configurator {
 	/**
 	 * Set the limit of stack traces for exceptions (default is 40). Can be set to "-1" for no limitation and to "0" to
 	 * disable any stack traces.
-	 * 
+	 *
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces
 	 * @return The current configurator
@@ -537,7 +537,7 @@ public final class Configurator {
 
 	/**
 	 * Activate the configuration.
-	 * 
+	 *
 	 * @return <code>true</code> if the configuration has been successfully activated, <code>false</code> if the
 	 *         activation failed
 	 */
@@ -567,7 +567,7 @@ public final class Configurator {
 
 	/**
 	 * Manually shutdown of writing thread.
-	 * 
+	 *
 	 * @param wait
 	 *            <code>true</code> to wait for the successful shutdown, <code>false</code> for an asynchronous shutdown
 	 */
@@ -593,7 +593,7 @@ public final class Configurator {
 
 	/**
 	 * Manually shutdown of configuration observer.
-	 * 
+	 *
 	 * @param wait
 	 *            <code>true</code> to wait for the successful shutdown, <code>false</code> for an asynchronous shutdown
 	 */
@@ -617,7 +617,7 @@ public final class Configurator {
 	/**
 	 * Load properties from environment variables (also know as "-D" parameter) and from the default properties file
 	 * "tinylog.properties", which must be placed in the default package.
-	 * 
+	 *
 	 * @return A new configurator
 	 */
 	static Configurator init() {
@@ -632,7 +632,7 @@ public final class Configurator {
 				isResource = false;
 			} catch (FileNotFoundException ex) {
 				if (file != DEFAULT_PROPERTIES_FILE) {
-					InternalLogger.error(ex, "Cannot find \"{0}\"", file);
+					InternalLogger.error(ex, "Cannot find \"{}\"", file);
 				}
 			}
 		}
@@ -644,7 +644,7 @@ public final class Configurator {
 					stream.close();
 				}
 			} catch (IOException ex) {
-				InternalLogger.error(ex, "Failed to read properties file \"{0}\"", file);
+				InternalLogger.error(ex, "Failed to read properties file \"{}\"", file);
 			}
 		}
 
@@ -677,7 +677,7 @@ public final class Configurator {
 
 	/**
 	 * Copy the configurator.
-	 * 
+	 *
 	 * @return A new configurator with the same configuration
 	 */
 	Configurator copy() {
@@ -688,7 +688,7 @@ public final class Configurator {
 
 	/**
 	 * Create the configuration.
-	 * 
+	 *
 	 * @return The created configuration
 	 */
 	Configuration create() {
@@ -698,7 +698,7 @@ public final class Configurator {
 		} else {
 			writingThread = new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
 			if (writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
-				InternalLogger.warn("Thread \"{0}\" could not be found, writing thread will not be used", writingThreadData.threadToObserve);
+				InternalLogger.warn("Thread \"{}\" could not be found, writing thread will not be used", writingThreadData.threadToObserve);
 				writingThread = null;
 			}
 		}
@@ -729,7 +729,7 @@ public final class Configurator {
 
 		/**
 		 * Test if this writing thread has the same parameters as another writing thread.
-		 * 
+		 *
 		 * @param writingThread
 		 *            Writing thread to compare
 		 * @return <code>true</code> if both writing threads have the same parameters, <code>false</code> if not

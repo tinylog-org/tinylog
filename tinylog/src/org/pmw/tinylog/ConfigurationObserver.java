@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -56,7 +56,7 @@ abstract class ConfigurationObserver extends Thread {
 
 	/**
 	 * Create a thread to observe a file from file system.
-	 * 
+	 *
 	 * @param configurator
 	 *            Basis configuration
 	 * @param properties
@@ -82,7 +82,7 @@ abstract class ConfigurationObserver extends Thread {
 
 	/**
 	 * Create a thread to observe a file from classpath.
-	 * 
+	 *
 	 * @param configurator
 	 *            Basis configuration
 	 * @param properties
@@ -104,7 +104,7 @@ abstract class ConfigurationObserver extends Thread {
 
 	/**
 	 * Get the active configuration observer.
-	 * 
+	 *
 	 * @return Active configuration observer or <code>null</code> if there is no active configuration observer
 	 */
 	public static ConfigurationObserver getActiveObserver() {
@@ -206,7 +206,7 @@ abstract class ConfigurationObserver extends Thread {
 
 	/**
 	 * Open the configuration file.
-	 * 
+	 *
 	 * @return Stream of configuration file or <code>null</code> if not exists.
 	 */
 	protected abstract InputStream openInputStream();
@@ -238,7 +238,7 @@ abstract class ConfigurationObserver extends Thread {
 		try {
 			stream = openInputStream();
 			if (stream == null) {
-				InternalLogger.error("Failed to open \"{0}\"", file);
+				InternalLogger.error("Failed to open \"{}\"", file);
 				return null;
 			} else {
 				Properties properties = new Properties();
