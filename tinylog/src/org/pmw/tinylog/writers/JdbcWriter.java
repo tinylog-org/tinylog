@@ -33,6 +33,7 @@ import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.Level;
+import org.pmw.tinylog.LogEntry;
 
 /**
  * Writes log entries to a SQL database.

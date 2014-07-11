@@ -31,11 +31,11 @@ public final class ArrayMatchers {
 
 	/**
 	 * Test if an array has an equal content.
-	 * 
+	 *
 	 * @param objects
 	 *            Expected objects
 	 * @return A matcher that matches the arrays
-	 * 
+	 *
 	 * @param <E>
 	 *            Type of array elements
 	 */
@@ -46,11 +46,11 @@ public final class ArrayMatchers {
 
 	/**
 	 * Test if an array has exactly the same content.
-	 * 
+	 *
 	 * @param objects
 	 *            Expected objects
 	 * @return A matcher that matches the arrays
-	 * 
+	 *
 	 * @param <E>
 	 *            Type of array elements
 	 */
@@ -105,12 +105,108 @@ public final class ArrayMatchers {
 	}
 
 	/**
+	 * Test if an array doesn't contain any element more than once.
+	 *
+	 * @return A matcher that matches the arrays
+	 *
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	public static <E> Matcher<E[]> distinctContentInArray() {
+		return new DistinctMatcher<E>();
+	}
+
+	private static final class DistinctMatcher<E> extends TypeSafeMatcher<E[]> {
+
+		private DistinctMatcher() {
+		}
+
+		@Override
+		public boolean matchesSafely(final E[] array) {
+			if (array == null) {
+				return false;
+			} else {
+				for (int i = 0; i < array.length; ++i) {
+					Object obj = array[i];
+					if (obj != null) {
+						for (int j = 0; j < array.length; ++j) {
+							if (i != j && obj.equals(array[j])) {
+								return false;
+							}
+						}
+					}
+				}
+				return true;
+			}
+		}
+
+		@Override
+		public void describeTo(final Description description) {
+			description.appendText("contains distinct elements");
+
+		}
+	}
+
+	/**
+	 * Test if an array consists of collections with the defined sizes in the defined order.
+	 *
+	 * @param sizes
+	 *            Sizes for collections(<code>null</code> is allowed to mark <code>null</code> references)
+	 * @return A matcher that matches the arrays
+	 *
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	public static <E> Matcher<E[]> containsCollectionWithSizes(final Integer... sizes) {
+		return new SizeMatcher<E>(Arrays.asList(sizes));
+	}
+
+	private static final class SizeMatcher<E> extends TypeSafeMatcher<E[]> {
+
+		private final Collection<Integer> sizes;
+
+		private SizeMatcher(final Collection<Integer> sizes) {
+			this.sizes = sizes;
+		}
+
+		@Override
+		public boolean matchesSafely(final E[] array) {
+			if (sizes.size() != array.length) {
+				return false;
+			} else {
+				Iterator<Integer> sizeIterator = sizes.iterator();
+				Iterator<?> objectIterator = Arrays.asList(array).iterator();
+				while (sizeIterator.hasNext()) {
+					Integer size = sizeIterator.next();
+					Object object = objectIterator.next();
+					if (size == null) {
+						if (object != null) {
+							return false;
+						}
+					} else {
+						if (!(object instanceof Collection) || ((Collection<?>) object).size() != size) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		}
+
+		@Override
+		public void describeTo(final Description description) {
+			description.appendText("contains collections of the sizes ");
+			description.appendValue(sizes);
+		}
+	}
+
+	/**
 	 * Test if the items of an array are from the expected classes.
-	 * 
+	 *
 	 * @param classes
 	 *            Expected classes
 	 * @return A matcher that matches the arrays
-	 * 
+	 *
 	 * @param <E>
 	 *            Type of array elements
 	 */

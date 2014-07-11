@@ -13,10 +13,11 @@
 
 package org.pmw.tinylog.util;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.pmw.tinylog.Level;
-import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.LogEntry;
 
 /**
  * Fluent API to create and fill {@link LogEntry}.
@@ -37,7 +38,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the current date.
-	 * 
+	 *
 	 * @param date
 	 *            Current date
 	 * @return The current log entry builder
@@ -49,7 +50,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the ID of the process (pid).
-	 * 
+	 *
 	 * @param processId
 	 *            ID of the process
 	 * @return The current log entry builder
@@ -61,7 +62,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the current thread.
-	 * 
+	 *
 	 * @param thread
 	 *            Current thread
 	 * @return The current log entry builder
@@ -73,7 +74,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the fully qualified class name of the caller.
-	 * 
+	 *
 	 * @param className
 	 *            Fully qualified class name of the caller
 	 * @return The current log entry builder
@@ -85,7 +86,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the method name of the caller.
-	 * 
+	 *
 	 * @param method
 	 *            Method name of the caller
 	 * @return The current log entry builder
@@ -97,7 +98,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the source filename of the caller.
-	 * 
+	 *
 	 * @param file
 	 *            Source filename of the caller
 	 * @return The current log entry builder
@@ -109,7 +110,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the line number of calling.
-	 * 
+	 *
 	 * @param lineNumber
 	 *            Line number of calling
 	 * @return The current log entry builder
@@ -121,7 +122,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the logging level.
-	 * 
+	 *
 	 * @param level
 	 *            Logging level
 	 * @return The current log entry builder
@@ -133,7 +134,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the message of the logging event.
-	 * 
+	 *
 	 * @param message
 	 *            Message of the logging event
 	 * @return The current log entry builder
@@ -145,7 +146,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the exception of the log entry.
-	 * 
+	 *
 	 * @param exception
 	 *            Exception of the log entry
 	 * @return The current log entry builder
@@ -157,7 +158,7 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Set the rendered log entry.
-	 * 
+	 *
 	 * @param renderedLogEntry
 	 *            Rendered log entry
 	 * @return The current log entry builder
@@ -169,10 +170,21 @@ public final class LogEntryBuilder {
 
 	/**
 	 * Get the created log entry.
-	 * 
+	 *
 	 * @return Created log entry
 	 */
 	public LogEntry create() {
-		return new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception, renderedLogEntry);
+		LogEntry logEntry = new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception);
+		try {
+			Method setter = LogEntry.class.getDeclaredMethod("setRenderedLogEntry", String.class);
+			setter.setAccessible(true);
+			setter.invoke(logEntry, renderedLogEntry);
+		} catch (ReflectiveOperationException ex) {
+			throw new RuntimeException(ex);
+		} catch (SecurityException ex) {
+			throw new RuntimeException(ex);
+		}
+		return logEntry;
 	}
+
 }

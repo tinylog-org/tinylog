@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.LogEntry;
 
 /**
  * Tests for the VM shutdown hook.

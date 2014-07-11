@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.Writer;
 
 /**

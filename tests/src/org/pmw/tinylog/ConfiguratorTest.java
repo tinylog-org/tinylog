@@ -30,7 +30,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.containsCollectionWithSizes;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.distinctContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.sameContentInArray;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
@@ -40,7 +41,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +63,7 @@ import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configurator.
- * 
+ *
  * @see Configurator
  */
 public class ConfiguratorTest extends AbstractTest {
@@ -138,7 +138,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test initialization of configuration.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -207,7 +207,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test initialization if reading of properties file failed.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -237,7 +237,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test loading the configuration form a resource from classpath.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -259,7 +259,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test loading the configuration from a file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -490,11 +490,11 @@ public class ConfiguratorTest extends AbstractTest {
 		ConsoleWriter consoleWriter3 = new ConsoleWriter();
 
 		Configuration configuration = configurator.writer(consoleWriter1, "123").create();
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		try {
 			configuration = configurator.writer(null, "").create();
@@ -512,19 +512,19 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = configurator.writer(consoleWriter1, "abc").addWriter(consoleWriter2, "xyz").create();
 		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		configuration = configurator.addWriter(consoleWriter3, "123").create();
 		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
 
 		try {
 			configuration = configurator.addWriter(null, "").create();
@@ -564,11 +564,11 @@ public class ConfiguratorTest extends AbstractTest {
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
 		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		try {
 			configuration = configurator.writer(null, Level.ERROR, "").create();
@@ -596,26 +596,26 @@ public class ConfiguratorTest extends AbstractTest {
 		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1, consoleWriter2));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1, consoleWriter2));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		configuration = configurator.addWriter(consoleWriter3, Level.INFO, "123").create();
 		assertThat(configuration.getWriters(), sameContent(consoleWriter1, consoleWriter2, consoleWriter3));
 		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), sameContentInArray(consoleWriter1));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.INFO), sameContentInArray(consoleWriter1, consoleWriter3));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), sameContentInArray(consoleWriter1, consoleWriter2, consoleWriter3));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), sameContentInArray(consoleWriter1, consoleWriter2, consoleWriter3));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz"), textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1, 1), distinctContentInArray()));
 		try {
 			configuration = configurator.addWriter(null, Level.ERROR, "").create();
 			fail("NullPointerException expected");
@@ -646,7 +646,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test handling writing thread.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -694,7 +694,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 	/**
 	 * Test manual shutdown of writing thread.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -731,17 +731,9 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(Integer.MAX_VALUE, configuration.getMaxStackTraceElements());
 	}
 
-	private static List<Token> textTokens(final String... texts) {
-		List<Token> tokens = new ArrayList<Token>();
-		for (String text : texts) {
-			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
-		}
-		return tokens;
-	}
-
 	/**
 	 * Tests for writing thread data.
-	 * 
+	 *
 	 * @see WritingThreadData
 	 */
 	public static class WritingThreadDataTest {

@@ -25,7 +25,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.containsCollectionWithSizes;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.distinctContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.typesInArray;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -66,14 +66,14 @@ import org.pmw.tinylog.writers.Writer;
 
 /**
  * Test properties loader.
- * 
+ *
  * @see PropertiesLoader
  */
 public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 * 
+	 *
 	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
@@ -280,7 +280,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading multiple writers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to create temporary file
 	 */
@@ -305,7 +305,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer without any properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -327,7 +327,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with custom severity level.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -392,7 +392,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with custom format pattern.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -408,11 +408,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		Configuration configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		/* Two writers, one with custom format pattern */
 
@@ -426,11 +426,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		logFile.delete();
 
@@ -446,18 +446,18 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 		configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		logFile.delete();
 	}
 
 	/**
 	 * Test reading a writer with custom severity level and format pattern.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -478,11 +478,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
 		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("123")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		/* Two writers, one with custom severity level and format pattern */
 
@@ -498,15 +498,15 @@ public class PropertiesLoaderTest extends AbstractTest {
 		configuration = configurator.create();
 		assertThat(configuration.getWriters(), types(ConsoleWriter.class, FileWriter.class));
 		assertThat(configuration.getEffectiveWriters(Level.TRACE), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		logFile.delete();
 
@@ -527,20 +527,20 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertThat(configuration.getEffectiveWriters(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveWriters(Level.DEBUG), typesInArray(ConsoleWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
 		assertThat(configuration.getEffectiveWriters(Level.INFO), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.WARNING), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 		assertThat(configuration.getEffectiveWriters(Level.ERROR), typesInArray(ConsoleWriter.class, FileWriter.class));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 
 		logFile.delete();
 	}
 
 	/**
 	 * Test reading a writer with boolean properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -583,7 +583,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with integer properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -617,7 +617,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with string properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -642,7 +642,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with string array properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -692,7 +692,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with labeler properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -729,7 +729,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with policy properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -763,7 +763,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with policy array properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -811,7 +811,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer with unsupported property type.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -848,7 +848,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a nonexistent labeler.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -872,7 +872,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a nonexistent policy.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -902,7 +902,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer if there is no file with registered writers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -926,7 +926,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a labeler if there is no file with registered labelers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -951,7 +951,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a policy if there is no file with registered policies.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -982,7 +982,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a writer if failed to open and read the file with registered writers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1012,7 +1012,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a registered writer but the class is missing.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1037,7 +1037,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a registered labeler but the class is missing.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1063,7 +1063,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test reading a registered policy but the class is missing.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1096,7 +1096,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test potential exception while instantiation of writers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1142,7 +1142,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test potential exception while instantiation of labelers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1197,7 +1197,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	/**
 	 * Test potential exception while instantiation of policies.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -1327,14 +1327,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWritingThread());
 		assertNull(configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(1, configuration.getWritingThread().getPriority());
-	}
-
-	private static List<Token> textTokens(final String... texts) {
-		List<Token> tokens = new ArrayList<Token>();
-		for (String text : texts) {
-			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
-		}
-		return tokens;
 	}
 
 	@PropertiesSupport(name = "properties", properties = { @Property(name = "boolean", type = boolean.class, optional = true),

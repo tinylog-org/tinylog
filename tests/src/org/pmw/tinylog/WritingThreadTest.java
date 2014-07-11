@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.writers.LogEntry;
 
 /**
  * Tests for writing thread.

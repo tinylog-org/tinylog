@@ -30,7 +30,6 @@ import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.RollingFileWriter;
 

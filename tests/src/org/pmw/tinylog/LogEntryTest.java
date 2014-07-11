@@ -11,20 +11,19 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.writers;
+package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import java.util.Date;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.Level;
 
 /**
  * Tests the log entry data class.
- * 
+ *
  * @see LogEntry
  */
 public class LogEntryTest extends AbstractTest {
@@ -46,7 +45,7 @@ public class LogEntryTest extends AbstractTest {
 		RuntimeException exception = new RuntimeException("Hello from Exception!");
 		String renderedLogEntry = "My log entry";
 
-		LogEntry logEntry = new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception, renderedLogEntry);
+		LogEntry logEntry = new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception);
 
 		assertSame(date, logEntry.getDate());
 		assertSame(processId, logEntry.getProcessId());
@@ -58,6 +57,10 @@ public class LogEntryTest extends AbstractTest {
 		assertEquals(level, logEntry.getLevel());
 		assertEquals(message, logEntry.getMessage());
 		assertSame(exception, logEntry.getException());
+		assertNull(logEntry.getRenderedLogEntry());
+
+		logEntry.setRenderedLogEntry(renderedLogEntry);
+
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 

@@ -14,13 +14,11 @@
 package org.pmw.tinylog;
 
 import java.lang.reflect.Method;
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 
@@ -718,76 +716,17 @@ public final class Logger {
 
 		for (int i = 0; i < entries.length; ++i) {
 			List<Token> formatTokensOfWriter = formatTokens[i];
-			String renderedLogEntry;
+			LogEntry logEntry = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder();
 				for (Token token : formatTokensOfWriter) {
-					switch (token.getType()) {
-						case DATE:
-							builder.append(getRenderedDate(now, token));
-							break;
-
-						case THREAD_NAME:
-							builder.append(thread.getName());
-							break;
-
-						case THREAD_ID:
-							builder.append(thread.getId());
-							break;
-
-						case CLASS:
-							builder.append(fullyQualifiedClassName);
-							break;
-
-						case CLASS_NAME:
-							builder.append(getNameOfClass(fullyQualifiedClassName));
-							break;
-
-						case PACKAGE:
-							builder.append(getPackageOfClass(fullyQualifiedClassName));
-							break;
-
-						case METHOD:
-							builder.append(method);
-							break;
-
-						case FILE:
-							builder.append(filename);
-							break;
-
-						case LINE:
-							builder.append(line);
-							break;
-
-						case LEVEL:
-							builder.append(level);
-							break;
-
-						case MESSAGE:
-							if (message != null) {
-								builder.append(renderedMessage);
-							}
-							if (exception != null) {
-								if (message != null) {
-									builder.append(": ");
-								}
-								formatException(builder, exception, currentConfiguration.getMaxStackTraceElements());
-							}
-							break;
-
-						default:
-							builder.append(token.getData());
-							break;
-					}
+					token.render(logEntry, builder);
 				}
 				builder.append(NEW_LINE);
-				renderedLogEntry = builder.toString();
-			} else {
-				renderedLogEntry = null;
+				logEntry.setRenderedLogEntry(builder.toString());
 			}
 
-			entries[i] = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception,
-					renderedLogEntry);
+			entries[i] = logEntry;
 		}
 
 		return entries;
@@ -814,31 +753,6 @@ public final class Logger {
 		return new Throwable().getStackTrace()[deep];
 	}
 
-	private static String getNameOfClass(final String fullyQualifiedClassName) {
-		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-		if (dotIndex < 0) {
-			return fullyQualifiedClassName;
-		} else {
-			return fullyQualifiedClassName.substring(dotIndex + 1);
-		}
-	}
-
-	private static String getPackageOfClass(final String fullyQualifiedClassName) {
-		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-		if (dotIndex < 0) {
-			return "";
-		} else {
-			return fullyQualifiedClassName.substring(0, dotIndex);
-		}
-	}
-
-	private static String getRenderedDate(final Date now, final Token token) {
-		DateFormat formatter = (DateFormat) token.getData();
-		synchronized (formatter) {
-			return formatter.format(now);
-		}
-	}
-
 	private static String getRenderedMessage(final Configuration currentConfiguration, final Object message, final Object[] arguments) {
 		String renderedMessage;
 		if (arguments == null || arguments.length == 0) {
@@ -847,51 +761,6 @@ public final class Logger {
 			renderedMessage = new MessageFormat((String) message, currentConfiguration.getLocale()).format(arguments);
 		}
 		return renderedMessage;
-	}
-
-	private static void formatException(final StringBuilder builder, final Throwable exception, final int countStackTraceElements) {
-		if (countStackTraceElements == 0) {
-			builder.append(exception.getClass().getName());
-			String exceptionMessage = exception.getMessage();
-			if (exceptionMessage != null) {
-				builder.append(": ");
-				builder.append(exceptionMessage);
-			}
-		} else {
-			formatExceptionWithStackTrace(builder, exception, countStackTraceElements);
-		}
-	}
-
-	private static void formatExceptionWithStackTrace(final StringBuilder builder, final Throwable exception, final int countStackTraceElements) {
-		builder.append(exception.getClass().getName());
-
-		String message = exception.getMessage();
-		if (message != null) {
-			builder.append(": ");
-			builder.append(message);
-		}
-
-		StackTraceElement[] stackTrace = exception.getStackTrace();
-		int length = Math.min(stackTrace.length, Math.max(1, countStackTraceElements));
-		for (int i = 0; i < length; ++i) {
-			builder.append(NEW_LINE);
-			builder.append('\t');
-			builder.append("at ");
-			builder.append(stackTrace[i]);
-		}
-
-		if (stackTrace.length > length) {
-			builder.append(NEW_LINE);
-			builder.append('\t');
-			builder.append("...");
-		} else {
-			Throwable cause = exception.getCause();
-			if (cause != null) {
-				builder.append(NEW_LINE);
-				builder.append("Caused by: ");
-				formatExceptionWithStackTrace(builder, cause, countStackTraceElements - length);
-			}
-		}
 	}
 
 }

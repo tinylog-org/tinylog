@@ -78,14 +78,14 @@ public final class Configuration {
 		this.maxStackTraceElements = maxStackTraceElements;
 
 		this.effectiveWriters = getEffectiveWriters(writerDefinitions);
-		this.effectiveFormatTokens = getEffectiveFormatTokens(writerDefinitions, formatPattern, locale);
+		this.effectiveFormatTokens = getEffectiveFormatTokens(writerDefinitions, formatPattern, locale, maxStackTraceElements);
 		this.requiredLogEntryValues = getRequiredLogEntryValues(effectiveWriters, effectiveFormatTokens);
 		this.requiredStackTraceInformation = getRequiredStackTraceInformation(requiredLogEntryValues, customLevels);
 	}
 
 	/**
 	 * Get the global severity level.
-	 * 
+	 *
 	 * @return Global severity level
 	 */
 	public Level getLevel() {
@@ -94,7 +94,7 @@ public final class Configuration {
 
 	/**
 	 * Check if there are custom severity levels.
-	 * 
+	 *
 	 * @return <code>true</code> if custom severity levels exist, <code>false</code> if not
 	 */
 	public boolean hasCustomLevels() {
@@ -103,10 +103,10 @@ public final class Configuration {
 
 	/**
 	 * Get the severity level for a package or class.
-	 * 
+	 *
 	 * @param packageOrClass
 	 *            Name of the package respectively class
-	 * 
+	 *
 	 * @return Severity level for the package respectively class
 	 */
 	public Level getLevel(final String packageOrClass) {
@@ -127,7 +127,7 @@ public final class Configuration {
 
 	/**
 	 * Get the format pattern for log entries.
-	 * 
+	 *
 	 * @return Format pattern for log entries
 	 */
 	public String getFormatPattern() {
@@ -136,7 +136,7 @@ public final class Configuration {
 
 	/**
 	 * Get the locale that is used to render format patterns for log entries.
-	 * 
+	 *
 	 * @return Locale for format pattern
 	 */
 	public Locale getLocale() {
@@ -145,7 +145,7 @@ public final class Configuration {
 
 	/**
 	 * Get the writers to output created log entries.
-	 * 
+	 *
 	 * @return Writers to output log entries
 	 */
 	public List<Writer> getWriters() {
@@ -154,7 +154,7 @@ public final class Configuration {
 
 	/**
 	 * Get the writing thread (writes log entries asynchronously).
-	 * 
+	 *
 	 * @return Writing thread
 	 */
 	public WritingThread getWritingThread() {
@@ -163,7 +163,7 @@ public final class Configuration {
 
 	/**
 	 * Get the limit of stack traces for exceptions.
-	 * 
+	 *
 	 * @return Limit of stack traces
 	 */
 	public int getMaxStackTraceElements() {
@@ -172,7 +172,7 @@ public final class Configuration {
 
 	/**
 	 * Fast check if output is possible.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level to check
 	 * @return <code>true</code> if log entries with the defined severity level can be output, <code>false</code> if not
@@ -183,7 +183,7 @@ public final class Configuration {
 
 	/**
 	 * Get the effective writers to be used by the logger.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level of log entry
 	 * @return Effective writers
@@ -194,7 +194,7 @@ public final class Configuration {
 
 	/**
 	 * Get the effective format tokens for all effective writers to be used by the logger.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level of log entry
 	 * @return Effective format tokens
@@ -205,7 +205,7 @@ public final class Configuration {
 
 	/**
 	 * Get all log entry values that are required by the writers.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level of log entry
 	 * @return Required values for log entry
@@ -216,7 +216,7 @@ public final class Configuration {
 
 	/**
 	 * Get the required stack trace information.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level of log entry
 	 * @return Required stack trace information
@@ -227,7 +227,7 @@ public final class Configuration {
 
 	/**
 	 * Create a copy of this configuration.
-	 * 
+	 *
 	 * @return Copy of this configuration
 	 */
 	Configurator copy() {
@@ -290,9 +290,9 @@ public final class Configuration {
 
 	@SuppressWarnings("unchecked")
 	private static Map<Level, List<Token>[]> getEffectiveFormatTokens(final List<WriterDefinition> definitions, final String globalFormatPattern,
-			final Locale locale) {
+			final Locale locale, final int maxStackTraceElements) {
 		Map<Writer, List<Token>> cache = new HashMap<Writer, List<Token>>();
-		List<Token> globalFormatTokens = Tokenizer.parse(globalFormatPattern, locale);
+		List<Token> globalFormatTokens = Tokenizer.parse(globalFormatPattern, locale, maxStackTraceElements);
 
 		Map<Level, List<Token>[]> map = new EnumMap<Level, List<Token>[]>(Level.class);
 		for (Level level : Level.values()) {
@@ -309,7 +309,12 @@ public final class Configuration {
 							cache.put(writer, null);
 						} else {
 							String formatPattern = definition.getFormatPattern();
-							List<Token> formatTokens = formatPattern == null ? globalFormatTokens : Tokenizer.parse(formatPattern, locale);
+							List<Token> formatTokens;
+							if (formatPattern == null) {
+								formatTokens = globalFormatTokens;
+							} else {
+								formatTokens = Tokenizer.parse(formatPattern, locale, maxStackTraceElements);
+							}
 							formatTokensOfLevel.add(formatTokens);
 							cache.put(writer, formatTokens);
 						}

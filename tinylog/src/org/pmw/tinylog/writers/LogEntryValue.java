@@ -18,7 +18,7 @@ import java.util.Date;
 import org.pmw.tinylog.Level;
 
 /**
- * Supported log entry values in {@link org.pmw.tinylog.writers.LogEntry LogEntry}.
+ * Supported log entry values in {@link org.pmw.tinylog.LogEntry LogEntry}.
  */
 public enum LogEntryValue {
 

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
-import org.pmw.tinylog.writers.LogEntry;
+import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 

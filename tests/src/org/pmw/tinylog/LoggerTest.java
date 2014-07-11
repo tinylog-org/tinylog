@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.util.StringListOutputStream;
-import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 
 /**

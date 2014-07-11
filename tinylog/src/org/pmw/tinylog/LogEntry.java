@@ -11,11 +11,9 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.writers;
+package org.pmw.tinylog;
 
 import java.util.Date;
-
-import org.pmw.tinylog.Level;
 
 /**
  * Log entry object for {@link org.pmw.tinylog.writers.Writer#write(LogEntry) Writer.write(LogEntry)}.
@@ -32,7 +30,7 @@ public final class LogEntry {
 	private final Level level;
 	private final String message;
 	private final Throwable exception;
-	private final String renderedLogEntry;
+	private String renderedLogEntry;
 
 	/**
 	 * @param date
@@ -55,11 +53,9 @@ public final class LogEntry {
 	 *            The message of the logging event
 	 * @param exception
 	 *            The exception of the log entry
-	 * @param renderedLogEntry
-	 *            The rendered log entry
 	 */
 	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String methodName, final String filename,
-			final int lineNumber, final Level level, final String message, final Throwable exception, final String renderedLogEntry) {
+			final int lineNumber, final Level level, final String message, final Throwable exception) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
@@ -70,12 +66,11 @@ public final class LogEntry {
 		this.level = level;
 		this.message = message;
 		this.exception = exception;
-		this.renderedLogEntry = renderedLogEntry;
 	}
 
 	/**
 	 * Get the current date.
-	 * 
+	 *
 	 * @return Current date
 	 */
 	public Date getDate() {
@@ -84,7 +79,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the ID of the process (pid).
-	 * 
+	 *
 	 * @return ID of the process
 	 */
 	public String getProcessId() {
@@ -93,7 +88,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the current thread.
-	 * 
+	 *
 	 * @return Current thread
 	 */
 	public Thread getThread() {
@@ -102,7 +97,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the fully qualified class name of the caller.
-	 * 
+	 *
 	 * @return Fully qualified class name of the caller
 	 */
 	public String getClassName() {
@@ -111,7 +106,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the method name of the caller.
-	 * 
+	 *
 	 * @return Method name of the caller
 	 */
 	public String getMethodName() {
@@ -120,7 +115,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the source filename of the caller.
-	 * 
+	 *
 	 * @return Source filename of the caller
 	 */
 	public String getFilename() {
@@ -129,7 +124,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the line number of calling.
-	 * 
+	 *
 	 * @return Line number of calling
 	 */
 	public int getLineNumber() {
@@ -138,7 +133,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the severity level.
-	 * 
+	 *
 	 * @return Severity level
 	 */
 	public Level getLevel() {
@@ -147,7 +142,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the message of the logging event.
-	 * 
+	 *
 	 * @return Message of the logging event
 	 */
 	public String getMessage() {
@@ -156,7 +151,7 @@ public final class LogEntry {
 
 	/**
 	 * Get the exception of the log entry.
-	 * 
+	 *
 	 * @return Exception of the log entry
 	 */
 	public Throwable getException() {
@@ -165,11 +160,21 @@ public final class LogEntry {
 
 	/**
 	 * Get the rendered log entry.
-	 * 
+	 *
 	 * @return Rendered log entry
 	 */
 	public String getRenderedLogEntry() {
 		return renderedLogEntry;
+	}
+
+	/**
+	 * Set the rendered log entry.
+	 *
+	 * @param renderedLogEntry
+	 *            Rendered log entry
+	 */
+	void setRenderedLogEntry(final String renderedLogEntry) {
+		this.renderedLogEntry = renderedLogEntry;
 	}
 
 }

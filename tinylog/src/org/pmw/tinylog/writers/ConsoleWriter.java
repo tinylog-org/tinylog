@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.Level;
+import org.pmw.tinylog.LogEntry;
 
 /**
  * Writes log entries to the console.

@@ -25,8 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 import org.pmw.tinylog.Configurator;
+import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.writers.LogEntry;
 
 /**
  * Tests for log4j logging API.

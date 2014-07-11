@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyArray;
@@ -23,6 +24,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.containsCollectionWithSizes;
+import static org.pmw.tinylog.hamcrest.ArrayMatchers.distinctContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.equalContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.sameContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.typesInArray;
@@ -30,7 +33,6 @@ import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.lang.Thread.State;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -42,13 +44,12 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.pmw.tinylog.writers.ConsoleWriter;
-import org.pmw.tinylog.writers.LogEntry;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configuration.
- * 
+ *
  * @see Configuration
  */
 public class ConfigurationTest extends AbstractTest {
@@ -320,11 +321,11 @@ public class ConfigurationTest extends AbstractTest {
 		writerDefinition = singleWriterDefinition(new ConsoleWriter(), "abc");
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertEquals("", configuration.getFormatPattern());
-		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), equalContentInArray(textTokens("abc")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), equalContentInArray(textTokens("abc")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("abc")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		writerDefinition = singleWriterDefinition(new ConsoleWriter(), Level.WARNING, "abc");
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
@@ -332,8 +333,8 @@ public class ConfigurationTest extends AbstractTest {
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), emptyArray());
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(1));
 
 		/* Two writers */
 
@@ -369,18 +370,18 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals("", configuration.getFormatPattern());
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray((List<Token>) null, textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray((List<Token>) null, textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), containsCollectionWithSizes(null, 1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), containsCollectionWithSizes(null, 1));
 
 		writerDefinition = pairWriterDefinition(new ConsoleWriter(), Level.WARNING, "abc", new ConsoleWriter(), Level.INFO, "xyz");
 		configuration = new Configuration(Level.INFO, noCustomLevels(), "", Locale.ROOT, writerDefinition, null, 0);
 		assertEquals("", configuration.getFormatPattern());
 		assertThat(configuration.getEffectiveFormatTokens(Level.TRACE), emptyArray());
 		assertThat(configuration.getEffectiveFormatTokens(Level.DEBUG), emptyArray());
-		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), equalContentInArray(textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), equalContentInArray(textTokens("abc"), textTokens("xyz")));
-		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), equalContentInArray(textTokens("abc"), textTokens("xyz")));
+		assertThat(configuration.getEffectiveFormatTokens(Level.INFO), containsCollectionWithSizes(1));
+		assertThat(configuration.getEffectiveFormatTokens(Level.WARNING), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
+		assertThat(configuration.getEffectiveFormatTokens(Level.ERROR), allOf(containsCollectionWithSizes(1, 1), distinctContentInArray()));
 	}
 
 	/**
@@ -714,14 +715,6 @@ public class ConfigurationTest extends AbstractTest {
 	private static List<WriterDefinition> pairWriterDefinition(final Writer writer1, final Level level1, final String formatPattern1, final Writer writer2,
 			final Level level2, final String formatPattern2) {
 		return Arrays.asList(new WriterDefinition(writer1, level1, formatPattern1), new WriterDefinition(writer2, level2, formatPattern2));
-	}
-
-	private static List<Token> textTokens(final String... texts) {
-		List<Token> tokens = new ArrayList<Token>();
-		for (String text : texts) {
-			tokens.add(new Token(TokenType.PLAIN_TEXT, text));
-		}
-		return tokens;
 	}
 
 	private static final class DummyWriter implements Writer {

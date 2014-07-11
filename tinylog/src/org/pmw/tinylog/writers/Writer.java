@@ -16,6 +16,7 @@ package org.pmw.tinylog.writers;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.LogEntry;
 
 /**
  * Writers output created log entries from {@link org.pmw.tinylog.Logger Logger}.

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
