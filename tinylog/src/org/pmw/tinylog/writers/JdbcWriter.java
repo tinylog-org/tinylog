@@ -420,7 +420,7 @@ public final class JdbcWriter implements Writer {
 	}
 
 	private static String renderSql(final Connection connection, final String table, final List<String> columns, final List<Value> values) throws SQLException {
-		StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder(256);
 
 		builder.append("INSERT INTO ");
 
@@ -515,7 +515,7 @@ public final class JdbcWriter implements Writer {
 	}
 
 	private static String formatException(final Throwable exception) {
-		StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder(1024);
 		formatExceptionWithStackTrace(builder, exception);
 		return builder.toString();
 	}
