@@ -608,7 +608,11 @@ public final class JdbcWriter implements Writer {
 					}
 					break;
 				case RENDERED_LOG_ENTRY:
-					statement.setString(i + 1, logEntry.getRenderedLogEntry());
+					String renderedLogEntry = logEntry.getRenderedLogEntry();
+					if (renderedLogEntry.endsWith(NEW_LINE)) {
+						renderedLogEntry = renderedLogEntry.substring(0, renderedLogEntry.length() - NEW_LINE.length());
+					}
+					statement.setString(i + 1, renderedLogEntry);
 					break;
 				default:
 					InternalLogger.warn("Unknown value type: " + values.get(i));

@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -54,7 +54,7 @@ import org.pmw.tinylog.writers.JdbcWriter.Value;
 
 /**
  * Tests for the SQL database writer.
- * 
+ *
  * @see JdbcWriter
  */
 public class JdbcWriterTest extends AbstractWriterTest {
@@ -66,7 +66,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Create the database.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Failed to create database
 	 */
@@ -84,7 +84,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Remove the database.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Failed to remove database
 	 */
@@ -339,7 +339,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test accepting and refusing of table names if database supports quoting.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -377,7 +377,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test accepting and refusing of table names if database doesn't supports quoting.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -425,7 +425,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test accepting and refusing of column names if database supports quoting.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -463,7 +463,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test accepting and refusing of column names if database doesn't supports quoting.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -511,7 +511,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test error handling if the lists columns and values have different sizes.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -554,7 +554,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test log in to database.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -583,7 +583,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing date.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -600,7 +600,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing process ID (pid).
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -617,7 +617,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing thread name.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -634,7 +634,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing thread ID.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -651,7 +651,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing full qualified class name.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -668,7 +668,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing class name without package.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -690,7 +690,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing package name.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -712,7 +712,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing method name.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -734,7 +734,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing source filename.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -756,7 +756,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing line number.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -778,7 +778,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing message.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -795,7 +795,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing exception.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -817,7 +817,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing rendered log entry.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -865,7 +865,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing .
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -877,12 +877,17 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello World").create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries());
 
+		clearEntries();
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("Hello World" + NEW_LINE).create());
+		assertEquals(Arrays.asList("Hello World"), getLogEntries());
+
 		writer.close();
 	}
 
 	/**
 	 * Test writing multiple fields.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -927,7 +932,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test batch writing.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
@@ -947,7 +952,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test auto flushing after many entries for batch writing.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             Test failed
 	 */
