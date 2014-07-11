@@ -715,8 +715,8 @@ public final class Logger {
 		}
 
 		for (int i = 0; i < entries.length; ++i) {
-			List<Token> formatTokensOfWriter = formatTokens[i];
 			LogEntry logEntry = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
+			List<Token> formatTokensOfWriter = formatTokens[i];
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder();
 				for (Token token : formatTokensOfWriter) {
@@ -725,7 +725,6 @@ public final class Logger {
 				builder.append(NEW_LINE);
 				logEntry.setRenderedLogEntry(builder.toString());
 			}
-
 			entries[i] = logEntry;
 		}
 
