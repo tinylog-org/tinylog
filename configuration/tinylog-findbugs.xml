@@ -23,7 +23,7 @@
 		<Bug pattern="SR_NOT_CHECKED" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.writers.LogEntry" />
+		<Class name="org.pmw.tinylog.LogEntry" />
 		<!-- Problem with "java.util.Date" is known but currently there is no better alternative in the Java library -->
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
