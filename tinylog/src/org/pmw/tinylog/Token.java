@@ -13,6 +13,9 @@
 
 package org.pmw.tinylog;
 
+import java.util.Collection;
+
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * The format pattern for log entries will be split in tokens.
@@ -22,11 +25,11 @@ package org.pmw.tinylog;
 interface Token {
 
 	/**
-	 * Returns the token type.
+	 * Get the required log entry values for rendering.
 	 *
-	 * @return Token type
+	 * @return Required log entry value
 	 */
-	TokenType getType();
+	Collection<LogEntryValue> getRequiredLogEntryValues();
 
 	/**
 	 * Render the token.

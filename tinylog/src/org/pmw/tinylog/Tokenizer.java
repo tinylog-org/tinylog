@@ -16,10 +16,14 @@ package org.pmw.tinylog;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Converts a format pattern for log entries to a list of tokens.
@@ -131,8 +135,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.DATE;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.DATE);
 		}
 
 		@Override
@@ -154,8 +158,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.THREAD_NAME;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.THREAD);
 		}
 
 		@Override
@@ -171,8 +175,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.THREAD_ID;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.THREAD);
 		}
 
 		@Override
@@ -188,8 +192,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.CLASS;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.CLASS);
 		}
 
 		@Override
@@ -205,8 +209,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.CLASS_NAME;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.CLASS);
 		}
 
 		@Override
@@ -228,8 +232,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.PACKAGE;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.CLASS);
 		}
 
 		@Override
@@ -249,8 +253,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.METHOD;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.METHOD);
 		}
 
 		@Override
@@ -266,8 +270,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.FILE;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.FILE);
 		}
 
 		@Override
@@ -283,8 +287,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.LINE;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.LINE);
 		}
 
 		@Override
@@ -300,8 +304,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.LEVEL;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.LEVEL);
 		}
 
 		@Override
@@ -322,8 +326,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.MESSAGE;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.MESSAGE);
 		}
 
 		@Override
@@ -397,8 +401,8 @@ final class Tokenizer {
 		}
 
 		@Override
-		public TokenType getType() {
-			return TokenType.PLAIN_TEXT;
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.emptyList();
 		}
 
 		@Override

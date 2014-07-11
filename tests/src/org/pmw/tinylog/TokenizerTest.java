@@ -14,8 +14,10 @@
 package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.RegexMatchers.contains;
 import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
@@ -27,6 +29,7 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.util.LogEntryBuilder;
+import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Tests for tokenizer.
@@ -62,7 +65,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testPlainTextToken() {
 		List<Token> tokens = Tokenizer.parse("Hello!", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("Hello!", render(tokens, new LogEntryBuilder()));
 	}
 
@@ -75,18 +78,18 @@ public class TokenizerTest extends AbstractTest {
 
 		List<Token> tokens = Tokenizer.parse("{date}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.DATE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
 		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = Tokenizer.parse("{date:yyyy}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.DATE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
 		assertEquals(new SimpleDateFormat("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = Tokenizer.parse("{date:'}", locale, 0);
 		assertThat(getErrorStream().nextLine(), containsString("invalid date format pattern"));
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.DATE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
 		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
 	}
 
@@ -97,7 +100,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testProcessIdToken() {
 		List<Token> tokens = Tokenizer.parse("{pid}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
 	}
 
@@ -108,7 +111,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testThreadNameToken() {
 		List<Token> tokens = Tokenizer.parse("{thread}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.THREAD_NAME, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.THREAD));
 		assertEquals("test", render(tokens, new LogEntryBuilder().thread(new Thread("test"))));
 	}
 
@@ -121,7 +124,7 @@ public class TokenizerTest extends AbstractTest {
 
 		List<Token> tokens = Tokenizer.parse("{thread_id}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.THREAD_ID, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.THREAD));
 		assertEquals(Long.toString(thread.getId()), render(tokens, new LogEntryBuilder().thread(thread)));
 	}
 
@@ -132,7 +135,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testClassToken() {
 		List<Token> tokens = Tokenizer.parse("{class}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.CLASS, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("my.package.MyClass", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 	}
@@ -144,7 +147,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testClassNameToken() {
 		List<Token> tokens = Tokenizer.parse("{class_name}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.CLASS_NAME, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 	}
@@ -156,7 +159,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testPackageToken() {
 		List<Token> tokens = Tokenizer.parse("{package}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PACKAGE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("my.package", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
 		assertEquals("", render(tokens, new LogEntryBuilder().className("MyClass")));
 	}
@@ -168,7 +171,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testMethodToken() {
 		List<Token> tokens = Tokenizer.parse("{method}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.METHOD, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.METHOD));
 		assertEquals("MyMethod", render(tokens, new LogEntryBuilder().method("MyMethod")));
 	}
 
@@ -179,7 +182,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testFileToken() {
 		List<Token> tokens = Tokenizer.parse("{file}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.FILE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.FILE));
 		assertEquals("MyFile", render(tokens, new LogEntryBuilder().file("MyFile")));
 	}
 
@@ -190,7 +193,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testLineToken() {
 		List<Token> tokens = Tokenizer.parse("{line}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.LINE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LINE));
 		assertEquals("42", render(tokens, new LogEntryBuilder().lineNumber(42)));
 	}
 
@@ -201,7 +204,7 @@ public class TokenizerTest extends AbstractTest {
 	public final void testLevelToken() {
 		List<Token> tokens = Tokenizer.parse("{level}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.LEVEL, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("DEBUG", render(tokens, new LogEntryBuilder().level(Level.DEBUG)));
 	}
 
@@ -216,7 +219,7 @@ public class TokenizerTest extends AbstractTest {
 
 		List<Token> tokens = Tokenizer.parse("{message}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.MESSAGE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
 
 		assertEquals("", render(tokens, new LogEntryBuilder().message(null)));
 		assertEquals("Hello world", render(tokens, new LogEntryBuilder().message("Hello world")));
@@ -228,7 +231,7 @@ public class TokenizerTest extends AbstractTest {
 
 		tokens = Tokenizer.parse("{message}", locale, 1);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.MESSAGE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
 
 		String renderedLogEntry = render(tokens, new LogEntryBuilder().message(null).exception(new Exception("Test")));
 		assertThat(renderedLogEntry, matches("java\\.lang\\.Exception\\: Test" + newLine
@@ -238,7 +241,7 @@ public class TokenizerTest extends AbstractTest {
 
 		tokens = Tokenizer.parse("{message}", locale, Integer.MAX_VALUE);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.MESSAGE, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
 
 		renderedLogEntry = render(tokens, new LogEntryBuilder().message(null).exception(new RuntimeException(new NullPointerException())));
 		assertThat(renderedLogEntry, contains("java\\.lang\\.RuntimeException.*" + newLine
@@ -266,42 +269,42 @@ public class TokenizerTest extends AbstractTest {
 
 		List<Token> tokens = Tokenizer.parse("\n", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\r", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\r\n", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\n\r", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine + newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\\n", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\\r", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\\r\\n", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine, render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\\n\\r", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(newLine + newLine, render(tokens, new LogEntryBuilder()));
 	}
 
@@ -312,12 +315,12 @@ public class TokenizerTest extends AbstractTest {
 	public final void testTabs() {
 		List<Token> tokens = Tokenizer.parse("\t", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("\t", render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("\\t", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("\t", render(tokens, new LogEntryBuilder()));
 	}
 
@@ -328,12 +331,12 @@ public class TokenizerTest extends AbstractTest {
 	public final void testInvalidNestedTokens() {
 		List<Token> tokens = Tokenizer.parse("{date", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("{date", render(tokens, new LogEntryBuilder()));
 
 		tokens = Tokenizer.parse("{{date}}", locale, 0);
 		assertEquals(1, tokens.size());
-		assertEquals(TokenType.PLAIN_TEXT, tokens.get(0).getType());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("{{date}}", render(tokens, new LogEntryBuilder()));
 	}
 
