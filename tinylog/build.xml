@@ -95,6 +95,7 @@
 		<delete dir="${tests.bin}" />
 		<mkdir dir="${tests.bin}" />
 		<javac srcdir="${tests.src}" destdir="${tests.bin}" includeantruntime="false" debug="true" debuglevel="source,lines">
+			<compilerarg value="-XDignore.symbol.file" />
 			<classpath refid="junit.classpath" />
 			<classpath location="${tinylog.bin}" />
 			<classpath location="${log4j.bin}" />
