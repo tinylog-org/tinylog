@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -27,19 +27,18 @@ import static org.pmw.tinylog.hamcrest.RegexMatchers.contains;
 import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
 
+import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
-import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
@@ -895,7 +894,7 @@ public class LoggerTest extends AbstractTest {
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter(EnumSet.allOf(LogEntryValue.class));
 		Configurator.defaultConfig().writer(writer).level(Level.INFO)
-		.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+				.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
@@ -912,9 +911,10 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 
-		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}", EnvironmentHelper.getProcessId(),
-				Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(), LoggerTest.class.getPackage().getName(),
-				LoggerTest.class.getSimpleName(), lineNumber, Level.INFO, new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
+		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}",
+				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
+				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
+				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 
@@ -1005,35 +1005,72 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
-	 * Test if tinylog get the right stack trace element if JVM doesn't support reflection.
+	 * Test if tinylog gets the right class name of caller even if calling of sun.reflect.Reflection will fail.
 	 */
 	@Test
-	public final void testJvmWithoutReflection() {
-		MockUp<Method> mock = new MockUp<Method>() {
+	public final void testErrorWhileCallingSunReflection() {
+		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}").activate();
 
-			@Mock
-			public Object invoke(final Object instance, final Object... arguments) {
-				throw new UnsupportedOperationException();
+		@SuppressWarnings("restriction")
+		MockUp<sun.reflect.Reflection> mock = new MockUp<sun.reflect.Reflection>() {
+
+			@Mock(invocations = 1)
+			public Class<?> getCallerClass(final Invocation invocation, final int index) {
+				try {
+					throw new UnsupportedOperationException();
+				} finally {
+					tearDown();
+				}
 			}
 
 		};
-
 		try {
-			StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
-			Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
-
-			StringListOutputStream errorStream = getErrorStream();
-			assertFalse(errorStream.hasLines());
 			Logger.info("Hello");
-			assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("stack trace element")));
-
-			LogEntry logEntry = writer.consumeLogEntry();
-			assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
-			assertEquals("testJvmWithoutReflection", logEntry.getMethodName());
-			assertEquals(LoggerTest.class.getName() + ".testJvmWithoutReflection()" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 		} finally {
 			mock.tearDown();
 		}
+
+		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("caller class")));
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
+		assertEquals(LoggerTest.class.getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+	}
+
+	/**
+	 * Test if tinylog gets the right stack trace element even if getting single stack trace element will fail.
+	 */
+	@Test
+	public final void testErrorWhileGettingSingleStackTraceElement() {
+		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
+
+		MockUp<Throwable> mock = new MockUp<Throwable>() {
+
+			@Mock(invocations = 1)
+			public StackTraceElement getStackTraceElement(final Invocation invocation, final int index) {
+				try {
+					throw new UnsupportedOperationException();
+				} finally {
+					tearDown();
+				}
+			}
+
+		};
+		try {
+			Logger.info("Hello");
+		} finally {
+			mock.tearDown();
+		}
+
+		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("stack trace element")));
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
+		assertEquals("testErrorWhileGettingSingleStackTraceElement", logEntry.getMethodName());
+		assertEquals(LoggerTest.class.getName() + ".testErrorWhileGettingSingleStackTraceElement()" + EnvironmentHelper.getNewLine(),
+				logEntry.getRenderedLogEntry());
 	}
 
 	private WritingThread findWritingThread() {
