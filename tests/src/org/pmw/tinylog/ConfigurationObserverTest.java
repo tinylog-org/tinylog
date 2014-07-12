@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -46,7 +46,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
-import org.pmw.tinylog.mocks.SleepHandledThreadMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
@@ -54,7 +53,7 @@ import org.pmw.tinylog.writers.Writer;
 
 /**
  * Tests for configuration observer.
- * 
+ *
  * @see ConfigurationObserver
  */
 @RunWith(Parameterized.class)
@@ -62,7 +61,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	private static final Configuration DEFAULT_CONFIGURATION = Configurator.defaultConfig().create();
 
-	private SleepHandledThreadMock threadMock;
 	private ClassLoaderMock classLoaderMock;
 
 	private final ConfigurationObserverInitializer initializer;
@@ -79,7 +77,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Get the creation wrappers for all available configuration observers.
-	 * 
+	 *
 	 * @return Creation wrappers for all available configuration observers
 	 */
 	@Parameters(name = "{0}")
@@ -124,13 +122,12 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Set up mocks for thread and class loader.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to initialize configuration observer
 	 */
 	@Before
 	public final void init() throws IOException {
-		threadMock = new SleepHandledThreadMock();
 		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
 
 		initializer.create(classLoaderMock);
@@ -145,13 +142,12 @@ public class ConfigurationObserverTest extends AbstractTest {
 	public final void dispose() {
 		classLoaderMock.tearDown();
 		classLoaderMock.close();
-		threadMock.tearDown();
 		file.delete();
 	}
 
 	/**
 	 * Test start and stop of configuration observer.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -171,7 +167,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 		assertTrue(observer.isAlive());
 		assertEquals(threadCount + 1, Thread.activeCount());
 
-		threadMock.disable();
 		observer.shutdown();
 		observer.join();
 
@@ -182,7 +177,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of an empty configuration file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -194,7 +189,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 		try {
 			/* Test if an empty file leads to the default configuration */
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
@@ -203,7 +198,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -211,7 +205,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of logging level.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -220,42 +214,36 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testLoggingLevel() throws IOException, InterruptedException {
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new logging level */
 
 			FileHelper.write(file, "tinylog.level=ERROR");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 
 			/* Test remove logging level */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 
 			/* Test new custom logging level */
 
 			FileHelper.write(file, "tinylog.level@" + ConfigurationObserverTest.class.getName() + "=TRACE");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(Level.TRACE, currentConfiguration.getLevel(ConfigurationObserverTest.class.getName()));
 
 			/* Test remove custom logging level */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -263,7 +251,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of format pattern.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -272,26 +260,22 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testFormatPattern() throws IOException, InterruptedException {
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new format pattern */
 
 			FileHelper.write(file, "tinylog.format={thread} -> {message}");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals("{thread} -> {message}", currentConfiguration.getFormatPattern());
 
 			/* Test remove format pattern */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -299,7 +283,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of locale.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -308,26 +292,22 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testLocale() throws IOException, InterruptedException {
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new locale */
 
 			FileHelper.write(file, "tinylog.locale=de_US");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(new Locale("de", "US"), currentConfiguration.getLocale());
 
 			/* Test remove locale */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -335,7 +315,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of max stack trace elements number.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -344,26 +324,22 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testMaxStackTraceElements() throws IOException, InterruptedException {
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new max stack trace elements number */
 
 			FileHelper.write(file, "tinylog.stacktrace=42");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(42, currentConfiguration.getMaxStackTraceElements());
 
 			/* Test remove max stack trace elements number */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -371,7 +347,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of writer.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -382,30 +358,26 @@ public class ConfigurationObserverTest extends AbstractTest {
 		File logFile1 = FileHelper.createTemporaryFile("log");
 		File logFile2 = FileHelper.createTemporaryFile("log");
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new writer without arguments */
 
 			FileHelper.write(file, "tinylog.writer=console");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertThat(currentConfiguration.getWriters(), types(ConsoleWriter.class));
 
 			/* Test remove writer */
 
 			FileHelper.write(file, "");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
 
 			/* Test new writer with arguments */
 
 			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=" + logFile1.getAbsolutePath());
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			List<Writer> writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class));
@@ -416,8 +388,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Argument of writer has changed */
 
 			FileHelper.write(file, "tinylog.writer=file", "tinylog.writer.filename=" + logFile2.getAbsolutePath());
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class));
@@ -425,7 +396,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertEquals(logFile2.getAbsolutePath(), fileWriter.getFilename());
 			fileWriter.close();
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 			logFile2.delete();
@@ -435,7 +405,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of multiple writers.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -445,14 +415,12 @@ public class ConfigurationObserverTest extends AbstractTest {
 	public final void testMultipleWriters() throws IOException, InterruptedException {
 		File logFile = FileHelper.createTemporaryFile("log");
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Test new writers */
 
 			FileHelper.write(file, "tinylog.writer=console", "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath());
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			List<Writer> writers = currentConfiguration.getWriters();
 			assertThat(writers, types(ConsoleWriter.class, FileWriter.class));
@@ -464,8 +432,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test remove first writer */
 
 			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath());
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class));
@@ -477,8 +444,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test change existing writer */
 
 			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath(), "tinylog.writer2.buffered=true");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class));
@@ -491,8 +457,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 			FileHelper.write(file, "tinylog.writer2=file", "tinylog.writer2.filename=" + logFile.getAbsolutePath(), "tinylog.writer2.buffered=true",
 					"tinylog.writerNew=console");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			writers = currentConfiguration.getWriters();
 			assertThat(writers, types(FileWriter.class, ConsoleWriter.class));
@@ -501,7 +466,6 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertTrue(fileWriter.isBuffered());
 			fileWriter.close();
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 			file.delete();
@@ -510,7 +474,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test reading of writing thread.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -524,10 +488,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test new writing thread */
 
 			FileHelper.write(file, "tinylog.writingthread=true", "tinylog.writingthread.priority=9");
-			for (int i = 0; i < 1000; ++i) { // Make sure that configuration observer and writing thread can run
-				threadMock.awake();
-				threadMock.waitForSleep();
-			}
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			WritingThread writingThread = currentConfiguration.getWritingThread();
 			assertNotNull(writingThread);
@@ -536,14 +497,10 @@ public class ConfigurationObserverTest extends AbstractTest {
 			/* Test remove writing thread */
 
 			FileHelper.write(file, "");
-			for (int i = 0; i < 1000; ++i) { // Make sure that configuration observer and writing thread can run
-				threadMock.awake();
-				threadMock.waitForSleep();
-			}
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
-			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
+			assertNull(currentConfiguration.getWritingThread());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -551,7 +508,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test overriding properties by system properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -560,34 +517,29 @@ public class ConfigurationObserverTest extends AbstractTest {
 	@Test
 	public final void testSystemProperties() throws IOException, InterruptedException {
 		observer.start();
-		threadMock.waitForSleep();
 
 		try {
 			/* Without system properties */
 
 			FileHelper.write(file, "tinylog.level=ERROR");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			Configuration currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 
 			/* Overriding properties by system properties. */
 
 			System.setProperty("tinylog.level", "TRACE");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(Level.TRACE, currentConfiguration.getLevel());
 
 			/* Without system properties */
 
 			System.clearProperty("tinylog.level");
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			currentConfiguration = Logger.getConfiguration().create();
 			assertEquals(Level.ERROR, currentConfiguration.getLevel());
 		} finally {
-			threadMock.disable();
 			observer.shutdown();
 			observer.join();
 		}
@@ -595,7 +547,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test to read a nonexistent file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -606,10 +558,8 @@ public class ConfigurationObserverTest extends AbstractTest {
 		file.delete();
 
 		observer.start();
-		threadMock.awake();
-		threadMock.waitForSleep();
+		waitForCompleteCycle();
 		observer.shutdown();
-		threadMock.disable();
 		observer.join();
 
 		Configuration currentConfiguration = Logger.getConfiguration().create();
@@ -625,7 +575,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 	/**
 	 * Test to read a existing file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -644,10 +594,8 @@ public class ConfigurationObserverTest extends AbstractTest {
 
 		try {
 			observer.start();
-			threadMock.awake();
-			threadMock.waitForSleep();
+			waitForCompleteCycle();
 			observer.shutdown();
-			threadMock.disable();
 			observer.join();
 
 			Configuration currentConfiguration = Logger.getConfiguration().create();
@@ -660,6 +608,20 @@ public class ConfigurationObserverTest extends AbstractTest {
 			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 		} finally {
 			mock.tearDown();
+		}
+	}
+
+	private void waitForCompleteCycle() throws InterruptedException {
+		while (observer.getState() == Thread.State.RUNNABLE) {
+			Thread.sleep(10);
+		}
+
+		if (observer.getState() == Thread.State.TIMED_WAITING) {
+			observer.interrupt();
+			Thread.sleep(10);
+			while (observer.getState() == Thread.State.RUNNABLE) {
+				Thread.sleep(10);
+			}
 		}
 	}
 
