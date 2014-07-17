@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="benchmark" default="run">
 	
-	<property name="runs" value="12" />
-	<property name="outliers" value="2" />
-	<property name="deep" value="20" />
-	<property name="iterations" value="2000000" />
-	<property name="threads" value="100" />
-	<property name="prime" value="10000000" />
+	<property name="benchmark" value="all" />
+	<property name="runs" value="120" />
+	<property name="outliers" value="20" />
+	<property name="deep" value="40" />
+	<property name="iterations" value="200000" />
+	<property name="threads" value="16" />
+	<property name="prime" value="2000000" />
 
 	<property name="root" location=".." />
 	<property name="bin" location="bin" />
@@ -62,7 +63,7 @@
 	<target name="dummy" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
 			<arg value="dummy" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -81,7 +82,7 @@
 	<target name="file" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
 			<arg value="file" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -100,7 +101,7 @@
 	<target name="jul" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
 			<arg value="jul" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -119,7 +120,7 @@
 	<target name="log4j" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j.classpath" fork="true">
 			<arg value="log4j" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -138,7 +139,7 @@
 	<target name="log4j2" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
 			<arg value="log4j2" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -157,7 +158,7 @@
 	<target name="logback" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="logback.classpath" fork="true">
 			<arg value="logback" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
@@ -176,7 +177,7 @@
 	<target name="tinylog" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
 			<arg value="tinylog" />
-			<arg value="all" />
+			<arg value="${benchmark}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
