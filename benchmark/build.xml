@@ -4,7 +4,7 @@
 	<property name="benchmark" value="all" />
 	<property name="runs" value="120" />
 	<property name="outliers" value="20" />
-	<property name="deep" value="40" />
+	<property name="deep" value="20" />
 	<property name="iterations" value="200000" />
 	<property name="threads" value="16" />
 	<property name="prime" value="2000000" />
