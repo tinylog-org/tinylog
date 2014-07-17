@@ -264,7 +264,7 @@
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${conf}" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
 		</javadoc>
 		
 		<pom id="org.log4j" groupId="org.tinylog" artifactId="log4j-facade" version="${maven-version}" name="Log4j Facade" description="Log4j Facade is a Log4j-compatible logging API for tinylog" url="http://www.tinylog.org/">
@@ -340,7 +340,7 @@
 				<dirset dir="${tinylog.bin}" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/7/docs/api/" offline="true" packagelistloc="${conf}" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
 		</javadoc>
 	</target>
 
