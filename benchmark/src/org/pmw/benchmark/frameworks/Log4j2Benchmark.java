@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -29,11 +30,15 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.async.AsyncLogger;
+import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector;
 import org.apache.logging.log4j.core.async.DaemonThreadFactory;
 import org.apache.logging.log4j.core.async.RingBufferLogEvent;
 import org.apache.logging.log4j.core.async.RingBufferLogEventHandler;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.core.selector.ClassLoaderContextSelector;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.pmw.benchmark.Benchmark;
 
@@ -65,13 +70,10 @@ public final class Log4j2Benchmark implements Benchmark {
 	}
 
 	@Override
-	public void init(final File file) {
+	public void init(final File file) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		reInitContextSelector(async);
 		if (async) {
-			try {
-				reInitAsyncLogger();
-			} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
-				throw new RuntimeException(ex);
-			}
+			reInitAsyncLogger();
 		}
 
 		logger = (Logger) LogManager.getLogger();
@@ -109,7 +111,7 @@ public final class Log4j2Benchmark implements Benchmark {
 	}
 
 	@Override
-	public void dispose() {
+	public void dispose() throws InterruptedException {
 		if (async) {
 			AsyncLogger.stop();
 		}
@@ -118,12 +120,20 @@ public final class Log4j2Benchmark implements Benchmark {
 	}
 
 	private Layout<? extends Serializable> createLayout(final Configuration configuration) {
-		return PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, null, null);
+		return PatternLayout.createLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n", configuration, null, null, true, false, null, null);
 	}
 
 	private Appender createAppender(final File file, final Configuration configuration) {
 		return FileAppender.createAppender(file.getAbsolutePath(), "false", null, "file", async ? "false" : "true", null, "true", null,
 				createLayout(configuration), null, null, null, configuration);
+	}
+
+	/* Evil workaround -> change context selector at runtime */
+	private static void reInitContextSelector(final boolean async) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		LoggerContextFactory contextFactory = LogManager.getFactory();
+		Field selectorField = Log4jContextFactory.class.getDeclaredField("selector");
+		selectorField.setAccessible(true);
+		selectorField.set(contextFactory, async ? new AsyncLoggerContextSelector() : new ClassLoaderContextSelector());
 	}
 
 	/* Evil workaround -> must do the same as org.apache.logging.log4j.core.async.AsyncLogger.<clinit>() */
@@ -133,7 +143,15 @@ public final class Log4j2Benchmark implements Benchmark {
 		Executor executor = Executors.newSingleThreadExecutor(new DaemonThreadFactory("AsyncLogger-"));
 		Field executorField = asyncLoggerClass.getDeclaredField("executor");
 		executorField.setAccessible(true);
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		modifiersField.setInt(executorField, executorField.getModifiers() & ~Modifier.FINAL);
 		executorField.set(null, executor);
+		modifiersField.setInt(executorField, executorField.getModifiers() & Modifier.FINAL);
+
+		Method initInfoForExecutorThread = asyncLoggerClass.getDeclaredMethod("initInfoForExecutorThread");
+		initInfoForExecutorThread.setAccessible(true);
+		initInfoForExecutorThread.invoke(null);
 
 		Method calculateRingBufferSize = asyncLoggerClass.getDeclaredMethod("calculateRingBufferSize");
 		calculateRingBufferSize.setAccessible(true);
