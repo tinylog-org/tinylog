@@ -25,6 +25,17 @@ public final class ClassMatchers {
 	private ClassMatchers() {
 	}
 
+	/**
+	 * Test if an object in a direct instance of a class (same class, not a sub class).
+	 * 
+	 * @param type
+	 *            Expected class
+	 * @return A matcher that matches any kind of objects
+	 */
+	public static Matcher<Object> type(final Class<?> type) {
+		return new ClassMatcher(type);
+	}
+
 	private static final class ClassMatcher extends TypeSafeMatcher<Object> {
 
 		private final Class<?> expected;
@@ -47,17 +58,6 @@ public final class ClassMatchers {
 			description.appendText("is type of ").appendValue(expected);
 		}
 
-	}
-
-	/**
-	 * Test if an object in a direct instance of a class (same class, not a sub class).
-	 * 
-	 * @param type
-	 *            Expected class
-	 * @return A matcher that matches any kind of objects
-	 */
-	public static Matcher<Object> type(final Class<?> type) {
-		return new ClassMatcher(type);
 	}
 
 }

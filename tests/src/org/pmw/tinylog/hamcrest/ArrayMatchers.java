@@ -59,16 +59,57 @@ public final class ArrayMatchers {
 		return new ContentMatcher<E>(Arrays.asList(objects), true);
 	}
 
-	private static final class ContentMatcher<E> extends TypeSafeMatcher<E[]> {
+	/**
+	 * Test if an array doesn't contain any element more than once.
+	 *
+	 * @return A matcher that matches the arrays
+	 *
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	public static <E> Matcher<E[]> distinctContentInArray() {
+		return new DistinctMatcher<E>();
+	}
 
+	/**
+	 * Test if an array consists of collections with the defined sizes in the defined order.
+	 *
+	 * @param sizes
+	 *            Sizes for collections(<code>null</code> is allowed to mark <code>null</code> references)
+	 * @return A matcher that matches the arrays
+	 *
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	public static <E> Matcher<E[]> containsCollectionWithSizes(final Integer... sizes) {
+		return new SizeMatcher<E>(Arrays.asList(sizes));
+	}
+
+	/**
+	 * Test if the items of an array are from the expected classes.
+	 *
+	 * @param classes
+	 *            Expected classes
+	 * @return A matcher that matches the arrays
+	 *
+	 * @param <E>
+	 *            Type of array elements
+	 */
+	@SafeVarargs
+	public static <E> Matcher<E[]> typesInArray(final Class<?>... classes) {
+		return new ClassMatcher<E>(Arrays.asList(classes));
+	}
+
+	private static final class ContentMatcher<E> extends TypeSafeMatcher<E[]> {
+	
 		private final Collection<?> collection;
 		private final boolean strict;
-
+	
 		private ContentMatcher(final Collection<?> collection, final boolean strict) {
 			this.collection = collection;
 			this.strict = strict;
 		}
-
+	
 		@Override
 		public boolean matchesSafely(final E[] array) {
 			if (collection == null || array == null) {
@@ -88,7 +129,7 @@ public final class ArrayMatchers {
 				return true;
 			}
 		}
-
+	
 		@Override
 		public void describeTo(final Description description) {
 			if (strict) {
@@ -104,23 +145,11 @@ public final class ArrayMatchers {
 		}
 	}
 
-	/**
-	 * Test if an array doesn't contain any element more than once.
-	 *
-	 * @return A matcher that matches the arrays
-	 *
-	 * @param <E>
-	 *            Type of array elements
-	 */
-	public static <E> Matcher<E[]> distinctContentInArray() {
-		return new DistinctMatcher<E>();
-	}
-
 	private static final class DistinctMatcher<E> extends TypeSafeMatcher<E[]> {
-
+	
 		private DistinctMatcher() {
 		}
-
+	
 		@Override
 		public boolean matchesSafely(final E[] array) {
 			if (array == null) {
@@ -139,36 +168,22 @@ public final class ArrayMatchers {
 				return true;
 			}
 		}
-
+	
 		@Override
 		public void describeTo(final Description description) {
 			description.appendText("contains distinct elements");
-
+	
 		}
-	}
-
-	/**
-	 * Test if an array consists of collections with the defined sizes in the defined order.
-	 *
-	 * @param sizes
-	 *            Sizes for collections(<code>null</code> is allowed to mark <code>null</code> references)
-	 * @return A matcher that matches the arrays
-	 *
-	 * @param <E>
-	 *            Type of array elements
-	 */
-	public static <E> Matcher<E[]> containsCollectionWithSizes(final Integer... sizes) {
-		return new SizeMatcher<E>(Arrays.asList(sizes));
 	}
 
 	private static final class SizeMatcher<E> extends TypeSafeMatcher<E[]> {
-
+	
 		private final Collection<Integer> sizes;
-
+	
 		private SizeMatcher(final Collection<Integer> sizes) {
 			this.sizes = sizes;
 		}
-
+	
 		@Override
 		public boolean matchesSafely(final E[] array) {
 			if (sizes.size() != array.length) {
@@ -192,27 +207,12 @@ public final class ArrayMatchers {
 				return true;
 			}
 		}
-
+	
 		@Override
 		public void describeTo(final Description description) {
 			description.appendText("contains collections of the sizes ");
 			description.appendValue(sizes);
 		}
-	}
-
-	/**
-	 * Test if the items of an array are from the expected classes.
-	 *
-	 * @param classes
-	 *            Expected classes
-	 * @return A matcher that matches the arrays
-	 *
-	 * @param <E>
-	 *            Type of array elements
-	 */
-	@SafeVarargs
-	public static <E> Matcher<E[]> typesInArray(final Class<?>... classes) {
-		return new ClassMatcher<E>(Arrays.asList(classes));
 	}
 
 	private static final class ClassMatcher<E> extends TypeSafeMatcher<E[]> {

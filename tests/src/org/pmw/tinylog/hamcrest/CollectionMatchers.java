@@ -42,14 +42,49 @@ public final class CollectionMatchers {
 		return new ContentMatcher(Arrays.asList(objects));
 	}
 
+	/**
+	 * Test if the items of a collection are from the expected classes.
+	 * 
+	 * @param classes
+	 *            Expected classes
+	 * @return A matcher that matches the collections
+	 */
+	@SafeVarargs
+	public static Matcher<? super Collection<?>> types(final Class<?>... classes) {
+		return new ClassMatcher(Arrays.asList(classes));
+	}
+
+	/**
+	 * Test if the items of a collection have the same type.
+	 * 
+	 * @param objects
+	 *            Expected types
+	 * @return A matcher that matches the collections
+	 */
+	@SafeVarargs
+	public static Matcher<? super Collection<?>> sameTypes(final Object... objects) {
+		return new TypesMatcher(Arrays.asList(objects));
+	}
+
+	/**
+	 * Test if the items of a collection have the same type.
+	 * 
+	 * @param collection
+	 *            Expected types
+	 * @return A matcher that matches the collections
+	 */
+	public static Matcher<? super Collection<?>> sameTypes(final Collection<?> collection) {
+		return new TypesMatcher(collection);
+	}
+
 	private static final class ContentMatcher extends TypeSafeMatcher<Collection<?>> {
-
+	
 		private final Collection<?> collection;
-
+	
 		private ContentMatcher(final Collection<?> collection) {
 			this.collection = collection;
 		}
-
+	
 		@Override
 		public boolean matchesSafely(final Collection<?> collection) {
 			if (this.collection == collection) {
@@ -71,7 +106,7 @@ public final class CollectionMatchers {
 				return true;
 			}
 		}
-
+	
 		@Override
 		public void describeTo(final Description description) {
 			description.appendText("contains exactly ");
@@ -81,18 +116,6 @@ public final class CollectionMatchers {
 				description.appendValue(collection);
 			}
 		}
-	}
-
-	/**
-	 * Test if the items of a collection are from the expected classes.
-	 * 
-	 * @param classes
-	 *            Expected classes
-	 * @return A matcher that matches the collections
-	 */
-	@SafeVarargs
-	public static Matcher<? super Collection<?>> types(final Class<?>... classes) {
-		return new ClassMatcher(Arrays.asList(classes));
 	}
 
 	private static final class ClassMatcher extends TypeSafeMatcher<Collection<?>> {
@@ -130,29 +153,6 @@ public final class CollectionMatchers {
 			description.appendText("contains exactly the types ");
 			description.appendValue(classes);
 		}
-	}
-
-	/**
-	 * Test if the items of a collection have the same type.
-	 * 
-	 * @param objects
-	 *            Expected types
-	 * @return A matcher that matches the collections
-	 */
-	@SafeVarargs
-	public static Matcher<? super Collection<?>> sameTypes(final Object... objects) {
-		return new TypesMatcher(Arrays.asList(objects));
-	}
-
-	/**
-	 * Test if the items of a collection have the same type.
-	 * 
-	 * @param collection
-	 *            Expected types
-	 * @return A matcher that matches the collections
-	 */
-	public static Matcher<? super Collection<?>> sameTypes(final Collection<?> collection) {
-		return new TypesMatcher(collection);
 	}
 
 	private static final class TypesMatcher extends TypeSafeMatcher<Collection<?>> {

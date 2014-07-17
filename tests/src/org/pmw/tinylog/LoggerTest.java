@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -23,8 +23,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
-import static org.pmw.tinylog.hamcrest.RegexMatchers.contains;
-import static org.pmw.tinylog.hamcrest.RegexMatchers.matches;
+import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
+import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -894,7 +894,7 @@ public class LoggerTest extends AbstractTest {
 	public final void testFullLogEntry() {
 		StoreWriter writer = new StoreWriter(EnumSet.allOf(LogEntryValue.class));
 		Configurator.defaultConfig().writer(writer).level(Level.INFO)
-				.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
+		.formatPattern("{pid}#{thread}#{thread_id}#{class}#{package}#{class_name}#{method}#{file}#{line}#{level}#{date:yyyy}#{message}").activate();
 
 		int lineNumber = new Throwable().getStackTrace()[0].getLineNumber() + 1;
 		Logger.info("Hello");
@@ -946,7 +946,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.error(exception);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(exception, logEntry.getException());
-		assertThat(logEntry.getRenderedLogEntry(), matches("java\\.lang\\.Exception\\: Test" + newLine
+		assertThat(logEntry.getRenderedLogEntry(), matchesPattern("java\\.lang\\.Exception\\: Test" + newLine
 				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine + "\t\\.\\.\\." + newLine));
 
 		Configurator.currentConfig().maxStackTraceElements(-1).activate();
@@ -955,9 +955,9 @@ public class LoggerTest extends AbstractTest {
 		Logger.error(exception);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(exception, logEntry.getException());
-		assertThat(logEntry.getRenderedLogEntry(), contains("java\\.lang\\.RuntimeException.*" + newLine
+		assertThat(logEntry.getRenderedLogEntry(), containsPattern("java\\.lang\\.RuntimeException.*" + newLine
 				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
-		assertThat(logEntry.getRenderedLogEntry(), contains("Caused by: java\\.lang\\.NullPointerException" + newLine
+		assertThat(logEntry.getRenderedLogEntry(), containsPattern("Caused by: java\\.lang\\.NullPointerException" + newLine
 				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
 	}
 
