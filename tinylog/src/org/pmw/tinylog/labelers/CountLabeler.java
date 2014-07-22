@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.pmw.tinylog.Configuration;
-import org.pmw.tinylog.InternalLogger;
 
 /**
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
@@ -65,7 +64,7 @@ public final class CountLabeler implements Labeler {
 			}
 		} else {
 			if (!sourceFile.delete()) {
-				InternalLogger.warn("Failed to delete \"{}\"", sourceFile);
+				throw new IOException("Failed to delete \"" + sourceFile + "\"");
 			}
 		}
 	}
