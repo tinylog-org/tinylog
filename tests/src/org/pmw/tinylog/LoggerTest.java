@@ -18,7 +18,6 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -421,20 +420,16 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to create log entry (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test failure of writing log entry */
 
 		Configurator.currentConfig().writer(new EvilWriter()).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.ERROR, null, "Hello!", new Object[0]);
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to write log entry (" + UnsupportedOperationException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test using writing thread */
 
@@ -523,20 +518,16 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("com.test", null).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.output(stackTraceElement, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to create log entry (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test failure of writing log entry */
 
 		Configurator.currentConfig().writer(new EvilWriter()).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.output(stackTraceElement, Level.ERROR, null, "Hello!", new Object[0]);
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to write log entry (" + UnsupportedOperationException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test using writing thread */
 
@@ -623,20 +614,16 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level(LoggerTest.class.getPackage(), null).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.info("Hello {}!", new EvilObject());
 		assertNull(writer.consumeLogEntry());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("create")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to create log entry (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test failure of writing log entry */
 
 		Configurator.currentConfig().writer(new EvilWriter(writer.getRequiredLogEntryValues())).activate();
 
-		assertFalse(getErrorStream().hasLines());
 		Logger.error("Hello!");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write")));
-		getErrorStream().clear();
+		assertEquals("LOGGER ERROR: Failed to write log entry (" + UnsupportedOperationException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test using writing thread */
 
@@ -1031,7 +1018,7 @@ public class LoggerTest extends AbstractTest {
 			mock.tearDown();
 		}
 
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("caller class")));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get caller class from sun.reflect.Reflection \\(.+\\)"));
 
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
@@ -1064,7 +1051,7 @@ public class LoggerTest extends AbstractTest {
 			mock.tearDown();
 		}
 
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("stack trace element")));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get single stack trace element from throwable \\(.+\\)"));
 
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
@@ -1086,9 +1073,7 @@ public class LoggerTest extends AbstractTest {
 
 		@Override
 		public String toString() {
-			/* Generate an individual error message */
-			String message = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-			throw new RuntimeException(message);
+			throw new RuntimeException();
 		}
 
 	}

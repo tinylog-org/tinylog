@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,8 +13,6 @@
 
 package org.pmw.tinylog.labelers;
 
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -36,11 +34,10 @@ import org.junit.Test;
 import org.pmw.tinylog.mocks.SystemTimeMock;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for timestamp labeler.
- * 
+ *
  * @see TimestampLabeler
  */
 public class TimestampLabelerTest extends AbstractLabelerTest {
@@ -69,7 +66,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file with file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -126,7 +123,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file without file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -171,7 +168,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling without storing backups.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -205,7 +202,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test deleting if backup file is in use.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -221,10 +218,8 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeler.getLogFile(baseFile);
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		labeler.roll(currentFile, 0);
-		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
+		assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
 
 		stream.close();
 		backupFile.delete();

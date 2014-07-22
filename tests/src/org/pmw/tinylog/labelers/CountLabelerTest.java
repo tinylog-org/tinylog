@@ -13,8 +13,6 @@
 
 package org.pmw.tinylog.labelers;
 
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -30,18 +28,17 @@ import java.io.IOException;
 import org.junit.Test;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for count labeler.
- * 
+ *
  * @see CountLabeler
  */
 public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file with file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -89,7 +86,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file without file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -120,7 +117,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling without storing backups.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -144,7 +141,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test renaming if file is in use.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -164,7 +161,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 			labeler.roll(baseFile, 2);
 			fail("IOException expected: Renaming should fail");
 		} catch (IOException ex) {
-			assertThat(ex.getMessage(), containsString("rename"));
+			assertEquals("Failed to rename \"" + backupFile + "\" to \"" + getBackupFile(baseFile, "tmp", "1") + "\"", ex.getMessage());
 		}
 
 		stream.close();
@@ -174,7 +171,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test deleting if file is in use.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -189,10 +186,8 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeler.getLogFile(baseFile));
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		labeler.roll(baseFile, 0);
-		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
+		assertEquals("LOGGER WARNING: Failed to delete \"" + baseFile + "\"", getErrorStream().nextLine());
 
 		stream.close();
 		baseFile.delete();

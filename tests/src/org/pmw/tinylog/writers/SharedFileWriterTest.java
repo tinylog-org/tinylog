@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,9 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -44,7 +42,7 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
  * Tests for the shared file writer.
- * 
+ *
  * @see SharedFileWriter
  */
 public class SharedFileWriterTest extends AbstractWriterTest {
@@ -54,7 +52,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -71,7 +69,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -87,7 +85,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing without threading.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -118,7 +116,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing with threading.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -172,7 +170,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test simultaneously writing from multiple JVMs.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -214,7 +212,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Main method for {@link #testMultiJvmWriting()}.
-	 * 
+	 *
 	 * @param arguments
 	 *            Contains the file name for writer
 	 * @throws IOException
@@ -243,7 +241,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test flushing.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -266,7 +264,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test overwriting of existing log file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -315,7 +313,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if file can't be opened.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -337,7 +335,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if writing fails.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -371,7 +369,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test reading shared file writer from properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to create log file
 	 */
@@ -382,8 +380,8 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "sharedfile");
 		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("sharedfile writer")));
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.filename\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize sharedfile writer", getErrorStream().nextLine());
 
 		propertiesBuilder.set("tinylog.writer.filename", file.getAbsolutePath());
 		writers = createFromProperties(propertiesBuilder.create());

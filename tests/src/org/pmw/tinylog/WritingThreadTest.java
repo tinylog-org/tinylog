@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,13 +13,12 @@
 
 package org.pmw.tinylog;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.LogEntryBuilder;
@@ -28,14 +27,14 @@ import org.pmw.tinylog.util.StoreWriter;
 
 /**
  * Tests for writing thread.
- * 
+ *
  * @see WritingThread
  */
 public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test simple startup and shutdown.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -59,7 +58,7 @@ public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test write log entries by writing thread.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -81,7 +80,7 @@ public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test if writing thread flushes after an iteration.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -106,7 +105,7 @@ public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test exceptions for writing log entries by writing thread.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -127,12 +126,12 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: Failed to write log entry \\(.+\\)"));
 	}
 
 	/**
 	 * Test exceptions for flushing writer.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -153,12 +152,12 @@ public class WritingThreadTest extends AbstractTest {
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("write"), containsString("Exception")));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: Failed to flush writer \\(.+\\)"));
 	}
 
 	/**
 	 * Test observing a thread and shutdown writing thread, when observed thread is dead.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
@@ -184,7 +183,7 @@ public class WritingThreadTest extends AbstractTest {
 
 	/**
 	 * Test observing a thread that doesn't exist.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */

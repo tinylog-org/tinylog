@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,12 +13,10 @@
 
 package org.pmw.tinylog;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests the internal logger.
@@ -42,47 +40,27 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testWarnings() {
-		StringListOutputStream errorStream = getErrorStream();
-
 		InternalLogger.warn("Hello World!");
-		String nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello World!"));
+		assertEquals("LOGGER WARNING: Hello World!", getErrorStream().nextLine());
 
 		InternalLogger.warn("Hello {}!", "tinylog");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertEquals("LOGGER WARNING: Hello tinylog!", getErrorStream().nextLine());
 
 		InternalLogger.warn(new IndexOutOfBoundsException());
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+		assertEquals("LOGGER WARNING: " + IndexOutOfBoundsException.class.getName(), getErrorStream().nextLine());
 
 		InternalLogger.warn(new IndexOutOfBoundsException("Hello World!"));
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello World!"));
-		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+		assertEquals("LOGGER WARNING: Hello World! (" + IndexOutOfBoundsException.class.getName() + ")", getErrorStream().nextLine());
 
 		InternalLogger.warn(new NullPointerException(), "Logging message");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Logging message"));
-		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+		assertEquals("LOGGER WARNING: Logging message (" + NullPointerException.class.getName() + ")", getErrorStream().nextLine());
 
 		InternalLogger.warn(new NullPointerException("Exception message"), "Logging message");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Logging message"));
-		assertThat(nextLine, containsString("Exception message"));
-		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+		assertEquals("LOGGER WARNING: Logging message (" + NullPointerException.class.getName() + ": Exception message)", getErrorStream().nextLine());
 
 		InternalLogger.warn(new RuntimeException(), "Hello {}!", "tinylog");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
-		assertThat(nextLine, containsString(RuntimeException.class.getName()));
+		assertEquals("LOGGER WARNING: Hello tinylog! (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
+
 	}
 
 	/**
@@ -90,25 +68,17 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRepeatingWarnings() {
-		StringListOutputStream errorStream = getErrorStream();
+		InternalLogger.warn("Hello World!");
+		assertEquals("LOGGER WARNING: Hello World!", getErrorStream().nextLine());
 
 		InternalLogger.warn("Hello World!");
-		String nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello World!"));
-
-		InternalLogger.warn("Hello World!");
-		assertFalse(errorStream.hasLines()); // Repeating warning should be ignored
+		assertFalse(getErrorStream().hasLines()); // Repeating warning should be ignored
 
 		InternalLogger.warn("Hello tinylog!");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertEquals("LOGGER WARNING: Hello tinylog!", getErrorStream().nextLine());
 
 		InternalLogger.warn("Hello World!");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("WARNING"));
-		assertThat(nextLine, containsString("Hello World!"));
+		assertEquals("LOGGER WARNING: Hello World!", getErrorStream().nextLine());
 	}
 
 	/**
@@ -116,47 +86,26 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testError() {
-		StringListOutputStream errorStream = getErrorStream();
-
 		InternalLogger.error("Hello World!");
-		String nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello World!"));
+		assertEquals("LOGGER ERROR: Hello World!", getErrorStream().nextLine());
 
 		InternalLogger.error("Hello {}!", "tinylog");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertEquals("LOGGER ERROR: Hello tinylog!", getErrorStream().nextLine());
 
 		InternalLogger.error(new IndexOutOfBoundsException());
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+		assertEquals("LOGGER ERROR: " + IndexOutOfBoundsException.class.getName(), getErrorStream().nextLine());
 
 		InternalLogger.error(new IndexOutOfBoundsException("Hello World!"));
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello World!"));
-		assertThat(nextLine, containsString(IndexOutOfBoundsException.class.getName()));
+		assertEquals("LOGGER ERROR: Hello World! (" + IndexOutOfBoundsException.class.getName() + ")", getErrorStream().nextLine());
 
 		InternalLogger.error(new NullPointerException(), "Logging message");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Logging message"));
-		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+		assertEquals("LOGGER ERROR: Logging message (" + NullPointerException.class.getName() + ")", getErrorStream().nextLine());
 
 		InternalLogger.error(new NullPointerException("Exception message"), "Logging message");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Logging message"));
-		assertThat(nextLine, containsString("Exception message"));
-		assertThat(nextLine, containsString(NullPointerException.class.getName()));
+		assertEquals("LOGGER ERROR: Logging message (" + NullPointerException.class.getName() + ": Exception message)", getErrorStream().nextLine());
 
 		InternalLogger.error(new RuntimeException(), "Hello {}!", "tinylog");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
-		assertThat(nextLine, containsString(RuntimeException.class.getName()));
+		assertEquals("LOGGER ERROR: Hello tinylog! (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
 	}
 
 	/**
@@ -164,25 +113,17 @@ public class InternalLoggerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testRepeatingErrors() {
-		StringListOutputStream errorStream = getErrorStream();
+		InternalLogger.error("Hello World!");
+		assertEquals("LOGGER ERROR: Hello World!", getErrorStream().nextLine());
 
 		InternalLogger.error("Hello World!");
-		String nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello World!"));
-
-		InternalLogger.error("Hello World!");
-		assertFalse(errorStream.hasLines()); // Repeating error should be ignored
+		assertFalse(getErrorStream().hasLines()); // Repeating error should be ignored
 
 		InternalLogger.error("Hello tinylog!");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello tinylog!"));
+		assertEquals("LOGGER ERROR: Hello tinylog!", getErrorStream().nextLine());
 
 		InternalLogger.error("Hello World!");
-		nextLine = errorStream.nextLine();
-		assertThat(nextLine, containsString("ERROR"));
-		assertThat(nextLine, containsString("Hello World!"));
+		assertEquals("LOGGER ERROR: Hello World!", getErrorStream().nextLine());
 	}
 
 }

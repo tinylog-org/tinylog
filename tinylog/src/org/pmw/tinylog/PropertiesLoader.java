@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -193,7 +193,7 @@ final class PropertiesLoader {
 				int limit = Integer.parseInt(stacktace);
 				configurator.maxStackTraceElements(limit);
 			} catch (NumberFormatException ex) {
-				InternalLogger.warn("\"{}\" is an invalid stack trace size and will be ignored", stacktace);
+				InternalLogger.warn("\"{}\" is an invalid stack trace size", stacktace);
 			}
 		}
 	}
@@ -266,7 +266,7 @@ final class PropertiesLoader {
 					priority = Integer.parseInt(priorityString.trim());
 				} catch (NumberFormatException ex) {
 					priority = null;
-					InternalLogger.warn("\"{}\" is an invalid thread priority and will be ignored", priorityString);
+					InternalLogger.warn("\"{}\" is an invalid thread priority", priorityString);
 				}
 			}
 			if (priority != null && observedThreadDefined) {
@@ -321,7 +321,7 @@ final class PropertiesLoader {
 			try {
 				return Level.valueOf(levelName.toUpperCase(Locale.ENGLISH));
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.warn("\"{}\" is an invalid severity level and will be ignored", levelName);
+				InternalLogger.warn("\"{}\" is an invalid severity level", levelName);
 				return null;
 			}
 		} else {

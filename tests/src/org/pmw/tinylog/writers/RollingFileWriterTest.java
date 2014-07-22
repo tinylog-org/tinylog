@@ -13,9 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -57,14 +55,14 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
  * Tests for the rolling file writer.
- * 
+ *
  * @see RollingFileWriter
  */
 public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test all constructors.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -145,7 +143,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -162,7 +160,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test simple writing (non-existing log file and neither policies nor a labeler).
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -196,7 +194,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if unbuffered rolling file writer writes log entries immediately.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -219,7 +217,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if buffered rolling file writer writes log entries after close.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -246,7 +244,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if buffered rolling file writer writes log entries after flush.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -275,7 +273,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing with threading.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -328,7 +326,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test rolling while writing.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -340,7 +338,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test rolling while opening.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -362,7 +360,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if file can't be opened.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -406,7 +404,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if writing fails.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -440,7 +438,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test reading rolling file writer from properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to create log file
 	 */
@@ -448,8 +446,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 	public final void testFromProperties() throws IOException {
 		List<Writer> writers = createFromProperties(new PropertiesBuilder().set("tinylog.writer", "rollingfile").create());
 		assertThat(writers, empty());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.filename\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize rollingfile writer", getErrorStream().nextLine());
 
 		testFromProperties(null); // Default
 		testFromProperties(false); // Non buffered
@@ -490,8 +488,8 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		PropertiesBuilder propertiesBuilder = defaultPropertiesBuilder.copy();
 		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.backups")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("rollingfile writer")));
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.backups\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize rollingfile writer", getErrorStream().nextLine());
 
 		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "1");
 		writers = createFromProperties(propertiesBuilder.create());

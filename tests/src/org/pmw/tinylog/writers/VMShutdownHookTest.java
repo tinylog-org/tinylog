@@ -13,10 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +33,7 @@ import org.pmw.tinylog.LogEntry;
 
 /**
  * Tests for the VM shutdown hook.
- * 
+ *
  * @see VMShutdownHook
  */
 public class VMShutdownHookTest extends AbstractTest {
@@ -61,7 +58,7 @@ public class VMShutdownHookTest extends AbstractTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 * 
+	 *
 	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
@@ -116,7 +113,7 @@ public class VMShutdownHookTest extends AbstractTest {
 			@Override
 			public void close() throws Exception {
 				super.close();
-				throw new IOException("Shutdown failed");
+				throw new IOException("Unknown error");
 			}
 
 		};
@@ -127,7 +124,7 @@ public class VMShutdownHookTest extends AbstractTest {
 		VMShutdownHook.register(writer2);
 
 		runtimeMock.threads.get(0).run();
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("Shutdown failed")));
+		assertEquals("LOGGER ERROR: Failed to shutdown writer (" + IOException.class.getName() + ": Unknown error)", getErrorStream().nextLine());
 		assertEquals(1, writer1.closeCalls);
 		assertEquals(1, writer2.closeCalls);
 	}

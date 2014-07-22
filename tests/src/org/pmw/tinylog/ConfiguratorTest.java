@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -57,7 +57,6 @@ import org.pmw.tinylog.Configurator.WritingThreadData;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
-import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.Writer;
 
@@ -397,8 +396,6 @@ public class ConfiguratorTest extends AbstractTest {
 		configuration = configurator.removeAllWriters().create();
 		assertThat(configuration.getWriters(), empty());
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		assertFalse(Configurator.defaultConfig().writer(new NullWriter() {
 
 			@Override
@@ -407,7 +404,7 @@ public class ConfiguratorTest extends AbstractTest {
 			}
 
 		}).activate());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString(IllegalArgumentException.class.getName()), containsString("activate")));
+		assertEquals("LOGGER ERROR: Failed to activate configuration (" + IllegalArgumentException.class.getName() + ")", getErrorStream().nextLine());
 	}
 
 	/**
@@ -686,10 +683,8 @@ public class ConfiguratorTest extends AbstractTest {
 		assertEquals(threadCount, Thread.activeCount());
 
 		configurator = Configurator.defaultConfig().writingThread("!!! NONEXISTING THREAD !!!");
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		configuration = configurator.create();
-		assertThat(errorStream.nextLine(), allOf(containsString("WARNING"), containsString("thread"), containsString("!!! NONEXISTING THREAD !!!")));
+		assertEquals("LOGGER WARNING: Thread \"!!! NONEXISTING THREAD !!!\" could not be found, writing thread will not be used", getErrorStream().nextLine());
 	}
 
 	/**

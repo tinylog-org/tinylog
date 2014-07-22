@@ -13,8 +13,6 @@
 
 package org.pmw.tinylog.labelers;
 
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -30,11 +28,10 @@ import org.junit.Test;
 import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
-import org.pmw.tinylog.util.StringListOutputStream;
 
 /**
  * Tests for process ID labeler.
- * 
+ *
  * @see ProcessIdLabeler
  */
 public class ProcessIdLabelerTest extends AbstractLabelerTest {
@@ -49,7 +46,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file with file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Problem with the temporary file
 	 */
@@ -75,7 +72,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling for log file without file extension.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Problem with the temporary file
 	 */
@@ -101,7 +98,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test labeling without storing backups.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Problem with the temporary file
 	 */
@@ -123,7 +120,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test if labeler deletes the right old files.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Problem with the temporary file
 	 */
@@ -155,7 +152,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test deleting if current file is in use.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -173,7 +170,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 			labeler.roll(currentFile, 0);
 			fail("IOException expected: Deleting should fail");
 		} catch (IOException ex) {
-			assertThat(ex.getMessage(), anyOf(containsString("delete"), containsString("remove")));
+			assertEquals("Failed to delete \"" + currentFile + "\"", ex.getMessage());
 		}
 
 		stream.close();
@@ -182,7 +179,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 	/**
 	 * Test deleting if backup file is in use.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -198,10 +195,8 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeler.getLogFile(baseFile);
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		labeler.roll(currentFile, 0);
-		assertThat(errorStream.nextLine(), anyOf(containsString("delete"), containsString("remove")));
+		assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
 
 		stream.close();
 		backupFile.delete();

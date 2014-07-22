@@ -13,9 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,7 +47,6 @@ import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
-import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.JdbcWriter.Value;
 
 /**
@@ -334,7 +331,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
-		assertThat(getErrorStream().nextLine(), containsString("unknown"));
+		assertEquals("LOGGER WARNING: Unknown value type: \"unknown\"", getErrorStream().nextLine());
 	}
 
 	/**
@@ -361,13 +358,13 @@ public class JdbcWriterTest extends AbstractWriterTest {
 					createAndCloseWriter("log" + "\n" + "entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\n" + "entries"));
+					assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
 				}
 				try {
 					createAndCloseWriter("log" + "\r" + "entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\r" + "entries"));
+					assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
 				}
 			} finally {
 				mock.tearDown();
@@ -397,25 +394,25 @@ public class JdbcWriterTest extends AbstractWriterTest {
 					createAndCloseWriter("log entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log entries"));
+					assertEquals("Illegal table name: log entries", ex.getMessage());
 				}
 				try {
 					createAndCloseWriter("log\"'entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log\"'entries"));
+					assertEquals("Illegal table name: log\"'entries", ex.getMessage());
 				}
 				try {
 					createAndCloseWriter("log" + "\n" + "entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\n" + "entries"));
+					assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
 				}
 				try {
 					createAndCloseWriter("log" + "\r" + "entries");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\r" + "entries"));
+					assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
 				}
 			} finally {
 				mock.tearDown();
@@ -440,20 +437,20 @@ public class JdbcWriterTest extends AbstractWriterTest {
 				createAndCloseWriter("log", "$entry$");
 				createAndCloseWriter("log", "@entry@");
 				createAndCloseWriter("log", "#entry#");
-				createAndCloseWriter("log", "log_entries");
-				createAndCloseWriter("log", "log entries");
-				createAndCloseWriter("log", "log\"'entries");
+				createAndCloseWriter("log", "log_entry");
+				createAndCloseWriter("log", "log entry");
+				createAndCloseWriter("log", "log\"'entry");
 				try {
-					createAndCloseWriter("log", "log" + "\n" + "entries");
+					createAndCloseWriter("log", "log" + "\n" + "entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\n" + "entries"));
+					assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
 				}
 				try {
-					createAndCloseWriter("log", "log" + "\r" + "entries");
+					createAndCloseWriter("log", "log" + "\r" + "entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\r" + "entries"));
+					assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
 				}
 			} finally {
 				mock.tearDown();
@@ -478,30 +475,30 @@ public class JdbcWriterTest extends AbstractWriterTest {
 				createAndCloseWriter("log", "$entry$");
 				createAndCloseWriter("log", "@entry@");
 				createAndCloseWriter("log", "#entry#");
-				createAndCloseWriter("log", "log_entries");
+				createAndCloseWriter("log", "log_entry");
 				try {
-					createAndCloseWriter("log", "log entries");
+					createAndCloseWriter("log", "log entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log entries"));
+					assertEquals("Illegal column name: log entry", ex.getMessage());
 				}
 				try {
-					createAndCloseWriter("log", "log\"'entries");
+					createAndCloseWriter("log", "log\"'entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log\"'entries"));
+					assertEquals("Illegal column name: log\"'entry", ex.getMessage());
 				}
 				try {
-					createAndCloseWriter("log", "log" + "\n" + "entries");
+					createAndCloseWriter("log", "log" + "\n" + "entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\n" + "entries"));
+					assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
 				}
 				try {
-					createAndCloseWriter("log", "log" + "\r" + "entries");
+					createAndCloseWriter("log", "log" + "\r" + "entry");
 					fail("SQLException expected");
 				} catch (SQLException ex) {
-					assertThat(ex.getMessage(), containsString("log" + "\r" + "entries"));
+					assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
 				}
 			} finally {
 				mock.tearDown();
@@ -529,7 +526,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			writer.init(null);
 			fail("SQLException expected");
 		} catch (SQLException ex) {
-			assertThat(ex.getMessage(), allOf(containsString("1"), containsString("2")));
+			assertEquals("Number of columns and values must be equal, but columns = 1 and values = 2", ex.getMessage());
 		} finally {
 			writer.close();
 		}
@@ -546,7 +543,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			writer.init(null);
 			fail("SQLException expected");
 		} catch (SQLException ex) {
-			assertThat(ex.getMessage(), allOf(containsString("2"), containsString("1")));
+			assertEquals("Number of columns and values must be equal, but columns = 2 and values = 1", ex.getMessage());
 		} finally {
 			writer.close();
 		}
@@ -980,28 +977,23 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testFromProperties() {
-		StringListOutputStream errorStream = getErrorStream();
-
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "jdbc");
 		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.url")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.url\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize jdbc writer", getErrorStream().nextLine());
 
 		propertiesBuilder.set("tinylog.writer.url", "jdbc:");
 		writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.table")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.table\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize jdbc writer", getErrorStream().nextLine());
 
 		propertiesBuilder.set("tinylog.writer.url", "jdbc:").set("tinylog.writer.table", "log");
 		writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.values")));
-		assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("jdbc writer")));
-		assertFalse(errorStream.hasLines());
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.values\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize jdbc writer", getErrorStream().nextLine());
 
 		propertiesBuilder.set("tinylog.writer.values", "log_entry");
 		writers = createFromProperties(propertiesBuilder.create());

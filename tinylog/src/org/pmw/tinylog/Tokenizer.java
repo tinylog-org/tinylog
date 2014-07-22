@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -163,7 +163,7 @@ final class Tokenizer {
 			try {
 				return new DateToken(new SimpleDateFormat(dateFormatPattern, locale));
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.error("\"{}\" is an invalid date format pattern ({})", dateFormatPattern, ex.getMessage());
+				InternalLogger.error(ex, "\"{}\" is an invalid date format pattern", dateFormatPattern);
 				return new DateToken(new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale));
 			}
 		} else if ("pid".equals(text)) {
@@ -261,7 +261,7 @@ final class Tokenizer {
 				if (splitter == -1) {
 					parameter = parameter.trim();
 					if ("min-size".equals(parameter)) {
-						InternalLogger.warn("No value set for \"min-size\" in \"{}\"", text);
+						InternalLogger.warn("No value set for \"min-size\"");
 					} else {
 						InternalLogger.warn("Unknown option \"{}\"", parameter);
 					}
@@ -270,16 +270,16 @@ final class Tokenizer {
 					String value = parameter.substring(splitter + 1).trim();
 					if ("min-size".equals(key)) {
 						if (value.length() == 0) {
-							InternalLogger.warn("No value set for \"min-size\"  in \"{}\"", text);
+							InternalLogger.warn("No value set for \"min-size\"");
 						} else {
 							try {
 								minSize = parsePositiveInt(value);
 							} catch (NumberFormatException ex) {
-								InternalLogger.warn("\"{}\" is an invalid number for \"min-size\" in \"{}\"", value, text);
+								InternalLogger.warn("\"{}\" is an invalid number for \"min-size\"", value);
 							}
 						}
 					} else {
-						InternalLogger.warn("Unknown option \"{}\" in \"{}\"", parameter, text);
+						InternalLogger.warn("Unknown option \"{}\"", key);
 					}
 				}
 			}

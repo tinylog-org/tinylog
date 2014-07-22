@@ -413,7 +413,7 @@ public final class JdbcWriter implements Writer {
 			} else if ("log_entry".equalsIgnoreCase(string)) {
 				values.add(Value.RENDERED_LOG_ENTRY);
 			} else {
-				InternalLogger.warn("Unknown value type: " + string);
+				InternalLogger.warn("Unknown value type: \"{}\"", string);
 			}
 		}
 		return values;
@@ -428,7 +428,9 @@ public final class JdbcWriter implements Writer {
 		if (quote == null || quote.trim().length() == 0) {
 			for (int i = 0; i < table.length(); ++i) {
 				char c = table.charAt(i);
-				if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
+				if (c == '\n' || c == '\r') {
+					throw new SQLException("Table name contains line breaks: " + table);
+				} else if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
 					throw new SQLException("Illegal table name: " + table);
 				}
 			}
@@ -444,7 +446,9 @@ public final class JdbcWriter implements Writer {
 					String column = iterator.next();
 					for (int i = 0; i < column.length(); ++i) {
 						char c = column.charAt(i);
-						if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
+						if (c == '\n' || c == '\r') {
+							throw new SQLException("Column name contains line breaks: " + column);
+						} else if (!Character.isLetterOrDigit(c) && c != '_' && c != '@' && c != '$' && c != '#') {
 							throw new SQLException("Illegal column name: " + column);
 						}
 					}
@@ -615,7 +619,7 @@ public final class JdbcWriter implements Writer {
 					statement.setString(i + 1, renderedLogEntry);
 					break;
 				default:
-					InternalLogger.warn("Unknown value type: " + values.get(i));
+					InternalLogger.warn("Unknown value type: \"{}\"", values.get(i));
 					break;
 			}
 		}

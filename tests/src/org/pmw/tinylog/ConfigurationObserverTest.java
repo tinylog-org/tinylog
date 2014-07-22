@@ -13,8 +13,6 @@
 
 package org.pmw.tinylog;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
+import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.io.File;
 import java.io.IOException;
@@ -563,7 +562,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 		observer.join();
 
 		Configuration currentConfiguration = Logger.getConfiguration().create();
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("open"), containsString(".properties")));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: Failed to open \\\".+\\\""));
 		assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 		assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 		assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
@@ -599,7 +598,7 @@ public class ConfigurationObserverTest extends AbstractTest {
 			observer.join();
 
 			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("read"), containsString(IOException.class.getName())));
+			assertEquals("LOGGER ERROR: Failed to read properties file (" + IOException.class.getName() + ")", getErrorStream().nextLine());
 			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
 			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
 			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());

@@ -15,7 +15,6 @@ package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -96,7 +95,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(new SimpleDateFormat("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = tokenizer.parse("{date:'}");
-		assertThat(getErrorStream().nextLine(), containsString("invalid date format pattern"));
+		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"\\'\" is an invalid date format pattern \\(.+\\)"));
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
 		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
@@ -115,7 +114,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
 
 		tokens = tokenizer.parse("{pid:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{pid}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{pid}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
@@ -134,7 +133,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("test", render(tokens, new LogEntryBuilder().thread(new Thread("test"))));
 
 		tokens = tokenizer.parse("{thread:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{thread}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{thread}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.THREAD));
 		assertEquals("test", render(tokens, new LogEntryBuilder().thread(new Thread("test"))));
@@ -154,7 +153,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(Long.toString(thread.getId()), render(tokens, new LogEntryBuilder().thread(thread)));
 
 		tokenizer.parse("{thread_id:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{thread_id}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{thread_id}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.THREAD));
 		assertEquals(Long.toString(thread.getId()), render(tokens, new LogEntryBuilder().thread(thread)));
@@ -174,7 +173,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 
 		tokens = tokenizer.parse("{class:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{class}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{class}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("my.package.MyClass", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
@@ -195,7 +194,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 
 		tokenizer.parse("{class_name:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{class_name}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{class_name}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
@@ -216,7 +215,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("", render(tokens, new LogEntryBuilder().className("MyClass")));
 
 		tokenizer.parse("{package:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{package}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{package}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("my.package", render(tokens, new LogEntryBuilder().className("my.package.MyClass")));
@@ -236,7 +235,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("MyMethod", render(tokens, new LogEntryBuilder().method("MyMethod")));
 
 		tokens = tokenizer.parse("{method:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{method}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{method}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.METHOD));
 		assertEquals("MyMethod", render(tokens, new LogEntryBuilder().method("MyMethod")));
@@ -255,7 +254,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("MyFile", render(tokens, new LogEntryBuilder().file("MyFile")));
 
 		tokens = tokenizer.parse("{file:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{file}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{file}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.FILE));
 		assertEquals("MyFile", render(tokens, new LogEntryBuilder().file("MyFile")));
@@ -274,7 +273,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("42", render(tokens, new LogEntryBuilder().lineNumber(42)));
 
 		tokens = tokenizer.parse("{line:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{line}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{line}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LINE));
 		assertEquals("42", render(tokens, new LogEntryBuilder().lineNumber(42)));
@@ -293,7 +292,7 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("DEBUG", render(tokens, new LogEntryBuilder().level(Level.DEBUG)));
 
 		tokens = tokenizer.parse("{level:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{level}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{level}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("DEBUG", render(tokens, new LogEntryBuilder().level(Level.DEBUG)));
@@ -313,7 +312,7 @@ public class TokenizerTest extends AbstractTest {
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
 
 		tokens = new Tokenizer(locale, 0).parse("{message:abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{message}"), containsString("parameter")));
+		assertEquals("LOGGER WARNING: \"{message}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
 
@@ -394,20 +393,20 @@ public class TokenizerTest extends AbstractTest {
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{class|option}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("option")));
+		assertEquals("LOGGER WARNING: Unknown option \"option\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 
 		tokens = tokenizer.parse("{class|key=value}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("key")));
+		assertEquals("LOGGER WARNING: Unknown option \"key\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("MyClass", render(tokens, new LogEntryBuilder().className("MyClass")));
 
-		tokens = tokenizer.parse("{class|key=value,min-size=10,option}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("key")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("option")));
+		tokens = tokenizer.parse("{class|option,min-size=10,key=value}");
+		assertEquals("LOGGER WARNING: Unknown option \"option\"", getErrorStream().nextLine());
+		assertEquals("LOGGER WARNING: Unknown option \"key\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CLASS));
 		assertEquals("MyClass   ", render(tokens, new LogEntryBuilder().className("MyClass")));
@@ -461,28 +460,28 @@ public class TokenizerTest extends AbstractTest {
 		/* Invalid definitions of minimum sizes */
 
 		tokens = tokenizer.parse("{level|min-size}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("min-size")));
-		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
-		assertEquals("INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
-		assertEquals("WARNING", render(tokens, new LogEntryBuilder().level(Level.WARNING)));
-
-		tokens = tokenizer.parse("{level|min-size=}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("min-size")));
+		assertEquals("LOGGER WARNING: No value set for \"min-size\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
 		assertEquals("WARNING", render(tokens, new LogEntryBuilder().level(Level.WARNING)));
 
 		tokens = tokenizer.parse("{level|min-size=-1}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("min-size"), containsString("-1")));
+		assertEquals("LOGGER WARNING: \"-1\" is an invalid number for \"min-size\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
 		assertEquals("WARNING", render(tokens, new LogEntryBuilder().level(Level.WARNING)));
 
 		tokens = tokenizer.parse("{level|min-size=abc}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("min-size"), containsString("abc")));
+		assertEquals("LOGGER WARNING: \"abc\" is an invalid number for \"min-size\"", getErrorStream().nextLine());
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
+		assertEquals("INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
+		assertEquals("WARNING", render(tokens, new LogEntryBuilder().level(Level.WARNING)));
+
+		tokens = tokenizer.parse("{level|min-size=}");
+		assertEquals("LOGGER WARNING: No value set for \"min-size\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
@@ -564,39 +563,39 @@ public class TokenizerTest extends AbstractTest {
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{")));
+		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{\"", getErrorStream().nextLine());
 		assertThat(tokens, empty());
 
 		tokens = tokenizer.parse("{pid");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{pid")));
+		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
 
 		tokens = tokenizer.parse("{pid|min-size=10");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{pid|min-size=10")));
+		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid|min-size=10\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertThat(render(tokens, new LogEntryBuilder()), allOf(startsWith(EnvironmentHelper.getProcessId().toString()), hasLength(10)));
 
 		tokens = tokenizer.parse("{pid {level}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("{pid")));
+		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid {level}\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("pid INFO", render(tokens, new LogEntryBuilder().level(Level.INFO)));
 
 		tokens = tokenizer.parse("}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("}")));
+		assertEquals("LOGGER WARNING: Opening curly brace is missing for: \"}\"", getErrorStream().nextLine());
 		assertThat(tokens, empty());
 
 		tokens = tokenizer.parse("pid}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("pid}")));
+		assertEquals("LOGGER WARNING: Opening curly brace is missing for: \"pid}\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
 		assertEquals("pid", render(tokens, new LogEntryBuilder()));
 
 		tokens = tokenizer.parse("{level} pid}");
-		assertThat(getErrorStream().nextLine(), allOf(containsString("WARNING"), containsString("pid}")));
+		assertEquals("LOGGER WARNING: Opening curly brace is missing for: \"{level} pid}\"", getErrorStream().nextLine());
 		assertEquals(2, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.LEVEL));
 		assertEquals("INFO pid", render(tokens, new LogEntryBuilder().level(Level.INFO)));

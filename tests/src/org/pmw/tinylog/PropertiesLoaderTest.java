@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -14,13 +14,11 @@
 package org.pmw.tinylog;
 
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -30,6 +28,7 @@ import static org.pmw.tinylog.hamcrest.ArrayMatchers.distinctContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.typesInArray;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
+import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,6 +40,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import mockit.Mock;
 import mockit.MockUp;
@@ -57,7 +57,6 @@ import org.pmw.tinylog.policies.StartupPolicy;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
-import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.FileWriter;
 import org.pmw.tinylog.writers.PropertiesSupport;
@@ -129,12 +128,10 @@ public class PropertiesLoaderTest extends AbstractTest {
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "ErrOr").create());
 		assertEquals(Level.ERROR, configurator.create().getLevel());
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level", "invalid").create());
 		assertEquals(defaultLevel, configurator.create().getLevel());
-		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("level")));
+		assertEquals("LOGGER WARNING: \"invalid\" is an invalid severity level", getErrorStream().nextLine());
 	}
 
 	/**
@@ -154,12 +151,10 @@ public class PropertiesLoaderTest extends AbstractTest {
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@org.pmw.tinylog", "ErrOr").create());
 		assertEquals(Level.ERROR, configurator.create().getLevel("org.pmw.tinylog"));
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readLevel(configurator, new PropertiesBuilder().set("tinylog.level@org.pmw.tinylog", "nonsense").create());
 		assertEquals(configurator.create().getLevel(), configurator.create().getLevel("org.pmw.tinylog"));
-		assertThat(errorStream.nextLine(), allOf(containsString("nonsense"), containsString("level")));
+		assertEquals("LOGGER WARNING: \"nonsense\" is an invalid severity level", getErrorStream().nextLine());
 	}
 
 	/**
@@ -253,12 +248,10 @@ public class PropertiesLoaderTest extends AbstractTest {
 		PropertiesLoader.readMaxStackTraceElements(configurator, new PropertiesBuilder().set("tinylog.stacktrace", "-1").create());
 		assertEquals(Integer.MAX_VALUE, configurator.create().getMaxStackTraceElements());
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		PropertiesLoader.readMaxStackTraceElements(configurator, new PropertiesBuilder().set("tinylog.stacktrace", "invalid").create());
 		assertEquals(defaultMaxStackTraceElements, configurator.create().getMaxStackTraceElements());
-		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("stack trace")));
+		assertEquals("LOGGER WARNING: \"invalid\" is an invalid stack trace size", getErrorStream().nextLine());
 	}
 
 	/**
@@ -572,9 +565,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.boolean"), containsString("abc")));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
-
+			assertEquals("LOGGER ERROR: \"abc\" for \"tinylog.writer.boolean\" is an invalid boolean", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -607,8 +599,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.int"), containsString("abc")));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: \"abc\" for \"tinylog.writer.int\" is an invalid number", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -805,8 +797,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 		PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 		List<Writer> writers = configurator.create().getWriters();
 		assertThat(writers, types(ConsoleWriter.class));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.filename\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize file writer", getErrorStream().nextLine());
 	}
 
 	/**
@@ -826,8 +818,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.class"), containsString("unsupported")));
-			assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"" + Pattern.quote(Class.class.getName())
+					+ "\" for \"tinylog\\.writer\\.class\" is an unsupported type \\(.+ are supported\\)"));
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -843,7 +836,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "invalid").create());
 		List<Writer> writers = configurator.create().getWriters();
 		assertThat(writers, types(ConsoleWriter.class));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("writer")));
+		assertEquals("LOGGER ERROR: Cannot find a writer for the name \"invalid\"", getErrorStream().nextLine());
 	}
 
 	/**
@@ -856,14 +849,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadInvalidLabeler() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "invalid");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("labeler")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a labeler for the name \"invalid\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -880,20 +872,19 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadInvalidPolicy() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "invalid");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("policy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"invalid\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "invalid");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("invalid"), containsString("policy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"invalid\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -912,12 +903,11 @@ public class PropertiesLoaderTest extends AbstractTest {
 		try {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), (String) null);
 
-			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
+			assertEquals("LOGGER ERROR: Cannot find a writer for the name \"console\"", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -934,15 +924,14 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadLabelerIfNoRegistered() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), (String) null);
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "count");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("count"), containsString("labeler")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a labeler for the name \"count\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -959,21 +948,20 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadPolicyIfNoRegistered() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), (String) null);
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "startup");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("startup"), containsString("policy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"startup\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "startup");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("find"), containsString("startup"), containsString("policy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"startup\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -998,13 +986,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 		};
 
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "console").create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(errorStream.nextLine(), allOf(containsString("read"), containsString("services")));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("console"), containsString("writer")));
+			assertEquals("LOGGER ERROR: Failed to read services from \"META-INF/services/org.pmw.tinylog.writers\" (" + IOException.class.getName() + ")",
+					getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Cannot find a writer for the name \"console\"", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 		}
@@ -1022,13 +1010,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 		try {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), "a.b.c.MyWriter");
 
-			StringListOutputStream errorStream = getErrorStream();
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "mywriter").create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyWriter")));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("writer"), containsString("mywriter")));
+			assertEquals("LOGGER WARNING: Cannot find class \"a.b.c.MyWriter\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Cannot find a writer for the name \"mywriter\"", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -1045,16 +1032,15 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadLabelerWithMissingClass() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), "a.b.c.MyLabeler");
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "mylabeler");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyLabeler")));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("labeler"), containsString("mylabeler")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER WARNING: Cannot find class \"a.b.c.MyLabeler\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Cannot find a labeler for the name \"mylabeler\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -1071,23 +1057,22 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadPolicyWithMissingClass() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), "a.b.c.MyPolicy");
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "mypolicy");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyPolicy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("policy"), containsString("mypolicy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER WARNING: Cannot find class \"a.b.c.MyPolicy\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"mypolicy\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "mypolicy");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("class"), containsString("a.b.c.MyPolicy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("find"), containsString("policy"), containsString("mypolicy")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER WARNING: Cannot find class \"a.b.c.MyPolicy\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"mypolicy\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
 			mock.close();
@@ -1104,15 +1089,16 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterIfInstantiationFailed() throws IOException {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
-			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), EvilWriter.class.getName());
+			String writerClassName = EvilWriter.class.getName();
+			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), writerClassName);
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(errorStream.nextLine(), allOf(containsString(EvilWriter.class.getName()), containsString(UnsupportedOperationException.class.getName())));
-			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("writer"), containsString("evil")));
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + writerClassName + "\" (" + UnsupportedOperationException.class.getName() + ")",
+					getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize evil writer", getErrorStream().nextLine());
 
 			for (final Exception exception : Arrays.asList(new IllegalArgumentException(), new InstantiationException(), new IllegalAccessException())) {
 				MockUp<Constructor<?>> mock = new MockUp<Constructor<?>>() {
@@ -1128,8 +1114,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 					PropertiesLoader.readWriters(configurator, new PropertiesBuilder().set("tinylog.writer", "evil").create());
 					writers = configurator.create().getWriters();
 					assertThat(writers, types(ConsoleWriter.class));
-					assertThat(errorStream.nextLine(), allOf(containsString(EvilWriter.class.getName()), containsString(exception.getClass().getName())));
-					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("writer"), containsString("evil")));
+					assertEquals("LOGGER ERROR: Failed to create an instance of \"" + writerClassName + "\" (" + exception.getClass().getName() + ")",
+							getErrorStream().nextLine());
+					assertEquals("LOGGER ERROR: Failed to initialize evil writer", getErrorStream().nextLine());
 				} finally {
 					mock.tearDown();
 				}
@@ -1150,24 +1137,25 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadLabelerIfInstantiationFailed() throws IOException {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
+			String labelerClassName = EvilLabeler.class.getName();
 			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
-			classLoaderMock.set("META-INF/services/" + Labeler.class.getPackage().getName(), EvilLabeler.class.getName());
+			classLoaderMock.set("META-INF/services/" + Labeler.class.getPackage().getName(), labelerClassName);
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(),
-					allOf(containsString(EvilLabeler.class.getName()), containsString(UnsupportedOperationException.class.getName())));
-			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + labelerClassName + "\" (" + UnsupportedOperationException.class.getName() + ")",
+					getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize evil labeler", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil: abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString(EvilLabeler.class.getName()), containsString(NoSuchMethodException.class.getName())));
-			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + labelerClassName + "\" (" + NoSuchMethodException.class.getName() + ": "
+					+ EvilLabeler.class.getName() + ".<init>(" + String.class.getName() + "))", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize evil labeler", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			for (final Exception exception : Arrays.asList(new InstantiationException(), new IllegalAccessException(), new IllegalArgumentException())) {
 				MockUp<Class<?>> mock = new MockUp<Class<?>>() {
@@ -1182,9 +1170,10 @@ public class PropertiesLoaderTest extends AbstractTest {
 					configurator = Configurator.defaultConfig();
 					propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil");
 					PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-					assertThat(errorStream.nextLine(), allOf(containsString(EvilLabeler.class.getName()), containsString(exception.getClass().getName())));
-					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("labeler"), containsString("evil")));
-					assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+					assertEquals("LOGGER ERROR: Failed to create an instance of \"" + labelerClassName + "\" (" + exception.getClass().getName() + ")",
+							getErrorStream().nextLine());
+					assertEquals("LOGGER ERROR: Failed to initialize evil labeler", getErrorStream().nextLine());
+					assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 				} finally {
 					mock.tearDown();
 				}
@@ -1205,23 +1194,25 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadPolicyIfInstantiationFailed() throws IOException {
 		ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			StringListOutputStream errorStream = getErrorStream();
+			String policyClassName = EvilPolicy.class.getName();
 			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
-			classLoaderMock.set("META-INF/services/" + Policy.class.getPackage().getName(), EvilPolicy.class.getName());
+			classLoaderMock.set("META-INF/services/" + Policy.class.getPackage().getName(), policyClassName);
 
 			Configurator configurator = Configurator.defaultConfig();
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString(EvilPolicy.class.getName()), containsString(UnsupportedOperationException.class.getName())));
-			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + policyClassName + "\" (" + UnsupportedOperationException.class.getName() + ")",
+					getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize evil policy", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil: abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertThat(errorStream.nextLine(), allOf(containsString(PropertiesLoader.class.getName()), containsString(NoSuchMethodException.class.getName())));
-			assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
-			assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + policyClassName + "\" (" + NoSuchMethodException.class.getName() + ": "
+					+ EvilPolicy.class.getName() + ".<init>(" + String.class.getName() + "))", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize evil policy", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
 			for (final Exception exception : Arrays.asList(new InstantiationException(), new IllegalAccessException(), new IllegalArgumentException())) {
 				MockUp<Class<?>> mock = new MockUp<Class<?>>() {
@@ -1236,9 +1227,10 @@ public class PropertiesLoaderTest extends AbstractTest {
 					configurator = Configurator.defaultConfig();
 					propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil");
 					PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-					assertThat(errorStream.nextLine(), allOf(containsString(EvilPolicy.class.getName()), containsString(exception.getClass().getName())));
-					assertThat(errorStream.nextLine(), allOf(containsString("initialize"), containsString("policy"), containsString("evil")));
-					assertThat(errorStream.nextLine(), allOf(containsString("ERROR"), containsString("properties writer")));
+					assertEquals("LOGGER ERROR: Failed to create an instance of \"" + policyClassName + "\" (" + exception.getClass().getName() + ")",
+							getErrorStream().nextLine());
+					assertEquals("LOGGER ERROR: Failed to initialize evil policy", getErrorStream().nextLine());
+					assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 				} finally {
 					mock.tearDown();
 				}
@@ -1291,8 +1283,6 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertEquals("main", configuration.getWritingThread().getNameOfThreadToObserve());
 		assertEquals(9, configuration.getWritingThread().getPriority());
 
-		StringListOutputStream errorStream = getErrorStream();
-		assertFalse(errorStream.hasLines());
 		configurator = Configurator.defaultConfig();
 		propertiesBuilder = new PropertiesBuilder().set("tinylog.writingthread", "true").set("tinylog.writingthread.priority", "invalid");
 		PropertiesLoader.readWritingThread(configurator, propertiesBuilder.create());
@@ -1300,7 +1290,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		assertNotNull(configuration.getWritingThread());
 		assertEquals("main", configuration.getWritingThread().getNameOfThreadToObserve());
 		assertThat(configuration.getWritingThread().getPriority(), lessThan(Thread.NORM_PRIORITY));
-		assertThat(errorStream.nextLine(), allOf(containsString("invalid"), containsString("priority")));
+		assertEquals("LOGGER WARNING: \"invalid\" is an invalid thread priority", getErrorStream().nextLine());
 
 		configurator = Configurator.defaultConfig();
 		propertiesBuilder = new PropertiesBuilder().set("tinylog.writingthread", "true").set("tinylog.writingthread.observe", "null");
@@ -1412,9 +1402,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	@org.pmw.tinylog.labelers.PropertiesSupport(name = "evil")
-	private static final class EvilLabeler implements Labeler {
+	private static class EvilLabeler implements Labeler {
 
-		@SuppressWarnings("unused")
 		public EvilLabeler() throws Exception {
 			throw new UnsupportedOperationException();
 		}
@@ -1436,10 +1425,19 @@ public class PropertiesLoaderTest extends AbstractTest {
 
 	}
 
-	@org.pmw.tinylog.policies.PropertiesSupport(name = "evil")
-	private static final class EvilPolicy implements Policy {
+	@org.pmw.tinylog.labelers.PropertiesSupport(name = "nodefault")
+	private static final class LabelerWithoutDefaultConstructor extends EvilLabeler {
 
 		@SuppressWarnings("unused")
+		public LabelerWithoutDefaultConstructor(final boolean flag) throws Exception {
+			super();
+		}
+
+	}
+
+	@org.pmw.tinylog.policies.PropertiesSupport(name = "evil")
+	private static class EvilPolicy implements Policy {
+
 		public EvilPolicy() throws Exception {
 			throw new UnsupportedOperationException();
 		}
@@ -1462,6 +1460,16 @@ public class PropertiesLoaderTest extends AbstractTest {
 		@Override
 		public void reset() {
 			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	@org.pmw.tinylog.policies.PropertiesSupport(name = "nodefault")
+	private static final class PolicyWithoutDefaultConstructor extends EvilPolicy {
+
+		@SuppressWarnings("unused")
+		public PolicyWithoutDefaultConstructor(final boolean flag) throws Exception {
+			super();
 		}
 
 	}

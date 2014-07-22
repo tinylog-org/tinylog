@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,9 +13,7 @@
 
 package org.pmw.tinylog.writers;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,14 +44,14 @@ import org.pmw.tinylog.util.PropertiesBuilder;
 
 /**
  * Tests for the file writer.
- * 
+ *
  * @see FileWriter
  */
 public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -70,7 +68,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test required log entry values.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -86,7 +84,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if unbuffered file writer writes log entries immediately.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -109,7 +107,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if buffered file writer writes log entries after close.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -136,7 +134,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if buffered file writer writes log entries after flush.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -165,7 +163,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing without threading.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -196,7 +194,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test writing with threading.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 * @throws InterruptedException
@@ -250,7 +248,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test overwriting of existing log file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -277,7 +275,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if file can't be opened.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -299,7 +297,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test if exception will be thrown if writing fails.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -333,7 +331,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 	/**
 	 * Test reading file writer from properties.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to create log file
 	 */
@@ -345,8 +343,8 @@ public class FileWriterTest extends AbstractWriterTest {
 		PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "file");
 		List<Writer> writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, empty());
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("tinylog.writer.filename")));
-		assertThat(getErrorStream().nextLine(), allOf(containsString("ERROR"), containsString("file writer")));
+		assertEquals("LOGGER ERROR: Missing required property \"tinylog.writer.filename\"", getErrorStream().nextLine());
+		assertEquals("LOGGER ERROR: Failed to initialize file writer", getErrorStream().nextLine());
 
 		propertiesBuilder.set("tinylog.writer.filename", filename);
 		writers = createFromProperties(propertiesBuilder.create());
@@ -371,5 +369,4 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
-
 }
