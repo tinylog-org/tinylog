@@ -22,7 +22,17 @@ import org.junit.Test;
  *
  * @see MessageFormatter
  */
-public class MessageFormatterTest {
+public class MessageFormatterTest extends AbstractTest {
+
+	/**
+	 * Test if the class is a valid utility class.
+	 *
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(MessageFormatter.class);
+	}
 
 	/**
 	 * Test format patterns without given arguments.
