@@ -49,7 +49,7 @@ public final class ProcessIdLabeler implements Labeler {
 
 	@Override
 	public void init(final Configuration configuration) {
-		// Do nothing
+		// Nothing to do
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public final class ProcessIdLabeler implements Labeler {
 	public File roll(final File file, final int maxBackups) throws IOException {
 		if (file.exists()) {
 			if (!file.delete()) {
-				throw new IOException("Failed to delete \"" + file + "\"");
+				InternalLogger.warn("Failed to delete \"{}\"", file);
 			}
 		}
 

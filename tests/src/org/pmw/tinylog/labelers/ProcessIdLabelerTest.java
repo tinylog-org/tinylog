@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
@@ -166,12 +165,8 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		currentFile.createNewFile();
 		FileInputStream stream = new FileInputStream(currentFile);
 
-		try {
-			labeler.roll(currentFile, 0);
-			fail("IOException expected: Deleting should fail");
-		} catch (IOException ex) {
-			assertEquals("Failed to delete \"" + currentFile + "\"", ex.getMessage());
-		}
+		labeler.roll(currentFile, 0);
+		assertEquals("LOGGER WARNING: Failed to delete \"" + currentFile + "\"", getErrorStream().nextLine());
 
 		stream.close();
 		currentFile.delete();
