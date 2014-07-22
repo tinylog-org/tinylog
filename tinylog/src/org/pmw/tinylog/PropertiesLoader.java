@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -569,7 +569,7 @@ final class PropertiesLoader {
 			org.pmw.tinylog.labelers.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.labelers.PropertiesSupport.class);
 			if (propertiesSupport != null) {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
-					Labeler labeler = (Labeler) createInstance(implementation, parameter);
+					Labeler labeler = (Labeler) createInstance(implementation, name, parameter);
 					if (labeler == null) {
 						InternalLogger.error("Failed to initialize {} labeler", name);
 					}
@@ -604,7 +604,7 @@ final class PropertiesLoader {
 			org.pmw.tinylog.policies.PropertiesSupport propertiesSupport = implementation.getAnnotation(org.pmw.tinylog.policies.PropertiesSupport.class);
 			if (propertiesSupport != null) {
 				if (name.equalsIgnoreCase(propertiesSupport.name())) {
-					Policy policy = (Policy) createInstance(implementation, parameter);
+					Policy policy = (Policy) createInstance(implementation, name, parameter);
 					if (policy == null) {
 						InternalLogger.error("Failed to initialize {} policy", name);
 					}
@@ -617,16 +617,26 @@ final class PropertiesLoader {
 		return null;
 	}
 
-	private static Object createInstance(final Class<?> clazz, final String parameter) {
+	private static Object createInstance(final Class<?> clazz, final String name, final String parameter) {
 		try {
 			if (parameter == null) {
-				Constructor<?> constructor = clazz.getDeclaredConstructor();
-				constructor.setAccessible(true);
-				return constructor.newInstance();
+				try {
+					Constructor<?> constructor = clazz.getDeclaredConstructor();
+					constructor.setAccessible(true);
+					return constructor.newInstance();
+				} catch (NoSuchMethodException ex) {
+					InternalLogger.error("\"{}\" does not have a default constructor", clazz.getName());
+					return null;
+				}
 			} else {
-				Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
-				constructor.setAccessible(true);
-				return constructor.newInstance(parameter);
+				try {
+					Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
+					constructor.setAccessible(true);
+					return constructor.newInstance(parameter);
+				} catch (NoSuchMethodException ex) {
+					InternalLogger.warn("{} does not support parameters", name);
+					return createInstance(clazz, name, null);
+				}
 			}
 		} catch (InstantiationException ex) {
 			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
@@ -639,9 +649,6 @@ final class PropertiesLoader {
 			return null;
 		} catch (InvocationTargetException ex) {
 			InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{}\"", clazz.getName());
-			return null;
-		} catch (NoSuchMethodException ex) {
-			InternalLogger.error(ex, "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		}
 	}

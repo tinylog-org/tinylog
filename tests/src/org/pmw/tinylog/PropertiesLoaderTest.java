@@ -1152,8 +1152,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "evil: abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + labelerClassName + "\" (" + NoSuchMethodException.class.getName() + ": "
-					+ EvilLabeler.class.getName() + ".<init>(" + String.class.getName() + "))", getErrorStream().nextLine());
+			assertEquals("LOGGER WARNING: evil does not support parameters", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + labelerClassName + "\" (" + UnsupportedOperationException.class.getName() + ")",
+					getErrorStream().nextLine());
 			assertEquals("LOGGER ERROR: Failed to initialize evil labeler", getErrorStream().nextLine());
 			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
@@ -1209,8 +1210,9 @@ public class PropertiesLoaderTest extends AbstractTest {
 			configurator = Configurator.defaultConfig();
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "evil: abc");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
-			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + policyClassName + "\" (" + NoSuchMethodException.class.getName() + ": "
-					+ EvilPolicy.class.getName() + ".<init>(" + String.class.getName() + "))", getErrorStream().nextLine());
+			assertEquals("LOGGER WARNING: evil does not support parameters", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to create an instance of \"" + policyClassName + "\" (" + UnsupportedOperationException.class.getName() + ")",
+					getErrorStream().nextLine());
 			assertEquals("LOGGER ERROR: Failed to initialize evil policy", getErrorStream().nextLine());
 			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 
@@ -1238,6 +1240,102 @@ public class PropertiesLoaderTest extends AbstractTest {
 		} finally {
 			classLoaderMock.tearDown();
 			classLoaderMock.close();
+		}
+	}
+
+	/**
+	 * Test instantiation of a labeler without default constructor.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadLabelerWithoutDefaultConstructor() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			String labelerClassName = LabelerWithoutDefaultConstructor.class.getName();
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), labelerClassName);
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "nodefault");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: \"" + labelerClassName + "\" does not have a default constructor", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize nodefault labeler", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test instantiation of a policy without default constructor.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadPolicyWithoutDefaultConstructor() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			String policyClassName = PolicyWithoutDefaultConstructor.class.getName();
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), policyClassName);
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "nodefault");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: \"" + policyClassName + "\" does not have a default constructor", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize nodefault policy", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test instantiation a labeler that doesn't support parameters with a parameter.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadLabelerWithUnsupportedParameters() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", "count: abc");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER WARNING: count does not support parameters", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test instantiation a policy that doesn't support parameters with a parameter.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadPolicyWithUnsupportedParameters() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", "startup: abc");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER WARNING: startup does not support parameters", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
 		}
 	}
 
