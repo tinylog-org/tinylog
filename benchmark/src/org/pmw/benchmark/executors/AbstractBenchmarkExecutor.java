@@ -33,11 +33,13 @@ public abstract class AbstractBenchmarkExecutor {
 
 	private final int runs;
 	private final int outliers;
+	private final int deep;
 
-	protected AbstractBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers) {
+	protected AbstractBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final int deep) {
 		this.benchmark = benchmark;
 		this.runs = runs;
 		this.outliers = outliers;
+		this.deep = deep;
 	}
 
 	public abstract String getName();
@@ -97,6 +99,10 @@ public abstract class AbstractBenchmarkExecutor {
 	protected abstract long countWrittenLogEntries();
 
 	protected abstract void run() throws Exception;
+
+	protected int getAdditionStackTraceDeep() {
+		return deep;
+	}
 
 	protected boolean isValidLogEntry(final String line) {
 		if (!line.contains(Integer.toString(Calendar.getInstance().get(Calendar.YEAR)))) {

@@ -2,12 +2,13 @@
 <project name="benchmark" default="run">
 	
 	<property name="benchmark" value="all" />
+	<property name="threading" value="both" />
 	<property name="runs" value="120" />
 	<property name="outliers" value="20" />
 	<property name="deep" value="20" />
-	<property name="iterations" value="200000" />
 	<property name="threads" value="16" />
-	<property name="prime" value="2000000" />
+	<property name="iterations" value="200000" />
+	<property name="prime" value="10000000" />
 
 	<property name="root" location=".." />
 	<property name="bin" location="bin" />
@@ -58,41 +59,23 @@
 		</javac>
 	</target>
 
-	<target name="run" depends="dummy, file, jul, log4j, log4j2, logback, tinylog" />
+	<target name="run" depends="dummy, jul, log4j, log4j2, logback, tinylog" />
 	
 	<target name="dummy" depends="compile">
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
 			<arg value="dummy" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="file" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
-			<arg value="file" />
-			<arg value="${benchmark}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
 			<arg value="--iterations" />
 			<arg value="${iterations}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
@@ -102,16 +85,17 @@
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
 			<arg value="jul" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
+			<arg value="--iterations" />
+			<arg value="${iterations}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
@@ -121,16 +105,17 @@
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j.classpath" fork="true">
 			<arg value="log4j" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
+			<arg value="--iterations" />
+			<arg value="${iterations}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
@@ -140,16 +125,17 @@
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
 			<arg value="log4j2" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
+			<arg value="--iterations" />
+			<arg value="${iterations}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
@@ -159,16 +145,17 @@
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="logback.classpath" fork="true">
 			<arg value="logback" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
+			<arg value="--iterations" />
+			<arg value="${iterations}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
@@ -178,16 +165,17 @@
 		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
 			<arg value="tinylog" />
 			<arg value="${benchmark}" />
+			<arg value="${threading}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
 			<arg value="--deep" />
 			<arg value="${deep}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
+			<arg value="--iterations" />
+			<arg value="${iterations}" />
 			<arg value="--prime" />
 			<arg value="${prime}" />
 		</java>
