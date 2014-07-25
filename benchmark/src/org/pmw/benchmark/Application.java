@@ -32,7 +32,7 @@ public class Application {
 
 	private static final int DEFAULT_RUNS = 1;
 	private static final int DEFAULT_OUTLIERS = 0;
-	private static final int DEFAULT_DEEP = 20;
+	private static final int DEFAULT_DEEP = 0;
 	private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 	private static final long DEFAULT_ITERATIONS = 20_000L;
 	private static final long DEFAULT_PRIME = 100_000L;
@@ -237,7 +237,7 @@ public class Application {
 		System.out.println();
 		System.out.println("  -r --runs X        Number of benchmark runs (default is 1)");
 		System.out.println("  -o --outliers X    Number of outlier benchmark runs to exclude from result (default is 0)");
-		System.out.println("  -d --deep X        Amount of additional stack trace deep for more realistic results (default is 20)");
+		System.out.println("  -d --deep X        Amount of additional stack trace deep for more realistic results (default is 0)");
 		System.out.println("  -t --threads X     Number of parallel threads in multi-threaded benchmarks (default is number of cores * 2)");
 		System.out.println("  -i --iterations X  Number of logging iterations in output benchmark (default is 20,000)");
 		System.out.println("  -p --prime X       Maximum prime to calculate in prime benchmark (default is 100,000)");
