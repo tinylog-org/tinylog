@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,6 +13,7 @@
 
 package org.pmw.benchmark;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +21,6 @@ import org.pmw.benchmark.executors.MultiThreadBenchmarkExecutor;
 import org.pmw.benchmark.executors.PrimesBenchmarkExecutor;
 import org.pmw.benchmark.executors.SingleThreadBenchmarkExecutor;
 import org.pmw.benchmark.frameworks.DummyBenchmark;
-import org.pmw.benchmark.frameworks.FileBenchmark;
 import org.pmw.benchmark.frameworks.JulBenchmark;
 import org.pmw.benchmark.frameworks.Log4j2Benchmark;
 import org.pmw.benchmark.frameworks.Log4jBenchmark;
@@ -107,13 +107,20 @@ public class Application {
 	private static List<? extends Benchmark> getBenchmarks(final String[] arguments) {
 		String framework = arguments[0];
 		if ("all".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new DummyBenchmark(), new FileBenchmark(), new JulBenchmark(), new Log4jBenchmark(false), new Log4jBenchmark(true),
-					new Log4j2Benchmark(false), new Log4j2Benchmark(true), new LogbackBenchmark(false), new LogbackBenchmark(true),
-					new TinylogBenchmark(false), new TinylogBenchmark(true));
+			List<Benchmark> benchmarks = new ArrayList<Benchmark>();
+			benchmarks.add(new DummyBenchmark());
+			benchmarks.add(new JulBenchmark());
+			benchmarks.add(new Log4jBenchmark(false));
+			benchmarks.add(new Log4jBenchmark(true));
+			benchmarks.add(new Log4j2Benchmark(false));
+			benchmarks.add(new Log4j2Benchmark(true));
+			benchmarks.add(new LogbackBenchmark(false));
+			benchmarks.add(new LogbackBenchmark(true));
+			benchmarks.add(new TinylogBenchmark(false));
+			benchmarks.add(new TinylogBenchmark(true));
+			return benchmarks;
 		} else if ("dummy".equalsIgnoreCase(framework)) {
 			return Arrays.asList(new DummyBenchmark());
-		} else if ("file".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new FileBenchmark());
 		} else if ("jul".equalsIgnoreCase(framework)) {
 			return Arrays.asList(new JulBenchmark());
 		} else if ("log4j".equalsIgnoreCase(framework)) {
@@ -218,7 +225,6 @@ public class Application {
 		System.out.println("  logback            Logback");
 		System.out.println("  tinylog            tinylog");
 		System.out.println("  dummy              Without any logging or output for calculating overhead");
-		System.out.println("  file               Write log entries to a file without using any logging framework");
 		System.out.println();
 		System.out.println("Benchmarks");
 		System.out.println();
