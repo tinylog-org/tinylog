@@ -131,10 +131,7 @@ public final class LogbackBenchmark implements Benchmark {
 		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 		encoder.setContext(context);
 		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
-		encoder.setImmediateFlush(true);
-		if (async) {
-			encoder.setImmediateFlush(false);
-		}
+		encoder.setImmediateFlush(!async);
 		return encoder;
 	}
 
