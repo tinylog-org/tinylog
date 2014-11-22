@@ -1,7 +1,0 @@
-language: java
-script: ant -buildfile tinylog/build.xml
-jdk:
-- openjdk6
-- openjdk7
-- oraclejdk7
-- oraclejdk8
