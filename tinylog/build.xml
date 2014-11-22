@@ -306,29 +306,7 @@
 		<delete dir="${dist.maven}/log4j-facade" />
 	</target>
 	
-	<target name="pack-sources">
-		<mkdir dir="${dist}" />
-		<delete>
-			<fileset dir="${dist}">
-				<include name="tinylog-*-src.zip" />
-			</fileset>
-		</delete>
-		<zip destfile="${dist}/tinylog-${version}-src.zip" level="9">
-			<zipfileset dir="${root}">
-				<include name="benchmark/**" />
-				<include name="configuration/**" />
-				<include name="libraries/**" />
-				<include name="log4j-facade/**" />
-				<include name="tests/**" />
-				<include name="tinylog/**" />
-				<include name="*.txt" />
-				<exclude name="**/bin/" />
-				<exclude name="**/.settings/" />
-			</zipfileset>
-		</zip>
-	</target>
-	
-	<target name="pack-all" depends="pack-jar, pack-bundle, pack-maven, pack-sources" />
+	<target name="pack-all" depends="pack-jar, pack-bundle, pack-maven" />
 	
 	<target name="docs" depends="compile">
 		<delete dir="${dist.docs}" />
@@ -380,5 +358,5 @@
 	</target>
 	
 	<target name="all" depends="clean, check, test, pack-all, docs" />
-
+	
 </project>
