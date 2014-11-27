@@ -994,13 +994,13 @@ public class LoggerTest extends AbstractTest {
 	/**
 	 * Test if tinylog gets the right class name of caller even if calling of sun.reflect.Reflection will fail.
 	 */
+	@SuppressWarnings("restriction")
 	@Test
 	public final void testErrorWhileCallingSunReflection() {
 		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}").activate();
 
-		@SuppressWarnings("restriction")
-		MockUp<sun.reflect.Reflection> mock = new MockUp<sun.reflect.Reflection>() {
+		new MockUp<sun.reflect.Reflection>() {
 
 			@Mock(invocations = 1)
 			public Class<?> getCallerClass(final Invocation invocation, final int index) {
@@ -1012,11 +1012,8 @@ public class LoggerTest extends AbstractTest {
 			}
 
 		};
-		try {
-			Logger.info("Hello");
-		} finally {
-			mock.tearDown();
-		}
+
+		Logger.info("Hello");
 
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get caller class from sun.reflect.Reflection \\(.+\\)"));
 
@@ -1033,7 +1030,7 @@ public class LoggerTest extends AbstractTest {
 		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
 
-		MockUp<Throwable> mock = new MockUp<Throwable>() {
+		new MockUp<Throwable>() {
 
 			@Mock(invocations = 1)
 			public StackTraceElement getStackTraceElement(final Invocation invocation, final int index) {
@@ -1045,11 +1042,8 @@ public class LoggerTest extends AbstractTest {
 			}
 
 		};
-		try {
-			Logger.info("Hello");
-		} finally {
-			mock.tearDown();
-		}
+
+		Logger.info("Hello");
 
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get single stack trace element from throwable \\(.+\\)"));
 
