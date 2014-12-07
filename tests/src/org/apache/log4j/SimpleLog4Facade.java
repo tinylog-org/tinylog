@@ -24,7 +24,7 @@ class SimpleLog4Facade {
 	 * @return Active logging level
 	 */
 	Level getLoggingLevel() {
-		return TinylogBride.getLevel();
+		return TinylogBridge.getLevel();
 	}
 
 	/**
@@ -35,7 +35,7 @@ class SimpleLog4Facade {
 	 * @return Active logging level
 	 */
 	Level getLoggingLevel(final Class<?> callerClass) {
-		return TinylogBride.getLevel(callerClass);
+		return TinylogBridge.getLevel(callerClass);
 	}
 
 	/**
@@ -46,7 +46,7 @@ class SimpleLog4Facade {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	boolean isEnabled(final Priority level) {
-		return TinylogBride.isEnabled(level);
+		return TinylogBridge.isEnabled(level);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class SimpleLog4Facade {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	boolean isEnabled(final Class<?> callerClass, final Priority level) {
-		return TinylogBride.isEnabled(callerClass, level);
+		return TinylogBridge.isEnabled(callerClass, level);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class SimpleLog4Facade {
 	 *            Message to log
 	 */
 	void log(final Priority level, final Object message) {
-		TinylogBride.log(level, message);
+		TinylogBridge.log(level, message);
 	}
 
 	/**
@@ -85,7 +85,7 @@ class SimpleLog4Facade {
 	 *            Throwable to log
 	 */
 	void log(final Priority level, final Object message, final Throwable throwable) {
-		TinylogBride.log(level, message, throwable);
+		TinylogBridge.log(level, message, throwable);
 	}
 
 }

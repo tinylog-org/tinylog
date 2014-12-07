@@ -61,7 +61,7 @@ public class Logger extends Category {
 	 * @return <code>true</code> if trace log entries will be output, <code>false</code> if not
 	 */
 	public boolean isTraceEnabled() {
-		return TinylogBride.isEnabled(Level.TRACE);
+		return TinylogBridge.isEnabled(Level.TRACE);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class Logger extends Category {
 	 *            Message to log
 	 */
 	public void trace(final Object message) {
-		TinylogBride.log(Level.TRACE, message);
+		TinylogBridge.log(Level.TRACE, message);
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class Logger extends Category {
 	 *            Throwable to log
 	 */
 	public void trace(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.TRACE, message, throwable);
+		TinylogBridge.log(Level.TRACE, message, throwable);
 	}
 
 }

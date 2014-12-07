@@ -76,7 +76,7 @@ public class Category {
 	 */
 	@Deprecated
 	public final Level getPriority() {
-		return TinylogBride.getLevel();
+		return TinylogBridge.getLevel();
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class Category {
 	 */
 	@Deprecated
 	public Priority getChainedPriority() {
-		return TinylogBride.getLevel();
+		return TinylogBridge.getLevel();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public final Level getLevel() {
-		return TinylogBride.getLevel();
+		return TinylogBridge.getLevel();
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class Category {
 	 * @return Active logging level
 	 */
 	public Level getEffectiveLevel() {
-		return TinylogBride.getLevel();
+		return TinylogBridge.getLevel();
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class Category {
 	 * @return <code>true</code> if debug log entries will be output, <code>false</code> if not
 	 */
 	public boolean isDebugEnabled() {
-		return TinylogBride.isEnabled(Level.DEBUG);
+		return TinylogBridge.isEnabled(Level.DEBUG);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void debug(final Object message) {
-		TinylogBride.log(Level.DEBUG, message);
+		TinylogBridge.log(Level.DEBUG, message);
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void debug(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.DEBUG, message, throwable);
+		TinylogBridge.log(Level.DEBUG, message, throwable);
 	}
 
 	/**
@@ -144,7 +144,7 @@ public class Category {
 	 * @return <code>true</code> if info log entries will be output, <code>false</code> if not
 	 */
 	public boolean isInfoEnabled() {
-		return TinylogBride.isEnabled(Level.INFO);
+		return TinylogBridge.isEnabled(Level.INFO);
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void info(final Object message) {
-		TinylogBride.log(Level.INFO, message);
+		TinylogBridge.log(Level.INFO, message);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void info(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.INFO, message, throwable);
+		TinylogBridge.log(Level.INFO, message, throwable);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void warn(final Object message) {
-		TinylogBride.log(Level.WARN, message);
+		TinylogBridge.log(Level.WARN, message);
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void warn(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.WARN, message, throwable);
+		TinylogBridge.log(Level.WARN, message, throwable);
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void error(final Object message) {
-		TinylogBride.log(Level.ERROR, message);
+		TinylogBridge.log(Level.ERROR, message);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void error(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.ERROR, message, throwable);
+		TinylogBridge.log(Level.ERROR, message, throwable);
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void fatal(final Object message) {
-		TinylogBride.log(Level.FATAL, message);
+		TinylogBridge.log(Level.FATAL, message);
 	}
 
 	/**
@@ -232,7 +232,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void fatal(final Object message, final Throwable throwable) {
-		TinylogBride.log(Level.FATAL, message, throwable);
+		TinylogBridge.log(Level.FATAL, message, throwable);
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class Category {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public boolean isEnabledFor(final Priority level) {
-		return TinylogBride.isEnabled(level);
+		return TinylogBridge.isEnabled(level);
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class Category {
 	 */
 	public void assertLog(final boolean assertion, final String message) {
 		if (!assertion) {
-			TinylogBride.log(Level.ERROR, message);
+			TinylogBridge.log(Level.ERROR, message);
 		}
 	}
 
@@ -269,7 +269,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void log(final Priority level, final Object message) {
-		TinylogBride.log(level, message);
+		TinylogBridge.log(level, message);
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class Category {
 	 *            Throwable to log
 	 */
 	public void log(final Priority level, final Object message, final Throwable throwable) {
-		TinylogBride.log(level, message, throwable);
+		TinylogBridge.log(level, message, throwable);
 	}
 
 }

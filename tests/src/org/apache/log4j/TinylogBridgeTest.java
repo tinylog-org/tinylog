@@ -30,7 +30,7 @@ import org.pmw.tinylog.writers.LogEntryValue;
 /**
  * Tests for tinylog bridge.
  * 
- * @see TinylogBride
+ * @see TinylogBridge
  */
 public class TinylogBridgeTest extends AbstractTest {
 

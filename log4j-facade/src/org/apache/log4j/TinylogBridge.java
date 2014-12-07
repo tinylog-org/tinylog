@@ -22,7 +22,7 @@ import org.pmw.tinylog.Logger;
 /**
  * Bridge to tinylog.
  */
-class TinylogBride {
+class TinylogBridge {
 
 	private static Method stackTraceMethod;
 	private static boolean hasSunReflection;
@@ -32,7 +32,7 @@ class TinylogBride {
 			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			stackTraceMethod.setAccessible(true);
 			StackTraceElement stackTraceElement = (StackTraceElement) stackTraceMethod.invoke(new Throwable(), 0);
-			if (!TinylogBride.class.getName().equals(stackTraceElement.getClassName())) {
+			if (!TinylogBridge.class.getName().equals(stackTraceElement.getClassName())) {
 				stackTraceMethod = null;
 			}
 		} catch (Exception ex) {
@@ -48,7 +48,7 @@ class TinylogBride {
 		}
 	}
 
-	private TinylogBride() {
+	private TinylogBridge() {
 	}
 
 	/**
