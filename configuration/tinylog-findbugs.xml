@@ -3,7 +3,8 @@
 	<Match>
 		<Or>
 			<Class name="org.pmw.tinylog.Logger" />
-			<Class name="org.apache.log4j.TinylogBride" />
+			<Class name="org.apache.log4j.TinylogBridge" />
+			<Class name="org.slf4j.impl.TinylogBridge" />
 		</Or>
 		<!-- Catching of exceptions is required for the case that the fast but unofficial ways to get the stack trace will fail -->
 		<Bug pattern="REC_CATCH_EXCEPTION" />

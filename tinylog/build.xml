@@ -4,6 +4,7 @@
 	<property name="version" value="1.0-rc1" />
 	<property name="bundle-version" value="1.0.rc1" />
 	<property name="maven-version" value="1.0-rc-1" />
+	<property name="slf4j-version" value="1.7.7" />
 	
 	<property name="vendor" value="PMW Media" />
 
@@ -18,6 +19,12 @@
 	<property name="log4j.files" location="${log4j}/files" />
 	<property name="log4j.bin" location="${log4j}/bin" />
 	<property name="log4j.src" location="${log4j}/src" />
+	
+	<property name="slf4j" location="${root}/slf4j-binding" />
+	<property name="slf4j.lib" location="${slf4j}/lib" />
+	<property name="slf4j.files" location="${slf4j}/files" />
+	<property name="slf4j.bin" location="${slf4j}/bin" />
+	<property name="slf4j.src" location="${slf4j}/src" />
 	
 	<property name="tests" location="${root}/tests" />
 	<property name="tests.bin" location="${tests}/bin" />
@@ -38,6 +45,9 @@
 
 	<path id="junit.classpath">
 		<fileset dir="${lib.junit}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${slf4j.lib}">
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -95,6 +105,21 @@
 				<include name="META-INF/**" />
 			</fileset>
 		</copy>
+		
+		<delete dir="${slf4j.bin}" />
+		<mkdir dir="${slf4j.bin}" />
+		<javac srcdir="${slf4j.src}" destdir="${slf4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
+			<classpath location="${tinylog.bin}" />
+			<classpath>
+				<fileset dir="${slf4j.lib}" includes="*.jar" />
+			</classpath>
+		</javac>
+		<copy todir="${slf4j.bin}">
+			<fileset dir="${slf4j.src}">
+				<include name="**/*.properties" />
+				<include name="META-INF/**" />
+			</fileset>
+		</copy>
 	
 		<delete dir="${tests.bin}" />
 		<mkdir dir="${tests.bin}" />
@@ -102,6 +127,7 @@
 			<compilerarg value="-XDignore.symbol.file" />
 			<classpath refid="junit.classpath" />
 			<classpath location="${tinylog.bin}" />
+			<classpath location="${slf4j.bin}" />
 			<classpath location="${log4j.bin}" />
 		</javac>
 		<copy todir="${tests.bin}">
@@ -144,6 +170,21 @@
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
 			<zipfileset dir="${log4j.files}" includes="readme-jar.txt" fullpath="readme.txt" />
+		</zip>
+		
+		<jar destfile="${dist.jar}/slf4j-binding.jar">
+			<zipfileset dir="${slf4j.bin}" />
+		</jar>
+		<zip destfile="${dist.jar}/slf4j-binding-src.zip">
+			<zipfileset dir="${slf4j.src}" />
+		</zip>
+		<zip destfile="${dist.jar}/slf4j-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="slf4j-binding.jar" />
+				<include name="slf4j-binding-src.zip" />
+			</zipfileset>
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${slf4j.files}" includes="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
 	</target>
 	
@@ -214,6 +255,40 @@
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
 			<zipfileset dir="${log4j.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
+		</zip>	
+		
+		<jar destfile="${dist.bundle}/org.pmw.slf4j-binding_${bundle-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.slf4j.impl;version=${slf4j-version}" />
+				<attribute name="Import-Package" value="org.slf4j;version=${slf4j-version}, org.slf4j.spi;version=${slf4j-version}, org.slf4j.helpers;version=${slf4j-version}, org.pmw.tinylog;version=${bundle-version}" />
+				<attribute name="Fragment-Host" value="slf4j.api" />
+			</manifest>
+			<zipfileset dir="${slf4j.bin}" />
+		</jar>
+		<jar destfile="${dist.bundle}/org.pmw.slf4j-binding.source_${bundle-version}.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${slf4j.src}" />
+		</jar>
+		<zip destfile="${dist.bundle}/slf4j-binding-${bundle-version}-bundles.zip" level="9">
+			<zipfileset dir="${dist.bundle}">
+				<include name="org.pmw.slf4j-binding_${bundle-version}.jar" />
+				<include name="org.pmw.slf4j-binding.source_${bundle-version}.jar" />
+			</zipfileset>
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${slf4j.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 	</target>
 	
@@ -304,6 +379,59 @@
 			<zipfileset dir="${dist.maven}/log4j-facade" />
 		</zip>		
 		<delete dir="${dist.maven}/log4j-facade" />
+		
+		<delete dir="${dist.maven}/slf4j-binding" />
+		<mkdir dir="${dist.maven}/slf4j-binding" />
+		<javadoc destdir="${dist.maven}/slf4j-binding" use="true" access="public" windowtitle="SLF4J Binding {version}">
+			<doctitle>SLF4J Binding ${version} - API Specification</doctitle>
+			<packageset dir="${slf4j.src}" />
+			<classpath>
+				<dirset dir="${slf4j.bin}" />
+				<fileset dir="${slf4j.lib}" includes="*.jar" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+		
+		<pom id="org.slf4j" groupId="org.tinylog" artifactId="slf4j-binding" version="${maven-version}" name="SLF4J Binding" description="SLF4J Binding for tinylog" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
+			<dependency groupId="org.slf4j" artifactId="slf4j-api" version="${slf4j-version}"/>
+		</pom>
+		<writepom pomRefId="org.slf4j" file="${dist.maven}/slf4j-binding-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.slf4j.impl;version=${slf4j-version}" />
+				<attribute name="Import-Package" value="org.slf4j;version=${slf4j-version}, org.slf4j.spi;version=${slf4j-version}, org.slf4j.helpers;version=${slf4j-version}, org.pmw.tinylog;version=${bundle-version}" />
+				<attribute name="Fragment-Host" value="slf4j.api" />
+			</manifest>
+			<zipfileset dir="${slf4j.bin}" />
+			<zipfileset dir="${dist.maven}" includes="slf4j-binding-${maven-version}.pom" fullpath="META-INF/pom.xml" />
+		</jar>
+		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${slf4j.src}" />
+		</jar>
+		<zip destfile="${dist.maven}/slf4j-binding-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/slf4j-binding" />
+		</zip>		
+		<delete dir="${dist.maven}/slf4j-binding" />
 	</target>
 	
 	<target name="pack-all" depends="pack-jar, pack-bundle, pack-maven" />
@@ -325,6 +453,7 @@
 	<target name="check" depends="compile">
 		<checkstyle config="${conf}/tinylog-checkstyle.xml">
 			<fileset dir="${tinylog.src}" includes="**/*.java" />
+			<fileset dir="${slf4j.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
@@ -334,6 +463,8 @@
 			<class location="${tinylog.bin}" />
 			<sourcepath location="${log4j.src}" />
 			<class location="${log4j.bin}" />
+			<sourcepath location="${slf4j.src}" />
+			<class location="${slf4j.bin}" />
 		</findbugs>
 	</target>
 
@@ -343,6 +474,7 @@
 			<classpath>
 				<path location="${tinylog.bin}" />
 				<path location="${log4j.bin}" />
+				<path location="${slf4j.bin}" />
 				<path location="${tests.bin}" />
 				<path refid="junit.classpath" />
 			</classpath>
@@ -356,7 +488,7 @@
 		<fail message="Tests failed" if="junit.test.error" />
 		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
-	
+
 	<target name="all" depends="clean, check, test, pack-all, docs" />
 	
 </project>

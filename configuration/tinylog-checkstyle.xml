@@ -129,6 +129,6 @@
     <property name="fileExtensions" value="java"/>
   </module>
   <module name="SuppressWithNearbyCommentFilter">
-    <property name="influenceFormat" value="1"/>
+    <property name="commentFormat" value="SUPPRESS CHECKSTYLE"/>
   </module>
 </module>
