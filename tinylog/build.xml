@@ -299,6 +299,7 @@
 		<pom id="pom.tinylog" groupId="org.tinylog" artifactId="tinylog" version="${maven-version}" name="tinylog" description="tinylog is a minimalist logger for Java, optimized for ease of use" url="http://www.tinylog.org/">
 			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
 			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
 		</pom>
 		<writepom pomRefId="pom.tinylog" file="${dist.maven}/tinylog-${maven-version}.pom" />
 		
@@ -346,6 +347,7 @@
 		<pom id="org.log4j" groupId="org.tinylog" artifactId="log4j-facade" version="${maven-version}" name="Log4j Facade" description="Log4j Facade is a Log4j-compatible logging API for tinylog" url="http://www.tinylog.org/">
 			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
 			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
 			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
 		</pom>
 		<writepom pomRefId="org.log4j" file="${dist.maven}/log4j-facade-${maven-version}.pom" />
@@ -397,6 +399,7 @@
 		<pom id="org.slf4j" groupId="org.tinylog" artifactId="slf4j-binding" version="${maven-version}" name="SLF4J Binding" description="SLF4J Binding for tinylog" url="http://www.tinylog.org/">
 			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
 			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
 			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
 			<dependency groupId="org.slf4j" artifactId="slf4j-api" version="${slf4j-version}"/>
 		</pom>
