@@ -18,7 +18,7 @@ specific language governing permissions and limitations under the License.
 
 1) Add "tinylog.jar" to your classpath
 
-2) Optionally attach "tinylog-src.zip" for JavaDoc documentation and source
+2) Optionally attach "tinylog-src.zip" for Javadoc documentation and source
    code attachment
 
 3) Now you can test the logger by the following simple program:
@@ -37,5 +37,5 @@ specific language governing permissions and limitations under the License.
   
    You should see a log statement appearing on the console.
 
-4) A detailed user manual and the JavaDoc documentation can be found on
+4) A detailed user manual and the Javadoc documentation can be found on
    http://www.tinylog.org/
