@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -100,7 +100,7 @@ final class Tokenizer {
 
 	private Token parsePartly(final String formatPattern) {
 		List<Token> tokens = new ArrayList<Token>();
-		int minSize = 0;
+		int[] options = new int[] { 0 /* minimum size */, 0 /* indent */};
 		int offset = index;
 
 		++index;
@@ -113,7 +113,7 @@ final class Tokenizer {
 				if (index >= formatPattern.length()) {
 					InternalLogger.warn("Closing curly brace is missing for: \"{}\"", formatPattern.substring(offset, index));
 					tokens.add(getToken(formatPattern.substring(start, index)));
-					return combine(tokens, minSize);
+					return combine(tokens, options);
 				}
 				c = formatPattern.charAt(index);
 			}
@@ -137,22 +137,22 @@ final class Tokenizer {
 					++index;
 					if (index >= formatPattern.length()) {
 						InternalLogger.warn("Closing curly brace is missing for: \"{}\"", formatPattern.substring(offset, index));
-						minSize = parseMinSize(formatPattern.substring(start));
-						return combine(tokens, minSize);
+						options = parseOptions(formatPattern.substring(start));
+						return combine(tokens, options);
 					}
 					c = formatPattern.charAt(index);
 				}
 				if (index > start) {
-					minSize = parseMinSize(formatPattern.substring(start, index));
+					options = parseOptions(formatPattern.substring(start, index));
 				}
 			} else if (c == '}') {
 				++index;
-				return combine(tokens, minSize);
+				return combine(tokens, options);
 			}
 		}
 
 		InternalLogger.warn("Closing curly brace is missing for: \"{}\"", formatPattern.substring(offset, index));
-		return combine(tokens, minSize);
+		return combine(tokens, options);
 	}
 
 	private Token getToken(final String text) {
@@ -232,8 +232,9 @@ final class Tokenizer {
 		return new PlainTextToken(plainText);
 	}
 
-	private static int parseMinSize(final String text) {
+	private static int[] parseOptions(final String text) {
 		int minSize = 0;
+		int indent = 0;
 
 		int index = 0;
 		while (index < text.length()) {
@@ -242,7 +243,7 @@ final class Tokenizer {
 			while (c == ',') {
 				++index;
 				if (index >= text.length()) {
-					return minSize;
+					return new int[] { minSize, indent };
 				}
 				c = text.charAt(index);
 			}
@@ -262,7 +263,9 @@ final class Tokenizer {
 					parameter = parameter.trim();
 					if ("min-size".equals(parameter)) {
 						InternalLogger.warn("No value set for \"min-size\"");
-					} else {
+					} else if ("indent".equals(parameter)) {
+						InternalLogger.warn("No value set for \"indent\"");
+					} else  {
 						InternalLogger.warn("Unknown option \"{}\"", parameter);
 					}
 				} else {
@@ -278,6 +281,16 @@ final class Tokenizer {
 								InternalLogger.warn("\"{}\" is an invalid number for \"min-size\"", value);
 							}
 						}
+					} else if ("indent".equals(key)) {
+						if (value.length() == 0) {
+							InternalLogger.warn("No value set for \"indent\"");
+						} else {
+							try {
+								indent = parsePositiveInt(value);
+							} catch (NumberFormatException ex) {
+								InternalLogger.warn("\"{}\" is an invalid number for \"indent\"", value);
+							}
+						}
 					} else {
 						InternalLogger.warn("Unknown option \"{}\"", key);
 					}
@@ -285,7 +298,7 @@ final class Tokenizer {
 			}
 		}
 
-		return minSize;
+		return new int[] { minSize, indent };
 	}
 
 	private static int parsePositiveInt(final String value) throws NumberFormatException {
@@ -297,13 +310,28 @@ final class Tokenizer {
 		}
 	}
 
-	private static Token combine(final List<Token> tokens, final int minSize) {
+	private static Token combine(final List<Token> tokens, final int[] options) {
+		int minSize = options[0];
+		int indent = options[1];
+
 		if (tokens.isEmpty()) {
 			return null;
 		} else if (tokens.size() == 1) {
-			return minSize > 0 ? new MinSizeToken(tokens.get(0), minSize) : tokens.get(0);
+			if (indent > 0) {
+				return new IndentToken(tokens.get(0), indent);
+			} else if (minSize > 0) {
+				return new MinSizeToken(tokens.get(0), minSize);
+			} else {
+				return tokens.get(0);
+			}
 		} else {
-			return minSize > 0 ? new MinSizeToken(new BundlerToken(tokens), minSize) : new BundlerToken(tokens);
+			if (indent > 0) {
+				return new IndentToken(new BundlerToken(tokens), indent);
+			} else if (minSize > 0) {
+				return new MinSizeToken(new BundlerToken(tokens), minSize);
+			} else {
+				return new BundlerToken(tokens);
+			}
 		}
 	}
 
@@ -357,6 +385,54 @@ final class Tokenizer {
 				char[] spaces = new char[minSize - size];
 				Arrays.fill(spaces, ' ');
 				builder.append(spaces);
+			}
+		}
+
+	}
+
+	private static final class IndentToken implements Token {
+
+		private final Token token;
+		private final char[] spaces;
+
+		private IndentToken(final Token token, final int indent) {
+			this.token = token;
+			this.spaces = new char[indent];
+			Arrays.fill(spaces, ' ');
+		}
+
+		@Override
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return token.getRequiredLogEntryValues();
+		}
+
+		@Override
+		public void render(final LogEntry logEntry, final StringBuilder builder) {
+			if (builder.length() == 0 || builder.charAt(builder.length() - 1) == '\n' || builder.charAt(builder.length() - 1) == '\r') {
+				builder.append(spaces);
+			}
+
+			StringBuilder subBuilder = new StringBuilder(1024);
+			token.render(logEntry, subBuilder);
+
+			int head = 0;
+			for (int i = head; i < subBuilder.length(); ++i) {
+				char c = subBuilder.charAt(i);
+				if (c == '\n') {
+					builder.append(subBuilder, head, i + 1);
+					builder.append(spaces);
+					head = i + 1;
+				} else if (c == '\r') {
+					if (i + 1 < subBuilder.length() && subBuilder.charAt(i + 1) == '\n') {
+						++i;
+					}
+					builder.append(subBuilder, head, i + 1);
+					builder.append(spaces);
+					head = i + 1;
+				}
+			}
+			if (head < subBuilder.length()) {
+				builder.append(subBuilder, head, subBuilder.length());
 			}
 		}
 

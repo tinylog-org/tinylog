@@ -489,6 +489,102 @@ public class TokenizerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test indenting for tokens.
+	 */
+	@Test
+	public final void testIndent() {
+		Tokenizer tokenizer = new Tokenizer(locale, 0);
+
+		/* Valid definitions of indenting */
+
+		List<Token> tokens = tokenizer.parse("{message|indent=0}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("Hello\nWorld", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{message|indent=1}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals(" Hello\r World", render(tokens, new LogEntryBuilder().message("Hello\rWorld")));
+
+		tokens = tokenizer.parse("{message|indent=1}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals(" Hello\r\n World", render(tokens, new LogEntryBuilder().message("Hello\r\nWorld")));
+
+		tokens = tokenizer.parse("{message|indent=1}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals(" Hello\n World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{message| indent = 1 }");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals(" Hello\n World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{{message}|indent=2}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("  TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("  Hello\n  World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{{message}!|indent=2}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("  TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("  Hello\n  World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{{message}!|indent=3,}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("   TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("   Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("{!{message}!|indent=3}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("   !TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("   !Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		tokens = tokenizer.parse("!{message|indent=3}!");
+		assertEquals(3, tokens.size());
+		assertThat(tokens.get(1).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("!TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
+		assertEquals("!Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
+
+		/* Invalid definitions of indenting */
+
+		tokens = tokenizer.parse("{message|indent}");
+		assertEquals("LOGGER WARNING: No value set for \"indent\"", getErrorStream().nextLine());
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+
+		tokens = tokenizer.parse("{message|indent=-1}");
+		assertEquals("LOGGER WARNING: \"-1\" is an invalid number for \"indent\"", getErrorStream().nextLine());
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+
+		tokens = tokenizer.parse("{message|indent=abc}");
+		assertEquals("LOGGER WARNING: \"abc\" is an invalid number for \"indent\"", getErrorStream().nextLine());
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+
+		tokens = tokenizer.parse("{message|indent=}");
+		assertEquals("LOGGER WARNING: No value set for \"indent\"", getErrorStream().nextLine());
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
+	}
+
+	/**
 	 * Test converting new lines.
 	 */
 	@Test
