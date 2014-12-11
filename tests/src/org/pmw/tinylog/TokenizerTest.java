@@ -557,6 +557,14 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("!TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("!Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
+		/* Test removing whitespace */
+
+		tokens = tokenizer.parse("{message|indent=2}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals("  TEST ", render(tokens, new LogEntryBuilder().message(" TEST ")));
+		assertEquals("  Hello\n  World\t", render(tokens, new LogEntryBuilder().message("\tHello\n\tWorld\t")));
+
 		/* Invalid definitions of indenting */
 
 		tokens = tokenizer.parse("{message|indent}");

@@ -429,6 +429,8 @@ final class Tokenizer {
 					builder.append(subBuilder, head, i + 1);
 					builder.append(spaces);
 					head = i + 1;
+				} else if (head == i && (c == ' ' || c == '\t')) {
+					++head;
 				}
 			}
 			if (head < subBuilder.length()) {
