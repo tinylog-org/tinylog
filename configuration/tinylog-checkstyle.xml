@@ -131,4 +131,5 @@
   <module name="SuppressWithNearbyCommentFilter">
     <property name="commentFormat" value="SUPPRESS CHECKSTYLE"/>
   </module>
+  <module name="SuppressionCommentFilter"/>
 </module>
