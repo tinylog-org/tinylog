@@ -71,11 +71,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	public final void init() throws SQLException {
 		connection = DriverManager.getConnection(URL);
 
-		Statement statement = connection.createStatement();
-		try {
+		try (Statement statement = connection.createStatement()) {
 			statement.executeUpdate("CREATE TABLE \"log\" (\"entry\" VARCHAR)");
-		} finally {
-			statement.close();
 		}
 	}
 
@@ -87,13 +84,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@After
 	public final void dispose() throws SQLException {
-		try {
-			Statement statement = connection.createStatement();
-			try {
-				statement.execute("SHUTDOWN");
-			} finally {
-				statement.close();
-			}
+		try (Statement statement = connection.createStatement()) {
+			statement.execute("SHUTDOWN");
 		} finally {
 			connection.close();
 		}
@@ -557,17 +549,17 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testLogin() throws SQLException {
-		Statement statement = connection.createStatement();
-		statement.execute("CREATE USER user PASSWORD '123'");
-		statement.close();
+		try (Statement statement = connection.createStatement()) {
+			statement.execute("CREATE USER user PASSWORD '123'");
+		}
 
 		JdbcWriter writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList(), "user", "123");
 		writer.init(null);
 		writer.close();
 
-		statement = connection.createStatement();
-		statement.execute("DROP USER user");
-		statement.close();
+		try (Statement statement = connection.createStatement()) {
+			statement.execute("DROP USER user");
+		}
 
 		writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList(), "user", "123");
 		try {
@@ -890,11 +882,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testMultipleFields() throws SQLException {
-		Statement statement = connection.createStatement();
-		try {
+		try (Statement statement = connection.createStatement()) {
 			statement.executeUpdate("ALTER TABLE \"log\" ADD \"level\" VARCHAR");
-		} finally {
-			statement.close();
 		}
 
 		/* Without column defining */
@@ -1056,7 +1045,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", jdbcWriter.getPassword());
 	}
 
-	private void createAndCloseWriter(final String table, final String... columns) throws SQLException {
+	private static void createAndCloseWriter(final String table, final String... columns) throws SQLException {
 		JdbcWriter writer = new JdbcWriter(URL, table, Collections.<Value> emptyList());
 		try {
 			writer.init(null);
@@ -1065,7 +1054,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		}
 	}
 
-	private void createAndCloseWriter(final String table, final String column) throws SQLException {
+	private static void createAndCloseWriter(final String table, final String column) throws SQLException {
 		JdbcWriter writer = new JdbcWriter(URL, table, Collections.singletonList(column), Collections.singletonList(Value.RENDERED_LOG_ENTRY));
 		try {
 			writer.init(null);
@@ -1079,29 +1068,20 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	private List<String> getLogEntries(final String field) throws SQLException {
-		Statement statement = connection.createStatement();
-		try {
-			ResultSet resultSet = statement.executeQuery("SELECT \"" + field + "\" FROM \"log\"");
-			try {
+		try (Statement statement = connection.createStatement()) {
+			try (ResultSet resultSet = statement.executeQuery("SELECT \"" + field + "\" FROM \"log\"")) {
 				List<String> entries = new ArrayList<>();
 				while (resultSet.next()) {
 					entries.add(resultSet.getString(field));
 				}
 				return entries;
-			} finally {
-				resultSet.close();
 			}
-		} finally {
-			statement.close();
 		}
 	}
 
 	private void clearEntries() throws SQLException {
-		Statement statement = connection.createStatement();
-		try {
+		try (Statement statement = connection.createStatement()) {
 			statement.executeUpdate("TRUNCATE TABLE \"log\"");
-		} finally {
-			statement.close();
 		}
 	}
 

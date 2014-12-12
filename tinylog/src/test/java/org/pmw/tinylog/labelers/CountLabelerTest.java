@@ -152,19 +152,18 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
 		backupFile.createNewFile();
 
-		FileInputStream stream = new FileInputStream(backupFile);
-
-		CountLabeler labeler = new CountLabeler();
-		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
-		try {
-			labeler.roll(baseFile, 2);
-			fail("IOException expected: Renaming should fail");
-		} catch (IOException ex) {
-			assertEquals("Failed to rename \"" + backupFile + "\" to \"" + getBackupFile(baseFile, "tmp", "1") + "\"", ex.getMessage());
+		try (FileInputStream stream = new FileInputStream(backupFile)) {
+			CountLabeler labeler = new CountLabeler();
+			labeler.init(ConfigurationCreator.getDummyConfiguration());
+			assertSame(baseFile, labeler.getLogFile(baseFile));
+			try {
+				labeler.roll(baseFile, 2);
+				fail("IOException expected: Renaming should fail");
+			} catch (IOException ex) {
+				assertEquals("Failed to rename \"" + backupFile + "\" to \"" + getBackupFile(baseFile, "tmp", "1") + "\"", ex.getMessage());
+			}
 		}
 
-		stream.close();
 		baseFile.delete();
 		backupFile.delete();
 	}
@@ -180,20 +179,19 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.createNewFile();
 
-		FileInputStream stream = new FileInputStream(baseFile);
+		try (FileInputStream stream = new FileInputStream(baseFile)) {
+			CountLabeler labeler = new CountLabeler();
+			labeler.init(ConfigurationCreator.getDummyConfiguration());
+			assertSame(baseFile, labeler.getLogFile(baseFile));
 
-		CountLabeler labeler = new CountLabeler();
-		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
-
-		try {
-			labeler.roll(baseFile, 0);
-			fail("IOException expected: Deleting should fail");
-		} catch (IOException ex) {
-			assertEquals("Failed to delete \"" + baseFile + "\"", ex.getMessage());
+			try {
+				labeler.roll(baseFile, 0);
+				fail("IOException expected: Deleting should fail");
+			} catch (IOException ex) {
+				assertEquals("Failed to delete \"" + baseFile + "\"", ex.getMessage());
+			}
 		}
 
-		stream.close();
 		baseFile.delete();
 	}
 

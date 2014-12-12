@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -183,11 +183,11 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 			// Expected
 		}
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertEquals("World", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertEquals("World", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}
@@ -208,9 +208,9 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 
 		writer.close();
 	}
@@ -231,15 +231,15 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		writer.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 	}
 
 	/**
@@ -258,15 +258,15 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		writer.flush();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 
 		writer.close();
 	}
@@ -285,7 +285,7 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		writer.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
-		List<LoopWritingThread> threads = new ArrayList<LoopWritingThread>();
+		List<LoopWritingThread> threads = new ArrayList<>();
 		for (int i = 0; i < 5; ++i) {
 			threads.add(new LoopWritingThread(writer));
 		}
@@ -310,12 +310,12 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		}
 
 		long readLines = 0L;
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(LoopWritingThread.LINE, line);
-			++readLines;
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				assertEquals(LoopWritingThread.LINE, line);
+				++readLines;
+			}
 		}
-		reader.close();
 
 		assertNotEquals(0, readLines);
 		assertEquals(writtenLines, readLines);

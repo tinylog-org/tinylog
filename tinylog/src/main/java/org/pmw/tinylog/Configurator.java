@@ -72,10 +72,10 @@ public final class Configurator {
 	Configurator(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
 			final List<WriterDefinition> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
 		this.level = level;
-		this.customLevels = new HashMap<String, Level>(customLevels);
+		this.customLevels = new HashMap<>(customLevels);
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writers = new ArrayList<WriterDefinition>(writers);
+		this.writers = new ArrayList<>(writers);
 		this.writingThreadData = writingThreadData;
 		this.maxStackTraceElements = maxStackTraceElements;
 	}
@@ -111,15 +111,12 @@ public final class Configurator {
 	public static Configurator fromResource(final String file) throws IOException {
 		Properties properties = new Properties();
 
-		InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file);
-		if (stream == null) {
-			throw new FileNotFoundException(file);
-		} else {
-			try {
+		try (InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file)) {
+			if (stream == null) {
+				throw new FileNotFoundException(file);
+			} else {
 				shutdownWritingThread(true);
 				properties.load(stream);
-			} finally {
-				stream.close();
 			}
 		}
 
@@ -138,15 +135,9 @@ public final class Configurator {
 	public static Configurator fromFile(final File file) throws IOException {
 		Properties properties = new Properties();
 
-		InputStream stream = null;
-		try {
-			stream = new FileInputStream(file);
+		try (InputStream stream = new FileInputStream(file)) {
 			shutdownWritingThread(true);
 			properties.load(stream);
-		} finally {
-			if (stream != null) {
-				stream.close();
-			}
 		}
 
 		return PropertiesLoader.readProperties(properties);

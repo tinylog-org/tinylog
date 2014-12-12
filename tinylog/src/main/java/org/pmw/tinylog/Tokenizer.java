@@ -65,7 +65,7 @@ final class Tokenizer {
 	 * @return List of tokens
 	 */
 	List<Token> parse(final String formatPattern) {
-		List<Token> tokens = new ArrayList<Token>();
+		List<Token> tokens = new ArrayList<>();
 		index = 0;
 
 		while (index < formatPattern.length()) {
@@ -99,7 +99,7 @@ final class Tokenizer {
 	}
 
 	private Token parsePartly(final String formatPattern) {
-		List<Token> tokens = new ArrayList<Token>();
+		List<Token> tokens = new ArrayList<>();
 		int[] options = new int[] { 0 /* minimum size */, 0 /* indent */};
 		int offset = index;
 
@@ -226,7 +226,7 @@ final class Tokenizer {
 		}
 	}
 
-	private Token getPlainTextToken(final String text) {
+	private static Token getPlainTextToken(final String text) {
 		String plainText = NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE);
 		plainText = TAB_REPLACER.matcher(plainText).replaceAll(TAB);
 		return new PlainTextToken(plainText);

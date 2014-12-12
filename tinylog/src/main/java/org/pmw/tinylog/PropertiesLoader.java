@@ -207,7 +207,7 @@ final class PropertiesLoader {
 	 *            Properties with configuration
 	 */
 	static void readWriters(final Configurator configurator, final Properties properties) {
-		Set<String> writerProperties = new TreeSet<String>(); // Sorted
+		Set<String> writerProperties = new TreeSet<>(); // Sorted
 		for (Object key : properties.keySet()) {
 			String propertyName = (String) key;
 			if (propertyName.startsWith(WRITER_PROPERTY) && propertyName.indexOf('.', WRITER_PROPERTY.length()) == -1) {
@@ -362,7 +362,7 @@ final class PropertiesLoader {
 			if (urls == null || !urls.hasMoreElements()) {
 				return Collections.emptyList();
 			} else {
-				Collection<Class<?>> services = new ArrayList<Class<?>>();
+				Collection<Class<?>> services = new ArrayList<>();
 				while (urls.hasMoreElements()) {
 					URL url = urls.nextElement();
 					InputStream inputStream = null;
@@ -437,7 +437,7 @@ final class PropertiesLoader {
 					if (matches) {
 						try {
 							if (parameters.length > parameterTypes.length) {
-								List<Object> list = new ArrayList<Object>();
+								List<Object> list = new ArrayList<>();
 								for (int i = 0; i < parameters.length; ++i) {
 									if (!skiped.get(i)) {
 										list.add(parameters[i]);
@@ -583,7 +583,7 @@ final class PropertiesLoader {
 	}
 
 	private static Policy[] parsePolicies(final String string) {
-		List<Policy> policies = new ArrayList<Policy>();
+		List<Policy> policies = new ArrayList<>();
 		for (String part : string.split(Pattern.quote(","))) {
 			Policy policy = parsePolicy(part.trim());
 			if (policy == null) {

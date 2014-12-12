@@ -211,13 +211,13 @@ abstract class ConfigurationObserver extends Thread {
 	 */
 	protected abstract InputStream openInputStream();
 
-	private boolean changed(final Properties properties, final Properties oldProperties) {
+	private static boolean changed(final Properties properties, final Properties oldProperties) {
 		if (oldProperties == null) {
 			return properties != null;
 		} else if (properties == null) {
 			return true;
 		} else {
-			Set<Object> keys = new HashSet<Object>();
+			Set<Object> keys = new HashSet<>();
 			keys.addAll(properties.keySet());
 			keys.addAll(oldProperties.keySet());
 
@@ -234,9 +234,7 @@ abstract class ConfigurationObserver extends Thread {
 	}
 
 	private Properties readProperties() {
-		InputStream stream = null;
-		try {
-			stream = openInputStream();
+		try (InputStream stream = openInputStream()) {
 			if (stream == null) {
 				InternalLogger.error("Failed to open \"{}\"", file);
 				return null;
@@ -248,50 +246,42 @@ abstract class ConfigurationObserver extends Thread {
 		} catch (IOException ex) {
 			InternalLogger.error(ex, "Failed to read properties file");
 			return null;
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException ex) {
-					// Ignore
-				}
-			}
 		}
 	}
 
-	private boolean levelHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean levelHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.LEVEL_PROPERTY),
 				Collections.singletonList(PropertiesLoader.CUSTOM_LEVEL_PREFIX));
 	}
 
-	private boolean formatPaternHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean formatPaternHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.FORMAT_PROPERTY), Collections.<String> emptyList());
 	}
 
-	private boolean localeHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean localeHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.LOCALE_PROPERTY), Collections.<String> emptyList());
 	}
 
-	private boolean maxStackTraceElementsHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean maxStackTraceElementsHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Collections.singletonList(PropertiesLoader.STACKTRACE_PROPERTY), Collections.<String> emptyList());
 	}
 
-	private boolean writerHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean writerHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Collections.<String> emptyList(), Collections.singletonList(PropertiesLoader.WRITER_PROPERTY));
 	}
 
-	private boolean writingThreadHasChanged(final Properties properties, final Properties oldProperties) {
+	private static boolean writingThreadHasChanged(final Properties properties, final Properties oldProperties) {
 		return compare(properties, oldProperties, Arrays.asList(PropertiesLoader.WRITING_THREAD_PROPERTY, PropertiesLoader.WRITING_THREAD_OBSERVE_PROPERTY,
 				PropertiesLoader.WRITING_THREAD_PRIORITY_PROPERTY), Collections.<String> emptyList());
 	}
 
-	private boolean compare(final Properties a, final Properties b, final List<String> fullKeys, final List<String> startPatterns) {
+	private static boolean compare(final Properties a, final Properties b, final List<String> fullKeys, final List<String> startPatterns) {
 		Properties relevantA = extract(a, fullKeys, startPatterns);
 		Properties relevantB = extract(b, fullKeys, startPatterns);
 		return !relevantA.equals(relevantB);
 	}
 
-	private Properties extract(final Properties properties, final List<String> fullKeys, final List<String> startPatterns) {
+	private static Properties extract(final Properties properties, final List<String> fullKeys, final List<String> startPatterns) {
 		Properties relevantProperties = new Properties();
 
 		for (String key : fullKeys) {

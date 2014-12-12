@@ -48,7 +48,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	 */
 	public ClassLoaderMock(final URLClassLoader classLoader) {
 		this.classLoader = classLoader;
-		this.resources = new HashMap<String, File>();
+		this.resources = new HashMap<>();
 	}
 
 	/**
@@ -173,7 +173,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	protected Enumeration<URL> findResources(final Invocation invocation, final String name) throws IOException {
 		if (classLoader == invocation.getInvokedInstance()) {
 			Enumeration<URL> enumeration = invocation.proceed(name);
-			List<URL> urls = new ArrayList<URL>(Collections.list(enumeration));
+			List<URL> urls = new ArrayList<>(Collections.list(enumeration));
 			if (resources.containsKey(name)) {
 				File file = resources.get(name);
 				if (file == null) {

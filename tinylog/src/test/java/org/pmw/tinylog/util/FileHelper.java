@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -31,7 +31,7 @@ public final class FileHelper {
 
 	/**
 	 * Create an empty temporary file in the workspace. It will be deleted automatically on exit.
-	 * 
+	 *
 	 * @param extension
 	 *            File extension without '.'
 	 * @return The created temporary file
@@ -46,7 +46,7 @@ public final class FileHelper {
 
 	/**
 	 * Create an empty temporary file. It will be deleted automatically on exit.
-	 * 
+	 *
 	 * @param extension
 	 *            File extension without '.'
 	 * @return The created temporary file
@@ -61,7 +61,7 @@ public final class FileHelper {
 
 	/**
 	 * Create a textual temporary file. It will be deleted automatically on exit.
-	 * 
+	 *
 	 * @param extension
 	 *            File extension without '.'
 	 * @param lines
@@ -76,7 +76,7 @@ public final class FileHelper {
 
 	/**
 	 * Create a textual temporary file. It will be deleted automatically on exit.
-	 * 
+	 *
 	 * @param extension
 	 *            File extension without '.'
 	 * @param content
@@ -93,7 +93,7 @@ public final class FileHelper {
 
 	/**
 	 * Read the content of a file.
-	 * 
+	 *
 	 * @param file
 	 *            File to get content from
 	 * @return Content of file as string
@@ -102,25 +102,19 @@ public final class FileHelper {
 	 */
 	public static String read(final File file) throws IOException {
 		StringBuilder builder = new StringBuilder((int) file.length());
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			char[] buffer = new char[1024];
 			int length = 0;
 			while ((length = reader.read(buffer)) != -1) {
 				builder.append(buffer, 0, length);
 			}
 			return builder.toString();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
 		}
 	}
 
 	/**
 	 * Write lines into a textual file (current content will be replaced).
-	 * 
+	 *
 	 * @param file
 	 *            File to write to
 	 * @param lines
@@ -134,7 +128,7 @@ public final class FileHelper {
 
 	/**
 	 * Write a text into a textual file (current content will be replaced).
-	 * 
+	 *
 	 * @param file
 	 *            File to write to
 	 * @param content
@@ -143,14 +137,8 @@ public final class FileHelper {
 	 *             Failed to write to file
 	 */
 	public static void write(final File file, final String content) throws IOException {
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(file);
+		try (FileWriter writer = new FileWriter(file)) {
 			writer.write(content);
-		} finally {
-			if (writer != null) {
-				writer.close();
-			}
 		}
 	}
 

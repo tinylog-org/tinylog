@@ -42,7 +42,7 @@ final class WritingThread extends Thread {
 	 *            {@link Thread#MAX_PRIORITY})
 	 */
 	WritingThread(final String nameOfThreadToObserve, final int priority) {
-		this.entries = new ArrayList<WritingTask>();
+		this.entries = new ArrayList<>();
 		this.nameOfThreadToObserve = nameOfThreadToObserve;
 		this.threadToObserve = nameOfThreadToObserve == null ? null : getThread(nameOfThreadToObserve);
 
@@ -87,7 +87,7 @@ final class WritingThread extends Thread {
 
 			List<WritingTask> writingTasks = getWritingTasks();
 			while (writingTasks != null) {
-				Collection<Writer> writers = new ArrayList<Writer>();
+				Collection<Writer> writers = new ArrayList<>();
 
 				for (WritingTask writingTask : writingTasks) {
 					try {
@@ -166,7 +166,7 @@ final class WritingThread extends Thread {
 			return null;
 		} else {
 			List<WritingTask> entriesToWrite = entries;
-			entries = new ArrayList<WritingTask>();
+			entries = new ArrayList<>();
 			return entriesToWrite;
 		}
 	}

@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -622,7 +622,7 @@ public class ConfigurationTest extends AbstractTest {
 		testDetailedConfigurationSample(detailedCopy);
 	}
 
-	private Configuration createMinimalConfigurationSample() {
+	private static Configuration createMinimalConfigurationSample() {
 		return new Configuration(Level.TRACE, noCustomLevels(), "", Locale.ROOT, emptyWriterDefinition(), null, 0);
 	}
 
@@ -642,8 +642,8 @@ public class ConfigurationTest extends AbstractTest {
 		assertEquals(StackTraceInformation.NONE, configuration.getRequiredStackTraceInformation(Level.ERROR));
 	}
 
-	private Configuration createDetailedConfigurationSample() {
-		Map<String, Level> packageLevels = new HashMap<String, Level>();
+	private static Configuration createDetailedConfigurationSample() {
+		Map<String, Level> packageLevels = new HashMap<>();
 		packageLevels.put(ConfigurationTest.class.getPackage().getName(), Level.INFO);
 		return new Configuration(Level.WARNING, packageLevels, "{class}{method}", Locale.GERMANY, singleWriterDefinition(new DummyWriter(
 				LogEntryValue.RENDERED_LOG_ENTRY)), new WritingThread(null, Thread.MIN_PRIORITY), Integer.MAX_VALUE);
@@ -678,7 +678,7 @@ public class ConfigurationTest extends AbstractTest {
 	}
 
 	private static Map<String, Level> pairCustomLevels(final String packageOrClass1, final Level level1, final String packageOrClass2, final Level level2) {
-		Map<String, Level> customLevels = new HashMap<String, Level>();
+		Map<String, Level> customLevels = new HashMap<>();
 		customLevels.put(packageOrClass1, level1);
 		customLevels.put(packageOrClass2, level2);
 		return customLevels;

@@ -72,7 +72,7 @@ public final class Configuration {
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern;
 		this.locale = locale;
-		this.writerDefinitions = new ArrayList<WriterDefinition>(writerDefinitions);
+		this.writerDefinitions = new ArrayList<>(writerDefinitions);
 		this.writers = getWriters(writerDefinitions);
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements;
@@ -235,7 +235,7 @@ public final class Configuration {
 		if (customLevels.isEmpty()) {
 			copyOfCustomLevels = Collections.emptyMap();
 		} else {
-			copyOfCustomLevels = new HashMap<String, Level>(customLevels);
+			copyOfCustomLevels = new HashMap<>(customLevels);
 		}
 
 		WritingThreadData writingThreadData;
@@ -267,7 +267,7 @@ public final class Configuration {
 	}
 
 	private static List<Writer> getWriters(final List<WriterDefinition> definitions) {
-		List<Writer> writers = new ArrayList<Writer>();
+		List<Writer> writers = new ArrayList<>();
 		for (WriterDefinition definition : definitions) {
 			writers.add(definition.getWriter());
 		}
@@ -275,9 +275,9 @@ public final class Configuration {
 	}
 
 	private static Map<Level, Writer[]> getEffectiveWriters(final List<WriterDefinition> definitions) {
-		Map<Level, Writer[]> map = new EnumMap<Level, Writer[]>(Level.class);
+		Map<Level, Writer[]> map = new EnumMap<>(Level.class);
 		for (Level level : Level.values()) {
-			List<Writer> writers = new ArrayList<Writer>();
+			List<Writer> writers = new ArrayList<>();
 			for (WriterDefinition definition : definitions) {
 				if (level.ordinal() >= definition.getLevel().ordinal()) {
 					writers.add(definition.getWriter());
@@ -291,13 +291,13 @@ public final class Configuration {
 	@SuppressWarnings("unchecked")
 	private static Map<Level, List<Token>[]> getEffectiveFormatTokens(final List<WriterDefinition> definitions, final String globalFormatPattern,
 			final Locale locale, final int maxStackTraceElements) {
-		Map<Writer, List<Token>> cache = new HashMap<Writer, List<Token>>();
+		Map<Writer, List<Token>> cache = new HashMap<>();
 		Tokenizer tokenizer = new Tokenizer(locale, maxStackTraceElements);
 		List<Token> globalFormatTokens = tokenizer.parse(globalFormatPattern);
 
-		Map<Level, List<Token>[]> map = new EnumMap<Level, List<Token>[]>(Level.class);
+		Map<Level, List<Token>[]> map = new EnumMap<>(Level.class);
 		for (Level level : Level.values()) {
-			List<List<Token>> formatTokensOfLevel = new ArrayList<List<Token>>();
+			List<List<Token>> formatTokensOfLevel = new ArrayList<>();
 			for (WriterDefinition definition : definitions) {
 				if (level.ordinal() >= definition.getLevel().ordinal()) {
 					Writer writer = definition.getWriter();
@@ -329,7 +329,7 @@ public final class Configuration {
 
 	private static Map<Level, Set<LogEntryValue>> getRequiredLogEntryValues(final Map<Level, Writer[]> writersMap,
 			final Map<Level, List<Token>[]> formatTokensMap) {
-		Map<Level, Set<LogEntryValue>> map = new EnumMap<Level, Set<LogEntryValue>>(Level.class);
+		Map<Level, Set<LogEntryValue>> map = new EnumMap<>(Level.class);
 		for (Entry<Level, Writer[]> entry : writersMap.entrySet()) {
 			Level level = entry.getKey();
 			Writer[] writers = entry.getValue();
@@ -363,7 +363,7 @@ public final class Configuration {
 
 	private static Map<Level, StackTraceInformation> getRequiredStackTraceInformation(final Map<Level, Set<LogEntryValue>> requiredLogEntryValues,
 			final Map<String, Level> customLevels) {
-		Map<Level, StackTraceInformation> map = new EnumMap<Level, StackTraceInformation>(Level.class);
+		Map<Level, StackTraceInformation> map = new EnumMap<>(Level.class);
 		for (Entry<Level, Set<LogEntryValue>> entry : requiredLogEntryValues.entrySet()) {
 			Level level = entry.getKey();
 			Set<LogEntryValue> logEntryValues = entry.getValue();

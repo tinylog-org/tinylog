@@ -212,16 +212,16 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		File backupFile = getBackupFile(baseFile, "tmp", formatCurrentTime());
 		backupFile.createNewFile();
-		FileInputStream stream = new FileInputStream(backupFile);
 
-		TimestampLabeler labeler = new TimestampLabeler();
-		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		File currentFile = labeler.getLogFile(baseFile);
+		try (FileInputStream stream = new FileInputStream(backupFile)) {
+			TimestampLabeler labeler = new TimestampLabeler();
+			labeler.init(ConfigurationCreator.getDummyConfiguration());
+			File currentFile = labeler.getLogFile(baseFile);
 
-		labeler.roll(currentFile, 0);
-		assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+			labeler.roll(currentFile, 0);
+			assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+		}
 
-		stream.close();
 		backupFile.delete();
 	}
 
@@ -239,7 +239,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
 	}
 
-	private String formatCurrentTime() {
+	private static String formatCurrentTime() {
 		return new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ROOT).format(new Date());
 	}
 

@@ -29,7 +29,7 @@ public final class VMShutdownHook extends Thread {
 	private static boolean shutdown;
 
 	static {
-		writers = new ArrayList<Writer>();
+		writers = new ArrayList<>();
 		shutdown = false;
 	}
 

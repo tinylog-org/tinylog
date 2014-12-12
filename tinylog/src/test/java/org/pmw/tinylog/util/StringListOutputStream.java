@@ -29,7 +29,7 @@ public final class StringListOutputStream extends OutputStream {
 
 	/** */
 	public StringListOutputStream() {
-		lines = new LinkedList<CharSequence>();
+		lines = new LinkedList<>();
 	}
 
 	/**

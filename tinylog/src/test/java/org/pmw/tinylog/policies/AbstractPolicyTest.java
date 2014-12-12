@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -27,25 +27,25 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
-import org.pmw.tinylog.writers.Writer;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Abstract test class for policies.
- * 
+ *
  * @see Policy
  */
 public abstract class AbstractPolicyTest extends AbstractTest {
 
 	/**
 	 * Create a policy from properties.
-	 * 
+	 *
 	 * @param property
 	 *            Property value with policy definition
 	 * @return Created policy
 	 */
-	protected final Policy createFromProperties(final String property) {
+	protected static final Policy createFromProperties(final String property) {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader());
 		try {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());

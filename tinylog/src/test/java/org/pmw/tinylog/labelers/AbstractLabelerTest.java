@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -27,20 +27,20 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.PropertiesBuilder;
-import org.pmw.tinylog.writers.Writer;
 import org.pmw.tinylog.writers.PropertiesSupport;
 import org.pmw.tinylog.writers.Property;
+import org.pmw.tinylog.writers.Writer;
 
 /**
  * Abstract test class for labelers.
- * 
+ *
  * @see Labeler
  */
 public abstract class AbstractLabelerTest extends AbstractTest {
 
 	/**
 	 * Generate a backup file for a given log file.
-	 * 
+	 *
 	 * @param baseFile
 	 *            Log file
 	 * @param fileExtension
@@ -64,12 +64,12 @@ public abstract class AbstractLabelerTest extends AbstractTest {
 
 	/**
 	 * Create a labeler from properties.
-	 * 
+	 *
 	 * @param property
 	 *            Property value with labeler definition
 	 * @return Created labeler
 	 */
-	protected final Labeler createFromProperties(final String property) {
+	protected static final Labeler createFromProperties(final String property) {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader());
 		try {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());

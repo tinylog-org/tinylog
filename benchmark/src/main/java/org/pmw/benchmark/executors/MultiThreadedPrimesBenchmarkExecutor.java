@@ -69,7 +69,7 @@ public final class MultiThreadedPrimesBenchmarkExecutor extends AbstractPrimeBen
 				while (splitterSquarePrime < end && primesToTest.size() < primes.size()) {
 					long splitterPrime = primes.get(primesToTest.size());
 					splitterSquarePrime = splitterPrime * splitterPrime;
-					primesToTest = new SubList<Long>(primes, primesToTest.size() + 1);
+					primesToTest = new SubList<>(primes, primesToTest.size() + 1);
 				}
 
 				if (end - start < threads) {

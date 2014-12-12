@@ -41,7 +41,7 @@ public final class ArrayMatchers {
 	 */
 	@SafeVarargs
 	public static <E> Matcher<E[]> equalContentInArray(final Object... objects) {
-		return new ContentMatcher<E>(Arrays.asList(objects), false);
+		return new ContentMatcher<>(Arrays.asList(objects), false);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public final class ArrayMatchers {
 	 */
 	@SafeVarargs
 	public static <E> Matcher<E[]> sameContentInArray(final Object... objects) {
-		return new ContentMatcher<E>(Arrays.asList(objects), true);
+		return new ContentMatcher<>(Arrays.asList(objects), true);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public final class ArrayMatchers {
 	 *            Type of array elements
 	 */
 	public static <E> Matcher<E[]> distinctContentInArray() {
-		return new DistinctMatcher<E>();
+		return new DistinctMatcher<>();
 	}
 
 	/**
@@ -82,7 +82,7 @@ public final class ArrayMatchers {
 	 *            Type of array elements
 	 */
 	public static <E> Matcher<E[]> containsCollectionWithSizes(final Integer... sizes) {
-		return new SizeMatcher<E>(Arrays.asList(sizes));
+		return new SizeMatcher<>(Arrays.asList(sizes));
 	}
 
 	/**
@@ -97,7 +97,7 @@ public final class ArrayMatchers {
 	 */
 	@SafeVarargs
 	public static <E> Matcher<E[]> typesInArray(final Class<?>... classes) {
-		return new ClassMatcher<E>(Arrays.asList(classes));
+		return new ClassMatcher<>(Arrays.asList(classes));
 	}
 
 	private static final class ContentMatcher<E> extends TypeSafeMatcher<E[]> {

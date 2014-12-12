@@ -116,7 +116,7 @@ public class Application {
 	private static List<? extends Benchmark> getBenchmarks(final String[] arguments) {
 		String framework = arguments[0];
 		if ("all".equalsIgnoreCase(framework)) {
-			List<Benchmark> benchmarks = new ArrayList<Benchmark>();
+			List<Benchmark> benchmarks = new ArrayList<>();
 			benchmarks.add(new DummyBenchmark());
 			benchmarks.add(new JulBenchmark());
 			benchmarks.add(new Log4jBenchmark(false));

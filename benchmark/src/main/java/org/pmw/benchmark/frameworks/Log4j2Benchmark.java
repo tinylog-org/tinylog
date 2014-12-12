@@ -161,7 +161,7 @@ public final class Log4j2Benchmark implements Benchmark {
 		createWaitStrategy.setAccessible(true);
 		WaitStrategy waitStrategy = (WaitStrategy) createWaitStrategy.invoke(null);
 
-		Disruptor<RingBufferLogEvent> disruptor = new Disruptor<RingBufferLogEvent>(RingBufferLogEvent.FACTORY, ringBufferSize, executor, ProducerType.MULTI,
+		Disruptor<RingBufferLogEvent> disruptor = new Disruptor<>(RingBufferLogEvent.FACTORY, ringBufferSize, executor, ProducerType.MULTI,
 				waitStrategy);
 		Field disruptorField = asyncLoggerClass.getDeclaredField("disruptor");
 		disruptorField.setAccessible(true);

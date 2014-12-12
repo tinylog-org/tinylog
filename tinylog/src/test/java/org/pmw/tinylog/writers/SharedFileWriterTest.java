@@ -105,11 +105,11 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 			// Expected
 		}
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertEquals("World", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertEquals("World", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}
@@ -129,7 +129,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		writer.init(null);
 
-		List<LoopWritingThread> threads = new ArrayList<LoopWritingThread>();
+		List<LoopWritingThread> threads = new ArrayList<>();
 		for (int i = 0; i < 5; ++i) {
 			threads.add(new LoopWritingThread(writer));
 		}
@@ -154,12 +154,12 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		}
 
 		long readLines = 0L;
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(LoopWritingThread.LINE, line);
-			++readLines;
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				assertEquals(LoopWritingThread.LINE, line);
+				++readLines;
+			}
 		}
-		reader.close();
 
 		assertNotEquals(0, readLines);
 		assertEquals(writtenLines, readLines);
@@ -198,12 +198,12 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		}
 
 		long readLines = 0L;
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(LoopWritingThread.LINE, line);
-			++readLines;
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				assertEquals(LoopWritingThread.LINE, line);
+				++readLines;
+			}
 		}
-		reader.close();
 
 		assertEquals(NUMBER_OF_JVMS * LOG_ENTRIES, readLines);
 
@@ -255,9 +255,9 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.flush();
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 
 		writer.close();
 	}
@@ -276,18 +276,18 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 		FileHelper.write(file, "Hello World!");
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello World!", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello World!", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		writer.init(null);
 		writer.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		/* But no overwriting by second writer */
 
@@ -302,11 +302,11 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		writer1.close();
 		writer2.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertEquals("World", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertEquals("World", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}

@@ -1054,7 +1054,7 @@ public class LoggerTest extends AbstractTest {
 				logEntry.getRenderedLogEntry());
 	}
 
-	private WritingThread findWritingThread() {
+	private static WritingThread findWritingThread() {
 		for (Thread thread : Thread.getAllStackTraces().keySet()) {
 			if (thread instanceof WritingThread) {
 				return (WritingThread) thread;

@@ -116,7 +116,7 @@ public final class LogbackBenchmark implements Benchmark {
 	}
 
 	private Appender<ILoggingEvent> createFileAppender(final File file, final LoggerContext context) {
-		FileAppender<ILoggingEvent> appender = new FileAppender<ILoggingEvent>();
+		FileAppender<ILoggingEvent> appender = new FileAppender<>();
 		appender.setContext(context);
 		appender.setAppend(false);
 		appender.setFile(file.getAbsolutePath());

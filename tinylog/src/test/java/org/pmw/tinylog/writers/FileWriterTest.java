@@ -98,9 +98,9 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 
 		writer.close();
 	}
@@ -121,15 +121,15 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		writer.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 	}
 
 	/**
@@ -148,15 +148,15 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		writer.flush();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+		}
 
 		writer.close();
 	}
@@ -183,11 +183,11 @@ public class FileWriterTest extends AbstractWriterTest {
 			// Expected
 		}
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertEquals("World", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertEquals("World", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}
@@ -207,7 +207,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		writer.init(null);
 
-		List<LoopWritingThread> threads = new ArrayList<LoopWritingThread>();
+		List<LoopWritingThread> threads = new ArrayList<>();
 		for (int i = 0; i < 5; ++i) {
 			threads.add(new LoopWritingThread(writer));
 		}
@@ -232,12 +232,12 @@ public class FileWriterTest extends AbstractWriterTest {
 		}
 
 		long readLines = 0L;
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			assertEquals(LoopWritingThread.LINE, line);
-			++readLines;
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				assertEquals(LoopWritingThread.LINE, line);
+				++readLines;
+			}
 		}
-		reader.close();
 
 		assertNotEquals(0, readLines);
 		assertEquals(writtenLines, readLines);
@@ -257,18 +257,18 @@ public class FileWriterTest extends AbstractWriterTest {
 		File file = FileHelper.createTemporaryFile(null);
 		FileHelper.write(file, "Hello World!");
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello World!", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello World!", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		writer.init(null);
 		writer.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}
