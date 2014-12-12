@@ -22,7 +22,7 @@ import java.util.Map;
 public final class LogManager {
 
 	private static final Logger root = new Logger(null, "root");
-	private static final Map<String, Logger> loggers = new HashMap<String, Logger>();
+	private static final Map<String, Logger> loggers = new HashMap<>();
 	private static final Object mutex = new Object();
 
 	static {
