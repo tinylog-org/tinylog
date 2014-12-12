@@ -81,7 +81,7 @@ public final class TimestampLabeler implements Labeler {
 	}
 
 	@Override
-	public File roll(final File file, final int maxBackups) {
+	public FilePair roll(final File file, final int maxBackups) {
 		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
 		if (files.size() > maxBackups) {
 			Collections.sort(files, LogFileComparator.getInstance());
@@ -93,7 +93,7 @@ public final class TimestampLabeler implements Labeler {
 			}
 		}
 
-		return createFile();
+		return new FilePair(createFile(), file.exists() ? file : null);
 	}
 
 	private File createFile() {

@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -25,8 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.labelers.CountLabeler;
+import org.pmw.tinylog.labelers.FilePair;
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
 import org.pmw.tinylog.policies.StartupPolicy;
@@ -37,7 +40,7 @@ import org.pmw.tinylog.policies.StartupPolicy;
  */
 @PropertiesSupport(name = "rollingfile", properties = { @Property(name = "filename", type = String.class), @Property(name = "backups", type = int.class),
 		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "label", type = Labeler.class, optional = true),
-		@Property(name = "policies", type = Policy[].class, optional = true) })
+		@Property(name = "policies", type = Policy[].class, optional = true), @Property(name = "listeners", type = RollingListener[].class, optional = true) })
 public final class RollingFileWriter implements Writer {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
@@ -47,6 +50,7 @@ public final class RollingFileWriter implements Writer {
 	private final boolean buffered;
 	private final Labeler labeler;
 	private final List<? extends Policy> policies;
+	private final List<RollingListener> listeners;
 
 	private final Object mutex;
 	private File file;
@@ -63,7 +67,7 @@ public final class RollingFileWriter implements Writer {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) {
-		this(filename, backups, false, null, (Policy[]) null);
+		this(filename, backups, false, (Labeler) null, (Policy[]) null, (RollingListener[]) null);
 	}
 
 	/**
@@ -79,7 +83,7 @@ public final class RollingFileWriter implements Writer {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered) {
-		this(filename, backups, buffered, null, (Policy[]) null);
+		this(filename, backups, buffered, (Labeler) null, (Policy[]) null, (RollingListener[]) null);
 	}
 
 	/**
@@ -95,7 +99,7 @@ public final class RollingFileWriter implements Writer {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeler labeler) {
-		this(filename, backups, false, labeler, (Policy[]) null);
+		this(filename, backups, false, labeler, (Policy[]) null, (RollingListener[]) null);
 	}
 
 	/**
@@ -113,7 +117,7 @@ public final class RollingFileWriter implements Writer {
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler) {
-		this(filename, backups, buffered, labeler, (Policy[]) null);
+		this(filename, backups, buffered, labeler, (Policy[]) null, (RollingListener[]) null);
 	}
 
 	/**
@@ -125,7 +129,7 @@ public final class RollingFileWriter implements Writer {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Policy... policies) {
-		this(filename, backups, false, null, policies);
+		this(filename, backups, false, (Labeler) null, policies, (RollingListener[]) null);
 	}
 
 	/**
@@ -139,7 +143,7 @@ public final class RollingFileWriter implements Writer {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Policy... policies) {
-		this(filename, backups, buffered, null, policies);
+		this(filename, backups, buffered, (Labeler) null, policies, (RollingListener[]) null);
 	}
 
 	/**
@@ -153,7 +157,7 @@ public final class RollingFileWriter implements Writer {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeler labeler, final Policy... policies) {
-		this(filename, backups, false, labeler, policies);
+		this(filename, backups, false, labeler, policies, (RollingListener[]) null);
 	}
 
 	/**
@@ -169,14 +173,73 @@ public final class RollingFileWriter implements Writer {
 	 *            Rollover strategies
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler, final Policy... policies) {
+		this(filename, backups, buffered, labeler, policies, (RollingListener[]) null);
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param labeler
+	 *            Labeler for naming backups
+	 * @param policies
+	 *            Rollover strategies
+	 * @param listeners
+	 *            Rollover listeners
+	 */
+	RollingFileWriter(final String filename, final int backups, final Labeler labeler, final Policy[] policies, final RollingListener[] listeners) {
+		this(filename, backups, false, labeler, policies, listeners);
+	}
+
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param backups
+	 *            Number of backups
+	 * @param buffered
+	 *            Buffered writing
+	 * @param labeler
+	 *            Labeler for naming backups
+	 * @param policies
+	 *            Rollover strategies
+	 * @param listeners
+	 *            Rollover listeners
+	 */
+	RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler, final Policy[] policies,
+			final RollingListener[] listeners) {
 		this.mutex = new Object();
 		this.filename = filename;
 		this.backups = Math.max(0, backups);
 		this.buffered = buffered;
 		this.labeler = labeler == null ? new CountLabeler() : labeler;
 		this.policies = policies == null || policies.length == 0 ? Arrays.asList(new StartupPolicy()) : Arrays.asList(policies);
+		this.listeners = listeners == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(listeners));
 	}
 
+	/**
+	 * Add a rolling listener.
+	 *
+	 * @param listener
+	 *            Rolling listener
+	 */
+	public void addListener(final RollingListener listener) {
+		synchronized (mutex) {
+			listeners.add(listener);
+		}
+	}
+
+	/**
+	 * Remove a rolling listener.
+	 *
+	 * @param listener
+	 *            Rolling listener
+	 */
+	public void removeListener(final RollingListener listener) {
+		synchronized (mutex) {
+			listeners.remove(listener);
+		}
+	}
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
 		return EnumSet.of(LogEntryValue.RENDERED_LOG_ENTRY);
@@ -231,27 +294,37 @@ public final class RollingFileWriter implements Writer {
 
 	@Override
 	public void init(final Configuration configuration) throws IOException {
-		labeler.init(configuration);
-		file = labeler.getLogFile(new File(filename));
+		synchronized (mutex) {
+			labeler.init(configuration);
+			file = labeler.getLogFile(new File(filename));
 
-		for (Policy policy : policies) {
-			policy.init(configuration);
-		}
-		for (Policy policy : policies) {
-			if (!policy.check(file)) {
-				resetPolicies();
-				file = labeler.roll(file, backups);
-				break;
+			for (RollingListener listener : listeners) {
+				try {
+					listener.startup(file);
+				} catch (Exception ex) {
+					InternalLogger.error(ex);
+				}
 			}
-		}
 
-		if (buffered) {
-			stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
-		} else {
-			stream = new FileOutputStream(file, true);
-		}
+			for (Policy policy : policies) {
+				policy.init(configuration);
+			}
+			for (Policy policy : policies) {
+				if (!policy.check(file)) {
+					resetPolicies();
+					roll();
+					break;
+				}
+			}
 
-		VMShutdownHook.register(this);
+			if (buffered) {
+				stream = new BufferedOutputStream(new FileOutputStream(file, true), BUFFER_SIZE);
+			} else {
+				stream = new FileOutputStream(file, true);
+			}
+
+			VMShutdownHook.register(this);
+		}
 	}
 
 	@Override
@@ -259,7 +332,7 @@ public final class RollingFileWriter implements Writer {
 		synchronized (mutex) {
 			if (!checkPolicies(logEntry.getRenderedLogEntry())) {
 				stream.close();
-				file = labeler.roll(file, backups);
+				roll();
 				if (buffered) {
 					stream = new BufferedOutputStream(new FileOutputStream(file), BUFFER_SIZE);
 				} else {
@@ -290,6 +363,14 @@ public final class RollingFileWriter implements Writer {
 		synchronized (mutex) {
 			VMShutdownHook.unregister(this);
 			stream.close();
+
+			for (RollingListener listener : listeners) {
+				try {
+					listener.shutdown(file);
+				} catch (Exception ex) {
+					InternalLogger.error(ex);
+				}
+			}
 		}
 	}
 
@@ -306,6 +387,19 @@ public final class RollingFileWriter implements Writer {
 	private void resetPolicies() {
 		for (Policy policy : policies) {
 			policy.reset();
+		}
+	}
+
+	private void roll() throws IOException {
+		FilePair files = labeler.roll(file, backups);
+		file = files.getFile();
+
+		for (RollingListener listener : listeners) {
+			try {
+				listener.rolled(files.getBackup(), file);
+			} catch (Exception ex) {
+				InternalLogger.error(ex);
+			}
 		}
 	}
 

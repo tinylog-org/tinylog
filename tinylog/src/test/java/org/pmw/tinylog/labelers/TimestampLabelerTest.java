@@ -15,6 +15,7 @@ package org.pmw.tinylog.labelers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
@@ -88,7 +89,9 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		systemTimeMock.setCurrentTimeMillis(1000L);
 		File targetFile2 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile2, labeler.roll(targetFile1, 2));
+		FilePair files = labeler.roll(targetFile1, 2);
+		assertEquals(targetFile2, files.getFile());
+		assertEquals(targetFile1, files.getBackup());
 		targetFile2.createNewFile();
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -97,7 +100,9 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		systemTimeMock.setCurrentTimeMillis(2000L);
 		File targetFile3 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile3, labeler.roll(targetFile2, 2));
+		files = labeler.roll(targetFile2, 2);
+		assertEquals(targetFile3, files.getFile());
+		assertEquals(targetFile2, files.getBackup());
 		targetFile3.createNewFile();
 		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -107,7 +112,9 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		systemTimeMock.setCurrentTimeMillis(3000L);
 		File targetFile4 = getBackupFile(baseFile, "tmp", formatCurrentTime());
 
-		assertEquals(targetFile4, labeler.roll(targetFile3, 2));
+		files = labeler.roll(targetFile3, 2);
+		assertEquals(targetFile4, files.getFile());
+		assertEquals(targetFile3, files.getBackup());
 		targetFile4.createNewFile();
 		targetFile4.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
@@ -145,7 +152,9 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		systemTimeMock.setCurrentTimeMillis(1000L);
 		File targetFile2 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		assertEquals(targetFile2, labeler.roll(targetFile1, 1));
+		FilePair files = labeler.roll(targetFile1, 1);
+		assertEquals(targetFile2, files.getFile());
+		assertEquals(targetFile1, files.getBackup());
 		targetFile2.createNewFile();
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 		assertTrue(targetFile1.exists());
@@ -154,7 +163,9 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		systemTimeMock.setCurrentTimeMillis(2000L);
 		File targetFile3 = getBackupFile(baseFile, null, formatCurrentTime());
 
-		assertEquals(targetFile3, labeler.roll(targetFile2, 1));
+		files = labeler.roll(targetFile2, 1);
+		assertEquals(targetFile3, files.getFile());
+		assertEquals(targetFile2, files.getBackup());
 		targetFile3.createNewFile();
 		targetFile3.setLastModified(systemTimeMock.currentTimeMillis());
 		assertFalse(targetFile1.exists());
@@ -193,8 +204,10 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		targetFile2.setLastModified(systemTimeMock.currentTimeMillis());
 
 		assertTrue(targetFile1.exists());
-		assertEquals(targetFile2, labeler.roll(targetFile1, 0));
+		FilePair files = labeler.roll(targetFile1, 0);
+		assertEquals(targetFile2, files.getFile());
 		assertFalse(targetFile1.exists());
+		assertNull(files.getBackup());
 
 		baseFile.delete();
 		targetFile1.delete();

@@ -47,6 +47,7 @@ import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.labelers.CountLabeler;
+import org.pmw.tinylog.labelers.FilePair;
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.labelers.TimestampLabeler;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
@@ -788,6 +789,58 @@ public class PropertiesLoaderTest extends AbstractTest {
 	}
 
 	/**
+	 * Test reading a writer with custom class properties.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithCustomClassProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
+
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.object", "java.lang.StringBuilder");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<Writer> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.object, type(StringBuilder.class));
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test reading a writer with custom classes properties.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWriterWithCustomClassesProperties() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
+
+			Configurator configurator = Configurator.defaultConfig();
+			propertiesBuilder.set("tinylog.writer.objects", "java.lang.StringBuilder, java.lang.StringBuffer");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			List<Writer> writers = configurator.create().getWriters();
+			assertThat(writers, types(PropertiesWriter.class));
+			PropertiesWriter propertiesWriter = (PropertiesWriter) writers.get(0);
+			assertThat(propertiesWriter.objects, typesInArray(StringBuilder.class, StringBuffer.class));
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
 	 * Test reading a writer with missing required property.
 	 */
 	@Test
@@ -811,15 +864,15 @@ public class PropertiesLoaderTest extends AbstractTest {
 	public final void testReadWriterWithUnsupportedProperties() throws IOException {
 		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
 		try {
-			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), ClassPropertyWriter.class.getName());
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), DoublePropertyWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
-			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.class", "MyClass");
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.value", "1.42");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			List<Writer> writers = configurator.create().getWriters();
 			assertThat(writers, types(ConsoleWriter.class));
-			assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"" + Pattern.quote(Class.class.getName())
-					+ "\" for \"tinylog\\.writer\\.class\" is an unsupported type \\(.+ are supported\\)"));
+			assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"" + Pattern.quote(double.class.getName())
+					+ "\" for \"tinylog\\.writer\\.value\" is an unsupported type \\(.+ are supported\\)"));
 			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
@@ -884,6 +937,64 @@ public class PropertiesLoaderTest extends AbstractTest {
 			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policies", "invalid");
 			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
 			assertEquals("LOGGER ERROR: Cannot find a policy for the name \"invalid\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test reading nonexistent custom class.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadInvalidCustomClass() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.object", "invalid.Class");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: Cannot find a class with the name \"invalid.Class\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.objects", "invalid.Class");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: Cannot find a class with the name \"invalid.Class\"", getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+		} finally {
+			mock.tearDown();
+			mock.close();
+		}
+	}
+
+	/**
+	 * Test reading wrong custom class.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReadWrongCustomClass() throws IOException {
+		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader());
+		try {
+			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
+
+			Configurator configurator = Configurator.defaultConfig();
+			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.object", "java.lang.Thread");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: \"" + Thread.class.getName() + "\" is not a " + CharSequence.class.getName(), getErrorStream().nextLine());
+			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
+
+			configurator = Configurator.defaultConfig();
+			propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.objects", "java.lang.Thread");
+			PropertiesLoader.readWriters(configurator, propertiesBuilder.create());
+			assertEquals("LOGGER ERROR: \"" + Thread.class.getName() + "\" is not a " + CharSequence.class.getName(), getErrorStream().nextLine());
 			assertEquals("LOGGER ERROR: Failed to initialize properties writer", getErrorStream().nextLine());
 		} finally {
 			mock.tearDown();
@@ -1420,7 +1531,8 @@ public class PropertiesLoaderTest extends AbstractTest {
 	@PropertiesSupport(name = "properties", properties = { @Property(name = "boolean", type = boolean.class, optional = true),
 			@Property(name = "int", type = int.class, optional = true), @Property(name = "string", type = String.class, optional = true),
 			@Property(name = "strings", type = String[].class, optional = true), @Property(name = "labeler", type = Labeler.class, optional = true),
-			@Property(name = "policy", type = Policy.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true) })
+			@Property(name = "policy", type = Policy.class, optional = true), @Property(name = "policies", type = Policy[].class, optional = true),
+			@Property(name = "object", type = CharSequence.class, optional = true), @Property(name = "objects", type = CharSequence[].class, optional = true) })
 	private static final class PropertiesWriter extends NullWriter {
 
 		private final Boolean booleanValue;
@@ -1430,9 +1542,12 @@ public class PropertiesLoaderTest extends AbstractTest {
 		private final Labeler labeler;
 		private final Policy policy;
 		private final Policy[] policies;
+		private final CharSequence object;
+		private final CharSequence[] objects;
 
 		@SuppressWarnings("unused")
-		public PropertiesWriter(final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy, final Policy[] policies) {
+		public PropertiesWriter(final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy, final Policy[] policies,
+				final CharSequence object, final CharSequence[] objects) {
 			this.booleanValue = null;
 			this.intValue = null;
 			this.stringValue = stringValue;
@@ -1440,11 +1555,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
+			this.object = object;
+			this.objects = objects;
 		}
 
 		@SuppressWarnings("unused")
 		public PropertiesWriter(final int intValue, final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy,
-				final Policy[] policies) {
+				final Policy[] policies, final CharSequence object, final CharSequence[] objects) {
 			this.booleanValue = null;
 			this.intValue = intValue;
 			this.stringValue = stringValue;
@@ -1452,11 +1569,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
+			this.object = object;
+			this.objects = objects;
 		}
 
 		@SuppressWarnings("unused")
 		public PropertiesWriter(final boolean booleanValue, final String stringValue, final String[] stringsValue, final Labeler labeler, final Policy policy,
-				final Policy[] policies) {
+				final Policy[] policies, final CharSequence object, final CharSequence[] objects) {
 			this.booleanValue = booleanValue;
 			this.intValue = null;
 			this.stringValue = stringValue;
@@ -1464,11 +1583,13 @@ public class PropertiesLoaderTest extends AbstractTest {
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
+			this.object = object;
+			this.objects = objects;
 		}
 
 		@SuppressWarnings("unused")
 		public PropertiesWriter(final boolean booleanValue, final int intValue, final String stringValue, final String[] stringsValue, final Labeler labeler,
-				final Policy policy, final Policy[] policies) {
+				final Policy policy, final Policy[] policies, final CharSequence object, final CharSequence[] objects) {
 			this.booleanValue = booleanValue;
 			this.intValue = intValue;
 			this.stringValue = stringValue;
@@ -1476,15 +1597,17 @@ public class PropertiesLoaderTest extends AbstractTest {
 			this.labeler = labeler;
 			this.policy = policy;
 			this.policies = policies;
+			this.object = object;
+			this.objects = objects;
 		}
 
 	}
 
-	@PropertiesSupport(name = "properties", properties = { @Property(name = "class", type = Class.class, optional = true) })
-	private static final class ClassPropertyWriter extends NullWriter {
+	@PropertiesSupport(name = "properties", properties = { @Property(name = "value", type = double.class, optional = true) })
+	private static final class DoublePropertyWriter extends NullWriter {
 
 		@SuppressWarnings("unused")
-		public ClassPropertyWriter(final Class<?> clazz) {
+		public DoublePropertyWriter(final double value) {
 		}
 
 	}
@@ -1517,7 +1640,7 @@ public class PropertiesLoaderTest extends AbstractTest {
 		}
 
 		@Override
-		public File roll(final File file, final int maxBackups) {
+		public FilePair roll(final File file, final int maxBackups) {
 			throw new UnsupportedOperationException();
 		}
 

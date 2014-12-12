@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -524,9 +525,23 @@ final class PropertiesLoader {
 					} else {
 						parameters[i] = policies;
 					}
+				} else if (!type.isArray() && Object.class.isAssignableFrom(type)) {
+					Object object = parseObject(type, value);
+					if (object == null) {
+						return null;
+					} else {
+						parameters[i] = object;
+					}
+				} else if (Object[].class.isAssignableFrom(type)) {
+					Object[] objects = parseObjects(type.getComponentType(), value);
+					if (objects == null) {
+						return null;
+					} else {
+						parameters[i] = objects;
+					}
 				} else {
-					InternalLogger.error(
-							"\"{}\" for \"{}.{}\" is an unsupported type (String, String[], int, boolean, Labeler, Policy and Policy[] are supported)",
+					InternalLogger.error("\"{}\" for \"{}.{}\" is an unsupported type (String, String[], int, boolean, Labeler, Policy, Policy[] "
+							+ " and classes with default constructor are supported)",
 							type.getName(), propertiesPrefix, name);
 					return null;
 				}
@@ -617,11 +632,41 @@ final class PropertiesLoader {
 		return null;
 	}
 
-	private static Object createInstance(final Class<?> clazz, final String name, final String parameter) {
+	@SuppressWarnings("unchecked")
+	private static <T> T[] parseObjects(final Class<T> expectedClass, final String string) {
+		List<T> objects = new ArrayList<>();
+		for (String part : string.split(Pattern.quote(","))) {
+			T object = parseObject(expectedClass, part.trim());
+			if (object == null) {
+				return null;
+			} else {
+				objects.add(object);
+			}
+		}
+		return objects.toArray((T[]) Array.newInstance(expectedClass, 1));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T parseObject(final Class<T> expectedClass, final String name) {
+		try {
+			Class<?> foundClass = Class.forName(name);
+			if (expectedClass.isAssignableFrom(foundClass)) {
+				return (T) createInstance(foundClass, null, null);
+			} else {
+				InternalLogger.error("\"{}\" is not a {}", foundClass.getName(), expectedClass.getName());
+				return null;
+			}
+		} catch (ClassNotFoundException ex) {
+			InternalLogger.error("Cannot find a class with the name \"{}\"", name);
+			return null;
+		}
+	}
+
+	private static <T> T createInstance(final Class<T> clazz, final String name, final String parameter) {
 		try {
 			if (parameter == null) {
 				try {
-					Constructor<?> constructor = clazz.getDeclaredConstructor();
+					Constructor<T> constructor = clazz.getDeclaredConstructor();
 					constructor.setAccessible(true);
 					return constructor.newInstance();
 				} catch (NoSuchMethodException ex) {
@@ -630,7 +675,7 @@ final class PropertiesLoader {
 				}
 			} else {
 				try {
-					Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
+					Constructor<T> constructor = clazz.getDeclaredConstructor(String.class);
 					constructor.setAccessible(true);
 					return constructor.newInstance(parameter);
 				} catch (NoSuchMethodException ex) {

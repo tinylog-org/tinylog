@@ -15,6 +15,7 @@ package org.pmw.tinylog.labelers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -54,16 +55,20 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
-		assertSame(baseFile, labeler.roll(baseFile, 2));
+		FilePair files = labeler.roll(baseFile, 2);
+		assertSame(baseFile, files.getFile());
 		assertFalse(baseFile.exists());
+		assertEquals(backupFile1, files.getBackup());
 		assertTrue(backupFile1.exists());
 		assertEquals("1", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
 		assertFalse(backupFile3.exists());
 
 		FileHelper.write(baseFile, "2");
-		assertSame(baseFile, labeler.roll(baseFile, 2));
+		files = labeler.roll(baseFile, 2);
+		assertSame(baseFile, files.getFile());
 		assertFalse(baseFile.exists());
+		assertEquals(backupFile1, files.getBackup());
 		assertTrue(backupFile1.exists());
 		assertEquals("2", FileHelper.read(backupFile1));
 		assertTrue(backupFile2.exists());
@@ -71,8 +76,10 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		assertFalse(backupFile3.exists());
 
 		FileHelper.write(baseFile, "3");
-		assertSame(baseFile, labeler.roll(baseFile, 2));
+		files = labeler.roll(baseFile, 2);
+		assertSame(baseFile, files.getFile());
 		assertFalse(baseFile.exists());
+		assertEquals(backupFile1, files.getBackup());
 		assertTrue(backupFile1.exists());
 		assertEquals("3", FileHelper.read(backupFile1));
 		assertTrue(backupFile2.exists());
@@ -101,13 +108,17 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		FileHelper.write(baseFile, "1");
-		assertSame(baseFile, labeler.roll(baseFile, 1));
+		FilePair files = labeler.roll(baseFile, 1);
+		assertSame(baseFile, files.getFile());
+		assertEquals(backupFile1, files.getBackup());
 		assertTrue(backupFile1.exists());
 		assertEquals("1", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
 
 		FileHelper.write(baseFile, "2");
-		assertSame(baseFile, labeler.roll(baseFile, 1));
+		files = labeler.roll(baseFile, 1);
+		assertSame(baseFile, files.getFile());
+		assertEquals(backupFile1, files.getBackup());
 		assertTrue(backupFile1.exists());
 		assertEquals("2", FileHelper.read(backupFile1));
 		assertFalse(backupFile2.exists());
@@ -132,7 +143,9 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 
-		assertSame(baseFile, labeler.roll(baseFile, 0));
+		FilePair files = labeler.roll(baseFile, 0);
+		assertSame(baseFile, files.getFile());
+		assertNull(files.getBackup());
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 

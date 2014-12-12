@@ -15,6 +15,7 @@ package org.pmw.tinylog.labelers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
@@ -60,10 +61,14 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		assertEquals(realFile, labeler.getLogFile(baseFile));
 
-		assertEquals(realFile, labeler.roll(realFile, 0));
+		FilePair files = labeler.roll(realFile, 0);
+		assertEquals(realFile, files.getFile());
+		assertNull(files.getBackup());
 
 		realFile.createNewFile();
-		assertEquals(realFile, labeler.roll(realFile, 0));
+		files = labeler.roll(realFile, 0);
+		assertEquals(realFile, files.getFile());
+		assertNull(files.getBackup());
 		assertFalse(realFile.exists());
 
 		baseFile.delete();
@@ -86,11 +91,15 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		assertEquals(realFile, labeler.getLogFile(baseFile));
 
-		assertEquals(realFile, labeler.roll(realFile, 0));
+		FilePair files = labeler.roll(realFile, 0);
+		assertEquals(realFile, files.getFile());
+		assertNull(files.getBackup());
 
 		realFile.createNewFile();
-		assertEquals(realFile, labeler.roll(realFile, 0));
+		files = labeler.roll(realFile, 0);
+		assertEquals(realFile, files.getFile());
 		assertFalse(realFile.exists());
+		assertNull(files.getBackup());
 
 		baseFile.delete();
 	}
@@ -113,8 +122,10 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(targetFile, labeler.getLogFile(baseFile));
 		assertTrue(targetFile.exists());
-		assertEquals(targetFile, labeler.roll(targetFile, 0));
+		FilePair files = labeler.roll(targetFile, 0);
+		assertEquals(targetFile, files.getFile());
 		assertFalse(targetFile.exists());
+		assertNull(files.getBackup());
 	}
 
 	/**

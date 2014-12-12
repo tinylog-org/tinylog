@@ -69,7 +69,7 @@ public final class ProcessIdLabeler implements Labeler {
 	}
 
 	@Override
-	public File roll(final File file, final int maxBackups) throws IOException {
+	public FilePair roll(final File file, final int maxBackups) throws IOException {
 		if (file.exists()) {
 			if (!file.delete()) {
 				InternalLogger.warn("Failed to delete \"{}\"", file);
@@ -87,7 +87,7 @@ public final class ProcessIdLabeler implements Labeler {
 			}
 		}
 
-		return file;
+		return new FilePair(file, null);
 	}
 
 }

@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -138,6 +139,86 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBuffered());
 		assertThat(writer.getLabeler(), type(ProcessIdLabeler.class));
 		assertThat(writer.getPolicies(), types(SizePolicy.class, DailyPolicy.class));
+		file.delete();
+	}
+
+	/**
+	 * Test calling of rolling listeners.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testListeners() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+
+		LifeCycleListener listener1 = new LifeCycleListener();
+		LifeCycleListener listener2 = new LifeCycleListener();
+
+		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 1, new SizePolicy(1));
+		writer.addListener(listener1);
+		writer.addListener(listener2);
+		assertEquals(0, listener1.startups);
+		assertEquals(0, listener2.startups);
+		assertEquals(0, listener1.rolls);
+		assertEquals(0, listener2.rolls);
+		assertEquals(0, listener1.shutdowns);
+		assertEquals(0, listener2.shutdowns);
+
+		writer.init(ConfigurationCreator.getDummyConfiguration());
+		assertEquals(1, listener1.startups);
+		assertEquals(1, listener2.startups);
+		assertEquals(0, listener1.rolls);
+		assertEquals(0, listener2.rolls);
+		assertEquals(0, listener1.shutdowns);
+		assertEquals(0, listener2.shutdowns);
+		assertEquals(file, listener1.currentFile);
+		assertNull(listener1.backupFile);
+		assertEquals(file, listener2.currentFile);
+		assertNull(listener2.backupFile);
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("..").create());
+		assertNotNull(listener2.backupFile);
+		assertEquals(1, listener1.startups);
+		assertEquals(1, listener2.startups);
+		assertEquals(1, listener1.rolls);
+		assertEquals(1, listener2.rolls);
+		assertEquals(0, listener1.shutdowns);
+		assertEquals(0, listener2.shutdowns);
+		assertEquals(file, listener1.currentFile);
+		assertNotEquals(listener1.currentFile, listener1.backupFile);
+		assertNotNull(listener1.backupFile);
+		assertEquals(file, listener2.currentFile);
+		assertNotNull(listener2.backupFile);
+		assertNotEquals(listener2.currentFile, listener2.backupFile);
+
+		writer.removeListener(listener2);
+
+		writer.write(new LogEntryBuilder().renderedLogEntry("..").create());
+		assertEquals(file, listener1.currentFile);
+		assertNotNull(listener1.backupFile);
+		assertEquals(file, listener2.currentFile);
+		assertNotNull(listener2.backupFile);
+		assertEquals(1, listener1.startups);
+		assertEquals(1, listener2.startups);
+		assertEquals(2, listener1.rolls);
+		assertEquals(1, listener2.rolls);
+		assertEquals(0, listener1.shutdowns);
+		assertEquals(0, listener2.shutdowns);
+		assertEquals(file, listener1.currentFile);
+		assertNotNull(listener1.backupFile);
+		assertNotEquals(listener1.currentFile, listener1.backupFile);
+
+		writer.close();
+		assertEquals(1, listener1.startups);
+		assertEquals(1, listener2.startups);
+		assertEquals(2, listener1.rolls);
+		assertEquals(1, listener2.rolls);
+		assertEquals(1, listener1.shutdowns);
+		assertEquals(0, listener2.shutdowns);
+		assertEquals(file, listener1.currentFile);
+		assertNull(listener1.backupFile);
+
 		file.delete();
 	}
 
@@ -540,7 +621,63 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		policies = rollingFileWriter.getPolicies();
 		assertThat(policies, types(StartupPolicy.class, DailyPolicy.class));
 
+		int instances = LifeCycleListener.instances;
+		propertiesBuilder = defaultPropertiesBuilder.copy().set("tinylog.writer.backups", "5").set("tinylog.writer.listeners", LifeCycleListener.class.getName());
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(RollingFileWriter.class));
+		rollingFileWriter = (RollingFileWriter) writers.get(0);
+		assertEquals(file.getAbsolutePath(), rollingFileWriter.getFilename());
+		assertEquals(5, rollingFileWriter.getNumberOfBackups());
+		assertEquals(expectBuffered, rollingFileWriter.isBuffered());
+		labeler = rollingFileWriter.getLabeler();
+		assertThat(labeler, type(CountLabeler.class));
+		policies = rollingFileWriter.getPolicies();
+		assertThat(policies, types(StartupPolicy.class));
+		assertEquals(instances + 1, LifeCycleListener.instances);
+
 		file.delete();
+	}
+
+	/**
+	 * Rolling listener for testing life cycle.
+	 */
+	public static final class LifeCycleListener implements RollingListener {
+
+		private static volatile int instances;
+
+		private int startups;
+		private int rolls;
+		private int shutdowns;
+
+		private File currentFile;
+		private File backupFile;
+
+		/** */
+		public LifeCycleListener() {
+			++instances;
+		}
+
+		@Override
+		public void startup(final File file) throws Exception {
+			++startups;
+			currentFile = file;
+			backupFile = null;
+		}
+
+		@Override
+		public void rolled(final File backup, final File file) throws Exception {
+			++rolls;
+			currentFile = file;
+			backupFile = backup;
+		}
+
+		@Override
+		public void shutdown(final File file) throws Exception {
+			++shutdowns;
+			currentFile = file;
+			backupFile = null;
+		}
+
 	}
 
 }
