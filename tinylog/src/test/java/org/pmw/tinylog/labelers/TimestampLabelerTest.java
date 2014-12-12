@@ -23,7 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -240,7 +241,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	}
 
 	private static String formatCurrentTime() {
-		return new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ROOT).format(new Date());
+		return DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT, Locale.ROOT).format(ZonedDateTime.now());
 	}
 
 }

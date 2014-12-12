@@ -26,8 +26,8 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -846,8 +846,8 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(new Date().getTime(), logEntry.getDate().getTime(), 10 * 1000d /* delta of 10 seconds */);
-		assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+		assertEquals(ZonedDateTime.now().toEpochSecond(), logEntry.getDate().toEpochSecond(), 10d /* delta of 10 seconds */);
+		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(ZonedDateTime.now()) + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	/**
@@ -894,14 +894,14 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("LoggerTest.java", logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
 		assertEquals(Level.INFO, logEntry.getLevel());
-		assertEquals(new Date().getTime(), logEntry.getDate().getTime(), 10 * 1000d /* delta of 10 seconds */);
+		assertEquals(ZonedDateTime.now().toEpochSecond(), logEntry.getDate().toEpochSecond(), 10d /* delta of 10 seconds */);
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 
 		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}",
 				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
 				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
-				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
+				DateTimeFormatter.ofPattern("yyyy").format(ZonedDateTime.now()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 

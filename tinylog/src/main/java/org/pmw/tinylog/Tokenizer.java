@@ -13,13 +13,11 @@
 
 package org.pmw.tinylog;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -157,14 +155,14 @@ final class Tokenizer {
 
 	private Token getToken(final String text) {
 		if (text.equals("date")) {
-			return new DateToken(new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale));
+			return new DateToken(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT_PATTERN, locale));
 		} else if (text.startsWith("date:")) {
 			String dateFormatPattern = text.substring(5, text.length());
 			try {
-				return new DateToken(new SimpleDateFormat(dateFormatPattern, locale));
+				return new DateToken(DateTimeFormatter.ofPattern(dateFormatPattern, locale));
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(ex, "\"{}\" is an invalid date format pattern", dateFormatPattern);
-				return new DateToken(new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale));
+				return new DateToken(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT_PATTERN, locale));
 			}
 		} else if ("pid".equals(text)) {
 			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
@@ -442,9 +440,9 @@ final class Tokenizer {
 
 	private static final class DateToken implements Token {
 
-		private final DateFormat formatter;
+		private final DateTimeFormatter formatter;
 
-		private DateToken(final DateFormat formatter) {
+		private DateToken(final DateTimeFormatter formatter) {
 			this.formatter = formatter;
 		}
 
@@ -455,13 +453,7 @@ final class Tokenizer {
 
 		@Override
 		public void render(final LogEntry logEntry, final StringBuilder builder) {
-			builder.append(format(logEntry.getDate()));
-		}
-
-		private String format(final Date date) {
-			synchronized (formatter) {
-				return formatter.format(date);
-			}
+			builder.append(formatter.format(logEntry.getDate()));
 		}
 
 	}

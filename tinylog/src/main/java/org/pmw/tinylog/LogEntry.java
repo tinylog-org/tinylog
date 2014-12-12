@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,14 +13,14 @@
 
 package org.pmw.tinylog;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * Log entry object for {@link org.pmw.tinylog.writers.Writer#write(LogEntry) Writer.write(LogEntry)}.
  */
 public final class LogEntry {
 
-	private final Date date;
+	private final ZonedDateTime date;
 	private final String processId;
 	private final Thread thread;
 	private final String className;
@@ -54,8 +54,8 @@ public final class LogEntry {
 	 * @param exception
 	 *            The exception of the log entry
 	 */
-	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String methodName, final String filename,
-			final int lineNumber, final Level level, final String message, final Throwable exception) {
+	public LogEntry(final ZonedDateTime date, final String processId, final Thread thread, final String className, final String methodName,
+			final String filename, final int lineNumber, final Level level, final String message, final Throwable exception) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
@@ -73,7 +73,7 @@ public final class LogEntry {
 	 *
 	 * @return Current date
 	 */
-	public Date getDate() {
+	public ZonedDateTime getDate() {
 		return date;
 	}
 

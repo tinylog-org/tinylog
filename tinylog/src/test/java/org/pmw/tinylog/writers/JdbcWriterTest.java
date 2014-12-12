@@ -30,10 +30,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import mockit.Mock;
@@ -581,7 +583,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.DATE));
 		writer.init(null);
 
-		writer.write(new LogEntryBuilder().date(new Date(1000)).create());
+		writer.write(new LogEntryBuilder().date(ZonedDateTime.ofInstant(Instant.ofEpochMilli(1000), ZoneId.systemDefault())).create());
 		assertEquals(Arrays.asList(new Timestamp(1000).toString()), getLogEntries());
 
 		writer.close();

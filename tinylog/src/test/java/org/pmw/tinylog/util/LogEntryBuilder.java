@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -14,7 +14,7 @@
 package org.pmw.tinylog.util;
 
 import java.lang.reflect.Method;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
@@ -24,7 +24,7 @@ import org.pmw.tinylog.LogEntry;
  */
 public final class LogEntryBuilder {
 
-	private Date date = null;
+	private ZonedDateTime date = null;
 	private String processId = null;
 	private Thread thread = null;
 	private String className = null;
@@ -43,7 +43,7 @@ public final class LogEntryBuilder {
 	 *            Current date
 	 * @return The current log entry builder
 	 */
-	public LogEntryBuilder date(final Date date) {
+	public LogEntryBuilder date(final ZonedDateTime date) {
 		this.date = date;
 		return this;
 	}

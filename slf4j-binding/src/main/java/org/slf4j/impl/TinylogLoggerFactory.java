@@ -27,7 +27,7 @@ public final class TinylogLoggerFactory implements ILoggerFactory {
 
 	/** */
 	public TinylogLoggerFactory() {
-		loggers = new ConcurrentHashMap<String, TinylogLogger>();
+		loggers = new ConcurrentHashMap<>();
 	}
 
 	@Override

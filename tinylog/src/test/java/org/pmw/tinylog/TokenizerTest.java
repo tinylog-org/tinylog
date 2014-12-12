@@ -24,8 +24,8 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.hasLength;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
@@ -81,24 +81,24 @@ public class TokenizerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testDateToken() {
-		Date date = new Date();
+		ZonedDateTime date = ZonedDateTime.now();
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{date}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = tokenizer.parse("{date:yyyy}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(DateTimeFormatter.ofPattern("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = tokenizer.parse("{date:'}");
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"\\'\" is an invalid date format pattern \\(.+\\)"));
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
 	}
 
 	/**

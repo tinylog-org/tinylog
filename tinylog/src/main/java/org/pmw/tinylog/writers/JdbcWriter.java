@@ -19,10 +19,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -550,7 +550,7 @@ public final class JdbcWriter implements Writer {
 		for (int i = 0; i < values.size(); ++i) {
 			switch (values.get(i)) {
 				case DATE:
-					statement.setTimestamp(i + 1, new Timestamp(logEntry.getDate().getTime()));
+					statement.setTimestamp(i + 1, Timestamp.valueOf(logEntry.getDate().toLocalDateTime()));
 					break;
 				case PROCESS_ID:
 					statement.setString(i + 1, logEntry.getProcessId());
@@ -642,7 +642,7 @@ public final class JdbcWriter implements Writer {
 		/**
 		 * The current date
 		 *
-		 * @see Date
+		 * @see ZonedDateTime
 		 */
 		DATE(LogEntryValue.DATE),
 

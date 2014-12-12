@@ -18,7 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -223,13 +223,13 @@ public final class Configurator {
 	/**
 	 * Set the format pattern for log entries.
 	 * <code>"{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"</code> is the default format
-	 * pattern. The date format pattern is compatible with {@link SimpleDateFormat}.
+	 * pattern. The date format pattern is compatible with {@link DateTimeFormatter}.
 	 *
 	 * @param formatPattern
 	 *            Format pattern for log entries (or <code>null</code> to reset to default)
 	 * @return The current configurator
 	 *
-	 * @see SimpleDateFormat
+	 * @see DateTimeFormatter
 	 */
 	public Configurator formatPattern(final String formatPattern) {
 		if (formatPattern == null) {

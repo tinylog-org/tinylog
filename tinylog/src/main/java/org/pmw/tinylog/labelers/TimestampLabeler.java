@@ -14,11 +14,10 @@
 package org.pmw.tinylog.labelers;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.pmw.tinylog.Configuration;
@@ -33,7 +32,7 @@ public final class TimestampLabeler implements Labeler {
 	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
 
 	private final String timestampFormat;
-	private DateFormat dateFormat;
+	private DateTimeFormatter formatter;
 
 	private LogFileFilter logFileFilter;
 
@@ -49,7 +48,7 @@ public final class TimestampLabeler implements Labeler {
 	}
 
 	/**
-	 * Timestamp pattern is compatible with {@link SimpleDateFormat#SimpleDateFormat(String)}.
+	 * Timestamp pattern is compatible with {@link DateTimeFormatter#ofPattern(String)}.
 	 *
 	 * @param timestampFormat
 	 *            Timestamp pattern for formatting the time-based identify
@@ -60,7 +59,7 @@ public final class TimestampLabeler implements Labeler {
 
 	@Override
 	public void init(final Configuration configuration) {
-		dateFormat = new SimpleDateFormat(timestampFormat, configuration.getLocale());
+		formatter = DateTimeFormatter.ofPattern(timestampFormat, configuration.getLocale());
 	}
 
 	@Override
@@ -98,7 +97,7 @@ public final class TimestampLabeler implements Labeler {
 	}
 
 	private File createFile() {
-		return new File(directory, filenameWithoutExtension + "." + dateFormat.format(new Date()) + filenameExtension);
+		return new File(directory, filenameWithoutExtension + "." + formatter.format(ZonedDateTime.now()) + filenameExtension);
 	}
 
 }
