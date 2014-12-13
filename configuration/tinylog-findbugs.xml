@@ -11,6 +11,16 @@
 		<Bug pattern="REC_CATCH_EXCEPTION" />
 	</Match>
 	<Match>
+		<Class name="org.slf4j.impl.StaticLoggerBinder" />
+		<!-- SLF4J expected public static (not final!) REQUESTED_API_VERSION -->
+		<Bug pattern="MS_PKGPROTECT" />
+	</Match>
+	<Match>
+		<Class name="org.slf4j.impl.StaticLoggerBinderTest" />
+		<!-- Test if static REQUESTED_API_VERSION is readable -->
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+	</Match>
+	<Match>
 		<Class name="org.apache.log4j.Priority" />
 		<!-- Known as bad but source code is from Log4j -->
 		<Bug pattern="HE_EQUALS_USE_HASHCODE" />
@@ -25,13 +35,18 @@
 		<Bug pattern="SR_NOT_CHECKED" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.LogEntry" />
-		<!-- Problem with "java.util.Date" is known but currently there is no better alternative in the Java library -->
-		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
-	</Match>
-	<Match>
 		<Class name="org.pmw.tinylog.writers.SharedFileWriter" />
 		<!-- "file.delete()" can be successful (=> create a new log file) as well as it can fail (=> join existing log file) -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+	</Match>
+	<Match>
+		<Source name="~.*\.[A-Za.z]*Test\.java" />
+		<!-- Mocks have uncallable methods / Allow to ignore return values to simplify tests  -->
+		<Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+	</Match>
+	<Match>
+		<Class name="org.pmw.tinylog.writers.VMShutdownHookTest" />
+		<!-- Here it is fine to invoke run() method of threads, because logic should be tested and not asynchronism of Java's thread class -->
+		<Bug pattern="RU_INVOKE_RUN" />
 	</Match>
 </FindBugsFilter>
