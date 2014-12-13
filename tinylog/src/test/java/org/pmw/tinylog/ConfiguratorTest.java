@@ -248,7 +248,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		classLoaderMock.remove("my/package/tinylog.properties");
 		try {
-			configuration = Configurator.fromResource("my/package/tinylog.properties").create();
+			Configurator.fromResource("my/package/tinylog.properties").create();
 			fail("FileNotFoundException expected");
 		} catch (FileNotFoundException ex) {
 			// Expected
@@ -270,7 +270,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		assertTrue(file.delete());
 		try {
-			configuration = Configurator.fromFile(file).create();
+			Configurator.fromFile(file).create();
 			fail("FileNotFoundException expected");
 		} catch (FileNotFoundException ex) {
 			// Expected

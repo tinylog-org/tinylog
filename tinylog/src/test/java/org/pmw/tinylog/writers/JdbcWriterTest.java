@@ -324,7 +324,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		writer = new JdbcWriter(URL, "log", null, new String[] { "log_entry" }, null, null);
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
+		new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
 		assertEquals("LOGGER WARNING: Unknown value type: \"unknown\"", getErrorStream().nextLine());
 	}
 
