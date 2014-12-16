@@ -23,7 +23,7 @@ log4j-facade:
 	Contains the log4j facade (Log4j 1.x compatible logging API)
 
 slf4j-binding:
-	Contains the SLF4J binding (SLF4J compatible logging API)
+	Contains the SLF4J binding (implementation for SLF4J logging API)
 
 tests:
 	Contains all JUnit tests
