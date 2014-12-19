@@ -2,7 +2,7 @@
 <project name="tinylog" default="all">
 	
 	<property name="version" value="1.1-alpha1" />
-	<property name="bundle-version" value="1.1.alpha1" />
+	<property name="bundle-version" value="1.1.0.alpha1" />
 	<property name="maven-version" value="1.1-alpha-1" />
 	<property name="slf4j-version" value="1.7.7" />
 	
