@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.executors;
+package org.pmw.benchmark.benchmarks.prime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,22 +23,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.pmw.benchmark.Benchmark;
+import org.pmw.benchmark.frameworks.Framework;
 
-public final class MultiThreadedPrimesBenchmarkExecutor extends AbstractPrimeBenchmarkExecutor {
+public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
-	private static final String NAME = "prime / multi-threaded";
 	private final int threads;
 
-	public MultiThreadedPrimesBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final int deep, final long maximum,
-			final int threads) {
-		super(benchmark, runs, outliers, deep, maximum);
+	public MultiThreadedPrimesBenchmark(final Framework framework, final int deep, final long maximum, final int threads) {
+		super(framework, deep, maximum);
 		this.threads = threads;
-	}
-
-	@Override
-	public String getName() {
-		return NAME;
 	}
 
 	@Override
@@ -113,7 +106,7 @@ public final class MultiThreadedPrimesBenchmarkExecutor extends AbstractPrimeBen
 			if (stackTraceDeep == 0) {
 				List<Long> found = new ArrayList<>();
 				for (long number = start; number <= end; ++number) {
-					if (benchmark.calculate(primes, number)) {
+					if (framework.calculate(primes, number)) {
 						found.add(number);
 					}
 				}
@@ -127,7 +120,7 @@ public final class MultiThreadedPrimesBenchmarkExecutor extends AbstractPrimeBen
 			if (stackTraceDeep == 0) {
 				List<Long> found = new ArrayList<>();
 				for (long number = start; number <= end; ++number) {
-					if (benchmark.calculate(primes, number)) {
+					if (framework.calculate(primes, number)) {
 						found.add(number);
 					}
 				}

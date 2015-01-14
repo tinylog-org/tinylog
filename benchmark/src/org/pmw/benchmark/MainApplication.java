@@ -13,22 +13,18 @@
 
 package org.pmw.benchmark;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.pmw.benchmark.executors.MultiThreadedOutputBenchmarkExecutor;
-import org.pmw.benchmark.executors.MultiThreadedPrimesBenchmarkExecutor;
-import org.pmw.benchmark.executors.SingleThreadedOutputBenchmarkExecutor;
-import org.pmw.benchmark.executors.SingleThreadedPrimesBenchmarkExecutor;
-import org.pmw.benchmark.frameworks.DummyBenchmark;
-import org.pmw.benchmark.frameworks.JulBenchmark;
-import org.pmw.benchmark.frameworks.Log4j2Benchmark;
-import org.pmw.benchmark.frameworks.Log4jBenchmark;
-import org.pmw.benchmark.frameworks.LogbackBenchmark;
-import org.pmw.benchmark.frameworks.TinylogBenchmark;
-
-public class Application {
+/**
+ * Main application for executing benchmarks with an user friendly console interface.
+ */
+public class MainApplication extends AbstractApplication {
 
 	private static final int DEFAULT_RUNS = 1;
 	private static final int DEFAULT_OUTLIERS = 0;
@@ -41,15 +37,12 @@ public class Application {
 		if (arguments.length < 2) {
 			showHelp();
 		} else {
-			List<? extends Benchmark> benchmarks = getBenchmarks(arguments);
-			String executorName = getExecutorName(arguments);
-			String threadingMode = getThreadingMode(arguments);
+			List<String> frameworks = getFrameworks(arguments);
+			List<String> benchmarks = getBenchmarks(arguments);
+			List<String> threadingModes = getThreadingModes(arguments);
+
 			int runs = getIntParameter(arguments, "runs", DEFAULT_RUNS);
 			int outliers = getIntParameter(arguments, "outliers", DEFAULT_OUTLIERS);
-			int deep = getIntParameter(arguments, "deep", DEFAULT_DEEP);
-			int threads = getIntParameter(arguments, "threads", DEFAULT_THREADS);
-			long iterations = getLongParameter(arguments, "iterations", DEFAULT_ITERATIONS);
-			long prime = getLongParameter(arguments, "prime", DEFAULT_PRIME);
 
 			if (runs <= 0) {
 				System.err.println("Minimum number of benchmark runs is 1");
@@ -67,109 +60,109 @@ public class Application {
 				System.err.println("Number of outlier benchmark runs must be less than total number of benchmark runs");
 				System.exit(-1);
 			}
+
+			int deep = getIntParameter(arguments, "deep", DEFAULT_DEEP);
+			int threads = getIntParameter(arguments, "threads", DEFAULT_THREADS);
+			long iterations = getLongParameter(arguments, "iterations", DEFAULT_ITERATIONS);
+			long prime = getLongParameter(arguments, "prime", DEFAULT_PRIME);
+
 			if (deep < 0) {
 				System.err.println("Minimum amount of additional stack trace deep is 0");
 				System.exit(-1);
 			}
-			if (!threadingMode.equalsIgnoreCase("single-threaded") && threads <= 0) {
+			if (threadingModes.contains("multi-threaded") && threads <= 0) {
 				System.err.println("Minimum number of parallel threads is 1");
 				System.exit(-1);
 			}
-			if (!executorName.equalsIgnoreCase("prime") && iterations <= 0) {
+			if (benchmarks.contains("output") && iterations <= 0) {
 				System.err.println("Minimum number of logging iterations is 1");
 				System.exit(-1);
 			}
-			if (!threadingMode.equalsIgnoreCase("single-threaded") && threads > iterations) {
+			if (threadingModes.contains("multi-threaded") && threads > iterations) {
 				System.err.println("Number of parallel threads must be less than total number of logging iterations");
 				System.exit(-1);
 			}
-			if (!threadingMode.equalsIgnoreCase("single-threaded") && iterations % threads != 0) {
+			if (threadingModes.contains("multi-threaded") && iterations % threads != 0) {
 				System.err.println("Number of logging iterations must be divisible by number of parallel threads");
 				System.exit(-1);
 			}
-			if (executorName.equalsIgnoreCase("prime") && prime <= 0) {
+			if (benchmarks.contains("prime") && prime <= 0) {
 				System.err.println("Minimum prime is 1");
 				System.exit(-1);
 			}
 
-			for (Benchmark benchmark : benchmarks) {
-				if (!executorName.equalsIgnoreCase("prime")) {
-					if (!threadingMode.equalsIgnoreCase("multi-threaded")) {
-						new SingleThreadedOutputBenchmarkExecutor(benchmark, runs, outliers, deep, iterations).start();
+			Executor executor = new Executor(runs, outliers);
+			for (String benchmark : benchmarks) {
+				for (String threadingMode : threadingModes) {
+					System.out.println(benchmark.toUpperCase() + " BENCHMARK (" + threadingMode.toUpperCase() + ")");
+					System.out.println();
+					for (String framework : frameworks) {
+						executor.run(framework, false, benchmark, threadingMode, deep, threads, iterations, prime);
+						if (supportsAsync(framework)) {
+							executor.run(framework, true, benchmark, threadingMode, deep, threads, iterations, prime);
+						}
 					}
-					if (!threadingMode.equalsIgnoreCase("single-threaded")) {
-						new MultiThreadedOutputBenchmarkExecutor(benchmark, runs, outliers, deep, iterations / threads, threads).start();
-					}
-				}
-				if (!executorName.equalsIgnoreCase("output")) {
-					if (!threadingMode.equalsIgnoreCase("multi-threaded")) {
-						new SingleThreadedPrimesBenchmarkExecutor(benchmark, runs, outliers, deep, prime).start();
-					}
-					if (!threadingMode.equalsIgnoreCase("single-threaded")) {
-						new MultiThreadedPrimesBenchmarkExecutor(benchmark, runs, outliers, deep, prime, threads).start();
-					}
+					System.out.println();
 				}
 			}
 		}
 	}
 
-	private static List<? extends Benchmark> getBenchmarks(final String[] arguments) {
-		String framework = arguments[0];
-		if ("all".equalsIgnoreCase(framework)) {
-			List<Benchmark> benchmarks = new ArrayList<Benchmark>();
-			benchmarks.add(new DummyBenchmark());
-			benchmarks.add(new JulBenchmark());
-			benchmarks.add(new Log4jBenchmark(false));
-			benchmarks.add(new Log4jBenchmark(true));
-			benchmarks.add(new Log4j2Benchmark(false));
-			benchmarks.add(new Log4j2Benchmark(true));
-			benchmarks.add(new LogbackBenchmark(false));
-			benchmarks.add(new LogbackBenchmark(true));
-			benchmarks.add(new TinylogBenchmark(false));
-			benchmarks.add(new TinylogBenchmark(true));
-			return benchmarks;
-		} else if ("dummy".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new DummyBenchmark());
-		} else if ("jul".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new JulBenchmark());
-		} else if ("log4j".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new Log4jBenchmark(false), new Log4jBenchmark(true));
-		} else if ("log4j2".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new Log4j2Benchmark(false), new Log4j2Benchmark(true));
-		} else if ("logback".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new LogbackBenchmark(false), new LogbackBenchmark(true));
-		} else if ("tinylog".equalsIgnoreCase(framework)) {
-			return Arrays.asList(new TinylogBenchmark(false), new TinylogBenchmark(true));
-		} else {
-			System.err.println("Unknown framework \"" + framework + "\"");
-			System.exit(-1);
-			return null;
+	private static List<String> getFrameworks(final String[] arguments) {
+		String name = arguments[0];
+
+		if ("all".equalsIgnoreCase(name)) {
+			return Arrays.asList(FRAMEWORKS);
 		}
+
+		for (String framework : FRAMEWORKS) {
+			if (framework.equalsIgnoreCase(name)) {
+				return Collections.singletonList(framework);
+			}
+		}
+
+		System.err.println("Unknown framework \"" + name + "\"");
+		System.exit(-1);
+		return null;
 	}
 
-	private static String getExecutorName(final String[] arguments) {
+	private static List<String> getBenchmarks(final String[] arguments) {
 		String name = arguments[1];
-		if ("all".equalsIgnoreCase(name) || "output".equalsIgnoreCase(name) || "prime".equalsIgnoreCase(name)) {
-			return name.toLowerCase();
-		} else {
-			System.err.println("Unknown benchmark \"" + name + "\"");
-			System.exit(-1);
-			return null;
+
+		if ("all".equalsIgnoreCase(name)) {
+			return Arrays.asList(BENCHMARKS);
 		}
+
+		for (String benchmark : BENCHMARKS) {
+			if (benchmark.equalsIgnoreCase(name)) {
+				return Collections.singletonList(benchmark);
+			}
+		}
+
+		System.err.println("Unknown benchmark \"" + name + "\"");
+		System.exit(-1);
+		return null;
 	}
 
-	private static String getThreadingMode(final String[] arguments) {
+	private static List<String> getThreadingModes(final String[] arguments) {
 		if (arguments.length < 3 || arguments[2].startsWith("-")) {
-			return "both";
+			return Arrays.asList(THREADING);
 		} else {
 			String mode = arguments[2];
-			if ("both".equalsIgnoreCase(mode) || "single-threaded".equalsIgnoreCase(mode) || "multi-threaded".equalsIgnoreCase(mode)) {
-				return mode.toLowerCase();
-			} else {
-				System.err.println("Unknown threading mode \"" + mode + "\"");
-				System.exit(-1);
-				return null;
+
+			if ("both".equalsIgnoreCase(mode)) {
+				return Arrays.asList(THREADING);
 			}
+
+			for (String threading : THREADING) {
+				if (threading.equalsIgnoreCase(mode)) {
+					return Collections.singletonList(threading);
+				}
+			}
+
+			System.err.println("Unknown threading mode \"" + mode + "\"");
+			System.exit(-1);
+			return null;
 		}
 	}
 
@@ -249,13 +242,84 @@ public class Application {
 		System.out.println("  log4j2             Apache Log4j 2");
 		System.out.println("  logback            Logback");
 		System.out.println("  tinylog            tinylog");
-		System.out.println("  dummy              Without any logging output (helpful for warm-up or calculating logging overhead)");
+		System.out.println("  dummy              Without any logging output (helpful for calculating logging overhead)");
 		System.out.println();
 		System.out.println("Benchmarks");
 		System.out.println();
 		System.out.println("  output             Writes a big amount of log entries to a file (tests the maximum logging output)");
-		System.out.println("  prime              Calculates primes and log the results (tests the influence of logging for a CPU intensive program)");
+		System.out.println("  primes             Calculates primes and log the results (tests the influence of logging for a CPU intensive program)");
 		System.out.println();
+	}
+
+	private static final class Executor {
+
+		private final int runs;
+		private final int outliers;
+
+		public Executor(final int runs, final int outliers) throws Exception {
+			this.runs = runs;
+			this.outliers = outliers;
+		}
+
+		public void run(final String framework, final boolean async, final String benchmark, final String threadingMode, final int deep, final int threads,
+				final long iterations, final long prime) throws Exception {
+			int[] times = new int[runs];
+			for (int i = 0; i < runs; ++i) {
+				int time = execute(framework, async, benchmark, threadingMode, deep, threads, iterations, prime);
+				if (time < 0) {
+					return;
+				} else {
+					times[i] += time;
+				}
+			}
+
+			Arrays.sort(times);
+			long time = 0L;
+			for (int i = outliers / 2; i < runs - outliers / 2; ++i) {
+				time += times[i];
+			}
+			time = Math.round((double) time / (runs - outliers));
+
+			System.out.println(String.format("%1$-30s %2$10dms", createFramework(framework, async).getName(), time));
+		}
+
+		private static int execute(final String framework, final boolean async, final String benchmark, final String threadingMode, final int deep,
+				final int threads, final long iterations, final long prime) throws Exception {
+			String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+			String classpath = System.getProperty("java.class.path");
+
+			List<String> command = new ArrayList<String>();
+			command.add(jvm);
+			command.add(SingleBenchmarkApplication.class.getName());
+			command.add(framework);
+			command.add(Boolean.toString(async));
+			command.add(benchmark);
+			command.add(threadingMode);
+			command.add(Integer.toString(deep));
+			command.add(Integer.toString(threads));
+			command.add(Long.toString(iterations));
+			command.add(Long.toString(prime));
+
+			ProcessBuilder processBuilder = new ProcessBuilder(command);
+			Map<String, String> environment = processBuilder.environment();
+			environment.put("CLASSPATH", classpath);
+
+			Process process = processBuilder.start();
+			int result = process.waitFor();
+
+			InputStream stream = process.getErrorStream();
+			byte[] data = new byte[stream.available()];
+			stream.read(data, 0, data.length);
+			System.err.print(new String(data));
+
+			stream = process.getInputStream();
+			data = new byte[stream.available()];
+			stream.read(data, 0, data.length);
+			System.out.print(new String(data));
+
+			return result;
+		}
+
 	}
 
 }
