@@ -288,7 +288,7 @@ public class MainApplication extends AbstractApplication {
 			String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 			String classpath = System.getProperty("java.class.path");
 
-			List<String> command = new ArrayList<String>();
+			List<String> command = new ArrayList<>();
 			command.add(jvm);
 			command.add(SingleBenchmarkApplication.class.getName());
 			command.add(framework);

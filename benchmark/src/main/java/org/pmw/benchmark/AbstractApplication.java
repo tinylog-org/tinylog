@@ -18,7 +18,7 @@ public abstract class AbstractApplication {
 	protected static final String[] BENCHMARKS = new String[] { "output", "primes" };
 	protected static final String[] THREADING = new String[] { "single-threaded", "multi-threaded" };
 
-	protected static final Map<String, Class<? extends Framework>> FRAMEWORK_MAPPING = new HashMap<String, Class<? extends Framework>>();
+	protected static final Map<String, Class<? extends Framework>> FRAMEWORK_MAPPING = new HashMap<>();
 	static {
 		FRAMEWORK_MAPPING.put("dummy", Dummy.class);
 		FRAMEWORK_MAPPING.put("jul", JUL.class);

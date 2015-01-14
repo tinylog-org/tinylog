@@ -41,7 +41,7 @@ public final class MultiThreadedOutputBenchmark extends AbstractOutputBenchmark 
 
 	@Override
 	public void run() throws Exception {
-		final List<LoggingThread> loggingThreads = new ArrayList<LoggingThread>(threads);
+		final List<LoggingThread> loggingThreads = new ArrayList<>(threads);
 
 		for (int i = 0; i < threads; ++i) {
 			LoggingThread loggingThread = new LoggingThread("logging-" + i);

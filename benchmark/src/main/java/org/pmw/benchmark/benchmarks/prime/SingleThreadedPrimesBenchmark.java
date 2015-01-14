@@ -46,7 +46,7 @@ public final class SingleThreadedPrimesBenchmark extends AbstractPrimeBenchmark 
 			if (splitterSquarePrime < number && primesToTest.size() < primes.size()) {
 				long splitterPrime = primes.get(primesToTest.size());
 				splitterSquarePrime = splitterPrime * splitterPrime;
-				primesToTest = new SubList<Long>(primes, primesToTest.size() + 1);
+				primesToTest = new SubList<>(primes, primesToTest.size() + 1);
 			}
 			if (framework.calculate(primesToTest, number)) {
 				primes.add(number);
