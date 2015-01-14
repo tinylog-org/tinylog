@@ -26,19 +26,17 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.pmw.benchmark.Benchmark;
-
 /**
  * Test JUL ({@link java.util.logging.Logger}).
  */
-public final class JulBenchmark implements Benchmark {
+public final class JUL implements Framework {
 
 	public static final String NAME = "JUL";
 
 	private Logger logger;
 	private FileHandler handler;
 
-	public JulBenchmark() {
+	public JUL() {
 	}
 
 	@Override

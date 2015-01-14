@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -16,7 +16,6 @@ package org.pmw.benchmark.frameworks;
 import java.io.File;
 import java.util.List;
 
-import org.pmw.benchmark.Benchmark;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.AsyncAppender;
@@ -33,16 +32,16 @@ import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 /**
  * Test Logback.
  */
-public final class LogbackBenchmark implements Benchmark {
+public final class Logback implements Framework {
 
-	private static final String NAME = "logback";
+	private static final String NAME = "Logback";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
 	private final boolean async;
 	private Logger logger;
 	private Appender<ILoggingEvent> appender;
 
-	public LogbackBenchmark(final boolean async) {
+	public Logback(final boolean async) {
 		this.async = async;
 	}
 
@@ -116,7 +115,7 @@ public final class LogbackBenchmark implements Benchmark {
 	}
 
 	private Appender<ILoggingEvent> createFileAppender(final File file, final LoggerContext context) {
-		FileAppender<ILoggingEvent> appender = new FileAppender<>();
+		FileAppender<ILoggingEvent> appender = new FileAppender<ILoggingEvent>();
 		appender.setContext(context);
 		appender.setAppend(false);
 		appender.setFile(file.getAbsolutePath());

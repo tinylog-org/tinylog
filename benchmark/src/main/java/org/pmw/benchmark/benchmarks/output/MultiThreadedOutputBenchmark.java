@@ -1,55 +1,47 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.executors;
+package org.pmw.benchmark.benchmarks.output;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pmw.benchmark.Benchmark;
+import org.pmw.benchmark.frameworks.Framework;
 
-public final class MultiThreadedOutputBenchmarkExecutor extends AbstractOutputBenchmarkExecutor {
-
-	private static final String NAME = "output / multi-threaded";
+public final class MultiThreadedOutputBenchmark extends AbstractOutputBenchmark {
 
 	private final long iterations;
 	private final int threads;
 
-	public MultiThreadedOutputBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final int deep, final long iterations,
-			final int threads) {
-		super(benchmark, runs, outliers, deep);
+	public MultiThreadedOutputBenchmark(final Framework framework, final int deep, final long iterations, final int threads) {
+		super(framework, deep);
 		this.iterations = iterations;
 		this.threads = threads;
 	}
 
 	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
-	protected final long countTriggeredLogEntries() {
+	public long countTriggeredLogEntries() {
 		return threads * iterations * 5L; // TRACE, DEBUG, INFO, WARNING and ERROR
 	}
 
 	@Override
-	protected final long countWrittenLogEntries() {
+	public long countWrittenLogEntries() {
 		return threads * iterations * 3L; // INFO, WARNING and ERROR will be output
 	}
 
 	@Override
-	protected void run() throws Exception {
-		final List<LoggingThread> loggingThreads = new ArrayList<>(threads);
+	public void run() throws Exception {
+		final List<LoggingThread> loggingThreads = new ArrayList<LoggingThread>(threads);
 
 		for (int i = 0; i < threads; ++i) {
 			LoggingThread loggingThread = new LoggingThread("logging-" + i);
