@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -24,21 +24,20 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.pmw.benchmark.Benchmark;
 
 /**
  * Test Apache Log4j 1.x.
  */
-public final class Log4jBenchmark implements Benchmark {
+public final class Log4j implements Framework {
 
-	private static final String NAME = "log4j";
+	private static final String NAME = "Log4j";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
 	private final boolean async;
 	private Logger logger;
 	private Appender appender;
 
-	public Log4jBenchmark(final boolean async) {
+	public Log4j(final boolean async) {
 		this.async = async;
 	}
 

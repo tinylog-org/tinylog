@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="benchmark" default="run">
 	
+	<property name="framework" value="all" />
 	<property name="benchmark" value="all" />
 	<property name="threading" value="both" />
 	<property name="runs" value="120" />
@@ -18,27 +19,10 @@
 	<property name="dist" location="${root}/distribution" />
 	<property name="dist.jar" location="${dist}/jar" />
 
-	<path id="log4j.classpath">
+	<path id="classpath">
 		<fileset dir="${lib}">
-			<include name="log4j-1*.jar" />
+			<include name="*.jar" />
 		</fileset>
-	</path>
-
-	<path id="log4j2.classpath">
-		<fileset dir="${lib}">
-			<include name="log4j-*-2*.jar" />
-			<include name="disruptor-*.jar" />
-		</fileset>
-	</path>
-
-	<path id="logback.classpath">
-		<fileset dir="${lib}">
-			<include name="slf4j-*.jar" />
-			<include name="logback-*.jar" />
-		</fileset>
-	</path>
-
-	<path id="tinylog.classpath">
 		<fileset dir="${dist.jar}">
 			<include name="tinylog.jar" />
 		</fileset>
@@ -52,118 +36,14 @@
 		<delete dir="${bin}" />
 		<mkdir dir="${bin}" />
 		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
-			<classpath refid="log4j.classpath" />
-			<classpath refid="log4j2.classpath" />
-			<classpath refid="logback.classpath" />
-			<classpath refid="tinylog.classpath" />
+			<classpath refid="classpath" />
 		</javac>
 	</target>
-
-	<target name="run" depends="dummy, jul, log4j, log4j2, logback, tinylog" />
 	
-	<target name="dummy" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
-			<arg value="dummy" />
-			<arg value="${benchmark}" />
-			<arg value="${threading}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="jul" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" fork="true">
-			<arg value="jul" />
-			<arg value="${benchmark}" />
-			<arg value="${threading}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="log4j" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j.classpath" fork="true">
-			<arg value="log4j" />
-			<arg value="${benchmark}" />
-			<arg value="${threading}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="log4j2" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="log4j2.classpath" fork="true">
-			<arg value="log4j2" />
-			<arg value="${benchmark}" />
-			<arg value="${threading}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="logback" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="logback.classpath" fork="true">
-			<arg value="logback" />
-			<arg value="${benchmark}" />
-			<arg value="${threading}" />
-			<arg value="--runs" />
-			<arg value="${runs}" />
-			<arg value="--outliers" />
-			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
-			<arg value="--threads" />
-			<arg value="${threads}" />
-			<arg value="--iterations" />
-			<arg value="${iterations}" />
-			<arg value="--prime" />
-			<arg value="${prime}" />
-		</java>
-	</target>
-	
-	<target name="tinylog" depends="compile">
-		<java classname="org.pmw.benchmark.Application" classpath="${bin}" classpathref="tinylog.classpath" fork="true">
-			<arg value="tinylog" />
+	<target name="run" depends="compile">
+		<echo>Benchmarks will be executed with same parameters as http://www.tinylog.org/benchmark. This can take several hours.</echo>
+		<java classname="org.pmw.benchmark.MainApplication" classpath="${bin}" classpathref="classpath" fork="true">
+			<arg value="${framework}" />
 			<arg value="${benchmark}" />
 			<arg value="${threading}" />
 			<arg value="--runs" />

@@ -11,32 +11,33 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.executors;
+package org.pmw.benchmark.benchmarks.output;
 
-import org.pmw.benchmark.Benchmark;
+import org.pmw.benchmark.benchmarks.AbstractBenchmark;
+import org.pmw.benchmark.frameworks.Framework;
 
-public abstract class AbstractOutputBenchmarkExecutor extends AbstractBenchmarkExecutor {
+public abstract class AbstractOutputBenchmark extends AbstractBenchmark {
 
-	protected AbstractOutputBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final int deep) {
-		super(benchmark, runs, outliers, deep);
+	protected AbstractOutputBenchmark(final Framework framework, final int deep) {
+		super(framework, deep);
+	}
+
+	@Override
+	public boolean isValidLogEntry(final String line) {
+		if (super.isValidLogEntry(line) && line.contains("write()")) {
+			return line.contains("Trace") ^ line.contains("Debug") ^ line.contains("Info") ^ line.contains("Warning") ^ line.contains("Error");
+		} else {
+			return false;
+		}
 	}
 
 	protected final void write(final int stackTraceDeep, final long iterations) throws Exception {
 		if (stackTraceDeep <= 0) {
 			for (long i = 0; i < iterations; ++i) {
-				benchmark.write(i + 1);
+				framework.write(i + 1);
 			}
 		} else {
 			write(stackTraceDeep - 1, iterations);
-		}
-	}
-
-	@Override
-	protected boolean isValidLogEntry(final String line) {
-		if (super.isValidLogEntry(line) && line.contains("write()")) {
-			return line.contains("Trace") ^ line.contains("Debug") ^ line.contains("Info") ^ line.contains("Warning") ^ line.contains("Error");
-		} else {
-			return false;
 		}
 	}
 

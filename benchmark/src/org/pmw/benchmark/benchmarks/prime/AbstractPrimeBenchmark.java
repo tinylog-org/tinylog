@@ -11,45 +11,46 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.benchmark.executors;
+package org.pmw.benchmark.benchmarks.prime;
 
 import java.util.AbstractList;
 import java.util.List;
 import java.util.RandomAccess;
 
-import org.pmw.benchmark.Benchmark;
+import org.pmw.benchmark.benchmarks.AbstractBenchmark;
+import org.pmw.benchmark.frameworks.Framework;
 
-public abstract class AbstractPrimeBenchmarkExecutor extends AbstractBenchmarkExecutor {
+public abstract class AbstractPrimeBenchmark extends AbstractBenchmark {
 
 	private final long maximum;
 	private long primes;
 
-	protected AbstractPrimeBenchmarkExecutor(final Benchmark benchmark, final int runs, final int outliers, final int deep, final long maximum) {
-		super(benchmark, runs, outliers, deep);
+	protected AbstractPrimeBenchmark(final Framework framework, final int deep, final long maximum) {
+		super(framework, deep);
 		this.maximum = maximum;
 	}
 
 	@Override
-	protected void run() throws Exception {
-		primes = calculate(maximum).size();
+	public boolean isValidLogEntry(final String line) {
+		return super.isValidLogEntry(line) && line.contains("calculate()") && line.contains("is prime");
 	}
 
-	protected abstract List<Long> calculate(long maximum) throws Exception;
-
 	@Override
-	protected final long countTriggeredLogEntries() {
+	public final long countTriggeredLogEntries() {
 		return maximum;
 	}
 
 	@Override
-	protected final long countWrittenLogEntries() {
+	public final long countWrittenLogEntries() {
 		return primes;
 	}
 
 	@Override
-	protected boolean isValidLogEntry(final String line) {
-		return super.isValidLogEntry(line) && line.contains("calculate()") && line.contains("is prime");
+	public void run() throws Exception {
+		primes = calculate(maximum).size();
 	}
+
+	protected abstract List<Long> calculate(long maximum) throws Exception;
 
 	protected final static class SubList<T> extends AbstractList<T> implements RandomAccess {
 
