@@ -57,11 +57,7 @@ public final class Log4j2 implements Framework {
 		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		builder.append("<Configuration>");
 		builder.append("<Appenders>");
-		if (async) {
-			builder.append("<File name=\"file\" fileName=\"" + file.getAbsolutePath() + "\" immediateFlush=\"false\" bufferedIO=\"true\">");
-		} else {
-			builder.append("<File name=\"file\" fileName=\"" + file.getAbsolutePath() + "\" immediateFlush=\"true\" bufferedIO=\"false\">");
-		}
+		builder.append("<File name=\"file\" fileName=\"" + file.getAbsolutePath() + "\" bufferedIO=\"" + async + "\">");
 		builder.append("<PatternLayout><Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n</Pattern></PatternLayout>");
 		builder.append("</File>");
 		builder.append("</Appenders>");
