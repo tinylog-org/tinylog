@@ -18,13 +18,13 @@ import org.pmw.benchmark.frameworks.Framework;
 
 public abstract class AbstractOutputBenchmark extends AbstractBenchmark {
 
-	protected AbstractOutputBenchmark(final Framework framework, final int deep) {
-		super(framework, deep);
+	protected AbstractOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep) {
+		super(framework, locationInformation, deep);
 	}
 
 	@Override
 	public boolean isValidLogEntry(final String line) {
-		if (super.isValidLogEntry(line) && line.contains("write()")) {
+		if (super.isValidLogEntry(line) && (!locationInformation || line.contains("write()"))) {
 			return line.contains("Trace") ^ line.contains("Debug") ^ line.contains("Info") ^ line.contains("Warning") ^ line.contains("Error");
 		} else {
 			return false;

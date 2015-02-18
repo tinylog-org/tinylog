@@ -4,6 +4,7 @@
 	<property name="framework" value="all" />
 	<property name="benchmark" value="all" />
 	<property name="threading" value="both" />
+	<property name="location" value="true" />
 	<property name="runs" value="120" />
 	<property name="outliers" value="20" />
 	<property name="deep" value="0" />
@@ -46,6 +47,8 @@
 			<arg value="${framework}" />
 			<arg value="${benchmark}" />
 			<arg value="${threading}" />
+			<arg value="--location" />
+			<arg value="${location}" />
 			<arg value="--runs" />
 			<arg value="${runs}" />
 			<arg value="--outliers" />
