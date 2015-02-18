@@ -29,8 +29,8 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
 	private final int threads;
 
-	public MultiThreadedPrimesBenchmark(final Framework framework, final int deep, final long maximum, final int threads) {
-		super(framework, deep, maximum);
+	public MultiThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long maximum, final int threads) {
+		super(framework, locationInformation, deep, maximum);
 		this.threads = threads;
 	}
 
@@ -84,7 +84,7 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 		return primes;
 	}
 
-	private long square(final long value) {
+	private static long square(final long value) {
 		return value * value;
 	}
 

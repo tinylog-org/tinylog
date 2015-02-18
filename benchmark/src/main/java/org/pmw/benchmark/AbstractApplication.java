@@ -29,21 +29,32 @@ public abstract class AbstractApplication {
 	}
 
 	protected static final boolean supportsAsync(final String framework) {
-		for (Constructor<?> constructor : FRAMEWORK_MAPPING.get(framework).getDeclaredConstructors()) {
-			Class<?>[] types = constructor.getParameterTypes();
-			if (types.length == 1 && types[0] == boolean.class) {
-				return true;
-			}
-		}
-		return false;
+		return countBooleanParameters(framework) == 2;
 	}
 
-	protected static final Framework createFramework(final String name, final boolean async) throws ReflectiveOperationException {
-		if (supportsAsync(name)) {
-			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class).newInstance(async);
+	protected static final Framework createFramework(final String name, final boolean locatioInformation, final boolean async)
+			throws ReflectiveOperationException {
+		int count = countBooleanParameters(name);
+		if (count == 2) {
+			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class, boolean.class).newInstance(locatioInformation, async);
+		} else if (count == 1) {
+			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class).newInstance(locatioInformation);
 		} else {
 			return FRAMEWORK_MAPPING.get(name).newInstance();
 		}
+	}
+
+	private static final int countBooleanParameters(final String framework) {
+		int count = 0;
+		for (Constructor<?> constructor : FRAMEWORK_MAPPING.get(framework).getDeclaredConstructors()) {
+			Class<?>[] types = constructor.getParameterTypes();
+			if (types.length == 1 && types[0] == boolean.class) {
+				count = Math.max(count, 1);
+			} else if (types.length == 2 && types[0] == boolean.class && types[1] == boolean.class) {
+				count = Math.max(count, 2);
+			}
+		}
+		return count;
 	}
 
 }

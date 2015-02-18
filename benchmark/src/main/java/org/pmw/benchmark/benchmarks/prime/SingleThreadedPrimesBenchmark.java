@@ -21,8 +21,8 @@ import org.pmw.benchmark.frameworks.Framework;
 
 public final class SingleThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
-	public SingleThreadedPrimesBenchmark(final Framework framework, final int deep, final long maximum) {
-		super(framework, deep, maximum);
+	public SingleThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long maximum) {
+		super(framework, locationInformation, deep, maximum);
 	}
 
 	@Override

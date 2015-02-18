@@ -26,6 +26,7 @@ import java.util.Map;
  */
 public class MainApplication extends AbstractApplication {
 
+	private static final boolean DEFAULT_LOCATION_INFORMATION = true;
 	private static final int DEFAULT_RUNS = 1;
 	private static final int DEFAULT_OUTLIERS = 0;
 	private static final int DEFAULT_DEEP = 0;
@@ -40,6 +41,8 @@ public class MainApplication extends AbstractApplication {
 			List<String> frameworks = getFrameworks(arguments);
 			List<String> benchmarks = getBenchmarks(arguments);
 			List<String> threadingModes = getThreadingModes(arguments);
+
+			boolean locationInformation = getBooleanParameter(arguments, "location", DEFAULT_LOCATION_INFORMATION);
 
 			int runs = getIntParameter(arguments, "runs", DEFAULT_RUNS);
 			int outliers = getIntParameter(arguments, "outliers", DEFAULT_OUTLIERS);
@@ -97,9 +100,9 @@ public class MainApplication extends AbstractApplication {
 					System.out.println(benchmark.toUpperCase() + " BENCHMARK (" + threadingMode.toUpperCase() + ")");
 					System.out.println();
 					for (String framework : frameworks) {
-						executor.run(framework, false, benchmark, threadingMode, deep, threads, iterations, prime);
+						executor.run(framework, locationInformation, false, benchmark, threadingMode, deep, threads, iterations, prime);
 						if (supportsAsync(framework)) {
-							executor.run(framework, true, benchmark, threadingMode, deep, threads, iterations, prime);
+							executor.run(framework, locationInformation, true, benchmark, threadingMode, deep, threads, iterations, prime);
 						}
 					}
 					System.out.println();
@@ -166,6 +169,15 @@ public class MainApplication extends AbstractApplication {
 		}
 	}
 
+	private static boolean getBooleanParameter(final String[] arguments, final String name, final boolean defaultValue) {
+		String value = getStringParameter(arguments, name);
+		if (value == null) {
+			return defaultValue;
+		} else {
+			return Boolean.parseBoolean(value);
+		}
+	}
+
 	private static int getIntParameter(final String[] arguments, final String name, final int defaultValue) {
 		String value = getStringParameter(arguments, name);
 		if (value == null) {
@@ -222,12 +234,13 @@ public class MainApplication extends AbstractApplication {
 	private static void showHelp() {
 		System.out.println("Run logging framework benchmarks.");
 		System.out.println();
-		System.out.println("  framework benchmark [-runs X] [-outliers X] [-deep X] [-iterations X] [-threads X] [-prime X]");
+		System.out.println("  framework benchmark [--location X] [--runs X] [--outliers X] [--deep X] [--iterations X] [--threads X] [--prime X]");
 		System.out.println();
 		System.out.println("  framework          Name of logging framework or \"all\"");
 		System.out.println("  benchmark          Name of benchmark or \"all\"");
 		System.out.println("  threading          \"single-threaded\" or \"multi-threaded\" execution (default is \"both\")");
 		System.out.println();
+		System.out.println("  -l --location X    Include location information in format pattern (default is true)");
 		System.out.println("  -r --runs X        Number of benchmark runs (default is 1)");
 		System.out.println("  -o --outliers X    Number of outlier benchmark runs to exclude from result (default is 0)");
 		System.out.println("  -d --deep X        Amount of additional stack trace deep for more realistic results (default is 0)");
@@ -249,6 +262,11 @@ public class MainApplication extends AbstractApplication {
 		System.out.println("  output             Writes a big amount of log entries to a file (tests the maximum logging output)");
 		System.out.println("  primes             Calculates primes and log the results (tests the influence of logging for a CPU intensive program)");
 		System.out.println();
+		System.out.println("Location information (format pattern for log entries)");
+		System.out.println();
+		System.out.println("  true               yyyy-MM-dd HH:mm:ss [thread] package.class.method(): message");
+		System.out.println("  false              yyyy-MM-dd HH:mm:ss: message");
+		System.out.println();
 	}
 
 	private static final class Executor {
@@ -256,16 +274,16 @@ public class MainApplication extends AbstractApplication {
 		private final int runs;
 		private final int outliers;
 
-		public Executor(final int runs, final int outliers) throws Exception {
+		public Executor(final int runs, final int outliers) {
 			this.runs = runs;
 			this.outliers = outliers;
 		}
 
-		public void run(final String framework, final boolean async, final String benchmark, final String threadingMode, final int deep, final int threads,
-				final long iterations, final long prime) throws Exception {
+		public void run(final String framework, final boolean locationInformation, final boolean async, final String benchmark, final String threadingMode,
+				final int deep, final int threads, final long iterations, final long prime) throws Exception {
 			int[] times = new int[runs];
 			for (int i = 0; i < runs; ++i) {
-				int time = execute(framework, async, benchmark, threadingMode, deep, threads, iterations, prime);
+				int time = execute(framework, locationInformation, async, benchmark, threadingMode, deep, threads, iterations, prime);
 				if (time < 0) {
 					return;
 				} else {
@@ -280,11 +298,11 @@ public class MainApplication extends AbstractApplication {
 			}
 			time = Math.round((double) time / (runs - outliers));
 
-			System.out.println(String.format("%1$-30s %2$10dms", createFramework(framework, async).getName(), time));
+			System.out.println(String.format("%1$-30s %2$10dms", createFramework(framework, locationInformation, async).getName(), time));
 		}
 
-		private static int execute(final String framework, final boolean async, final String benchmark, final String threadingMode, final int deep,
-				final int threads, final long iterations, final long prime) throws Exception {
+		private static int execute(final String framework, final boolean locationInformation, final boolean async, final String benchmark,
+				final String threadingMode, final int deep, final int threads, final long iterations, final long prime) throws Exception {
 			String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 			String classpath = System.getProperty("java.class.path");
 
@@ -292,6 +310,7 @@ public class MainApplication extends AbstractApplication {
 			command.add(jvm);
 			command.add(SingleBenchmarkApplication.class.getName());
 			command.add(framework);
+			command.add(Boolean.toString(locationInformation));
 			command.add(Boolean.toString(async));
 			command.add(benchmark);
 			command.add(threadingMode);
