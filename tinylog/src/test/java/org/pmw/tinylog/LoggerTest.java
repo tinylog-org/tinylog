@@ -18,9 +18,11 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
@@ -58,45 +60,36 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
-	 * Test getter for logging level.
+	 * Test trace enabled tester.
 	 */
 	@Test
-	public final void testLoggingLevel() {
+	public final void testIsTraceEnabled() {
 		Configurator.defaultConfig().level(Level.TRACE).activate();
-		assertEquals(Level.TRACE, Logger.getLevel());
+		assertTrue(Logger.isTraceEnabled());
 
-		Configurator.currentConfig().level(Level.OFF).activate();
-		assertEquals(Level.OFF, Logger.getLevel());
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-		Configurator.currentConfig().level(Level.ERROR).activate();
-		assertEquals(Level.ERROR, Logger.getLevel());
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-		Configurator.currentConfig().level(null).activate();
-		assertEquals(Level.OFF, Logger.getLevel());
-	}
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-	/**
-	 * Test getter for custom logging level for specific packages and classes.
-	 */
-	@Test
-	public final void testCustomLoggingLevel() {
-		Configurator.defaultConfig().level("a", Level.TRACE).level("a.b", Level.INFO).activate();
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-		assertEquals(Level.TRACE, Logger.getLevel("a"));
-		assertEquals(Level.INFO, Logger.getLevel("a.b"));
-		assertEquals(Level.TRACE, Logger.getLevel("a.c"));
-		assertEquals(Level.INFO, Logger.getLevel("a.b.d"));
-		assertEquals(Level.TRACE, Logger.getLevel("a.c.d"));
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-		Configurator.defaultConfig().level(LoggerTest.class.getPackage(), Level.TRACE).activate();
+		Configurator.defaultConfig().level(Level.OFF).level(LoggerTest.class, Level.TRACE).activate();
+		assertTrue(Logger.isTraceEnabled());
 
-		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class.getPackage()));
-		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class));
+		Configurator.defaultConfig().level(Level.TRACE).level(LoggerTest.class, Level.OFF).activate();
+		assertFalse(Logger.isTraceEnabled());
 
-		Configurator.defaultConfig().level(LoggerTest.class, Level.TRACE).activate();
-
-		assertEquals(Level.INFO, Logger.getLevel(LoggerTest.class.getPackage()));
-		assertEquals(Level.TRACE, Logger.getLevel(LoggerTest.class));
+		Configurator.defaultConfig().level(Level.TRACE).writer(null).activate();
+		assertFalse(Logger.isTraceEnabled());
 	}
 
 	/**
@@ -151,6 +144,39 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test debug enabled tester.
+	 */
+	@Test
+	public final void testIsDebugEnabled() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertTrue(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertFalse(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertFalse(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).level(LoggerTest.class, Level.DEBUG).activate();
+		assertTrue(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).level(LoggerTest.class, Level.OFF).activate();
+		assertFalse(Logger.isDebugEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).writer(null).activate();
+		assertFalse(Logger.isDebugEnabled());
+	}
+
+	/**
 	 * Test debug methods.
 	 */
 	@Test
@@ -199,6 +225,39 @@ public class LoggerTest extends AbstractTest {
 			Logger.debug("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
+	}
+
+	/**
+	 * Test info enabled tester.
+	 */
+	@Test
+	public final void testIsInfoEnabled() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertTrue(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertTrue(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertFalse(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).level(LoggerTest.class, Level.INFO).activate();
+		assertTrue(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).level(LoggerTest.class, Level.OFF).activate();
+		assertFalse(Logger.isInfoEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).writer(null).activate();
+		assertFalse(Logger.isInfoEnabled());
 	}
 
 	/**
@@ -253,6 +312,39 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test warning enabled tester.
+	 */
+	@Test
+	public final void testIsWarningEnabled() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertTrue(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertTrue(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertTrue(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).level(LoggerTest.class, Level.WARNING).activate();
+		assertTrue(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).level(LoggerTest.class, Level.OFF).activate();
+		assertFalse(Logger.isWarningEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).writer(null).activate();
+		assertFalse(Logger.isWarningEnabled());
+	}
+
+	/**
 	 * Test warning methods.
 	 */
 	@Test
@@ -304,6 +396,39 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test error enabled tester.
+	 */
+	@Test
+	public final void testIsErrorEnabled() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.OFF).level(LoggerTest.class, Level.ERROR).activate();
+		assertTrue(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).level(LoggerTest.class, Level.OFF).activate();
+		assertFalse(Logger.isErrorEnabled());
+
+		Configurator.defaultConfig().level(Level.ERROR).writer(null).activate();
+		assertFalse(Logger.isErrorEnabled());
+	}
+
+	/**
 	 * Test error methods.
 	 */
 	@Test
@@ -352,6 +477,228 @@ public class LoggerTest extends AbstractTest {
 			Logger.error("Hello!");
 			assertNull(writer.consumeLogEntry());
 		}
+	}
+
+	/**
+	 * Test stack trace deep based logging level enabled tester.
+	 */
+	@Test
+	public final void testIsEnabledByStackTraceDeep() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.WARNING).level(LoggerTest.class, Level.DEBUG).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).level(LoggerTest.class, Level.WARNING).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertTrue(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).writer(null).activate();
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.TRACE));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.INFO));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.WARNING));
+		assertFalse(Logger.isEnabled(Logger.DEEP_OF_STACK_TRACE, Level.ERROR));
+	}
+
+	/**
+	 * Test stack trace element based logging level enabled tester.
+	 */
+	@Test
+	public final void testIsEnabledByStackTraceElement() {
+		StackTraceElement stackTraceElementA = new StackTraceElement("a.A", "?", "?", -1);
+		StackTraceElement stackTraceElementB = new StackTraceElement("a.B", "?", "?", -1);
+
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.WARNING).level("a.A", Level.DEBUG).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+		assertFalse(Logger.isEnabled(stackTraceElementB, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementB, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementB, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).level("a.A", Level.WARNING).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+		assertFalse(Logger.isEnabled(stackTraceElementB, Level.TRACE));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.DEBUG));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.INFO));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.WARNING));
+		assertTrue(Logger.isEnabled(stackTraceElementB, Level.ERROR));
+
+		Configurator.defaultConfig().level(Level.DEBUG).writer(null).activate();
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.TRACE));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.DEBUG));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.INFO));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.WARNING));
+		assertFalse(Logger.isEnabled(stackTraceElementA, Level.ERROR));
+	}
+
+	/**
+	 * Test stack trace deep based logging level getter.
+	 */
+	@Test
+	public final void testGetLevelByStackTraceDeep() {
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertEquals(Level.TRACE, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertEquals(Level.INFO, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertEquals(Level.WARNING, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertEquals(Level.ERROR, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertEquals(Level.OFF, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.WARNING).level(LoggerTest.class, Level.DEBUG).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.DEBUG).level(LoggerTest.class, Level.WARNING).activate();
+		assertEquals(Level.WARNING, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+
+		Configurator.defaultConfig().level(Level.DEBUG).writer(null).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(Logger.DEEP_OF_STACK_TRACE));
+	}
+
+	/**
+	 * Test stack trace element based logging level getter.
+	 */
+	@Test
+	public final void testGetLevelByStackTraceElement() {
+		StackTraceElement stackTraceElementA = new StackTraceElement("a.A", "?", "?", -1);
+		StackTraceElement stackTraceElementB = new StackTraceElement("a.B", "?", "?", -1);
+
+		Configurator.defaultConfig().level(Level.TRACE).activate();
+		assertEquals(Level.TRACE, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.DEBUG).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.INFO).activate();
+		assertEquals(Level.INFO, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.WARNING).activate();
+		assertEquals(Level.WARNING, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.ERROR).activate();
+		assertEquals(Level.ERROR, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.OFF).activate();
+		assertEquals(Level.OFF, Logger.getLevel(stackTraceElementA));
+
+		Configurator.defaultConfig().level(Level.WARNING).level("a.A", Level.DEBUG).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(stackTraceElementA));
+		assertEquals(Level.WARNING, Logger.getLevel(stackTraceElementB));
+
+		Configurator.defaultConfig().level(Level.DEBUG).level("a.A", Level.WARNING).activate();
+		assertEquals(Level.WARNING, Logger.getLevel(stackTraceElementA));
+		assertEquals(Level.DEBUG, Logger.getLevel(stackTraceElementB));
+
+		Configurator.defaultConfig().level(Level.DEBUG).writer(null).activate();
+		assertEquals(Level.DEBUG, Logger.getLevel(stackTraceElementA));
 	}
 
 	/**

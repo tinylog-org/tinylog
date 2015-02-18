@@ -68,48 +68,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Get the current global severity level.
+	 * Test if log entries with the severity level trace will be output.
 	 *
-	 * @return Global severity level
+	 * @return <code>true</code> if trace is enabled, otherwise <code>false</code>
 	 */
-	public static Level getLevel() {
-		return configuration.getLevel();
-	}
-
-	/**
-	 * Get the current severity level for a specific package.
-	 *
-	 * @param packageObject
-	 *            Package
-	 *
-	 * @return Severity level for the package
-	 */
-	public static Level getLevel(final Package packageObject) {
-		return configuration.getLevel(packageObject.getName());
-	}
-
-	/**
-	 * Get the current severity level for a specific class.
-	 *
-	 * @param classObject
-	 *            Name of the class
-	 *
-	 * @return Severity level for the class
-	 */
-	public static Level getLevel(final Class<?> classObject) {
-		return configuration.getLevel(classObject.getName());
-	}
-
-	/**
-	 * Get the current severity level for a specific package or class.
-	 *
-	 * @param packageOrClass
-	 *            Name of the package respectively class
-	 *
-	 * @return severity level for the package respectively class
-	 */
-	public static Level getLevel(final String packageOrClass) {
-		return configuration.getLevel(packageOrClass);
+	public static boolean isTraceEnabled() {
+		return isEnabled(configuration, DEEP_OF_STACK_TRACE, Level.TRACE);
 	}
 
 	/**
@@ -184,6 +148,15 @@ public final class Logger {
 	}
 
 	/**
+	 * Test if log entries with the severity level debug will be output.
+	 *
+	 * @return <code>true</code> if debug is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isDebugEnabled() {
+		return isEnabled(configuration, DEEP_OF_STACK_TRACE, Level.DEBUG);
+	}
+
+	/**
 	 * Create a debug log entry.
 	 *
 	 * @param obj
@@ -252,6 +225,15 @@ public final class Logger {
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
 			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, null, null);
 		}
+	}
+
+	/**
+	 * Test if log entries with the severity level info will be output.
+	 *
+	 * @return <code>true</code> if info is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isInfoEnabled() {
+		return isEnabled(configuration, DEEP_OF_STACK_TRACE, Level.INFO);
 	}
 
 	/**
@@ -326,6 +308,15 @@ public final class Logger {
 	}
 
 	/**
+	 * Test if log entries with the severity level warning will be output.
+	 *
+	 * @return <code>true</code> if warning is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isWarningEnabled() {
+		return isEnabled(configuration, DEEP_OF_STACK_TRACE, Level.WARNING);
+	}
+
+	/**
 	 * Create a warning log entry.
 	 *
 	 * @param obj
@@ -394,6 +385,15 @@ public final class Logger {
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
 			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, null);
 		}
+	}
+
+	/**
+	 * Test if log entries with the severity level error will be output.
+	 *
+	 * @return <code>true</code> if error is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isErrorEnabled() {
+		return isEnabled(configuration, DEEP_OF_STACK_TRACE, Level.ERROR);
 	}
 
 	/**
@@ -472,7 +472,7 @@ public final class Logger {
 	 *
 	 * @return A copy of the current configuration
 	 */
-	public static Configurator getConfiguration() {
+	static Configurator getConfiguration() {
 		return configuration.copy();
 	}
 
@@ -504,6 +504,54 @@ public final class Logger {
 		}
 
 		Logger.configuration = configuration;
+	}
+
+	/**
+	 * Test if log entries with the defined severity level will be output.
+	 *
+	 * @param strackTraceDeep
+	 *            Deep of stack trace for finding the right caller class
+	 * @param level
+	 *            Severity level to test
+	 * @return <code>true</code> if defined severity level is enabled, otherwise <code>false</code>
+	 */
+	static boolean isEnabled(final int strackTraceDeep, final Level level) {
+		return isEnabled(configuration, strackTraceDeep, level);
+	}
+
+	/**
+	 * Test if log entries with the defined severity level will be output.
+	 *
+	 * @param stackTraceElement
+	 *            Created stack trace element with at least name of caller class
+	 * @param level
+	 *            Severity level to test
+	 * @return <code>true</code> if defined severity level is enabled, otherwise <code>false</code>
+	 */
+	static boolean isEnabled(final StackTraceElement stackTraceElement, final Level level) {
+		return isEnabled(configuration, stackTraceElement, level);
+	}
+
+	/**
+	 * Get the severity level for a caller class.
+	 *
+	 * @param strackTraceDeep
+	 *            Deep of stack trace for finding the right caller class
+	 * @return Severity level
+	 */
+	static Level getLevel(final int strackTraceDeep) {
+		return getLevel(configuration, strackTraceDeep);
+	}
+
+	/**
+	 * Get the severity level for a caller class.
+	 *
+	 * @param stackTraceElement
+	 *            Created stack trace element with at least name of caller class
+	 * @return Severity level
+	 */
+	static Level getLevel(final StackTraceElement stackTraceElement) {
+		return getLevel(configuration, stackTraceElement);
 	}
 
 	/**
@@ -545,6 +593,48 @@ public final class Logger {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(level)) {
 			output(currentConfiguration, stackTraceElement, level, exception, message, arguments);
+		}
+	}
+
+	private static boolean isEnabled(final Configuration currentConfiguration, final int strackTraceDeep, final Level level) {
+		if (currentConfiguration.isOutputPossible(level)) {
+			if (currentConfiguration.hasCustomLevels()) {
+				StackTraceElement stackTraceElement = getStackTraceElement(strackTraceDeep, true);
+				return currentConfiguration.getLevel(stackTraceElement.getClassName()).ordinal() <= level.ordinal();
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	private static boolean isEnabled(final Configuration currentConfiguration, final StackTraceElement stackTraceElement, final Level level) {
+		if (currentConfiguration.isOutputPossible(level)) {
+			if (currentConfiguration.hasCustomLevels()) {
+				return currentConfiguration.getLevel(stackTraceElement.getClassName()).ordinal() <= level.ordinal();
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	private static Level getLevel(final Configuration currentConfiguration, final int strackTraceDeep) {
+		if (currentConfiguration.hasCustomLevels()) {
+			StackTraceElement stackTraceElement = getStackTraceElement(strackTraceDeep, true);
+			return currentConfiguration.getLevel(stackTraceElement.getClassName());
+		} else {
+			return currentConfiguration.getLevel();
+		}
+	}
+
+	private static Level getLevel(final Configuration currentConfiguration, final StackTraceElement stackTraceElement) {
+		if (currentConfiguration.hasCustomLevels()) {
+			return currentConfiguration.getLevel(stackTraceElement.getClassName());
+		} else {
+			return currentConfiguration.getLevel();
 		}
 	}
 

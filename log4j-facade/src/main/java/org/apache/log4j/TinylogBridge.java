@@ -13,9 +13,6 @@
 
 package org.apache.log4j;
 
-import java.lang.reflect.Method;
-
-import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.LogEntryForwarder;
 
 /**
@@ -23,29 +20,7 @@ import org.pmw.tinylog.LogEntryForwarder;
  */
 final class TinylogBridge {
 
-	private static Method stackTraceMethod;
-	private static boolean hasSunReflection;
-
-	static {
-		try {
-			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
-			stackTraceMethod.setAccessible(true);
-			StackTraceElement stackTraceElement = (StackTraceElement) stackTraceMethod.invoke(new Throwable(), 0);
-			if (!TinylogBridge.class.getName().equals(stackTraceElement.getClassName())) {
-				stackTraceMethod = null;
-			}
-		} catch (Exception ex) {
-			stackTraceMethod = null;
-		}
-
-		try {
-			@SuppressWarnings({ "restriction", "deprecation" })
-			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
-			hasSunReflection = TinylogBridge.class.equals(caller);
-		} catch (Exception ex) {
-			hasSunReflection = false;
-		}
-	}
+	private static final int DEEP_OF_STACK_TRACE = 2;
 
 	private TinylogBridge() {
 	}
@@ -56,9 +31,7 @@ final class TinylogBridge {
 	 * @return Active logging level
 	 */
 	public static Level getLevel() {
-		String className = getFullyQualifiedClassName(3);
-		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
-		return toLog4jLevel(activeLevel);
+		return toLog4jLevel(LogEntryForwarder.getLevel(DEEP_OF_STACK_TRACE));
 	}
 
 	/**
@@ -69,8 +42,7 @@ final class TinylogBridge {
 	 * @return Active logging level
 	 */
 	public static Level getLevel(final Class<?> callerClass) {
-		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(callerClass.getName());
-		return toLog4jLevel(activeLevel);
+		return toLog4jLevel(LogEntryForwarder.getLevel(new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1)));
 	}
 
 	/**
@@ -81,9 +53,7 @@ final class TinylogBridge {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public static boolean isEnabled(final Priority level) {
-		String className = getFullyQualifiedClassName(3);
-		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(className);
-		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
+		return LogEntryForwarder.isEnabled(DEEP_OF_STACK_TRACE, toTinylogLevel(level));
 	}
 
 	/**
@@ -96,8 +66,7 @@ final class TinylogBridge {
 	 * @return <code>true</code> if log entries with the given logging level will be output, <code>false</code> if not
 	 */
 	public static boolean isEnabled(final Class<?> callerClass, final Priority level) {
-		org.pmw.tinylog.Level activeLevel = org.pmw.tinylog.Logger.getLevel(callerClass.getName());
-		return activeLevel.ordinal() <= toTinylogLevel(level).ordinal();
+		return LogEntryForwarder.isEnabled(new StackTraceElement(callerClass.getName(), "<unknown>", "<unknown>", -1), toTinylogLevel(level));
 	}
 
 	/**
@@ -109,7 +78,7 @@ final class TinylogBridge {
 	 *            Message to log
 	 */
 	public static void log(final Priority level, final Object message) {
-		LogEntryForwarder.forward(2, toTinylogLevel(level), message);
+		LogEntryForwarder.forward(DEEP_OF_STACK_TRACE, toTinylogLevel(level), message);
 	}
 
 	/**
@@ -123,7 +92,7 @@ final class TinylogBridge {
 	 *            Throwable to log
 	 */
 	public static void log(final Priority level, final Object message, final Throwable throwable) {
-		LogEntryForwarder.forward(2, toTinylogLevel(level), throwable, message == null ? null : message.toString());
+		LogEntryForwarder.forward(DEEP_OF_STACK_TRACE, toTinylogLevel(level), throwable, message == null ? null : message.toString());
 	}
 
 	private static org.pmw.tinylog.Level toTinylogLevel(final Priority level) {
@@ -157,28 +126,6 @@ final class TinylogBridge {
 			return Level.TRACE;
 		}
 
-	}
-
-	@SuppressWarnings({ "restriction", "deprecation" })
-	private static String getFullyQualifiedClassName(final int deep) {
-		if (hasSunReflection) {
-			try {
-				return sun.reflect.Reflection.getCallerClass(deep + 1).getName();
-			} catch (Exception ex) {
-				InternalLogger.warn(ex, "Failed to get caller class from ");
-			}
-		}
-
-		if (stackTraceMethod != null) {
-			try {
-				return ((StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep)).getClassName();
-			} catch (Exception ex) {
-				InternalLogger.warn(ex, "Failed to get single stack trace element from throwable");
-			}
-		}
-
-		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
-		return stackTraceElements[deep].getClassName();
 	}
 
 }

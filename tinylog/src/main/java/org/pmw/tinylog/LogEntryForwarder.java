@@ -14,7 +14,7 @@
 package org.pmw.tinylog;
 
 /**
- * API for external logging facades.
+ * External logging API.
  */
 public final class LogEntryForwarder {
 
@@ -22,8 +22,56 @@ public final class LogEntryForwarder {
 	}
 
 	/**
+	 * Test if log entries with the defined severity level will be output.
+	 *
+	 * @param deepOfStackTrace
+	 *            Deep of (additional) stack trace (is needed to find the right caller class)
+	 * @param level
+	 *            Severity level to test
+	 * @return <code>true</code> if defined severity level is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isEnabled(final int deepOfStackTrace, final Level level) {
+		return Logger.isEnabled(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1, level);
+	}
+
+	/**
+	 * Test if log entries with the defined severity level will be output.
+	 *
+	 * @param stackTraceElement
+	 *            Stack trace element that contains at least the class name
+	 * @param level
+	 *            Severity level to test
+	 * @return <code>true</code> if defined severity level is enabled, otherwise <code>false</code>
+	 */
+	public static boolean isEnabled(final StackTraceElement stackTraceElement, final Level level) {
+		return Logger.isEnabled(stackTraceElement, level);
+	}
+
+	/**
+	 * Get the severity level for the caller class.
+	 *
+	 * @param deepOfStackTrace
+	 *            Deep of (additional) stack trace (is needed to find the right caller class)
+	 * @return Severity level
+	 */
+	public static Level getLevel(final int deepOfStackTrace) {
+		return Logger.getLevel(deepOfStackTrace + Logger.DEEP_OF_STACK_TRACE + 1);
+	}
+
+	/**
+	 * Get the severity level for the caller class.
+	 *
+	 * @param stackTraceElement
+	 *            Stack trace element that contains at least the class name
+	 * @return Severity level
+	 */
+	public static Level getLevel(final StackTraceElement stackTraceElement) {
+		return Logger.getLevel(stackTraceElement);
+	}
+
+	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
@@ -37,7 +85,7 @@ public final class LogEntryForwarder {
 
 	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
@@ -53,7 +101,7 @@ public final class LogEntryForwarder {
 
 	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param deepOfStackTrace
 	 *            Deep of (additional) stack trace (is needed to find the right stack trace element in a stack trace)
 	 * @param level
@@ -71,7 +119,7 @@ public final class LogEntryForwarder {
 
 	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
@@ -85,7 +133,7 @@ public final class LogEntryForwarder {
 
 	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
@@ -101,7 +149,7 @@ public final class LogEntryForwarder {
 
 	/**
 	 * Forward a logging message.
-	 * 
+	 *
 	 * @param stackTraceElement
 	 *            Stack trace element for class, method and source information
 	 * @param level
