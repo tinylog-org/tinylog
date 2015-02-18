@@ -671,7 +671,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(EnvironmentHelper.getProcessId().toString(), logEntry.getProcessId());
+		assertEquals(EnvironmentHelper.getProcessId(), logEntry.getProcessId());
 		assertEquals(EnvironmentHelper.getProcessId() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
@@ -887,7 +887,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(EnvironmentHelper.getProcessId().toString(), logEntry.getProcessId());
+		assertEquals(EnvironmentHelper.getProcessId(), logEntry.getProcessId());
 		assertEquals(Thread.currentThread(), logEntry.getThread());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 		assertEquals("testFullLogEntry", logEntry.getMethodName());

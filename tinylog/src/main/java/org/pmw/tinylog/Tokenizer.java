@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -165,7 +165,7 @@ final class Tokenizer {
 				return new DateToken(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT_PATTERN, locale));
 			}
 		} else if ("pid".equals(text)) {
-			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
+			return new PlainTextToken(EnvironmentHelper.getProcessId());
 		} else if (text.startsWith("pid:")) {
 			InternalLogger.warn("\"{pid}\" does not support parameters");
 			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
@@ -263,7 +263,7 @@ final class Tokenizer {
 						InternalLogger.warn("No value set for \"min-size\"");
 					} else if ("indent".equals(parameter)) {
 						InternalLogger.warn("No value set for \"indent\"");
-					} else  {
+					} else {
 						InternalLogger.warn("Unknown option \"{}\"", parameter);
 					}
 				} else {
