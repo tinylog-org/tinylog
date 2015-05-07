@@ -33,11 +33,13 @@ public final class Log4j implements Framework {
 	private static final String NAME = "Log4j";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
+	private final boolean location;
 	private final boolean async;
 	private Logger logger;
 	private Appender appender;
 
-	public Log4j(final boolean async) {
+	public Log4j(final boolean location, final boolean async) {
+		this.location = location;
 		this.async = async;
 	}
 
@@ -84,7 +86,7 @@ public final class Log4j implements Framework {
 	private Appender createAppender(final File file) throws IOException {
 		if (async) {
 			AsyncAppender appender = new AsyncAppender();
-			appender.setLocationInfo(true);
+			appender.setLocationInfo(location);
 			appender.addAppender(new FileAppender(createLayout(), file.getAbsolutePath(), false, true, 64 * 1024));
 			return appender;
 		} else {
@@ -93,7 +95,11 @@ public final class Log4j implements Framework {
 	}
 
 	private Layout createLayout() {
-		return new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+		if (location) {
+			return new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+		} else {
+			return new PatternLayout("%d{yyyy-MM-dd HH:mm:ss}: %m%n");
+		}
 	}
 
 }

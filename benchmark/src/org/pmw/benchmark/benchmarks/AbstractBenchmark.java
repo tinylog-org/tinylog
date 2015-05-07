@@ -20,14 +20,17 @@ import org.pmw.benchmark.frameworks.Framework;
 public abstract class AbstractBenchmark implements Benchmark {
 
 	protected final Framework framework;
+	protected final boolean locationInformation;
 
 	private final int deep;
 
-	protected AbstractBenchmark(final Framework framework, final int deep) {
+	protected AbstractBenchmark(final Framework framework, final boolean locationInformation, final int deep) {
 		this.framework = framework;
+		this.locationInformation = locationInformation;
 		this.deep = deep;
 	}
 
+	@Override
 	public Framework getFramework() {
 		return framework;
 	}
@@ -38,7 +41,7 @@ public abstract class AbstractBenchmark implements Benchmark {
 			return false;
 		}
 
-		if (!line.contains(framework.getClass().getName())) {
+		if (locationInformation && !line.contains(framework.getClass().getName())) {
 			return false;
 		}
 

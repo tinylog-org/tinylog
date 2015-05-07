@@ -35,30 +35,31 @@ public final class SingleBenchmarkApplication extends AbstractApplication {
 	private static final String ERROR_INVALID_LINES_MESSAGE = "Found {0} invalid log entries";
 
 	public static void main(final String[] arguments) {
-		if (arguments.length != 8) {
+		if (arguments.length != 9) {
 			System.err.println(MainApplication.class.getName() + " should be used");
 			System.exit(-1);
 		} else {
 			try {
-				Framework framework = createFramework(arguments[0], Boolean.parseBoolean(arguments[1]));
-				String benchmark = arguments[2];
-				String threadingMode = arguments[3];
-				int deep = Integer.parseInt(arguments[4]);
-				int threads = Integer.parseInt(arguments[5]);
-				long iterations = Long.parseLong(arguments[6]);
-				long prime = Long.parseLong(arguments[7]);
+				Framework framework = createFramework(arguments[0], Boolean.parseBoolean(arguments[1]), Boolean.parseBoolean(arguments[2]));
+				boolean locationInformation = Boolean.parseBoolean(arguments[1]);
+				String benchmark = arguments[3];
+				String threadingMode = arguments[4];
+				int deep = Integer.parseInt(arguments[5]);
+				int threads = Integer.parseInt(arguments[6]);
+				long iterations = Long.parseLong(arguments[7]);
+				long prime = Long.parseLong(arguments[8]);
 
 				if ("output".equals(benchmark)) {
 					if ("single-threaded".equals(threadingMode)) {
-						execute(new SingleThreadedOutputBenchmark(framework, deep, iterations));
+						execute(new SingleThreadedOutputBenchmark(framework, locationInformation, deep, iterations));
 					} else if ("multi-threaded".equals(threadingMode)) {
-						execute(new MultiThreadedOutputBenchmark(framework, deep, iterations / threads, threads));
+						execute(new MultiThreadedOutputBenchmark(framework, locationInformation, deep, iterations / threads, threads));
 					}
 				} else if ("primes".equals(benchmark)) {
 					if ("single-threaded".equals(threadingMode)) {
-						execute(new SingleThreadedPrimesBenchmark(framework, deep, prime));
+						execute(new SingleThreadedPrimesBenchmark(framework, locationInformation, deep, prime));
 					} else if ("multi-threaded".equals(threadingMode)) {
-						execute(new MultiThreadedPrimesBenchmark(framework, deep, prime, threads));
+						execute(new MultiThreadedPrimesBenchmark(framework, locationInformation, deep, prime, threads));
 					}
 				}
 

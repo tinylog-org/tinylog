@@ -23,8 +23,8 @@ public final class MultiThreadedOutputBenchmark extends AbstractOutputBenchmark 
 	private final long iterations;
 	private final int threads;
 
-	public MultiThreadedOutputBenchmark(final Framework framework, final int deep, final long iterations, final int threads) {
-		super(framework, deep);
+	public MultiThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long iterations, final int threads) {
+		super(framework, locationInformation, deep);
 		this.iterations = iterations;
 		this.threads = threads;
 	}

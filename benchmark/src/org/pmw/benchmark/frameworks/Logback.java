@@ -37,11 +37,13 @@ public final class Logback implements Framework {
 	private static final String NAME = "Logback";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
+	private final boolean location;
 	private final boolean async;
 	private Logger logger;
 	private Appender<ILoggingEvent> appender;
 
-	public Logback(final boolean async) {
+	public Logback(final boolean location, final boolean async) {
+		this.location = location;
 		this.async = async;
 	}
 
@@ -103,7 +105,7 @@ public final class Logback implements Framework {
 
 	private Appender<ILoggingEvent> createAsyncAppender(final File file, final LoggerContext context) {
 		AsyncAppender appender = new AsyncAppender();
-		appender.setIncludeCallerData(true);
+		appender.setIncludeCallerData(location);
 		appender.setDiscardingThreshold(0);
 		appender.setContext(context);
 
@@ -129,7 +131,11 @@ public final class Logback implements Framework {
 	private LayoutWrappingEncoder<ILoggingEvent> createEncoder(final LoggerContext context) {
 		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 		encoder.setContext(context);
-		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		if (location) {
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		} else {
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss}: %message%n");
+		}
 		encoder.setImmediateFlush(!async);
 		return encoder;
 	}

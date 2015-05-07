@@ -30,10 +30,12 @@ public final class Tinylog implements Framework {
 	private static final String NAME = "tinylog";
 	private static final String NAME_ASYNC = NAME + " with writing thread";
 
+	private final boolean location;
 	private final boolean async;
 	private FileWriter writer;
 
-	public Tinylog(final boolean async) {
+	public Tinylog(final boolean location, final boolean async) {
+		this.location = location;
 		this.async = async;
 	}
 
@@ -50,7 +52,12 @@ public final class Tinylog implements Framework {
 
 		configurator.writer(writer);
 		configurator.level(Level.INFO);
-		configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+
+		if (location) {
+			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+		} else {
+			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss}: {message}");
+		}
 
 		if (async) {
 			configurator.writingThread(null);

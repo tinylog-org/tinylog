@@ -19,8 +19,8 @@ public final class SingleThreadedOutputBenchmark extends AbstractOutputBenchmark
 
 	private final long iterations;
 
-	public SingleThreadedOutputBenchmark(final Framework framework, final int deep, final long iterations) {
-		super(framework, deep);
+	public SingleThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long iterations) {
+		super(framework, locationInformation, deep);
 		this.iterations = iterations;
 	}
 
