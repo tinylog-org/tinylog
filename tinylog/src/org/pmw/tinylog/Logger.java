@@ -473,7 +473,7 @@ public final class Logger {
 	 * @return A copy of the current configuration
 	 */
 	public static Configurator getConfiguration() {
-		return configuration.copy();
+		return configuration.getConfigurator();
 	}
 
 	/**

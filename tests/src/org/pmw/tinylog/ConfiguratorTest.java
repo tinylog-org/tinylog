@@ -311,7 +311,7 @@ public class ConfiguratorTest extends AbstractTest {
 
 		configuration = Configurator.defaultConfig().level(null).create();
 		assertFalse(configuration.hasCustomLevels());
-		assertEquals(Level.OFF, configuration.getLevel());
+		assertEquals(Level.INFO, configuration.getLevel());
 
 		configuration = Configurator.defaultConfig().level(Level.ERROR).level("a", Level.WARNING).create();
 		assertTrue(configuration.hasCustomLevels());

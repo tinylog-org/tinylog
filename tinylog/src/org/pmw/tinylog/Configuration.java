@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.pmw.tinylog.Configurator.WritingThreadData;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 
@@ -33,13 +32,18 @@ import org.pmw.tinylog.writers.Writer;
  * create a configuration.
  */
 public final class Configuration {
+	
+	private static final Level DEFAULT_LEVEL = Level.INFO;
+	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
+	private static final int DEFAULT_MAX_STACK_TRACE_ELEMENTS = 40;
 
+	private final Configurator configurator;
+	
 	private final Level level;
 	private final Level lowestLevel;
 	private final Map<String, Level> customLevels;
 	private final String formatPattern;
 	private final Locale locale;
-	private final List<WriterDefinition> writerDefinitions;
 	private final List<Writer> writers;
 	private final WritingThread writingThread;
 	private final int maxStackTraceElements;
@@ -50,6 +54,8 @@ public final class Configuration {
 	private final Map<Level, StackTraceInformation> requiredStackTraceInformation;
 
 	/**
+	 * @param configurator
+	 *            Copy of based configurator
 	 * @param level
 	 *            Severity level
 	 * @param customLevels
@@ -65,20 +71,21 @@ public final class Configuration {
 	 * @param maxStackTraceElements
 	 *            Limit of stack traces for exceptions
 	 */
-	Configuration(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
-			final List<WriterDefinition> writerDefinitions, final WritingThread writingThread, final int maxStackTraceElements) {
-		this.level = level;
-		this.lowestLevel = getLowestLevel(level, customLevels, writerDefinitions);
+	Configuration(final Configurator configurator, final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
+			final List<WriterDefinition> writerDefinitions, final WritingThread writingThread, final Integer maxStackTraceElements) {
+		this.configurator = configurator;
+		
+		this.level = level == null ? getLevel(writerDefinitions) : level;
+		this.lowestLevel = getLowestLevel(this.level, customLevels, writerDefinitions);
 		this.customLevels = customLevels;
-		this.formatPattern = formatPattern;
-		this.locale = locale;
-		this.writerDefinitions = new ArrayList<WriterDefinition>(writerDefinitions);
+		this.formatPattern = formatPattern == null ? DEFAULT_FORMAT_PATTERN : formatPattern;
+		this.locale = locale == null ? Locale.getDefault() : locale;
 		this.writers = getWriters(writerDefinitions);
 		this.writingThread = writingThread;
-		this.maxStackTraceElements = maxStackTraceElements;
+		this.maxStackTraceElements = maxStackTraceElements == null ? DEFAULT_MAX_STACK_TRACE_ELEMENTS : maxStackTraceElements;
 
 		this.effectiveWriters = getEffectiveWriters(writerDefinitions);
-		this.effectiveFormatTokens = getEffectiveFormatTokens(writerDefinitions, formatPattern, locale, maxStackTraceElements);
+		this.effectiveFormatTokens = getEffectiveFormatTokens(writerDefinitions, this.formatPattern, this.locale, this.maxStackTraceElements);
 		this.requiredLogEntryValues = getRequiredLogEntryValues(effectiveWriters, effectiveFormatTokens);
 		this.requiredStackTraceInformation = getRequiredStackTraceInformation(requiredLogEntryValues, customLevels);
 	}
@@ -169,6 +176,14 @@ public final class Configuration {
 	public int getMaxStackTraceElements() {
 		return maxStackTraceElements;
 	}
+	
+	/**
+	 * Get a new configurator, based on this configuration.
+	 * @return New configurator
+	 */
+	Configurator getConfigurator() {
+		return configurator.copy();
+	}
 
 	/**
 	 * Fast check if output is possible.
@@ -225,27 +240,16 @@ public final class Configuration {
 		return requiredStackTraceInformation.get(level);
 	}
 
-	/**
-	 * Create a copy of this configuration.
-	 *
-	 * @return Copy of this configuration
-	 */
-	Configurator copy() {
-		Map<String, Level> copyOfCustomLevels;
-		if (customLevels.isEmpty()) {
-			copyOfCustomLevels = Collections.emptyMap();
-		} else {
-			copyOfCustomLevels = new HashMap<String, Level>(customLevels);
+	private static Level getLevel(final List<WriterDefinition> definitions) {
+		Level level = null;
+		for (WriterDefinition definition : definitions) {
+			if (definition.getLevel() != null) {
+				if (level == null || definition.getLevel().ordinal() < level.ordinal()) {
+					level = definition.getLevel();
+				}
+			}
 		}
-
-		WritingThreadData writingThreadData;
-		if (writingThread == null) {
-			writingThreadData = null;
-		} else {
-			writingThreadData = new WritingThreadData(writingThread.getNameOfThreadToObserve(), writingThread.getPriority());
-		}
-
-		return new Configurator(level, copyOfCustomLevels, formatPattern, locale, writerDefinitions, writingThreadData, maxStackTraceElements);
+		return level == null ? DEFAULT_LEVEL : level;
 	}
 
 	private static Level getLowestLevel(final Level level, final Map<String, Level> customLevels, final List<WriterDefinition> definitions) {
@@ -255,14 +259,18 @@ public final class Configuration {
 				lowestLevel = customLevel;
 			}
 		}
-
+		
 		Level writerOutput = Level.OFF;
 		for (WriterDefinition definition : definitions) {
-			if (definition.getLevel().ordinal() < writerOutput.ordinal()) {
-				writerOutput = definition.getLevel();
+			Level definitionLevel = definition.getLevel();
+			if (definitionLevel == null) {
+				definitionLevel = lowestLevel;
+			}
+			if (definitionLevel.ordinal() <= writerOutput.ordinal()) {
+				writerOutput = definitionLevel;
 			}
 		}
-
+		
 		return writerOutput.ordinal() > lowestLevel.ordinal() ? writerOutput : lowestLevel;
 	}
 
@@ -279,7 +287,11 @@ public final class Configuration {
 		for (Level level : Level.values()) {
 			List<Writer> writers = new ArrayList<Writer>();
 			for (WriterDefinition definition : definitions) {
-				if (level.ordinal() >= definition.getLevel().ordinal()) {
+				Level definitionLevel = definition.getLevel();
+				if (definitionLevel == null) {
+					definitionLevel = Level.TRACE;
+				}
+				if (level.ordinal() >= definitionLevel.ordinal()) {
 					writers.add(definition.getWriter());
 				}
 			}
@@ -293,13 +305,16 @@ public final class Configuration {
 			final Locale locale, final int maxStackTraceElements) {
 		Map<Writer, List<Token>> cache = new HashMap<Writer, List<Token>>();
 		Tokenizer tokenizer = new Tokenizer(locale, maxStackTraceElements);
-		List<Token> globalFormatTokens = tokenizer.parse(globalFormatPattern);
 
 		Map<Level, List<Token>[]> map = new EnumMap<Level, List<Token>[]>(Level.class);
 		for (Level level : Level.values()) {
 			List<List<Token>> formatTokensOfLevel = new ArrayList<List<Token>>();
 			for (WriterDefinition definition : definitions) {
-				if (level.ordinal() >= definition.getLevel().ordinal()) {
+				Level definitionLevel = definition.getLevel();
+				if (definitionLevel == null) {
+					definitionLevel = Level.TRACE;
+				}
+				if (level.ordinal() >= definitionLevel.ordinal()) {
 					Writer writer = definition.getWriter();
 					if (cache.containsKey(writer)) {
 						formatTokensOfLevel.add(cache.get(writer));
@@ -310,12 +325,10 @@ public final class Configuration {
 							cache.put(writer, null);
 						} else {
 							String formatPattern = definition.getFormatPattern();
-							List<Token> formatTokens;
 							if (formatPattern == null) {
-								formatTokens = globalFormatTokens;
-							} else {
-								formatTokens = tokenizer.parse(formatPattern);
+								formatPattern = globalFormatPattern;
 							}
+							List<Token> formatTokens = tokenizer.parse(formatPattern);
 							formatTokensOfLevel.add(formatTokens);
 							cache.put(writer, formatTokens);
 						}

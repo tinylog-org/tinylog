@@ -30,7 +30,7 @@ final class WriterDefinition {
 	 */
 	WriterDefinition(final Writer writer) {
 		this.writer = writer;
-		this.level = Level.TRACE;
+		this.level = null;
 		this.formatPattern = null;
 	}
 
@@ -56,7 +56,7 @@ final class WriterDefinition {
 	 */
 	WriterDefinition(final Writer writer, final String formatPattern) {
 		this.writer = writer;
-		this.level = Level.TRACE;
+		this.level = null;
 		this.formatPattern = formatPattern;
 	}
 
@@ -100,6 +100,24 @@ final class WriterDefinition {
 	 */
 	String getFormatPattern() {
 		return formatPattern;
+	}
+	
+	/**
+	 * Get an instance with filled severity level and format pattern.
+	 * @param defaultLevel Severity level if not set
+	 * @param defaultFormatPattern Format pattern if not set
+	 * @return New or same writer definition
+	 */
+	WriterDefinition fill(final Level defaultLevel, final String defaultFormatPattern) {
+		if (level == null && formatPattern == null) {
+			return new WriterDefinition(writer, defaultLevel, defaultFormatPattern);
+		} else if (level == null) {
+			return new WriterDefinition(writer, defaultLevel, formatPattern);
+		} else if (formatPattern == null) {
+			return new WriterDefinition(writer, level, defaultFormatPattern);
+		} else {
+			return this;
+		}
 	}
 
 }

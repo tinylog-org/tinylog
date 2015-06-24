@@ -72,7 +72,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.ERROR, Logger.getLevel());
 
 		Configurator.currentConfig().level(null).activate();
-		assertEquals(Level.OFF, Logger.getLevel());
+		assertEquals(Level.INFO, Logger.getLevel());
 	}
 
 	/**
