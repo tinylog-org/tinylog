@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -14,6 +14,7 @@
 package org.pmw.tinylog.writers;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +22,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.LogEntry;
 
 /**
@@ -63,7 +65,7 @@ public final class FileWriter implements Writer {
 
 	/**
 	 * Get the filename of the log file.
-	 * 
+	 *
 	 * @return Filename of the log file
 	 */
 	public String getFilename() {
@@ -72,7 +74,7 @@ public final class FileWriter implements Writer {
 
 	/**
 	 * Determine whether buffered writing is enabled.
-	 * 
+	 *
 	 * @return <code>true</code> if buffered writing is enabled, otherwise <code>false</code>
 	 */
 	public boolean isBuffered() {
@@ -81,11 +83,15 @@ public final class FileWriter implements Writer {
 
 	@Override
 	public void init(final Configuration configuration) throws IOException {
+		File file = new File(filename);
+		EnvironmentHelper.makeDirectories(file);
+
 		if (buffered) {
-			stream = new BufferedOutputStream(new FileOutputStream(filename), BUFFER_SIZE);
+			stream = new BufferedOutputStream(new FileOutputStream(file), BUFFER_SIZE);
 		} else {
-			stream = new FileOutputStream(filename);
+			stream = new FileOutputStream(file);
 		}
+
 		VMShutdownHook.register(this);
 	}
 
@@ -103,7 +109,7 @@ public final class FileWriter implements Writer {
 
 	/**
 	 * Close the log file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */

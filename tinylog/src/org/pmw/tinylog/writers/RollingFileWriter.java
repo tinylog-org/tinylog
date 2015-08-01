@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.labelers.CountLabeler;
 import org.pmw.tinylog.labelers.Labeler;
@@ -54,12 +55,12 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Rolling log files once at startup.
-	 * 
+	 *
 	 * @param filename
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
-	 * 
+	 *
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups) {
@@ -68,14 +69,14 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Rolling log files once at startup.
-	 * 
+	 *
 	 * @param filename
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
 	 * @param buffered
 	 *            Buffered writing
-	 * 
+	 *
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered) {
@@ -84,14 +85,14 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Rolling log files once at startup.
-	 * 
+	 *
 	 * @param filename
 	 *            Filename of the log file
 	 * @param backups
 	 *            Number of backups
 	 * @param labeler
 	 *            Labeler for naming backups
-	 * 
+	 *
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final Labeler labeler) {
@@ -100,7 +101,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Rolling log files once at startup.
-	 * 
+	 *
 	 * @param filename
 	 *            Filename of the log file
 	 * @param backups
@@ -109,7 +110,7 @@ public final class RollingFileWriter implements Writer {
 	 *            Buffered writing
 	 * @param labeler
 	 *            Labeler for naming backups
-	 * 
+	 *
 	 * @see org.pmw.tinylog.policies.StartupPolicy
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler) {
@@ -184,7 +185,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Get the filename of the current log file.
-	 * 
+	 *
 	 * @return Filename of the current log file
 	 */
 	public String getFilename() {
@@ -195,7 +196,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Determine whether buffered writing is enabled.
-	 * 
+	 *
 	 * @return <code>true</code> if buffered writing is enabled, otherwise <code>false</code>
 	 */
 	public boolean isBuffered() {
@@ -204,7 +205,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Get the maximum number of backups.
-	 * 
+	 *
 	 * @return Maximum number of backups
 	 */
 	public int getNumberOfBackups() {
@@ -213,7 +214,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Get the labeler for naming backups.
-	 * 
+	 *
 	 * @return Labeler for naming backups
 	 */
 	public Labeler getLabeler() {
@@ -222,7 +223,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Get the rollover strategies.
-	 * 
+	 *
 	 * @return Rollover strategies
 	 */
 	public List<? extends Policy> getPolicies() {
@@ -231,8 +232,11 @@ public final class RollingFileWriter implements Writer {
 
 	@Override
 	public void init(final Configuration configuration) throws IOException {
+		File baseFile = new File(filename);
+		EnvironmentHelper.makeDirectories(baseFile);
+
 		labeler.init(configuration);
-		file = labeler.getLogFile(new File(filename));
+		file = labeler.getLogFile(baseFile);
 
 		for (Policy policy : policies) {
 			policy.init(configuration);
@@ -281,7 +285,7 @@ public final class RollingFileWriter implements Writer {
 
 	/**
 	 * Close the log file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */

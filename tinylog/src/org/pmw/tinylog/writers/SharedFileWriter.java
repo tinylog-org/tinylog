@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -22,11 +22,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.LogEntry;
 
 /**
  * Writes log entries to a shared file.
- * 
+ *
  * Multiple instances of a program are allowed to log into the same file.
  */
 @PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
@@ -52,7 +53,7 @@ public final class SharedFileWriter implements Writer {
 
 	/**
 	 * Get the filename of the log file.
-	 * 
+	 *
 	 * @return Filename of the log file
 	 */
 	public String getFilename() {
@@ -63,7 +64,10 @@ public final class SharedFileWriter implements Writer {
 	public void init(final Configuration configuration) throws IOException {
 		if (file.isFile()) {
 			file.delete();
+		} else {
+			EnvironmentHelper.makeDirectories(file);
 		}
+
 		stream = new FileOutputStream(file, true);
 		VMShutdownHook.register(this);
 	}
@@ -88,7 +92,7 @@ public final class SharedFileWriter implements Writer {
 
 	/**
 	 * Close the log file.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed to close the log file
 	 */
