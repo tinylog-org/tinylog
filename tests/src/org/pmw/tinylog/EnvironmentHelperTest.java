@@ -16,15 +16,20 @@ package org.pmw.tinylog;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
-import mockit.NonStrictExpectations;
-
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import mockit.NonStrictExpectations;
 
 /**
  * Tests the environment helper.
@@ -94,6 +99,36 @@ public class EnvironmentHelperTest extends AbstractTest {
 		};
 
 		assertEquals("5678", EnvironmentHelper.getProcessId());
+	}
+
+	/**
+	 * Test making nonexistent directories.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testMakingDirectories() throws IOException {
+		TemporaryFolder folder = new TemporaryFolder();
+		folder.create();
+
+		try {
+			File parentFolder = new File(folder.getRoot(), "parent");
+			File subFolder = new File(parentFolder, "sub");
+			File testFile = new File(subFolder, "test.log");
+
+			assertFalse(parentFolder.exists());
+			assertFalse(subFolder.exists());
+			assertFalse(testFile.exists());
+
+			EnvironmentHelper.makeDirectories(testFile);
+
+			assertTrue(parentFolder.exists());
+			assertTrue(subFolder.exists());
+			assertFalse(testFile.exists());
+		} finally {
+			folder.delete();
+		}
 	}
 
 }
