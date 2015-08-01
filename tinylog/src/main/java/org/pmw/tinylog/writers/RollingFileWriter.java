@@ -296,11 +296,11 @@ public final class RollingFileWriter implements Writer {
 	@Override
 	public void init(final Configuration configuration) throws IOException {
 		synchronized (mutex) {
-		File baseFile = new File(filename);
-		EnvironmentHelper.makeDirectories(baseFile);
+			File baseFile = new File(filename);
+			EnvironmentHelper.makeDirectories(baseFile);
 
-		labeler.init(configuration);
-		file = labeler.getLogFile(baseFile);
+			labeler.init(configuration);
+			file = labeler.getLogFile(baseFile);
 
 			for (RollingListener listener : listeners) {
 				try {

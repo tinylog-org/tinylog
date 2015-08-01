@@ -82,7 +82,7 @@ public final class Configuration {
 		this.customLevels = customLevels;
 		this.formatPattern = formatPattern == null ? DEFAULT_FORMAT_PATTERN : formatPattern;
 		this.locale = locale == null ? Locale.getDefault() : locale;
-		this.writerDefinitions = new ArrayList<WriterDefinition>(writerDefinitions);
+		this.writerDefinitions = new ArrayList<>(writerDefinitions);
 		this.writers = getWriters(writerDefinitions);
 		this.writingThread = writingThread;
 		this.maxStackTraceElements = maxStackTraceElements == null ? DEFAULT_MAX_STACK_TRACE_ELEMENTS : maxStackTraceElements;
