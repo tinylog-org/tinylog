@@ -16,9 +16,11 @@ package org.pmw.tinylog.writers;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
@@ -31,14 +33,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.LoopWritingThread;
 import org.pmw.tinylog.util.PropertiesBuilder;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the shared file writer.
@@ -309,6 +312,31 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		}
 
 		file.delete();
+	}
+
+	/**
+	 * Test creating a log file in an non-existing folder.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testNonexistengDirectory() throws IOException {
+		TemporaryFolder folder = new TemporaryFolder();
+		folder.create();
+		folder.delete();
+
+		File file = new File(folder.getRoot(), "test.log");
+
+		assertFalse(folder.getRoot().exists());
+
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		writer.init(null);
+		writer.close();
+
+		assertTrue(file.exists());
+
+		folder.delete();
 	}
 
 	/**

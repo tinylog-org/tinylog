@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.labelers.CountLabeler;
@@ -295,8 +296,11 @@ public final class RollingFileWriter implements Writer {
 	@Override
 	public void init(final Configuration configuration) throws IOException {
 		synchronized (mutex) {
-			labeler.init(configuration);
-			file = labeler.getLogFile(new File(filename));
+		File baseFile = new File(filename);
+		EnvironmentHelper.makeDirectories(baseFile);
+
+		labeler.init(configuration);
+		file = labeler.getLogFile(baseFile);
 
 			for (RollingListener listener : listeners) {
 				try {

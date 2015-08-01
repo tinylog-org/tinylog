@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 
 /**
@@ -46,6 +47,19 @@ public final class EnvironmentHelper {
 			return name.substring(0, index);
 		} else {
 			return name;
+		}
+	}
+
+	/**
+	 * Make all nonexistent directories.
+	 *
+	 * @param file
+	 *            Path to a file
+	 */
+	public static void makeDirectories(final File file) {
+		File parent = file.getParentFile();
+		if (parent != null) {
+			parent.mkdirs();
 		}
 	}
 

@@ -37,8 +37,6 @@ import org.pmw.tinylog.writers.Writer;
 public final class Configurator {
 
 	private static final String DEFAULT_PROPERTIES_FILE = "tinylog.properties";
-	private static final int DEFAULT_MAX_STACK_TRACE_ELEMENTS = 40;
-	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
 	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
 	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = (Thread.MIN_PRIORITY + Thread.NORM_PRIORITY) / 2;
 
@@ -51,7 +49,7 @@ public final class Configurator {
 	private Locale locale;
 	private final List<WriterDefinition> writers;
 	private WritingThreadData writingThreadData;
-	private int maxStackTraceElements;
+	private Integer maxStackTraceElements;
 
 	/**
 	 * @param level
@@ -70,7 +68,7 @@ public final class Configurator {
 	 *            Limit of stack traces for exceptions
 	 */
 	Configurator(final Level level, final Map<String, Level> customLevels, final String formatPattern, final Locale locale,
-			final List<WriterDefinition> writers, final WritingThreadData writingThreadData, final int maxStackTraceElements) {
+			final List<WriterDefinition> writers, final WritingThreadData writingThreadData, final Integer maxStackTraceElements) {
 		this.level = level;
 		this.customLevels = new HashMap<>(customLevels);
 		this.formatPattern = formatPattern;
@@ -86,8 +84,8 @@ public final class Configurator {
 	 * @return A new configurator
 	 */
 	public static Configurator defaultConfig() {
-		return new Configurator(Level.INFO, Collections.<String, Level> emptyMap(), DEFAULT_FORMAT_PATTERN, Locale.getDefault(),
-				Collections.<WriterDefinition> singletonList(new WriterDefinition(new ConsoleWriter())), null, DEFAULT_MAX_STACK_TRACE_ELEMENTS);
+		return new Configurator(null, Collections.<String, Level> emptyMap(), null, Locale.getDefault(),
+				Collections.<WriterDefinition> singletonList(new WriterDefinition(new ConsoleWriter())), null, null);
 	}
 
 	/**
@@ -152,11 +150,7 @@ public final class Configurator {
 	 * @return The current configurator
 	 */
 	public Configurator level(final Level level) {
-		if (level == null) {
-			this.level = Level.OFF;
-		} else {
-			this.level = level;
-		}
+		this.level = level;
 		return this;
 	}
 
@@ -232,11 +226,7 @@ public final class Configurator {
 	 * @see DateTimeFormatter
 	 */
 	public Configurator formatPattern(final String formatPattern) {
-		if (formatPattern == null) {
-			this.formatPattern = DEFAULT_FORMAT_PATTERN;
-		} else {
-			this.formatPattern = formatPattern;
-		}
+		this.formatPattern = formatPattern;
 		return this;
 	}
 
@@ -683,18 +673,21 @@ public final class Configurator {
 	 * @return The created configuration
 	 */
 	Configuration create() {
+		Configurator configurator = copy();
+				
 		WritingThread writingThread;
-		if (writingThreadData == null) {
+		if (configurator.writingThreadData == null) {
 			writingThread = null;
 		} else {
-			writingThread = new WritingThread(writingThreadData.threadToObserve, writingThreadData.priority);
-			if (writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
-				InternalLogger.warn("Thread \"{}\" could not be found, writing thread will not be used", writingThreadData.threadToObserve);
+			writingThread = new WritingThread(configurator.writingThreadData.threadToObserve, configurator.writingThreadData.priority);
+			if (configurator.writingThreadData.threadToObserve != null && writingThread.getThreadToObserve() == null) {
+				InternalLogger.warn("Thread \"{}\" could not be found, writing thread will not be used", configurator.writingThreadData.threadToObserve);
 				writingThread = null;
 			}
 		}
 
-		return new Configuration(level, customLevels, formatPattern, locale, writers, writingThread, maxStackTraceElements);
+		return new Configuration(configurator, configurator.level, configurator.customLevels, configurator.formatPattern, configurator.locale,
+				configurator.writers, writingThread, configurator.maxStackTraceElements);
 	}
 
 	/**

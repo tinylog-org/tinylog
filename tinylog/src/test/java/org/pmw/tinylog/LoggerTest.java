@@ -1448,3 +1448,4 @@ public class LoggerTest extends AbstractTest {
 	}
 
 }
+

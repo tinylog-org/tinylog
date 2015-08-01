@@ -143,7 +143,7 @@ abstract class ConfigurationObserver extends Thread {
 				Configurator configurator = oldConfigurator.copy();
 				if (properties != null) {
 					if (levelHasChanged(properties, oldProperties)) {
-						configurator.level(DEFAULT_CONFIGURATION.getLevel()).resetCustomLevels();
+						configurator.level(null).resetCustomLevels();
 						PropertiesLoader.readLevel(configurator, properties);
 					}
 					if (formatPaternHasChanged(properties, oldProperties)) {
