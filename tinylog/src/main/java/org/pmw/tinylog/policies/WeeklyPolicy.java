@@ -71,7 +71,7 @@ public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	}
 
 	private static int convert(final Calendar calendar, final int dayOfWeek) {
-		return (calendar.getFirstDayOfWeek() - 1 + dayOfWeek - 1) % 7 + 1;
+		return (Calendar.MONDAY - 1 + dayOfWeek - 1) % 7 + 1;
 	}
 
 	private static Calendar createCalendar(final String dayOfWeek) {
