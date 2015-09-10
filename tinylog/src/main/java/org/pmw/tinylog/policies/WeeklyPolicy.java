@@ -35,7 +35,7 @@ public final class WeeklyPolicy extends AbstractTimeBasedPolicy {
 	 * Trigger the first rollover at 00:00 at the defined day of week.
 	 * 
 	 * @param dayOfWeek
-	 *            Day of week (between 1..7) for rollover
+	 *            Day of week (between 1..7) for rollover (1=Monday, 7=Sunday)
 	 * @throws IllegalArgumentException
 	 *             if dayOfWeek is out of range (1..7)
 	 */
