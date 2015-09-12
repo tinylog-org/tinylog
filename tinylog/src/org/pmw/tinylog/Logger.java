@@ -485,7 +485,7 @@ public final class Logger {
 	 * @throws Exception
 	 *             Failed to initialize the writer
 	 */
-	static void setConfirguration(final Configuration configuration) throws Exception {
+	static void setConfiguration(final Configuration configuration) throws Exception {
 		Configuration previousConfiguration = Logger.configuration;
 
 		if (previousConfiguration == null) {

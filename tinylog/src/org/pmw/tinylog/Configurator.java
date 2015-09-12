@@ -540,7 +540,7 @@ public final class Configurator {
 
 			Configuration configuration = create();
 			try {
-				Logger.setConfirguration(configuration);
+				Logger.setConfiguration(configuration);
 			} catch (Exception ex) {
 				InternalLogger.error(ex, "Failed to activate configuration");
 				return false;

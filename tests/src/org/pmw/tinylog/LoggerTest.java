@@ -959,7 +959,7 @@ public class LoggerTest extends AbstractTest {
 		/* Test getting and setting configuration */
 
 		Configuration configuration = Configurator.defaultConfig().writer(null).formatPattern("Hello World").create();
-		Logger.setConfirguration(configuration);
+		Logger.setConfiguration(configuration);
 		assertEquals("Hello World", Logger.getConfiguration().create().getFormatPattern());
 
 		/* Reset logger */
@@ -973,12 +973,12 @@ public class LoggerTest extends AbstractTest {
 		DummyWriter writer = new DummyWriter();
 
 		configuration = Configurator.defaultConfig().writer(writer).create();
-		Logger.setConfirguration(configuration);
+		Logger.setConfiguration(configuration);
 		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
 
 		configuration = Configurator.defaultConfig().writer(writer).create();
-		Logger.setConfirguration(configuration);
+		Logger.setConfiguration(configuration);
 		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
 
@@ -986,7 +986,7 @@ public class LoggerTest extends AbstractTest {
 
 		assertEquals(0, writer.numberOfInits);
 		configuration = Configurator.defaultConfig().writer(writer).create();
-		Logger.setConfirguration(configuration);
+		Logger.setConfiguration(configuration);
 		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
 	}
