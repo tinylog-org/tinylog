@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog.policies;
 
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.junit.After;
@@ -51,6 +52,7 @@ public abstract class AbstractTimeBasedPolicyTest extends AbstractPolicyTest {
 	 */
 	protected static final long YEAR = 365L * DAY;
 
+	private Locale defaultLocale;
 	private SystemTimeMock systemTimeMock;
 
 	/**
@@ -58,15 +60,17 @@ public abstract class AbstractTimeBasedPolicyTest extends AbstractPolicyTest {
 	 */
 	@Before
 	public final void init() {
+		defaultLocale = Locale.getDefault();
 		systemTimeMock = new SystemTimeMock();
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	/**
-	 * Tear down mock and reset time zone.
+	 * Restore default locale, tear down mock and reset time zone.
 	 */
 	@After
 	public final void dispose() {
+		Locale.setDefault(defaultLocale);
 		systemTimeMock.tearDown();
 		TimeZone.setDefault(null);
 	}

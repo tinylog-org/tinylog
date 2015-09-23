@@ -20,6 +20,7 @@ import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.FileHelper;
@@ -38,7 +39,19 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	public final void testDefaultRollingAtEndOfWeek() {
 		// Thursday, 1st January 1970
 
+		Locale.setDefault(Locale.US);
 		Policy policy = new WeeklyPolicy();
+		policy.init(null);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY * 3 - 1L); // Saturday, 3rd January 1970 23:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // Sunday, 4th January 1970
+		assertFalse(policy.check((String) null));
+		
+		setTime(0L); // Thursday, 1st January 1970
+
+		Locale.setDefault(Locale.GERMANY);
+		policy = new WeeklyPolicy();
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
@@ -52,9 +65,28 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	 */
 	@Test
 	public final void testRollingAtEndOfWeek() {
+		Locale.setDefault(Locale.US);
 		setTime(DAY); // Friday, 2nd January 1970
-
+		
 		Policy policy = new WeeklyPolicy(1);
+		policy.init(null);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY * 2 - 1L); // Saturday, 3rd January 1970 23:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // Sunday, 4th January 1970
+		assertFalse(policy.check((String) null));
+
+		policy.reset();
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY * 7 - 1L); // Saturday, 10th January 1970 23:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // Sunday, 11th January January 1970
+		assertFalse(policy.check((String) null));
+		
+		Locale.setDefault(Locale.GERMANY);
+		setTime(DAY); // Friday, 2nd January 1970
+		
+		policy = new WeeklyPolicy(1);
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 3 - 1L); // Sunday, 4th January 1970 23:59:59,999
@@ -71,13 +103,13 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test rolling at Sunday 00:00 by setting explicitly 7.
+	 * Test rolling at Sunday 00:00 by setting explicitly "sunday".
 	 */
 	@Test
 	public final void testRollingAtSundayMorning() {
 		setTime(DAY); // Friday, 2nd January 1970
 
-		Policy policy = new WeeklyPolicy(7);
+		Policy policy = new WeeklyPolicy("sunday");
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 2 - 1L); // Saturday, 3rd January 1970 23:59:59,999
@@ -110,13 +142,25 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test String parameter for numeric Monday (= "1").
+	 * Test String parameter for numeric Monday.
 	 */
 	@Test
 	public final void testStringParameterForNumericMonday() {
 		// Thursday, 1st January 1970
 
-		Policy policy = new WeeklyPolicy("1");
+		Locale.setDefault(Locale.US);		
+		Policy policy = new WeeklyPolicy("2");
+		policy.init(null);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // Monday, 5th January 1970
+		assertFalse(policy.check((String) null));
+		
+		setTime(0L); // Thursday, 1st January 1970
+
+		Locale.setDefault(Locale.GERMANY);		
+		policy = new WeeklyPolicy("1");
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 4 - 1L); // Sunday, 4th January 1970 23:59:59,999
@@ -126,13 +170,25 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test String parameter for numeric Sunday (= "7").
+	 * Test String parameter for numeric Sunday.
 	 */
 	@Test
 	public final void testStringParameterForNumericSunday() {
 		// Thursday, 1st January 1970
 
-		Policy policy = new WeeklyPolicy("7");
+		Locale.setDefault(Locale.US);		
+		Policy policy = new WeeklyPolicy("1");
+		policy.init(null);
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY * 3 - 1L); // Saturday, 3th January 1970 23:59:59,999
+		assertTrue(policy.check((String) null));
+		increaseTime(1L); // Sunday, 4th January 1970
+		assertFalse(policy.check((String) null));
+		
+		setTime(0L); // Thursday, 1st January 1970
+
+		Locale.setDefault(Locale.GERMANY);		
+		policy = new WeeklyPolicy("7");
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY * 3 - 1L); // Saturday, 3th January 1970 23:59:59,999
@@ -281,7 +337,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		Policy policy = new WeeklyPolicy();
+		Policy policy = new WeeklyPolicy("monday");
 		policy.init(null);
 		assertTrue(policy.check(file));
 		assertTrue(policy.check((String) null));
@@ -291,7 +347,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		assertFalse(policy.check((String) null));
 
 		increaseTime(-1L); // Sunday, 4th January 1970 23:59:59,999
-		policy = new WeeklyPolicy();
+		policy = new WeeklyPolicy("monday");
 		policy.init(null);
 		assertTrue(policy.check(file));
 		assertTrue(policy.check((String) null));
@@ -311,13 +367,13 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		File file = FileHelper.createTemporaryFile(null);
 		file.setLastModified(getTime());
 
-		WeeklyPolicy policy = new WeeklyPolicy();
+		WeeklyPolicy policy = new WeeklyPolicy("monday");
 		policy.init(null);
 		assertTrue(policy.check(file));
 
 		increaseTime(DAY); // Monday, 5th January 1970 12:00
 
-		policy = new WeeklyPolicy();
+		policy = new WeeklyPolicy("monday");
 		policy.init(null);
 		assertFalse(policy.check(file));
 
@@ -345,7 +401,21 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	 */
 	@Test
 	public final void testFromProperties() {
+		 // Thursday, 1st January 1970
+		
+		Locale.setDefault(Locale.US);
 		Policy policy = createFromProperties("weekly");
+		assertThat(policy, type(WeeklyPolicy.class));
+		policy.init(null);
+		increaseTime(DAY * 2); // Saturday, 3rd January 1970
+		assertTrue(policy.check((String) null));
+		increaseTime(DAY); // Sunday, 4th January 1970
+		assertFalse(policy.check((String) null));
+
+		setTime(0L); // Thursday, 1st January 1970
+		
+		Locale.setDefault(Locale.GERMANY);
+		policy = createFromProperties("weekly");
 		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 3); // Sunday, 4th January 1970
@@ -353,7 +423,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		increaseTime(DAY); // Monday, 5th January 1970
 		assertFalse(policy.check((String) null));
 
-		setTime(0L);
+		setTime(0L); // Thursday, 1st January 1970
 
 		policy = createFromProperties("weekly: friday");
 		assertThat(policy, type(WeeklyPolicy.class));
@@ -362,7 +432,7 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		increaseTime(DAY); // Friday, 2nd January 1970
 		assertFalse(policy.check((String) null));
 
-		setTime(0L);
+		setTime(0L); // Thursday, 1st January 1970
 
 		policy = createFromProperties("weekly: sunday");
 		assertThat(policy, type(WeeklyPolicy.class));
