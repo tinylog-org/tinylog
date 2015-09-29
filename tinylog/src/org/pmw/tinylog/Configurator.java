@@ -638,17 +638,17 @@ public final class Configurator {
 			}
 		}
 
-		if (stream == null) {
+		Properties systemProperties = System.getProperties();
+		for (Object key : systemProperties.keySet()) {
+			String name = (String) key;
+			if (name.startsWith("tinylog.")) {
+				properties.put(name, systemProperties.getProperty(name));
+			}
+		}
+
+		if (properties.isEmpty()) {
 			return Configurator.defaultConfig();
 		} else {
-			Properties systemProperties = System.getProperties();
-			for (Object key : systemProperties.keySet()) {
-				String name = (String) key;
-				if (name.startsWith("tinylog.")) {
-					properties.put(name, systemProperties.getProperty(name));
-				}
-			}
-
 			if ("true".equalsIgnoreCase(properties.getProperty("tinylog.configuration.observe"))) {
 				shutdownWritingThread(true);
 				Configurator configurator = PropertiesLoader.readProperties(properties);

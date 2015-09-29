@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -61,7 +61,7 @@ public class RegressionsTest extends AbstractTest {
 
 	/**
 	 * Bug: If a log file is continued, the policy will start from scratch. This leads to a too late rollover.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -127,7 +127,7 @@ public class RegressionsTest extends AbstractTest {
 
 	/**
 	 * Bug: Timestamps need a locale but the locale isn't set at startup.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -139,7 +139,7 @@ public class RegressionsTest extends AbstractTest {
 
 	/**
 	 * Bug: Rolling fails for files without a parent path in timestamp labeler.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Test failed
 	 */
@@ -160,7 +160,7 @@ public class RegressionsTest extends AbstractTest {
 	/**
 	 * Bug: Initialization of a rolling file writer with a timestamp labeler fails if there is no previous
 	 * configuration.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Test failed
 	 */
@@ -190,6 +190,20 @@ public class RegressionsTest extends AbstractTest {
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertNotNull(logEntry);
 		assertEquals(exception.getClass().getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+	}
+
+	/**
+	 * Bug: System properties not loaded without existing properties file in default package.
+	 */
+	@Test
+	public final void testSystemProperties() {
+		try {
+			System.setProperty("tinylog.level", "trace");
+			Configurator.init().activate();
+			assertEquals(Level.TRACE, Logger.getLevel());
+		} finally {
+			System.clearProperty("tinylog.level");
+		}
 	}
 
 	private void resetLogger() throws Exception {
