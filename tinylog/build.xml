@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="tinylog" default="all">
 	
-	<property name="version" value="1.0.1" />
-	<property name="bundle-version" value="1.0.1" />
-	<property name="maven-version" value="1.0.1" />
+	<property name="version" value="1.0.2" />
+	<property name="bundle-version" value="1.0.2" />
+	<property name="maven-version" value="1.0.2" />
 	<property name="slf4j-version" value="1.7.7" />
 	
 	<property name="vendor" value="PMW Media" />
