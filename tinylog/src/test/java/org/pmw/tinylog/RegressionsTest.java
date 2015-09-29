@@ -192,6 +192,20 @@ public class RegressionsTest extends AbstractTest {
 		assertEquals(exception.getClass().getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
+	/**
+	 * Bug: System properties not loaded without existing properties file in default package.
+	 */
+	@Test
+	public final void testSystemProperties() {
+		try {
+			System.setProperty("tinylog.level", "trace");
+			Configurator.init().activate();
+			assertEquals(Level.TRACE, Logger.getLevel());
+		} finally {
+			System.clearProperty("tinylog.level");
+		}
+	}
+
 	private static void resetLogger() throws Exception {
 		Field field = Logger.class.getDeclaredField("configuration");
 		field.setAccessible(true);
