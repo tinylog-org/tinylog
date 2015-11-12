@@ -24,6 +24,7 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.hasLength;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
+import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.writers.LogEntryValue;
+
+import mockit.Expectations;
+import mockit.Verifications;
 
 /**
  * Tests for tokenizer.
@@ -99,6 +103,40 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
 		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+	}
+
+	/**
+	 * Test caching of rendered dates.
+	 */
+	@Test
+	public final void testDateCaching() {
+		List<Token> tokens = new Tokenizer(locale, 0).parse("{date: HH:mm:ss.SSS}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
+
+		final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
+
+		Date date = new Date();
+		LogEntryBuilder logEntryBuilder = new LogEntryBuilder().date(date);
+		String expected = formatter.format(date);
+
+		new Expectations(SimpleDateFormat.class) {
+		};
+
+		assertEquals(expected, render(tokens, logEntryBuilder));
+		assertEquals(expected, render(tokens, logEntryBuilder));
+
+		new Verifications(1) {
+			{
+				formatter.format((Date) any, (StringBuffer) any, (FieldPosition) any);
+			}
+		};
+
+		date = new Date(date.getTime() + 1);
+		logEntryBuilder = new LogEntryBuilder().date(date);
+		expected = formatter.format(date);
+
+		assertEquals(expected, render(tokens, logEntryBuilder));
 	}
 
 	/**

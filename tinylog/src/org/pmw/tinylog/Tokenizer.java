@@ -157,14 +157,14 @@ final class Tokenizer {
 
 	private Token getToken(final String text) {
 		if (text.equals("date")) {
-			return new DateToken(new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale));
+			return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 		} else if (text.startsWith("date:")) {
-			String dateFormatPattern = text.substring(5, text.length());
+			String dateFormatPattern = text.substring(5, text.length()).trim();
 			try {
-				return new DateToken(new SimpleDateFormat(dateFormatPattern, locale));
+				return new DateToken(dateFormatPattern, locale);
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(ex, "\"{}\" is an invalid date format pattern", dateFormatPattern);
-				return new DateToken(new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale));
+				return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 			}
 		} else if ("pid".equals(text)) {
 			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
@@ -443,9 +443,14 @@ final class Tokenizer {
 	private static final class DateToken implements Token {
 
 		private final DateFormat formatter;
+		private final long divisor;
 
-		private DateToken(final DateFormat formatter) {
-			this.formatter = formatter;
+		private Date lastDate;
+		private String lastFormat;
+
+		private DateToken(final String pattern, final Locale locale) {
+			this.formatter = new SimpleDateFormat(pattern, locale);
+			this.divisor = pattern.contains("SSS") ? 1 : pattern.contains("ss") ? 1000 : 60000;
 		}
 
 		@Override
@@ -460,7 +465,13 @@ final class Tokenizer {
 
 		private String format(final Date date) {
 			synchronized (formatter) {
-				return formatter.format(date);
+				if (lastDate != null && date.getTime() / divisor == lastDate.getTime() / divisor) {
+					return lastFormat;
+				} else {
+					lastDate = date;
+					lastFormat = formatter.format(date);
+					return lastFormat;
+				}
 			}
 		}
 
