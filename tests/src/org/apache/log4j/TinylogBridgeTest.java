@@ -27,6 +27,7 @@ import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntryValue;
 
+
 /**
  * Tests for tinylog bridge.
  * 
