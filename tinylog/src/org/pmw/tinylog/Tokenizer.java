@@ -181,6 +181,17 @@ final class Tokenizer {
 		} else if (text.startsWith("thread_id:")) {
 			InternalLogger.warn("\"{thread_id}\" does not support parameters");
 			return new ThreadIdToken();
+		} else if (text.equals("context")) {
+			InternalLogger.error("\"{context}\" requires a key");
+			return getPlainTextToken("");
+		} else if (text.startsWith("context:")) {
+			String key = text.substring(8, text.length()).trim();
+			if (key.length() == 0) {
+				InternalLogger.error("\"{context}\" requires a key");
+				return getPlainTextToken("");
+			} else {
+				return new ContextToken(key);
+			}
 		} else if ("class".equals(text)) {
 			return new ClassToken();
 		} else if (text.startsWith("class:")) {
@@ -510,7 +521,27 @@ final class Tokenizer {
 		}
 
 	}
+	
+	private static final class ContextToken implements Token {
 
+		private final String key;
+
+		private ContextToken(final String key) {
+			this.key = key;
+		}
+		
+		@Override
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.CONTEXT);
+		}
+		
+		@Override
+		public void render(final LogEntry logEntry, final StringBuilder builder) {
+			builder.append(logEntry.getContext().get(key));
+		}
+
+	}
+	
 	private static final class ClassToken implements Token {
 
 		public ClassToken() {

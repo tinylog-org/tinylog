@@ -178,6 +178,28 @@ public class TokenizerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test parsing with results of context tokens.
+	 */
+	@Test
+	public final void testContextToken() {
+		Tokenizer tokenizer = new Tokenizer(locale, 0);
+		LogEntryBuilder logEntryBuilder = new LogEntryBuilder().context("pi", "3.14");
+
+		List<Token> tokens = tokenizer.parse("{context: pi}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CONTEXT));
+		assertEquals("3.14", render(tokens, logEntryBuilder));
+
+		tokens = tokenizer.parse("{context: e}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CONTEXT));
+		assertEquals("null", render(tokens, logEntryBuilder));
+
+		tokenizer.parse("{context}");
+		assertEquals("LOGGER ERROR: \"{context}\" requires a key", getErrorStream().nextLine());
+	}
+
+	/**
 	 * Test parsing with results of thread ID tokens.
 	 */
 	@Test

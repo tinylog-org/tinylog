@@ -16,6 +16,7 @@ package org.pmw.tinylog;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntryValue;
@@ -622,6 +623,7 @@ public final class Logger {
 		Date now = null;
 		String processId = null;
 		Thread thread = null;
+		Map<String, String> context = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		String fullyQualifiedClassName = null;
 		String method = null;
@@ -641,6 +643,10 @@ public final class Logger {
 
 				case THREAD:
 					thread = Thread.currentThread();
+					break;
+
+				case CONTEXT:
+					context = LoggingContext.getMapping();
 					break;
 
 				case CLASS:
@@ -688,7 +694,7 @@ public final class Logger {
 		}
 
 		for (int i = 0; i < entries.length; ++i) {
-			LogEntry logEntry = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
+			LogEntry logEntry = new LogEntry(now, processId, thread, context, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
 			List<Token> formatTokensOfWriter = formatTokens[i];
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder(exception == null ? 256 : 1024);

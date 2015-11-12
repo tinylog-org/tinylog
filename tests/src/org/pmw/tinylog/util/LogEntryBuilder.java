@@ -15,6 +15,8 @@ package org.pmw.tinylog.util;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
@@ -27,6 +29,7 @@ public final class LogEntryBuilder {
 	private Date date = null;
 	private String processId = null;
 	private Thread thread = null;
+	private Map<String, String> context = new HashMap<String, String>();
 	private String className = null;
 	private String method = null;
 	private String file = null;
@@ -71,6 +74,21 @@ public final class LogEntryBuilder {
 		this.thread = thread;
 		return this;
 	}
+
+	/**
+	 * Add a mapping to the logging context.
+	 *
+	 * @param key
+	 *            Key of mapping
+	 * @param value
+	 *            Value of mapping
+	 * @return The current log entry builder instance
+	 */
+	public LogEntryBuilder context(final String key, final String value) {
+		context.put(key, value);
+		return this;
+	}
+
 
 	/**
 	 * Set the fully qualified class name of the caller.
@@ -174,7 +192,7 @@ public final class LogEntryBuilder {
 	 * @return Created log entry
 	 */
 	public LogEntry create() {
-		LogEntry logEntry = new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception);
+		LogEntry logEntry = new LogEntry(date, processId, thread, context, className, method, file, lineNumber, level, message, exception);
 		try {
 			Method setter = LogEntry.class.getDeclaredMethod("setRenderedLogEntry", String.class);
 			setter.setAccessible(true);

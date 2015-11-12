@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
@@ -642,6 +644,33 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().thread(Thread.currentThread()).create());
 		assertEquals(Arrays.asList(Long.toString(Thread.currentThread().getId())), getLogEntries());
+
+		writer.close();
+	}
+
+	/**
+	 * Test writing mapped diagnostic context.
+	 *
+	 * @throws SQLException
+	 *             Test failed
+	 */
+	@Test
+	public final void testLoggingContext() throws SQLException {
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.CONTEXT));
+		writer.init(null);
+
+		writer.write(new LogEntryBuilder().create());
+		assertEquals(Arrays.asList((String) null), getLogEntries());
+
+		clearEntries();
+
+		writer.write(new LogEntryBuilder().context("number", "42").create());
+		assertEquals(Arrays.asList("number=42"), getLogEntries());
+
+		clearEntries();
+
+		writer.write(new LogEntryBuilder().context("number", "42").context("pi", "3.14").create());
+		assertThat(getLogEntries(), anyOf(contains("number=42, pi=3.14"), contains("pi=3.14, number=42")));
 
 		writer.close();
 	}

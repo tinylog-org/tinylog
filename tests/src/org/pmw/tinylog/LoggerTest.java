@@ -27,6 +27,7 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
@@ -704,7 +705,23 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Thread.currentThread(), logEntry.getThread());
 		assertEquals(Thread.currentThread().getId() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
+	
+	/**
+	 * Test a log entry with logging context.
+	 */
+	@Test
+	public final void testLogEntryWithContext() {
+		LoggingContext.put("pi", "3.14");
+		StoreWriter writer = new StoreWriter(LogEntryValue.CONTEXT, LogEntryValue.RENDERED_LOG_ENTRY);
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{context: pi}").activate();
 
+		Logger.info("Hello");
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(Collections.singletonMap("pi", "3.14"), logEntry.getContext());
+		assertEquals("3.14" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+	}
+	
 	/**
 	 * Test a log entry with a fully qualified class name pattern.
 	 */

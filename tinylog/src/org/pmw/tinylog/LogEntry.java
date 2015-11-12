@@ -14,6 +14,7 @@
 package org.pmw.tinylog;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Log entry object for {@link org.pmw.tinylog.writers.Writer#write(LogEntry) Writer.write(LogEntry)}.
@@ -23,6 +24,7 @@ public final class LogEntry {
 	private final Date date;
 	private final String processId;
 	private final Thread thread;
+	private final Map<String, String> context;
 	private final String className;
 	private final String methodName;
 	private final String filename;
@@ -39,6 +41,8 @@ public final class LogEntry {
 	 *            The ID of the process (pid)
 	 * @param thread
 	 *            The current thread
+	 * @param context
+	 *            Thread-based mapped diagnostic context
 	 * @param className
 	 *            The fully qualified class name
 	 * @param methodName
@@ -54,11 +58,12 @@ public final class LogEntry {
 	 * @param exception
 	 *            The exception of the log entry
 	 */
-	public LogEntry(final Date date, final String processId, final Thread thread, final String className, final String methodName, final String filename,
-			final int lineNumber, final Level level, final String message, final Throwable exception) {
+	public LogEntry(final Date date, final String processId, final Thread thread, final Map<String, String> context, final String className,
+			final String methodName, final String filename, final int lineNumber, final Level level, final String message, final Throwable exception) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
+		this.context = context;
 		this.className = className;
 		this.methodName = methodName;
 		this.filename = filename;
@@ -93,6 +98,15 @@ public final class LogEntry {
 	 */
 	public Thread getThread() {
 		return thread;
+	}
+
+	/**
+	 * Get the thread-based mapped diagnostic context.
+	 *
+	 * @return Mapped diagnostic context
+	 */
+	public Map<String, String> getContext() {
+		return context;
 	}
 
 	/**
