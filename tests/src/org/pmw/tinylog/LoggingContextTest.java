@@ -21,7 +21,6 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -30,14 +29,6 @@ import org.junit.Test;
  * @see LoggingContext
  */
 public class LoggingContextTest extends AbstractTest {
-	
-	/**
-	 * Clear logging context.
-	 */
-	@After
-	public final void dispose() {
-		LoggingContext.clear();
-	}
 
 	/**
 	 * Test all getters and data manipulation methods in single threading mode.
