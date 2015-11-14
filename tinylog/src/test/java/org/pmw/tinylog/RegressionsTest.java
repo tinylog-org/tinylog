@@ -200,7 +200,7 @@ public class RegressionsTest extends AbstractTest {
 		try {
 			System.setProperty("tinylog.level", "trace");
 			Configurator.init().activate();
-			assertEquals(Level.TRACE, Logger.getLevel());
+			assertTrue(Logger.isTraceEnabled());
 		} finally {
 			System.clearProperty("tinylog.level");
 		}
