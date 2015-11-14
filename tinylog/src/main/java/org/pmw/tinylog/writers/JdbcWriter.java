@@ -19,13 +19,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -515,6 +517,17 @@ public final class JdbcWriter implements Writer {
 		}
 	}
 
+	private static String formatMap(final Map<String, String> map) {
+		StringBuilder builder = new StringBuilder(256);
+		for (Entry<String, String> entry : map.entrySet()) {
+			if (builder.length() > 0) {
+				builder.append(", ");
+			}
+			builder.append(entry.getKey()).append('=').append(entry.getValue());
+		}
+		return builder.toString();
+	}
+
 	private static String formatException(final Throwable exception) {
 		StringBuilder builder = new StringBuilder(1024);
 		formatExceptionWithStackTrace(builder, exception);
@@ -550,7 +563,7 @@ public final class JdbcWriter implements Writer {
 		for (int i = 0; i < values.size(); ++i) {
 			switch (values.get(i)) {
 				case DATE:
-					statement.setTimestamp(i + 1, Timestamp.valueOf(logEntry.getDate().toLocalDateTime()));
+					statement.setTimestamp(i + 1, new Timestamp(logEntry.getDate().getTime()));
 					break;
 				case PROCESS_ID:
 					statement.setString(i + 1, logEntry.getProcessId());
@@ -560,6 +573,14 @@ public final class JdbcWriter implements Writer {
 					break;
 				case THREAD_ID:
 					statement.setLong(i + 1, logEntry.getThread().getId());
+					break;
+				case CONTEXT:
+					Map<String, String> context = logEntry.getContext();
+					if (context == null || context.isEmpty()) {
+						statement.setNull(i + 1, Types.VARCHAR);
+					} else {
+						statement.setString(i + 1, formatMap(context));
+					}
 					break;
 				case CLASS:
 					statement.setString(i + 1, logEntry.getClassName());
@@ -642,7 +663,7 @@ public final class JdbcWriter implements Writer {
 		/**
 		 * The current date
 		 *
-		 * @see ZonedDateTime
+		 * @see Date
 		 */
 		DATE(LogEntryValue.DATE),
 
@@ -660,6 +681,11 @@ public final class JdbcWriter implements Writer {
 		 * The ID of the current thread
 		 */
 		THREAD_ID(LogEntryValue.THREAD),
+
+		/**
+		 * Mapped diagnostic context
+		 */
+		CONTEXT(LogEntryValue.CONTEXT),
 
 		/**
 		 * The fully qualified class name of the caller

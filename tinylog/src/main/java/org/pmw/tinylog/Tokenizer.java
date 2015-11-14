@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,11 +13,13 @@
 
 package org.pmw.tinylog;
 
-import java.time.format.DateTimeFormatter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -155,17 +157,17 @@ final class Tokenizer {
 
 	private Token getToken(final String text) {
 		if (text.equals("date")) {
-			return new DateToken(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT_PATTERN, locale));
+			return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 		} else if (text.startsWith("date:")) {
-			String dateFormatPattern = text.substring(5, text.length());
+			String dateFormatPattern = text.substring(5, text.length()).trim();
 			try {
-				return new DateToken(DateTimeFormatter.ofPattern(dateFormatPattern, locale));
+				return new DateToken(dateFormatPattern, locale);
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(ex, "\"{}\" is an invalid date format pattern", dateFormatPattern);
-				return new DateToken(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT_PATTERN, locale));
+				return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 			}
 		} else if ("pid".equals(text)) {
-			return new PlainTextToken(EnvironmentHelper.getProcessId());
+			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
 		} else if (text.startsWith("pid:")) {
 			InternalLogger.warn("\"{pid}\" does not support parameters");
 			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
@@ -179,6 +181,17 @@ final class Tokenizer {
 		} else if (text.startsWith("thread_id:")) {
 			InternalLogger.warn("\"{thread_id}\" does not support parameters");
 			return new ThreadIdToken();
+		} else if (text.equals("context")) {
+			InternalLogger.error("\"{context}\" requires a key");
+			return getPlainTextToken("");
+		} else if (text.startsWith("context:")) {
+			String key = text.substring(8, text.length()).trim();
+			if (key.length() == 0) {
+				InternalLogger.error("\"{context}\" requires a key");
+				return getPlainTextToken("");
+			} else {
+				return new ContextToken(key);
+			}
 		} else if ("class".equals(text)) {
 			return new ClassToken();
 		} else if (text.startsWith("class:")) {
@@ -440,10 +453,15 @@ final class Tokenizer {
 
 	private static final class DateToken implements Token {
 
-		private final DateTimeFormatter formatter;
+		private final DateFormat formatter;
+		private final long divisor;
 
-		private DateToken(final DateTimeFormatter formatter) {
-			this.formatter = formatter;
+		private Date lastDate;
+		private String lastFormat;
+
+		private DateToken(final String pattern, final Locale locale) {
+			this.formatter = new SimpleDateFormat(pattern, locale);
+			this.divisor = pattern.contains("SSS") ? 1 : pattern.contains("ss") ? 1000 : 60000;
 		}
 
 		@Override
@@ -453,7 +471,19 @@ final class Tokenizer {
 
 		@Override
 		public void render(final LogEntry logEntry, final StringBuilder builder) {
-			builder.append(formatter.format(logEntry.getDate()));
+			builder.append(format(logEntry.getDate()));
+		}
+
+		private String format(final Date date) {
+			synchronized (formatter) {
+				if (lastDate != null && date.getTime() / divisor == lastDate.getTime() / divisor) {
+					return lastFormat;
+				} else {
+					lastDate = date;
+					lastFormat = formatter.format(date);
+					return lastFormat;
+				}
+			}
 		}
 
 	}
@@ -488,6 +518,26 @@ final class Tokenizer {
 		@Override
 		public void render(final LogEntry logEntry, final StringBuilder builder) {
 			builder.append(logEntry.getThread().getId());
+		}
+
+	}
+
+	private static final class ContextToken implements Token {
+
+		private final String key;
+
+		private ContextToken(final String key) {
+			this.key = key;
+		}
+
+		@Override
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.CONTEXT);
+		}
+
+		@Override
+		public void render(final LogEntry logEntry, final StringBuilder builder) {
+			builder.append(logEntry.getContext().get(key));
 		}
 
 	}

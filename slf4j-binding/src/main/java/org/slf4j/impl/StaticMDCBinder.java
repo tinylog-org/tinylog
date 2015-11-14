@@ -27,9 +27,12 @@ public final class StaticMDCBinder {
 	 */
 	public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
 
-	private static final String mdcAdapterClassName = NOPMDCAdapter.class.getName();
+	private static final String mdcAdapterClassName = TinylogMDCAdapter.class.getName();
+
+	private final TinylogMDCAdapter adapter;
 
 	private StaticMDCBinder() {
+		adapter = new TinylogMDCAdapter();
 	}
 
 	/**
@@ -37,8 +40,8 @@ public final class StaticMDCBinder {
 	 *
 	 * @return MDC adapter
 	 */
-	public NOPMDCAdapter getMDCA() {
-		return new NOPMDCAdapter();
+	public TinylogMDCAdapter getMDCA() {
+		return adapter;
 	}
 
 	/**

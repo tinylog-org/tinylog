@@ -13,7 +13,6 @@
 
 package org.apache.log4j;
 
-
 /**
  * log4j logging API.
  */

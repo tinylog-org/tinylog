@@ -13,6 +13,8 @@
 
 package org.pmw.tinylog.writers;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
@@ -30,16 +32,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 import org.h2.jdbc.JdbcDatabaseMetaData;
 import org.junit.After;
@@ -50,6 +47,9 @@ import org.pmw.tinylog.Level;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.JdbcWriter.Value;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the SQL database writer.
@@ -324,7 +324,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		writer = new JdbcWriter(URL, "log", null, new String[] { "log_entry" }, null, null);
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), writer.getValues());
 
-		new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
+		writer = new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
 		assertEquals("LOGGER WARNING: Unknown value type: \"unknown\"", getErrorStream().nextLine());
 	}
 
@@ -583,7 +583,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.DATE));
 		writer.init(null);
 
-		writer.write(new LogEntryBuilder().date(ZonedDateTime.ofInstant(Instant.ofEpochMilli(1000), ZoneId.systemDefault())).create());
+		writer.write(new LogEntryBuilder().date(new Date(1000)).create());
 		assertEquals(Arrays.asList(new Timestamp(1000).toString()), getLogEntries());
 
 		writer.close();
@@ -636,6 +636,33 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		writer.write(new LogEntryBuilder().thread(Thread.currentThread()).create());
 		assertEquals(Arrays.asList(Long.toString(Thread.currentThread().getId())), getLogEntries());
+
+		writer.close();
+	}
+
+	/**
+	 * Test writing mapped diagnostic context.
+	 *
+	 * @throws SQLException
+	 *             Test failed
+	 */
+	@Test
+	public final void testLoggingContext() throws SQLException {
+		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.CONTEXT));
+		writer.init(null);
+
+		writer.write(new LogEntryBuilder().create());
+		assertEquals(Arrays.asList((String) null), getLogEntries());
+
+		clearEntries();
+
+		writer.write(new LogEntryBuilder().context("number", "42").create());
+		assertEquals(Arrays.asList("number=42"), getLogEntries());
+
+		clearEntries();
+
+		writer.write(new LogEntryBuilder().context("number", "42").context("pi", "3.14").create());
+		assertThat(getLogEntries(), anyOf(contains("number=42, pi=3.14"), contains("pi=3.14, number=42")));
 
 		writer.close();
 	}

@@ -15,10 +15,8 @@ package org.slf4j.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 
 import org.junit.Test;
-import org.slf4j.helpers.NOPMDCAdapter;
 
 /**
  * Test MDC binder.
@@ -32,12 +30,9 @@ public class StaticMDCBinderTest {
 	 */
 	@Test
 	public final void testMDCAdapter() {
-		assertEquals(NOPMDCAdapter.class.getName(), StaticMDCBinder.SINGLETON.getMDCAdapterClassStr());
-
-		NOPMDCAdapter first = StaticMDCBinder.SINGLETON.getMDCA();
-		assertNotNull(first);
-		NOPMDCAdapter second = StaticMDCBinder.SINGLETON.getMDCA();
-		assertNotNull(second);
-		assertNotSame(first, second);
+		assertNotNull(StaticMDCBinder.SINGLETON);
+		assertEquals(TinylogMDCAdapter.class.getName(), StaticMDCBinder.SINGLETON.getMDCAdapterClassStr());
+		assertNotNull(StaticMDCBinder.SINGLETON.getMDCA());
 	}
+	
 }

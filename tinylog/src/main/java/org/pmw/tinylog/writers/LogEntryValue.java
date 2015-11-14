@@ -16,6 +16,7 @@ package org.pmw.tinylog.writers;
 import java.time.ZonedDateTime;
 
 import org.pmw.tinylog.Level;
+import org.pmw.tinylog.LoggingContext;
 
 /**
  * Supported log entry values in {@link org.pmw.tinylog.LogEntry LogEntry}.
@@ -40,6 +41,13 @@ public enum LogEntryValue {
 	 * @see Thread
 	 */
 	THREAD,
+
+	/**
+	 * Thread-based mapped diagnostic context
+	 *
+	 * @see LoggingContext
+	 */
+	CONTEXT,
 
 	/**
 	 * The fully qualified class name of the caller

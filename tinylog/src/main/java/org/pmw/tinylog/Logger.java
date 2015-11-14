@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -14,8 +14,9 @@
 package org.pmw.tinylog;
 
 import java.lang.reflect.Method;
-import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.pmw.tinylog.writers.LogEntryValue;
@@ -589,7 +590,8 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	static void output(final StackTraceElement stackTraceElement, final Level level, final Throwable exception, final Object message, final Object[] arguments) {
+	static void output(final StackTraceElement stackTraceElement, final Level level, final Throwable exception, final Object message,
+			final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(level)) {
 			output(currentConfiguration, stackTraceElement, level, exception, message, arguments);
@@ -709,11 +711,12 @@ public final class Logger {
 		List<Token>[] formatTokens = currentConfiguration.getEffectiveFormatTokens(level);
 		LogEntry[] entries = new LogEntry[formatTokens.length];
 
-		ZonedDateTime now = null;
+		Date now = null;
 		String processId = null;
 		Thread thread = null;
+		Map<String, String> context = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
-		String fullyQualifiedClassName = null;
+		String className = null;
 		String method = null;
 		String filename = null;
 		int line = -1;
@@ -722,7 +725,7 @@ public final class Logger {
 		for (LogEntryValue logEntryValue : requiredLogEntryValues) {
 			switch (logEntryValue) {
 				case DATE:
-					now = ZonedDateTime.now();
+					now = new Date();
 					break;
 
 				case PROCESS_ID:
@@ -733,12 +736,16 @@ public final class Logger {
 					thread = Thread.currentThread();
 					break;
 
+				case CONTEXT:
+					context = LoggingContext.getMapping();
+					break;
+
 				case CLASS:
 					if (stackTraceElement == null) {
 						boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
 						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
-					fullyQualifiedClassName = stackTraceElement.getClassName();
+					className = stackTraceElement.getClassName();
 					break;
 
 				case METHOD:
@@ -778,7 +785,7 @@ public final class Logger {
 		}
 
 		for (int i = 0; i < entries.length; ++i) {
-			LogEntry logEntry = new LogEntry(now, processId, thread, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
+			LogEntry logEntry = new LogEntry(now, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
 			List<Token> formatTokensOfWriter = formatTokens[i];
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder(exception == null ? 256 : 1024);

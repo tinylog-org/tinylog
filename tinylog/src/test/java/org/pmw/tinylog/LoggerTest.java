@@ -28,19 +28,20 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.reflect.Field;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
-
-import mockit.Invocation;
-import mockit.Mock;
-import mockit.MockUp;
 
 import org.junit.Test;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntryValue;
+
+import mockit.Invocation;
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the logger.
@@ -1053,6 +1054,22 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
+	 * Test a log entry with logging context.
+	 */
+	@Test
+	public final void testLogEntryWithContext() {
+		LoggingContext.put("pi", "3.14");
+		StoreWriter writer = new StoreWriter(LogEntryValue.CONTEXT, LogEntryValue.RENDERED_LOG_ENTRY);
+		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{context: pi}").activate();
+
+		Logger.info("Hello");
+
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(Collections.singletonMap("pi", "3.14"), logEntry.getContext());
+		assertEquals("3.14" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+	}
+
+	/**
 	 * Test a log entry with a fully qualified class name pattern.
 	 */
 	@Test
@@ -1193,8 +1210,8 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(ZonedDateTime.now().toEpochSecond(), logEntry.getDate().toEpochSecond(), 10d /* delta of 10 seconds */);
-		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(ZonedDateTime.now()) + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+		assertEquals(new Date().getTime(), logEntry.getDate().getTime(), 10 * 1000d /* delta of 10 seconds */);
+		assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	/**
@@ -1241,14 +1258,14 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("LoggerTest.java", logEntry.getFilename());
 		assertEquals(lineNumber, logEntry.getLineNumber());
 		assertEquals(Level.INFO, logEntry.getLevel());
-		assertEquals(ZonedDateTime.now().toEpochSecond(), logEntry.getDate().toEpochSecond(), 10d /* delta of 10 seconds */);
+		assertEquals(new Date().getTime(), logEntry.getDate().getTime(), 10 * 1000d /* delta of 10 seconds */);
 		assertEquals("Hello", logEntry.getMessage());
 		assertNull(logEntry.getException());
 
 		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}",
 				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
 				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
-				DateTimeFormatter.ofPattern("yyyy").format(ZonedDateTime.now()), EnvironmentHelper.getNewLine());
+				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
 
@@ -1289,8 +1306,8 @@ public class LoggerTest extends AbstractTest {
 		Logger.error(exception);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(exception, logEntry.getException());
-		assertThat(logEntry.getRenderedLogEntry(), containsPattern("java\\.lang\\.RuntimeException.*" + newLine
-				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
+		assertThat(logEntry.getRenderedLogEntry(), containsPattern(
+				"java\\.lang\\.RuntimeException.*" + newLine + "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
 		assertThat(logEntry.getRenderedLogEntry(), containsPattern("Caused by: java\\.lang\\.NullPointerException" + newLine
 				+ "\tat org.pmw.tinylog.LoggerTest.testExceptions\\(LoggerTest.java:\\d*\\)" + newLine));
 	}
@@ -1448,4 +1465,3 @@ public class LoggerTest extends AbstractTest {
 	}
 
 }
-

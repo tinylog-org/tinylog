@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -24,8 +24,9 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.containsPattern;
 import static org.pmw.tinylog.hamcrest.StringMatchers.hasLength;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +34,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.writers.LogEntryValue;
+
+import mockit.Expectations;
+import mockit.Verifications;
 
 /**
  * Tests for tokenizer.
@@ -81,24 +85,58 @@ public class TokenizerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testDateToken() {
-		ZonedDateTime date = ZonedDateTime.now();
+		Date date = new Date();
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{date}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = tokenizer.parse("{date:yyyy}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(DateTimeFormatter.ofPattern("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(new SimpleDateFormat("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
 
 		tokens = tokenizer.parse("{date:'}");
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"\\'\" is an invalid date format pattern \\(.+\\)"));
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+	}
+
+	/**
+	 * Test caching of rendered dates.
+	 */
+	@Test
+	public final void testDateCaching() {
+		List<Token> tokens = new Tokenizer(locale, 0).parse("{date: HH:mm:ss.SSS}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
+
+		final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
+
+		Date date = new Date();
+		LogEntryBuilder logEntryBuilder = new LogEntryBuilder().date(date);
+		String expected = formatter.format(date);
+
+		new Expectations(SimpleDateFormat.class) {
+		};
+
+		assertEquals(expected, render(tokens, logEntryBuilder));
+		assertEquals(expected, render(tokens, logEntryBuilder));
+
+		new Verifications(1) {
+			{
+				formatter.format((Date) any, (StringBuffer) any, (FieldPosition) any);
+			}
+		};
+
+		date = new Date(date.getTime() + 1);
+		logEntryBuilder = new LogEntryBuilder().date(date);
+		expected = formatter.format(date);
+
+		assertEquals(expected, render(tokens, logEntryBuilder));
 	}
 
 	/**
@@ -137,6 +175,28 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.THREAD));
 		assertEquals("test", render(tokens, new LogEntryBuilder().thread(new Thread("test"))));
+	}
+
+	/**
+	 * Test parsing with results of context tokens.
+	 */
+	@Test
+	public final void testContextToken() {
+		Tokenizer tokenizer = new Tokenizer(locale, 0);
+		LogEntryBuilder logEntryBuilder = new LogEntryBuilder().context("pi", "3.14");
+
+		List<Token> tokens = tokenizer.parse("{context: pi}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CONTEXT));
+		assertEquals("3.14", render(tokens, logEntryBuilder));
+
+		tokens = tokenizer.parse("{context: e}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.CONTEXT));
+		assertEquals("null", render(tokens, logEntryBuilder));
+
+		tokenizer.parse("{context}");
+		assertEquals("LOGGER ERROR: \"{context}\" requires a key", getErrorStream().nextLine());
 	}
 
 	/**

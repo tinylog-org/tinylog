@@ -35,6 +35,11 @@
 		<Bug pattern="SR_NOT_CHECKED" />
 	</Match>
 	<Match>
+		<Class name="org.pmw.tinylog.LogEntry" />
+		<!-- Problem with "java.util.Date" is known but the alternative "java.time.ZonedDateTime" is too slow -->
+		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
+	</Match>
+	<Match>
 		<Class name="org.pmw.tinylog.writers.SharedFileWriter" />
 		<!-- "File.delete()" can be successful (=> create a new log file) as well as it can fail (=> join existing log file) -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />

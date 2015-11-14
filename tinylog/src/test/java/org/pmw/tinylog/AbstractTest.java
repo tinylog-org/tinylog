@@ -71,6 +71,8 @@ public abstract class AbstractTest {
 		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
 
+		LoggingContext.clear();
+
 		try {
 			Collection<Writer> openWriters = getOpenWriters();
 			for (Writer writer : openWriters) {

@@ -17,7 +17,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -33,9 +35,10 @@ public class LogEntryTest extends AbstractTest {
 	 */
 	@Test
 	public final void testGetters() {
-		ZonedDateTime date = ZonedDateTime.now();
+		Date date = new Date();
 		String processId = "1234";
 		Thread thread = new Thread();
+		Map<String, String> context = Collections.emptyMap();
 		String className = "org.package.MyClass";
 		String method = "myMethod";
 		String file = "myFile";
@@ -45,11 +48,12 @@ public class LogEntryTest extends AbstractTest {
 		RuntimeException exception = new RuntimeException("Hello from Exception!");
 		String renderedLogEntry = "My log entry";
 
-		LogEntry logEntry = new LogEntry(date, processId, thread, className, method, file, lineNumber, level, message, exception);
+		LogEntry logEntry = new LogEntry(date, processId, thread, context, className, method, file, lineNumber, level, message, exception);
 
 		assertSame(date, logEntry.getDate());
 		assertSame(processId, logEntry.getProcessId());
 		assertSame(thread, logEntry.getThread());
+		assertSame(context, logEntry.getContext());
 		assertEquals(className, logEntry.getClassName());
 		assertEquals(method, logEntry.getMethodName());
 		assertEquals(file, logEntry.getFilename());
