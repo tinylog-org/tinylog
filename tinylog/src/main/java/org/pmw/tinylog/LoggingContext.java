@@ -76,7 +76,7 @@ public final class LoggingContext {
 	public static void put(final String key, final Object value) {
 		Map<String, String> map = new HashMap<>(data.get());
 		if (value == null) {
-			map.remove(value);
+			map.remove(key);
 		} else {
 			map.put(key, value.toString());
 		}
