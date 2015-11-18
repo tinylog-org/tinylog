@@ -32,12 +32,12 @@ Other folders
 -------------
 
 * configuration
-  * Contains configuration files like for formatter, Checkstyle and FindBugs
+  * Contains configuration files for formatting, Checkstyle and FindBugs
 
 Support
 -------
 
-A detailed user manual and the Javadoc documentation can be found on http://www.tinylog.org/. Please file bug reports and feature requests in [GitHub issues](https://github.com/pmwmedia/tinylog/issues).
+A detailed user manual and the Javadoc documentation can be found on http://www.tinylog.org/. Bug reports and feature requests are welcome and can be created via [GitHub issues](https://github.com/pmwmedia/tinylog/issues).
 
 License
 -------
