@@ -29,8 +29,6 @@ import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Converts a format pattern for log entries to a list of tokens.
- *
- * @see Logger#setLoggingFormat(String)
  */
 final class Tokenizer {
 

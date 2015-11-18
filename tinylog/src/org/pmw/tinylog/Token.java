@@ -19,8 +19,6 @@ import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * The format pattern for log entries will be split in tokens.
- *
- * @see Logger#setLoggingFormat(String)
  */
 interface Token {
 
