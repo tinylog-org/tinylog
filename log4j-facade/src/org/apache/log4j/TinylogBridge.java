@@ -117,13 +117,45 @@ final class TinylogBridge {
 	 *
 	 * @param level
 	 *            Logging level of log entry
-	 * @param message
-	 *            Message to log
 	 * @param throwable
 	 *            Throwable to log
+	 * @param message
+	 *            Message to log
 	 */
-	public static void log(final Priority level, final Object message, final Throwable throwable) {
+	public static void log(final Priority level, final Throwable throwable, final Object message) {
 		LogEntryForwarder.forward(2, toTinylogLevel(level), throwable, message == null ? null : message.toString());
+	}
+
+	/**
+	 * Create a log entry. The parameterized message will be formatted by
+	 * {@link java.text.MessageFormat#format(String,Object[])}.
+	 *
+	 * @param level
+	 *            Logging level of log entry
+	 * @param message
+	 *            Message pattern to log
+	 * @param arguments
+	 *            Arguments for formatting message
+	 */
+	public static void log(final Priority level, final String message, final Object... arguments) {
+		LogEntryForwarder.forward(2, toTinylogLevel(level), message, arguments);
+	}
+
+	/**
+	 * Create a log entry. The parameterized message will be formatted by
+	 * {@link java.text.MessageFormat#format(String,Object[])}.
+	 *
+	 * @param level
+	 *            Logging level of log entry
+	 * @param throwable
+	 *            Throwable to log
+	 * @param message
+	 *            Message pattern to log
+	 * @param arguments
+	 *            Arguments for formatting message
+	 */
+	public static void log(final Priority level, final Throwable throwable, final String message, final Object... arguments) {
+		LogEntryForwarder.forward(2, toTinylogLevel(level), throwable, message, arguments);
 	}
 
 	private static org.pmw.tinylog.Level toTinylogLevel(final Priority level) {
