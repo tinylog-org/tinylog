@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.util.MappedResourceBundle;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
@@ -30,7 +31,7 @@ import org.pmw.tinylog.util.StoreWriter;
 
 /**
  * Tests for log4j logging API.
- * 
+ *
  * @see Logger
  */
 public class LoggerTest extends AbstractTest {
@@ -235,6 +236,103 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
+	}
+
+	/**
+	 * Test localized logging with resource bundle.
+	 */
+	@Test
+	public final void testLocalizedLogging() {
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
+
+		Throwable throwable = new Throwable();
+
+		Logger child = Logger.getLogger("a.b");
+		assertNull(child.getResourceBundle());
+		Category parent = child.getParent();
+		assertNull(parent.getResourceBundle());
+
+		/* No resource bundle */
+
+		child.l7dlog(Level.INFO, "common", throwable);
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("common", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		child.l7dlog(Level.INFO, "named", new Object[] { "Java" }, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("named", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		/* Set resource bundle */
+
+		MappedResourceBundle bundle = new MappedResourceBundle();
+		bundle.put("common", "Hello World");
+		bundle.put("named", "Hello {0}!");
+		parent.setResourceBundle(bundle);
+
+		assertSame(bundle, parent.getResourceBundle());
+		assertSame(bundle, child.getResourceBundle());
+
+		/* Silent */
+
+		child.l7dlog(Level.DEBUG, "common", throwable);
+		assertNull(writer.consumeLogEntry());
+
+		child.l7dlog(Level.DEBUG, "named", new Object[] { "Java" }, throwable);
+		assertNull(writer.consumeLogEntry());
+
+		parent.l7dlog(Level.DEBUG, "common", throwable);
+		assertNull(writer.consumeLogEntry());
+
+		parent.l7dlog(Level.DEBUG, "named", new Object[] { "Java" }, throwable);
+		assertNull(writer.consumeLogEntry());
+
+		parent.l7dlog(Level.DEBUG, "invalid", throwable);
+		assertNull(writer.consumeLogEntry());
+
+		parent.l7dlog(Level.DEBUG, "invalid", new Object[] { "Java" }, throwable);
+		assertNull(writer.consumeLogEntry());
+
+		/* Output */
+
+		child.l7dlog(Level.INFO, "common", throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("Hello World", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		child.l7dlog(Level.INFO, "named", new Object[] { "Java" }, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("Hello Java!", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		parent.l7dlog(Level.INFO, "common", throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("Hello World", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		parent.l7dlog(Level.INFO, "named", new Object[] { "Java" }, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("Hello Java!", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		parent.l7dlog(Level.INFO, "invalid", throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("invalid", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
+
+		parent.l7dlog(Level.INFO, "invalid", new Object[] { "Java" }, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("invalid", logEntry.getMessage());
+		assertEquals(throwable, logEntry.getException());
 	}
 
 	/**

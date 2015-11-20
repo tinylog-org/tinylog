@@ -32,7 +32,7 @@ public class MainApplication extends AbstractApplication {
 	private static final int DEFAULT_DEEP = 0;
 	private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 	private static final long DEFAULT_ITERATIONS = 20_000L;
-	private static final long DEFAULT_PRIME = 100_000L;
+	private static final long DEFAULT_PRIME = 200_000L;
 
 	public static void main(final String[] arguments) throws Exception {
 		if (arguments.length < 2) {

@@ -150,7 +150,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertNull(logEntry);
 
-		logger.log(Level.DEBUG, "Hello!", exception);
+		logger.log(Level.DEBUG, exception, "Hello!");
 		logEntry = writer.consumeLogEntry();
 		assertNull(logEntry);
 
@@ -159,7 +159,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 
-		logger.log(Level.WARN, null, exception);
+		logger.log(Level.WARN, exception, null);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
@@ -188,7 +188,7 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());
 
-		logger.log(Level.ERROR, "Hello!", new Exception());
+		logger.log(Level.ERROR, new Exception(), "Hello!");
 		logEntry = writer.consumeLogEntry();
 		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals(TinylogBridgeTest.class.getName(), logEntry.getClassName());

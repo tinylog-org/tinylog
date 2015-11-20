@@ -29,8 +29,6 @@ import org.pmw.tinylog.writers.LogEntryValue;
 
 /**
  * Converts a format pattern for log entries to a list of tokens.
- *
- * @see Logger#setLoggingFormat(String)
  */
 final class Tokenizer {
 
@@ -237,7 +235,7 @@ final class Tokenizer {
 		}
 	}
 
-	private static Token getPlainTextToken(final String text) {
+	private Token getPlainTextToken(final String text) {
 		String plainText = NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE);
 		plainText = TAB_REPLACER.matcher(plainText).replaceAll(TAB);
 		return new PlainTextToken(plainText);

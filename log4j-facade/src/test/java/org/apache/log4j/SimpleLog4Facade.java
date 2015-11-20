@@ -79,13 +79,13 @@ final class SimpleLog4Facade {
 	 *
 	 * @param level
 	 *            Logging level of log entry
-	 * @param message
-	 *            Message to log
 	 * @param throwable
 	 *            Throwable to log
+	 * @param message
+	 *            Message to log
 	 */
-	void log(final Priority level, final Object message, final Throwable throwable) {
-		TinylogBridge.log(level, message, throwable);
+	void log(final Priority level, final Throwable throwable, final Object message) {
+		TinylogBridge.log(level, throwable, message);
 	}
 
 }

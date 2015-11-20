@@ -13,6 +13,10 @@
 
 package org.apache.log4j;
 
+import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 /**
  * Deprecated log4j logging API (use {@link Logger} instead).
  *
@@ -22,6 +26,7 @@ public abstract class Category {
 
 	private final Category parent;
 	private final String name;
+	private volatile ResourceBundle bundle;
 
 	/**
 	 * @param parent
@@ -88,6 +93,32 @@ public abstract class Category {
 	}
 
 	/**
+	 * Get the (inherited) result bundle.
+	 *
+	 * @return Effective result bundle
+	 */
+	public final ResourceBundle getResourceBundle() {
+		for (Category category = this; category != null; category = category.getParent()) {
+			ResourceBundle bundle = category.bundle;
+			if (bundle != null) {
+				return bundle;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Set a new result bundle for localized logging methods.
+	 *
+	 * @param bundle
+	 *            New result bundle
+	 */
+	public final void setResourceBundle(final ResourceBundle bundle) {
+		this.bundle = bundle;
+	}
+
+	/**
 	 * @deprecated Replaced by {@link Category#getLevel()}
 	 *
 	 * @return Active logging level
@@ -146,7 +177,7 @@ public abstract class Category {
 	}
 
 	/**
-	 * Create a debugr log entry.
+	 * Create a debug log entry.
 	 *
 	 * @param message
 	 *            Message to log
@@ -154,7 +185,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void debug(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.DEBUG, message, throwable);
+		TinylogBridge.log(Level.DEBUG, throwable, message);
 	}
 
 	/**
@@ -185,7 +216,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void info(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.INFO, message, throwable);
+		TinylogBridge.log(Level.INFO, throwable, message);
 	}
 
 	/**
@@ -207,7 +238,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void warn(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.WARN, message, throwable);
+		TinylogBridge.log(Level.WARN, throwable, message);
 	}
 
 	/**
@@ -229,7 +260,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void error(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.ERROR, message, throwable);
+		TinylogBridge.log(Level.ERROR, throwable, message);
 	}
 
 	/**
@@ -251,7 +282,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void fatal(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.FATAL, message, throwable);
+		TinylogBridge.log(Level.FATAL, throwable, message);
 	}
 
 	/**
@@ -302,7 +333,63 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void log(final Priority level, final Object message, final Throwable throwable) {
-		TinylogBridge.log(level, message, throwable);
+		TinylogBridge.log(level, throwable, message);
+	}
+
+	/**
+	 * Create a localized log entry.
+	 *
+	 * @param priority
+	 *            Severity level
+	 * @param key
+	 *            Key of localized message
+	 * @param throwable
+	 *            Throwable to log (can be null if none)
+	 */
+	public final void l7dlog(final Priority priority, final String key, final Throwable throwable) {
+		String message = getResourceBundleString(key);
+		if (message == null) {
+			message = key;
+		}
+
+		TinylogBridge.log(priority, throwable, message);
+	}
+
+	/**
+	 * Create a localized log entry. The parameterized message will be formatted by
+	 * {@link java.text.MessageFormat#format(String,Object[])}.
+	 *
+	 * @param priority
+	 *            Severity level
+	 * @param key
+	 *            Key of localized message
+	 * @param params
+	 *            Parameters for formatting message
+	 * @param throwable
+	 *            Throwable to log (can be null if none)
+	 */
+	public final void l7dlog(final Priority priority, final String key, final Object[] params, final Throwable throwable) {
+		String message = getResourceBundleString(key);
+		if (message == null) {
+			message = key;
+		} else {
+			message = MessageFormat.format(message, params);
+		}
+
+		TinylogBridge.log(priority, throwable, message);
+	}
+
+	protected final String getResourceBundleString(final String key) {
+		ResourceBundle bundle = getResourceBundle();
+		if (bundle == null) {
+			return null;
+		} else {
+			try {
+				return bundle.getString(key);
+			} catch (MissingResourceException ex) {
+				return null;
+			}
+		}
 	}
 
 }
