@@ -158,7 +158,7 @@ public class Category {
 	}
 
 	/**
-	 * Create a debugr log entry.
+	 * Create a debug log entry.
 	 *
 	 * @param message
 	 *            Message to log
