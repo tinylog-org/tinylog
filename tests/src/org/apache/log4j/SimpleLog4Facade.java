@@ -88,4 +88,37 @@ final class SimpleLog4Facade {
 		TinylogBridge.log(level, throwable, message);
 	}
 
+	/**
+	 * Create a log entry. The parameterized message will be formatted by
+	 * {@link java.text.MessageFormat#format(String,Object[])}.
+	 *
+	 * @param level
+	 *            Logging level of log entry
+	 * @param message
+	 *            Message pattern to log
+	 * @param arguments
+	 *            Arguments for formatting message
+	 */
+	void log(final Priority level, final String message, final Object... arguments) {
+		TinylogBridge.log(level, message, arguments);
+	}
+
+
+	/**
+	 * Create a log entry. The parameterized message will be formatted by
+	 * {@link java.text.MessageFormat#format(String,Object[])}.
+	 *
+	 * @param level
+	 *            Logging level of log entry
+	 * @param throwable
+	 *            Throwable to log
+	 * @param message
+	 *            Message pattern to log
+	 * @param arguments
+	 *            Arguments for formatting message
+	 */
+	void log(final Priority level, final Throwable throwable, final String message, final Object... arguments) {
+		TinylogBridge.log(level, throwable, message, arguments);
+	}
+
 }
