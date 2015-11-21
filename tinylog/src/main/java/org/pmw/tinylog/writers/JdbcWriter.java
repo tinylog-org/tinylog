@@ -658,7 +658,7 @@ public final class JdbcWriter implements Writer {
 	 *
 	 * @see JdbcWriter
 	 */
-	public static enum Value {
+	public enum Value {
 
 		/**
 		 * The current date

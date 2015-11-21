@@ -505,7 +505,7 @@ final class Tokenizer {
 
 	private static final class ThreadIdToken implements Token {
 
-		public ThreadIdToken() {
+		private ThreadIdToken() {
 		}
 
 		@Override
@@ -542,7 +542,7 @@ final class Tokenizer {
 
 	private static final class ClassToken implements Token {
 
-		public ClassToken() {
+		private ClassToken() {
 		}
 
 		@Override
@@ -559,7 +559,7 @@ final class Tokenizer {
 
 	private static final class ClassNameToken implements Token {
 
-		public ClassNameToken() {
+		private ClassNameToken() {
 		}
 
 		@Override

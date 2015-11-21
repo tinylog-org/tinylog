@@ -33,6 +33,16 @@ import org.pmw.tinylog.LoggingContext;
 public class MDCTest extends AbstractTest {
 
 	/**
+	 * Test if the class is a valid utility class.
+	 *
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(MDC.class);
+	}
+
+	/**
 	 * Test creating a copy of the current context map.
 	 */
 	@Test

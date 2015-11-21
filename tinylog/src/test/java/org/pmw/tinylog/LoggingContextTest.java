@@ -31,6 +31,16 @@ import org.junit.Test;
 public class LoggingContextTest extends AbstractTest {
 
 	/**
+	 * Test if the class is a valid utility class.
+	 *
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(LoggingContext.class);
+	}
+
+	/**
 	 * Test all getters and data manipulation methods in single threading mode.
 	 */
 	@Test
@@ -82,6 +92,7 @@ public class LoggingContextTest extends AbstractTest {
 				assertEquals(singletonMap("number", "42"), LoggingContext.getMapping());
 				assertEquals("42", LoggingContext.get("number"));
 			};
+
 		};
 		thread.start();
 		thread.join();
@@ -112,6 +123,7 @@ public class LoggingContextTest extends AbstractTest {
 				assertEquals(singletonMap("number", "42"), LoggingContext.getMapping());
 				assertEquals("42", LoggingContext.get("number"));
 			};
+
 		};
 		thread.start();
 		thread.join();

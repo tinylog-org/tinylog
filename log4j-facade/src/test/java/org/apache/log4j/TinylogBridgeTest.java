@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -27,9 +27,10 @@ import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntryValue;
 
+
 /**
  * Tests for tinylog bridge.
- * 
+ *
  * @see TinylogBridge
  */
 public class TinylogBridgeTest extends AbstractTest {
@@ -45,6 +46,16 @@ public class TinylogBridgeTest extends AbstractTest {
 		logger = new SimpleLog4Facade();
 		writer = new StoreWriter();
 		Configurator.defaultConfig().writer(writer).activate();
+	}
+
+	/**
+	 * Test if the class is a valid utility class.
+	 *
+	 * @see AbstractTest#testIfValidUtilityClass(Class)
+	 */
+	@Test
+	public final void testIfValidUtilityClass() {
+		testIfValidUtilityClass(TinylogBridge.class);
 	}
 
 	/**
@@ -139,10 +150,10 @@ public class TinylogBridgeTest extends AbstractTest {
 	}
 
 	/**
-	 * Test logging.
+	 * Test logging without parameters.
 	 */
 	@Test
-	public final void testLogging() {
+	public final void testCommonLogging() {
 		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
 		Exception exception = new Exception();
 
@@ -173,6 +184,34 @@ public class TinylogBridgeTest extends AbstractTest {
 		logEntry = writer.consumeLogEntry();
 		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
+	}
+
+	/**
+	 * Test logging with parameters.
+	 */
+	@Test
+	public final void testLoggingWithParameters() {
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
+		Exception exception = new Exception();
+
+		logger.log(Level.TRACE, "Hello {}!", "World");
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertNull(logEntry);
+
+		logger.log(Level.DEBUG, exception, "Hello {}!", "World");
+		logEntry = writer.consumeLogEntry();
+		assertNull(logEntry);
+
+		logger.log(Level.INFO, "Hello {}!", "World");
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertEquals("Hello World!", logEntry.getMessage());
+
+		logger.log(Level.WARN, exception, "Hello {}!", "World");
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
+		assertEquals(exception, logEntry.getException());
+		assertEquals("Hello World!", logEntry.getMessage());
 	}
 
 	/**
