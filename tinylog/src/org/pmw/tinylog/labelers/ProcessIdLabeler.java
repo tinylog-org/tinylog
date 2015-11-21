@@ -16,8 +16,6 @@ package org.pmw.tinylog.labelers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
@@ -76,11 +74,11 @@ public final class ProcessIdLabeler implements Labeler {
 			}
 		}
 
-		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
-		if (files.size() > maxBackups) {
-			Collections.sort(files, LogFileComparator.getInstance());
-			for (int i = maxBackups; i < files.size(); ++i) {
-				File backup = files.get(i);
+		File[] files = file.getAbsoluteFile().getParentFile().listFiles(logFileFilter);
+		if (files != null && files.length > maxBackups) {
+			Arrays.sort(files, LogFileComparator.getInstance());
+			for (int i = maxBackups; i < files.length; ++i) {
+				File backup = files[i];
 				if (!backup.delete()) {
 					InternalLogger.warn("Failed to delete \"{}\"", backup);
 				}

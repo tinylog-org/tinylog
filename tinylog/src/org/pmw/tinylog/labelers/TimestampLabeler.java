@@ -17,9 +17,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.InternalLogger;
@@ -83,11 +81,11 @@ public final class TimestampLabeler implements Labeler {
 
 	@Override
 	public File roll(final File file, final int maxBackups) {
-		List<File> files = Arrays.asList(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter));
-		if (files.size() > maxBackups) {
-			Collections.sort(files, LogFileComparator.getInstance());
-			for (int i = maxBackups; i < files.size(); ++i) {
-				File backup = files.get(i);
+		File[] files = file.getAbsoluteFile().getParentFile().listFiles(logFileFilter);
+		if (files != null && files.length > maxBackups) {
+			Arrays.sort(files, LogFileComparator.getInstance());
+			for (int i = maxBackups; i < files.length; ++i) {
+				File backup = files[i];
 				if (!backup.delete()) {
 					InternalLogger.warn("Failed to delete \"{}\"", backup);
 				}
