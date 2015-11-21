@@ -505,7 +505,7 @@ final class Tokenizer {
 
 	private static final class ThreadIdToken implements Token {
 
-		public ThreadIdToken() {
+		private ThreadIdToken() {
 		}
 
 		@Override
@@ -519,7 +519,7 @@ final class Tokenizer {
 		}
 
 	}
-	
+
 	private static final class ContextToken implements Token {
 
 		private final String key;
@@ -527,22 +527,22 @@ final class Tokenizer {
 		private ContextToken(final String key) {
 			this.key = key;
 		}
-		
+
 		@Override
 		public Collection<LogEntryValue> getRequiredLogEntryValues() {
 			return Collections.singletonList(LogEntryValue.CONTEXT);
 		}
-		
+
 		@Override
 		public void render(final LogEntry logEntry, final StringBuilder builder) {
 			builder.append(logEntry.getContext().get(key));
 		}
 
 	}
-	
+
 	private static final class ClassToken implements Token {
 
-		public ClassToken() {
+		private ClassToken() {
 		}
 
 		@Override
@@ -559,7 +559,7 @@ final class Tokenizer {
 
 	private static final class ClassNameToken implements Token {
 
-		public ClassNameToken() {
+		private ClassNameToken() {
 		}
 
 		@Override
