@@ -296,7 +296,7 @@
 		<delete dir="${dist.maven}" />
 		<mkdir dir="${dist.maven}" />
 		
-		<pom id="pom.tinylog" groupId="org.tinylog" artifactId="tinylog" version="${maven-version}" name="tinylog" description="tinylog is a minimalist logger for Java, optimized for ease of use" url="http://www.tinylog.org/">
+		<pom id="pom.tinylog" groupId="org.tinylog" artifactId="tinylog" version="${maven-version}" name="tinylog" description="tinylog is a lightweight logging framework for Java, optimized for ease of use" url="http://www.tinylog.org/">
 			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
 			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
