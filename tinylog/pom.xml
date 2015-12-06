@@ -10,7 +10,7 @@
 	</parent>
 	<artifactId>tinylog</artifactId>
 	<name>tinylog</name>
-	<description>tinylog is a minimalist logger for Java, optimized for ease of use</description>
+	<description>tinylog is a lightweight logging framework for Java, optimized for ease of use</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.jmockit</groupId>
