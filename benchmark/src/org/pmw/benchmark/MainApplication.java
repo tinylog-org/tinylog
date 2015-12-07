@@ -234,7 +234,7 @@ public class MainApplication extends AbstractApplication {
 	private static void showHelp() {
 		System.out.println("Run logging framework benchmarks.");
 		System.out.println();
-		System.out.println("  framework benchmark [--location X] [--runs X] [--outliers X] [--deep X] [--iterations X] [--threads X] [--prime X]");
+		System.out.println("  framework benchmark [threading] [--location X] [--runs X] [--outliers X] [--deep X] [--iterations X] [--threads X] [--prime X]");
 		System.out.println();
 		System.out.println("  framework          Name of logging framework or \"all\"");
 		System.out.println("  benchmark          Name of benchmark or \"all\"");
@@ -246,13 +246,13 @@ public class MainApplication extends AbstractApplication {
 		System.out.println("  -d --deep X        Amount of additional stack trace deep for more realistic results (default is 0)");
 		System.out.println("  -t --threads X     Number of parallel threads in multi-threaded benchmarks (default is number of cores * 2)");
 		System.out.println("  -i --iterations X  Number of logging iterations in output benchmark (default is 20,000)");
-		System.out.println("  -p --prime X       Maximum prime to calculate in prime benchmark (default is 100,000)");
+		System.out.println("  -p --prime X       Maximum prime to calculate in prime benchmark (default is 200,000)");
 		System.out.println();
 		System.out.println("Frameworks");
 		System.out.println();
 		System.out.println("  jul                JUL (java.util.logging.Logger)");
-		System.out.println("  log4j              Apache Log4j 1.x");
-		System.out.println("  log4j2             Apache Log4j 2");
+		System.out.println("  log4j1             Apache Log4j 1.x");
+		System.out.println("  log4j2             Apache Log4j 2.x");
 		System.out.println("  logback            Logback");
 		System.out.println("  tinylog            tinylog");
 		System.out.println("  dummy              Without any logging output (helpful for calculating logging overhead)");
