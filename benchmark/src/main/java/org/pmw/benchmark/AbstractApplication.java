@@ -14,7 +14,7 @@ import org.pmw.benchmark.frameworks.Tinylog;
 
 public abstract class AbstractApplication {
 
-	protected static final String[] FRAMEWORKS = new String[] { "dummy", "jul", "log4j", "log4j2", "logback", "tinylog" };
+	protected static final String[] FRAMEWORKS = new String[] { "dummy", "jul", "log4j1", "log4j2", "logback", "tinylog" };
 	protected static final String[] BENCHMARKS = new String[] { "output", "primes" };
 	protected static final String[] THREADING = new String[] { "single-threaded", "multi-threaded" };
 
@@ -22,7 +22,7 @@ public abstract class AbstractApplication {
 	static {
 		FRAMEWORK_MAPPING.put("dummy", Dummy.class);
 		FRAMEWORK_MAPPING.put("jul", JUL.class);
-		FRAMEWORK_MAPPING.put("log4j", Log4j.class);
+		FRAMEWORK_MAPPING.put("log4j1", Log4j.class);
 		FRAMEWORK_MAPPING.put("log4j2", Log4j2.class);
 		FRAMEWORK_MAPPING.put("logback", Logback.class);
 		FRAMEWORK_MAPPING.put("tinylog", Tinylog.class);
