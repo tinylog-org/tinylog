@@ -746,6 +746,10 @@ public final class Logger {
 						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
 					className = stackTraceElement.getClassName();
+					int dollarIndex = className.indexOf("$");
+					if (dollarIndex != -1) {
+						className = className.substring(0, dollarIndex);
+					}
 					break;
 
 				case METHOD:
