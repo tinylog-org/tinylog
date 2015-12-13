@@ -919,6 +919,17 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 
+		/* Test logging of anonymous class. Anonymous part of classname gets stripped */
+
+		new Object() {
+			{
+				Logger.info("Hello!");
+			}
+		};
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
+
 		/* Test logging of plain texts */
 
 		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.CLASS, LogEntryValue.MESSAGE);
@@ -1132,6 +1143,12 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
 		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("MyClass$1", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("MyClass", logEntry.getClassName());
