@@ -625,7 +625,7 @@ public final class Logger {
 		Thread thread = null;
 		Map<String, String> context = null;
 		StackTraceElement stackTraceElement = createdStackTraceElement;
-		String fullyQualifiedClassName = null;
+		String className = null;
 		String method = null;
 		String filename = null;
 		int line = -1;
@@ -654,7 +654,11 @@ public final class Logger {
 						boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
 						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
-					fullyQualifiedClassName = stackTraceElement.getClassName();
+					className = stackTraceElement.getClassName();
+					int dollarIndex = className.indexOf("$");
+					if (dollarIndex != -1) {
+						className = className.substring(0, dollarIndex);
+					}
 					break;
 
 				case METHOD:
@@ -694,7 +698,7 @@ public final class Logger {
 		}
 
 		for (int i = 0; i < entries.length; ++i) {
-			LogEntry logEntry = new LogEntry(now, processId, thread, context, fullyQualifiedClassName, method, filename, line, level, renderedMessage, exception);
+			LogEntry logEntry = new LogEntry(now, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
 			List<Token> formatTokensOfWriter = formatTokens[i];
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder(exception == null ? 256 : 1024);
