@@ -168,6 +168,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 	 */
 	@Test
 	public final void testDeletingOfCurrentFileFails() throws IOException {
+		skipOnNonWindowsPlatforms();
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
@@ -191,6 +192,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 	 */
 	@Test
 	public final void testDeletingOfBackupFileFails() throws IOException {
+		skipOnNonWindowsPlatforms();
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		File backupFile = getBackupFile(baseFile, "tmp", "$backup$");

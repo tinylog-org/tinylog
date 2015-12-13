@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.VMShutdownHook;
@@ -44,6 +45,8 @@ public abstract class AbstractTest {
 	private Properties originProperties;
 	private PrintStream originOutStream;
 	private PrintStream originErrStream;
+
+	private boolean isWindowsPlatform = System.getProperty("os.name").startsWith("Windows");
 
 	/**
 	 * Reconfigure {@link System}.
@@ -136,4 +139,11 @@ public abstract class AbstractTest {
 		return new ArrayList<>((Collection<Writer>) field.get(null));
 	}
 
+	/**
+	 * Skips tests on non-Windows platforms. Can be used as the first statement in a test that relies on
+	 * Windows-specific I/O behaviour, such as file locking.
+	 */
+	protected void skipOnNonWindowsPlatforms() {
+		Assume.assumeTrue(isWindowsPlatform);
+	}
 }

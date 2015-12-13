@@ -222,6 +222,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	 */
 	@Test
 	public final void testDeletingOfBackupFileFails() throws IOException {
+		skipOnNonWindowsPlatforms();
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		File backupFile = getBackupFile(baseFile, "tmp", formatCurrentTime());
