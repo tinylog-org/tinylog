@@ -1,3 +1,3 @@
-/.*/*
-/*/.settings
-/*/target
+.*
+target
+*.iml
