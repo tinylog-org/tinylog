@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.pmw.tinylog.util.ConfigurationCreator;
 import org.pmw.tinylog.util.FileHelper;
@@ -160,6 +161,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 	 */
 	@Test
 	public final void testRenamingFails() throws IOException {
+		skipOnNonWindowsPlatforms();
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.createNewFile();
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
@@ -189,6 +191,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 	 */
 	@Test
 	public final void testDeletingFails() throws IOException {
+		skipOnNonWindowsPlatforms();
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.createNewFile();
 
