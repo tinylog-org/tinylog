@@ -141,10 +141,10 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		File backupFile1 = getBackupFile(baseFile, "tmp", "$OLD1$");
 		backupFile1.createNewFile();
-		backupFile1.setLastModified(1L);
+		backupFile1.setLastModified(1000L);
 		File backupFile2 = getBackupFile(baseFile, "tmp", "$OLD2$");
 		backupFile2.createNewFile();
-		backupFile2.setLastModified(2L);
+		backupFile2.setLastModified(2000L);
 		File backupFile3 = getBackupFile(baseFile, "tmp", "$OLD3$");
 		backupFile3.createNewFile();
 		backupFile3.setLastModified(0L);
