@@ -655,9 +655,12 @@ public final class Logger {
 						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
 					className = stackTraceElement.getClassName();
-					int dollarIndex = className.indexOf("$");
-					if (dollarIndex != -1) {
-						className = className.substring(0, dollarIndex);
+					for (int index = className.indexOf("$", 1); index != -1 && index < className.length() - 1; index = className.indexOf('$', index + 2)) {
+						char firstLetter = className.charAt(index + 1);
+						if (firstLetter >= '0' && firstLetter <= '9') {
+							className = className.substring(0, index);
+							break;
+						}
 					}
 					break;
 
