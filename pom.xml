@@ -8,7 +8,7 @@
 	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://www.tinylog.org/</url>
-	
+
 	<modules>
 		<module>tinylog</module>
 		<module>log4j-facade</module>
@@ -27,14 +27,14 @@
 		<jmockit.version>1.20</jmockit.version>
 		<h2.version>1.4.190</h2.version>
 
-		<maven-compiler-plugin.version>2.5</maven-compiler-plugin.version>
-		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+		<maven-jar-plugin.version>2.6</maven-jar-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>2.10.1</maven-javadoc-plugin.version>
-		<maven-bundle-plugin.version>2.5.3</maven-bundle-plugin.version>
-		<maven-assembly-plugin.version>2.5.2</maven-assembly-plugin.version>
-		<maven-checkstyle-plugin.version>2.13</maven-checkstyle-plugin.version>
-		<findbugs-maven-plugin.version>3.0.0</findbugs-maven-plugin.version>
+		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+		<maven-bundle-plugin.version>3.0.1</maven-bundle-plugin.version>
+		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
+		<findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
 	</properties>
 
 	<licenses>
@@ -72,6 +72,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<debug>false</debug>
+					<optimize>true</optimize>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -89,7 +93,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${maven-compiler-plugin.version}</version>
+				<version>${maven-javadoc-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
