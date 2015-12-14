@@ -18,7 +18,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.pmw.tinylog.hamcrest.ClassMatchers.type;
 
 import java.io.File;
@@ -146,7 +145,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testRenamingFails() throws IOException {
+	public final void testRenamingOfOpenFile() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.createNewFile();
 		File backupFile = getBackupFile(baseFile, "tmp", "0");
@@ -158,8 +157,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		assertSame(baseFile, labeler.getLogFile(baseFile));
 		try {
-			labeler.roll(baseFile, 2);
-			fail("IOException expected: Renaming should fail");
+			labeler.roll(baseFile, 2); // Works or fails depending on OS
 		} catch (IOException ex) {
 			assertEquals("Failed to rename \"" + backupFile + "\" to \"" + getBackupFile(baseFile, "tmp", "1") + "\"", ex.getMessage());
 		}
@@ -176,7 +174,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testDeletingFails() throws IOException {
+	public final void testDeletingOfOpenFile() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 		baseFile.createNewFile();
 
@@ -187,8 +185,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		assertSame(baseFile, labeler.getLogFile(baseFile));
 
 		try {
-			labeler.roll(baseFile, 0);
-			fail("IOException expected: Deleting should fail");
+			labeler.roll(baseFile, 0); // Works or fails depending on OS
 		} catch (IOException ex) {
 			assertEquals("Failed to delete \"" + baseFile + "\"", ex.getMessage());
 		}
