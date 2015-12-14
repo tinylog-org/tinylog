@@ -1,4 +1,4 @@
-tinylog
+tinylog [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg)](https://travis-ci.org/pmwmedia/tinylog)
 =======
 
 Example
