@@ -32,6 +32,8 @@ import org.pmw.tinylog.LogEntry;
  */
 @PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
 public final class SharedFileWriter implements Writer {
+	
+    private static final long HOUR = 60L * 60L * 1000L;
 
 	private final File file;
 	private final Object mutex;
@@ -63,7 +65,9 @@ public final class SharedFileWriter implements Writer {
 	@Override
 	public void init(final Configuration configuration) throws IOException {
 		if (file.isFile()) {
-			file.delete();
+			if (file.lastModified() < System.currentTimeMillis() - HOUR) {
+				file.delete();
+			}
 		} else {
 			EnvironmentHelper.makeDirectories(file);
 		}
@@ -75,10 +79,12 @@ public final class SharedFileWriter implements Writer {
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		FileChannel channel = stream.getChannel();
+		byte[] data = logEntry.getRenderedLogEntry().getBytes();
+
 		synchronized (mutex) {
 			FileLock lock = channel.lock();
 			try {
-				stream.write(logEntry.getRenderedLogEntry().getBytes());
+				stream.write(data);
 			} finally {
 				lock.release();
 			}
