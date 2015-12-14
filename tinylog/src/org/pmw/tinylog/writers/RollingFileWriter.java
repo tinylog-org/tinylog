@@ -260,8 +260,11 @@ public final class RollingFileWriter implements Writer {
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
+		String rendered = logEntry.getRenderedLogEntry();
+		byte[] data = rendered.getBytes();
+		
 		synchronized (mutex) {
-			if (!checkPolicies(logEntry.getRenderedLogEntry())) {
+			if (!checkPolicies(rendered)) {
 				stream.close();
 				file = labeler.roll(file, backups);
 				if (buffered) {
@@ -270,7 +273,7 @@ public final class RollingFileWriter implements Writer {
 					stream = new FileOutputStream(file);
 				}
 			}
-			stream.write(logEntry.getRenderedLogEntry().getBytes());
+			stream.write(data);
 		}
 	}
 
