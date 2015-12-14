@@ -748,7 +748,7 @@ public final class Logger {
 					className = stackTraceElement.getClassName();
 					for (int index = className.indexOf("$", 0); index != -1 && index < className.length() - 1; index = className.indexOf('$', index + 2)) {
 						char firstLetter = className.charAt(index + 1);
-						if (firstLetter >= '0' && firstLetter <= '9') {
+						if ((firstLetter >= '0' && firstLetter <= '9') || firstLetter <= '$') {
 							className = className.substring(0, index);
 							break;
 						}

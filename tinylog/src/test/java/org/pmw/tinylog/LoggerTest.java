@@ -1148,6 +1148,12 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("MyClass", logEntry.getClassName());
 		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
+		Logger.output(new StackTraceElement("MyClass$$anonfun", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
 		Logger.output(new StackTraceElement("MyClass$1", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
