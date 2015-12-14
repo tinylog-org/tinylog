@@ -130,10 +130,10 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		File backupFile1 = getBackupFile(baseFile, "tmp", "$OLD1$");
 		backupFile1.createNewFile();
-		backupFile1.setLastModified(1L);
+		backupFile1.setLastModified(1000L);
 		File backupFile2 = getBackupFile(baseFile, "tmp", "$OLD2$");
 		backupFile2.createNewFile();
-		backupFile2.setLastModified(2L);
+		backupFile2.setLastModified(2000L);
 		File backupFile3 = getBackupFile(baseFile, "tmp", "$OLD3$");
 		backupFile3.createNewFile();
 		backupFile3.setLastModified(0L);
@@ -156,7 +156,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testDeletingOfCurrentFileFails() throws IOException {
+	public final void testDeletingOfOpenLog() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
@@ -165,8 +165,13 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		currentFile.createNewFile();
 		FileInputStream stream = new FileInputStream(currentFile);
 
-		labeler.roll(currentFile, 0);
-		assertEquals("LOGGER WARNING: Failed to delete \"" + currentFile + "\"", getErrorStream().nextLine());
+		labeler.roll(currentFile, 0); // Works or fails depending on OS
+		
+		if (getErrorStream().hasLines()) {
+			assertEquals("LOGGER WARNING: Failed to delete \"" + currentFile + "\"", getErrorStream().nextLine());
+		} else {
+			assertFalse(currentFile.exists());
+		}
 
 		stream.close();
 		currentFile.delete();
@@ -179,7 +184,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testDeletingOfBackupFileFails() throws IOException {
+	public final void testDeletingOfOpenBackup() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		File backupFile = getBackupFile(baseFile, "tmp", "$backup$");
@@ -190,8 +195,13 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		File currentFile = labeler.getLogFile(baseFile);
 
-		labeler.roll(currentFile, 0);
-		assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+		labeler.roll(currentFile, 0); // Works or fails depending on OS
+		
+		if (getErrorStream().hasLines()) {
+			assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+		} else {
+			assertFalse(currentFile.exists());
+		}
 
 		stream.close();
 		backupFile.delete();
