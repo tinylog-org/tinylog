@@ -1,3 +1,5 @@
 language: java
-before_script: cd tinylog
-script: ant
+jdk:
+	- openjdk8
+	- oraclejdk8
+script: mvn clean install
