@@ -284,6 +284,9 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 			assertNull(reader.readLine());
 		}
 
+		// Only old files will be overwritten -> Decrease modification time by 24h
+		file.setLastModified(file.lastModified() - 24L * 60L * 60L * 1000L);
+
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		writer.init(null);
 		writer.close();
