@@ -221,7 +221,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testDeletingOfBackupFileFails() throws IOException {
+	public final void testDeletingOfOpenBackup() throws IOException {
 		File baseFile = FileHelper.createTemporaryFile("tmp");
 
 		File backupFile = getBackupFile(baseFile, "tmp", formatCurrentTime());
@@ -232,8 +232,13 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 			labeler.init(ConfigurationCreator.getDummyConfiguration());
 			File currentFile = labeler.getLogFile(baseFile);
 
-			labeler.roll(currentFile, 0);
-			assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+			labeler.roll(currentFile, 0); // Works or fails depending on OS
+
+			if (getErrorStream().hasLines()) {
+				assertEquals("LOGGER WARNING: Failed to delete \"" + backupFile + "\"", getErrorStream().nextLine());
+			} else {
+				assertFalse(currentFile.exists());
+			}
 		}
 
 		backupFile.delete();

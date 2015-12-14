@@ -56,7 +56,7 @@ public class LogFileComparatorTest extends AbstractTest {
 	@Test
 	public final void testYoungestFirst() {
 		assertTrue(file1.setLastModified(0L));
-		assertTrue(file2.setLastModified(1L));
+		assertTrue(file2.setLastModified(1000L));
 
 		LogFileComparator comparator = LogFileComparator.getInstance();
 		assertNotNull(comparator);
@@ -69,8 +69,8 @@ public class LogFileComparatorTest extends AbstractTest {
 	 */
 	@Test
 	public final void testSameAge() {
-		assertTrue(file1.setLastModified(1L));
-		assertTrue(file2.setLastModified(1L));
+		assertTrue(file1.setLastModified(1000L));
+		assertTrue(file2.setLastModified(1000L));
 
 		LogFileComparator comparator = LogFileComparator.getInstance();
 		assertNotNull(comparator);
@@ -82,7 +82,7 @@ public class LogFileComparatorTest extends AbstractTest {
 	 */
 	@Test
 	public final void testOldestFirst() {
-		assertTrue(file1.setLastModified(1L));
+		assertTrue(file1.setLastModified(1000L));
 		assertTrue(file2.setLastModified(0L));
 
 		LogFileComparator comparator = LogFileComparator.getInstance();
