@@ -716,7 +716,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Thread.currentThread(), logEntry.getThread());
 		assertEquals(Thread.currentThread().getId() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
-	
+
 	/**
 	 * Test a log entry with logging context.
 	 */
@@ -732,7 +732,7 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(Collections.singletonMap("pi", "3.14"), logEntry.getContext());
 		assertEquals("3.14" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
-	
+
 	/**
 	 * Test a log entry with a fully qualified class name pattern.
 	 */
@@ -796,6 +796,12 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
 		Logger.output(new StackTraceElement("MyClass", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("MyClass", logEntry.getClassName());
+		assertEquals("MyClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("MyClass$$anonfun", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("MyClass", logEntry.getClassName());
