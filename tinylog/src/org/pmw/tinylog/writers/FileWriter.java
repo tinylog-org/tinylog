@@ -97,13 +97,18 @@ public final class FileWriter implements Writer {
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		stream.write(logEntry.getRenderedLogEntry().getBytes());
+		byte[] data = logEntry.getRenderedLogEntry().getBytes();
+		synchronized (stream) {
+			stream.write(data);
+		}
 	}
 
 	@Override
 	public void flush() throws IOException {
 		if (buffered) {
-			stream.flush();
+			synchronized (stream) {
+				stream.flush();
+			}
 		}
 	}
 
@@ -115,8 +120,10 @@ public final class FileWriter implements Writer {
 	 */
 	@Override
 	public void close() throws IOException {
-		VMShutdownHook.unregister(this);
-		stream.close();
+		synchronized (stream) {
+			VMShutdownHook.unregister(this);
+			stream.close();
+		}
 	}
 
 }
