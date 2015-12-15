@@ -746,9 +746,16 @@ public final class Logger {
 						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
 					}
 					className = stackTraceElement.getClassName();
-					for (int index = className.indexOf("$", 0); index != -1 && index < className.length() - 1; index = className.indexOf('$', index + 2)) {
+					for (int index = className.indexOf("$", 0); index != -1; index = className.indexOf('$', index + 2)) {
+						// trailing dollar sign
+						if (index >= className.length() -1) {
+							className = className.substring(0, index);
+							break;
+						}
+
 						char firstLetter = className.charAt(index + 1);
-						if ((firstLetter >= '0' && firstLetter <= '9') || firstLetter <= '$') {
+						// first letter after dollar sign is not an uppercase letter of an inner class
+						if (firstLetter < 'A' || firstLetter > 'Z') {
 							className = className.substring(0, index);
 							break;
 						}

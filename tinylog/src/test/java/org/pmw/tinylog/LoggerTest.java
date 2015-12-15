@@ -1166,11 +1166,71 @@ public class LoggerTest extends AbstractTest {
 		assertEquals("MyClass$InnerClass", logEntry.getClassName());
 		assertEquals("MyClass$InnerClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 
+		Logger.output(new StackTraceElement("MyClass$I$1", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("MyClass$I", logEntry.getClassName());
+		assertEquals("MyClass$I" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("MyClass$I", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("MyClass$I", logEntry.getClassName());
+		assertEquals("MyClass$I" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
 		Logger.output(new StackTraceElement("MyClass$InnerClass$2", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
 
 		logEntry = writer.consumeLogEntry();
 		assertEquals("MyClass$InnerClass", logEntry.getClassName());
 		assertEquals("MyClass$InnerClass" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("scalaPackageObject$", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("scalaPackageObject", logEntry.getClassName());
+		assertEquals("scalaPackageObject" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("ScalaObject$", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("ScalaObject", logEntry.getClassName());
+		assertEquals("ScalaObject" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("ScalaTrait$class", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("ScalaTrait", logEntry.getClassName());
+		assertEquals("ScalaTrait" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("groovyClosure$_runImpl_closure_1", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("groovyClosure", logEntry.getClassName());
+		assertEquals("groovyClosure" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("$", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("", logEntry.getClassName());
+		assertEquals("" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("A", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("A", logEntry.getClassName());
+		assertEquals("A" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("A$", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("A", logEntry.getClassName());
+		assertEquals("A" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+
+		Logger.output(new StackTraceElement("a$", "unknown", "unknown", -1), Level.INFO, null, "Hello", new Object[0]);
+
+		logEntry = writer.consumeLogEntry();
+		assertEquals("a", logEntry.getClassName());
+		assertEquals("a" + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	/**
