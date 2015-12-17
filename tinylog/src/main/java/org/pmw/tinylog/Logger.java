@@ -748,7 +748,7 @@ public final class Logger {
 					className = stackTraceElement.getClassName();
 					for (int index = className.indexOf("$", 0); index != -1; index = className.indexOf('$', index + 2)) {
 						// trailing dollar sign
-						if (index >= className.length() -1) {
+						if (index >= className.length() - 1) {
 							className = className.substring(0, index);
 							break;
 						}
