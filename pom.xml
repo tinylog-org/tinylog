@@ -109,7 +109,7 @@
 				<version>${maven-checkstyle-plugin.version}</version>
 				<configuration>
 					<consoleOutput>true</consoleOutput>
-					<configLocation>../configuration/tinylog-checkstyle.xml</configLocation>
+					<configLocation>${project.parent.basedir}/configuration/tinylog-checkstyle.xml</configLocation>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -117,7 +117,7 @@
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>${findbugs-maven-plugin.version}</version>
 				<configuration>
-					<excludeFilterFile>../configuration/tinylog-findbugs.xml</excludeFilterFile>
+					<excludeFilterFile>${project.parent.basedir}/configuration/tinylog-findbugs.xml</excludeFilterFile>
 				</configuration>
 			</plugin>
 		</plugins>

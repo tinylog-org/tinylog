@@ -51,10 +51,11 @@
 				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 						<manifestEntries>
 							<Built-By>${project.organization.name}</Built-By>
 						</manifestEntries>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
 				<executions>
@@ -73,6 +74,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Import-Package>!sun.reflect, *</Import-Package>
 						<Export-Package>org.apache.log4j</Export-Package>
 					</instructions>
 				</configuration>
@@ -93,7 +95,7 @@
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptors>
-						<descriptor>../distribution.xml</descriptor>
+						<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>

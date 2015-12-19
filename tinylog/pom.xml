@@ -45,10 +45,11 @@
 				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 						<manifestEntries>
 							<Built-By>${project.organization.name}</Built-By>
 						</manifestEntries>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
 				<executions>
@@ -68,6 +69,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Import-Package>!sun.reflect, !org.pmw.tinylog*, *</Import-Package>
 						<Export-Package>org.pmw.tinylog, org.pmw.tinylog.labelers, org.pmw.tinylog.policies, org.pmw.tinylog.writers</Export-Package>
 					</instructions>
 				</configuration>
@@ -88,7 +90,7 @@
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptors>
-						<descriptor>../distribution.xml</descriptor>
+						<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
