@@ -68,7 +68,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.groupId}.framework; singleton:=true</Bundle-SymbolicName>
 						<Import-Package>!sun.reflect, !org.tinylog*, *</Import-Package>
 						<Export-Package>org.tinylog, org.tinylog.labelers, org.tinylog.policies, org.tinylog.writers</Export-Package>
 					</instructions>

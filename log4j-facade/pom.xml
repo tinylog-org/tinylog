@@ -73,7 +73,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
 						<Import-Package>!sun.reflect, *</Import-Package>
 						<Export-Package>org.apache.log4j</Export-Package>
 					</instructions>
