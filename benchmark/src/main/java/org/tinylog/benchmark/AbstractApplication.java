@@ -7,7 +7,7 @@ import java.util.Map;
 import org.tinylog.benchmark.frameworks.Dummy;
 import org.tinylog.benchmark.frameworks.Framework;
 import org.tinylog.benchmark.frameworks.JUL;
-import org.tinylog.benchmark.frameworks.Log4j;
+import org.tinylog.benchmark.frameworks.Log4j1;
 import org.tinylog.benchmark.frameworks.Log4j2;
 import org.tinylog.benchmark.frameworks.Logback;
 import org.tinylog.benchmark.frameworks.Tinylog;
@@ -22,7 +22,7 @@ public abstract class AbstractApplication {
 	static {
 		FRAMEWORK_MAPPING.put("dummy", Dummy.class);
 		FRAMEWORK_MAPPING.put("jul", JUL.class);
-		FRAMEWORK_MAPPING.put("log4j1", Log4j.class);
+		FRAMEWORK_MAPPING.put("log4j1", Log4j1.class);
 		FRAMEWORK_MAPPING.put("log4j2", Log4j2.class);
 		FRAMEWORK_MAPPING.put("logback", Logback.class);
 		FRAMEWORK_MAPPING.put("tinylog", Tinylog.class);

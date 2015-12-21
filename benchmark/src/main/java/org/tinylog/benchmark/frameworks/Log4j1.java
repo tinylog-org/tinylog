@@ -28,9 +28,9 @@ import org.apache.log4j.PatternLayout;
 /**
  * Test Apache Log4j 1.x.
  */
-public final class Log4j implements Framework {
+public final class Log4j1 implements Framework {
 
-	private static final String NAME = "Log4j";
+	private static final String NAME = "Log4j 1";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
 	private final boolean location;
@@ -38,7 +38,7 @@ public final class Log4j implements Framework {
 	private Logger logger;
 	private Appender appender;
 
-	public Log4j(final boolean location, final boolean async) {
+	public Log4j1(final boolean location, final boolean async) {
 		this.location = location;
 		this.async = async;
 	}
