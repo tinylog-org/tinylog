@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.LoggingContext;
+import org.tinylog.AbstractTest;
+import org.tinylog.LoggingContext;
 
 /**
  * Tests for thread-based mapped diagnostic context.

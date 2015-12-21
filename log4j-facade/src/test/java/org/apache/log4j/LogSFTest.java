@@ -21,11 +21,11 @@ import java.util.ResourceBundle;
 import org.apache.log4j.util.MappedResourceBundle;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.Level;
-import org.pmw.tinylog.LogEntry;
-import org.pmw.tinylog.util.StoreWriter;
+import org.tinylog.AbstractTest;
+import org.tinylog.Configurator;
+import org.tinylog.Level;
+import org.tinylog.LogEntry;
+import org.tinylog.util.StoreWriter;
 
 import mockit.NonStrictExpectations;
 

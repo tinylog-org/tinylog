@@ -20,14 +20,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
-import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.Level;
-import org.pmw.tinylog.LogEntry;
-import org.pmw.tinylog.util.StoreWriter;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarker;
 import org.slf4j.helpers.BasicMarkerFactory;
+import org.tinylog.AbstractTest;
+import org.tinylog.Configurator;
+import org.tinylog.Level;
+import org.tinylog.LogEntry;
+import org.tinylog.util.StoreWriter;
 
 /**
  * Tests for SLF4J logger API.
@@ -71,7 +71,7 @@ public class TinylogLoggerTest extends AbstractTest {
 	public final void testLoggingLevel() {
 		TinylogLogger logger = new TinylogLogger(null);
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.TRACE).activate();
 		assertTrue(logger.isTraceEnabled());
 		assertTrue(logger.isTraceEnabled(MARKER));
 		assertTrue(logger.isDebugEnabled());
@@ -83,7 +83,7 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertTrue(logger.isErrorEnabled());
 		assertTrue(logger.isErrorEnabled(MARKER));
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.DEBUG).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.DEBUG).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isTraceEnabled(MARKER));
 		assertTrue(logger.isDebugEnabled());
@@ -95,7 +95,7 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertTrue(logger.isErrorEnabled());
 		assertTrue(logger.isErrorEnabled(MARKER));
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.INFO).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.INFO).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isTraceEnabled(MARKER));
 		assertFalse(logger.isDebugEnabled());
@@ -107,7 +107,7 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertTrue(logger.isErrorEnabled());
 		assertTrue(logger.isErrorEnabled(MARKER));
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.WARNING).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.WARNING).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isTraceEnabled(null));
 		assertFalse(logger.isDebugEnabled());
@@ -119,7 +119,7 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertTrue(logger.isErrorEnabled());
 		assertTrue(logger.isErrorEnabled(null));
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.ERROR).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.ERROR).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isTraceEnabled(null));
 		assertFalse(logger.isDebugEnabled());
@@ -131,7 +131,7 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertTrue(logger.isErrorEnabled());
 		assertTrue(logger.isErrorEnabled(null));
 
-		Configurator.currentConfig().level(org.pmw.tinylog.Level.OFF).activate();
+		Configurator.currentConfig().level(org.tinylog.Level.OFF).activate();
 		assertFalse(logger.isTraceEnabled());
 		assertFalse(logger.isTraceEnabled(null));
 		assertFalse(logger.isDebugEnabled());

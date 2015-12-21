@@ -13,9 +13,9 @@
 
 package org.slf4j.impl;
 
-import org.pmw.tinylog.Level;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import org.tinylog.Level;
 
 /**
  * SLF4J compatible logger implementation.

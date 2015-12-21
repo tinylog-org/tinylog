@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.pmw.tinylog.LoggingContext;
 import org.slf4j.MDC;
 import org.slf4j.spi.MDCAdapter;
+import org.tinylog.LoggingContext;
 
 /**
  * Adapter for using {@link LoggingContext} as {@link MDC}.

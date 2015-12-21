@@ -13,8 +13,8 @@
 
 package org.slf4j.impl;
 
-import org.pmw.tinylog.Level;
-import org.pmw.tinylog.LogEntryForwarder;
+import org.tinylog.Level;
+import org.tinylog.LogEntryForwarder;
 
 /**
  * Bridge to tinylog.

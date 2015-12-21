@@ -1,0 +1,8 @@
+org.tinylog.policies.StartupPolicy
+org.tinylog.policies.CountPolicy
+org.tinylog.policies.SizePolicy
+org.tinylog.policies.HourlyPolicy
+org.tinylog.policies.DailyPolicy
+org.tinylog.policies.WeeklyPolicy
+org.tinylog.policies.MonthlyPolicy
+org.tinylog.policies.YearlyPolicy

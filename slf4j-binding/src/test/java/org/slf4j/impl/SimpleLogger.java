@@ -13,7 +13,7 @@
 
 package org.slf4j.impl;
 
-import org.pmw.tinylog.Level;
+import org.tinylog.Level;
 
 /**
  * Simple logger facade for testing tinylog bridge.

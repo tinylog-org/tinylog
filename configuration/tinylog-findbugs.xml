@@ -3,7 +3,7 @@
 <FindBugsFilter>
 	<Match>
 		<Or>
-			<Class name="org.pmw.tinylog.Logger" />
+			<Class name="org.tinylog.Logger" />
 			<Class name="org.apache.log4j.TinylogBridge" />
 			<Class name="org.slf4j.impl.TinylogBridge" />
 		</Or>
@@ -30,22 +30,22 @@
 		<Bug pattern="DM_DEFAULT_ENCODING" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.policies.CountPolicy" />
+		<Class name="org.tinylog.policies.CountPolicy" />
 		<!-- Number of skipped characters isn't interesting in this context -->
 		<Bug pattern="SR_NOT_CHECKED" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.LogEntry" />
+		<Class name="org.tinylog.LogEntry" />
 		<!-- Problem with "java.util.Date" is known but the alternative "java.time.ZonedDateTime" is too slow -->
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.writers.SharedFileWriter" />
+		<Class name="org.tinylog.writers.SharedFileWriter" />
 		<!-- "File.delete()" can be successful (=> create a new log file) as well as it can fail (=> join existing log file) -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.EnvironmentHelper" />
+		<Class name="org.tinylog.EnvironmentHelper" />
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if they exist already (returns "false") -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
@@ -55,7 +55,7 @@
 		<Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
 	<Match>
-		<Class name="org.pmw.tinylog.writers.VMShutdownHookTest" />
+		<Class name="org.tinylog.writers.VMShutdownHookTest" />
 		<!-- Here it is fine to invoke run() method of threads, because logic should be tested and not asynchronism of Java's thread class -->
 		<Bug pattern="RU_INVOKE_RUN" />
 	</Match>

@@ -15,7 +15,7 @@ package org.apache.log4j;
 
 import java.util.Hashtable;
 
-import org.pmw.tinylog.LoggingContext;
+import org.tinylog.LoggingContext;
 
 /**
  * Thread-based mapped diagnostic context.

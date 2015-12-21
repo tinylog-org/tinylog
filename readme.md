@@ -4,7 +4,7 @@ tinylog [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg)](https://tr
 Example
 -------
 
-    import org.pmw.tinylog.Logger;
+    import org.tinylog.Logger;
     
     public class Application {
     

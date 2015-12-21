@@ -13,7 +13,7 @@
 
 package org.apache.log4j;
 
-import org.pmw.tinylog.LogEntryForwarder;
+import org.tinylog.LogEntryForwarder;
 
 /**
  * Bridge to tinylog.
@@ -127,32 +127,32 @@ final class TinylogBridge {
 		LogEntryForwarder.forward(DEEP_OF_STACK_TRACE, toTinylogLevel(level), throwable, message, arguments);
 	}
 
-	private static org.pmw.tinylog.Level toTinylogLevel(final Priority level) {
+	private static org.tinylog.Level toTinylogLevel(final Priority level) {
 		if (level.isGreaterOrEqual(Level.OFF)) {
-			return org.pmw.tinylog.Level.OFF;
+			return org.tinylog.Level.OFF;
 		} else if (level.isGreaterOrEqual(Level.ERROR)) {
-			return org.pmw.tinylog.Level.ERROR;
+			return org.tinylog.Level.ERROR;
 		} else if (level.isGreaterOrEqual(Level.WARN)) {
-			return org.pmw.tinylog.Level.WARNING;
+			return org.tinylog.Level.WARNING;
 		} else if (level.isGreaterOrEqual(Level.INFO)) {
-			return org.pmw.tinylog.Level.INFO;
+			return org.tinylog.Level.INFO;
 		} else if (level.isGreaterOrEqual(Level.DEBUG)) {
-			return org.pmw.tinylog.Level.DEBUG;
+			return org.tinylog.Level.DEBUG;
 		} else {
-			return org.pmw.tinylog.Level.TRACE;
+			return org.tinylog.Level.TRACE;
 		}
 	}
 
-	private static Level toLog4jLevel(final org.pmw.tinylog.Level level) {
-		if (level.ordinal() >= org.pmw.tinylog.Level.OFF.ordinal()) {
+	private static Level toLog4jLevel(final org.tinylog.Level level) {
+		if (level.ordinal() >= org.tinylog.Level.OFF.ordinal()) {
 			return Level.OFF;
-		} else if (level.ordinal() >= org.pmw.tinylog.Level.ERROR.ordinal()) {
+		} else if (level.ordinal() >= org.tinylog.Level.ERROR.ordinal()) {
 			return Level.ERROR;
-		} else if (level.ordinal() >= org.pmw.tinylog.Level.WARNING.ordinal()) {
+		} else if (level.ordinal() >= org.tinylog.Level.WARNING.ordinal()) {
 			return Level.WARN;
-		} else if (level.ordinal() >= org.pmw.tinylog.Level.INFO.ordinal()) {
+		} else if (level.ordinal() >= org.tinylog.Level.INFO.ordinal()) {
 			return Level.INFO;
-		} else if (level.ordinal() >= org.pmw.tinylog.Level.DEBUG.ordinal()) {
+		} else if (level.ordinal() >= org.tinylog.Level.DEBUG.ordinal()) {
 			return Level.DEBUG;
 		} else {
 			return Level.TRACE;

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/benchmark/src/main/java/org/pmw/benchmark/MainApplication.java"/>
+<listEntry value="/benchmark/src/main/java/org/tinylog/benchmark/MainApplication.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.pmw.benchmark.MainApplication"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.tinylog.benchmark.MainApplication"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="all all both --location true --runs 120 --outliers 20 --deep 0 --threads 16 --iterations 200000 --prime 10000000"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="benchmark"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>

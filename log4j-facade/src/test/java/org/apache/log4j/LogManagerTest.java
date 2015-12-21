@@ -14,7 +14,7 @@
 package org.apache.log4j;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.tinylog.AbstractTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
