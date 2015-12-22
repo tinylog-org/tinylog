@@ -185,7 +185,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void debug(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.DEBUG, throwable, message);
+		TinylogBridge.log(Level.DEBUG, throwable, message == throwable ? null : message);
 	}
 
 	/**
@@ -216,7 +216,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void info(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.INFO, throwable, message);
+		TinylogBridge.log(Level.INFO, throwable, message == throwable ? null : message);
 	}
 
 	/**
@@ -238,7 +238,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void warn(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.WARN, throwable, message);
+		TinylogBridge.log(Level.WARN, throwable, message == throwable ? null : message);
 	}
 
 	/**
@@ -260,7 +260,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void error(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.ERROR, throwable, message);
+		TinylogBridge.log(Level.ERROR, throwable, message == throwable ? null : message);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void fatal(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.FATAL, throwable, message);
+		TinylogBridge.log(Level.FATAL, throwable, message == throwable ? null : message);
 	}
 
 	/**
@@ -333,7 +333,7 @@ public abstract class Category {
 	 *            Throwable to log
 	 */
 	public final void log(final Priority level, final Object message, final Throwable throwable) {
-		TinylogBridge.log(level, throwable, message);
+		TinylogBridge.log(level, throwable, message == throwable ? null : message);
 	}
 
 	/**
