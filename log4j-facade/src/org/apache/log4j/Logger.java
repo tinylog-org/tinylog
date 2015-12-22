@@ -82,7 +82,7 @@ public class Logger extends Category {
 	 *            Throwable to log
 	 */
 	public void trace(final Object message, final Throwable throwable) {
-		TinylogBridge.log(Level.TRACE, throwable, message);
+		TinylogBridge.log(Level.TRACE, throwable, message == throwable ? null : message);
 	}
 
 }

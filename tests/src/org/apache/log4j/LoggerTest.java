@@ -350,5 +350,58 @@ public class LoggerTest extends AbstractTest {
 		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
 	}
+	
+	/**
+	 * Tests ignoring message object if it is the same as the passed throwable.
+	 */
+	@Test
+	public final void duplicateException() {
+		Configurator.currentConfig().level(org.pmw.tinylog.Level.TRACE).activate();
+
+		Logger logger = Logger.getRootLogger();
+		Throwable throwable = new Throwable();
+
+		logger.trace(throwable, throwable);
+		LogEntry logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.TRACE, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.debug(throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.DEBUG, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.info(throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.INFO, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.warn(throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.WARNING, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.error(throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.fatal(throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+
+		logger.log(Level.FATAL, throwable, throwable);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(org.pmw.tinylog.Level.ERROR, logEntry.getLevel());
+		assertNull(logEntry.getMessage());
+		assertSame(throwable, logEntry.getException());
+	}
 
 }
