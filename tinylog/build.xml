@@ -4,6 +4,7 @@
 	<property name="version" value="1.1-beta2" />
 	<property name="bundle-version" value="1.1.0.beta2" />
 	<property name="maven-version" value="1.1-beta-2" />
+	<property name="jcl-version" value="1.2" />
 	<property name="slf4j-version" value="1.7.7" />
 	
 	<property name="vendor" value="PMW Media" />
@@ -14,6 +15,12 @@
 	<property name="tinylog.files" location="${tinylog}/files" />
 	<property name="tinylog.bin" location="${tinylog}/bin" />
 	<property name="tinylog.src" location="${tinylog}/src" />
+	
+	<property name="jcl" location="${root}/jcl-binding" />
+	<property name="jcl.lib" location="${jcl}/lib" />
+	<property name="jcl.files" location="${jcl}/files" />
+	<property name="jcl.bin" location="${jcl}/bin" />
+	<property name="jcl.src" location="${jcl}/src" />
 	
 	<property name="log4j" location="${root}/log4j-facade" />
 	<property name="log4j.files" location="${log4j}/files" />
@@ -45,6 +52,9 @@
 
 	<path id="junit.classpath">
 		<fileset dir="${lib.junit}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${jcl.lib}">
 			<include name="*.jar" />
 		</fileset>
 		<fileset dir="${slf4j.lib}">
@@ -94,6 +104,21 @@
 			</fileset>
 		</copy>
 		
+		<delete dir="${jcl.bin}" />
+		<mkdir dir="${jcl.bin}" />
+		<javac srcdir="${jcl.src}" destdir="${jcl.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
+			<classpath location="${tinylog.bin}" />
+			<classpath>
+				<fileset dir="${jcl.lib}" includes="*.jar" />
+			</classpath>
+		</javac>
+		<copy todir="${jcl.bin}">
+			<fileset dir="${jcl.src}">
+				<include name="**/*.properties" />
+				<include name="META-INF/**" />
+			</fileset>
+		</copy>
+		
 		<delete dir="${log4j.bin}" />
 		<mkdir dir="${log4j.bin}" />
 		<javac srcdir="${log4j.src}" destdir="${log4j.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
@@ -127,8 +152,9 @@
 			<compilerarg value="-XDignore.symbol.file" />
 			<classpath refid="junit.classpath" />
 			<classpath location="${tinylog.bin}" />
-			<classpath location="${slf4j.bin}" />
+			<classpath location="${jcl.bin}" />
 			<classpath location="${log4j.bin}" />
+			<classpath location="${slf4j.bin}" />
 		</javac>
 		<copy todir="${tests.bin}">
 			<fileset dir="${tests.src}">
@@ -155,6 +181,21 @@
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
 			<zipfileset dir="${tinylog.files}" includes="readme-jar.txt" fullpath="readme.txt" />
+		</zip>
+		
+		<jar destfile="${dist.jar}/jcl-binding.jar">
+			<zipfileset dir="${jcl.bin}" />
+		</jar>
+		<zip destfile="${dist.jar}/jcl-binding-src.zip">
+			<zipfileset dir="${jcl.src}" />
+		</zip>
+		<zip destfile="${dist.jar}/jcl-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="jcl-binding.jar" />
+				<include name="jcl-binding-src.zip" />
+			</zipfileset>
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${jcl.files}" includes="readme-jar.txt" fullpath="readme.txt" />
 		</zip>
 		
 		<jar destfile="${dist.jar}/log4j-facade.jar">
@@ -222,6 +263,39 @@
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
 			<zipfileset dir="${tinylog.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
+		</zip>	
+		
+		<jar destfile="${dist.bundle}/org.pmw.jcl-binding_${bundle-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.commons.logging;version=${bundle-version}" />
+				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
+			</manifest>
+			<zipfileset dir="${jcl.bin}" />
+		</jar>
+		<jar destfile="${dist.bundle}/org.pmw.jcl-binding.source_${bundle-version}.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${jcl.src}" />
+		</jar>
+		<zip destfile="${dist.bundle}/jcl-binding-${bundle-version}-bundles.zip" level="9">
+			<zipfileset dir="${dist.bundle}">
+				<include name="org.pmw.jcl-binding_${bundle-version}.jar" />
+				<include name="org.pmw.jcl-binding.source_${bundle-version}.jar" />
+			</zipfileset>
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${jcl.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
 		</zip>	
 		
 		<jar destfile="${dist.bundle}/org.pmw.log4j-facade_${bundle-version}.jar">
@@ -331,6 +405,59 @@
 			<zipfileset dir="${dist.docs}" />
 		</zip>
 		
+		<delete dir="${dist.maven}/jcl-binding" />
+		<mkdir dir="${dist.maven}/jcl-binding" />
+		<javadoc destdir="${dist.maven}/jcl-binding" use="true" access="public" windowtitle="Apache Commons Logging Binding {version}">
+			<doctitle>Apache Commons Logging Binding ${version} - API Specification</doctitle>
+			<packageset dir="${jcl.src}" />
+			<classpath>
+				<dirset dir="${jcl.bin}" />
+				<fileset dir="${jcl.lib}" includes="*.jar" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+		
+		<pom id="org.jcl" groupId="org.tinylog" artifactId="jcl-binding" version="${maven-version}" name="Apache Commons Logging Binding" description="Apache Commons Logging (JCL) Binding for tinylog" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
+			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
+			<dependency groupId="commons-logging" artifactId="commons-logging" version="${jcl-version}"/>
+		</pom>
+		<writepom pomRefId="org.jcl" file="${dist.maven}/jcl-binding-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/jcl-binding-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.commons.logging;version=${bundle-version}" />
+				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
+			</manifest>
+			<zipfileset dir="${jcl.bin}" />
+			<zipfileset dir="${dist.maven}" includes="jcl-binding-${maven-version}.pom" fullpath="META-INF/pom.xml" />
+		</jar>
+		<jar destfile="${dist.maven}/jcl-binding-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${jcl.src}" />
+		</jar>
+		<zip destfile="${dist.maven}/jcl-binding-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/jcl-binding" />
+		</zip>		
+		<delete dir="${dist.maven}/jcl-binding" />
+	
 		<delete dir="${dist.maven}/log4j-facade" />
 		<mkdir dir="${dist.maven}/log4j-facade" />
 		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="Log4j Facade {version}">
@@ -464,6 +591,8 @@
 			<auxclasspath refid="junit.classpath" />
 			<sourcepath location="${tinylog.bin}" />
 			<class location="${tinylog.bin}" />
+			<sourcepath location="${jcl.src}" />
+			<class location="${jcl.bin}" />
 			<sourcepath location="${log4j.src}" />
 			<class location="${log4j.bin}" />
 			<sourcepath location="${slf4j.src}" />
@@ -476,6 +605,7 @@
 			<formatter type="plain" usefile="false" />
 			<classpath>
 				<path location="${tinylog.bin}" />
+				<path location="${jcl.bin}" />
 				<path location="${log4j.bin}" />
 				<path location="${slf4j.bin}" />
 				<path location="${tests.bin}" />

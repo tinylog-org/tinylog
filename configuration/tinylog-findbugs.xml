@@ -3,6 +3,7 @@
 	<Match>
 		<Or>
 			<Class name="org.pmw.tinylog.Logger" />
+			<Class name="org.pmw.commons.logging.TinylogBridge" />
 			<Class name="org.apache.log4j.TinylogBridge" />
 			<Class name="org.slf4j.impl.TinylogBridge" />
 		</Or>

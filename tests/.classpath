@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="/slf4j-binding/lib/slf4j-api-1.7.7.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/log4j-facade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/slf4j-binding"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jcl-binding"/>
+	<classpathentry kind="lib" path="/jcl-binding/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
