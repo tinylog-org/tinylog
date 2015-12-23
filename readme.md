@@ -19,15 +19,15 @@ Projects
 
 * benchmark
   * Contains a benchmark for comparing logging frameworks
-* log4j-facade
-  * Contains the log4j facade (Log4j 1.x compatible logging API)
-* slf4j-binding
-  * Contains the SLF4J binding (implementation for SLF4J logging API)
-* jcl-binding
+* jcl-binding:
   * Contains the Apache Commons Logging (JCL) binding, implementing the JCL logging API
+* log4j-facade:
+  * Contains the log4j facade, an Apache Log4j 1.x compatible logging API replacement
+* slf4j-binding:
+  * Contains the SLF4J binding, implementing the SLF4J logging API
 * tinylog
   * Contains tinylog
-  
+
 All projects can be imported as Eclipse Java project.
 
 Other folders
