@@ -13,12 +13,8 @@
 
 package org.tinylog.commons.logging;
 
-import java.lang.reflect.Method;
-
-import org.tinylog.InternalLogger;
 import org.tinylog.Level;
 import org.tinylog.LogEntryForwarder;
-import org.tinylog.Logger;
 
 /**
  * Bridge to tinylog.
@@ -64,7 +60,7 @@ final class TinylogBridge {
 	 *            Throwable to log
 	 */
 	public static void log(final Level level, final Object message, final Throwable throwable) {
-		LogEntryForwarder.forward(DEEP_OF_STACK_TRACE, level, message == null ? null : message.toString(), throwable);
+		LogEntryForwarder.forward(DEEP_OF_STACK_TRACE, level, throwable, message == null ? null : message.toString());
 	}
 
 }
