@@ -24,6 +24,9 @@ log4j-facade:
 
 slf4j-binding:
 	Contains the SLF4J binding (implementation for SLF4J logging API)
+	
+jcl-binding:
+        Contains the Apache Commons Logging (JCL) binding, implementing the JCL logging API.
 
 tests:
 	Contains all JUnit tests
