@@ -93,21 +93,17 @@ public class WritingThreadTest extends AbstractTest {
 		DummyWriter writer2 = new DummyWriter();
 
 		WritingThread writingThread = new WritingThread(null, Thread.NORM_PRIORITY);
-		writingThread.start();
 
 		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("one").create());
 		writingThread.putLogEntry(writer2, new LogEntryBuilder().message("two").create());
 		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("three").create());
-		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("four").create());
-		writingThread.putLogEntry(writer1, new LogEntryBuilder().message("five").create());
 
+		writingThread.start();
 		writingThread.shutdown();
 		writingThread.join();
 
-		assertTrue(writer1.numberOfFlushes >= 1); // Should be flushed at least once
-		assertTrue(writer1.numberOfFlushes < 4); // ... and ideally less than four times
-
-		assertEquals(1, writer2.numberOfFlushes); // Should be flushed exactly once
+		assertEquals(1, writer1.numberOfFlushes);
+		assertEquals(1, writer2.numberOfFlushes);
 	}
 
 	/**
