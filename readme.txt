@@ -18,15 +18,15 @@ specific language governing permissions and limitations under the License.
 
 benchmark:
 	Contains a benchmark with an ANT script for multiple logging frameworks
-
-log4j-facade:
-	Contains the log4j facade (Log4j 1.x compatible logging API)
-
-slf4j-binding:
-	Contains the SLF4J binding (implementation for SLF4J logging API)
 	
 jcl-binding:
-        Contains the Apache Commons Logging (JCL) binding, implementing the JCL logging API.
+	Contains the Apache Commons Logging (JCL) binding, implementing the JCL logging API.
+
+log4j-facade:
+	Contains the log4j facade, an Apache Log4j 1.x compatible logging API replacement.
+
+slf4j-binding:
+	Contains the SLF4J binding, implementing the SLF4J logging API.
 
 tests:
 	Contains all JUnit tests
