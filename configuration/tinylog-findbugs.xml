@@ -2,12 +2,7 @@
 <!-- Exclude list of warnings -->
 <FindBugsFilter>
 	<Match>
-		<Or>
-			<Class name="org.tinylog.Logger" />
-			<Class name="org.tinylog.commons.logging.TinylogBridge" />
-			<Class name="org.apache.log4j.TinylogBridge" />
-			<Class name="org.slf4j.impl.TinylogBridge" />
-		</Or>
+		<Class name="org.tinylog.Logger" />
 		<!-- Catching of exceptions is required for the case that the fast but unofficial ways to get the stack trace will fail -->
 		<Bug pattern="REC_CATCH_EXCEPTION" />
 	</Match>
