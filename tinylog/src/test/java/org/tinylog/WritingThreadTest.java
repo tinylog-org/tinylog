@@ -180,7 +180,7 @@ public class WritingThreadTest extends AbstractTest {
 		assertEquals(EndlessThread.class.getName(), writingThread.getNameOfThreadToObserve());
 		assertEquals(observableThread, writingThread.getThreadToObserve());
 		assertTrue(writingThread.isAlive());
-		Thread.sleep(10L);
+		Thread.sleep(100L);
 		assertTrue(writingThread.isAlive());
 
 		observableThread.cancelled = true;
