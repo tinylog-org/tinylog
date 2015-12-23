@@ -23,6 +23,8 @@ Projects
   * Contains the log4j facade (Log4j 1.x compatible logging API)
 * slf4j-binding
   * Contains the SLF4J binding (implementation for SLF4J logging API)
+* jcl-binding
+  * Contains the Apache Commons Logging (JCL) binding, implementing the JCL logging API
 * tinylog
   * Contains tinylog
   
