@@ -26,9 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.tinylog.labelers.CountLabeler;
-import org.tinylog.labelers.FilePair;
-import org.tinylog.labelers.Labeler;
 import org.tinylog.util.ConfigurationCreator;
 import org.tinylog.util.FileHelper;
 

@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.tinylog.policies.CountPolicy;
-import org.tinylog.policies.Policy;
 import org.tinylog.util.ConfigurationCreator;
 import org.tinylog.util.FileHelper;
 

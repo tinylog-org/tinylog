@@ -39,9 +39,6 @@ import org.tinylog.util.FileHelper;
 import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.util.LoopWritingThread;
 import org.tinylog.util.PropertiesBuilder;
-import org.tinylog.writers.LogEntryValue;
-import org.tinylog.writers.SharedFileWriter;
-import org.tinylog.writers.Writer;
 
 import mockit.Mock;
 import mockit.MockUp;

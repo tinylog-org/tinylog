@@ -26,9 +26,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.tinylog.EnvironmentHelper;
-import org.tinylog.labelers.FilePair;
-import org.tinylog.labelers.Labeler;
-import org.tinylog.labelers.ProcessIdLabeler;
 import org.tinylog.util.ConfigurationCreator;
 import org.tinylog.util.FileHelper;
 

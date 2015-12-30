@@ -29,8 +29,6 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
-import org.tinylog.Configurator;
-import org.tinylog.LoggingContext;
 import org.tinylog.util.StringListOutputStream;
 import org.tinylog.writers.VMShutdownHook;
 import org.tinylog.writers.Writer;

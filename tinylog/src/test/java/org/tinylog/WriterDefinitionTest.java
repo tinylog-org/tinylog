@@ -18,8 +18,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
-import org.tinylog.Level;
-import org.tinylog.WriterDefinition;
 import org.tinylog.writers.ConsoleWriter;
 import org.tinylog.writers.Writer;
 

@@ -46,9 +46,6 @@ import org.tinylog.EnvironmentHelper;
 import org.tinylog.Level;
 import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.util.PropertiesBuilder;
-import org.tinylog.writers.JdbcWriter;
-import org.tinylog.writers.LogEntryValue;
-import org.tinylog.writers.Writer;
 import org.tinylog.writers.JdbcWriter.Value;
 
 import mockit.Mock;

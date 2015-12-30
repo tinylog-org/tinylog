@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.junit.Test;
-import org.tinylog.policies.Policy;
-import org.tinylog.policies.WeeklyPolicy;
 import org.tinylog.util.FileHelper;
 
 /**

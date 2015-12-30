@@ -18,10 +18,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.tinylog.Configurator;
-import org.tinylog.Level;
-import org.tinylog.LogEntry;
-import org.tinylog.LogEntryForwarder;
 import org.tinylog.util.StoreWriter;
 import org.tinylog.writers.LogEntryValue;
 

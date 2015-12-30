@@ -21,14 +21,12 @@ import static org.tinylog.hamcrest.ClassMatchers.type;
 import java.io.File;
 import java.io.IOException;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.junit.Test;
-import org.tinylog.policies.Policy;
-import org.tinylog.policies.SizePolicy;
 import org.tinylog.util.ConfigurationCreator;
 import org.tinylog.util.FileHelper;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for size policy.

@@ -21,9 +21,6 @@ import static org.junit.Assert.assertTrue;
 import static org.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import org.junit.Test;
-import org.tinylog.Level;
-import org.tinylog.LogEntry;
-import org.tinylog.WritingThread;
 import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.util.NullWriter;
 import org.tinylog.util.StoreWriter;

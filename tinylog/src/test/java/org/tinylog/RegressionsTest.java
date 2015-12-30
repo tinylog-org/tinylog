@@ -23,11 +23,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.junit.Test;
-import org.tinylog.Configurator;
-import org.tinylog.EnvironmentHelper;
-import org.tinylog.Level;
-import org.tinylog.LogEntry;
-import org.tinylog.Logger;
 import org.tinylog.labelers.TimestampLabeler;
 import org.tinylog.policies.SizePolicy;
 import org.tinylog.policies.StartupPolicy;

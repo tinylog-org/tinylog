@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.junit.Test;
 import org.tinylog.AbstractTest;
-import org.tinylog.labelers.LogFileFilter;
 
 /**
  * Tests for log file filter.

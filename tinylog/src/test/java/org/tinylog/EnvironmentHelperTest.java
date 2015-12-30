@@ -27,7 +27,6 @@ import java.lang.management.RuntimeMXBean;
 
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.tinylog.EnvironmentHelper;
 
 import mockit.NonStrictExpectations;
 

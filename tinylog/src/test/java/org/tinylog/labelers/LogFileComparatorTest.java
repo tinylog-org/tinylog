@@ -26,7 +26,6 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.tinylog.AbstractTest;
-import org.tinylog.labelers.LogFileComparator;
 import org.tinylog.util.FileHelper;
 
 /**

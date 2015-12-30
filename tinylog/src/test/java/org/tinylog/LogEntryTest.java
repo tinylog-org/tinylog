@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.junit.Test;
-import org.tinylog.Level;
-import org.tinylog.LogEntry;
 
 /**
  * Tests the log entry data class.

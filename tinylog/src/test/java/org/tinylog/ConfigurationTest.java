@@ -42,13 +42,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.tinylog.Configuration;
-import org.tinylog.Level;
-import org.tinylog.LogEntry;
-import org.tinylog.StackTraceInformation;
-import org.tinylog.Token;
-import org.tinylog.WriterDefinition;
-import org.tinylog.WritingThread;
 import org.tinylog.writers.ConsoleWriter;
 import org.tinylog.writers.LogEntryValue;
 import org.tinylog.writers.Writer;

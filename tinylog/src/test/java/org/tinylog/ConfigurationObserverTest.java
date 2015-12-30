@@ -35,26 +35,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.tinylog.Configuration;
-import org.tinylog.ConfigurationObserver;
-import org.tinylog.Configurator;
-import org.tinylog.Level;
-import org.tinylog.Logger;
-import org.tinylog.WritingThread;
 import org.tinylog.mocks.ClassLoaderMock;
 import org.tinylog.util.FileHelper;
 import org.tinylog.writers.ConsoleWriter;
 import org.tinylog.writers.FileWriter;
 import org.tinylog.writers.Writer;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for configuration observer.

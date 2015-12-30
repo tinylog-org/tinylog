@@ -21,18 +21,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tinylog.AbstractTest;
 import org.tinylog.Configuration;
 import org.tinylog.LogEntry;
-import org.tinylog.writers.LogEntryValue;
-import org.tinylog.writers.VMShutdownHook;
-import org.tinylog.writers.Writer;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the VM shutdown hook.

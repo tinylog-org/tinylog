@@ -27,9 +27,6 @@ import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.util.PropertiesBuilder;
-import org.tinylog.writers.ConsoleWriter;
-import org.tinylog.writers.LogEntryValue;
-import org.tinylog.writers.Writer;
 
 /**
  * Tests for the console writer.

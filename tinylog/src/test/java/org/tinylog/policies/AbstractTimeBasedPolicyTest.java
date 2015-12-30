@@ -19,7 +19,6 @@ import java.util.TimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.tinylog.mocks.SystemTimeMock;
-import org.tinylog.policies.AbstractTimeBasedPolicy;
 
 /**
  * Basis class for time based tests.
