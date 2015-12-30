@@ -99,9 +99,8 @@ public abstract class Category {
 	 */
 	public final ResourceBundle getResourceBundle() {
 		for (Category category = this; category != null; category = category.getParent()) {
-			ResourceBundle bundle = category.bundle;
-			if (bundle != null) {
-				return bundle;
+			if (category.bundle != null) {
+				return category.bundle;
 			}
 		}
 
@@ -380,12 +379,12 @@ public abstract class Category {
 	}
 
 	protected final String getResourceBundleString(final String key) {
-		ResourceBundle bundle = getResourceBundle();
-		if (bundle == null) {
+		ResourceBundle foundBundle = getResourceBundle();
+		if (foundBundle == null) {
 			return null;
 		} else {
 			try {
-				return bundle.getString(key);
+				return foundBundle.getString(key);
 			} catch (MissingResourceException ex) {
 				return null;
 			}
