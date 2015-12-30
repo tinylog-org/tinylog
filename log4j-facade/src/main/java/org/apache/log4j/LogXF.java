@@ -150,8 +150,8 @@ public abstract class LogXF {
 	public static void throwing(final Logger logger, final String sourceClass, final String sourceMethod, final Throwable throwable) {
 		TinylogBridge.log(Level.DEBUG, throwable, sourceClass + "." + sourceMethod + " THROW");
 	}
-	
-	protected static String getResourceBundleString(String bundleName, String key) {
+
+	protected static String getResourceBundleString(final String bundleName, final String key) {
 		if (bundleName == null) {
 			return key;
 		} else {
@@ -162,7 +162,7 @@ public abstract class LogXF {
 			}
 		}
 	}
-	
+
 	private static String toString(final Object[] array) {
 		if (array == null) {
 			return "null";
@@ -172,7 +172,7 @@ public abstract class LogXF {
 			for (int i = 0; i < array.length; ++i) {
 				if (i > 0) {
 					builder.append(',');
-			}
+				}
 				builder.append(toString(array[i]));
 			}
 			builder.append('}');

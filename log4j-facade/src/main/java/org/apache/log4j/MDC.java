@@ -43,7 +43,7 @@ public final class MDC {
 	 *            Key of mapping
 	 * @return Context value or {@code null}
 	 */
-	public static Object get(String key) {
+	public static Object get(final String key) {
 		return LoggingContext.get(key);
 	}
 
@@ -55,7 +55,7 @@ public final class MDC {
 	 * @param value
 	 *            New value
 	 */
-	public static void put(String key, Object value) {
+	public static void put(final String key, final Object value) {
 		LoggingContext.put(key, value);
 	}
 
@@ -65,7 +65,7 @@ public final class MDC {
 	 * @param key
 	 *            Key of mapping
 	 */
-	public static void remove(String key) {
+	public static void remove(final String key) {
 		LoggingContext.remove(key);
 	}
 
