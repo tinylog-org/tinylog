@@ -11,7 +11,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.build.directory}</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory></outputDirectory>
 			<includes>
 				<include>*${project.version}.jar</include>
 				<include>*${project.version}-javadoc.jar</include>
@@ -20,7 +20,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>..</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory></outputDirectory>
 			<includes>
 				<include>license.txt</include>
 			</includes>
