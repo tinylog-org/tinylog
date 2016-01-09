@@ -417,33 +417,59 @@ final class Tokenizer {
 
 		@Override
 		public void render(final LogEntry logEntry, final StringBuilder builder) {
-			if (builder.length() == 0 || builder.charAt(builder.length() - 1) == '\n' || builder.charAt(builder.length() - 1) == '\r') {
-				builder.append(spaces);
-			}
-
 			StringBuilder subBuilder = new StringBuilder(1024);
 			token.render(logEntry, subBuilder);
 
+			int i = 0;
 			int head = 0;
-			for (int i = head; i < subBuilder.length(); ++i) {
-				char c = subBuilder.charAt(i);
-				if (c == '\n') {
-					builder.append(subBuilder, head, i + 1);
-					builder.append(spaces);
-					head = i + 1;
-				} else if (c == '\r') {
-					if (i + 1 < subBuilder.length() && subBuilder.charAt(i + 1) == '\n') {
-						++i;
-					}
-					builder.append(subBuilder, head, i + 1);
-					builder.append(spaces);
-					head = i + 1;
-				} else if (head == i && (c == ' ' || c == '\t')) {
-					++head;
+
+			if (builder.length() == 0 || builder.charAt(builder.length() - 1) == '\n' || builder.charAt(builder.length() - 1) == '\r') {
+				i += addSpaces(builder, subBuilder, i);
+				head = i;
+			}
+
+			while (i < subBuilder.length()) {
+				int lineBreakLength = readLineBreak(subBuilder, i);
+				if (lineBreakLength > 0) {
+					i += lineBreakLength;
+					builder.append(subBuilder, head, i);
+					i += addSpaces(builder, subBuilder, i);
+					head = i;
+				} else if (head == i && (subBuilder.charAt(i) == ' ' || subBuilder.charAt(i) == '\t')) {
+					head = ++i;
+				} else {
+					++i;
 				}
 			}
+
 			if (head < subBuilder.length()) {
 				builder.append(subBuilder, head, subBuilder.length());
+			}
+		}
+
+		private int addSpaces(final StringBuilder targetBuilder, final StringBuilder sourceBuilder, final int index) {
+			targetBuilder.append(spaces);
+
+			int count = 0;
+			for (int i = index; i < sourceBuilder.length() && sourceBuilder.charAt(i) == '\t'; ++i) {
+				targetBuilder.append(spaces);
+				++count;
+			}
+			return count;
+		}
+
+		private static int readLineBreak(final StringBuilder builder, final int index) {
+			char c = builder.charAt(index);
+			if (c == '\n') {
+				return 1;
+			} else if (c == '\r') {
+				if (index + 1 < builder.length() && builder.charAt(index + 1) == '\n') {
+					return 2;
+				} else {
+					return 1;
+				}
+			} else {
+				return 0;
 			}
 		}
 
@@ -501,7 +527,7 @@ final class Tokenizer {
 			builder.append(logEntry.getThread().getName());
 		}
 
-	};
+	}
 
 	private static final class ThreadIdToken implements Token {
 
