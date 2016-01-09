@@ -1,4 +1,4 @@
-tinylog [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=master)](https://travis-ci.org/pmwmedia/tinylog)
+tinylog [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=master)](https://travis-ci.org/pmwmedia/tinylog) [![codecov.io](https://codecov.io/github/pmwmedia/tinylog/coverage.svg?branch=master)](https://codecov.io/github/pmwmedia/tinylog)
 =======
 
 Example
