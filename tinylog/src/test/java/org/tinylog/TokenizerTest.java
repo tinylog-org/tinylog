@@ -617,15 +617,23 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("!TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("!Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
-		/* Test removing whitespace */
+		/* Test various level of indention */
 
-		tokens = tokenizer.parse("{message|indent=2}");
+		tokens = tokenizer.parse("{message|indent=1}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
-		assertEquals("  TEST ", render(tokens, new LogEntryBuilder().message(" TEST ")));
-		assertEquals("  Hello\n  World\t", render(tokens, new LogEntryBuilder().message("\tHello\n\tWorld\t")));
+		assertEquals("  Hello\n World!", render(tokens, new LogEntryBuilder().message("\tHello\nWorld!")));
+		assertEquals(" Hello\n  World!", render(tokens, new LogEntryBuilder().message("Hello\n\tWorld!")));
 
-		/* Invalid definitions of indenting */
+		/* Test removing whitespace */
+
+		tokens = tokenizer.parse("{message|indent=1}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertEquals(" TEST ", render(tokens, new LogEntryBuilder().message(" \t TEST ")));
+		assertEquals(" Hello\n  World!", render(tokens, new LogEntryBuilder().message("  Hello\n\t  \t World!")));
+
+		/* Invalid definitions of indention */
 
 		tokens = tokenizer.parse("{message|indent}");
 		assertEquals("LOGGER WARNING: No value set for \"indent\"", getErrorStream().nextLine());
