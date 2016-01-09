@@ -91,7 +91,7 @@ public class LoggingContextTest extends AbstractTest {
 				LoggingContext.put("number", "42");
 				assertEquals(singletonMap("number", "42"), LoggingContext.getMapping());
 				assertEquals("42", LoggingContext.get("number"));
-			};
+			}
 
 		};
 		thread.start();
@@ -122,7 +122,7 @@ public class LoggingContextTest extends AbstractTest {
 			public void run() {
 				assertEquals(singletonMap("number", "42"), LoggingContext.getMapping());
 				assertEquals("42", LoggingContext.get("number"));
-			};
+			}
 
 		};
 		thread.start();
