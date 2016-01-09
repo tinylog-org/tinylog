@@ -27,6 +27,8 @@ public @interface PropertiesSupport {
 
 	/**
 	 * Name of the labeler for the properties.
+	 *
+	 * @return Name of labeler
 	 */
 	String name();
 

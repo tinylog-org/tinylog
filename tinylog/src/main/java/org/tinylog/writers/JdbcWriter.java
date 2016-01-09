@@ -661,83 +661,83 @@ public final class JdbcWriter implements Writer {
 	public enum Value {
 
 		/**
-		 * The current date
+		 * The current date.
 		 *
 		 * @see Date
 		 */
 		DATE(LogEntryValue.DATE),
 
 		/**
-		 * The ID of the process (pid)
+		 * The ID of the process (pid).
 		 */
 		PROCESS_ID(LogEntryValue.PROCESS_ID),
 
 		/**
-		 * The name of the current thread
+		 * The name of the current thread.
 		 */
 		THREAD_NAME(LogEntryValue.THREAD),
 
 		/**
-		 * The ID of the current thread
+		 * The ID of the current thread.
 		 */
 		THREAD_ID(LogEntryValue.THREAD),
 
 		/**
-		 * Mapped diagnostic context
+		 * Mapped diagnostic context.
 		 */
 		CONTEXT(LogEntryValue.CONTEXT),
 
 		/**
-		 * The fully qualified class name of the caller
+		 * The fully qualified class name of the caller.
 		 */
 		CLASS(LogEntryValue.CLASS),
 
 		/**
-		 * The class name without package of the caller
+		 * The class name without package of the caller.
 		 */
 		CLASS_NAME(LogEntryValue.CLASS),
 
 		/**
-		 * The package name of the caller
+		 * The package name of the caller.
 		 */
 		PACKAGE(LogEntryValue.CLASS),
 
 		/**
-		 * The method name of the caller
+		 * The method name of the caller.
 		 */
 		METHOD(LogEntryValue.METHOD),
 
 		/**
-		 * The source filename of the caller
+		 * The source filename of the caller.
 		 */
 		FILE(LogEntryValue.FILE),
 
 		/**
-		 * The line number of calling
+		 * The line number of calling.
 		 */
 		LINE(LogEntryValue.LINE),
 
 		/**
-		 * The severity level
+		 * The severity level.
 		 *
 		 * @see Level
 		 */
 		LEVEL(LogEntryValue.LEVEL),
 
 		/**
-		 * The message of the logging event
+		 * The message of the logging event.
 		 */
 		MESSAGE(LogEntryValue.MESSAGE),
 
 		/**
-		 * The exception of the log entry
+		 * The exception of the log entry.
 		 *
 		 * @see Throwable
 		 */
 		EXCEPTION(LogEntryValue.EXCEPTION),
 
 		/**
-		 * The rendered log entry
+		 * The rendered log entry.
 		 */
 		RENDERED_LOG_ENTRY(LogEntryValue.RENDERED_LOG_ENTRY);
 

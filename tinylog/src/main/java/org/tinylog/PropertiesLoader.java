@@ -43,57 +43,57 @@ import org.tinylog.writers.Writer;
 final class PropertiesLoader {
 
 	/**
-	 * tinylog prefix of properties
+	 * tinylog prefix of properties.
 	 */
 	static final String TINYLOG_PREFIX = "tinylog";
 
 	/**
-	 * Name of property for severity level
+	 * Name of property for severity level.
 	 */
 	static final String LEVEL_PROPERTY = TINYLOG_PREFIX + ".level";
 
 	/**
-	 * Name of property for format pattern
+	 * Name of property for format pattern.
 	 */
 	static final String FORMAT_PROPERTY = TINYLOG_PREFIX + ".format";
 
 	/**
-	 * Name of property for locale
+	 * Name of property for locale.
 	 */
 	static final String LOCALE_PROPERTY = TINYLOG_PREFIX + ".locale";
 
 	/**
-	 * Name of property for max stack trace elements
+	 * Name of property for max stack trace elements.
 	 */
 	static final String STACKTRACE_PROPERTY = TINYLOG_PREFIX + ".stacktrace";
 
 	/**
-	 * Name of property for writer
+	 * Name of property for writer.
 	 */
 	static final String WRITER_PROPERTY = TINYLOG_PREFIX + ".writer";
 
 	/**
-	 * Name of property for writing thread
+	 * Name of property for writing thread.
 	 */
 	static final String WRITING_THREAD_PROPERTY = TINYLOG_PREFIX + ".writingthread";
 
 	/**
-	 * Name of property for thread to observe by writing thread
+	 * Name of property for thread to observe by writing thread.
 	 */
 	static final String WRITING_THREAD_OBSERVE_PROPERTY = WRITING_THREAD_PROPERTY + ".observe";
 
 	/**
-	 * Name of property for priority by writing thread
+	 * Name of property for priority by writing thread.
 	 */
 	static final String WRITING_THREAD_PRIORITY_PROPERTY = WRITING_THREAD_PROPERTY + ".priority";
 
 	/**
-	 * Prefix for path to services
+	 * Prefix for path to services.
 	 */
 	static final String SERVICES_PREFIX = "META-INF/services/";
 
 	/**
-	 * Name prefix of properties for custom severity levels
+	 * Name prefix of properties for custom severity levels.
 	 */
 	static final String CUSTOM_LEVEL_PREFIX = LEVEL_PROPERTY + "@";
 

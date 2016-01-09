@@ -19,17 +19,17 @@ package org.tinylog;
 enum StackTraceInformation {
 
 	/**
-	 * No stack trace information required at all
+	 * No stack trace information required at all.
 	 */
 	NONE,
 
 	/**
-	 * Only class name is required
+	 * Only class name is required.
 	 */
 	CLASS_NAME,
 
 	/**
-	 * Full stack trace information is required
+	 * Full stack trace information is required.
 	 */
 	FULL;
 

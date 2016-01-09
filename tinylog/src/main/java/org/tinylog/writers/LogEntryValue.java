@@ -13,7 +13,7 @@
 
 package org.tinylog.writers;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 import org.tinylog.Level;
 import org.tinylog.LoggingContext;
@@ -24,72 +24,72 @@ import org.tinylog.LoggingContext;
 public enum LogEntryValue {
 
 	/**
-	 * The current date
+	 * The current date.
 	 *
-	 * @see ZonedDateTime
+	 * @see Date
 	 */
 	DATE,
 
 	/**
-	 * The ID of the process (pid)
+	 * The ID of the process (pid).
 	 */
 	PROCESS_ID,
 
 	/**
-	 * The current thread
+	 * The current thread.
 	 *
 	 * @see Thread
 	 */
 	THREAD,
 
 	/**
-	 * Thread-based mapped diagnostic context
+	 * Thread-based mapped diagnostic context.
 	 *
 	 * @see LoggingContext
 	 */
 	CONTEXT,
 
 	/**
-	 * The fully qualified class name of the caller
+	 * The fully qualified class name of the caller.
 	 */
 	CLASS,
 
 	/**
-	 * The method name of the caller
+	 * The method name of the caller.
 	 */
 	METHOD,
 
 	/**
-	 * The source filename of the caller
+	 * The source filename of the caller.
 	 */
 	FILE,
 
 	/**
-	 * The line number of calling
+	 * The line number of calling.
 	 */
 	LINE,
 
 	/**
-	 * The severity level
+	 * The severity level.
 	 *
 	 * @see Level
 	 */
 	LEVEL,
 
 	/**
-	 * The message of the logging event
+	 * The message of the logging event.
 	 */
 	MESSAGE,
 
 	/**
-	 * The exception of the log entry
+	 * The exception of the log entry.
 	 *
 	 * @see Throwable
 	 */
 	EXCEPTION,
 
 	/**
-	 * The rendered log entry
+	 * The rendered log entry.
 	 */
 	RENDERED_LOG_ENTRY;
 

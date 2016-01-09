@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
  */
 public abstract class LogXF {
 
+	/** */
 	protected LogXF() {
 	}
 
@@ -151,6 +152,15 @@ public abstract class LogXF {
 		TinylogBridge.log(Level.DEBUG, throwable, sourceClass + "." + sourceMethod + " THROW");
 	}
 
+	/**
+	 * Get a value from a resource bundle.
+	 *
+	 * @param bundleName
+	 *            Name of resource bundle
+	 * @param key
+	 *            Key of localized value
+	 * @return Localized value
+	 */
 	protected static String getResourceBundleString(final String bundleName, final String key) {
 		if (bundleName == null) {
 			return key;

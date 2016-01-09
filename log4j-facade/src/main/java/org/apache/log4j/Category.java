@@ -378,6 +378,13 @@ public abstract class Category {
 		TinylogBridge.log(priority, throwable, message);
 	}
 
+	/**
+	 * Get a value from resource bundle.
+	 *
+	 * @param key
+	 *            Key of localized value
+	 * @return Localized value
+	 */
 	protected final String getResourceBundleString(final String key) {
 		ResourceBundle foundBundle = getResourceBundle();
 		if (foundBundle == null) {

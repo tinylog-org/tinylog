@@ -23,7 +23,7 @@ import org.slf4j.helpers.NOPMDCAdapter;
 public final class StaticMDCBinder {
 
 	/**
-	 * Unique instance of static MDC binder
+	 * Unique instance of static MDC binder.
 	 */
 	public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
 

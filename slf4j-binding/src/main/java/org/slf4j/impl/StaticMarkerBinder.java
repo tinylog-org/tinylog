@@ -24,7 +24,7 @@ import org.slf4j.spi.MarkerFactoryBinder;
 public final class StaticMarkerBinder implements MarkerFactoryBinder {
 
 	/**
-	 * Unique instance of static marker binder
+	 * Unique instance of static marker binder.
 	 */
 	public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
 
