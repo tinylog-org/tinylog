@@ -1,4 +1,8 @@
 language: java
+
 jdk:
    - oraclejdk8
+
+before_script: pip install --user codecov
 script: mvn clean checkstyle:checkstyle findbugs:findbugs install
+after_success: codecov
