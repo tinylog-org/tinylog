@@ -39,6 +39,7 @@ public final class LoggingContext {
 		protected Map<String, String> childValue(final Map<String, String> parentValue) {
 			return parentValue;
 		}
+
 	};
 
 	/** */
