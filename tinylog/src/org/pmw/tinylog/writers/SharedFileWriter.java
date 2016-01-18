@@ -75,10 +75,11 @@ public final class SharedFileWriter implements Writer {
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		FileChannel channel = stream.getChannel();
+		byte[] data = logEntry.getRenderedLogEntry().getBytes();
 		synchronized (mutex) {
 			FileLock lock = channel.lock();
 			try {
-				stream.write(logEntry.getRenderedLogEntry().getBytes());
+				stream.write(data);
 			} finally {
 				lock.release();
 			}
