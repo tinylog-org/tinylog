@@ -14,6 +14,7 @@
 package org.slf4j.impl;
 
 import org.slf4j.helpers.NOPMDCAdapter;
+import org.slf4j.spi.MDCAdapter;
 
 /**
  * The binding for {@link org.slf4j.spi.MDCAdapter MDCAdapter}.
@@ -40,7 +41,7 @@ public final class StaticMDCBinder {
 	 *
 	 * @return MDC adapter
 	 */
-	public TinylogMDCAdapter getMDCA() {
+	public MDCAdapter getMDCA() {
 		return adapter;
 	}
 
