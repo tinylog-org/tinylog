@@ -32,6 +32,7 @@ import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.StoreWriter;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.RollingFileWriter;
+import org.slf4j.MDC;
 
 /**
  * Tests old fixed bugs to prevent regressions.
@@ -203,6 +204,18 @@ public class RegressionsTest extends AbstractTest {
 			assertEquals(Level.TRACE, Logger.getLevel());
 		} finally {
 			System.clearProperty("tinylog.level");
+		}
+	}
+
+	/**
+	 * Bug: SLF4Js MDC implementation failed due to incorrect return type of {@link org.slf4j.impl.StaticMDCBinder#getMDCA()}.
+	 */
+	@Test
+	public final void testReturnTypeOfStaticMDCBinder() {
+		try {
+			MDC.put("pi", "3.14");
+		} finally {
+			MDC.clear();
 		}
 	}
 

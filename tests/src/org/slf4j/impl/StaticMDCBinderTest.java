@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
+import org.slf4j.spi.MDCAdapter;
 
 /**
  * Test MDC binder.
@@ -32,7 +33,10 @@ public class StaticMDCBinderTest {
 	public final void testMDCAdapter() {
 		assertNotNull(StaticMDCBinder.SINGLETON);
 		assertEquals(TinylogMDCAdapter.class.getName(), StaticMDCBinder.SINGLETON.getMDCAdapterClassStr());
-		assertNotNull(StaticMDCBinder.SINGLETON.getMDCA());
+		
+		MDCAdapter adapter = StaticMDCBinder.SINGLETON.getMDCA();
+		assertNotNull(adapter);
+		assertEquals(adapter.getClass(), TinylogMDCAdapter.class);
 	}
 	
 }
