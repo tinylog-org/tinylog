@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="tinylog" default="all">
 	
-	<property name="version" value="1.1-beta3" />
-	<property name="bundle-version" value="1.1.0.beta3" />
-	<property name="maven-version" value="1.1-beta-3" />
+	<property name="version" value="1.1-rc1" />
+	<property name="bundle-version" value="1.1.0.rc1" />
+	<property name="maven-version" value="1.1-rc-1" />
 	<property name="jcl-version" value="1.2" />
 	<property name="slf4j-version" value="1.7.7" />
 	
