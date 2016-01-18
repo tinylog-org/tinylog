@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotSame;
 
 import org.junit.Test;
 import org.slf4j.helpers.NOPMDCAdapter;
+import org.slf4j.spi.MDCAdapter;
 
 /**
  * Test MDC binder.
@@ -34,10 +35,14 @@ public class StaticMDCBinderTest {
 	public final void testMDCAdapter() {
 		assertEquals(NOPMDCAdapter.class.getName(), StaticMDCBinder.SINGLETON.getMDCAdapterClassStr());
 
-		NOPMDCAdapter first = StaticMDCBinder.SINGLETON.getMDCA();
+		MDCAdapter first = StaticMDCBinder.SINGLETON.getMDCA();
 		assertNotNull(first);
-		NOPMDCAdapter second = StaticMDCBinder.SINGLETON.getMDCA();
+		assertEquals(first.getClass(), NOPMDCAdapter.class);
+		
+		MDCAdapter second = StaticMDCBinder.SINGLETON.getMDCA();
 		assertNotNull(second);
+		assertEquals(second.getClass(), NOPMDCAdapter.class);
+
 		assertNotSame(first, second);
 	}
 }
