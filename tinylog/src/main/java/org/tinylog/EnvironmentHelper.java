@@ -25,6 +25,15 @@ public final class EnvironmentHelper {
 
 	private EnvironmentHelper() {
 	}
+	
+	/**
+	 * Determine whether running on Windows.
+	 * 
+	 * @return <code>true</code> if operating system is Windows, <code>false</code> if not
+	 */
+	public static boolean isWindows() {
+		return System.getProperty("os.name").startsWith("Windows");
+	}
 
 	/**
 	 * Get the line separator.
