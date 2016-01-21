@@ -276,9 +276,6 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testAppending() throws IOException {	
 		File file = FileHelper.createTemporaryFile(null);
-
-		/* Overwriting by first writer */
-
 		FileHelper.write(file, "Hello\n");
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
