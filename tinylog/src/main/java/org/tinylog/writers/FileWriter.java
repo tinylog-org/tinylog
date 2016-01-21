@@ -29,13 +29,14 @@ import org.tinylog.LogEntry;
  * Writes log entries to a file.
  */
 @PropertiesSupport(name = "file", properties = { @Property(name = "filename", type = String.class),
-		@Property(name = "buffered", type = boolean.class, optional = true) })
+		@Property(name = "buffered", type = boolean.class, optional = true), @Property(name = "append", type = boolean.class, optional = true) })
 public final class FileWriter implements Writer {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
 	private final String filename;
 	private final boolean buffered;
+	private final boolean append;
 	private OutputStream stream;
 
 	/**
@@ -43,8 +44,7 @@ public final class FileWriter implements Writer {
 	 *            Filename of the log file
 	 */
 	public FileWriter(final String filename) {
-		this.filename = filename;
-		this.buffered = false;
+		this(filename, false, false);
 	}
 
 	/**
@@ -54,8 +54,37 @@ public final class FileWriter implements Writer {
 	 *            Buffered writing
 	 */
 	public FileWriter(final String filename, final boolean buffered) {
+		this(filename, buffered, false);
+	}
+	
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param buffered
+	 *            Buffered writing
+	 * @param append
+	 *            Continuing existing file
+	 */
+	public FileWriter(final String filename, final boolean buffered, final boolean append) {
 		this.filename = filename;
 		this.buffered = buffered;
+		this.append = append;
+	}
+	
+	/**
+	 * Helper constructor with wrapper class parameters for {@link org.pmw.tinylog.PropertiesLoader PropertiesLoader}.
+	 * 
+	 * @param filename
+	 *            Filename of the log file
+	 * @param buffered
+	 *            Buffered writing
+	 * @param append
+	 *            Continuing existing file
+	 */
+	FileWriter(final String filename, final Boolean buffered, final Boolean append) {
+		this.filename = filename;
+		this.buffered = buffered == null ? false : buffered;
+		this.append = append == null ? false : append;
 	}
 
 	@Override
@@ -80,6 +109,15 @@ public final class FileWriter implements Writer {
 	public boolean isBuffered() {
 		return buffered;
 	}
+	
+	/**
+	 * Determine whether appending is enabled.
+	 *
+	 * @return <code>true</code> if appending is enabled, otherwise <code>false</code>
+	 */
+	public boolean isAppending() {
+		return append;
+	}
 
 	@Override
 	public void init(final Configuration configuration) throws IOException {
@@ -87,9 +125,9 @@ public final class FileWriter implements Writer {
 		EnvironmentHelper.makeDirectories(file);
 
 		if (buffered) {
-			stream = new BufferedOutputStream(new FileOutputStream(file), BUFFER_SIZE);
+			stream = new BufferedOutputStream(new FileOutputStream(file, append), BUFFER_SIZE);
 		} else {
-			stream = new FileOutputStream(file);
+			stream = new FileOutputStream(file, append);
 		}
 
 		VMShutdownHook.register(this);

@@ -264,6 +264,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		}
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
+		assertFalse(writer.isAppending());
 		writer.init(null);
 		writer.close();
 
@@ -273,7 +274,38 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
+	
+	/**
+	 * Test appending existing log file.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testAppending() throws IOException {
+		File file = FileHelper.createTemporaryFile(null);
+		FileHelper.write(file, "Hello\n");
 
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		FileWriter writer = new FileWriter(file.getAbsolutePath(), false , true);
+		assertTrue(writer.isAppending());
+		writer.init(null);
+		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
+		writer.close();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		assertEquals("World", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		file.delete();
+	}
+	
 	/**
 	 * Test creating a log file in an non-existing folder.
 	 *
@@ -378,6 +410,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		FileWriter fileWriter = (FileWriter) writers.get(0);
 		assertEquals(filename, fileWriter.getFilename());
 		assertFalse(fileWriter.isBuffered());
+		assertFalse(fileWriter.isAppending());
 
 		propertiesBuilder.set("tinylog.writer.buffered", "true");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -385,6 +418,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		fileWriter = (FileWriter) writers.get(0);
 		assertEquals(filename, fileWriter.getFilename());
 		assertTrue(fileWriter.isBuffered());
+		assertFalse(fileWriter.isAppending());
 
 		propertiesBuilder.set("tinylog.writer.buffered", "false");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -392,6 +426,51 @@ public class FileWriterTest extends AbstractWriterTest {
 		fileWriter = (FileWriter) writers.get(0);
 		assertEquals(filename, fileWriter.getFilename());
 		assertFalse(fileWriter.isBuffered());
+		assertFalse(fileWriter.isAppending());
+
+		propertiesBuilder.remove("tinylog.writer.buffered");
+		propertiesBuilder.set("tinylog.writer.append", "true");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertFalse(fileWriter.isBuffered());
+		assertTrue(fileWriter.isAppending());
+
+		propertiesBuilder.set("tinylog.writer.append", "false");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertFalse(fileWriter.isBuffered());
+		assertFalse(fileWriter.isAppending());
+		
+		propertiesBuilder.set("tinylog.writer.buffered", "true");
+		propertiesBuilder.set("tinylog.writer.append", "false");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertTrue(fileWriter.isBuffered());
+		assertFalse(fileWriter.isAppending());
+		
+		propertiesBuilder.set("tinylog.writer.buffered", "false");
+		propertiesBuilder.set("tinylog.writer.append", "true");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertFalse(fileWriter.isBuffered());
+		assertTrue(fileWriter.isAppending());
+		
+		propertiesBuilder.set("tinylog.writer.buffered", "true");
+		propertiesBuilder.set("tinylog.writer.append", "true");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(FileWriter.class));
+		fileWriter = (FileWriter) writers.get(0);
+		assertEquals(filename, fileWriter.getFilename());
+		assertTrue(fileWriter.isBuffered());
+		assertTrue(fileWriter.isAppending());
 
 		file.delete();
 	}
