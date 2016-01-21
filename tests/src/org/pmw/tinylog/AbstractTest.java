@@ -31,6 +31,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.pmw.tinylog.util.StringListOutputStream;
 import org.pmw.tinylog.writers.Writer;
+
+import mockit.Deencapsulation;
+
 import org.pmw.tinylog.writers.VMShutdownHook;
 
 /**
@@ -71,7 +74,7 @@ public abstract class AbstractTest {
 		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
 		
-		mockit.Deencapsulation.setField(InternalLogger.class, "lastLogEntry", null);
+		Deencapsulation.setField(InternalLogger.class, "lastLogEntry", null);
 
 		LoggingContext.clear();
 
