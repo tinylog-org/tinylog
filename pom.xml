@@ -30,6 +30,7 @@
 		<h2.version>1.4.190</h2.version>
 
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
 		<maven-jar-plugin.version>2.6</maven-jar-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
@@ -79,6 +80,15 @@
 				<configuration>
 					<debug>false</debug>
 					<optimize>true</optimize>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<argLine>-XX:-Inline</argLine>
 				</configuration>
 			</plugin>
 
