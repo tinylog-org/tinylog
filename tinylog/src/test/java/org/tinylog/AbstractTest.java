@@ -33,6 +33,8 @@ import org.tinylog.util.StringListOutputStream;
 import org.tinylog.writers.VMShutdownHook;
 import org.tinylog.writers.Writer;
 
+import mockit.Deencapsulation;
+
 /**
  * Base class for all tests.
  */
@@ -71,7 +73,7 @@ public abstract class AbstractTest {
 		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
 		
-		mockit.Deencapsulation.setField(InternalLogger.class, "lastLogEntry", null);
+		Deencapsulation.setField(InternalLogger.class, "lastLogEntry", null);
 
 		LoggingContext.clear();
 
