@@ -421,7 +421,7 @@ final class PropertiesLoader {
 					int offset = 0;
 					for (int i = 0; i < definition.length; ++i) {
 						Class<?> parameterType = i - offset < parameterTypes.length ? parameterTypes[i - offset] : null;
-						if (parameterType == null || !parameterType.equals(definition[i].type())) {
+						if (parameterType == null || !areCompatible(definition[i].type(), parameterType)) {
 							if (definition[i].optional() && parameters[i] == null) {
 								skiped.set(i);
 								++offset;
@@ -651,6 +651,12 @@ final class PropertiesLoader {
 			InternalLogger.error(ex.getTargetException(), "Failed to create an instance of \"{}\"", clazz.getName());
 			return null;
 		}
+	}
+
+	private static boolean areCompatible(final Class<?> expectedType, final Class<?> foundType) {
+		return foundType.equals(expectedType)
+				|| (expectedType.equals(boolean.class) && foundType.equals(Boolean.class))
+				|| (expectedType.equals(int.class) && foundType.equals(Integer.class));
 	}
 
 }
