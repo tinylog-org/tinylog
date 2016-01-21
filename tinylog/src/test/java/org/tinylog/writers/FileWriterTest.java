@@ -286,10 +286,10 @@ public class FileWriterTest extends AbstractWriterTest {
 		File file = FileHelper.createTemporaryFile(null);
 		FileHelper.write(file, "Hello\n");
 
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath(), false , true);
 		assertTrue(writer.isAppending());
@@ -297,11 +297,11 @@ public class FileWriterTest extends AbstractWriterTest {
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 		writer.close();
 
-		reader = new BufferedReader(new FileReader(file));
-		assertEquals("Hello", reader.readLine());
-		assertEquals("World", reader.readLine());
-		assertNull(reader.readLine());
-		reader.close();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			assertEquals("Hello", reader.readLine());
+			assertEquals("World", reader.readLine());
+			assertNull(reader.readLine());
+		}
 
 		file.delete();
 	}
