@@ -33,8 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.LoopWritingThread;
@@ -63,7 +65,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testRequiredLogEntryValue() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		Set<LogEntryValue> requiredLogEntryValues = writer.getRequiredLogEntryValues();
 		assertThat(requiredLogEntryValues, contains(LogEntryValue.RENDERED_LOG_ENTRY));
 
@@ -80,7 +82,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testFilename() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		file.delete();
@@ -95,7 +97,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testSingleThreadedWriting() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
@@ -129,7 +131,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testMultiThreadedWriting() throws IOException, InterruptedException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 
 		List<LoopWritingThread> threads = new ArrayList<LoopWritingThread>();
@@ -229,7 +231,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 			Thread.yield();
 		}
 
-		SharedFileWriter writer = new SharedFileWriter(filename);
+		SharedFileWriter writer = new SharedFileWriter(filename, true);
 		writer.init(null);
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			writer.write(new LogEntryBuilder().renderedLogEntry(LoopWritingThread.LINE + "\n").create());
@@ -252,7 +254,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testFlush() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
@@ -266,6 +268,40 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
+	 * Test continuing of existing log file.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testAppending() throws IOException {	
+		File file = FileHelper.createTemporaryFile(null);
+
+		/* Overwriting by first writer */
+
+		FileHelper.write(file, "Hello\n");
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
+		assertTrue(writer.isAppending());
+		writer.init(null);
+		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
+		writer.close();
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello", reader.readLine());
+		assertEquals("World", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		file.delete();
+	}
+	
+	/**
 	 * Test overwriting of existing log file.
 	 *
 	 * @throws IOException
@@ -273,6 +309,8 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testOverwriting() throws IOException {
+		Assume.assumeTrue("Supported only on Windows", EnvironmentHelper.isWindows());
+		
 		File file = FileHelper.createTemporaryFile(null);
 
 		/* Overwriting by first writer */
@@ -283,11 +321,9 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		assertEquals("Hello World!", reader.readLine());
 		assertNull(reader.readLine());
 		reader.close();
-		
-		// Only old files will be overwritten on non-Windows systems -> Decrease modification time by 24h
-		file.setLastModified(file.lastModified() - 24L * 60L * 60L * 1000L);
 
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		assertFalse(writer.isAppending());
 		writer.init(null);
 		writer.close();
 
@@ -298,10 +334,12 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		/* But no overwriting by second writer */
 
 		SharedFileWriter writer1 = new SharedFileWriter(file.getAbsolutePath());
+		assertFalse(writer.isAppending());
 		writer1.init(null);
 		writer1.write(new LogEntryBuilder().renderedLogEntry("Hello\n").create());
 
 		SharedFileWriter writer2 = new SharedFileWriter(file.getAbsolutePath());
+		assertFalse(writer.isAppending());
 		writer2.init(null);
 		writer2.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
 
@@ -314,6 +352,39 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		assertNull(reader.readLine());
 		reader.close();
 
+		file.delete();
+	}
+	
+	/**
+	 * Test automatically changing of append mode if not supporting.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testOverwritingFailback() throws IOException {
+		Assume.assumeTrue("Happens only on non-Windows operating systems", !EnvironmentHelper.isWindows());
+	
+		File file = FileHelper.createTemporaryFile(null);
+		FileHelper.write(file, "Hello World!");
+
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello World!", reader.readLine());
+		assertNull(reader.readLine());
+		reader.close();
+
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		writer.init(null);
+		writer.close();
+	
+		assertTrue(writer.isAppending());
+		assertEquals("LOGGER WARNING: Shared file writer supports starting new log files only on Windows. Therefore \"append\" will be set automatically to "
+				+ "\"true\".", getErrorStream().nextLine());
+
+		reader = new BufferedReader(new FileReader(file));
+		assertEquals("Hello World!", reader.readLine());
+		reader.close();
+		
 		file.delete();
 	}
 
@@ -333,7 +404,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 		assertFalse(folder.getRoot().exists());
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 		writer.close();
 
@@ -353,7 +424,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		File file = FileHelper.createTemporaryFile(null);
 
 		File folder = file.getAbsoluteFile().getParentFile();
-		SharedFileWriter writer = new SharedFileWriter(folder.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(folder.getAbsolutePath(), true);
 		try {
 			writer.init(null); // A folder can't be open as file
 			fail("IOException expected");
@@ -373,7 +444,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testWritingFails() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 
 		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
@@ -419,6 +490,20 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		assertThat(writers, types(SharedFileWriter.class));
 		SharedFileWriter sharedFileWriter = (SharedFileWriter) writers.get(0);
 		assertEquals(file.getAbsolutePath(), sharedFileWriter.getFilename());
+		if (EnvironmentHelper.isWindows()) {
+			assertFalse(sharedFileWriter.isAppending());
+		} else {
+			assertTrue(sharedFileWriter.isAppending());
+			assertEquals("LOGGER WARNING: Shared file writer supports starting new log files only on Windows. Therefore \"append\" will be set automatically "
+					+ "to \"true\".", getErrorStream().nextLine());
+		}
+		
+		propertiesBuilder.set("tinylog.writer.append", "true");
+		writers = createFromProperties(propertiesBuilder.create());
+		assertThat(writers, types(SharedFileWriter.class));
+		sharedFileWriter = (SharedFileWriter) writers.get(0);
+		assertEquals(file.getAbsolutePath(), sharedFileWriter.getFilename());
+		assertTrue(sharedFileWriter.isAppending());
 
 		file.delete();
 	}

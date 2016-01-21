@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
+import org.pmw.tinylog.InternalLogger;
 import org.pmw.tinylog.LogEntry;
 
 /**
@@ -30,12 +31,12 @@ import org.pmw.tinylog.LogEntry;
  *
  * Multiple instances of a program are allowed to log into the same file.
  */
-@PropertiesSupport(name = "sharedfile", properties = @Property(name = "filename", type = String.class))
+@PropertiesSupport(name = "sharedfile", properties = { @Property(name = "filename", type = String.class),
+		@Property(name = "append", type = boolean.class, optional = true) })
 public final class SharedFileWriter implements Writer {
-	
-    private static final long HOUR = 60L * 60L * 1000L;
 
 	private final File file;
+	private final boolean append;
 	private final Object mutex;
 	private FileOutputStream stream;
 
@@ -44,8 +45,25 @@ public final class SharedFileWriter implements Writer {
 	 *            Filename of the log file
 	 */
 	public SharedFileWriter(final String filename) {
-		file = new File(filename);
-		mutex = new Object();
+		this(filename, false);
+	}
+	
+	/**
+	 * @param filename
+	 *            Filename of the log file
+	 * @param append
+	 *            Continuing existing file
+	 */
+	public SharedFileWriter(final String filename, final boolean append) {
+		this.file = new File(filename);
+		this.mutex = new Object();
+		
+		if (append || EnvironmentHelper.isWindows()) {
+			this.append = append;
+		} else {
+			InternalLogger.warn("Shared file writer supports starting new log files only on Windows. Therefore \"append\" will be set automatically to \"true\".");
+			this.append = true;
+		}
 	}
 
 	@Override
@@ -62,10 +80,19 @@ public final class SharedFileWriter implements Writer {
 		return file.getAbsolutePath();
 	}
 
+	/**
+	 * Determine whether appending is enabled.
+	 *
+	 * @return <code>true</code> if appending is enabled, otherwise <code>false</code>
+	 */
+	public boolean isAppending() {
+		return append;
+	}
+
 	@Override
 	public void init(final Configuration configuration) throws IOException {
 		if (file.isFile()) {
-			if (file.lastModified() < System.currentTimeMillis() - HOUR) {
+			if (!append) {
 				file.delete();
 			}
 		} else {

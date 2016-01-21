@@ -49,6 +49,46 @@ public class EnvironmentHelperTest extends AbstractTest {
 	}
 
 	/**
+	 * Test if common Windows versions will be detected.
+	 */
+	@Test
+	public final void testIsWindowsOnWindows() {
+		String os = System.getProperty("os.name");
+		try {
+			System.setProperty("os.name", "Windows NT");
+			assertTrue(EnvironmentHelper.isWindows());
+			
+			System.setProperty("os.name", "Windows 7");
+			assertTrue(EnvironmentHelper.isWindows());
+			
+			System.setProperty("os.name", "Windows 8.1");
+			assertTrue(EnvironmentHelper.isWindows());
+		} finally {
+			System.setProperty("os.name", os);
+		}
+	}
+
+	/**
+	 * Test if non-Windows operating systems will be detected.
+	 */
+	@Test
+	public final void testIsWindowsWithoutWindows() {
+		String os = System.getProperty("os.name");
+		try {
+			System.setProperty("os.name", "Linux");
+			assertFalse(EnvironmentHelper.isWindows());
+			
+			System.setProperty("os.name", "Mac OS X");
+			assertFalse(EnvironmentHelper.isWindows());
+			
+			System.setProperty("os.name", "SunOS");
+			assertFalse(EnvironmentHelper.isWindows());
+		} finally {
+			System.setProperty("os.name", os);
+		}
+	}
+
+	/**
 	 * Test if the line separator is equals to the line separator of the OS.
 	 */
 	@Test
