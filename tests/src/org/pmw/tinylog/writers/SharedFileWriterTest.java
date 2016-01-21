@@ -362,7 +362,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testOverwritingFailback() throws IOException {
+	public final void testOverwritingFallback() throws IOException {
 		Assume.assumeTrue("Happens only on non-Windows operating systems", !EnvironmentHelper.isWindows());
 	
 		File file = FileHelper.createTemporaryFile(null);
@@ -373,7 +373,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		assertNull(reader.readLine());
 		reader.close();
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), false);
 		writer.init(null);
 		writer.close();
 	
