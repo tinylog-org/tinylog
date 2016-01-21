@@ -70,6 +70,8 @@ public abstract class AbstractTest {
 		System.setErr(originErrStream);
 		assertFalse(systemOutputStream.toString(), systemOutputStream.hasLines());
 		assertFalse(systemErrorStream.toString(), systemErrorStream.hasLines());
+		
+		mockit.Deencapsulation.setField(InternalLogger.class, "lastLogEntry", null);
 
 		LoggingContext.clear();
 
