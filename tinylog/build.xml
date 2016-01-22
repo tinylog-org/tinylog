@@ -602,6 +602,7 @@
 
 	<target name="test" depends="compile">
 		<junit fork="true" failureproperty="junit.tests.failure" errorproperty="junit.tests.error">
+			<jvmarg value="-XX:-Inline"/><!-- Avoid inlining, because it breaks mocks -->
 			<formatter type="plain" usefile="false" />
 			<classpath>
 				<path location="${tinylog.bin}" />
