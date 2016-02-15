@@ -394,6 +394,8 @@ public final class JdbcWriter implements Writer {
 				values.add(Value.THREAD_NAME);
 			} else if ("thread_id".equalsIgnoreCase(string)) {
 				values.add(Value.THREAD_ID);
+			} else if ("context".equalsIgnoreCase(string)) {
+				values.add(Value.CONTEXT);
 			} else if ("class".equalsIgnoreCase(string)) {
 				values.add(Value.CLASS);
 			} else if ("class_name".equalsIgnoreCase(string)) {

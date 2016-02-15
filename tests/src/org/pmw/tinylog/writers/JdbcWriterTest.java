@@ -38,9 +38,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.h2.jdbc.JdbcDatabaseMetaData;
 import org.junit.After;
 import org.junit.Before;
@@ -50,6 +47,9 @@ import org.pmw.tinylog.Level;
 import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.JdbcWriter.Value;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the SQL database writer.
@@ -281,6 +281,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals(Collections.singletonList(Value.THREAD_ID), writer.getValues());
 		writer = new JdbcWriter(URL, "log", null, new String[] { "THREAD_ID" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_ID), writer.getValues());
+
+		writer = new JdbcWriter(URL, "log", null, new String[] { "context" }, null, null);
+		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
+		writer = new JdbcWriter(URL, "log", null, new String[] { "CONTEXT" }, null, null);
+		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
 
 		writer = new JdbcWriter(URL, "log", null, new String[] { "class" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS), writer.getValues());
