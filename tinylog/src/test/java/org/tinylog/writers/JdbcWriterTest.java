@@ -274,6 +274,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		writer = new JdbcWriter(URL, "log", null, new String[] { "THREAD_ID" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_ID), writer.getValues());
 
+		writer = new JdbcWriter(URL, "log", null, new String[] { "context" }, null, null);
+		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
+		writer = new JdbcWriter(URL, "log", null, new String[] { "CONTEXT" }, null, null);
+		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
+
 		writer = new JdbcWriter(URL, "log", null, new String[] { "class" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS), writer.getValues());
 		writer = new JdbcWriter(URL, "log", null, new String[] { "CLASS" }, null, null);
