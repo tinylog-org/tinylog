@@ -29,7 +29,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
@@ -467,7 +466,7 @@ public final class JdbcWriter implements Writer {
 					throw new SQLException("Table name contains line breaks: " + table);
 				}
 			}
-			builder.append(quote).append(table.replaceAll(Pattern.quote(quote), quote + quote)).append(quote);
+			builder.append(quote).append(table.replace(quote, quote + quote)).append(quote);
 
 			if (columns != null) {
 				builder.append(" (");
@@ -483,7 +482,7 @@ public final class JdbcWriter implements Writer {
 							throw new SQLException("Column name contains line breaks: " + column);
 						}
 					}
-					builder.append(quote).append(column.replaceAll(Pattern.quote(quote), quote + quote)).append(quote);
+					builder.append(quote).append(column.replace(quote, quote + quote)).append(quote);
 				}
 				builder.append(")");
 			}
