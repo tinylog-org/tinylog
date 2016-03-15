@@ -49,7 +49,9 @@
       <property name="max" value="164"/>
       <property name="tabWidth" value="4"/>
     </module>
-    <module name="MethodLength"/>
+    <module name="MethodLength">
+      <property name="max" value="180"/>
+    </module>
     <module name="EmptyForIteratorPad"/>
     <module name="MethodParamPad"/>
     <module name="NoWhitespaceAfter">
