@@ -274,7 +274,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
-	
+
 	/**
 	 * Test appending existing log file.
 	 *
@@ -291,7 +291,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		assertNull(reader.readLine());
 		reader.close();
 
-		FileWriter writer = new FileWriter(file.getAbsolutePath(), false , true);
+		FileWriter writer = new FileWriter(file.getAbsolutePath(), false, true);
 		assertTrue(writer.isAppending());
 		writer.init(null);
 		writer.write(new LogEntryBuilder().renderedLogEntry("World\n").create());
@@ -305,7 +305,7 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
-	
+
 	/**
 	 * Test creating a log file in an non-existing folder.
 	 *
@@ -444,7 +444,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		assertEquals(filename, fileWriter.getFilename());
 		assertFalse(fileWriter.isBuffered());
 		assertFalse(fileWriter.isAppending());
-		
+
 		propertiesBuilder.set("tinylog.writer.buffered", "true");
 		propertiesBuilder.set("tinylog.writer.append", "false");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -453,7 +453,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		assertEquals(filename, fileWriter.getFilename());
 		assertTrue(fileWriter.isBuffered());
 		assertFalse(fileWriter.isAppending());
-		
+
 		propertiesBuilder.set("tinylog.writer.buffered", "false");
 		propertiesBuilder.set("tinylog.writer.append", "true");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -462,7 +462,7 @@ public class FileWriterTest extends AbstractWriterTest {
 		assertEquals(filename, fileWriter.getFilename());
 		assertFalse(fileWriter.isBuffered());
 		assertTrue(fileWriter.isAppending());
-		
+
 		propertiesBuilder.set("tinylog.writer.buffered", "true");
 		propertiesBuilder.set("tinylog.writer.append", "true");
 		writers = createFromProperties(propertiesBuilder.create());
