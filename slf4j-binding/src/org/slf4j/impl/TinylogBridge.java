@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -82,12 +82,12 @@ final class TinylogBridge {
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
 	public static void log(final Level level, final String message, final Object... arguments) {
-		LogEntryForwarder.forward(2, level, message, arguments);
+		LogEntryForwarder.forward(2, level, getLastElementIfThrowable(level, arguments), message, arguments);
 	}
 
 	/**
@@ -124,6 +124,23 @@ final class TinylogBridge {
 
 		StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
 		return stackTraceElements[deep].getClassName();
+	}
+
+	/**
+	 * If the message being logged is of type ERROR the last object needs to be test to see if it is Throwable,
+	 * if not no further action is needed, if so the throwable needs to be tracked so that the stacktrace is logged.
+	 *
+	 * @param level
+	 *            Logging level to test
+	 * @param arguments
+	 *            Arguments for the text message
+	 * @return The Throwable if the last element is Throwable otherwise null.
+	 */
+	private static Throwable getLastElementIfThrowable(final Level level, final Object... arguments) {
+		if (level == Level.ERROR && arguments[arguments.length - 1] instanceof Throwable) {
+			return (Throwable) arguments[arguments.length - 1];
+		}
+		return null;
 	}
 
 }
