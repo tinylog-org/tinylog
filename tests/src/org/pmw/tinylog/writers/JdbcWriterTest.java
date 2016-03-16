@@ -127,7 +127,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
 		assertEquals(URL, writer.getUrl());
@@ -137,7 +137,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
 		assertEquals(URL, writer.getUrl());
@@ -147,7 +147,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
 		assertEquals(URL, writer.getUrl());
@@ -157,7 +157,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
 		assertEquals(URL, writer.getUrl());
@@ -167,7 +167,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		assertEquals(URL, writer.getUrl());
@@ -177,7 +177,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
 		assertEquals(URL, writer.getUrl());
@@ -187,7 +187,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
 		assertEquals(URL, writer.getUrl());
@@ -197,7 +197,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
 		assertEquals(URL, writer.getUrl());
@@ -207,7 +207,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
 		assertEquals(URL, writer.getUrl());
@@ -217,7 +217,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertNull(writer.getUsername());
 		assertNull(writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 	}
 
 	/**
@@ -233,7 +233,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -243,7 +243,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -253,7 +253,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
 		assertEquals(URL, writer.getUrl());
@@ -263,7 +263,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
 		assertEquals(URL, writer.getUrl());
@@ -273,7 +273,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -283,7 +283,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -293,7 +293,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -303,7 +303,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
 		assertEquals(URL, writer.getUrl());
@@ -313,7 +313,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
 		assertEquals(URL, writer.getUrl());
@@ -323,7 +323,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -333,7 +333,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 1);
 		assertEquals(URL, writer.getUrl());
@@ -343,7 +343,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 30);
 		assertEquals(URL, writer.getUrl());
@@ -353,7 +353,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -363,7 +363,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123");
 		assertEquals(URL, writer.getUrl());
@@ -373,7 +373,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertTrue(writer.getReconnetingTimeSpan() < 0);
+		assertTrue(writer.getReconnetInterval() < 0);
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123", 1);
 		assertEquals(URL, writer.getUrl());
@@ -383,7 +383,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(1000, writer.getReconnetingTimeSpan());
+		assertEquals(1000, writer.getReconnetInterval());
 
 		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123", 30);
 		assertEquals(URL, writer.getUrl());
@@ -393,7 +393,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(writer.isBatchMode());
 		assertEquals("admin", writer.getUsername());
 		assertEquals("123", writer.getPassword());
-		assertEquals(30000, writer.getReconnetingTimeSpan());
+		assertEquals(30000, writer.getReconnetInterval());
 	}
 
 	/**
@@ -1329,7 +1329,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 
 		propertiesBuilder.set("tinylog.writer.columns", "ENTRY");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1342,7 +1342,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 
 		propertiesBuilder.remove("tinylog.writer.columns").set("batch", "false");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1355,7 +1355,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 
 		propertiesBuilder.set("tinylog.writer.batch", "true");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1368,7 +1368,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertTrue(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 
 		propertiesBuilder.remove("tinylog.writer.batch").set("tinylog.writer.reconnect", "1");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1381,7 +1381,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertEquals(1000, jdbcWriter.getReconnetingTimeSpan());
+		assertEquals(1000, jdbcWriter.getReconnetInterval());
 
 		propertiesBuilder.remove("tinylog.writer.batch").set("tinylog.writer.reconnect", "-1");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1394,7 +1394,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 
 		propertiesBuilder.remove("tinylog.writer.batch").set("tinylog.writer.reconnect", "30");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1407,7 +1407,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertNull(jdbcWriter.getUsername());
 		assertNull(jdbcWriter.getPassword());
-		assertEquals(30000, jdbcWriter.getReconnetingTimeSpan());
+		assertEquals(30000, jdbcWriter.getReconnetInterval());
 
 		propertiesBuilder.remove("tinylog.writer.reconnect").set("tinylog.writer.username", "admin").set("tinylog.writer.password", "123");
 		writers = createFromProperties(propertiesBuilder.create());
@@ -1420,7 +1420,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertFalse(jdbcWriter.isBatchMode());
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
-		assertTrue(jdbcWriter.getReconnetingTimeSpan() < 0);
+		assertTrue(jdbcWriter.getReconnetInterval() < 0);
 	}
 
 	private void shutdown() throws SQLException {

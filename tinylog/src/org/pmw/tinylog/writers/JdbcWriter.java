@@ -56,7 +56,7 @@ public final class JdbcWriter implements Writer {
 	private final boolean batchMode;
 	private final String username;
 	private final String password;
-	private final long timeSpan;
+	private final long interval;
 
 	private final Object lock = new Object();
 
@@ -105,7 +105,7 @@ public final class JdbcWriter implements Writer {
 	 *            <code>true</code> for collecting SQL statements and execute them in a batch process,
 	 *            <code>false</code> to execute SQL statements immediately (default)
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds between two reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values, final boolean batch, final int reconnect) {
 		this(url, table, null, values, batch, null, null, reconnect);
@@ -161,7 +161,7 @@ public final class JdbcWriter implements Writer {
 	 * @param password
 	 *            Password for database log in
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds between two reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	public JdbcWriter(final String url, final String table, final List<Value> values, final boolean batch, final String username, final String password,
 			final int reconnect) {
@@ -212,7 +212,7 @@ public final class JdbcWriter implements Writer {
 	 *            <code>true</code> for collecting SQL statements and execute them in a batch process,
 	 *            <code>false</code> to execute SQL statements immediately (default)
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds two between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values, final boolean batch, final int reconnect) {
 		this(url, table, columns, values, batch, null, null, reconnect);
@@ -275,7 +275,7 @@ public final class JdbcWriter implements Writer {
 	 * @param password
 	 *            Password for database log in
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds between two reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	public JdbcWriter(final String url, final String table, final List<String> columns, final List<Value> values, final boolean batch, final String username,
 			final String password, final int reconnect) {
@@ -287,7 +287,7 @@ public final class JdbcWriter implements Writer {
 		this.batchMode = batch;
 		this.username = username;
 		this.password = password;
-		this.timeSpan = reconnect * 1000L;
+		this.interval = reconnect * 1000L;
 	}
 
 	/**
@@ -322,7 +322,7 @@ public final class JdbcWriter implements Writer {
 	 * @param password
 	 *            Password for database log in
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds between two reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	JdbcWriter(final String url, final String table, final String[] columns, final String[] values, final String username, final String password,
 			final int reconnect) {
@@ -368,7 +368,7 @@ public final class JdbcWriter implements Writer {
 	 * @param password
 	 *            Password for database log in
 	 * @param reconnect
-	 *            Seconds between reconnecting tries to database if connecting is broken (-1 disables reconnecting)
+	 *            Seconds between two reconnecting tries to database if connecting is broken (-1 disables reconnecting)
 	 */
 	JdbcWriter(final String url, final String table, final String[] columns, final String[] values, final boolean batch, final String username,
 			final String password, final int reconnect) {
@@ -439,13 +439,13 @@ public final class JdbcWriter implements Writer {
 	}
 
 	/**
-	 * Get the minimum time span in milliseconds between reconnecting tries to database if connecting is broken.
+	 * Get the minimum time span in milliseconds between two reconnecting tries to database if connecting is broken.
 	 * Negative numbers mean that automatically reconnecting is disabled.
 	 *
-	 * @return Milliseconds between reconnecting tries to database if connecting is broken
+	 * @return Milliseconds between two reconnecting tries to database if connecting is broken
 	 */
-	public long getReconnetingTimeSpan() {
-		return timeSpan;
+	public long getReconnetInterval() {
+		return interval;
 	}
 
 	@Override
@@ -828,9 +828,9 @@ public final class JdbcWriter implements Writer {
 	}
 
 	private void repairConnectionIfBroken() {
-		if (connection == null && timeSpan >= 0) {
+		if (connection == null && interval >= 0) {
 			synchronized (lock) {
-				if (connection == null && System.currentTimeMillis() >= lostTimestamp + timeSpan) {
+				if (connection == null && System.currentTimeMillis() >= lostTimestamp + interval) {
 					try {
 						connect();
 						InternalLogger.error("Broken database connection has been reestablished");
