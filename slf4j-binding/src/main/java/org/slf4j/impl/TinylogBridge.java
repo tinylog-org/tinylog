@@ -55,12 +55,12 @@ final class TinylogBridge {
 	 * @param level
 	 *            Logging level of log entry
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
 	public static void log(final Level level, final String message, final Object... arguments) {
-		LogEntryForwarder.forward(2, level, message, arguments);
+		LogEntryForwarder.forward(2, level, getLastElementIfThrowable(level, arguments), message, arguments);
 	}
 
 	/**
@@ -75,6 +75,23 @@ final class TinylogBridge {
 	 */
 	public static void log(final Level level, final String message, final Throwable throwable) {
 		LogEntryForwarder.forward(2, level, throwable, message);
+	}
+
+	/**
+	 * If the message being logged is of type ERROR the last object needs to be test to see if it is Throwable,
+	 * if not no further action is needed, if so the throwable needs to be tracked so that the stacktrace is logged.
+	 *
+	 * @param level
+	 *            Logging level to test
+	 * @param arguments
+	 *            Arguments for the text message
+	 * @return The Throwable if the last element is Throwable otherwise null.
+	 */
+	private static Throwable getLastElementIfThrowable(final Level level, final Object... arguments) {
+		if (level == Level.ERROR && arguments[arguments.length - 1] instanceof Throwable) {
+			return (Throwable) arguments[arguments.length - 1];
+		}
+		return null;
 	}
 
 }
