@@ -33,7 +33,7 @@ public final class ProcessIdLabeler implements Labeler {
 	/**
 	 */
 	public ProcessIdLabeler() {
-		pid = EnvironmentHelper.getProcessId().toString();
+		pid = EnvironmentHelper.getRuntimeDialect().getProcessId();
 	}
 
 	/**

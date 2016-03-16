@@ -149,13 +149,13 @@ public class TokenizerTest extends AbstractTest {
 		List<Token> tokens = tokenizer.parse("{pid}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
-		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId(), render(tokens, new LogEntryBuilder()));
 
 		tokens = tokenizer.parse("{pid:abc}");
 		assertEquals("LOGGER WARNING: \"{pid}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
-		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId(), render(tokens, new LogEntryBuilder()));
 	}
 
 	/**
@@ -420,7 +420,7 @@ public class TokenizerTest extends AbstractTest {
 	 */
 	@Test
 	public final void testNestedTokens() {
-		String pid = EnvironmentHelper.getProcessId().toString();
+		String pid = EnvironmentHelper.getRuntimeDialect().getProcessId();
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{{pid}}");
@@ -734,13 +734,13 @@ public class TokenizerTest extends AbstractTest {
 		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
-		assertEquals(EnvironmentHelper.getProcessId().toString(), render(tokens, new LogEntryBuilder()));
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId(), render(tokens, new LogEntryBuilder()));
 
 		tokens = tokenizer.parse("{pid|min-size=10");
 		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid|min-size=10\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), empty());
-		assertThat(render(tokens, new LogEntryBuilder()), allOf(startsWith(EnvironmentHelper.getProcessId().toString()), hasLength(10)));
+		assertThat(render(tokens, new LogEntryBuilder()), allOf(startsWith(EnvironmentHelper.getRuntimeDialect().getProcessId()), hasLength(10)));
 
 		tokens = tokenizer.parse("{pid {level}");
 		assertEquals("LOGGER WARNING: Closing curly brace is missing for: \"{pid {level}\"", getErrorStream().nextLine());

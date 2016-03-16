@@ -14,25 +14,37 @@
 package org.pmw.tinylog;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
+
+import org.pmw.tinylog.runtime.JavaRuntime;
+import org.pmw.tinylog.runtime.RuntimeDialect;
 
 /**
  * Encapsulate functionality that depends on the environment.
  */
 public final class EnvironmentHelper {
 
+	private static final RuntimeDialect DIALECT = new JavaRuntime();
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private EnvironmentHelper() {
 	}
-	
+
 	/**
 	 * Determine whether running on Windows.
-	 * 
+	 *
 	 * @return <code>true</code> if operating system is Windows, <code>false</code> if not
 	 */
 	public static boolean isWindows() {
 		return System.getProperty("os.name").startsWith("Windows");
+	}
+
+	/**
+	 * Get VM runtime depending functionality.
+	 *
+	 * @return Runtime dialect
+	 */
+	public static RuntimeDialect getRuntimeDialect() {
+		return DIALECT;
 	}
 
 	/**
@@ -42,21 +54,6 @@ public final class EnvironmentHelper {
 	 */
 	public static String getNewLine() {
 		return NEW_LINE;
-	}
-
-	/**
-	 * Get the ID of the current process (pid).
-	 *
-	 * @return ID of the current process
-	 */
-	public static Object getProcessId() {
-		String name = ManagementFactory.getRuntimeMXBean().getName();
-		int index = name.indexOf('@');
-		if (index > 0) {
-			return name.substring(0, index);
-		} else {
-			return name;
-		}
 	}
 
 	/**

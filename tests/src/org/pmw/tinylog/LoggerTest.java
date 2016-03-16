@@ -32,10 +32,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
 
-import mockit.Invocation;
-import mockit.Mock;
-import mockit.MockUp;
-
 import org.junit.Test;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.util.StoreWriter;
@@ -683,8 +679,8 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(EnvironmentHelper.getProcessId().toString(), logEntry.getProcessId());
-		assertEquals(EnvironmentHelper.getProcessId() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId(), logEntry.getProcessId());
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
 	}
 
 	/**
@@ -999,7 +995,7 @@ public class LoggerTest extends AbstractTest {
 		Logger.info("Hello");
 
 		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(EnvironmentHelper.getProcessId().toString(), logEntry.getProcessId());
+		assertEquals(EnvironmentHelper.getRuntimeDialect().getProcessId(), logEntry.getProcessId());
 		assertEquals(Thread.currentThread(), logEntry.getThread());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
 		assertEquals("testFullLogEntry", logEntry.getMethodName());
@@ -1011,8 +1007,8 @@ public class LoggerTest extends AbstractTest {
 		assertNull(logEntry.getException());
 
 		String renderedLogEntry = MessageFormatter.format("{}#{}#{}#{}#{}#{}#testFullLogEntry#LoggerTest.java#{}#{}#{}#Hello{}",
-				EnvironmentHelper.getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(), LoggerTest.class.getName(),
-				LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
+				EnvironmentHelper.getRuntimeDialect().getProcessId(), Thread.currentThread().getName(), Thread.currentThread().getId(),
+				LoggerTest.class.getName(), LoggerTest.class.getPackage().getName(), LoggerTest.class.getSimpleName(), lineNumber, Level.INFO,
 				new SimpleDateFormat("yyyy").format(new Date()), EnvironmentHelper.getNewLine());
 		assertEquals(renderedLogEntry, logEntry.getRenderedLogEntry());
 	}
@@ -1101,69 +1097,6 @@ public class LoggerTest extends AbstractTest {
 		Logger.setConfiguration(configuration);
 		assertThat(Logger.getConfiguration().create().getWriters(), sameContent(writer));
 		assertEquals(1, writer.numberOfInits);
-	}
-
-	/**
-	 * Test if tinylog gets the right class name of caller even if calling of sun.reflect.Reflection will fail.
-	 */
-	@SuppressWarnings("restriction")
-	@Test
-	public final void testErrorWhileCallingSunReflection() {
-		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.RENDERED_LOG_ENTRY);
-		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}").activate();
-
-		new MockUp<sun.reflect.Reflection>() {
-
-			@Mock(invocations = 1)
-			public Class<?> getCallerClass(final Invocation invocation, final int index) {
-				try {
-					throw new UnsupportedOperationException();
-				} finally {
-					tearDown();
-				}
-			}
-
-		};
-
-		Logger.info("Hello");
-
-		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get caller class from sun.reflect.Reflection \\(.+\\)"));
-
-		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
-		assertEquals(LoggerTest.class.getName() + EnvironmentHelper.getNewLine(), logEntry.getRenderedLogEntry());
-	}
-
-	/**
-	 * Test if tinylog gets the right stack trace element even if getting single stack trace element will fail.
-	 */
-	@Test
-	public final void testErrorWhileGettingSingleStackTraceElement() {
-		StoreWriter writer = new StoreWriter(LogEntryValue.CLASS, LogEntryValue.METHOD, LogEntryValue.RENDERED_LOG_ENTRY);
-		Configurator.defaultConfig().writer(writer).level(Level.INFO).formatPattern("{class}.{method}()").activate();
-
-		new MockUp<Throwable>() {
-
-			@Mock(invocations = 1)
-			public StackTraceElement getStackTraceElement(final Invocation invocation, final int index) {
-				try {
-					throw new UnsupportedOperationException();
-				} finally {
-					tearDown();
-				}
-			}
-
-		};
-
-		Logger.info("Hello");
-
-		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get single stack trace element from throwable \\(.+\\)"));
-
-		LogEntry logEntry = writer.consumeLogEntry();
-		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
-		assertEquals("testErrorWhileGettingSingleStackTraceElement", logEntry.getMethodName());
-		assertEquals(LoggerTest.class.getName() + ".testErrorWhileGettingSingleStackTraceElement()" + EnvironmentHelper.getNewLine(),
-				logEntry.getRenderedLogEntry());
 	}
 
 	private WritingThread findWritingThread() {

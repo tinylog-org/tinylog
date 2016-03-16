@@ -13,12 +13,12 @@
 
 package org.pmw.tinylog;
 
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.pmw.tinylog.runtime.RuntimeDialect;
 import org.pmw.tinylog.writers.LogEntryValue;
 import org.pmw.tinylog.writers.Writer;
 
@@ -37,32 +37,11 @@ public final class Logger {
 
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
+	private static final RuntimeDialect dialect = EnvironmentHelper.getRuntimeDialect();
 	private static volatile Configuration configuration = Configurator.defaultConfig().create();
-
-	private static Method stackTraceMethod;
-	private static boolean hasSunReflection;
 
 	static {
 		Configurator.init().activate();
-
-		try {
-			stackTraceMethod = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
-			stackTraceMethod.setAccessible(true);
-			StackTraceElement stackTraceElement = (StackTraceElement) stackTraceMethod.invoke(new Throwable(), 0);
-			if (!Logger.class.getName().equals(stackTraceElement.getClassName())) {
-				stackTraceMethod = null;
-			}
-		} catch (Throwable ex) {
-			stackTraceMethod = null;
-		}
-
-		try {
-			@SuppressWarnings({ "restriction", "deprecation" })
-			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
-			hasSunReflection = Logger.class.equals(caller);
-		} catch (Throwable ex) {
-			hasSunReflection = false;
-		}
 	}
 
 	private Logger() {
@@ -556,7 +535,7 @@ public final class Logger {
 
 		if (currentConfiguration.hasCustomLevels()) {
 			boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
-			stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
+			stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDeep)) : dialect.getStackTraceElement(strackTraceDeep);
 			activeLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 		}
 
@@ -614,6 +593,10 @@ public final class Logger {
 		}
 	}
 
+	private static StackTraceElement asStackTraceElement(final String className) {
+		return new StackTraceElement(className, "<unknown>", "<unknown>", -1);
+	}
+
 	private static LogEntry[] createLogEntries(final Configuration currentConfiguration, final int strackTraceDeep, final Level level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		Set<LogEntryValue> requiredLogEntryValues = currentConfiguration.getRequiredLogEntryValues(level);
@@ -638,7 +621,7 @@ public final class Logger {
 					break;
 
 				case PROCESS_ID:
-					processId = EnvironmentHelper.getProcessId().toString();
+					processId = dialect.getProcessId();
 					break;
 
 				case THREAD:
@@ -652,7 +635,8 @@ public final class Logger {
 				case CLASS:
 					if (stackTraceElement == null) {
 						boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
-						stackTraceElement = getStackTraceElement(strackTraceDeep, onlyClassName);
+						stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDeep))
+								: dialect.getStackTraceElement(strackTraceDeep);
 					}
 					className = stackTraceElement.getClassName();
 					for (int index = className.indexOf("$", 0); index != -1; index = className.indexOf('$', index + 2)) {
@@ -673,21 +657,21 @@ public final class Logger {
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
 					}
 					method = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
 					}
 					filename = stackTraceElement.getFileName();
 					break;
 
 				case LINE:
 					if (stackTraceElement == null) {
-						stackTraceElement = getStackTraceElement(strackTraceDeep, false);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
 					}
 					line = stackTraceElement.getLineNumber();
 					break;
@@ -722,27 +706,6 @@ public final class Logger {
 		}
 
 		return entries;
-	}
-
-	@SuppressWarnings({ "deprecation", "restriction" })
-	private static StackTraceElement getStackTraceElement(final int deep, final boolean onlyClassName) {
-		if (onlyClassName && hasSunReflection) {
-			try {
-				return new StackTraceElement(sun.reflect.Reflection.getCallerClass(deep + 1).getName(), "<unknown>", "<unknown>", -1);
-			} catch (Exception ex) {
-				InternalLogger.warn(ex, "Failed to get caller class from sun.reflect.Reflection");
-			}
-		}
-
-		if (stackTraceMethod != null) {
-			try {
-				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
-			} catch (Exception ex) {
-				InternalLogger.warn(ex, "Failed to get single stack trace element from throwable");
-			}
-		}
-
-		return new Throwable().getStackTrace()[deep];
 	}
 
 }

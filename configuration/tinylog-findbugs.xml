@@ -1,16 +1,6 @@
 <!-- Exclude list of warnings -->
 <FindBugsFilter>
 	<Match>
-		<Or>
-			<Class name="org.pmw.tinylog.Logger" />
-			<Class name="org.pmw.commons.logging.TinylogBridge" />
-			<Class name="org.apache.log4j.TinylogBridge" />
-			<Class name="org.slf4j.impl.TinylogBridge" />
-		</Or>
-		<!-- Catching of exceptions is required for the case that the fast but unofficial ways to get the stack trace will fail -->
-		<Bug pattern="REC_CATCH_EXCEPTION" />
-	</Match>
-	<Match>
 		<Class name="org.apache.log4j.Priority" />
 		<!-- Known as bad but source code is from Log4j -->
 		<Bug pattern="HE_EQUALS_USE_HASHCODE" />

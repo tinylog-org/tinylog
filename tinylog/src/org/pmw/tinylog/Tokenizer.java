@@ -165,10 +165,10 @@ final class Tokenizer {
 				return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 			}
 		} else if ("pid".equals(text)) {
-			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
+			return new PlainTextToken(EnvironmentHelper.getRuntimeDialect().getProcessId());
 		} else if (text.startsWith("pid:")) {
 			InternalLogger.warn("\"{pid}\" does not support parameters");
-			return new PlainTextToken(EnvironmentHelper.getProcessId().toString());
+			return new PlainTextToken(EnvironmentHelper.getRuntimeDialect().getProcessId());
 		} else if ("thread".equals(text)) {
 			return new ThreadNameToken();
 		} else if (text.startsWith("thread:")) {

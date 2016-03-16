@@ -13,23 +13,15 @@
 
 package org.pmw.tinylog;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import mockit.NonStrictExpectations;
 
 /**
  * Tests the environment helper.
@@ -57,10 +49,10 @@ public class EnvironmentHelperTest extends AbstractTest {
 		try {
 			System.setProperty("os.name", "Windows NT");
 			assertTrue(EnvironmentHelper.isWindows());
-			
+
 			System.setProperty("os.name", "Windows 7");
 			assertTrue(EnvironmentHelper.isWindows());
-			
+
 			System.setProperty("os.name", "Windows 8.1");
 			assertTrue(EnvironmentHelper.isWindows());
 		} finally {
@@ -77,10 +69,10 @@ public class EnvironmentHelperTest extends AbstractTest {
 		try {
 			System.setProperty("os.name", "Linux");
 			assertFalse(EnvironmentHelper.isWindows());
-			
+
 			System.setProperty("os.name", "Mac OS X");
 			assertFalse(EnvironmentHelper.isWindows());
-			
+
 			System.setProperty("os.name", "SunOS");
 			assertFalse(EnvironmentHelper.isWindows());
 		} finally {
@@ -94,51 +86,6 @@ public class EnvironmentHelperTest extends AbstractTest {
 	@Test
 	public final void testNewLine() {
 		assertEquals(System.getProperty("line.separator"), EnvironmentHelper.getNewLine());
-	}
-
-	/**
-	 * Test getting the current process ID.
-	 */
-	@Test
-	public final void testCurrentProcessId() {
-		Object pid = EnvironmentHelper.getProcessId();
-		assertThat(pid, instanceOf(String.class));
-		assertThat((String) pid, matchesPattern("\\d+"));
-		assertThat(ManagementFactory.getRuntimeMXBean().getName(), startsWith((String) pid));
-	}
-
-	/**
-	 * Test use case if {@link RuntimeMXBean#getName()} returns only the process ID.
-	 */
-	@Test
-	public final void testProcessIdWithoutHost() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
-			{
-				ManagementFactory.getRuntimeMXBean().getName();
-				returns("1234");
-			}
-
-		};
-
-		assertEquals("1234", EnvironmentHelper.getProcessId());
-	}
-
-	/**
-	 * Test use case if {@link RuntimeMXBean#getName()} returns process ID plus host name.
-	 */
-	@Test
-	public final void testProcessIdWithHost() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
-			{
-				ManagementFactory.getRuntimeMXBean().getName();
-				returns("5678@localhost");
-			}
-
-		};
-
-		assertEquals("5678", EnvironmentHelper.getProcessId());
 	}
 
 	/**
