@@ -92,10 +92,11 @@ final class TinylogBridge {
 	 * @return The Throwable if the last element is Throwable otherwise null.
 	 */
 	private static Throwable getLastElementIfThrowable(final Level level, final Object... arguments) {
-		if (level == Level.ERROR && arguments[arguments.length - 1] instanceof Throwable) {
+		if (arguments != null && arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable) {
 			return (Throwable) arguments[arguments.length - 1];
+		} else {
+		    return null;
 		}
-		return null;
 	}
 
 }
