@@ -463,13 +463,6 @@ public class TinylogLoggerTest extends AbstractTest {
 		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Failed", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
-
-		exception = new Exception();
-		logger.error(MARKER, "Failed {}", "Here", exception);
-		logEntry = writer.consumeLogEntry();
-		assertEquals(Level.ERROR, logEntry.getLevel());
-		assertEquals("Failed Here", logEntry.getMessage());
-		assertEquals(exception, logEntry.getException());
 	}
 
 }

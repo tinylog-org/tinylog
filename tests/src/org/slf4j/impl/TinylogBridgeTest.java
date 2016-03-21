@@ -115,6 +115,12 @@ public class TinylogBridgeTest extends AbstractTest {
 		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Error!", logEntry.getMessage());
 		assertEquals(exception, logEntry.getException());
+
+		logger.log(Level.ERROR, "Failed {}", "Here", exception);
+		logEntry = writer.consumeLogEntry();
+		assertEquals(Level.ERROR, logEntry.getLevel());
+		assertEquals("Failed Here", logEntry.getMessage());
+		assertEquals(exception, logEntry.getException());
 	}
 
 	/**
