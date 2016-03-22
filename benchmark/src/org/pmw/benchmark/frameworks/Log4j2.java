@@ -22,7 +22,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.async.AsyncLogger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 
@@ -103,11 +102,8 @@ public final class Log4j2 implements Framework {
 	}
 
 	@Override
-	public void dispose() throws InterruptedException {
-		if (async) {
-			AsyncLogger.stop();
-		}
-
+	public void dispose() {
+		logger.getContext().stop();
 		appender.stop();
 	}
 
