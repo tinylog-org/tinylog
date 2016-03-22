@@ -274,7 +274,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	 *             Test failed
 	 */
 	@Test
-	public final void testAppending() throws IOException {	
+	public final void testAppending() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 		FileHelper.write(file, "Hello\n");
 
@@ -297,7 +297,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
-	
+
 	/**
 	 * Test overwriting of existing log file.
 	 *
@@ -307,7 +307,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testOverwriting() throws IOException {
 		Assume.assumeTrue("Supported only on Windows", EnvironmentHelper.isWindows());
-		
+
 		File file = FileHelper.createTemporaryFile(null);
 
 		/* Overwriting by first writer */
@@ -351,7 +351,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 
 		file.delete();
 	}
-	
+
 	/**
 	 * Test automatically changing of append mode if not supporting.
 	 *
@@ -360,8 +360,8 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testOverwritingFallback() throws IOException {
-		Assume.assumeTrue("Happens only on non-Windows operating systems", !EnvironmentHelper.isWindows());
-	
+		Assume.assumeTrue("Only relevant for non-Windows operating systems", !EnvironmentHelper.isWindows());
+
 		File file = FileHelper.createTemporaryFile(null);
 		FileHelper.write(file, "Hello World!");
 
@@ -373,7 +373,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), false);
 		writer.init(null);
 		writer.close();
-	
+
 		assertTrue(writer.isAppending());
 		assertEquals("LOGGER WARNING: Shared file writer supports starting new log files only on Windows. Therefore \"append\" will be set automatically to "
 				+ "\"true\".", getErrorStream().nextLine());
@@ -381,7 +381,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		reader = new BufferedReader(new FileReader(file));
 		assertEquals("Hello World!", reader.readLine());
 		reader.close();
-		
+
 		file.delete();
 	}
 
@@ -494,7 +494,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 			assertEquals("LOGGER WARNING: Shared file writer supports starting new log files only on Windows. Therefore \"append\" will be set automatically "
 					+ "to \"true\".", getErrorStream().nextLine());
 		}
-		
+
 		propertiesBuilder.set("tinylog.writer.append", "true");
 		writers = createFromProperties(propertiesBuilder.create());
 		assertThat(writers, types(SharedFileWriter.class));
