@@ -546,7 +546,7 @@ public final class Configurator {
 				return false;
 			}
 
-			if (activeWritingThread == null && writingThreadData != null) {
+			if (activeWritingThread == null && configuration.getWritingThread() != null) {
 				activeWritingThread = configuration.getWritingThread();
 				activeWritingThread.start();
 			}
@@ -683,7 +683,7 @@ public final class Configurator {
 	 */
 	Configuration create() {
 		Configurator configurator = copy();
-				
+
 		WritingThread writingThread;
 		if (configurator.writingThreadData == null) {
 			writingThread = null;

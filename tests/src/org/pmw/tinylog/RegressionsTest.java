@@ -219,6 +219,15 @@ public class RegressionsTest extends AbstractTest {
 		}
 	}
 
+	/**
+	 * Bug: {@link NullPointerException} if configured thread for observing could not found.
+	 */
+	@Test
+	public final void testConfigurationWithUnknownObservingThread() {
+		Configurator.defaultConfig().writingThread("_invalid_").activate();
+		assertEquals("LOGGER WARNING: Thread \"_invalid_\" could not be found, writing thread will not be used", getErrorStream().nextLine());
+	}
+
 	private void resetLogger() throws Exception {
 		Field field = Logger.class.getDeclaredField("configuration");
 		field.setAccessible(true);
