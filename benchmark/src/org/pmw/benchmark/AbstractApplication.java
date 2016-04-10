@@ -32,13 +32,13 @@ public abstract class AbstractApplication {
 		return countBooleanParameters(framework) == 2;
 	}
 
-	protected static final Framework createFramework(final String name, final boolean locatioInformation, final boolean async)
+	protected static final Framework createFramework(final String name, final boolean locationInformation, final boolean async)
 			throws ReflectiveOperationException {
 		int count = countBooleanParameters(name);
 		if (count == 2) {
-			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class, boolean.class).newInstance(locatioInformation, async);
+			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class, boolean.class).newInstance(locationInformation, async);
 		} else if (count == 1) {
-			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class).newInstance(locatioInformation);
+			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class).newInstance(locationInformation);
 		} else {
 			return FRAMEWORK_MAPPING.get(name).newInstance();
 		}
