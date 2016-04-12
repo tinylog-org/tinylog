@@ -1461,10 +1461,10 @@ public final class LogMF extends LogXF {
 
 	private static final class LazyMessageFormat {
 
-		private String pattern;
-		private Object[] arguments;
+		private final String pattern;
+		private final Object[] arguments;
 
-		private LazyMessageFormat(String pattern, Object... arguments) {
+		private LazyMessageFormat(final String pattern, final Object... arguments) {
 			this.pattern = pattern;
 			this.arguments = arguments;
 		}
@@ -1473,7 +1473,7 @@ public final class LogMF extends LogXF {
 		public String toString() {
 			return MessageFormat.format(pattern, arguments);
 		}
-		
+
 	}
-	
+
 }

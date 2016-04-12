@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -28,6 +28,12 @@ public class Category {
 	private final String name;
 	private volatile ResourceBundle bundle;
 
+	/**
+	 * @param parent
+	 *            Parent category
+	 * @param name
+	 *            Name of category
+	 */
 	Category(final Category parent, final String name) {
 		this.parent = parent;
 		this.name = name;
@@ -35,6 +41,8 @@ public class Category {
 
 	/**
 	 * @deprecated Replaced by {@link Logger#getRootLogger()}
+	 *
+	 * @return Root category
 	 */
 	@Deprecated
 	public static final Category getRoot() {
@@ -43,6 +51,11 @@ public class Category {
 
 	/**
 	 * @deprecated Replaced by {@link Logger#getLogger(String)}
+	 *
+	 * @param name
+	 *            Name of category
+	 *
+	 * @return Found or created category
 	 */
 	@Deprecated
 	public static Category getInstance(final String name) {
@@ -51,6 +64,11 @@ public class Category {
 
 	/**
 	 * @deprecated Replaced by {@link Logger#getLogger(String)}
+	 *
+	 * @param clazz
+	 *            Class used as name for category
+	 *
+	 * @return Found or created category
 	 */
 	@SuppressWarnings("rawtypes")
 	@Deprecated
@@ -83,9 +101,9 @@ public class Category {
 	 */
 	public final ResourceBundle getResourceBundle() {
 		for (Category category = this; category != null; category = category.getParent()) {
-			ResourceBundle bundle = category.bundle;
-			if (bundle != null) {
-				return bundle;
+			ResourceBundle resourceBundle = category.bundle;
+			if (resourceBundle != null) {
+				return resourceBundle;
 			}
 		}
 
@@ -104,6 +122,8 @@ public class Category {
 
 	/**
 	 * @deprecated Replaced by {@link Category#getLevel()}
+	 *
+	 * @return Category priority
 	 */
 	@Deprecated
 	public final Level getPriority() {
@@ -112,6 +132,8 @@ public class Category {
 
 	/**
 	 * @deprecated Replaced by {@link Category#getEffectiveLevel()}
+	 *
+	 * @return Category priority
 	 */
 	@Deprecated
 	public Priority getChainedPriority() {
@@ -360,13 +382,21 @@ public class Category {
 		TinylogBridge.log(priority, throwable, message);
 	}
 
+	/**
+	 * Translate a string by using resource bundle.
+	 *
+	 * @param key
+	 *            Key of string in resource bundle
+	 *
+	 * @return Translated string or <code>null</code> if not found
+	 */
 	protected final String getResourceBundleString(final String key) {
-		ResourceBundle bundle = getResourceBundle();
-		if (bundle == null) {
+		ResourceBundle resourceBundle = getResourceBundle();
+		if (resourceBundle == null) {
 			return null;
 		} else {
 			try {
-				return bundle.getString(key);
+				return resourceBundle.getString(key);
 			} catch (MissingResourceException ex) {
 				return null;
 			}

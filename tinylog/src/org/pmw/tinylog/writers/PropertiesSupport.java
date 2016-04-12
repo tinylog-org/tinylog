@@ -27,16 +27,12 @@ public @interface PropertiesSupport {
 
 	/**
 	 * Name of the writer that can be used for the "tinylog.writer" property.
-	 *
-	 * @return Name of writer
 	 */
 	String name();
 
 	/**
 	 * Properties to configure the writer (for example a filename of the log file). The constructor of the writer will
 	 * be called according to the defined properties.
-	 *
-	 * @return Accepted properties
 	 */
 	Property[] properties();
 

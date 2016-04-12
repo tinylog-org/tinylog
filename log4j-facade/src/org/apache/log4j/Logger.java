@@ -18,6 +18,12 @@ package org.apache.log4j;
  */
 public class Logger extends Category {
 
+	/**
+	 * @param parent
+	 *            Parent logger
+	 * @param name
+	 *            Name of logger
+	 */
 	Logger(final Logger parent, final String name) {
 		super(parent, name);
 	}
