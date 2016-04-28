@@ -12,6 +12,7 @@
 	<property name="root" location=".." />
 	
 	<property name="tinylog" location="${root}/tinylog" />
+	<property name="tinylog.lib" location="${tinylog}/lib" />
 	<property name="tinylog.files" location="${tinylog}/files" />
 	<property name="tinylog.bin" location="${tinylog}/bin" />
 	<property name="tinylog.src" location="${tinylog}/src" />
@@ -52,6 +53,9 @@
 
 	<path id="junit.classpath">
 		<fileset dir="${lib.junit}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${tinylog.lib}">
 			<include name="*.jar" />
 		</fileset>
 		<fileset dir="${jcl.lib}">
@@ -96,6 +100,9 @@
 		<delete dir="${tinylog.bin}" />
 		<mkdir dir="${tinylog.bin}" />
 		<javac srcdir="${tinylog.src}" destdir="${tinylog.bin}" includeantruntime="false" source="1.5" target="1.5" bootclasspath="${java5.boot.classpath}">
+			<classpath>
+				<fileset dir="${tinylog.lib}" includes="*.jar" />
+			</classpath>
 		</javac>
 		<copy todir="${tinylog.bin}">
 			<fileset dir="${tinylog.src}">
@@ -574,6 +581,7 @@
 			<packageset dir="${tinylog.src}" />
 			<classpath>
 				<dirset dir="${tinylog.bin}" />
+				<fileset dir="${tinylog.lib}" includes="*.jar" />
 			</classpath>
 			<arg line="-XDignore.symbol.file" />
 			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
