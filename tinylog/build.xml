@@ -583,13 +583,15 @@
 	<target name="check" depends="compile">
 		<checkstyle config="${conf}/tinylog-checkstyle.xml">
 			<fileset dir="${tinylog.src}" includes="**/*.java" />
+			<fileset dir="${jcl.src}" includes="**/*.java" />
+			<fileset dir="${log4j.src}" includes="**/*.java" />
 			<fileset dir="${slf4j.src}" includes="**/*.java" />
 			<fileset dir="${tests.src}" includes="**/*.java" />
 			<formatter type="plain" usefile="false" />
 		</checkstyle>
 		<findbugs home="${lib.findbugs}" output="text" excludefilter="${conf}/tinylog-findbugs.xml">
 			<auxclasspath refid="junit.classpath" />
-			<sourcepath location="${tinylog.bin}" />
+			<sourcepath location="${tinylog.src}" />
 			<class location="${tinylog.bin}" />
 			<sourcepath location="${jcl.src}" />
 			<class location="${jcl.bin}" />
