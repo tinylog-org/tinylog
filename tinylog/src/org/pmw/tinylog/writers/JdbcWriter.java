@@ -26,9 +26,14 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.EnvironmentHelper;
@@ -454,7 +459,7 @@ public final class JdbcWriter implements Writer {
 	}
 
 	@Override
-	public void init(final Configuration configuration) throws SQLException {
+	public void init(final Configuration configuration) throws SQLException, NamingException {
 		if (columns != null && columns.size() != values.size()) {
 			throw new SQLException("Number of columns and values must be equal, but columns = " + columns.size() + " and values = " + values.size());
 		}
@@ -800,11 +805,20 @@ public final class JdbcWriter implements Writer {
 		}
 	}
 
-	private void connect() throws SQLException {
-		if (username == null) {
-			connection = DriverManager.getConnection(url);
+	private void connect() throws SQLException, NamingException {
+		if (url.toLowerCase(Locale.ENGLISH).startsWith("java:")) {
+			DataSource source = (DataSource) new InitialContext().lookup(url);
+			if (username == null) {
+				connection = source.getConnection();
+			} else {
+				connection = source.getConnection(username, password);
+			}
 		} else {
-			connection = DriverManager.getConnection(url, username, password);
+			if (username == null) {
+				connection = DriverManager.getConnection(url);
+			} else {
+				connection = DriverManager.getConnection(url, username, password);
+			}
 		}
 
 		if (sql == null) {
@@ -835,6 +849,9 @@ public final class JdbcWriter implements Writer {
 						connect();
 						InternalLogger.error("Broken database connection has been reestablished");
 					} catch (SQLException ex) {
+						connection = null;
+						lostTimestamp = System.currentTimeMillis();
+					} catch (NamingException ex) {
 						connection = null;
 						lostTimestamp = System.currentTimeMillis();
 					}

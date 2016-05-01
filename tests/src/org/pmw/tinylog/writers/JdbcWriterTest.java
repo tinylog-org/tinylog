@@ -43,7 +43,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+
 import org.h2.jdbc.JdbcDatabaseMetaData;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +70,8 @@ import mockit.MockUp;
 public class JdbcWriterTest extends AbstractWriterTest {
 
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
-	private static final String URL = "jdbc:h2:mem:testDB";
+	private static final String JDBC_URL = "jdbc:h2:mem:testDB";
+	private static final String DATA_SOURCE_URL = "java:db/test";
 
 	private Connection connection;
 	private DriverManagerMock databaseMock;
@@ -78,7 +84,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Before
 	public final void init() throws SQLException {
-		connection = DriverManager.getConnection(URL);
+		connection = DriverManager.getConnection(JDBC_URL);
 
 		Statement statement = connection.createStatement();
 		try {
@@ -119,8 +125,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testCreateInstanceWithoutLogin() {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
-		assertEquals(URL, writer.getUrl());
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -129,8 +135,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -139,8 +145,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -149,8 +155,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -159,8 +165,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -169,8 +175,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertEquals(30000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -179,8 +185,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -189,8 +195,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -199,8 +205,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -209,8 +215,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertNull(writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -225,8 +231,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testCreateInstanceWithLogin() {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -235,8 +241,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -245,8 +251,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -255,8 +261,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -265,8 +271,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertNull(writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -275,8 +281,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(30000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -285,8 +291,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -295,8 +301,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -305,8 +311,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), false, "admin", "123", 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -315,8 +321,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE), true, "admin", "123", 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -325,8 +331,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(30000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -335,8 +341,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -345,8 +351,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, "admin", "123", 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -355,8 +361,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(30000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -365,8 +371,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123");
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123");
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -375,8 +381,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertTrue(writer.getReconnetInterval() < 0);
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123", 1);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, false, "admin", "123", 1);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -385,8 +391,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("123", writer.getPassword());
 		assertEquals(1000, writer.getReconnetInterval());
 
-		writer = new JdbcWriter(URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123", 30);
-		assertEquals(URL, writer.getUrl());
+		writer = new JdbcWriter(JDBC_URL, "log", new String[] { "LEVEL", "MESSAGE" }, new String[] { "level", "message" }, true, "admin", "123", 30);
+		assertEquals(JDBC_URL, writer.getUrl());
 		assertEquals("log", writer.getTable());
 		assertEquals(Arrays.asList("LEVEL", "MESSAGE"), writer.getColumns());
 		assertEquals(Arrays.asList(Value.LEVEL, Value.MESSAGE), writer.getValues());
@@ -401,13 +407,13 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testRequiredLogEntryValue() {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList());
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Collections.<Value> emptyList());
 		assertEquals(Collections.<LogEntryValue> emptySet(), writer.getRequiredLogEntryValues());
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE));
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList(Value.values()));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.values()));
 		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.values()));
 	}
 
@@ -416,82 +422,82 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testStringValues() {
-		JdbcWriter writer = new JdbcWriter(URL, "log", null, new String[] { "date" }, null, null);
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "date" }, null, null);
 		assertEquals(Collections.singletonList(Value.DATE), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "DATE" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "DATE" }, null, null);
 		assertEquals(Collections.singletonList(Value.DATE), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "pid" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "pid" }, null, null);
 		assertEquals(Collections.singletonList(Value.PROCESS_ID), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "PID" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "PID" }, null, null);
 		assertEquals(Collections.singletonList(Value.PROCESS_ID), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "thread" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "thread" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_NAME), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "THREAD" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "THREAD" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_NAME), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "thread_id" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "thread_id" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_ID), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "THREAD_ID" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "THREAD_ID" }, null, null);
 		assertEquals(Collections.singletonList(Value.THREAD_ID), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "context" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "context" }, null, null);
 		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "CONTEXT" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "CONTEXT" }, null, null);
 		assertEquals(Collections.singletonList(Value.CONTEXT), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "class" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "class" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "CLASS" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "CLASS" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "class_name" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "class_name" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS_NAME), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "CLASS_NAME" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "CLASS_NAME" }, null, null);
 		assertEquals(Collections.singletonList(Value.CLASS_NAME), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "package" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "package" }, null, null);
 		assertEquals(Collections.singletonList(Value.PACKAGE), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "PACKAGE" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "PACKAGE" }, null, null);
 		assertEquals(Collections.singletonList(Value.PACKAGE), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "method" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "method" }, null, null);
 		assertEquals(Collections.singletonList(Value.METHOD), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "METHOD" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "METHOD" }, null, null);
 		assertEquals(Collections.singletonList(Value.METHOD), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "file" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "file" }, null, null);
 		assertEquals(Collections.singletonList(Value.FILE), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "FILE" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "FILE" }, null, null);
 		assertEquals(Collections.singletonList(Value.FILE), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "line" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "line" }, null, null);
 		assertEquals(Collections.singletonList(Value.LINE), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "line" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "line" }, null, null);
 		assertEquals(Collections.singletonList(Value.LINE), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "level" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "level" }, null, null);
 		assertEquals(Collections.singletonList(Value.LEVEL), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "LEVEL" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "LEVEL" }, null, null);
 		assertEquals(Collections.singletonList(Value.LEVEL), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "message" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "message" }, null, null);
 		assertEquals(Collections.singletonList(Value.MESSAGE), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "MESSAGE" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "MESSAGE" }, null, null);
 		assertEquals(Collections.singletonList(Value.MESSAGE), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "exception" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "exception" }, null, null);
 		assertEquals(Collections.singletonList(Value.EXCEPTION), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "EXCEPTION" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "EXCEPTION" }, null, null);
 		assertEquals(Collections.singletonList(Value.EXCEPTION), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "log_entry" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "log_entry" }, null, null);
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), writer.getValues());
-		writer = new JdbcWriter(URL, "log", null, new String[] { "log_entry" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "log_entry" }, null, null);
 		assertEquals(Collections.singletonList(Value.RENDERED_LOG_ENTRY), writer.getValues());
 
-		writer = new JdbcWriter(URL, "log", null, new String[] { "unknown" }, null, null);
+		writer = new JdbcWriter(JDBC_URL, "log", null, new String[] { "unknown" }, null, null);
 		assertEquals("LOGGER WARNING: Unknown value type: \"unknown\"", getErrorStream().nextLine());
 	}
 
@@ -500,9 +506,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testTableNamesWithQuotingSupport() throws SQLException {
+	public final void testTableNamesWithQuotingSupport() throws SQLException, NamingException {
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
 			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
 			try {
@@ -538,9 +546,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testTableNamesWithoutQuotingSupport() throws SQLException {
+	public final void testTableNamesWithoutQuotingSupport() throws SQLException, NamingException {
 		for (String identifierQuote : Arrays.asList(null, " ")) {
 			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
 			try {
@@ -586,9 +596,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testColumnNamesWithQuotingSupport() throws SQLException {
+	public final void testColumnNamesWithQuotingSupport() throws SQLException, NamingException {
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
 			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
 			try {
@@ -624,9 +636,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testColumnNamesWithoutQuotingSupport() throws SQLException {
+	public final void testColumnNamesWithoutQuotingSupport() throws SQLException, NamingException {
 		for (String identifierQuote : Arrays.asList(null, " ")) {
 			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
 			try {
@@ -672,17 +686,19 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testSizeOfColumnsAndValues() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.MESSAGE));
+	public final void testSizeOfColumnsAndValues() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.MESSAGE));
 		try {
 			writer.init(null);
 		} finally {
 			writer.close();
 		}
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		try {
 			writer.init(null);
 			fail("SQLException expected");
@@ -692,14 +708,14 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			writer.close();
 		}
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		try {
 			writer.init(null);
 		} finally {
 			writer.close();
 		}
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.MESSAGE));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("LEVEL", "MESSAGE"), Arrays.asList(Value.MESSAGE));
 		try {
 			writer.init(null);
 			fail("SQLException expected");
@@ -715,14 +731,16 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testLogin() throws SQLException {
+	public final void testLogin() throws SQLException, NamingException {
 		Statement statement = connection.createStatement();
 		statement.execute("CREATE USER user PASSWORD '123'");
 		statement.close();
 
-		JdbcWriter writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList(), "user", "123");
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Collections.<Value> emptyList(), "user", "123");
 		writer.init(null);
 		writer.close();
 
@@ -730,7 +748,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		statement.execute("DROP USER user");
 		statement.close();
 
-		writer = new JdbcWriter(URL, "log", Collections.<Value> emptyList(), "user", "123");
+		writer = new JdbcWriter(JDBC_URL, "log", Collections.<Value> emptyList(), "user", "123");
 		try {
 			writer.init(null);
 			fail("SQLException expected");
@@ -740,14 +758,41 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	/**
+	 * Test connecting to database via data source.
+	 *
+	 * @throws SQLException
+	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDataSource() throws SQLException, NamingException {
+		new DataSourceContextMock();
+
+		JdbcWriter writer = new JdbcWriter(DATA_SOURCE_URL, "log", Collections.<Value> emptyList());
+		writer.init(null);
+		writer.close();
+
+		Statement statement = connection.createStatement();
+		statement.execute("CREATE USER user PASSWORD '123'");
+		statement.close();
+
+		writer = new JdbcWriter(DATA_SOURCE_URL, "log", Collections.<Value> emptyList(), "user", "123");
+		writer.init(null);
+		writer.close();
+	}
+
+	/**
 	 * Test writing date.
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testDate() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.DATE));
+	public final void testDate() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.DATE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().date(new Date(1000)).create());
@@ -761,10 +806,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testProcessId() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.PROCESS_ID));
+	public final void testProcessId() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.PROCESS_ID));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().processId("42").create());
@@ -778,10 +825,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testThreadName() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.THREAD_NAME));
+	public final void testThreadName() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.THREAD_NAME));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().thread(Thread.currentThread()).create());
@@ -795,10 +844,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testThreadId() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.THREAD_ID));
+	public final void testThreadId() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.THREAD_ID));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().thread(Thread.currentThread()).create());
@@ -812,10 +863,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testLoggingContext() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.CONTEXT));
+	public final void testLoggingContext() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.CONTEXT));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().create());
@@ -839,10 +892,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testClass() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.CLASS));
+	public final void testClass() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.CLASS));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().className(JdbcWriterTest.class.getName()).create());
@@ -856,10 +911,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testClassName() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.CLASS_NAME));
+	public final void testClassName() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.CLASS_NAME));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().className(JdbcWriterTest.class.getName()).create());
@@ -878,10 +935,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testPackage() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.PACKAGE));
+	public final void testPackage() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.PACKAGE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().className(JdbcWriterTest.class.getName()).create());
@@ -900,10 +959,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testMethod() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.METHOD));
+	public final void testMethod() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.METHOD));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().method(null).create());
@@ -922,10 +983,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testFile() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.FILE));
+	public final void testFile() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.FILE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().file(null).create());
@@ -944,10 +1007,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testLineNumber() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LINE));
+	public final void testLineNumber() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LINE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().lineNumber(-1).create());
@@ -966,10 +1031,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testLoggingLevel() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.LEVEL));
+	public final void testLoggingLevel() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.LEVEL));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().level(Level.ERROR).create());
@@ -983,10 +1050,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testMessage() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE));
+	public final void testMessage() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().message(null).create());
@@ -1005,10 +1074,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testException() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.EXCEPTION));
+	public final void testException() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.EXCEPTION));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().exception(null).create());
@@ -1053,10 +1124,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testRenderedLogEntry() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.RENDERED_LOG_ENTRY));
+	public final void testRenderedLogEntry() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.RENDERED_LOG_ENTRY));
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().renderedLogEntry("Hello World").create());
@@ -1075,9 +1148,11 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testMultipleFields() throws SQLException {
+	public final void testMultipleFields() throws SQLException, NamingException {
 		Statement statement = connection.createStatement();
 		try {
 			statement.executeUpdate("ALTER TABLE \"log\" ADD \"level\" VARCHAR");
@@ -1087,7 +1162,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		/* Without column defining */
 
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE, Value.LEVEL));
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE, Value.LEVEL));
 		writer.init(null);
 		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
@@ -1098,7 +1173,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		/* With column defining */
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("entry", "level"), Arrays.asList(Value.MESSAGE, Value.LEVEL));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("entry", "level"), Arrays.asList(Value.MESSAGE, Value.LEVEL));
 		writer.init(null);
 		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
@@ -1107,7 +1182,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 		clearEntries();
 
-		writer = new JdbcWriter(URL, "log", Arrays.asList("level", "entry"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
+		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("level", "entry"), Arrays.asList(Value.LEVEL, Value.MESSAGE));
 		writer.init(null);
 		writer.write(new LogEntryBuilder().message("Hello World").level(Level.ERROR).create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries("entry"));
@@ -1120,10 +1195,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testBatchWriting() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), true);
+	public final void testBatchWriting() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), true);
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().message("Hello World").create());
@@ -1140,10 +1217,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testAutoFlushing() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), true);
+	public final void testAutoFlushing() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), true);
 		writer.init(null);
 
 		for (int i = 0; i < 1000; ++i) {
@@ -1165,10 +1244,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testBrokenConnection() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), false, -1);
+	public final void testBrokenConnection() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), false, -1);
 		writer.init(null);
 
 		writer.write(new LogEntryBuilder().message("Hello World").create());
@@ -1194,10 +1275,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testReconnecting() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), false, 0);
+	public final void testReconnecting() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), false, 0);
 		writer.init(null);
 
 		shutdown();
@@ -1223,10 +1306,12 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testBatchReconnecting() throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), true, 0);
+	public final void testBatchReconnecting() throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), true, 0);
 		writer.init(null);
 
 		shutdown();
@@ -1255,12 +1340,14 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 *
 	 * @throws SQLException
 	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
 	 */
 	@Test
-	public final void testDelayedReconnecting() throws SQLException {
+	public final void testDelayedReconnecting() throws SQLException, NamingException {
 		SystemTimeMock mock = new SystemTimeMock();
 		try {
-			JdbcWriter writer = new JdbcWriter(URL, "log", Arrays.asList(Value.MESSAGE), false, 1);
+			JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), false, 1);
 			writer.init(null);
 
 			shutdown();
@@ -1293,6 +1380,45 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		} finally {
 			mock.tearDown();
 		}
+	}
+
+	/**
+	 * Test reestablishing a broken data source connection.
+	 *
+	 * @throws SQLException
+	 *             Test failed
+	 * @throws NamingException
+	 *             Test failed
+	 */
+	@Test
+	public final void testReconnectingViaDataSource() throws SQLException, NamingException {
+		DataSourceContextMock mock = new DataSourceContextMock();
+
+		JdbcWriter writer = new JdbcWriter(DATA_SOURCE_URL, "log", Arrays.asList(Value.MESSAGE), false, 0);
+		writer.init(null);
+
+		shutdown();
+		mock.tearDown();
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertThat(getErrorStream().nextLine(), allOf(startsWith("LOGGER ERROR: Database connection is broken ("), endsWith(")")));
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		// The same error won't be printed again
+
+		while (getErrorStream().hasLines()) { // H2 writes errors into the console
+			assertThat(getErrorStream().nextLine(), not(startsWith("LOGGER")));
+		}
+
+		reestablish();
+		mock = new DataSourceContextMock();
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertEquals(Arrays.asList("Hello World"), getLogEntries());
+		assertThat(getErrorStream().nextLine(), is("LOGGER ERROR: Broken database connection has been reestablished"));
+
+		writer.close();
+		mock.tearDown();
 	}
 
 	/**
@@ -1445,8 +1571,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		init();
 	}
 
-	private void createAndCloseWriter(final String table, final String... columns) throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, table, Collections.<Value> emptyList());
+	private void createAndCloseWriter(final String table, final String... columns) throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, table, Collections.<Value> emptyList());
 		try {
 			writer.init(null);
 		} finally {
@@ -1454,8 +1580,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		}
 	}
 
-	private void createAndCloseWriter(final String table, final String column) throws SQLException {
-		JdbcWriter writer = new JdbcWriter(URL, table, Collections.singletonList(column), Collections.singletonList(Value.RENDERED_LOG_ENTRY));
+	private void createAndCloseWriter(final String table, final String column) throws SQLException, NamingException {
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, table, Collections.singletonList(column), Collections.singletonList(Value.RENDERED_LOG_ENTRY));
 		try {
 			writer.init(null);
 		} finally {
@@ -1519,6 +1645,21 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		@Mock
 		public Connection getConnection(final String url, final String user, final String password) throws SQLException {
 			throw new SQLException("No connection");
+		}
+
+	}
+
+	private static final class DataSourceContextMock extends MockUp<InitialContext> {
+
+		@Mock
+		public Object lookup(final String name) throws NamingException {
+			if (DATA_SOURCE_URL.equals(name)) {
+				JdbcDataSource dataSource = new JdbcDataSource();
+				dataSource.setURL(JDBC_URL);
+				return dataSource;
+			} else {
+				throw new NameNotFoundException();
+			}
 		}
 
 	}
