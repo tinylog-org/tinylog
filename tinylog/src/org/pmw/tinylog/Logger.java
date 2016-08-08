@@ -31,9 +31,9 @@ import org.pmw.tinylog.writers.Writer;
 public final class Logger {
 
 	/**
-	 * Default deep in stack trace to find the needed stack trace element.
+	 * Default depth in stack trace to find the needed stack trace element.
 	 */
-	static final int DEEP_OF_STACK_TRACE = 3;
+	static final int DEPTH_OF_STACK_TRACE = 3;
 
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
@@ -101,7 +101,7 @@ public final class Logger {
 	public static void trace(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, obj, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, null, obj, null);
 		}
 	}
 
@@ -114,7 +114,7 @@ public final class Logger {
 	public static void trace(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, null, message, null);
 		}
 	}
 
@@ -129,7 +129,7 @@ public final class Logger {
 	public static void trace(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, null, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, null, message, arguments);
 		}
 	}
 
@@ -146,7 +146,7 @@ public final class Logger {
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
 		}
 	}
 
@@ -159,7 +159,7 @@ public final class Logger {
 	public static void trace(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.TRACE, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, null, null);
 		}
 	}
 
@@ -172,7 +172,7 @@ public final class Logger {
 	public static void debug(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, obj, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, null, obj, null);
 		}
 	}
 
@@ -185,7 +185,7 @@ public final class Logger {
 	public static void debug(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, null, message, null);
 		}
 	}
 
@@ -200,7 +200,7 @@ public final class Logger {
 	public static void debug(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, null, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, null, message, arguments);
 		}
 	}
 
@@ -217,7 +217,7 @@ public final class Logger {
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
 		}
 	}
 
@@ -230,7 +230,7 @@ public final class Logger {
 	public static void debug(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.DEBUG, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, null, null);
 		}
 	}
 
@@ -243,7 +243,7 @@ public final class Logger {
 	public static void info(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, obj, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, null, obj, null);
 		}
 	}
 
@@ -256,7 +256,7 @@ public final class Logger {
 	public static void info(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, null, message, null);
 		}
 	}
 
@@ -271,7 +271,7 @@ public final class Logger {
 	public static void info(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, null, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, null, message, arguments);
 		}
 	}
 
@@ -288,7 +288,7 @@ public final class Logger {
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, message, arguments);
 		}
 	}
 
@@ -301,7 +301,7 @@ public final class Logger {
 	public static void info(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.INFO, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, null, null);
 		}
 	}
 
@@ -314,7 +314,7 @@ public final class Logger {
 	public static void warn(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, obj, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, null, obj, null);
 		}
 	}
 
@@ -327,7 +327,7 @@ public final class Logger {
 	public static void warn(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, null, message, null);
 		}
 	}
 
@@ -342,7 +342,7 @@ public final class Logger {
 	public static void warn(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, null, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, null, message, arguments);
 		}
 	}
 
@@ -359,7 +359,7 @@ public final class Logger {
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
 		}
 	}
 
@@ -372,7 +372,7 @@ public final class Logger {
 	public static void warn(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, null, null);
 		}
 	}
 
@@ -385,7 +385,7 @@ public final class Logger {
 	public static void error(final Object obj) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, obj, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, null, obj, null);
 		}
 	}
 
@@ -398,7 +398,7 @@ public final class Logger {
 	public static void error(final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, null, message, null);
 		}
 	}
 
@@ -413,7 +413,7 @@ public final class Logger {
 	public static void error(final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, null, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, null, message, arguments);
 		}
 	}
 
@@ -430,7 +430,7 @@ public final class Logger {
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, message, arguments);
 		}
 	}
 
@@ -443,7 +443,7 @@ public final class Logger {
 	public static void error(final Throwable exception) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEEP_OF_STACK_TRACE, Level.ERROR, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, null, null);
 		}
 	}
 
@@ -489,8 +489,8 @@ public final class Logger {
 	/**
 	 * Add a log entry. This method is helpful for adding log entries form logger bridges.
 	 *
-	 * @param strackTraceDeep
-	 *            Deep of stack trace for finding the class, source line etc.
+	 * @param strackTraceDepth
+	 *            Depth of stack trace for finding the class, source line etc.
 	 * @param level
 	 *            Severity level
 	 * @param exception
@@ -500,10 +500,10 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
-	static void output(final int strackTraceDeep, final Level level, final Throwable exception, final Object message, final Object[] arguments) {
+	static void output(final int strackTraceDepth, final Level level, final Throwable exception, final Object message, final Object[] arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(level)) {
-			output(currentConfiguration, strackTraceDeep, level, exception, message, arguments);
+			output(currentConfiguration, strackTraceDepth, level, exception, message, arguments);
 		}
 	}
 
@@ -528,21 +528,21 @@ public final class Logger {
 		}
 	}
 
-	private static void output(final Configuration currentConfiguration, final int strackTraceDeep, final Level level, final Throwable exception,
+	private static void output(final Configuration currentConfiguration, final int strackTraceDepth, final Level level, final Throwable exception,
 			final Object message, final Object[] arguments) {
 		StackTraceElement stackTraceElement = null;
 		Level activeLevel = currentConfiguration.getLevel();
 
 		if (currentConfiguration.hasCustomLevels()) {
 			boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
-			stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDeep)) : dialect.getStackTraceElement(strackTraceDeep);
+			stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDepth)) : dialect.getStackTraceElement(strackTraceDepth);
 			activeLevel = currentConfiguration.getLevel(stackTraceElement.getClassName());
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			try {
 				Writer[] writers = currentConfiguration.getEffectiveWriters(level);
-				LogEntry[] logEntries = createLogEntries(currentConfiguration, strackTraceDeep + 1, level, stackTraceElement, exception, message, arguments);
+				LogEntry[] logEntries = createLogEntries(currentConfiguration, strackTraceDepth + 1, level, stackTraceElement, exception, message, arguments);
 				if (currentConfiguration.getWritingThread() == null) {
 					for (int i = 0; i < writers.length; ++i) {
 						try {
@@ -597,7 +597,7 @@ public final class Logger {
 		return new StackTraceElement(className, "<unknown>", "<unknown>", -1);
 	}
 
-	private static LogEntry[] createLogEntries(final Configuration currentConfiguration, final int strackTraceDeep, final Level level,
+	private static LogEntry[] createLogEntries(final Configuration currentConfiguration, final int strackTraceDepth, final Level level,
 			final StackTraceElement createdStackTraceElement, final Throwable exception, final Object message, final Object[] arguments) {
 		Set<LogEntryValue> requiredLogEntryValues = currentConfiguration.getRequiredLogEntryValues(level);
 		List<Token>[] formatTokens = currentConfiguration.getEffectiveFormatTokens(level);
@@ -635,8 +635,8 @@ public final class Logger {
 				case CLASS:
 					if (stackTraceElement == null) {
 						boolean onlyClassName = currentConfiguration.getRequiredStackTraceInformation(level) == StackTraceInformation.CLASS_NAME;
-						stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDeep))
-								: dialect.getStackTraceElement(strackTraceDeep);
+						stackTraceElement = onlyClassName ? asStackTraceElement(dialect.getClassName(strackTraceDepth))
+								: dialect.getStackTraceElement(strackTraceDepth);
 					}
 					className = stackTraceElement.getClassName();
 					for (int index = className.indexOf("$", 0); index != -1; index = className.indexOf('$', index + 2)) {
@@ -657,21 +657,21 @@ public final class Logger {
 
 				case METHOD:
 					if (stackTraceElement == null) {
-						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDepth);
 					}
 					method = stackTraceElement.getMethodName();
 					break;
 
 				case FILE:
 					if (stackTraceElement == null) {
-						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDepth);
 					}
 					filename = stackTraceElement.getFileName();
 					break;
 
 				case LINE:
 					if (stackTraceElement == null) {
-						stackTraceElement = dialect.getStackTraceElement(strackTraceDeep);
+						stackTraceElement = dialect.getStackTraceElement(strackTraceDepth);
 					}
 					line = stackTraceElement.getLineNumber();
 					break;

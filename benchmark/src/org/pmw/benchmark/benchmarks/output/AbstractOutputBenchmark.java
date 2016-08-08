@@ -18,8 +18,8 @@ import org.pmw.benchmark.frameworks.Framework;
 
 public abstract class AbstractOutputBenchmark extends AbstractBenchmark {
 
-	protected AbstractOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep) {
-		super(framework, locationInformation, deep);
+	protected AbstractOutputBenchmark(final Framework framework, final boolean locationInformation, final int depth) {
+		super(framework, locationInformation, depth);
 	}
 
 	@Override
@@ -31,13 +31,13 @@ public abstract class AbstractOutputBenchmark extends AbstractBenchmark {
 		}
 	}
 
-	protected final void write(final int stackTraceDeep, final long iterations) throws Exception {
-		if (stackTraceDeep <= 0) {
+	protected final void write(final int stackTraceDepth, final long iterations) throws Exception {
+		if (stackTraceDepth <= 0) {
 			for (long i = 0; i < iterations; ++i) {
 				framework.write(i + 1);
 			}
 		} else {
-			write(stackTraceDeep - 1, iterations);
+			write(stackTraceDepth - 1, iterations);
 		}
 	}
 

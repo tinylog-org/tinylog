@@ -29,7 +29,7 @@ public class MainApplication extends AbstractApplication {
 	private static final boolean DEFAULT_LOCATION_INFORMATION = true;
 	private static final int DEFAULT_RUNS = 1;
 	private static final int DEFAULT_OUTLIERS = 0;
-	private static final int DEFAULT_DEEP = 0;
+	private static final int DEFAULT_DEPTH = 0;
 	private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 	private static final long DEFAULT_ITERATIONS = 20_000L;
 	private static final long DEFAULT_PRIME = 200_000L;
@@ -64,13 +64,13 @@ public class MainApplication extends AbstractApplication {
 				System.exit(-1);
 			}
 
-			int deep = getIntParameter(arguments, "deep", DEFAULT_DEEP);
+			int depth = getIntParameter(arguments, "depth", DEFAULT_DEPTH);
 			int threads = getIntParameter(arguments, "threads", DEFAULT_THREADS);
 			long iterations = getLongParameter(arguments, "iterations", DEFAULT_ITERATIONS);
 			long prime = getLongParameter(arguments, "prime", DEFAULT_PRIME);
 
-			if (deep < 0) {
-				System.err.println("Minimum amount of additional stack trace deep is 0");
+			if (depth < 0) {
+				System.err.println("Minimum amount of additional stack trace depth is 0");
 				System.exit(-1);
 			}
 			if (threadingModes.contains("multi-threaded") && threads <= 0) {
@@ -100,9 +100,9 @@ public class MainApplication extends AbstractApplication {
 					System.out.println(benchmark.toUpperCase() + " BENCHMARK (" + threadingMode.toUpperCase() + ")");
 					System.out.println();
 					for (String framework : frameworks) {
-						executor.run(framework, locationInformation, false, benchmark, threadingMode, deep, threads, iterations, prime);
+						executor.run(framework, locationInformation, false, benchmark, threadingMode, depth, threads, iterations, prime);
 						if (supportsAsync(framework)) {
-							executor.run(framework, locationInformation, true, benchmark, threadingMode, deep, threads, iterations, prime);
+							executor.run(framework, locationInformation, true, benchmark, threadingMode, depth, threads, iterations, prime);
 						}
 					}
 					System.out.println();
@@ -234,7 +234,7 @@ public class MainApplication extends AbstractApplication {
 	private static void showHelp() {
 		System.out.println("Run logging framework benchmarks.");
 		System.out.println();
-		System.out.println("  framework benchmark [threading] [--location X] [--runs X] [--outliers X] [--deep X] [--iterations X] [--threads X] [--prime X]");
+		System.out.println("  framework benchmark [threading] [--location X] [--runs X] [--outliers X] [--depth X] [--iterations X] [--threads X] [--prime X]");
 		System.out.println();
 		System.out.println("  framework          Name of logging framework or \"all\"");
 		System.out.println("  benchmark          Name of benchmark or \"all\"");
@@ -243,7 +243,7 @@ public class MainApplication extends AbstractApplication {
 		System.out.println("  -l --location X    Include location information in format pattern (default is true)");
 		System.out.println("  -r --runs X        Number of benchmark runs (default is 1)");
 		System.out.println("  -o --outliers X    Number of outlier benchmark runs to exclude from result (default is 0)");
-		System.out.println("  -d --deep X        Amount of additional stack trace deep for more realistic results (default is 0)");
+		System.out.println("  -d --depth X        Amount of additional stack trace depth for more realistic results (default is 0)");
 		System.out.println("  -t --threads X     Number of parallel threads in multi-threaded benchmarks (default is number of cores * 2)");
 		System.out.println("  -i --iterations X  Number of logging iterations in output benchmark (default is 20,000)");
 		System.out.println("  -p --prime X       Maximum prime to calculate in prime benchmark (default is 200,000)");
@@ -280,10 +280,10 @@ public class MainApplication extends AbstractApplication {
 		}
 
 		public void run(final String framework, final boolean locationInformation, final boolean async, final String benchmark, final String threadingMode,
-				final int deep, final int threads, final long iterations, final long prime) throws Exception {
+				final int depth, final int threads, final long iterations, final long prime) throws Exception {
 			int[] times = new int[runs];
 			for (int i = 0; i < runs; ++i) {
-				int time = execute(framework, locationInformation, async, benchmark, threadingMode, deep, threads, iterations, prime);
+				int time = execute(framework, locationInformation, async, benchmark, threadingMode, depth, threads, iterations, prime);
 				if (time < 0) {
 					return;
 				} else {
@@ -302,7 +302,7 @@ public class MainApplication extends AbstractApplication {
 		}
 
 		private static int execute(final String framework, final boolean locationInformation, final boolean async, final String benchmark,
-				final String threadingMode, final int deep, final int threads, final long iterations, final long prime) throws Exception {
+				final String threadingMode, final int depth, final int threads, final long iterations, final long prime) throws Exception {
 			String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 			String classpath = System.getProperty("java.class.path");
 
@@ -314,7 +314,7 @@ public class MainApplication extends AbstractApplication {
 			command.add(Boolean.toString(async));
 			command.add(benchmark);
 			command.add(threadingMode);
-			command.add(Integer.toString(deep));
+			command.add(Integer.toString(depth));
 			command.add(Integer.toString(threads));
 			command.add(Long.toString(iterations));
 			command.add(Long.toString(prime));

@@ -53,8 +53,8 @@
 			<arg value="${runs}" />
 			<arg value="--outliers" />
 			<arg value="${outliers}" />
-			<arg value="--deep" />
-			<arg value="${deep}" />
+			<arg value="--depth" />
+			<arg value="${depth}" />
 			<arg value="--threads" />
 			<arg value="${threads}" />
 			<arg value="--iterations" />

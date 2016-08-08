@@ -1,11 +1,11 @@
 /*
  * Copyright 2014 Martin Winandy
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -22,12 +22,12 @@ public abstract class AbstractBenchmark implements Benchmark {
 	protected final Framework framework;
 	protected final boolean locationInformation;
 
-	private final int deep;
+	private final int depth;
 
-	protected AbstractBenchmark(final Framework framework, final boolean locationInformation, final int deep) {
+	protected AbstractBenchmark(final Framework framework, final boolean locationInformation, final int depth) {
 		this.framework = framework;
 		this.locationInformation = locationInformation;
-		this.deep = deep;
+		this.depth = depth;
 	}
 
 	@Override
@@ -48,8 +48,8 @@ public abstract class AbstractBenchmark implements Benchmark {
 		return true;
 	}
 
-	protected int getAdditionStackTraceDeep() {
-		return deep;
+	protected int getAdditionStackTraceDepth() {
+		return depth;
 	}
 
 }

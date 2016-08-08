@@ -29,8 +29,8 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
 	private final int threads;
 
-	public MultiThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long maximum, final int threads) {
-		super(framework, locationInformation, deep, maximum);
+	public MultiThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int depth, final long maximum, final int threads) {
+		super(framework, locationInformation, depth, maximum);
 		this.threads = threads;
 	}
 
@@ -102,8 +102,8 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
 		@Override
 		public List<Long> call() throws Exception {
-			int stackTraceDeep = getAdditionStackTraceDeep();
-			if (stackTraceDeep == 0) {
+			int stackTraceDepth = getAdditionStackTraceDepth();
+			if (stackTraceDepth == 0) {
 				List<Long> found = new ArrayList<>();
 				for (long number = start; number <= end; ++number) {
 					if (framework.calculate(primes, number)) {
@@ -112,12 +112,12 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 				}
 				return found;
 			} else {
-				return call(stackTraceDeep - 1);
+				return call(stackTraceDepth - 1);
 			}
 		}
 
-		private List<Long> call(final int stackTraceDeep) throws Exception {
-			if (stackTraceDeep == 0) {
+		private List<Long> call(final int stackTraceDepth) throws Exception {
+			if (stackTraceDepth == 0) {
 				List<Long> found = new ArrayList<>();
 				for (long number = start; number <= end; ++number) {
 					if (framework.calculate(primes, number)) {
@@ -126,7 +126,7 @@ public final class MultiThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 				}
 				return found;
 			} else {
-				return call(stackTraceDeep - 1);
+				return call(stackTraceDepth - 1);
 			}
 		}
 

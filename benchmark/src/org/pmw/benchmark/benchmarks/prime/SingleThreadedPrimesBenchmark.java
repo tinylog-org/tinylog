@@ -21,17 +21,17 @@ import org.pmw.benchmark.frameworks.Framework;
 
 public final class SingleThreadedPrimesBenchmark extends AbstractPrimeBenchmark {
 
-	public SingleThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long maximum) {
-		super(framework, locationInformation, deep, maximum);
+	public SingleThreadedPrimesBenchmark(final Framework framework, final boolean locationInformation, final int depth, final long maximum) {
+		super(framework, locationInformation, depth, maximum);
 	}
 
 	@Override
 	public void run() throws Exception {
-		int stackTraceDeep = getAdditionStackTraceDeep();
-		if (stackTraceDeep == 0) {
+		int stackTraceDepth = getAdditionStackTraceDepth();
+		if (stackTraceDepth == 0) {
 			super.run();
 		} else {
-			run(stackTraceDeep - 1);
+			run(stackTraceDepth - 1);
 		}
 	}
 
@@ -56,11 +56,11 @@ public final class SingleThreadedPrimesBenchmark extends AbstractPrimeBenchmark 
 		return primes;
 	}
 
-	private void run(final int stackTraceDeep) throws Exception {
-		if (stackTraceDeep == 0) {
+	private void run(final int stackTraceDepth) throws Exception {
+		if (stackTraceDepth == 0) {
 			super.run();
 		} else {
-			run(stackTraceDeep - 1);
+			run(stackTraceDepth - 1);
 		}
 	}
 

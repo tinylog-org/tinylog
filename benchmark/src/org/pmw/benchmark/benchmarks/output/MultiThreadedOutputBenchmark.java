@@ -23,8 +23,8 @@ public final class MultiThreadedOutputBenchmark extends AbstractOutputBenchmark 
 	private final long iterations;
 	private final int threads;
 
-	public MultiThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long iterations, final int threads) {
-		super(framework, locationInformation, deep);
+	public MultiThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int depth, final long iterations, final int threads) {
+		super(framework, locationInformation, depth);
 		this.iterations = iterations;
 		this.threads = threads;
 	}
@@ -76,7 +76,7 @@ public final class MultiThreadedOutputBenchmark extends AbstractOutputBenchmark 
 		@Override
 		public void run() {
 			try {
-				write(getAdditionStackTraceDeep(), iterations);
+				write(getAdditionStackTraceDepth(), iterations);
 			} catch (Exception ex) {
 				exception = ex;
 			}

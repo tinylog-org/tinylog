@@ -19,8 +19,8 @@ public final class SingleThreadedOutputBenchmark extends AbstractOutputBenchmark
 
 	private final long iterations;
 
-	public SingleThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int deep, final long iterations) {
-		super(framework, locationInformation, deep);
+	public SingleThreadedOutputBenchmark(final Framework framework, final boolean locationInformation, final int depth, final long iterations) {
+		super(framework, locationInformation, depth);
 		this.iterations = iterations;
 	}
 
@@ -36,7 +36,7 @@ public final class SingleThreadedOutputBenchmark extends AbstractOutputBenchmark
 
 	@Override
 	public void run() throws Exception {
-		write(getAdditionStackTraceDeep(), iterations);
+		write(getAdditionStackTraceDepth(), iterations);
 	}
 
 }

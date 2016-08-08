@@ -45,29 +45,29 @@ public final class JavaRuntime implements RuntimeDialect {
 
 	@SuppressWarnings({ "restriction", "deprecation" })
 	@Override
-	public String getClassName(final int deep) {
+	public String getClassName(final int depth) {
 		if (hasSunReflection) {
 			try {
-				return sun.reflect.Reflection.getCallerClass(deep + 1).getName();
+				return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
 			} catch (Exception ex) {
 				InternalLogger.warn(ex, "Failed to get caller class from sun.reflect.Reflection");
 			}
 		}
 
-		return getStackTraceElement(deep + 1).getClassName();
+		return getStackTraceElement(depth + 1).getClassName();
 	}
 
 	@Override
-	public StackTraceElement getStackTraceElement(final int deep) {
+	public StackTraceElement getStackTraceElement(final int depth) {
 		if (stackTraceMethod != null) {
 			try {
-				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), deep);
+				return (StackTraceElement) stackTraceMethod.invoke(new Throwable(), depth);
 			} catch (Exception ex) {
 				InternalLogger.warn(ex, "Failed to get single stack trace element from throwable");
 			}
 		}
 
-		return new Throwable().getStackTrace()[deep];
+		return new Throwable().getStackTrace()[depth];
 	}
 
 	private static Method getStackTraceMethod() {

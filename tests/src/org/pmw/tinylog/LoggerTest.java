@@ -352,17 +352,17 @@ public class LoggerTest extends AbstractTest {
 	}
 
 	/**
-	 * Test output method with stack trace deep.
+	 * Test output method with stack trace depth.
 	 *
 	 * @throws InterruptedException
 	 *             Test failed
 	 */
 	@Test
-	public final void testOutputWithStackTraceDeep() throws InterruptedException {
+	public final void testOutputWithStackTraceDepth() throws InterruptedException {
 		/* Test logging without writer */
 
 		Configurator.defaultConfig().writer(null).activate();
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, null, null);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.INFO, null, null, null);
 
 		/* Initialize writer */
 
@@ -371,7 +371,7 @@ public class LoggerTest extends AbstractTest {
 
 		/* Test logging of class */
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
 		LogEntry logEntry = writer.consumeLogEntry();
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals(LoggerTest.class.getName(), logEntry.getClassName());
@@ -381,10 +381,10 @@ public class LoggerTest extends AbstractTest {
 		writer = new StoreWriter(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 		Configurator.defaultConfig().writer(writer).level(Level.INFO).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { "World" });
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { "World" });
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.INFO, logEntry.getLevel());
 		assertEquals("Hello World!", logEntry.getMessage());
@@ -393,12 +393,12 @@ public class LoggerTest extends AbstractTest {
 
 		Exception exception = new Exception();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.WARNING, exception, null, new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.WARNING, exception, null, new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.ERROR, exception, "Test", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.ERROR, exception, "Test", new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.ERROR, logEntry.getLevel());
 		assertEquals("Test", logEntry.getMessage());
@@ -408,7 +408,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", Level.DEBUG).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.DEBUG, null, "Hello!", new Object[0]);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.DEBUG, logEntry.getLevel());
 		assertEquals("Hello!", logEntry.getMessage());
@@ -417,7 +417,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().level("org.pmw.tinylog", null).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.INFO, null, "Hello {}!", new Object[] { new EvilObject() });
 		assertNull(writer.consumeLogEntry());
 		assertEquals("LOGGER ERROR: Failed to create log entry (" + RuntimeException.class.getName() + ")", getErrorStream().nextLine());
 
@@ -425,7 +425,7 @@ public class LoggerTest extends AbstractTest {
 
 		Configurator.currentConfig().writer(new EvilWriter()).activate();
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.ERROR, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.ERROR, null, "Hello!", new Object[0]);
 		assertEquals("LOGGER ERROR: Failed to write log entry (" + UnsupportedOperationException.class.getName() + ")", getErrorStream().nextLine());
 
 		/* Test using writing thread */
@@ -434,7 +434,7 @@ public class LoggerTest extends AbstractTest {
 		WritingThread writingThread = findWritingThread();
 		assertNotNull(writingThread);
 
-		Logger.output(Logger.DEEP_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
+		Logger.output(Logger.DEPTH_OF_STACK_TRACE, Level.INFO, null, "Hello!", new Object[0]);
 		assertNull(writer.consumeLogEntry());
 		writingThread.shutdown();
 		writingThread.join();

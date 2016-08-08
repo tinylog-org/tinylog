@@ -28,19 +28,19 @@ public interface RuntimeDialect {
 	/**
 	 * Get a specific fully-qualified class name from current stack trace.
 	 *
-	 * @param deep
+	 * @param depth
 	 *            Position of stack trace element
 	 * @return Fully-qualified class name from defined position
 	 */
-	String getClassName(final int deep);
+	String getClassName(final int depth);
 
 	/**
 	 * Get a specific stack trace element from current stack trace.
 	 *
-	 * @param deep
+	 * @param depth
 	 *            Position of stack trace element
 	 * @return Stack trace element from defined position
 	 */
-	StackTraceElement getStackTraceElement(final int deep);
+	StackTraceElement getStackTraceElement(final int depth);
 
 }
