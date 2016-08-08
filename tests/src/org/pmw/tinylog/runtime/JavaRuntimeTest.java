@@ -26,7 +26,6 @@ import java.lang.management.RuntimeMXBean;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTest;
 
-import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.NonStrictExpectations;
@@ -55,12 +54,10 @@ public class JavaRuntimeTest extends AbstractTest {
 	@Test
 	public final void testProcessIdWithoutHost() {
 		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
 				returns("1234");
 			}
-
 		};
 
 		assertEquals("1234", new JavaRuntime().getProcessId());
@@ -72,12 +69,10 @@ public class JavaRuntimeTest extends AbstractTest {
 	@Test
 	public final void testProcessIdWithHost() {
 		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
-
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
 				returns("5678@localhost");
 			}
-
 		};
 
 		assertEquals("5678", new JavaRuntime().getProcessId());
@@ -110,12 +105,10 @@ public class JavaRuntimeTest extends AbstractTest {
 	@Test
 	public final void testWithoutSupportingSunReflection() {
 		new MockUp<sun.reflect.Reflection>() {
-
 			@Mock(invocations = 1)
-			public Class<?> getCallerClass(final Invocation invocation, final int index) {
+			public Class<?> getCallerClass(final int index) {
 				throw new UnsupportedOperationException();
 			}
-
 		};
 
 		String name = new JavaRuntime().getClassName(1);
@@ -128,12 +121,10 @@ public class JavaRuntimeTest extends AbstractTest {
 	@Test
 	public final void testWithoutSupportingSingleStackTraceElementExtracting() {
 		MockUp<Throwable> mock = new MockUp<Throwable>() {
-
 			@Mock
-			public StackTraceElement getStackTraceElement(final Invocation invocation, final int index) {
+			public StackTraceElement getStackTraceElement(final int index) {
 				throw new UnsupportedOperationException();
 			}
-
 		};
 
 		JavaRuntime runtime = new JavaRuntime();
@@ -154,16 +145,14 @@ public class JavaRuntimeTest extends AbstractTest {
 		JavaRuntime runtime = new JavaRuntime();
 
 		new MockUp<sun.reflect.Reflection>() {
-
 			@Mock(invocations = 1)
-			public Class<?> getCallerClass(final Invocation invocation, final int index) {
+			public Class<?> getCallerClass(final int index) {
 				try {
 					throw new UnsupportedOperationException();
 				} finally {
 					tearDown();
 				}
 			}
-
 		};
 
 		String name = runtime.getClassName(1);
@@ -179,16 +168,14 @@ public class JavaRuntimeTest extends AbstractTest {
 		JavaRuntime runtime = new JavaRuntime();
 
 		new MockUp<Throwable>() {
-
 			@Mock(invocations = 1)
-			public StackTraceElement getStackTraceElement(final Invocation invocation, final int index) {
+			public StackTraceElement getStackTraceElement(final int index) {
 				try {
 					throw new UnsupportedOperationException();
 				} finally {
 					tearDown();
 				}
 			}
-
 		};
 
 		StackTraceElement stackTraceElement = runtime.getStackTraceElement(1);
