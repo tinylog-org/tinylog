@@ -23,13 +23,13 @@ import org.pmw.tinylog.InternalLogger;
  */
 public final class JavaRuntime implements RuntimeDialect {
 
-	private final Method stackTraceMethod;
 	private final boolean hasSunReflection;
+	private final Method stackTraceMethod;
 
 	/** */
 	public JavaRuntime() {
-		stackTraceMethod = getStackTraceMethod();
 		hasSunReflection = hasSunReflection();
+		stackTraceMethod = getStackTraceMethod();
 	}
 
 	@Override
@@ -70,6 +70,16 @@ public final class JavaRuntime implements RuntimeDialect {
 		return new Throwable().getStackTrace()[depth];
 	}
 
+	private static boolean hasSunReflection() {
+		try {
+			@SuppressWarnings({ "restriction", "deprecation" })
+			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
+			return JavaRuntime.class.equals(caller);
+		} catch (Throwable ex) {
+			return false;
+		}
+	}
+
 	private static Method getStackTraceMethod() {
 		try {
 			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
@@ -82,16 +92,6 @@ public final class JavaRuntime implements RuntimeDialect {
 			}
 		} catch (Throwable ex) {
 			return null;
-		}
-	}
-
-	private static boolean hasSunReflection() {
-		try {
-			@SuppressWarnings({ "restriction", "deprecation" })
-			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
-			return JavaRuntime.class.equals(caller);
-		} catch (Throwable ex) {
-			return false;
 		}
 	}
 
