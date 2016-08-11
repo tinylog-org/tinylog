@@ -12,7 +12,6 @@
  */
 
 package org.pmw.tinylog;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,10 +40,44 @@ public class EnvironmentHelperTest extends AbstractTest {
 	}
 
 	/**
+	 * Test if an Android Runtime will be detected on Android.
+	 */
+	@Test
+	public final void testDetectingAndroidRuntime() {
+		String runtime = System.getProperty("java.runtime.name");
+		try {
+			System.setProperty("java.runtime.name", "Android Runtime");
+			assertTrue(EnvironmentHelper.isAndroid());
+
+			System.setProperty("java.runtime.name", "android runtime");
+			assertTrue(EnvironmentHelper.isAndroid());
+		} finally {
+			System.setProperty("java.runtime.name", runtime);
+		}
+	}
+
+	/**
+	 * Test if an Android Runtime will be not detected on common Java runtime environments.
+	 */
+	@Test
+	public final void testDetectingCommonJavaRuntime() {
+		String runtime = System.getProperty("java.runtime.name");
+		try {
+			System.setProperty("java.runtime.name", "Java(TM) SE Runtime Environment");
+			assertFalse(EnvironmentHelper.isAndroid());
+
+			System.setProperty("java.runtime.name", "OpenJDK Runtime Environment");
+			assertFalse(EnvironmentHelper.isAndroid());
+		} finally {
+			System.setProperty("java.runtime.name", runtime);
+		}
+	}
+
+	/**
 	 * Test if common Windows versions will be detected.
 	 */
 	@Test
-	public final void testIsWindowsOnWindows() {
+	public final void testDetectingWindows() {
 		String os = System.getProperty("os.name");
 		try {
 			System.setProperty("os.name", "Windows NT");
@@ -64,7 +97,7 @@ public class EnvironmentHelperTest extends AbstractTest {
 	 * Test if non-Windows operating systems will be detected.
 	 */
 	@Test
-	public final void testIsWindowsWithoutWindows() {
+	public final void testDetectingNonWindowsSystems() {
 		String os = System.getProperty("os.name");
 		try {
 			System.setProperty("os.name", "Linux");

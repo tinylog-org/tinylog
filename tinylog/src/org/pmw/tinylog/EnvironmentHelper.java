@@ -15,6 +15,7 @@ package org.pmw.tinylog;
 
 import java.io.File;
 
+import org.pmw.tinylog.runtime.AndroidRuntime;
 import org.pmw.tinylog.runtime.JavaRuntime;
 import org.pmw.tinylog.runtime.RuntimeDialect;
 
@@ -23,10 +24,19 @@ import org.pmw.tinylog.runtime.RuntimeDialect;
  */
 public final class EnvironmentHelper {
 
-	private static final RuntimeDialect DIALECT = new JavaRuntime();
+	private static final RuntimeDialect DIALECT = isAndroid() ? new AndroidRuntime() : new JavaRuntime();
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private EnvironmentHelper() {
+	}
+
+	/**
+	 * Determine whether running on Android.
+	 *
+	 * @return <code>true</code> if operating system is Android, <code>false</code> if not
+	 */
+	public static boolean isAndroid() {
+		return System.getProperty("java.runtime.name").equalsIgnoreCase("Android Runtime");
 	}
 
 	/**

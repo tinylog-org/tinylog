@@ -79,7 +79,7 @@ public class JavaRuntimeTest extends AbstractTest {
 	}
 
 	/**
-	 * Tests getting a class name from stack trace.
+	 * Test getting a class name from stack trace.
 	 */
 	@Test
 	public final void testGettingClassName() {
@@ -88,7 +88,7 @@ public class JavaRuntimeTest extends AbstractTest {
 	}
 
 	/**
-	 * Tests getting a stack trace element from StackTrace.
+	 * Test getting a stack trace element from stack trace.
 	 */
 	@Test
 	public final void testGettingStackTraceElement() {
@@ -137,7 +137,7 @@ public class JavaRuntimeTest extends AbstractTest {
 	}
 
 	/**
-	 * Test getting the right class name of caller even if calling of sun.reflect.Reflection will fail.
+	 * Test getting the right class name of caller even if calling sun.reflect.Reflection will fail.
 	 */
 	@SuppressWarnings("restriction")
 	@Test
