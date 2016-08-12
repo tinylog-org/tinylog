@@ -18,9 +18,9 @@ specific language governing permissions and limitations under the License.
 
 1) Add "slf4j-api.jar", "slf4j-binding.jar" and "tinylog.jar" to your classpath
 
-2) Optionally attach "slf4j-binding-source.jar" for Javadoc documentation and
-   source code attachment
-
+2) Optionally attach "slf4j-binding-javadoc.jar" for Javadoc documentation and
+   "slf4j-binding-sources.jar" for source code attachment
+   
 3) Now you can test the logger facade by the following simple program:
 
       import org.slf4j.Logger;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="tinylog" default="pack-all">
+<project name="tinylog" default="all">
 	
 	<property name="version" value="1.2-alpha2" />
 	<property name="bundle-version" value="1.2.0.alpha2" />
@@ -90,6 +90,8 @@
 		</classpath>
 	</taskdef>
 
+	<target name="all" depends="clean, compile, docs, check, test, pack-all" />
+
 	<target name="clean">
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${dist}" includes="**/*" excludes=".*" />
@@ -170,354 +172,6 @@
 			</fileset>
 		</copy>
 	</target>
-	
-	<target name="pack-jar" depends="compile">
-		<delete dir="${dist.jar}" />
-		<mkdir dir="${dist.jar}" />
-		
-		<jar destfile="${dist.jar}/tinylog-${version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="tinylog" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.pmw.tinylog;version=${bundle-version}, org.pmw.tinylog.labelers;version=${bundle-version}, org.pmw.tinylog.policies;version=${bundle-version}, org.pmw.tinylog.writers;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${tinylog.bin}" />
-		</jar>
-		<jar destfile="${dist.jar}/tinylog-${version}-source.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="tinylog" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${tinylog.src}" />
-		</jar>
-		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="tinylog-${version}.jar" />
-				<include name="tinylog-${version}-source.jar" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${tinylog.files}" includes="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/jcl-binding-${version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="jcl-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.pmw.commons.logging;version=${bundle-version}" />
-				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${jcl.bin}" />
-		</jar>
-		<jar destfile="${dist.jar}/jcl-binding-${version}-source.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="jcl-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${jcl.src}" />
-		</jar>
-		<zip destfile="${dist.jar}/jcl-binding-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="jcl-binding-${version}.jar" />
-				<include name="jcl-binding-${version}-source.jar" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${jcl.files}" includes="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/log4j-facade-${version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="log4j-facade" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.apache.log4j;version=${bundle-version}" />
-				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${log4j.bin}" />
-		</jar>
-		<jar destfile="${dist.jar}/log4j-facade-${version}-source.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="log4j-facade" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${log4j.src}" />
-		</jar>
-		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="log4j-facade-${version}.jar" />
-				<include name="log4j-facade-${version}-source.jar" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${log4j.files}" includes="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/slf4j-binding-${version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="slf4j-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.slf4j.impl;version=${slf4j-version}" />
-				<attribute name="Import-Package" value="org.slf4j;version=${slf4j-version}, org.slf4j.spi;version=${slf4j-version}, org.slf4j.helpers;version=${slf4j-version}, org.pmw.tinylog;version=${bundle-version}" />
-				<attribute name="Fragment-Host" value="slf4j.api" />
-			</manifest>
-			<zipfileset dir="${slf4j.bin}" />
-		</jar>
-		<jar destfile="${dist.jar}/slf4j-binding-${version}-source.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="slf4j-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${slf4j.src}" />
-		</jar>
-		<zip destfile="${dist.jar}/slf4j-binding-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="slf4j-binding-${version}.jar" />
-				<include name="slf4j-binding-${version}-source.jar" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${slf4j.files}" includes="readme.txt" />
-		</zip>
-	</target>
-	
-	<target name="pack-maven" depends="compile, docs">
-		<delete dir="${dist.maven}" />
-		<mkdir dir="${dist.maven}" />
-		
-		<pom id="pom.tinylog" groupId="org.tinylog" artifactId="tinylog" version="${maven-version}" name="tinylog" description="tinylog is a lightweight logging framework for Java, optimized for ease of use" url="http://www.tinylog.org/">
-			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
-			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
-			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
-		</pom>
-		<writepom pomRefId="pom.tinylog" file="${dist.maven}/tinylog-${maven-version}.pom" />
-		
-		<jar destfile="${dist.maven}/tinylog-${maven-version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="tinylog" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.pmw.tinylog;version=${bundle-version}, org.pmw.tinylog.labelers;version=${bundle-version}, org.pmw.tinylog.policies;version=${bundle-version}, org.pmw.tinylog.writers;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${tinylog.bin}" />
-		</jar>
-		<jar destfile="${dist.maven}/tinylog-${maven-version}-sources.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="tinylog" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${tinylog.src}" />
-		</jar>
-		<zip destfile="${dist.maven}/tinylog-${maven-version}-javadoc.jar">
-			<zipfileset dir="${dist.docs}" />
-		</zip>
-		
-		<delete dir="${dist.maven}/jcl-binding" />
-		<mkdir dir="${dist.maven}/jcl-binding" />
-		<javadoc destdir="${dist.maven}/jcl-binding" use="true" access="public" windowtitle="Apache Commons Logging Binding {version}">
-			<doctitle>Apache Commons Logging Binding ${version} - API Specification</doctitle>
-			<packageset dir="${jcl.src}" />
-			<classpath>
-				<dirset dir="${jcl.bin}" />
-				<fileset dir="${jcl.lib}" includes="*.jar" />
-				<dirset dir="${tinylog.bin}" />
-			</classpath>
-			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
-		</javadoc>
-		
-		<pom id="org.jcl" groupId="org.tinylog" artifactId="jcl-binding" version="${maven-version}" name="Apache Commons Logging Binding" description="Apache Commons Logging (JCL) Binding for tinylog" url="http://www.tinylog.org/">
-			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
-			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
-			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
-			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
-			<dependency groupId="commons-logging" artifactId="commons-logging" version="${jcl-version}"/>
-		</pom>
-		<writepom pomRefId="org.jcl" file="${dist.maven}/jcl-binding-${maven-version}.pom" />
-		
-		<jar destfile="${dist.maven}/jcl-binding-${maven-version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="jcl-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.pmw.commons.logging;version=${bundle-version}" />
-				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${jcl.bin}" />
-		</jar>
-		<jar destfile="${dist.maven}/jcl-binding-${maven-version}-sources.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="jcl-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${jcl.src}" />
-		</jar>
-		<zip destfile="${dist.maven}/jcl-binding-${maven-version}-javadoc.jar">
-			<zipfileset dir="${dist.maven}/jcl-binding" />
-		</zip>		
-		<delete dir="${dist.maven}/jcl-binding" />
-	
-		<delete dir="${dist.maven}/log4j-facade" />
-		<mkdir dir="${dist.maven}/log4j-facade" />
-		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="Log4j Facade {version}">
-			<doctitle>Log4j Facade ${version} - API Specification</doctitle>
-			<packageset dir="${log4j.src}" />
-			<classpath>
-				<dirset dir="${log4j.bin}" />
-				<dirset dir="${tinylog.bin}" />
-			</classpath>
-			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
-		</javadoc>
-		
-		<pom id="org.log4j" groupId="org.tinylog" artifactId="log4j-facade" version="${maven-version}" name="Log4j Facade" description="Log4j Facade is a Log4j-compatible logging API for tinylog" url="http://www.tinylog.org/">
-			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
-			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
-			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
-			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
-		</pom>
-		<writepom pomRefId="org.log4j" file="${dist.maven}/log4j-facade-${maven-version}.pom" />
-		
-		<jar destfile="${dist.maven}/log4j-facade-${maven-version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="log4j-facade" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.apache.log4j;version=${bundle-version}" />
-				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${bundle-version}" />
-			</manifest>
-			<zipfileset dir="${log4j.bin}" />
-		</jar>
-		<jar destfile="${dist.maven}/log4j-facade-${maven-version}-sources.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="log4j-facade" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${log4j.src}" />
-		</jar>
-		<zip destfile="${dist.maven}/log4j-facade-${maven-version}-javadoc.jar">
-			<zipfileset dir="${dist.maven}/log4j-facade" />
-		</zip>		
-		<delete dir="${dist.maven}/log4j-facade" />
-		
-		<delete dir="${dist.maven}/slf4j-binding" />
-		<mkdir dir="${dist.maven}/slf4j-binding" />
-		<javadoc destdir="${dist.maven}/slf4j-binding" use="true" access="public" windowtitle="SLF4J Binding {version}">
-			<doctitle>SLF4J Binding ${version} - API Specification</doctitle>
-			<packageset dir="${slf4j.src}" />
-			<classpath>
-				<dirset dir="${slf4j.bin}" />
-				<fileset dir="${slf4j.lib}" includes="*.jar" />
-				<dirset dir="${tinylog.bin}" />
-			</classpath>
-			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
-		</javadoc>
-		
-		<pom id="org.slf4j" groupId="org.tinylog" artifactId="slf4j-binding" version="${maven-version}" name="SLF4J Binding" description="SLF4J Binding for tinylog" url="http://www.tinylog.org/">
-			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
-			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
-			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
-			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
-			<dependency groupId="org.slf4j" artifactId="slf4j-api" version="${slf4j-version}"/>
-		</pom>
-		<writepom pomRefId="org.slf4j" file="${dist.maven}/slf4j-binding-${maven-version}.pom" />
-		
-		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}.jar">
-			<manifest>
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
-				<attribute name="Bundle-Name" value="slf4j-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-				<attribute name="Export-Package" value="org.slf4j.impl;version=${slf4j-version}" />
-				<attribute name="Import-Package" value="org.slf4j;version=${slf4j-version}, org.slf4j.spi;version=${slf4j-version}, org.slf4j.helpers;version=${slf4j-version}, org.pmw.tinylog;version=${bundle-version}" />
-				<attribute name="Fragment-Host" value="slf4j.api" />
-			</manifest>
-			<zipfileset dir="${slf4j.bin}" />
-		</jar>
-		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}-sources.jar">
-			<manifest>
-				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
-				<attribute name="Bundle-Vendor" value="${vendor}" />
-				<attribute name="Bundle-Name" value="slf4j-binding" />
-				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding.source; singleton:=true" />
-				<attribute name="Bundle-Version" value="${bundle-version}" />
-				<attribute name="Bundle-ManifestVersion" value="2" />
-			</manifest>
-			<zipfileset dir="${slf4j.src}" />
-		</jar>
-		<zip destfile="${dist.maven}/slf4j-binding-${maven-version}-javadoc.jar">
-			<zipfileset dir="${dist.maven}/slf4j-binding" />
-		</zip>		
-		<delete dir="${dist.maven}/slf4j-binding" />
-	</target>
-	
-	<target name="pack-all" depends="pack-jar, pack-maven" />
-	
-	<target name="docs" depends="compile">
-		<delete dir="${dist.docs}" />
-		<mkdir dir="${dist.docs}" />
-		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="tinylog ${version}">
-			<doctitle>tinylog ${version} - API Specification</doctitle>
-			<packageset dir="${tinylog.src}" />
-			<classpath>
-				<dirset dir="${tinylog.bin}" />
-				<fileset dir="${tinylog.lib}" includes="*.jar" />
-			</classpath>
-			<arg line="-XDignore.symbol.file" />
-			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
-		</javadoc>
-	</target>
 
 	<target name="check" depends="compile">
 		<checkstyle config="${conf}/tinylog-checkstyle.xml">
@@ -563,7 +217,272 @@
 		<fail message="Tests failed" if="junit.test.error" />
 		<fail message="Tests failed" if="junit.tests.failure" />
 	</target>
+	
+	<target name="pack-all" depends="pack-tinylog, pack-jcl-binding, pack-log4j-facade, pack-slf4j-binding" />
+	
+	<target name="prepare-packing" depends="compile">
+		<delete dir="${dist.jar}" />
+		<mkdir dir="${dist.jar}" />
+		<delete dir="${dist.maven}" />
+		<mkdir dir="${dist.maven}" />
+	</target>
+		
+	<target name="pack-tinylog" depends="prepare-packing, docs">
+		<pom id="pom.tinylog" groupId="org.tinylog" artifactId="tinylog" version="${maven-version}" name="tinylog" description="tinylog is a lightweight logging framework for Java, optimized for ease of use" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
+		</pom>
+		<writepom pomRefId="pom.tinylog" file="${dist.maven}/tinylog-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/tinylog-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.tinylog;version=${bundle-version}, org.pmw.tinylog.labelers;version=${bundle-version}, org.pmw.tinylog.policies;version=${bundle-version}, org.pmw.tinylog.writers;version=${bundle-version}" />
+			</manifest>
+			<zipfileset dir="${tinylog.bin}" />
+		</jar>
 
-	<target name="all" depends="clean, check, test, pack-all, docs" />
+		<jar destfile="${dist.maven}/tinylog-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="tinylog" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.tinylog.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${tinylog.src}" />
+		</jar>
+
+		<zip destfile="${dist.maven}/tinylog-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.docs}" />
+		</zip>
+
+		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
+			<zipfileset dir="${dist.maven}" includes="tinylog-${maven-version}.jar" fullPath="tinylog-${version}.jar" />
+			<zipfileset dir="${dist.maven}" includes="tinylog-${maven-version}-javadoc.jar" fullPath="tinylog-${version}-javadoc.jar" />
+			<zipfileset dir="${dist.maven}" includes="tinylog-${maven-version}-sources.jar" fullPath="tinylog-${version}-sources.jar" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${tinylog.files}" includes="readme.txt" />
+		</zip>
+	</target>
+			
+	<target name="pack-jcl-binding" depends="prepare-packing">
+		<delete dir="${dist.maven}/jcl-binding" />
+		<mkdir dir="${dist.maven}/jcl-binding" />
+
+		<javadoc destdir="${dist.maven}/jcl-binding" use="true" access="public" windowtitle="Apache Commons Logging Binding {version}">
+			<doctitle>Apache Commons Logging Binding ${version} - API Specification</doctitle>
+			<packageset dir="${jcl.src}" />
+			<classpath>
+				<dirset dir="${jcl.bin}" />
+				<fileset dir="${jcl.lib}" includes="*.jar" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+		
+		<pom id="org.jcl" groupId="org.tinylog" artifactId="jcl-binding" version="${maven-version}" name="Apache Commons Logging Binding" description="Apache Commons Logging (JCL) Binding for tinylog" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
+			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
+			<dependency groupId="commons-logging" artifactId="commons-logging" version="${jcl-version}"/>
+		</pom>
+		<writepom pomRefId="org.jcl" file="${dist.maven}/jcl-binding-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/jcl-binding-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.pmw.commons.logging;version=${bundle-version}" />
+				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
+			</manifest>
+			<zipfileset dir="${jcl.bin}" />
+		</jar>
+
+		<jar destfile="${dist.maven}/jcl-binding-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="jcl-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.jcl-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${jcl.src}" />
+		</jar>
+
+		<zip destfile="${dist.maven}/jcl-binding-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/jcl-binding" />
+		</zip>		
+
+		<zip destfile="${dist.jar}/jcl-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.maven}" includes="jcl-binding-${maven-version}.jar" fullPath="jcl-binding-${version}.jar" />
+			<zipfileset dir="${dist.maven}" includes="jcl-binding-${maven-version}-javadoc.jar" fullPath="jcl-binding-${version}-javadoc.jar" />
+			<zipfileset dir="${dist.maven}" includes="jcl-binding-${maven-version}-sources.jar" fullPath="jcl-binding-${version}-sources.jar" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${jcl.files}" includes="readme.txt" />
+		</zip>
+		
+		<delete dir="${dist.maven}/jcl-binding" />
+	</target>
+				
+	<target name="pack-log4j-facade" depends="prepare-packing">
+		<delete dir="${dist.maven}/log4j-facade" />
+		<mkdir dir="${dist.maven}/log4j-facade" />
+
+		<javadoc destdir="${dist.maven}/log4j-facade" use="true" access="public" windowtitle="Log4j Facade {version}">
+			<doctitle>Log4j Facade ${version} - API Specification</doctitle>
+			<packageset dir="${log4j.src}" />
+			<classpath>
+				<dirset dir="${log4j.bin}" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+		
+		<pom id="org.log4j" groupId="org.tinylog" artifactId="log4j-facade" version="${maven-version}" name="Log4j Facade" description="Log4j Facade is a Log4j-compatible logging API for tinylog" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
+			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
+		</pom>
+		<writepom pomRefId="org.log4j" file="${dist.maven}/log4j-facade-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/log4j-facade-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.apache.log4j;version=${bundle-version}" />
+				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${bundle-version}" />
+			</manifest>
+			<zipfileset dir="${log4j.bin}" />
+		</jar>
+
+		<jar destfile="${dist.maven}/log4j-facade-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="log4j-facade" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.log4j-facade.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${log4j.src}" />
+		</jar>
+
+		<zip destfile="${dist.maven}/log4j-facade-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/log4j-facade" />
+		</zip>		
+
+		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
+			<zipfileset dir="${dist.maven}" includes="log4j-facade-${maven-version}.jar" fullPath="log4j-facade-${version}.jar" />
+			<zipfileset dir="${dist.maven}" includes="log4j-facade-${maven-version}-javadoc.jar" fullPath="log4j-facade-${version}-javadoc.jar" />
+			<zipfileset dir="${dist.maven}" includes="log4j-facade-${maven-version}-sources.jar" fullPath="log4j-facade-${version}-sources.jar" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${log4j.files}" includes="readme.txt" />
+		</zip>
+		
+		<delete dir="${dist.maven}/log4j-facade" />
+	</target>
+					
+	<target name="pack-slf4j-binding" depends="prepare-packing">
+		<delete dir="${dist.maven}/slf4j-binding" />
+		<mkdir dir="${dist.maven}/slf4j-binding" />
+
+		<javadoc destdir="${dist.maven}/slf4j-binding" use="true" access="public" windowtitle="SLF4J Binding {version}">
+			<doctitle>SLF4J Binding ${version} - API Specification</doctitle>
+			<packageset dir="${slf4j.src}" />
+			<classpath>
+				<dirset dir="${slf4j.bin}" />
+				<fileset dir="${slf4j.lib}" includes="*.jar" />
+				<dirset dir="${tinylog.bin}" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+		
+		<pom id="org.slf4j" groupId="org.tinylog" artifactId="slf4j-binding" version="${maven-version}" name="SLF4J Binding" description="SLF4J Binding for tinylog" url="http://www.tinylog.org/">
+			<scm url="https://github.com/pmwmedia/tinylog" connection="scm:git:github.com/pmwmedia/tinylog.git" developerConnection="scm:git:git@github.com:pmwmedia/tinylog.git" />
+			<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+			<developer name="Martin Winandy" email="martin.winandy@tinylog.org" />
+			<dependency groupId="org.tinylog" artifactId="tinylog" version="${maven-version}"/>
+			<dependency groupId="org.slf4j" artifactId="slf4j-api" version="${slf4j-version}"/>
+		</pom>
+		<writepom pomRefId="org.slf4j" file="${dist.maven}/slf4j-binding-${maven-version}.pom" />
+		
+		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}.jar">
+			<manifest>
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+				<attribute name="Export-Package" value="org.slf4j.impl;version=${slf4j-version}" />
+				<attribute name="Import-Package" value="org.slf4j;version=${slf4j-version}, org.slf4j.spi;version=${slf4j-version}, org.slf4j.helpers;version=${slf4j-version}, org.pmw.tinylog;version=${bundle-version}" />
+				<attribute name="Fragment-Host" value="slf4j.api" />
+			</manifest>
+			<zipfileset dir="${slf4j.bin}" />
+		</jar>
+
+		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}-sources.jar">
+			<manifest>
+				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
+				<attribute name="Bundle-Vendor" value="${vendor}" />
+				<attribute name="Bundle-Name" value="slf4j-binding" />
+				<attribute name="Bundle-SymbolicName" value="org.pmw.slf4j-binding.source; singleton:=true" />
+				<attribute name="Bundle-Version" value="${bundle-version}" />
+				<attribute name="Bundle-ManifestVersion" value="2" />
+			</manifest>
+			<zipfileset dir="${slf4j.src}" />
+		</jar>
+
+		<zip destfile="${dist.maven}/slf4j-binding-${maven-version}-javadoc.jar">
+			<zipfileset dir="${dist.maven}/slf4j-binding" />
+		</zip>
+		
+		<zip destfile="${dist.jar}/slf4j-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.maven}" includes="slf4j-binding-${maven-version}.jar" fullPath="slf4j-binding-${version}.jar" />
+			<zipfileset dir="${dist.maven}" includes="slf4j-binding-${maven-version}-javadoc.jar" fullPath="slf4j-binding-${version}-javadoc.jar" />
+			<zipfileset dir="${dist.maven}" includes="slf4j-binding-${maven-version}-sources.jar" fullPath="slf4j-binding-${version}-sources.jar" />
+			<zipfileset dir="${root}" includes="license.txt" />
+			<zipfileset dir="${slf4j.files}" includes="readme.txt" />
+		</zip>
+
+		<delete dir="${dist.maven}/slf4j-binding" />
+	</target>
+	
+	<target name="docs" depends="compile">
+		<delete dir="${dist.docs}" />
+		<mkdir dir="${dist.docs}" />
+		<javadoc destdir="${dist.docs}" use="true" access="public" windowtitle="tinylog ${version}">
+			<doctitle>tinylog ${version} - API Specification</doctitle>
+			<packageset dir="${tinylog.src}" />
+			<classpath>
+				<dirset dir="${tinylog.bin}" />
+				<fileset dir="${tinylog.lib}" includes="*.jar" />
+			</classpath>
+			<arg line="-XDignore.symbol.file" />
+			<link href="http://download.oracle.com/javase/8/docs/api/" offline="true" packagelistloc="${conf}" />
+		</javadoc>
+	</target>
 	
 </project>

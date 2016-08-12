@@ -18,9 +18,9 @@ specific language governing permissions and limitations under the License.
 
 1) Add "tinylog.jar" to your classpath
 
-2) Optionally attach "tinylog-source.jar" for Javadoc documentation and source
-   code attachment
-
+2) Optionally attach "tinylog-javadoc.jar" for Javadoc documentation and
+   "tinylog-sources.jar" for source code attachment
+   
 3) Now you can test the logger by the following simple program:
 
       import org.pmw.tinylog.Logger;
