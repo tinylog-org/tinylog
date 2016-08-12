@@ -16,12 +16,14 @@ specific language governing permissions and limitations under the License.
  Using SLF4J Binding
 =====================
 
-1) Add "commons-logging.jar", "jcl-binding.jar" and "tinylog.jar" to your classpath
+1) Download tinylog and Apache Commons Logging (JCL)
 
-2) Optionally attach "jcl-binding-javadoc.jar" for Javadoc documentation and
+2) Add "commons-logging.jar", "jcl-binding.jar" and "tinylog.jar" to your classpath
+
+3) Optionally attach "jcl-binding-javadoc.jar" for Javadoc documentation and
    "jcl-binding-sources.jar" for source code attachment
 
-3) Now you can test the logger facade by the following simple program:
+4) Now you can test the logger facade by the following simple program:
 
       import org.apache.commons.logging.Log;
       import org.apache.commons.logging.LogFactory;
@@ -39,4 +41,4 @@ specific language governing permissions and limitations under the License.
   
    You should see a log statement appearing on the console.
 
-3) A detailed user manual can be found on http://www.tinylog.org/
+5) A detailed user manual can be found on http://www.tinylog.org/

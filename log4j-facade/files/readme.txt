@@ -16,12 +16,14 @@ specific language governing permissions and limitations under the License.
  Using Log4j Facade
 ====================
 
-1) Add "log4j-facade.jar" and "tinylog.jar" to your classpath
+1) Download tinylog as well
 
-2) Optionally attach "log4j-facade-javadoc.jar" for Javadoc documentation and
+2) Add "log4j-facade.jar" and "tinylog.jar" to your classpath
+
+3) Optionally attach "log4j-facade-javadoc.jar" for Javadoc documentation and
    "log4j-facade-sources.jar" for source code attachment
    
-3) Now you can test the logger facade by the following simple program:
+4) Now you can test the logger facade by the following simple program:
 
       import org.apache.log4j.Logger;
  	  
@@ -38,4 +40,4 @@ specific language governing permissions and limitations under the License.
   
    You should see a log statement appearing on the console.
 
-3) A detailed user manual can be found on http://www.tinylog.org/
+5) A detailed user manual can be found on http://www.tinylog.org/
