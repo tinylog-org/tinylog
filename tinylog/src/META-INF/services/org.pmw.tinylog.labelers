@@ -1,3 +1,0 @@
-org.pmw.tinylog.labelers.CountLabeler
-org.pmw.tinylog.labelers.TimestampLabeler
-org.pmw.tinylog.labelers.ProcessIdLabeler
