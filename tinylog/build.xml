@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="tinylog" default="all">
+<project name="tinylog" default="pack-all">
 	
 	<property name="version" value="1.2-alpha2" />
 	<property name="bundle-version" value="1.2.0.alpha2" />
@@ -175,72 +175,7 @@
 		<delete dir="${dist.jar}" />
 		<mkdir dir="${dist.jar}" />
 		
-		<jar destfile="${dist.jar}/tinylog.jar">
-			<zipfileset dir="${tinylog.bin}" />
-		</jar>
-		<zip destfile="${dist.jar}/tinylog-src.zip">
-			<zipfileset dir="${tinylog.src}" />
-		</zip>
-		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="tinylog.jar" />
-				<include name="tinylog-src.zip" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${tinylog.files}" includes="readme-jar.txt" fullpath="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/jcl-binding.jar">
-			<zipfileset dir="${jcl.bin}" />
-		</jar>
-		<zip destfile="${dist.jar}/jcl-binding-src.zip">
-			<zipfileset dir="${jcl.src}" />
-		</zip>
-		<zip destfile="${dist.jar}/jcl-binding-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="jcl-binding.jar" />
-				<include name="jcl-binding-src.zip" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${jcl.files}" includes="readme-jar.txt" fullpath="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/log4j-facade.jar">
-			<zipfileset dir="${log4j.bin}" />
-		</jar>
-		<zip destfile="${dist.jar}/log4j-facade-src.zip">
-			<zipfileset dir="${log4j.src}" />
-		</zip>
-		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="log4j-facade.jar" />
-				<include name="log4j-facade-src.zip" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${log4j.files}" includes="readme-jar.txt" fullpath="readme.txt" />
-		</zip>
-		
-		<jar destfile="${dist.jar}/slf4j-binding.jar">
-			<zipfileset dir="${slf4j.bin}" />
-		</jar>
-		<zip destfile="${dist.jar}/slf4j-binding-src.zip">
-			<zipfileset dir="${slf4j.src}" />
-		</zip>
-		<zip destfile="${dist.jar}/slf4j-binding-${version}.zip" level="9">
-			<zipfileset dir="${dist.jar}">
-				<include name="slf4j-binding.jar" />
-				<include name="slf4j-binding-src.zip" />
-			</zipfileset>
-			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${slf4j.files}" includes="readme-jar.txt" fullpath="readme.txt" />
-		</zip>
-	</target>
-	
-	<target name="pack-bundle" depends="compile">
-		<delete dir="${dist.bundle}" />
-		<mkdir dir="${dist.bundle}" />
-		
-		<jar destfile="${dist.bundle}/org.pmw.tinylog_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/tinylog-${version}.jar">
 			<manifest>
 				<attribute name="Bundle-Vendor" value="${vendor}" />
 				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
@@ -252,7 +187,7 @@
 			</manifest>
 			<zipfileset dir="${tinylog.bin}" />
 		</jar>
-		<jar destfile="${dist.bundle}/org.pmw.tinylog.source_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/tinylog-${version}-source.jar">
 			<manifest>
 				<attribute name="Eclipse-SourceBundle" value="org.pmw.tinylog;version=${bundle-version}" />
 				<attribute name="Bundle-Vendor" value="${vendor}" />
@@ -263,16 +198,16 @@
 			</manifest>
 			<zipfileset dir="${tinylog.src}" />
 		</jar>
-		<zip destfile="${dist.bundle}/tinylog-${bundle-version}-bundles.zip" level="9">
-			<zipfileset dir="${dist.bundle}">
-				<include name="org.pmw.tinylog_${bundle-version}.jar" />
-				<include name="org.pmw.tinylog.source_${bundle-version}.jar" />
+		<zip destfile="${dist.jar}/tinylog-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="tinylog-${version}.jar" />
+				<include name="tinylog-${version}-source.jar" />
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${tinylog.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
-		</zip>	
+			<zipfileset dir="${tinylog.files}" includes="readme.txt" />
+		</zip>
 		
-		<jar destfile="${dist.bundle}/org.pmw.jcl-binding_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/jcl-binding-${version}.jar">
 			<manifest>
 				<attribute name="Bundle-Vendor" value="${vendor}" />
 				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
@@ -285,7 +220,7 @@
 			</manifest>
 			<zipfileset dir="${jcl.bin}" />
 		</jar>
-		<jar destfile="${dist.bundle}/org.pmw.jcl-binding.source_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/jcl-binding-${version}-source.jar">
 			<manifest>
 				<attribute name="Eclipse-SourceBundle" value="org.pmw.jcl-binding;version=${bundle-version}" />
 				<attribute name="Bundle-Vendor" value="${vendor}" />
@@ -296,16 +231,16 @@
 			</manifest>
 			<zipfileset dir="${jcl.src}" />
 		</jar>
-		<zip destfile="${dist.bundle}/jcl-binding-${bundle-version}-bundles.zip" level="9">
-			<zipfileset dir="${dist.bundle}">
-				<include name="org.pmw.jcl-binding_${bundle-version}.jar" />
-				<include name="org.pmw.jcl-binding.source_${bundle-version}.jar" />
+		<zip destfile="${dist.jar}/jcl-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="jcl-binding-${version}.jar" />
+				<include name="jcl-binding-${version}-source.jar" />
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${jcl.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
-		</zip>	
+			<zipfileset dir="${jcl.files}" includes="readme.txt" />
+		</zip>
 		
-		<jar destfile="${dist.bundle}/org.pmw.log4j-facade_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/log4j-facade-${version}.jar">
 			<manifest>
 				<attribute name="Bundle-Vendor" value="${vendor}" />
 				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
@@ -318,7 +253,7 @@
 			</manifest>
 			<zipfileset dir="${log4j.bin}" />
 		</jar>
-		<jar destfile="${dist.bundle}/org.pmw.log4j-facade.source_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/log4j-facade-${version}-source.jar">
 			<manifest>
 				<attribute name="Eclipse-SourceBundle" value="org.pmw.log4j-facade;version=${bundle-version}" />
 				<attribute name="Bundle-Vendor" value="${vendor}" />
@@ -329,16 +264,16 @@
 			</manifest>
 			<zipfileset dir="${log4j.src}" />
 		</jar>
-		<zip destfile="${dist.bundle}/log4j-facade-${bundle-version}-bundles.zip" level="9">
-			<zipfileset dir="${dist.bundle}">
-				<include name="org.pmw.log4j-facade_${bundle-version}.jar" />
-				<include name="org.pmw.log4j-facade.source_${bundle-version}.jar" />
+		<zip destfile="${dist.jar}/log4j-facade-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="log4j-facade-${version}.jar" />
+				<include name="log4j-facade-${version}-source.jar" />
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${log4j.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
-		</zip>	
+			<zipfileset dir="${log4j.files}" includes="readme.txt" />
+		</zip>
 		
-		<jar destfile="${dist.bundle}/org.pmw.slf4j-binding_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/slf4j-binding-${version}.jar">
 			<manifest>
 				<attribute name="Bundle-Vendor" value="${vendor}" />
 				<attribute name="Bundle-RequiredExecutionEnvironment" value="J2SE-1.5" />
@@ -352,7 +287,7 @@
 			</manifest>
 			<zipfileset dir="${slf4j.bin}" />
 		</jar>
-		<jar destfile="${dist.bundle}/org.pmw.slf4j-binding.source_${bundle-version}.jar">
+		<jar destfile="${dist.jar}/slf4j-binding-${version}-source.jar">
 			<manifest>
 				<attribute name="Eclipse-SourceBundle" value="org.pmw.slf4j-binding;version=${bundle-version}" />
 				<attribute name="Bundle-Vendor" value="${vendor}" />
@@ -363,14 +298,14 @@
 			</manifest>
 			<zipfileset dir="${slf4j.src}" />
 		</jar>
-		<zip destfile="${dist.bundle}/slf4j-binding-${bundle-version}-bundles.zip" level="9">
-			<zipfileset dir="${dist.bundle}">
-				<include name="org.pmw.slf4j-binding_${bundle-version}.jar" />
-				<include name="org.pmw.slf4j-binding.source_${bundle-version}.jar" />
+		<zip destfile="${dist.jar}/slf4j-binding-${version}.zip" level="9">
+			<zipfileset dir="${dist.jar}">
+				<include name="slf4j-binding-${version}.jar" />
+				<include name="slf4j-binding-${version}-source.jar" />
 			</zipfileset>
 			<zipfileset dir="${root}" includes="license.txt" />
-			<zipfileset dir="${slf4j.files}" includes="readme-bundle.txt" fullpath="readme.txt" />
-		</zip>	
+			<zipfileset dir="${slf4j.files}" includes="readme.txt" />
+		</zip>
 	</target>
 	
 	<target name="pack-maven" depends="compile, docs">
@@ -571,7 +506,7 @@
 		<delete dir="${dist.maven}/slf4j-binding" />
 	</target>
 	
-	<target name="pack-all" depends="pack-jar, pack-bundle, pack-maven" />
+	<target name="pack-all" depends="pack-jar, pack-maven" />
 	
 	<target name="docs" depends="compile">
 		<delete dir="${dist.docs}" />

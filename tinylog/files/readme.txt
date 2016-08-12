@@ -16,12 +16,12 @@ specific language governing permissions and limitations under the License.
  Using tinylog
 ===============
 
-1) Add bundle "org.pmw.tinylog_*.jar" to your target platform
+1) Add "tinylog.jar" to your classpath
 
-2) Optionally add bundle "org.pmw.tinylog.source_*.jar" for Javadoc
-   documentation and source code attachment
+2) Optionally attach "tinylog-source.jar" for Javadoc documentation and source
+   code attachment
 
-3) Now you can test the logger by the following simple statement:
+3) Now you can test the logger by the following simple program:
 
       import org.pmw.tinylog.Logger;
 
@@ -30,6 +30,10 @@ specific language governing permissions and limitations under the License.
             Logger.info("Hello World!");
          }
       }
+
+   After compilation, try it out by issuing the command
+
+      java Application
   
    You should see a log statement appearing on the console.
 

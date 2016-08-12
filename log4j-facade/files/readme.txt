@@ -16,16 +16,25 @@ specific language governing permissions and limitations under the License.
  Using Log4j Facade
 ====================
 
-1) Add bundles "org.pmw.log4j-facade_*.jar" and "org.pmw.tinylog_*.jar" to your
-   target platform
+1) Add "log4j-facade.jar" and "tinylog.jar" to your classpath
 
-2) Optionally add bundle "org.pmw.log4j-facade.source_*.jar" for Javadoc
-   documentation and source code attachment
+2) Optionally attach "log4j-facade-source.zip" for Javadoc documentation and
+   source code attachment
 
-3) Now you can test the logger by the following simple statement:
+3) Now you can test the logger facade by the following simple program:
 
-      Logger logger = Logger.getLogger(Application.class);
-      logger.info("Hello World!");
+      import org.apache.log4j.Logger;
+ 	  
+      public class Application {
+         public static void main(final String[] args) {
+            Logger logger = Logger.getLogger(Application.class);
+            logger.info("Hello World!");
+         }
+      }
+
+   After compilation, try it out by issuing the command
+
+      java Application
   
    You should see a log statement appearing on the console.
 
