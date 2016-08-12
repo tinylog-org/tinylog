@@ -330,7 +330,6 @@
 				<attribute name="Export-Package" value="org.pmw.tinylog;version=${bundle-version}, org.pmw.tinylog.labelers;version=${bundle-version}, org.pmw.tinylog.policies;version=${bundle-version}, org.pmw.tinylog.writers;version=${bundle-version}" />
 			</manifest>
 			<zipfileset dir="${tinylog.bin}" />
-			<zipfileset dir="${dist.maven}" includes="tinylog-${maven-version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<jar destfile="${dist.maven}/tinylog-${maven-version}-sources.jar">
 			<manifest>
@@ -382,7 +381,6 @@
 				<attribute name="Import-Package" value="org.apache.commons.logging;version=${jcl-version}.0, org.pmw.tinylog;version=${bundle-version}" />
 			</manifest>
 			<zipfileset dir="${jcl.bin}" />
-			<zipfileset dir="${dist.maven}" includes="jcl-binding-${maven-version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<jar destfile="${dist.maven}/jcl-binding-${maven-version}-sources.jar">
 			<manifest>
@@ -433,7 +431,6 @@
 				<attribute name="Require-Bundle" value="org.pmw.tinylog;version=${bundle-version}" />
 			</manifest>
 			<zipfileset dir="${log4j.bin}" />
-			<zipfileset dir="${dist.maven}" includes="log4j-facade-${maven-version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<jar destfile="${dist.maven}/log4j-facade-${maven-version}-sources.jar">
 			<manifest>
@@ -487,7 +484,6 @@
 				<attribute name="Fragment-Host" value="slf4j.api" />
 			</manifest>
 			<zipfileset dir="${slf4j.bin}" />
-			<zipfileset dir="${dist.maven}" includes="slf4j-binding-${maven-version}.pom" fullpath="META-INF/pom.xml" />
 		</jar>
 		<jar destfile="${dist.maven}/slf4j-binding-${maven-version}-sources.jar">
 			<manifest>
