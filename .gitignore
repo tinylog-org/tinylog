@@ -1,4 +1,5 @@
 .*
-/*/bin
-/*/target
+*.iml
+bin
+target
 /distribution
