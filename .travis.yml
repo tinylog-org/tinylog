@@ -1,6 +1,6 @@
 language: java
 
 script:
-  - mvn clean checkstyle:checkstyle findbugs:findbugs package -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
+  - mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
   - cd benchmark
-  - ant compile
+  - mvn clean package
