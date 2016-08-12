@@ -1,8 +1,6 @@
 language: java
 
 script:
-  - cd tinylog
-  - ant
-  - cd ..
+  - mvn clean checkstyle:checkstyle findbugs:findbugs package -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
   - cd benchmark
   - ant compile

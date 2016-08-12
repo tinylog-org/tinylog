@@ -1,0 +1,8 @@
+org.pmw.tinylog.policies.StartupPolicy
+org.pmw.tinylog.policies.CountPolicy
+org.pmw.tinylog.policies.SizePolicy
+org.pmw.tinylog.policies.HourlyPolicy
+org.pmw.tinylog.policies.DailyPolicy
+org.pmw.tinylog.policies.WeeklyPolicy
+org.pmw.tinylog.policies.MonthlyPolicy
+org.pmw.tinylog.policies.YearlyPolicy

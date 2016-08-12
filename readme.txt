@@ -28,13 +28,10 @@ log4j-facade:
 slf4j-binding:
 	Contains the SLF4J binding, implementing the SLF4J logging API.
 
-tests:
-	Contains all JUnit tests
-
 tinylog:
 	Contains tinylog and the ANT script to build tinylog
 
-All projects can be imported as Eclipse Java project.
+All projects can be imported as Maven projects.
 
 
 ===============
@@ -42,19 +39,25 @@ All projects can be imported as Eclipse Java project.
 ===============
 	
 configuration:
-	Contains configuration files like for formatter, Checkstyle and FindBugs
-	
-libraries:
-	Contains third party libraries for testing and code style checks
+	Contains configuration files for Java formatter, Checkstyle and FindBugs
 
 
 ===============
  Build tinylog
 ===============
 
-Run the ANT script "build.xml", which can be found in the "tinylog" folder.
-Afterwards the created JARs can be found under "distribution".
+tinylog can be built via Maven:
 
+	mvn clean checkstyle:checkstyle findbugs:findbugs package
+	
 tinylog is compatible with Java 5 (and higher). Therefore it is recommend to
-build tinylog with the run time classes of Java 5. The path to "rt.jar" can be
-set optionally by the property "java5.boot.classpath".
+build tinylog at least once against a Java 5 runtime before commiting
+something. The path to "rt.jar" as well as the source and target version can
+be set via a properties.
+
+	"-Dbootclasspath=JAVA_5_HOME/lib/rt.jar"
+	-Dmaven.compiler.source=1.5
+	-Dmaven.compiler.target=1.5
+
+A new folder "distribution" with Javadoc documentation and all JARs will be
+created in the root directory.
