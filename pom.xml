@@ -31,9 +31,9 @@
 		<!-- Tests require Java 1.7 -->
 		<maven.compiler.testSource>1.7</maven.compiler.testSource>
 		<maven.compiler.testTarget>1.7</maven.compiler.testTarget>
-		
+
 		<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
-		
+
 		<jcl.version>[1.2,1.3)</jcl.version>
 		<slf4j.version>[1.6,1.8)</slf4j.version>
 		<junit.version>4.12</junit.version>
@@ -148,7 +148,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
 					</instructions>
 				</configuration>
 				<executions>
@@ -157,6 +157,20 @@
 						<phase>compile</phase>
 						<goals>
 							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>set-osgi-version</id>
+						<goals>
+							<goal>parse-version</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -174,6 +188,19 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Built-By>${project.organization.name}</Built-By>
+							<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+							<Bundle-Name>${project.name}</Bundle-Name>
+							<Bundle-SymbolicName>org.pmw.${project.artifactId}.source</Bundle-SymbolicName>
+							<Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+							<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+							<Eclipse-SourceBundle>org.pmw.${project.artifactId};version="${parsedVersion.osgiVersion}";roots:="."</Eclipse-SourceBundle>
+						</manifestEntries>
+					</archive>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -188,6 +215,13 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Built-By>${project.organization.name}</Built-By>
+						</manifestEntries>
+					</archive>
+				</configuration>
 			</plugin>
 
 			<plugin>
