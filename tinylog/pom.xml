@@ -12,7 +12,7 @@
 	
 	<artifactId>tinylog</artifactId>
 	<name>tinylog</name>
-	<description>lightweight logging framework for Java with static logger class</description>
+	<description>lightweight logging framework for Java</description>
 	
 	<dependencies>
 		<dependency>
