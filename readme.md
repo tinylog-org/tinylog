@@ -59,7 +59,7 @@ tinylog is compatible with Java 5 (and higher). Therefore it is recommend to bui
 	-Dmaven.compiler.source=1.5
 	-Dmaven.compiler.target=1.5
 
-A new folder "distribution" with Javadoc documentation and all JARs will be created in the root directory.
+A new folder "target" with Javadoc documentation and all JARs will be created in the root directory.
 
 License
 -------

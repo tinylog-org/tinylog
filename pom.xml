@@ -260,7 +260,7 @@
 				<version>${maven-assembly-plugin.version}</version>
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
-					<outputDirectory>${project.parent.basedir}/distribution</outputDirectory>
+					<outputDirectory>${project.parent.build.directory}</outputDirectory>
 					<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
 				</configuration>
 			</plugin>

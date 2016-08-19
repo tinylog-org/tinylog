@@ -25,7 +25,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/files</directory>
+			<directory>${project.build.sourceDirectory}/../files</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>readme.txt</include>
@@ -33,7 +33,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>..</directory>
+			<directory>${project.parent.basedir}</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>license.txt</include>
