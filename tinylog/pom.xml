@@ -67,10 +67,6 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<destDir>${project.parent.build.directory}/docs</destDir>
-					<includeDependencySources>true</includeDependencySources>
-					<dependencySourceIncludes>
-						<dependencySourceInclude>${project.groupId}:*</dependencySourceInclude>
-					</dependencySourceIncludes>
 				</configuration>
 			</plugin>
 
