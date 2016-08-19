@@ -26,14 +26,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 
 /**
  * Tests for Apache Commons Logging log factory.
  *
  * @see TinylogLogFactory
  */
-public class TinylogLogFactoryTest extends AbstractTest {
+public class TinylogLogFactoryTest extends AbstractTinylogTest {
 
 	private LogFactory factory;
 

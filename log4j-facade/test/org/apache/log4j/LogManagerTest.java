@@ -14,7 +14,7 @@
 package org.apache.log4j;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertSame;
  * 
  * @see LogManager
  */
-public class LogManagerTest extends AbstractTest {
+public class LogManagerTest extends AbstractTinylogTest {
 
 	/**
 	 * Test the root logger.

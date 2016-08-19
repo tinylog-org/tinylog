@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.util.MappedResourceBundle;
@@ -34,7 +34,7 @@ import org.pmw.tinylog.util.StoreWriter;
  * 
  * @see Logger
  */
-public class LoggerTest extends AbstractTest {
+public class LoggerTest extends AbstractTinylogTest {
 
 	private StoreWriter writer;
 

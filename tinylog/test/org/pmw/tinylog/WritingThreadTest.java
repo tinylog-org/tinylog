@@ -30,7 +30,7 @@ import org.pmw.tinylog.util.StoreWriter;
  *
  * @see WritingThread
  */
-public class WritingThreadTest extends AbstractTest {
+public class WritingThreadTest extends AbstractTinylogTest {
 
 	/**
 	 * Test simple startup and shutdown.

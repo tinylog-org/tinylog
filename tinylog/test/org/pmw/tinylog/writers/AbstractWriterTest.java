@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.util.ConfigurationCreator;
@@ -28,7 +28,7 @@ import org.pmw.tinylog.util.ConfigurationCreator;
  * 
  * @see Writer
  */
-public abstract class AbstractWriterTest extends AbstractTest {
+public abstract class AbstractWriterTest extends AbstractTinylogTest {
 
 	/**
 	 * Create a writer from properties.

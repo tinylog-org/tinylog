@@ -28,12 +28,10 @@ import org.junit.Test;
  *
  * @see LoggingContext
  */
-public class LoggingContextTest extends AbstractTest {
+public class LoggingContextTest extends AbstractTinylogTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 *
-	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
 	public final void testIfValidUtilityClass() {

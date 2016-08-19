@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import java.net.URLClassLoader;
 import java.util.Properties;
 
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.labelers.Labeler;
@@ -36,7 +36,7 @@ import org.pmw.tinylog.writers.Property;
  * 
  * @see Policy
  */
-public abstract class AbstractPolicyTest extends AbstractTest {
+public abstract class AbstractPolicyTest extends AbstractTinylogTest {
 
 	/**
 	 * Create a policy from properties.

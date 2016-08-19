@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.LoggingContext;
 
 /**
@@ -30,7 +30,7 @@ import org.pmw.tinylog.LoggingContext;
  *
  * @see TinylogMDCAdapter
  */
-public class TinylogMDCAdapterTest extends AbstractTest {
+public class TinylogMDCAdapterTest extends AbstractTinylogTest {
 
 	/**
 	 * Test creating a copy of the current context map.

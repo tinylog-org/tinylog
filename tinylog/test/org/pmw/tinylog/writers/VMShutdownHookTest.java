@@ -27,7 +27,7 @@ import mockit.MockUp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.LogEntry;
 
@@ -36,7 +36,7 @@ import org.pmw.tinylog.LogEntry;
  *
  * @see VMShutdownHook
  */
-public class VMShutdownHookTest extends AbstractTest {
+public class VMShutdownHookTest extends AbstractTinylogTest {
 
 	private RuntimeMock runtimeMock;
 
@@ -58,8 +58,6 @@ public class VMShutdownHookTest extends AbstractTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 *
-	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
 	public final void testIfValidUtilityClass() {

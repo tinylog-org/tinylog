@@ -42,12 +42,10 @@ import org.pmw.tinylog.writers.LogEntryValue;
  *
  * @see Logger
  */
-public class LoggerTest extends AbstractTest {
+public class LoggerTest extends AbstractTinylogTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 *
-	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
 	public final void testIfValidUtilityClass() {

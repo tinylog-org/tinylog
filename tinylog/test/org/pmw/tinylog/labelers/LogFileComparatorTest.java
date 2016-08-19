@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.util.FileHelper;
 
 /**
@@ -33,7 +33,7 @@ import org.pmw.tinylog.util.FileHelper;
  * 
  * @see LogFileComparator
  */
-public class LogFileComparatorTest extends AbstractTest {
+public class LogFileComparatorTest extends AbstractTinylogTest {
 
 	private File file1;
 	private File file2;

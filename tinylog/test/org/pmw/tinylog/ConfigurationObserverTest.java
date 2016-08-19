@@ -56,7 +56,7 @@ import org.pmw.tinylog.writers.Writer;
  * @see ConfigurationObserver
  */
 @RunWith(Parameterized.class)
-public class ConfigurationObserverTest extends AbstractTest {
+public class ConfigurationObserverTest extends AbstractTinylogTest {
 
 	private static final Configuration DEFAULT_CONFIGURATION = Configurator.defaultConfig().create();
 

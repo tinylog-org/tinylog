@@ -24,7 +24,7 @@ import mockit.NonStrictExpectations;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
@@ -36,7 +36,7 @@ import org.pmw.tinylog.util.StoreWriter;
  *
  * @see LogMF
  */
-public class LogMFTest extends AbstractTest {
+public class LogMFTest extends AbstractTinylogTest {
 
 	private StoreWriter writer;
 

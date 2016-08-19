@@ -22,6 +22,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.tinylog</groupId>
+			<artifactId>tinylog-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tinylog</groupId>
+			<artifactId>tinylog-core</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.jmockit</groupId>
 			<artifactId>jmockit</artifactId>
 			<version>${jmockit.version}</version>
@@ -52,9 +64,19 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<destDir>${project.parent.basedir}/distribution/docs</destDir>
+					<includeDependencySources>true</includeDependencySources>
+					<dependencySourceIncludes>
+						<dependencySourceInclude>${project.groupId}:*</dependencySourceInclude>
+					</dependencySourceIncludes>
 				</configuration>
 			</plugin>
 
@@ -83,18 +105,37 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactSet>
+						<includes>
+							<include>${project.groupId}:tinylog-core</include>
+						</includes>
+					</artifactSet>
+				</configuration>
+			</plugin>
+	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>make-assembly</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			
+			</plugin>			
+
 		</plugins>
 	</build>
 	

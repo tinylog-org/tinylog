@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
@@ -32,7 +32,7 @@ import org.pmw.tinylog.writers.LogEntryValue;
  *
  * @see TinylogBridge
  */
-public class TinylogBridgeTest extends AbstractTest {
+public class TinylogBridgeTest extends AbstractTinylogTest {
 
 	private SimpleLogger logger;
 	private StoreWriter writer;

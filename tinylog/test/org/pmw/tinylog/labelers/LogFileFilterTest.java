@@ -19,14 +19,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 
 /**
  * Tests for log file filter.
  * 
  * @see LogFileFilter
  */
-public class LogFileFilterTest extends AbstractTest {
+public class LogFileFilterTest extends AbstractTinylogTest {
 
 	/**
 	 * Test matching of filter.

@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.net.URLClassLoader;
 import java.util.Properties;
 
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.mocks.ClassLoaderMock;
@@ -36,7 +36,7 @@ import org.pmw.tinylog.writers.Writer;
  *
  * @see Labeler
  */
-public abstract class AbstractLabelerTest extends AbstractTest {
+public abstract class AbstractLabelerTest extends AbstractTinylogTest {
 
 	/**
 	 * Generate a backup file for a given log file.

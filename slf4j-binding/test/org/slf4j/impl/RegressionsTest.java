@@ -13,13 +13,13 @@ package org.slf4j.impl;
  */
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.slf4j.MDC;
 
 /**
  * Tests old fixed bugs to prevent regressions.
  */
-public class RegressionsTest extends AbstractTest {
+public class RegressionsTest extends AbstractTinylogTest {
 
 	/**
 	 * Bug: SLF4Js MDC implementation failed due to incorrect return type of

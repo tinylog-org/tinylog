@@ -28,8 +28,10 @@ Projects
   * Contains the log4j facade, an Apache Log4j 1.x compatible logging API replacement
 * slf4j-binding:
   * Contains the SLF4J binding, implementing the SLF4J logging API
+* tinylog-core
+  * Contains shared basis for tinylog and compatible server replacements
 * tinylog
-  * Contains tinylog
+  * Contains tinylog itself
 
 All projects can be imported as Maven projects.
 
@@ -47,9 +49,9 @@ A detailed user manual and the Javadoc documentation can be found on http://www.
 Build tinylog
 -------------
 
-tinylog can be built via Maven:
+tinylog can be built with Maven:
 
-	mvn clean checkstyle:checkstyle findbugs:findbugs package
+	mvn clean checkstyle:checkstyle findbugs:findbugs install
 	
 tinylog is compatible with Java 5 (and higher). Therefore it is recommend to build tinylog at least once against a Java 5 runtime before commiting something. The path to "rt.jar" as well as the source and target version can be set via a properties.
 

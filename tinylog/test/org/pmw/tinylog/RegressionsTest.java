@@ -36,7 +36,7 @@ import org.pmw.tinylog.writers.RollingFileWriter;
 /**
  * Tests old fixed bugs to prevent regressions.
  */
-public class RegressionsTest extends AbstractTest {
+public class RegressionsTest extends AbstractTinylogTest {
 
 	/**
 	 * Bug: Wrong class in log entry if there isn't set any special logging level for at least one package.

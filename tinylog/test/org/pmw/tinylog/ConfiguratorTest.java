@@ -65,7 +65,7 @@ import org.pmw.tinylog.writers.Writer;
  *
  * @see Configurator
  */
-public class ConfiguratorTest extends AbstractTest {
+public class ConfiguratorTest extends AbstractTinylogTest {
 
 	private ClassLoaderMock classLoaderMock;
 

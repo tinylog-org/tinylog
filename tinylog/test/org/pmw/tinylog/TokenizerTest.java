@@ -43,7 +43,7 @@ import mockit.Verifications;
  *
  * @see Tokenizer
  */
-public class TokenizerTest extends AbstractTest {
+public class TokenizerTest extends AbstractCoreTest {
 
 	private Locale locale;
 

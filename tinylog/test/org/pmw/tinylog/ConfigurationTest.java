@@ -51,7 +51,7 @@ import org.pmw.tinylog.writers.Writer;
  *
  * @see Configuration
  */
-public class ConfigurationTest extends AbstractTest {
+public class ConfigurationTest extends AbstractTinylogTest {
 
 	/**
 	 * Test a minimal configuration sample.

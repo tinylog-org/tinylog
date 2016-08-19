@@ -68,12 +68,10 @@ import org.pmw.tinylog.writers.Writer;
  *
  * @see PropertiesLoader
  */
-public class PropertiesLoaderTest extends AbstractTest {
+public class PropertiesLoaderTest extends AbstractTinylogTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 *
-	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
 	public final void testIfValidUtilityClass() {

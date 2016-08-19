@@ -28,7 +28,7 @@ import org.junit.Test;
  *
  * @see LogEntry
  */
-public class LogEntryTest extends AbstractTest {
+public class LogEntryTest extends AbstractCoreTest {
 
 	/**
 	 * Test all getters.

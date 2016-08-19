@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.LoggingContext;
 
 /**
@@ -30,12 +30,10 @@ import org.pmw.tinylog.LoggingContext;
  *
  * @see MDC
  */
-public class MDCTest extends AbstractTest {
+public class MDCTest extends AbstractTinylogTest {
 
 	/**
 	 * Test if the class is a valid utility class.
-	 *
-	 * @see AbstractTest#testIfValidUtilityClass(Class)
 	 */
 	@Test
 	public final void testIfValidUtilityClass() {

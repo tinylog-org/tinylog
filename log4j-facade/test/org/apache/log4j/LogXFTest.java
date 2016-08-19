@@ -15,7 +15,7 @@ package org.apache.log4j;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pmw.tinylog.AbstractTest;
+import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.util.StoreWriter;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
  *
  * @see LogXF
  */
-public class LogXFTest extends AbstractTest {
+public class LogXFTest extends AbstractTinylogTest {
 	
 	private StoreWriter writer;
 
