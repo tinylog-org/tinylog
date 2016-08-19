@@ -24,8 +24,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- tinylog require only Java 1.5 but due to limitations of Eclipse, Java 
-			1.7 is defined here and to override on command line, when executing Maven -->
+		<!-- tinylog requires Java 1.5, but Java 1.7 is defined here due to limitations of Eclipse -->
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 
