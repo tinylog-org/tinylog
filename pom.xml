@@ -52,6 +52,7 @@
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
 		<findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
+		<flatten-maven-plugin.version>1.0.0</flatten-maven-plugin.version>
 
 		<!-- Avoid inlining, because it breaks mocks -->
 		<argLine>-XX:-Inline</argLine>
@@ -150,7 +151,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.pmw.${project.artifactId}; singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>org.pmw.${project.artifactId};singleton:=true</Bundle-SymbolicName>
 					</instructions>
 				</configuration>
 				<executions>
@@ -249,7 +250,7 @@
 					<finalName>${project.artifactId}-${project.version}</finalName>
 					<createSourcesJar>true</createSourcesJar>
 					<shadeSourcesContent>true</shadeSourcesContent>
-					<dependencyReducedPomLocation>${project.build.directory}/pom.xml</dependencyReducedPomLocation>
+					<dependencyReducedPomLocation>${project.build.directory}/.shaded-pom.xml</dependencyReducedPomLocation>
 				</configuration>
 			</plugin>
 
@@ -262,6 +263,24 @@
 					<outputDirectory>${project.parent.build.directory}</outputDirectory>
 					<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>${flatten-maven-plugin.version}</version>
+				<configuration>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<flattenMode>oss</flattenMode>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
