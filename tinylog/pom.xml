@@ -3,17 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>org.tinylog</groupId>
 		<artifactId>parent</artifactId>
 		<version>1.2-alpha-2</version>
 	</parent>
-	
+
 	<artifactId>tinylog</artifactId>
 	<name>tinylog</name>
 	<description>lightweight logging framework for Java</description>
-	
+	<url>${website.url}</url>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -58,7 +59,13 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
+
 	<build>
 		<plugins>
 
@@ -81,14 +88,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
 						<Import-Package>!*</Import-Package>
-						<Export-Package>org.pmw.tinylog, org.pmw.runtime, org.pmw.tinylog.labelers, org.pmw.tinylog.policies, org.pmw.tinylog.writers</Export-Package>
+						<Export-Package>org.pmw.tinylog, org.pmw.runtime,
+							org.pmw.tinylog.labelers, org.pmw.tinylog.policies,
+							org.pmw.tinylog.writers</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -112,7 +121,7 @@
 					</artifactSet>
 				</configuration>
 			</plugin>
-	
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -124,9 +133,9 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
 
 		</plugins>
 	</build>
-	
+
 </project>

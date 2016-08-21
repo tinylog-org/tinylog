@@ -13,6 +13,7 @@
 	<artifactId>log4j-facade</artifactId>
 	<name>Log4j Facade</name>
 	<description>Log4j Facade is a Log4j 1.x compatible logging API for tinylog</description>
+	<url>${website.url}</url>
 
 	<dependencies>
 		<dependency>
@@ -53,6 +54,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

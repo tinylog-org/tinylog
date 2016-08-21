@@ -13,6 +13,7 @@
 	<artifactId>jcl-binding</artifactId>
 	<name>Apache Commons Logging Binding</name>
 	<description>Apache Commons Logging (JCL) binding for tinylog</description>
+	<url>${website.url}</url>
 
 	<dependencies>
 		<dependency>
@@ -58,6 +59,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

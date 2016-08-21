@@ -7,7 +7,7 @@
 	<artifactId>parent</artifactId>
 	<version>1.2-alpha-2</version>
 	<packaging>pom</packaging>
-	<url>http://www.tinylog.org/</url>
+	<url>${website.url}</url>
 
 	<modules>
 		<module>jcl-binding</module>
@@ -56,6 +56,11 @@
 
 		<!-- Avoid inlining, because it breaks mocks -->
 		<argLine>-XX:-Inline</argLine>
+		
+		<website.url>http://www.tinylog.org/</website.url>
+		<git.url>https://github.com/pmwmedia/tinylog</git.url>
+		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
+		<git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
 	</properties>
 
 	<licenses>
@@ -77,9 +82,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:github.com/pmwmedia/tinylog.git</connection>
-		<developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</developerConnection>
-		<url>https://github.com/pmwmedia/tinylog</url>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
 	</scm>
 
 	<issueManagement>

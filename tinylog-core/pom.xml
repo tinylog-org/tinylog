@@ -13,6 +13,7 @@
 	<artifactId>tinylog-core</artifactId>
 	<name>tinylog Core</name>
 	<description>Shared basis for tinylog and compatible server replacements</description>
+	<url>${website.url}</url>
 	
 	<dependencies>
 		<dependency>
@@ -40,6 +41,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

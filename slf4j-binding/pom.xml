@@ -13,6 +13,7 @@
 	<artifactId>slf4j-binding</artifactId>
 	<name>SLF4J Binding</name>
 	<description>SLF4J binding for tinylog</description>
+	<url>${website.url}</url>
 
 	<dependencies>
 		<dependency>
@@ -58,6 +59,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>
