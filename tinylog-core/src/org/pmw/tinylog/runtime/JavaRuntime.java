@@ -43,12 +43,13 @@ public final class JavaRuntime implements RuntimeDialect {
 		}
 	}
 
-	@SuppressWarnings({ "restriction", "deprecation" })
 	@Override
 	public String getClassName(final int depth) {
 		if (hasSunReflection) {
 			try {
-				return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
+				@SuppressWarnings({ "restriction", "deprecation" })
+				Class<?> caller = sun.reflect.Reflection.getCallerClass(depth + 1);
+				return caller.getName();
 			} catch (Exception ex) {
 				InternalLogger.warn(ex, "Failed to get caller class from sun.reflect.Reflection");
 			}
