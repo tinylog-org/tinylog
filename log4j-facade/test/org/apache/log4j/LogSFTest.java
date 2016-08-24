@@ -18,8 +18,6 @@ import static org.junit.Assert.assertSame;
 
 import java.util.ResourceBundle;
 
-import mockit.NonStrictExpectations;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTinylogTest;
@@ -28,6 +26,8 @@ import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.util.MappedResourceBundle;
 import org.pmw.tinylog.util.StoreWriter;
+
+import mockit.Expectations;
 
 /**
  * Tests for Apache Log4j 1.x compatible parameterized logging with SLF4J pattern syntax.
@@ -498,7 +498,7 @@ public class LogSFTest extends AbstractTinylogTest {
 		bundle.put("triple", "{}, {} and {}");
 		bundle.put("quadruple", "{}, {}, {} and {}");
 
-		new NonStrictExpectations(ResourceBundle.class) {
+		new Expectations(ResourceBundle.class) {
 			{
 				ResourceBundle.getBundle(anyString);
 				result = bundle;
@@ -613,7 +613,7 @@ public class LogSFTest extends AbstractTinylogTest {
 	public final void testMissingKey() {
 		final MappedResourceBundle bundle = new MappedResourceBundle();
 
-		new NonStrictExpectations(ResourceBundle.class) {
+		new Expectations(ResourceBundle.class) {
 			{
 				ResourceBundle.getBundle(anyString);
 				result = bundle;

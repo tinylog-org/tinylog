@@ -20,8 +20,6 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
-import mockit.NonStrictExpectations;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTinylogTest;
@@ -30,6 +28,8 @@ import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
 import org.pmw.tinylog.util.MappedResourceBundle;
 import org.pmw.tinylog.util.StoreWriter;
+
+import mockit.Expectations;
 
 /**
  * Tests for Apache Log4j 1.x compatible parameterized logging with {@link MessageFormat} pattern syntax.
@@ -500,7 +500,7 @@ public class LogMFTest extends AbstractTinylogTest {
 		bundle.put("triple", "{0}, {1} and {2}");
 		bundle.put("quadruple", "{0}, {1}, {2} and {3}");
 
-		new NonStrictExpectations(ResourceBundle.class) {
+		new Expectations(ResourceBundle.class) {
 			{
 				ResourceBundle.getBundle(anyString);
 				result = bundle;
@@ -615,7 +615,7 @@ public class LogMFTest extends AbstractTinylogTest {
 	public final void testMissingKey() {
 		final MappedResourceBundle bundle = new MappedResourceBundle();
 
-		new NonStrictExpectations(ResourceBundle.class) {
+		new Expectations(ResourceBundle.class) {
 			{
 				ResourceBundle.getBundle(anyString);
 				result = bundle;

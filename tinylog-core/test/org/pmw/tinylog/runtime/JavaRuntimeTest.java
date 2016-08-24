@@ -26,9 +26,9 @@ import java.lang.management.RuntimeMXBean;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractCoreTest;
 
+import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
-import mockit.NonStrictExpectations;
 
 /**
  * Tests for Sun's and Oracle's Java runtime implementation.
@@ -53,7 +53,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testProcessIdWithoutHost() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
+		new Expectations(ManagementFactory.getRuntimeMXBean()) {
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
 				returns("1234");
@@ -68,7 +68,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testProcessIdWithHost() {
-		new NonStrictExpectations(ManagementFactory.getRuntimeMXBean()) {
+		new Expectations(ManagementFactory.getRuntimeMXBean()) {
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
 				returns("5678@localhost");
