@@ -21,15 +21,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import mockit.Mock;
-import mockit.MockUp;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractTinylogTest;
 import org.pmw.tinylog.Configuration;
 import org.pmw.tinylog.LogEntry;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for the VM shutdown hook.
@@ -46,14 +45,6 @@ public class VMShutdownHookTest extends AbstractTinylogTest {
 	@Before
 	public final void init() {
 		runtimeMock = new RuntimeMock();
-	}
-
-	/**
-	 * Tear down mock.
-	 */
-	@After
-	public final void dispose() {
-		runtimeMock.tearDown();
 	}
 
 	/**

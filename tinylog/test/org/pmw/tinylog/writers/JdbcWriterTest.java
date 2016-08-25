@@ -59,6 +59,7 @@ import org.pmw.tinylog.util.LogEntryBuilder;
 import org.pmw.tinylog.util.PropertiesBuilder;
 import org.pmw.tinylog.writers.JdbcWriter.Value;
 
+import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
 
@@ -74,7 +75,6 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	private static final String DATA_SOURCE_URL = "java:db/test";
 
 	private Connection connection;
-	private DriverManagerMock databaseMock;
 
 	/**
 	 * Create the database.
@@ -102,10 +102,6 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@After
 	public final void dispose() throws SQLException {
-		if (databaseMock != null) {
-			databaseMock = null;
-		}
-
 		if (!connection.isClosed()) {
 			try {
 				Statement statement = connection.createStatement();
@@ -511,32 +507,33 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testTableNamesWithQuotingSupport() throws SQLException, NamingException {
+		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
-			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
+			mock.identifierQuote = identifierQuote;
+			 
+			createAndCloseWriter("log");
+			createAndCloseWriter("LOG");
+			createAndCloseWriter("log2");
+			createAndCloseWriter("$log$");
+			createAndCloseWriter("@log@");
+			createAndCloseWriter("#log#");
+			createAndCloseWriter("log_entries");
+			createAndCloseWriter("log entries");
+			createAndCloseWriter("log\"'entries");
+
 			try {
-				createAndCloseWriter("log");
-				createAndCloseWriter("LOG");
-				createAndCloseWriter("log2");
-				createAndCloseWriter("$log$");
-				createAndCloseWriter("@log@");
-				createAndCloseWriter("#log#");
-				createAndCloseWriter("log_entries");
-				createAndCloseWriter("log entries");
-				createAndCloseWriter("log\"'entries");
-				try {
-					createAndCloseWriter("log" + "\n" + "entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log" + "\r" + "entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
-				}
-			} finally {
-				mock.tearDown();
+				createAndCloseWriter("log" + "\n" + "entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log" + "\r" + "entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
 			}
 		}
 	}
@@ -551,42 +548,45 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testTableNamesWithoutQuotingSupport() throws SQLException, NamingException {
+		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+
 		for (String identifierQuote : Arrays.asList(null, " ")) {
-			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
+			mock.identifierQuote = identifierQuote;
+			
+			createAndCloseWriter("log");
+			createAndCloseWriter("LOG");
+			createAndCloseWriter("log2");
+			createAndCloseWriter("$log$");
+			createAndCloseWriter("@log@");
+			createAndCloseWriter("#log#");
+			createAndCloseWriter("log_entries");
+
 			try {
-				createAndCloseWriter("log");
-				createAndCloseWriter("LOG");
-				createAndCloseWriter("log2");
-				createAndCloseWriter("$log$");
-				createAndCloseWriter("@log@");
-				createAndCloseWriter("#log#");
-				createAndCloseWriter("log_entries");
-				try {
-					createAndCloseWriter("log entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Illegal table name: log entries", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log\"'entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Illegal table name: log\"'entries", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log" + "\n" + "entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log" + "\r" + "entries");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
-				}
-			} finally {
-				mock.tearDown();
+				createAndCloseWriter("log entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Illegal table name: log entries", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log\"'entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Illegal table name: log\"'entries", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log" + "\n" + "entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Table name contains line breaks: log" + "\n" + "entries", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log" + "\r" + "entries");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Table name contains line breaks: log" + "\r" + "entries", ex.getMessage());
 			}
 		}
 	}
@@ -601,32 +601,33 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testColumnNamesWithQuotingSupport() throws SQLException, NamingException {
+		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
-			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
+			mock.identifierQuote = identifierQuote;
+			
+			createAndCloseWriter("log", "entry");
+			createAndCloseWriter("log", "ENTRY");
+			createAndCloseWriter("log", "entry2");
+			createAndCloseWriter("log", "$entry$");
+			createAndCloseWriter("log", "@entry@");
+			createAndCloseWriter("log", "#entry#");
+			createAndCloseWriter("log", "log_entry");
+			createAndCloseWriter("log", "log entry");
+			createAndCloseWriter("log", "log\"'entry");
+
 			try {
-				createAndCloseWriter("log", "entry");
-				createAndCloseWriter("log", "ENTRY");
-				createAndCloseWriter("log", "entry2");
-				createAndCloseWriter("log", "$entry$");
-				createAndCloseWriter("log", "@entry@");
-				createAndCloseWriter("log", "#entry#");
-				createAndCloseWriter("log", "log_entry");
-				createAndCloseWriter("log", "log entry");
-				createAndCloseWriter("log", "log\"'entry");
-				try {
-					createAndCloseWriter("log", "log" + "\n" + "entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log", "log" + "\r" + "entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
-				}
-			} finally {
-				mock.tearDown();
+				createAndCloseWriter("log", "log" + "\n" + "entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log", "log" + "\r" + "entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
 			}
 		}
 	}
@@ -641,42 +642,45 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testColumnNamesWithoutQuotingSupport() throws SQLException, NamingException {
+		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+
 		for (String identifierQuote : Arrays.asList(null, " ")) {
-			DatabaseMetaDataMock mock = new DatabaseMetaDataMock(identifierQuote);
+			mock.identifierQuote = identifierQuote;
+
+			createAndCloseWriter("log", "entry");
+			createAndCloseWriter("log", "ENTRY");
+			createAndCloseWriter("log", "entry2");
+			createAndCloseWriter("log", "$entry$");
+			createAndCloseWriter("log", "@entry@");
+			createAndCloseWriter("log", "#entry#");
+			createAndCloseWriter("log", "log_entry");
+
 			try {
-				createAndCloseWriter("log", "entry");
-				createAndCloseWriter("log", "ENTRY");
-				createAndCloseWriter("log", "entry2");
-				createAndCloseWriter("log", "$entry$");
-				createAndCloseWriter("log", "@entry@");
-				createAndCloseWriter("log", "#entry#");
-				createAndCloseWriter("log", "log_entry");
-				try {
-					createAndCloseWriter("log", "log entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Illegal column name: log entry", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log", "log\"'entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Illegal column name: log\"'entry", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log", "log" + "\n" + "entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
-				}
-				try {
-					createAndCloseWriter("log", "log" + "\r" + "entry");
-					fail("SQLException expected");
-				} catch (SQLException ex) {
-					assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
-				}
-			} finally {
-				mock.tearDown();
+				createAndCloseWriter("log", "log entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Illegal column name: log entry", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log", "log\"'entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Illegal column name: log\"'entry", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log", "log" + "\n" + "entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Column name contains line breaks: log" + "\n" + "entry", ex.getMessage());
+			}
+
+			try {
+				createAndCloseWriter("log", "log" + "\r" + "entry");
+				fail("SQLException expected");
+			} catch (SQLException ex) {
+				assertEquals("Column name contains line breaks: log" + "\r" + "entry", ex.getMessage());
 			}
 		}
 	}
@@ -1345,41 +1349,43 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testDelayedReconnecting() throws SQLException, NamingException {
-		SystemTimeMock mock = new SystemTimeMock();
-		try {
-			JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), false, 1);
-			writer.init(null);
+		SystemTimeMock systemTimeMock = new SystemTimeMock();
+		DriverManagerMock driverManagerMock = new DriverManagerMock();
 
-			shutdown();
+		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.MESSAGE), false, 1);
+		writer.init(null);
 
-			writer.write(new LogEntryBuilder().message("Hello World").create());
-			assertThat(getErrorStream().nextLine(), allOf(startsWith("LOGGER ERROR: Database connection is broken ("), endsWith(")")));
+		shutdown();
+		driverManagerMock.disconnected = true;
 
-			while (getErrorStream().hasLines()) { // H2 writes errors into the console
-				assertThat(getErrorStream().nextLine(), not(startsWith("LOGGER")));
-			}
-			mock.setCurrentTimeMillis(1000);
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertThat(getErrorStream().nextLine(), allOf(startsWith("LOGGER ERROR: Database connection is broken ("), endsWith(")")));
 
-			writer.write(new LogEntryBuilder().message("Hello World").create());
-			assertFalse(getErrorStream().hasLines());
-
-			reestablish();
-			mock.setCurrentTimeMillis(1999);
-
-			writer.write(new LogEntryBuilder().message("Hello World").create());
-			assertFalse(getErrorStream().hasLines());
-			assertEquals(Collections.emptyList(), getLogEntries());
-
-			mock.setCurrentTimeMillis(2000);
-
-			writer.write(new LogEntryBuilder().message("Hello World").create());
-			assertEquals(Arrays.asList("Hello World"), getLogEntries());
-			assertThat(getErrorStream().nextLine(), is("LOGGER ERROR: Broken database connection has been reestablished"));
-
-			writer.close();
-		} finally {
-			mock.tearDown();
+		while (getErrorStream().hasLines()) { // H2 writes errors into the console
+			assertThat(getErrorStream().nextLine(), not(startsWith("LOGGER")));
 		}
+
+		systemTimeMock.setCurrentTimeMillis(1000);
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertFalse(getErrorStream().hasLines());
+
+		driverManagerMock.disconnected = false;
+		reestablish();
+	
+		systemTimeMock.setCurrentTimeMillis(1999);
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertFalse(getErrorStream().hasLines());
+		assertEquals(Collections.emptyList(), getLogEntries());
+
+		systemTimeMock.setCurrentTimeMillis(2000);
+
+		writer.write(new LogEntryBuilder().message("Hello World").create());
+		assertEquals(Arrays.asList("Hello World"), getLogEntries());
+		assertThat(getErrorStream().nextLine(), is("LOGGER ERROR: Broken database connection has been reestablished"));
+
+		writer.close();
 	}
 
 	/**
@@ -1398,7 +1404,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		writer.init(null);
 
 		shutdown();
-		mock.tearDown();
+		mock.disconnected = true;
 
 		writer.write(new LogEntryBuilder().message("Hello World").create());
 		assertThat(getErrorStream().nextLine(), allOf(startsWith("LOGGER ERROR: Database connection is broken ("), endsWith(")")));
@@ -1410,15 +1416,14 @@ public class JdbcWriterTest extends AbstractWriterTest {
 			assertThat(getErrorStream().nextLine(), not(startsWith("LOGGER")));
 		}
 
+		mock.disconnected = false;
 		reestablish();
-		mock = new DataSourceContextMock();
 
 		writer.write(new LogEntryBuilder().message("Hello World").create());
 		assertEquals(Arrays.asList("Hello World"), getLogEntries());
 		assertThat(getErrorStream().nextLine(), is("LOGGER ERROR: Broken database connection has been reestablished"));
 
 		writer.close();
-		mock.tearDown();
 	}
 
 	/**
@@ -1550,10 +1555,6 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	private void shutdown() throws SQLException {
-		if (databaseMock == null) {
-			databaseMock = new DriverManagerMock();
-		}
-
 		Statement statement = connection.createStatement();
 		try {
 			statement.execute("SHUTDOWN");
@@ -1563,11 +1564,6 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	private void reestablish() throws SQLException {
-		if (databaseMock != null) {
-			databaseMock.tearDown();
-			databaseMock = null;
-		}
-
 		init();
 	}
 
@@ -1622,11 +1618,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 
 	private static final class DatabaseMetaDataMock extends MockUp<JdbcDatabaseMetaData> {
 
-		private final String identifierQuote;
-
-		private DatabaseMetaDataMock(final String identifierQuote) {
-			this.identifierQuote = identifierQuote;
-		}
+		private String identifierQuote;
 
 		@Mock
 		public String getIdentifierQuoteString() {
@@ -1636,24 +1628,36 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	}
 
 	private static final class DriverManagerMock extends MockUp<DriverManager> {
+		
+		private boolean disconnected = false;
 
 		@Mock
-		public Connection getConnection(final String url) throws SQLException {
-			throw new SQLException("No connection");
+		public Connection getConnection(final Invocation invocation, final String url) throws SQLException {
+			if (disconnected) {
+				throw new SQLException("No connection");
+			} else {
+				return invocation.proceed();
+			}
 		}
 
 		@Mock
-		public Connection getConnection(final String url, final String user, final String password) throws SQLException {
-			throw new SQLException("No connection");
+		public Connection getConnection(final Invocation invocation, final String url, final String user, final String password) throws SQLException {
+			if (disconnected) {
+				throw new SQLException("No connection");
+			} else {
+				return invocation.proceed();
+			}
 		}
 
 	}
 
 	private static final class DataSourceContextMock extends MockUp<InitialContext> {
+		
+		private boolean disconnected = false;
 
 		@Mock
 		public Object lookup(final String name) throws NamingException {
-			if (DATA_SOURCE_URL.equals(name)) {
+			if (!disconnected && DATA_SOURCE_URL.equals(name)) {
 				JdbcDataSource dataSource = new JdbcDataSource();
 				dataSource.setURL(JDBC_URL);
 				return dataSource;

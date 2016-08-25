@@ -146,7 +146,7 @@ public class SizePolicyTest extends AbstractPolicyTest {
 	public final void testStringParameterForGB() {
 		final int size = 1024 * 1024; // 1 MB
 
-		MockUp<String> mock = new MockUp<String>() { // Speed up test
+		new MockUp<String>() { // Speed up test
 
 			private final byte[] buffer = new byte[size]; // 1 MB
 
@@ -157,17 +157,13 @@ public class SizePolicyTest extends AbstractPolicyTest {
 
 		};
 
-		try {
-			String filler = createString(size); // 1 MB
-			Policy policy = new SizePolicy("4GB");
-			policy.init(null);
-			for (int i = 0; i < 4 * 1024; ++i) {
-				assertTrue(policy.check(filler));
-			}
-			assertFalse(policy.check(createString(1)));
-		} finally {
-			mock.tearDown();
+		String filler = createString(size); // 1 MB
+		Policy policy = new SizePolicy("4GB");
+		policy.init(null);
+		for (int i = 0; i < 4 * 1024; ++i) {
+			assertTrue(policy.check(filler));
 		}
+		assertFalse(policy.check(createString(1)));
 	}
 
 	/**
@@ -187,10 +183,10 @@ public class SizePolicyTest extends AbstractPolicyTest {
 	}
 
 	/**
-	 * Test reading size policy from properties.
+	 * Test reading size policy without unit from properties.
 	 */
 	@Test
-	public final void testFromProperties() {
+	public final void testWithoutUnitFromProperties() {
 		Policy policy = createFromProperties("size: 3");
 		assertThat(policy, type(SizePolicy.class));
 		policy.init(ConfigurationCreator.getDummyConfiguration());
@@ -198,8 +194,14 @@ public class SizePolicyTest extends AbstractPolicyTest {
 		assertTrue(policy.check("2"));
 		assertTrue(policy.check("3"));
 		assertFalse(policy.check("4"));
+	}
 
-		policy = createFromProperties("size: 1 KB");
+	/**
+	 * Test reading size policy with unit from properties.
+	 */
+	@Test
+	public final void testUnitFromProperties() {
+		Policy policy = createFromProperties("size: 1 KB");
 		assertThat(policy, type(SizePolicy.class));
 		policy.init(ConfigurationCreator.getDummyConfiguration());
 		for (int i = 0; i < 1024; ++i) {

@@ -22,6 +22,7 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.security.Permission;
 
 import org.junit.Test;
 import org.pmw.tinylog.AbstractCoreTest;
@@ -101,13 +102,14 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	/**
 	 * Test getting the right class name of caller even if sun.reflect.Reflection is not supported.
 	 */
-	@SuppressWarnings("restriction")
+	@SuppressWarnings({ "restriction", "deprecation" })
 	@Test
 	public final void testWithoutSupportingSunReflection() {
-		new MockUp<sun.reflect.Reflection>() {
-			@Mock(invocations = 1)
-			public Class<?> getCallerClass(final int index) {
-				throw new UnsupportedOperationException();
+		new Expectations(sun.reflect.Reflection.class) {
+			{
+				sun.reflect.Reflection.getCallerClass(anyInt);
+				result = new UnsupportedOperationException();
+				minTimes = 1;
 			}
 		};
 
@@ -120,38 +122,37 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testWithoutSupportingSingleStackTraceElementExtracting() {
-		MockUp<Throwable> mock = new MockUp<Throwable>() {
-			@Mock
-			public StackTraceElement getStackTraceElement(final int index) {
-				throw new UnsupportedOperationException();
+		System.setSecurityManager(new SecurityManager() {
+			@Override
+			public void checkPermission(final Permission permission) {
+				if ("suppressAccessChecks".equals(permission.getName())) {
+					throw new SecurityException();
+				}
 			}
-		};
+		});
 
-		JavaRuntime runtime = new JavaRuntime();
-
-		mock.tearDown();
-
-		StackTraceElement stackTraceElement = runtime.getStackTraceElement(1);
-		assertNotNull(stackTraceElement);
-		assertEquals(JavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
+		try {
+			StackTraceElement stackTraceElement = new JavaRuntime().getStackTraceElement(1);
+			assertNotNull(stackTraceElement);
+			assertEquals(JavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
+		} finally {
+			System.setSecurityManager(null);
+		}
 	}
 
 	/**
 	 * Test getting the right class name of caller even if calling sun.reflect.Reflection will fail.
 	 */
-	@SuppressWarnings("restriction")
+	@SuppressWarnings({ "restriction", "deprecation" })
 	@Test
 	public final void testErrorWhileCallingSunReflection() {
 		JavaRuntime runtime = new JavaRuntime();
 
-		new MockUp<sun.reflect.Reflection>() {
-			@Mock(invocations = 1)
-			public Class<?> getCallerClass(final int index) {
-				try {
-					throw new UnsupportedOperationException();
-				} finally {
-					tearDown();
-				}
+		new Expectations(sun.reflect.Reflection.class) {
+			{
+				sun.reflect.Reflection.getCallerClass(anyInt);
+				result = new UnsupportedOperationException();
+				minTimes = 1;
 			}
 		};
 
@@ -166,16 +167,21 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	@Test
 	public final void testErrorWhileGettingSingleStackTraceElement() {
 		JavaRuntime runtime = new JavaRuntime();
+		
+		final StackTraceElement[] stackTrace = new StackTraceElement[] { runtime.getStackTraceElement(0), runtime.getStackTraceElement(1) };
 
 		new MockUp<Throwable>() {
-			@Mock(invocations = 1)
+			
+			@Mock
 			public StackTraceElement getStackTraceElement(final int index) {
-				try {
-					throw new UnsupportedOperationException();
-				} finally {
-					tearDown();
-				}
+				throw new UnsupportedOperationException();
 			}
+			
+			@Mock
+			public StackTraceElement[] getStackTrace() {
+				return stackTrace;
+			}
+			
 		};
 
 		StackTraceElement stackTraceElement = runtime.getStackTraceElement(1);

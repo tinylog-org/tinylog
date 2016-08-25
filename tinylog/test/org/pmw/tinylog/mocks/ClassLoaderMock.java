@@ -140,7 +140,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	 */
 	@Mock
 	protected URL findResource(final Invocation invocation, final String name) {
-		URL url = invocation.proceed(name);
+		URL url = invocation.proceed();
 		if (url == null && classLoader == invocation.getInvokedInstance()) {
 			if (resources.containsKey(name)) {
 				File file = resources.get(name);
@@ -172,7 +172,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	@Mock
 	protected Enumeration<URL> findResources(final Invocation invocation, final String name) throws IOException {
 		if (classLoader == invocation.getInvokedInstance()) {
-			Enumeration<URL> enumeration = invocation.proceed(name);
+			Enumeration<URL> enumeration = invocation.proceed();
 			List<URL> urls = new ArrayList<URL>(Collections.list(enumeration));
 			if (resources.containsKey(name)) {
 				File file = resources.get(name);
@@ -188,7 +188,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 			}
 			return Collections.enumeration(urls);
 		} else {
-			return invocation.proceed(name);
+			return invocation.proceed();
 		}
 	}
 

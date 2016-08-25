@@ -440,13 +440,11 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		RollingFileWriter writer = new RollingFileWriter(file.getAbsolutePath(), 0);
 		writer.init(ConfigurationCreator.getDummyConfiguration());
 
-		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
-
+		new MockUp<FileOutputStream>() {
 			@Mock
 			public void write(final byte[] b) throws IOException {
 				throw new IOException();
 			}
-
 		};
 
 		try {
@@ -455,8 +453,6 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 		} catch (IOException ex) {
 			// Expected
 		}
-
-		mock.tearDown();
 
 		writer.close();
 		file.delete();

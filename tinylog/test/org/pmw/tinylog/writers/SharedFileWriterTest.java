@@ -444,13 +444,11 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		writer.init(null);
 
-		MockUp<FileOutputStream> mock = new MockUp<FileOutputStream>() {
-
+		new MockUp<FileOutputStream>() {
 			@Mock
 			public void write(final byte[] b) throws IOException {
 				throw new IOException();
 			}
-
 		};
 
 		try {
@@ -459,8 +457,6 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		} catch (IOException ex) {
 			// Expected
 		}
-
-		mock.tearDown();
 
 		writer.close();
 		file.delete();

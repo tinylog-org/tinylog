@@ -83,7 +83,6 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 	@After
 	public final void dispose() {
 		Configurator.shutdownConfigurationObserver(true);
-		classLoaderMock.tearDown();
 		classLoaderMock.close();
 	}
 
@@ -194,14 +193,9 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 	@Test
 	public final void testInitWithNonexistentFile() {
 		System.setProperty("tinylog.configuration", "invalid.properties");
-
-		try {
-			Configurator.init();
-			String line = getErrorStream().nextLine();
-			assertThat(line, allOf(containsString("ERROR"), containsString(FileNotFoundException.class.getName()), containsString("invalid.properties")));
-		} finally {
-			System.clearProperty("tinylog.configuration");
-		}
+		Configurator.init();
+		String line = getErrorStream().nextLine();
+		assertThat(line, allOf(containsString("ERROR"), containsString(FileNotFoundException.class.getName()), containsString("invalid.properties")));
 	}
 
 	/**
@@ -215,23 +209,16 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 		File file = FileHelper.createTemporaryFile(null);
 		System.setProperty("tinylog.configuration", file.getAbsolutePath());
 
-		MockUp<Properties> mock = new MockUp<Properties>() {
-
+		new MockUp<Properties>() {
 			@Mock
 			public void load(final InputStream inStream) throws IOException {
 				throw new IOException();
 			}
-
 		};
 
-		try {
-			Configurator.init();
-			String line = getErrorStream().nextLine();
-			assertThat(line, allOf(containsString("ERROR"), containsString(IOException.class.getName()), containsString(file.getName())));
-		} finally {
-			System.clearProperty("tinylog.configuration");
-			mock.tearDown();
-		}
+		Configurator.init();
+		String line = getErrorStream().nextLine();
+		assertThat(line, allOf(containsString("ERROR"), containsString(IOException.class.getName()), containsString(file.getName())));
 	}
 
 	/**

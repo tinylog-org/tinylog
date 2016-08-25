@@ -397,13 +397,13 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test reading weekly policy from properties.
+	 * Test reading weekly policy for US week (Sunday is first day) from properties.
 	 */
 	@Test
-	public final void testFromProperties() {
-		 // Thursday, 1st January 1970
-		
+	public final void testAmericanWeekFromProperties() {
 		Locale.setDefault(Locale.US);
+
+		// Thursday, 1st January 1970
 		Policy policy = createFromProperties("weekly");
 		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
@@ -411,35 +411,36 @@ public class WeeklyPolicyTest extends AbstractTimeBasedPolicyTest {
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // Sunday, 4th January 1970
 		assertFalse(policy.check((String) null));
+	}
 
-		setTime(0L); // Thursday, 1st January 1970
-		
+	/**
+	 * Test reading weekly policy for German week (Monday is first day)  from properties.
+	 */
+	@Test
+	public final void testGermanWeekFromProperties() {
 		Locale.setDefault(Locale.GERMANY);
-		policy = createFromProperties("weekly");
+
+		// Thursday, 1st January 1970
+		Policy policy = createFromProperties("weekly");
 		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 3); // Sunday, 4th January 1970
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // Monday, 5th January 1970
 		assertFalse(policy.check((String) null));
+	}
 
-		setTime(0L); // Thursday, 1st January 1970
-
-		policy = createFromProperties("weekly: friday");
+	/**
+	 * Test reading weekly policy with defined day from properties.
+	 */
+	@Test
+	public final void testDefinedDayFromProperties() {
+		// Thursday, 1st January 1970
+		Policy policy = createFromProperties("weekly: friday");
 		assertThat(policy, type(WeeklyPolicy.class));
 		policy.init(null);
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // Friday, 2nd January 1970
-		assertFalse(policy.check((String) null));
-
-		setTime(0L); // Thursday, 1st January 1970
-
-		policy = createFromProperties("weekly: sunday");
-		assertThat(policy, type(WeeklyPolicy.class));
-		policy.init(null);
-		increaseTime(DAY * 2); // Saturday, 3rd January 1970
-		assertTrue(policy.check((String) null));
-		increaseTime(DAY); // Sunday, 4th January 1970
 		assertFalse(policy.check((String) null));
 	}
 

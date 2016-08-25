@@ -139,7 +139,6 @@ public class ConfigurationObserverTest extends AbstractTinylogTest {
 	 */
 	@After
 	public final void dispose() {
-		classLoaderMock.tearDown();
 		classLoaderMock.close();
 		file.delete();
 	}
@@ -582,32 +581,26 @@ public class ConfigurationObserverTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testInvalidExistingFile() throws IOException, InterruptedException {
-		MockUp<Properties> mock = new MockUp<Properties>() {
-
+		new MockUp<Properties>() {
 			@Mock
 			public void load(final InputStream inStream) throws IOException {
 				throw new IOException();
 			}
-
 		};
 
-		try {
-			observer.start();
-			waitForCompleteCycle();
-			observer.shutdown();
-			observer.join();
+		observer.start();
+		waitForCompleteCycle();
+		observer.shutdown();
+		observer.join();
 
-			Configuration currentConfiguration = Logger.getConfiguration().create();
-			assertEquals("LOGGER ERROR: Failed to read properties file (" + IOException.class.getName() + ")", getErrorStream().nextLine());
-			assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
-			assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
-			assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
-			assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
-			assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
-			assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
-		} finally {
-			mock.tearDown();
-		}
+		Configuration currentConfiguration = Logger.getConfiguration().create();
+		assertEquals("LOGGER ERROR: Failed to read properties file (" + IOException.class.getName() + ")", getErrorStream().nextLine());
+		assertEquals(DEFAULT_CONFIGURATION.getLevel(), currentConfiguration.getLevel());
+		assertEquals(DEFAULT_CONFIGURATION.getFormatPattern(), currentConfiguration.getFormatPattern());
+		assertEquals(DEFAULT_CONFIGURATION.getLocale(), currentConfiguration.getLocale());
+		assertEquals(DEFAULT_CONFIGURATION.getMaxStackTraceElements(), currentConfiguration.getMaxStackTraceElements());
+		assertThat(currentConfiguration.getWriters(), sameTypes(DEFAULT_CONFIGURATION.getWriters()));
+		assertSame(DEFAULT_CONFIGURATION.getWritingThread(), currentConfiguration.getWritingThread());
 	}
 
 	private void waitForCompleteCycle() throws InterruptedException {

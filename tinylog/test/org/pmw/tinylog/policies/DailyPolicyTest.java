@@ -222,10 +222,10 @@ public class DailyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test reading daily policy from properties.
+	 * Test reading daily policy without defined time from properties.
 	 */
 	@Test
-	public final void testFromProperties() {
+	public final void testDefaultFromProperties() {
 		Policy policy = createFromProperties("daily");
 		assertThat(policy, type(DailyPolicy.class));
 		policy.init(null);
@@ -233,10 +233,14 @@ public class DailyPolicyTest extends AbstractTimeBasedPolicyTest {
 		assertTrue(policy.check((String) null));
 		increaseTime(1L); // 24:00
 		assertFalse(policy.check((String) null));
+	}
 
-		setTime(0L);
-
-		policy = createFromProperties("daily: 12:00");
+	/**
+	 * Test reading daily policy without defined time from properties.
+	 */
+	@Test
+	public final void testDefinedTimeFromProperties() {
+		Policy policy = createFromProperties("daily: 12:00");
 		assertThat(policy, type(DailyPolicy.class));
 		policy.init(null);
 		increaseTime(HOUR * 12 - 1L); // 11:59:59,999

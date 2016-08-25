@@ -60,7 +60,6 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	 */
 	@After
 	public final void dispose() {
-		systemTimeMock.tearDown();
 		TimeZone.setDefault(null);
 	}
 
@@ -231,14 +230,20 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 	}
 
 	/**
-	 * Test reading timestamp labeler from properties.
+	 * Test reading timestamp labeler with default timestamp format from properties.
 	 */
 	@Test
-	public final void testFromProperties() {
+	public final void testDefaultFromProperties() {
 		Labeler labeler = createFromProperties("timestamp");
 		assertThat(labeler, type(TimestampLabeler.class));
+	}
 
-		labeler = createFromProperties("timestamp: yyyy");
+	/**
+	 * Test reading timestamp labeler with defined timestamp format from properties.
+	 */
+	@Test
+	public final void testDefinedProperties() {
+		Labeler labeler = createFromProperties("timestamp: yyyy");
 		assertThat(labeler, type(TimestampLabeler.class));
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 		assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));

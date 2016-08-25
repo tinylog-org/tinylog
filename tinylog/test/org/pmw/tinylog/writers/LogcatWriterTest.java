@@ -46,12 +46,10 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testInitOnAndroid() {
 		new MockUp<Class<?>>() {
-
 			@Mock
 			public Class<?> forName(final String className) throws ClassNotFoundException {
 				return "android.util.Log".equals(className) ? null : Class.forName(className);
 			}
-
 		};
 
 		LogcatWriter writer = new LogcatWriter();
@@ -65,7 +63,6 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testInitOnJava() {
 		new MockUp<Class<?>>() {
-
 			@Mock
 			public Class<?> forName(final String className) throws ClassNotFoundException {
 				if ("android.util.Log".equals(className)) {
@@ -74,7 +71,6 @@ public class LogcatWriterTest extends AbstractWriterTest {
 					return Class.forName(className);
 				}
 			}
-
 		};
 
 		LogcatWriter writer = new LogcatWriter();
@@ -101,17 +97,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testTrimmingTag() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("A_VERY_VERY_LONG_IDNETIFIER");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Message\n").create());
-			assertThat(mock.consume(), contains("i/A_VERY_VERY_LONG_IDN.../Message\n"));
+		LogcatWriter writer = new LogcatWriter("A_VERY_VERY_LONG_IDNETIFIER");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Message\n").create());
+		assertThat(mock.consume(), contains("i/A_VERY_VERY_LONG_IDN.../Message\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -120,23 +113,20 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testClassAsTag() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter();
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.INFO).className("MyClass").renderedLogEntry("Message\n").create());
-			assertThat(mock.consume(), contains("i/MyClass/Message\n"));
+		LogcatWriter writer = new LogcatWriter();
+		writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.INFO).className("com.example.AnotherClass").renderedLogEntry("Message\n").create());
-			assertThat(mock.consume(), contains("i/AnotherClass/Message\n"));
+		writer.write(new LogEntryBuilder().level(Level.INFO).className("MyClass").renderedLogEntry("Message\n").create());
+		assertThat(mock.consume(), contains("i/MyClass/Message\n"));
 
-			writer.write(new LogEntryBuilder().level(Level.INFO).className("AVeryVeryLongNameForAClass").renderedLogEntry("Message\n").create());
-			assertThat(mock.consume(), contains("i/AVeryVeryLongNameFor.../Message\n"));
+		writer.write(new LogEntryBuilder().level(Level.INFO).className("com.example.AnotherClass").renderedLogEntry("Message\n").create());
+		assertThat(mock.consume(), contains("i/AnotherClass/Message\n"));
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.INFO).className("AVeryVeryLongNameForAClass").renderedLogEntry("Message\n").create());
+		assertThat(mock.consume(), contains("i/AVeryVeryLongNameFor.../Message\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -145,17 +135,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testTrace() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.TRACE).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), contains("v/Test/Hello\n"));
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.TRACE).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), contains("v/Test/Hello\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -164,17 +151,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testDebug() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.DEBUG).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), contains("d/Test/Hello\n"));
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.DEBUG).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), contains("d/Test/Hello\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -183,17 +167,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testInfo() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), contains("i/Test/Hello\n"));
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), contains("i/Test/Hello\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -202,17 +183,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testWarning() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.WARNING).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), contains("w/Test/Hello\n"));
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.WARNING).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), contains("w/Test/Hello\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -221,17 +199,14 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testError() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.ERROR).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), contains("e/Test/Hello\n"));
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.ERROR).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), contains("e/Test/Hello\n"));
+
+		writer.close();
 	}
 
 	/**
@@ -240,18 +215,15 @@ public class LogcatWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testInvalidLevel() {
 		LogcatMock mock = new LogcatMock();
-		try {
-			LogcatWriter writer = new LogcatWriter("Test");
-			writer.init(null);
 
-			writer.write(new LogEntryBuilder().level(Level.OFF).renderedLogEntry("Hello\n").create());
-			assertThat(mock.consume(), empty());
-			assertEquals("LOGGER WARNING: Unexpected logging level: OFF", getErrorStream().nextLine());
+		LogcatWriter writer = new LogcatWriter("Test");
+		writer.init(null);
 
-			writer.close();
-		} finally {
-			mock.tearDown();
-		}
+		writer.write(new LogEntryBuilder().level(Level.OFF).renderedLogEntry("Hello\n").create());
+		assertThat(mock.consume(), empty());
+		assertEquals("LOGGER WARNING: Unexpected logging level: OFF", getErrorStream().nextLine());
+
+		writer.close();
 	}
 
 	/**

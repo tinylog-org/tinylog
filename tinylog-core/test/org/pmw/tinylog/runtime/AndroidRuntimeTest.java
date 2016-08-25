@@ -15,6 +15,7 @@ package org.pmw.tinylog.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.reflect.Method;
@@ -23,6 +24,7 @@ import org.junit.Test;
 import org.pmw.tinylog.AbstractCoreTest;
 
 import android.os.Process;
+import mockit.Invocation;
 import mockit.Mock;
 import mockit.MockUp;
 
@@ -39,7 +41,7 @@ public class AndroidRuntimeTest extends AbstractCoreTest {
 	@Test
 	public final void testProcessId() {
 		new MockUp<Process>() {
-			@Mock(invocations = 1)
+			@Mock
 			public int myPid() {
 				return 42;
 			}
@@ -57,10 +59,12 @@ public class AndroidRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testGettingClassName() throws NoSuchMethodException {
-		VMStackTraceMock.create();
+		VMStackTraceMock mock = VMStackTraceMock.create();
 
 		String name = new AndroidRuntime().getClassName(1);
 		assertEquals(AndroidRuntimeTest.class.getName(), name);
+		
+		assertTrue(mock.mocked);
 	}
 
 	/**
@@ -80,11 +84,13 @@ public class AndroidRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testGettingStackTraceElemente() throws NoSuchMethodException {
-		VMStackTraceMock.create();
+		VMStackTraceMock mock = VMStackTraceMock.create();
 
 		StackTraceElement element = new AndroidRuntime().getStackTraceElement(1);
 		assertEquals(AndroidRuntimeTest.class.getName(), element.getClassName());
 		assertEquals("testGettingStackTraceElemente", element.getMethodName());
+		
+		assertTrue(mock.mocked);
 	}
 
 	/**
@@ -105,24 +111,29 @@ public class AndroidRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testErrorWhileCallingVMStackTrace() throws NoSuchMethodException {
-		VMStackTraceMock.create();
+		VMStackTraceMock mock = VMStackTraceMock.create();
 		AndroidRuntime runtime = new AndroidRuntime();
 		VMStackTraceMock.evil = true;
 
 		String name = runtime.getClassName(1);
 		assertEquals(AndroidRuntimeTest.class.getName(), name);
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get stack trace from dalvik.system.VMStack \\(.+\\)"));
+		
+		assertTrue(mock.mocked);
 	}
 
 	private static final class VMStackTraceMock extends MockUp<Class<?>> {
 
-		private final Method fillStackTraceElementsMethod;
-
 		private static boolean evil;
 
+		private final Method fillStackTraceElementsMethod;
+		private boolean mocked;
+
 		private VMStackTraceMock(final Method fillStackTraceElementsMethod) {
-			this.fillStackTraceElementsMethod = fillStackTraceElementsMethod;
 			VMStackTraceMock.evil = false;
+
+			this.fillStackTraceElementsMethod = fillStackTraceElementsMethod;
+			this.mocked = false;
 		}
 
 		private static VMStackTraceMock create() throws NoSuchMethodException {
@@ -130,9 +141,14 @@ public class AndroidRuntimeTest extends AbstractCoreTest {
 			return new VMStackTraceMock(method);
 		}
 
-		@Mock(invocations = 1)
-		private Method getDeclaredMethod(final String name, final Class<?>... parameterTypes) {
-			return fillStackTraceElementsMethod;
+		@Mock
+		private Method getDeclaredMethod(final Invocation invocation, final String name, final Class<?>... parameterTypes) {
+			if ("fillStackTraceElements".equals(name)) {
+				mocked = true;
+				return fillStackTraceElementsMethod;
+			} else {
+				return invocation.proceed();
+			}
 		}
 
 		@SuppressWarnings("unused")

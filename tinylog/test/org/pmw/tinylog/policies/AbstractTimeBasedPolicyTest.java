@@ -71,7 +71,6 @@ public abstract class AbstractTimeBasedPolicyTest extends AbstractPolicyTest {
 	@After
 	public final void dispose() {
 		Locale.setDefault(defaultLocale);
-		systemTimeMock.tearDown();
 		TimeZone.setDefault(null);
 	}
 

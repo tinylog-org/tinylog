@@ -46,8 +46,7 @@ public abstract class AbstractPolicyTest extends AbstractTinylogTest {
 	 * @return Created policy
 	 */
 	protected final Policy createFromProperties(final String property) {
-		ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader());
-		try {
+		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
 			PropertiesBuilder properties = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.policy", property);
@@ -64,9 +63,6 @@ public abstract class AbstractPolicyTest extends AbstractTinylogTest {
 			return writer instanceof PropertiesWriter ? ((PropertiesWriter) writer).policy : null;
 		} catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			throw new RuntimeException(ex);
-		} finally {
-			mock.tearDown();
-			mock.close();
 		}
 	}
 

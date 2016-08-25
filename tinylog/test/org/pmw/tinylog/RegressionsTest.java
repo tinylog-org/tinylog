@@ -197,13 +197,9 @@ public class RegressionsTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testSystemProperties() {
-		try {
-			System.setProperty("tinylog.level", "trace");
-			Configurator.init().activate();
-			assertEquals(Level.TRACE, Logger.getLevel());
-		} finally {
-			System.clearProperty("tinylog.level");
-		}
+		System.setProperty("tinylog.level", "trace");
+		Configurator.init().activate();
+		assertEquals(Level.TRACE, Logger.getLevel());
 	}
 
 	/**

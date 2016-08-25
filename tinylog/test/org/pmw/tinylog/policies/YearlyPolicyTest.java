@@ -421,10 +421,10 @@ public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 	}
 
 	/**
-	 * Test reading yearly policy from properties.
+	 * Test reading yearly policy with default month from properties.
 	 */
 	@Test
-	public final void testFromProperties() {
+	public final void testDefaultFromProperties() {
 		Policy policy = createFromProperties("yearly");
 		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
@@ -432,20 +432,28 @@ public class YearlyPolicyTest extends AbstractTimeBasedPolicyTest {
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY);
 		assertFalse(policy.check((String) null));
+	}
 
-		setTime(0L);
-
-		policy = createFromProperties("yearly: 2");
+	/**
+	 * Test reading yearly policy with month number from properties.
+	 */
+	@Test
+	public final void testNumericFromProperties() {
+		Policy policy = createFromProperties("yearly: 2");
 		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 30); // 31th January
 		assertTrue(policy.check((String) null));
 		increaseTime(DAY); // 1st February
 		assertFalse(policy.check((String) null));
+	}
 
-		setTime(0L);
-
-		policy = createFromProperties("yearly: march");
+	/**
+	 * Test reading yearly policy with month name from properties.
+	 */
+	@Test
+	public final void testNamedFromProperties() {
+		Policy policy = createFromProperties("yearly: march");
 		assertThat(policy, type(YearlyPolicy.class));
 		policy.init(null);
 		increaseTime(DAY * 30 + DAY * 28); // 28th February
