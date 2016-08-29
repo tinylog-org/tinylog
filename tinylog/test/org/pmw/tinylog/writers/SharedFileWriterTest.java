@@ -82,12 +82,12 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testFilename() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		file.delete();
 	}
-	
+
 	/**
 	 * Test resolving filename with placeholders.
 	 *
@@ -102,7 +102,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 		String finalPath = file.getAbsolutePath();
 		String resolvablePath = finalPath.substring(0, finalPath.length() - 3) + "${extension}";
 
-		SharedFileWriter writer = new SharedFileWriter(resolvablePath);
+		SharedFileWriter writer = new SharedFileWriter(resolvablePath, true);
 		assertEquals(finalPath, writer.getFilename());
 
 		file.delete();
