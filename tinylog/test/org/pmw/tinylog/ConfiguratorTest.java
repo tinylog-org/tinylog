@@ -35,6 +35,7 @@ import static org.pmw.tinylog.hamcrest.ArrayMatchers.distinctContentInArray;
 import static org.pmw.tinylog.hamcrest.ArrayMatchers.sameContentInArray;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
+import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,13 +43,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,7 +57,11 @@ import org.pmw.tinylog.mocks.ClassLoaderMock;
 import org.pmw.tinylog.util.FileHelper;
 import org.pmw.tinylog.util.NullWriter;
 import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.writers.RollingFileWriter;
 import org.pmw.tinylog.writers.Writer;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Tests for configurator.
@@ -263,6 +266,27 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 			// Expected
 		}
 		assertEquals("TEST", configuration.getFormatPattern());
+	}
+
+	/**
+	 * Test loading the configuration from a map.
+	 */
+	@Test
+	public final void testLoadFromMap() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("tinylog.format", null);
+		map.put("tinylog.writer", "rollingfile");
+		map.put("tinylog.writer.filename", "test.log");
+		map.put("tinylog.writer.backups", 42);
+
+		Configuration configuration = Configurator.fromMap(map).create();
+
+		assertEquals(Configurator.defaultConfig().create().getFormatPattern(), configuration.getFormatPattern());
+		assertThat(configuration.getWriters(), types(RollingFileWriter.class));
+
+		RollingFileWriter writer = (RollingFileWriter) configuration.getWriters().get(0);
+		assertEquals("test.log", writer.getFilename());
+		assertEquals(42, writer.getNumberOfBackups());
 	}
 
 	/**

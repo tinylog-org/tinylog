@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.pmw.tinylog.writers.ConsoleWriter;
@@ -147,6 +148,26 @@ public final class Configurator {
 			}
 		}
 
+		return PropertiesLoader.readProperties(properties);
+	}
+
+	/**
+	 * Load properties from a {@link Map}.
+	 *
+	 * @param map
+	 *            Map with configuration
+	 * @return A new configurator
+	 */
+	public static Configurator fromMap(final Map<String, ?> map) {
+		Properties properties = new Properties();
+		
+		for (Entry<String, ?> entry : map.entrySet()) {
+			Object value = entry.getValue();
+			if (value != null) {
+				properties.put(entry.getKey(), value.toString());
+			}
+		}
+		
 		return PropertiesLoader.readProperties(properties);
 	}
 
