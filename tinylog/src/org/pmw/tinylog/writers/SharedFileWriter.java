@@ -55,7 +55,7 @@ public final class SharedFileWriter implements Writer {
 	 *            Continuing existing file
 	 */
 	public SharedFileWriter(final String filename, final boolean append) {
-		this.file = new File(filename);
+		this.file = new File(PathResolver.resolve(filename));
 		this.mutex = new Object();
 		
 		if (append || EnvironmentHelper.isWindows()) {

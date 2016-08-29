@@ -143,6 +143,26 @@ public class RollingFileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
+	 * Test resolving filename with placeholders.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testResolvingFilename() throws IOException {
+		System.setProperty("extension", "log");
+		File file = FileHelper.createTemporaryFile("log");
+
+		String finalPath = file.getAbsolutePath();
+		String resolvablePath = finalPath.substring(0, finalPath.length() - 3) + "${extension}";
+
+		RollingFileWriter writer = new RollingFileWriter(resolvablePath, 42);
+		assertEquals(finalPath, writer.getFilename());
+
+		file.delete();
+	}
+
+	/**
 	 * Test required log entry values.
 	 *
 	 * @throws IOException

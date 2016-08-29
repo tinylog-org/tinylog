@@ -66,7 +66,7 @@ public final class FileWriter implements Writer {
 	 *            Continuing existing file
 	 */
 	public FileWriter(final String filename, final boolean buffered, final boolean append) {
-		this.filename = filename;
+		this.filename = PathResolver.resolve(filename);
 		this.buffered = buffered;
 		this.append = append;
 	}

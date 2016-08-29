@@ -171,7 +171,7 @@ public final class RollingFileWriter implements Writer {
 	 */
 	public RollingFileWriter(final String filename, final int backups, final boolean buffered, final Labeler labeler, final Policy... policies) {
 		this.mutex = new Object();
-		this.filename = filename;
+		this.filename = PathResolver.resolve(filename);
 		this.backups = Math.max(0, backups);
 		this.buffered = buffered;
 		this.labeler = labeler == null ? new CountLabeler() : labeler;

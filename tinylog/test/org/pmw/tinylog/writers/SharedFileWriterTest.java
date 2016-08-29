@@ -73,7 +73,7 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test required log entry values.
+	 * Test getting plain filename.
 	 *
 	 * @throws IOException
 	 *             Test failed
@@ -82,11 +82,32 @@ public class SharedFileWriterTest extends AbstractWriterTest {
 	public final void testFilename() throws IOException {
 		File file = FileHelper.createTemporaryFile(null);
 
-		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath(), true);
+		SharedFileWriter writer = new SharedFileWriter(file.getAbsolutePath());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
 
 		file.delete();
 	}
+	
+	/**
+	 * Test resolving filename with placeholders.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testResolvingFilename() throws IOException {
+		System.setProperty("extension", "log");
+		File file = FileHelper.createTemporaryFile("log");
+
+		String finalPath = file.getAbsolutePath();
+		String resolvablePath = finalPath.substring(0, finalPath.length() - 3) + "${extension}";
+
+		SharedFileWriter writer = new SharedFileWriter(resolvablePath);
+		assertEquals(finalPath, writer.getFilename());
+
+		file.delete();
+	}
+
 
 	/**
 	 * Test writing without threading.

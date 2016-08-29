@@ -68,7 +68,7 @@ public class FileWriterTest extends AbstractWriterTest {
 	}
 
 	/**
-	 * Test required log entry values.
+	 * Test getting plain filename.
 	 *
 	 * @throws IOException
 	 *             Test failed
@@ -79,6 +79,26 @@ public class FileWriterTest extends AbstractWriterTest {
 
 		FileWriter writer = new FileWriter(file.getAbsolutePath());
 		assertEquals(file.getAbsolutePath(), writer.getFilename());
+
+		file.delete();
+	}
+	
+	/**
+	 * Test resolving filename with placeholders.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testResolvingFilename() throws IOException {
+		System.setProperty("extension", "log");
+		File file = FileHelper.createTemporaryFile("log");
+
+		String finalPath = file.getAbsolutePath();
+		String resolvablePath = finalPath.substring(0, finalPath.length() - 3) + "${extension}";
+
+		FileWriter writer = new FileWriter(resolvablePath);
+		assertEquals(finalPath, writer.getFilename());
 
 		file.delete();
 	}
