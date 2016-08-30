@@ -53,7 +53,7 @@ tinylog can be built with Maven:
 
 	mvn clean checkstyle:checkstyle findbugs:findbugs install
 	
-tinylog is compatible with Java 5 (and higher). Therefore it is recommend to build tinylog at least once against a Java 5 runtime before commiting something. The path to "rt.jar" as well as the source and target version can be set via a properties.
+tinylog is compatible with Java 5 (and higher). Therefore it is recommend to build tinylog at least once against a Java 5 runtime before commiting something. The path to "rt.jar" as well as the source and target version can be set via properties.
 
 	"-Dbootclasspath=JAVA_5_HOME/lib/rt.jar"
 	-Dmaven.compiler.source=1.5
