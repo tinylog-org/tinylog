@@ -30,6 +30,8 @@ Projects
   * Contains the SLF4J binding, implementing the SLF4J logging API
 * tinylog-core
   * Contains shared basis for tinylog and compatible server replacements
+* tinylog-jboss
+  * Contains tinylog API for JBoss Logging backend
 * tinylog
   * Contains tinylog itself
 
