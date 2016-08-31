@@ -15,6 +15,7 @@
 		<module>slf4j-binding</module>
 		<module>tinylog-core</module>
 		<module>tinylog</module>
+		<module>tinylog-jboss</module>
 	</modules>
 
 	<prerequisites>
