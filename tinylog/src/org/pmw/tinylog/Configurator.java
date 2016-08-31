@@ -152,6 +152,25 @@ public final class Configurator {
 	}
 
 	/**
+	 * Load a properties file from an input stream.
+	 * 
+	 * @param stream
+	 *            Properties file
+	 * @return A new configurator
+	 * @throws IOException
+	 *             Failed to read from stream
+	 */
+	public static Configurator fromStream(final InputStream stream) throws IOException {
+		if (stream == null) {
+			throw new FileNotFoundException();
+		} else {
+			Properties properties = new Properties();
+			properties.load(stream);
+			return PropertiesLoader.readProperties(properties);
+		}
+	}
+
+	/**
 	 * Load properties from a {@link Map}.
 	 *
 	 * @param map
@@ -160,14 +179,14 @@ public final class Configurator {
 	 */
 	public static Configurator fromMap(final Map<String, ?> map) {
 		Properties properties = new Properties();
-		
+
 		for (Entry<String, ?> entry : map.entrySet()) {
 			Object value = entry.getValue();
 			if (value != null) {
 				properties.put(entry.getKey(), value.toString());
 			}
 		}
-		
+
 		return PropertiesLoader.readProperties(properties);
 	}
 
@@ -692,8 +711,8 @@ public final class Configurator {
 	 * @return A new configurator with the same configuration
 	 */
 	Configurator copy() {
-		WritingThreadData writingThreadDataCopy = writingThreadData == null ? null : new WritingThreadData(writingThreadData.threadToObserve,
-				writingThreadData.priority);
+		WritingThreadData writingThreadDataCopy = writingThreadData == null ? null
+				: new WritingThreadData(writingThreadData.threadToObserve, writingThreadData.priority);
 		return new Configurator(level, customLevels, formatPattern, locale, writers, writingThreadDataCopy, maxStackTraceElements);
 	}
 

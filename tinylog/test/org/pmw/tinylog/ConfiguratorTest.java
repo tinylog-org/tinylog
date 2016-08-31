@@ -37,6 +37,7 @@ import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameContent;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.sameTypes;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -261,6 +262,28 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 		assertTrue(file.delete());
 		try {
 			configuration = Configurator.fromFile(file).create();
+			fail("FileNotFoundException expected");
+		} catch (FileNotFoundException ex) {
+			// Expected
+		}
+		assertEquals("TEST", configuration.getFormatPattern());
+	}
+	
+	
+	/**
+	 * Test loading the configuration from an input stream.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testLoadFromStream() throws IOException {		
+		InputStream stream = new ByteArrayInputStream("tinylog.format=TEST".getBytes());
+		Configuration configuration = Configurator.fromStream(stream).create();
+		assertEquals("TEST", configuration.getFormatPattern());
+		
+		try {
+			configuration = Configurator.fromStream(null).create();
 			fail("FileNotFoundException expected");
 		} catch (FileNotFoundException ex) {
 			// Expected
