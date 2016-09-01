@@ -35,8 +35,8 @@ public abstract class AbstractJBossTest extends AbstractCoreTest {
 		for (StorageLogger logger : StorageLoggerProvider.getLoggers()) {
 			logger.setLevel(null);
 			if (!logger.getName().startsWith("org.jboss.logging")) {
-				Collection<LogEntry> records = logger.consumeLogEntries();
-				assertTrue(records.toString(), records.isEmpty());
+				Collection<LogEntry> entries = logger.consumeLogEntries();
+				assertTrue(entries.toString(), entries.isEmpty());
 			}
 		}
 	}

@@ -90,8 +90,8 @@ public final class LogEntry implements Serializable {
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof LogEntry) {
-			LogEntry record = (LogEntry) obj;
-			return Objects.equals(this.level, record.level) && Objects.equals(this.message, record.message) && Objects.equals(this.exception, record.exception);
+			LogEntry entry = (LogEntry) obj;
+			return Objects.equals(this.level, entry.level) && Objects.equals(this.message, entry.message) && Objects.equals(this.exception, entry.exception);
 		} else {
 			return false;
 		}
