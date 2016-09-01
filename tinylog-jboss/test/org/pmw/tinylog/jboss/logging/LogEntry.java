@@ -99,7 +99,16 @@ public final class LogEntry implements Serializable {
 
 	@Override
 	public String toString() {
-		return level + ": " + (message == null ? exception.toString() : message.toString());
+		StringBuilder builder = new StringBuilder();
+		builder.append(level).append(": ");
+		if (message == null) {
+			builder.append(exception);
+		} else if (exception == null) {
+			builder.append(message);
+		} else {
+			builder.append(message).append(" (").append(exception).append(")");
+		}		
+		return builder.toString();
 	}
 
 }
