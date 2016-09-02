@@ -1,4 +1,5 @@
 language: java
+sudo: false
 
 script:
   - mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
