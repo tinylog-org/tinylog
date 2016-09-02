@@ -4,3 +4,6 @@ script:
   - mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
   - cd benchmark
   - mvn clean package
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
