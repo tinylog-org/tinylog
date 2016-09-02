@@ -1,6 +1,7 @@
 tinylog
 =======
 [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v1.2)](https://travis-ci.org/pmwmedia/tinylog)
+[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v1.2/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog)
 [![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.tinylog/tinylog/badge.svg)](http://www.javadoc.io/doc/org.tinylog/tinylog)
 
