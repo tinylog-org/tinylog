@@ -116,7 +116,7 @@
 					<execution>
 						<id>default-compile</id>
 						<configuration>
-							<debuglevel>none</debuglevel>
+							<debuglevel>lines</debuglevel>
 							<compilerArguments>
 								<bootclasspath>${bootclasspath}</bootclasspath>
 							</compilerArguments>
