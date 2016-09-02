@@ -46,6 +46,7 @@
 		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
 		<findbugs-maven-plugin.version>3.0.4</findbugs-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -58,7 +59,7 @@
 
 		<!-- Avoid inlining, because it breaks mocks -->
 		<argLine>-XX:-Inline</argLine>
-		
+
 		<website.url>http://www.tinylog.org/</website.url>
 		<git.url>https://github.com/pmwmedia/tinylog</git.url>
 		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
@@ -147,6 +148,27 @@
 				<configuration>
 					<excludeFilterFile>${project.parent.basedir}/configuration/tinylog-findbugs.xml</excludeFilterFile>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
