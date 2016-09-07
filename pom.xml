@@ -116,7 +116,6 @@
 					<execution>
 						<id>default-compile</id>
 						<configuration>
-							<debuglevel>lines</debuglevel>
 							<compilerArguments>
 								<bootclasspath>${bootclasspath}</bootclasspath>
 							</compilerArguments>
@@ -156,14 +155,13 @@
 				<version>${jacoco-maven-plugin.version}</version>
 				<executions>
 					<execution>
-						<phase>process-test-resources</phase>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>verify</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
