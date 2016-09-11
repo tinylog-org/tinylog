@@ -33,6 +33,8 @@ Projects
   * Contains shared basis for tinylog and compatible server replacements
 * tinylog-jboss
   * Contains tinylog API for JBoss Logging backend
+* tinylog-jul
+  * Contains tinylog API for java.util.logging backend
 * tinylog
   * Contains tinylog itself
 

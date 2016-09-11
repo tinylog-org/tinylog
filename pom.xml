@@ -16,6 +16,7 @@
 		<module>tinylog-core</module>
 		<module>tinylog</module>
 		<module>tinylog-jboss</module>
+		<module>tinylog-jul</module>
 	</modules>
 
 	<prerequisites>
