@@ -17,9 +17,6 @@ import org.pmw.tinylog.runtime.RuntimeDialect;
 
 /**
  * Static class to create log entries.
- *
- * The default severity level is {@link org.pmw.tinylog.Level#INFO Level.INFO}, which ignores trace and debug log
- * entries.
  */
 public final class Logger {
 
