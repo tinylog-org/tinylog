@@ -57,6 +57,8 @@
 		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<flatten-maven-plugin.version>1.0.0</flatten-maven-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
 		<!-- Avoid inlining, because it breaks mocks -->
 		<argLine>-XX:-Inline</argLine>
@@ -95,6 +97,17 @@
 		<system>GitHub</system>
 		<url>https://github.com/pmwmedia/tinylog/issues</url>
 	</issueManagement>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
 
@@ -309,6 +322,33 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>${maven-gpg-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>${nexus-staging-maven-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					 <serverId>ossrh</serverId>
+					 <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					 <autoReleaseAfterClose>true</autoReleaseAfterClose>
+					 <skipStaging>true</skipStaging>
+				</configuration>
 			</plugin>
 
 		</plugins>
