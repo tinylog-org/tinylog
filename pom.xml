@@ -76,10 +76,6 @@
 		</license>
 	</licenses>
 
-	<organization>
-		<name>PMW Media</name>
-	</organization>
-
 	<developers>
 		<developer>
 			<name>Martin Winandy</name>
@@ -312,7 +308,15 @@
 				<version>${flatten-maven-plugin.version}</version>
 				<configuration>
 					<outputDirectory>${project.build.directory}</outputDirectory>
-					<flattenMode>oss</flattenMode>
+					<pomElements>
+						<name />
+						<description />
+						<url />
+						<scm />
+						<developers />
+						<contributors />
+						<issueManagement />
+					</pomElements>
 				</configuration>
 				<executions>
 					<execution>
