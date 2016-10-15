@@ -12,7 +12,7 @@
 
 	<artifactId>tinylog</artifactId>
 	<name>tinylog</name>
-	<description>lightweight logging framework for Java</description>
+	<description>Lightweight logging framework for Java and Android</description>
 	<url>${website.url}</url>
 
 	<dependencies>
