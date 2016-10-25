@@ -56,12 +56,33 @@ public class MessageFormatterTest extends AbstractCoreTest {
 		assertEquals("Hello {}!", MessageFormatter.format("{} {}!", "Hello"));
 		assertEquals("Hello!", MessageFormatter.format("{}!", "Hello", "World"));
 	}
+
+	/**
+	 * Test number format patterns with given arguments.
+	 */
 	@Test
-	public final void testFormatting() {
+	public final void testNumberFormatting() {
 		assertEquals("3" + DECIMAL_SEPARATOR + "14", MessageFormatter.format("{#.##}", Math.PI));
 		assertEquals("01", MessageFormatter.format("{00}", 1));
 		assertEquals("1" + GROUPING_SEPARATOR + "024", MessageFormatter.format("{#,###}", 1024));
 		assertEquals("Test", MessageFormatter.format("{#.##}", "Test"));
 	}
-	
+
+	/**
+	 * Test choice format patterns with given arguments.
+	 */
+	@Test
+	public final void testChoiceFormatting() {
+		assertEquals("negative", MessageFormatter.format("{-1#negative|0#zero|+1#positive}", -2));
+		assertEquals("negative", MessageFormatter.format("{-1#negative|0#zero|+1#positive}", -1));
+		assertEquals("zero", MessageFormatter.format("{-1#negative|0#zero|+1#positive}", 0));
+		assertEquals("positive", MessageFormatter.format("{-1#negative|0#zero|+1#positive}", +1));
+		assertEquals("positive", MessageFormatter.format("{-1#negative|0#zero|+1#positive}", +2));
+
+		assertEquals("-", MessageFormatter.format("{0#-|1#{#.#}}", 0));
+		assertEquals("1" + DECIMAL_SEPARATOR + "0", MessageFormatter.format("{0#-|1#{0.0}}", 1));
+
+		assertEquals("Test", MessageFormatter.format("{a|b}", "Test"));
+	}
+
 }

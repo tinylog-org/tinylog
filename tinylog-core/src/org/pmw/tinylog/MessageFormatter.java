@@ -13,8 +13,10 @@
 
 package org.pmw.tinylog;
 
+import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.Format;
 
 /**
  * Format logging messages.
@@ -77,13 +79,25 @@ final class MessageFormatter {
 			return builder.toString();
 		}
 	}
-	
-	private static String format(String pattern, Object argument) {
-		DecimalFormat formatter = new DecimalFormat(pattern, FORMATTER_SYMBOLS);
+
+	private static String format(final String pattern, final Object argument) {
 		try {
-			return formatter.format(argument);
+			return getFormatter(pattern, argument).format(argument);
 		} catch (IllegalArgumentException ex) {
 			return String.valueOf(argument);
+		}
+	}
+
+	private static Format getFormatter(final String pattern, final Object argument) {
+		if (pattern.indexOf('|') != -1) {
+			int start = pattern.indexOf('{');
+			if (start >= 0 && start < pattern.lastIndexOf('}')) {
+				return new ChoiceFormat(format(pattern, new Object[] { argument }));
+			} else {
+				return new ChoiceFormat(pattern);
+			}
+		} else {
+			return new DecimalFormat(pattern, FORMATTER_SYMBOLS);
 		}
 	}
 
