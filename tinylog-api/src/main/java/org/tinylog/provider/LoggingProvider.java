@@ -22,30 +22,36 @@ public interface LoggingProvider {
 
 	/**
 	 * Gets the lowest activated severity level.
-	 * 
+	 *
 	 * <p>
 	 * The result of this method can be used to stop processing log entries at an early stage, before doing any
 	 * expensive operations. All lower severity levels than the returned level will be never output. But it is not
 	 * guaranteed the returned severity level or higher will be really output (for example if output depends on package
 	 * or class name).
 	 * </p>
-	 * 
+	 *
 	 * @return Lowest activated severity level
 	 */
 	Level getMinimumLevel();
 
 	/**
 	 * Checks whether log entries with given severity level will be output.
-	 * 
+	 *
+	 * @param depth
+	 *            Depth of caller in stack trace (e.g. '1' if there is only one method between caller and this method in
+	 *            the stack trace)
 	 * @param level
 	 *            Severity level to check
 	 * @return {@code true} if given severity level is enabled, {@code false} if disabled
 	 */
-	boolean isEnabled(Level level);
+	boolean isEnabled(int depth, Level level);
 
 	/**
 	 * Provides a regular log entry.
-	 * 
+	 *
+	 * @param depth
+	 *            Depth of caller in stack trace (e.g. '1' if there is only one method between caller and this method in
+	 *            the stack trace)
 	 * @param level
 	 *            Severity level of log entry
 	 * @param exception
@@ -55,11 +61,14 @@ public interface LoggingProvider {
 	 * @param arguments
 	 *            Arguments for message or {@code null}
 	 */
-	void log(Level level, Throwable exception, Object obj, Object... arguments);
+	void log(int depth, Level level, Throwable exception, Object obj, Object... arguments);
 
 	/**
 	 * Provides an internal log entry (typically used for internal tinylog warnings and errors).
-	 * 
+	 *
+	 * @param depth
+	 *            Depth of caller in stack trace (e.g. '1' if there is only one method between caller and this method in
+	 *            the stack trace)
 	 * @param level
 	 *            Severity level of log entry
 	 * @param exception
@@ -69,6 +78,6 @@ public interface LoggingProvider {
 	 * @param arguments
 	 *            Arguments for message or {@code null}
 	 */
-	void internal(Level level, Throwable exception, Object obj, Object... arguments);
+	void internal(int depth, Level level, Throwable exception, Object obj, Object... arguments);
 
 }
