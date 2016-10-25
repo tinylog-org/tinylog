@@ -15,6 +15,8 @@ package org.pmw.tinylog;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.DecimalFormatSymbols;
+
 import org.junit.Test;
 
 /**
@@ -23,6 +25,9 @@ import org.junit.Test;
  * @see MessageFormatter
  */
 public class MessageFormatterTest extends AbstractCoreTest {
+
+	private static final char DECIMAL_SEPARATOR = DecimalFormatSymbols.getInstance().getDecimalSeparator();
+	private static final char GROUPING_SEPARATOR = DecimalFormatSymbols.getInstance().getGroupingSeparator();
 
 	/**
 	 * Test if the class is a valid utility class.
@@ -51,5 +56,12 @@ public class MessageFormatterTest extends AbstractCoreTest {
 		assertEquals("Hello {}!", MessageFormatter.format("{} {}!", "Hello"));
 		assertEquals("Hello!", MessageFormatter.format("{}!", "Hello", "World"));
 	}
-
+	@Test
+	public final void testFormatting() {
+		assertEquals("3" + DECIMAL_SEPARATOR + "14", MessageFormatter.format("{#.##}", Math.PI));
+		assertEquals("01", MessageFormatter.format("{00}", 1));
+		assertEquals("1" + GROUPING_SEPARATOR + "024", MessageFormatter.format("{#,###}", 1024));
+		assertEquals("Test", MessageFormatter.format("{#.##}", "Test"));
+	}
+	
 }

@@ -13,10 +13,15 @@
 
 package org.pmw.tinylog;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 /**
  * Format logging messages.
  */
 final class MessageFormatter {
+	
+	private static final DecimalFormatSymbols FORMATTER_SYMBOLS = new DecimalFormatSymbols(); 
 
 	private MessageFormatter() {
 	}
@@ -35,20 +40,50 @@ final class MessageFormatter {
 			return message;
 		} else {
 			StringBuilder builder = new StringBuilder(256);
-			String pattern = message;
-			int index = 0;
-			for (int i = 0; i < arguments.length && index < pattern.length(); ++i) {
-				int found = pattern.indexOf("{}", index);
-				if (found >= 0) {
-					builder.append(pattern, index, found);
-					builder.append(arguments[i]);
-					index = found + 2;
-				} else {
-					break;
+			
+			int argumentIndex = 0;
+			int start = 0;
+			int openBraces = 0;
+			
+			for (int index = 0; index < message.length(); ++index) {
+				char character = message.charAt(index);
+				if (character == '{') {
+					if (openBraces++ == 0 && start < index) {
+						builder.append(message, start, index);
+						start = index;
+					}
+				} else if (character == '}' && openBraces > 0) {
+					if (--openBraces == 0) {
+						if (argumentIndex < arguments.length) {
+							Object argument = arguments[argumentIndex++];
+							if (index == start + 1) {
+								builder.append(argument);
+							} else {
+								builder.append(format(message.substring(start + 1, index), argument));
+							}
+						} else {
+							builder.append(message, start, index + 1);
+						}
+						
+						start = index + 1;
+					}
 				}
 			}
-			builder.append(pattern, index, pattern.length());
+			
+			if (start < message.length()) {
+				builder.append(message, start, message.length());
+			}
+			
 			return builder.toString();
+		}
+	}
+	
+	private static String format(String pattern, Object argument) {
+		DecimalFormat formatter = new DecimalFormat(pattern, FORMATTER_SYMBOLS);
+		try {
+			return formatter.format(argument);
+		} catch (IllegalArgumentException ex) {
+			return String.valueOf(argument);
 		}
 	}
 
