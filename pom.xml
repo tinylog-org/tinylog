@@ -27,8 +27,13 @@
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
+		<!-- tinylog 2 requires only Java 6, but Java 8 is defined here due to limitations of Eclipse -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<!-- Tests require Java 8 -->
+		<maven.compiler.testSource>1.8</maven.compiler.testSource>
+		<maven.compiler.testTarget>1.8</maven.compiler.testTarget>
 
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
 		<maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
@@ -41,7 +46,7 @@
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.5.1</maven-site-plugin.version>
 
-		<assertj-core.version>1.7.1</assertj-core.version>
+		<assertj-core.version>3.5.2</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
 		<junit.version>4.12</junit.version>
 	</properties>
