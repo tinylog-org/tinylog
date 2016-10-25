@@ -17,13 +17,14 @@ import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
+import java.util.Locale;
 
 /**
  * Format logging messages.
  */
 final class MessageFormatter {
-	
-	private static final DecimalFormatSymbols FORMATTER_SYMBOLS = new DecimalFormatSymbols(); 
+
+	private static final DecimalFormatSymbols FORMATTER_SYMBOLS = new DecimalFormatSymbols(Locale.ENGLISH);
 
 	private MessageFormatter() {
 	}
@@ -42,11 +43,11 @@ final class MessageFormatter {
 			return message;
 		} else {
 			StringBuilder builder = new StringBuilder(256);
-			
+
 			int argumentIndex = 0;
 			int start = 0;
 			int openBraces = 0;
-			
+
 			for (int index = 0; index < message.length(); ++index) {
 				char character = message.charAt(index);
 				if (character == '{') {
@@ -66,16 +67,16 @@ final class MessageFormatter {
 						} else {
 							builder.append(message, start, index + 1);
 						}
-						
+
 						start = index + 1;
 					}
 				}
 			}
-			
+
 			if (start < message.length()) {
 				builder.append(message, start, message.length());
 			}
-			
+
 			return builder.toString();
 		}
 	}
