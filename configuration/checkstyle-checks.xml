@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<module name="Checker">
+
+	<property name="fileExtensions" value="java, properties, xml" />
+
+	<!-- Headers -->
+	<module name="Header">
+		<property name="headerFile" value="configuration/checkstyle-header.txt" />
+		<property name="fileExtensions" value="java" />
+		<property name="ignoreLines" value="2" />
+	</module>
+
+	<!-- Javadoc Comments -->
+
+	<module name="JavadocPackage" />
+
+	<!-- Size Violations -->
+
+	<module name="FileLength">
+		<property name="fileExtensions" value="java" />
+		<property name="max" value="1000" />
+	</module>
+
+	<!-- Miscellaneous -->
+
+	<module name="NewlineAtEndOfFile" />
+	<module name="UniqueProperties">
+		<property name="fileExtensions" value="properties" />
+	</module>
+
+	<module name="TreeWalker">
+
+		<property name="tabWidth" value="4" />
+
+		<!-- Annotations -->
+
+		<module name="AnnotationLocation">
+			<property name="allowSamelineSingleParameterlessAnnotation" value="false" />
+		</module>
+		<module name="AnnotationUseStyle" />
+		<module name="MissingDeprecated" />
+		<module name="MissingOverride" />
+		<module name="PackageAnnotation" />
+
+		<!-- Blocks -->
+
+		<module name="AvoidNestedBlocks" />
+		<module name="EmptyBlock">
+			<property name="option" value="text" />
+		</module>
+		<module name="EmptyCatchBlock" />
+		<module name="LeftCurly">
+			<property name="maxLineLength" value="140" />
+		</module>
+		<module name="NeedBraces" />
+		<module name="RightCurly" />
+
+		<!-- Class Design -->
+
+		<module name="DesignForExtension" />
+		<module name="FinalClass" />
+		<module name="HideUtilityClassConstructor" />
+		<module name="InnerTypeLast" />
+		<module name="InterfaceIsType" />
+		<module name="MutableException" />
+		<module name="OneTopLevelClass" />
+		<module name="VisibilityModifier" />
+
+		<!-- Coding -->
+
+		<module name="CovariantEquals" />
+		<module name="DeclarationOrder" />
+		<module name="DefaultComesLast" />
+		<module name="EmptyStatement" />
+		<module name="EqualsHashCode" />
+		<module name="ExplicitInitialization" />
+		<module name="FallThrough" />
+		<module name="IllegalInstantiation" />
+		<module name="IllegalThrows" />
+		<module name="IllegalToken" />
+		<module name="IllegalTokenText" />
+		<module name="IllegalType" />
+		<module name="InnerAssignment" />
+		<module name="MagicNumber" />
+		<module name="MissingCtor" />
+		<module name="MissingSwitchDefault" />
+		<module name="ModifiedControlVariable" />
+		<module name="MultipleStringLiterals" />
+		<module name="MultipleVariableDeclarations" />
+		<module name="NoClone" />
+		<module name="NoFinalizer" />
+		<module name="OneStatementPerLine" />
+		<module name="OverloadMethodsDeclarationOrder" />
+		<module name="PackageAnnotation" />
+		<module name="ParameterAssignment" />
+		<module name="SimplifyBooleanExpression" />
+		<module name="SimplifyBooleanReturn" />
+		<module name="StringLiteralEquality" />
+		<module name="SuperClone" />
+		<module name="SuperFinalize" />
+		<module name="UnnecessaryParentheses" />
+
+		<!-- Imports -->
+
+		<module name="AvoidStarImport" />
+		<module name="AvoidStaticImport" />
+		<module name="ImportOrder">
+			<property name="ordered" value="true" />
+			<property name="separated" value="true" />
+			<property name="sortStaticImportsAlphabetically" value="true" />
+		</module>
+		<module name="RedundantImport" />
+		<module name="UnusedImports" />
+
+		<!-- Javadoc Comments -->
+
+		<module name="AtclauseOrder" />
+		<module name="JavadocMethod">
+			<property name="allowUndeclaredRTE" value="true" />
+			<property name="allowThrowsTagsForSubclasses" value="true" />
+			<property name="validateThrows" value="true" />
+		</module>
+		<module name="JavadocParagraph" />
+		<module name="JavadocStyle" />
+		<module name="JavadocTagContinuationIndentation" />
+		<module name="JavadocType" />
+		<module name="JavadocVariable">
+			<property name="scope" value="public" />
+		</module>
+		<module name="NonEmptyAtclauseDescription" />
+
+		<!-- Modifiers -->
+
+		<module name="ModifierOrder" />
+		<module name="RedundantModifier" />
+
+		<!-- Naming Conventions -->
+
+		<module name="AbbreviationAsWordInName">
+			<property name="ignoreFinal" value="false" />
+			<property name="allowedAbbreviationLength" value="1" />
+		</module>
+		<module name="AbstractClassName" />
+		<module name="CatchParameterName">
+			<property name="format" value="^(ex|[a-z][a-z][a-zA-Z]+)$" />
+		</module>
+		<module name="ClassTypeParameterName" />
+		<module name="ConstantName" />
+		<module name="InterfaceTypeParameterName" />
+		<module name="LocalFinalVariableName" />
+		<module name="LocalVariableName">
+			<property name="allowOneCharVarInForLoop" value="true" />
+		</module>
+		<module name="MemberName" />
+		<module name="MethodName" />
+		<module name="MethodTypeParameterName" />
+		<module name="PackageName" />
+		<module name="ParameterName" />
+		<module name="StaticVariableName" />
+		<module name="TypeName" />
+
+		<!-- Size Violations -->
+
+		<module name=" AnonInnerLength " />
+		<module name="LineLength">
+			<property name="max" value="140" />
+		</module>
+		<module name="MethodLength">
+			<property name="max" value="200" />
+		</module>
+		<module name="OuterTypeNumber" />
+
+		<!-- Whitespace -->
+
+		<module name="EmptyForInitializerPad" />
+		<module name="EmptyForIteratorPad" />
+		<module name="GenericWhitespace" />
+		<module name="MethodParamPad" />
+		<module name="NoLineWrap" />
+		<module name="NoWhitespaceAfter" />
+		<module name="NoWhitespaceBefore" />
+		<module name="OperatorWrap" />
+		<module name="ParenPad" />
+		<module name="RegexpSinglelineJava">
+			<property name="format" value="^\t* +([^\*]| \*)" />
+			<property name="message" value="Indent must use tab characters" />
+		</module>
+		<module name="SeparatorWrap" />
+		<module name="SingleSpaceSeparator" />
+		<module name="TypecastParenPad" />
+		<module name="WhitespaceAfter" />
+		<module name="WhitespaceAround" />
+
+		<!-- Miscellaneous -->
+
+		<module name="ArrayTypeStyle" />
+		<module name="AvoidEscapedUnicodeCharacters" />
+		<module name="CommentsIndentation" />
+		<module name="EmptyLineSeparator">
+			<property name="allowMultipleEmptyLines" value="false" />
+			<property name="allowMultipleEmptyLinesInsideClassMembers" value="false" />
+		</module>
+		<module name="FinalParameters" />
+		<module name="Indentation" />
+		<module name="OuterTypeFilename" />
+		<module name="TodoComment">
+			<property name="format" value="(TODO)|(FIXME)" />
+		</module>
+
+	</module>
+
+</module>

@@ -5,7 +5,7 @@ jdk:
   - openjdk6
 
 script:
-  - mvn clean install
+  - mvn clean checkstyle:checkstyle install
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
