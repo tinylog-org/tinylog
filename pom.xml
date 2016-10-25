@@ -41,7 +41,9 @@
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.5.1</maven-site-plugin.version>
 
+		<assertj-core.version>1.7.1</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
+		<junit.version>4.12</junit.version>
 	</properties>
 
 	<licenses>
@@ -79,6 +81,23 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>${assertj-core.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
