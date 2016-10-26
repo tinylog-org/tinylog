@@ -36,7 +36,7 @@ public enum Level {
 	/**
 	 * Warn log entries contain technical warnings. Typically warnings do not prevent the application from continuing.
 	 */
-	WARN,
+	WARNING,
 
 	/**
 	 * Error log entries contain severe technical errors. Typically errors prevent a function from continuing normally.

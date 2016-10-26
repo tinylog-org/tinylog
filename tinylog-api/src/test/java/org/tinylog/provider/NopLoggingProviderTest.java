@@ -50,7 +50,7 @@ public final class NopLoggingProviderTest {
 		assertThat(provider.isEnabled(0, Level.TRACE)).isFalse();
 		assertThat(provider.isEnabled(1, Level.DEBUG)).isFalse();
 		assertThat(provider.isEnabled(2, Level.INFO)).isFalse();
-		assertThat(provider.isEnabled(3, Level.WARN)).isFalse();
+		assertThat(provider.isEnabled(3, Level.WARNING)).isFalse();
 		assertThat(provider.isEnabled(4, Level.ERROR)).isFalse();
 	}
 

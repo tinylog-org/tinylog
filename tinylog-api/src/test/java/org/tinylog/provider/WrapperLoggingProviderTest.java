@@ -51,7 +51,7 @@ public final class WrapperLoggingProviderTest {
 	 */
 	@Test
 	public void getDifferentMinimumLevel() {
-		init(Level.DEBUG, Level.WARN);
+		init(Level.DEBUG, Level.WARNING);
 		assertThat(wrapped.getMinimumLevel()).isEqualTo(Level.DEBUG);
 	}
 
@@ -66,19 +66,19 @@ public final class WrapperLoggingProviderTest {
 		when(first.isEnabled(anyInt(), eq(Level.TRACE))).thenReturn(false);
 		when(first.isEnabled(anyInt(), eq(Level.DEBUG))).thenReturn(false);
 		when(first.isEnabled(anyInt(), eq(Level.INFO))).thenReturn(false);
-		when(first.isEnabled(anyInt(), eq(Level.WARN))).thenReturn(true);
+		when(first.isEnabled(anyInt(), eq(Level.WARNING))).thenReturn(true);
 		when(first.isEnabled(anyInt(), eq(Level.ERROR))).thenReturn(true);
 
 		when(second.isEnabled(anyInt(), eq(Level.TRACE))).thenReturn(false);
 		when(second.isEnabled(anyInt(), eq(Level.DEBUG))).thenReturn(true);
 		when(second.isEnabled(anyInt(), eq(Level.INFO))).thenReturn(true);
-		when(second.isEnabled(anyInt(), eq(Level.WARN))).thenReturn(true);
+		when(second.isEnabled(anyInt(), eq(Level.WARNING))).thenReturn(true);
 		when(second.isEnabled(anyInt(), eq(Level.ERROR))).thenReturn(true);
 
 		assertThat(wrapped.isEnabled(1, Level.TRACE)).isEqualTo(false);
 		assertThat(wrapped.isEnabled(1, Level.DEBUG)).isEqualTo(true);
 		assertThat(wrapped.isEnabled(1, Level.INFO)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, Level.WARN)).isEqualTo(true);
+		assertThat(wrapped.isEnabled(1, Level.WARNING)).isEqualTo(true);
 		assertThat(wrapped.isEnabled(1, Level.ERROR)).isEqualTo(true);
 
 		verify(first, atLeastOnce()).isEnabled(eq(2), any());
