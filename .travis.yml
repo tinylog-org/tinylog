@@ -5,7 +5,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvn clean install
+  - mvn clean install -Dmaven.compiler.source=1.6 -Dmaven.compiler.target=1.6
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
