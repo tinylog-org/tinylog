@@ -2,5 +2,5 @@
 <!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN" "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
 	<!-- JUnit Tests -->
-	<suppress files="[/\\]src[/\\]test[/\\].*Test.java" checks="(AvoidStaticImport|JavadocPackage|MagicNumber|MissingCtor|MultipleStringLiterals)"/>
+	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|JavadocPackage|MagicNumber|MissingCtor)"/>
 </suppressions>
