@@ -4,7 +4,15 @@
 
 	<property name="fileExtensions" value="java, properties, xml" />
 
+	<!-- Suppressions -->
+	
+	<module name="SuppressionFilter">
+		<property name="file" value="configuration/checkstyle-suppressions.xml"/>
+		<property name="optional" value="false"/>
+	</module>
+
 	<!-- Headers -->
+
 	<module name="Header">
 		<property name="headerFile" value="configuration/checkstyle-header.txt" />
 		<property name="fileExtensions" value="java" />
