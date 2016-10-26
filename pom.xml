@@ -177,6 +177,7 @@
 						<threshold>Low</threshold>
 						<includeTests>true</includeTests>
 						<failOnError>true</failOnError>
+						<excludeFilterFile>configuration/findbugs-filters.xml</excludeFilterFile>
 					</configuration>
 					<executions>
 						<execution>
