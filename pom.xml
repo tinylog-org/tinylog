@@ -161,7 +161,7 @@
 					</configuration>
 					<executions>
 						<execution>
-							<phase>compile</phase>
+							<phase>test</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
@@ -175,11 +175,12 @@
 					<configuration>
 						<effort>Max</effort>
 						<threshold>Low</threshold>
+						<includeTests>true</includeTests>
 						<failOnError>true</failOnError>
 					</configuration>
 					<executions>
 						<execution>
-							<phase>compile</phase>
+							<phase>test</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
