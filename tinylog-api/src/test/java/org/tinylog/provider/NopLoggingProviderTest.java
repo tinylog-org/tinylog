@@ -55,7 +55,7 @@ public final class NopLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that log() method is invokable without throwing any exceptions.
+	 * Verifies that {@code log()} method is invokable without throwing any exceptions.
 	 */
 	@Test
 	public void log() {
@@ -64,7 +64,7 @@ public final class NopLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that internal() method is invokable without throwing any exceptions.
+	 * Verifies that {@code internal()} method is invokable without throwing any exceptions.
 	 */
 	@Test
 	public void internal() {

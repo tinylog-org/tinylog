@@ -60,7 +60,7 @@ public final class NopContextProviderTest {
 	}
 
 	/**
-	 * Verifies that remove() method is invokable without throwing any exceptions.
+	 * Verifies that {@code remove()} method is invokable without throwing any exceptions.
 	 */
 	@Test
 	public void remove() {
@@ -69,7 +69,7 @@ public final class NopContextProviderTest {
 	}
 
 	/**
-	 * Verifies that clear() method is invokable without throwing any exceptions.
+	 * Verifies that {@code clear()} method is invokable without throwing any exceptions.
 	 */
 	@Test
 	public void clear() {
