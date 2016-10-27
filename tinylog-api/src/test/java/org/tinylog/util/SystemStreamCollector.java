@@ -88,6 +88,18 @@ public final class SystemStreamCollector implements AutoCloseable {
 	}
 
 	/**
+	 * Drops stored output from standard and error output stream.
+	 */
+	public void clear() {
+		synchronized (standardStream) {
+			standardStream.reset();
+		}
+		synchronized (errorStream) {
+			errorStream.reset();
+		}
+	}
+
+	/**
 	 * Stops collecting outputs form standard output stream {@link System#out} and error output stream
 	 * {@link System#err}.
 	 */
