@@ -58,9 +58,9 @@ final class WrapperLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void internal(final int depth, final Level level, final Throwable exception, final Object obj, final Object... arguments) {
+	public void internal(final int depth, final Level level, final Throwable exception, final String message) {
 		for (int i = 0; i < providers.length; ++i) {
-			providers[i].internal(depth + 1, level, exception, obj, arguments);
+			providers[i].internal(depth + 1, level, exception, message);
 		}
 	}
 

@@ -67,17 +67,14 @@ public interface LoggingProvider {
 	 * Provides an internal log entry (typically used for internal tinylog warnings and errors).
 	 *
 	 * @param depth
-	 *            Depth of caller in stack trace (e.g. '1' if there is only one method between caller and this method in
-	 *            the stack trace)
+	 *            Depth of caller in stack trace (e.g. '0' for direct calls)
 	 * @param level
 	 *            Severity level of log entry
 	 * @param exception
 	 *            Exception to log or {@code null}
-	 * @param obj
+	 * @param message
 	 *            Message to log or {@code null}
-	 * @param arguments
-	 *            Arguments for message or {@code null}
 	 */
-	void internal(int depth, Level level, Throwable exception, Object obj, Object... arguments);
+	void internal(int depth, Level level, Throwable exception, String message);
 
 }

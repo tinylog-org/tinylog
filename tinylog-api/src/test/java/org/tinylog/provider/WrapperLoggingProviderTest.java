@@ -107,10 +107,10 @@ public final class WrapperLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		wrapped.internal(1, Level.INFO, exception, "Test", 42);
+		wrapped.internal(1, Level.INFO, exception, "Test");
 
-		verify(first).internal(2, Level.INFO, exception, "Test", 42);
-		verify(second).internal(2, Level.INFO, exception, "Test", 42);
+		verify(first).internal(2, Level.INFO, exception, "Test");
+		verify(second).internal(2, Level.INFO, exception, "Test");
 	}
 
 	/**

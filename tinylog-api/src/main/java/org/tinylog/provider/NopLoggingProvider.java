@@ -40,7 +40,7 @@ final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void internal(final int depth, final Level level, final Throwable exception, final Object obj, final Object... arguments) {
+	public void internal(final int depth, final Level level, final Throwable exception, final String message) {
 		// Ignore
 	}
 

@@ -68,8 +68,8 @@ public final class NopLoggingProviderTest {
 	 */
 	@Test
 	public void internal() {
-		provider.internal(0, Level.DEBUG, null, null, (Object[]) null);
-		provider.internal(1, Level.ERROR, null, null, (Object[]) null);
+		provider.internal(0, Level.DEBUG, null, null);
+		provider.internal(1, Level.ERROR, null, null);
 	}
 
 }
