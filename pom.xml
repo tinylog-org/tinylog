@@ -56,7 +56,7 @@
 		<assertj-core.version>3.5.2</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
 		<junit.version>4.12</junit.version>
-		<mockito-core.version>2.2.9</mockito-core.version>
+		<powermock.version>1.6.5</powermock.version>
 	</properties>
 
 	<licenses>
@@ -110,9 +110,15 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito-core.version}</version>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-mockito</artifactId>
+				<version>${powermock.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>${powermock.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
