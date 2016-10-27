@@ -190,7 +190,9 @@
 		<module name="GenericWhitespace" />
 		<module name="MethodParamPad" />
 		<module name="NoLineWrap" />
-		<module name="NoWhitespaceAfter" />
+		<module name="NoWhitespaceAfter">
+			<property name="tokens" value="INC, DEC, UNARY_MINUS, UNARY_PLUS, BNOT, LNOT, DOT, ARRAY_DECLARATOR, INDEX_OP"/>
+		</module>
 		<module name="NoWhitespaceBefore" />
 		<module name="OperatorWrap" />
 		<module name="ParenPad" />
@@ -198,7 +200,9 @@
 			<property name="format" value="^\t* +([^\*]| \*)" />
 			<property name="message" value="Indent must use tab characters" />
 		</module>
-		<module name="SeparatorWrap" />
+		<module name="SeparatorWrap">
+			<property name="tokens" value="COMMA, SEMI, ELLIPSIS, LPAREN, ARRAY_DECLARATOR, RBRACK"/>
+		</module>
 		<module name="SingleSpaceSeparator" />
 		<module name="TypecastParenPad" />
 		<module name="WhitespaceAfter" />
