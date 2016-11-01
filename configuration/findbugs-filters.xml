@@ -2,6 +2,6 @@
 	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
-		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
 	</Match>
 </FindBugsFilter>
