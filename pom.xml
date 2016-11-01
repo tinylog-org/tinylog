@@ -184,7 +184,7 @@
 						<consoleOutput>true</consoleOutput>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
 						<failsOnError>true</failsOnError>
-						<configLocation>configuration/checkstyle-checks.xml</configLocation>
+						<configLocation>${project.parent.basedir}/configuration/checkstyle-checks.xml</configLocation>
 						<linkXRef>false</linkXRef>
 					</configuration>
 					<executions>
@@ -205,7 +205,7 @@
 						<threshold>Low</threshold>
 						<includeTests>true</includeTests>
 						<failOnError>true</failOnError>
-						<excludeFilterFile>configuration/findbugs-filters.xml</excludeFilterFile>
+						<excludeFilterFile>${project.parent.basedir}/configuration/findbugs-filters.xml</excludeFilterFile>
 					</configuration>
 					<executions>
 						<execution>
