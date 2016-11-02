@@ -9,4 +9,9 @@
 		<Source name="~.*Test\.java" />
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
 	</Match>
+	<Match>
+		<!-- Reflections Class -->
+		<Class name="org.tinylog.util.Reflections" />
+		<Bug pattern="DP_DO_INSIDE_DO_PRIVILEGED" />
+	</Match>
 </FindBugsFilter>
