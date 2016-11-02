@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -26,7 +26,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
-import org.tinylog.util.SystemStreamCollector;
+import org.tinylog.rule.SystemStreamCollector;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,27 +41,19 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest(ProviderRegistry.class)
 public final class ProviderRegistryTest {
 
-	private SystemStreamCollector systemStream;
+	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
-	 * Redirects {@link System#out} and {@link System#err} as well as initializes {@link ProviderRegistry} properly.
+	 * Initializes {@link ProviderRegistry} properly.
 	 */
 	@Before
 	public void init() {
-		systemStream = new SystemStreamCollector();
 		ProviderRegistry.getLoggingProvider();
 		systemStream.clear();
-	}
-
-	/**
-	 * Stops redirecting {@link System#out} and {@link System#err}.
-	 */
-	@After
-	public void reset() {
-		systemStream.close();
-
-		assertThat(systemStream.consumeStandardOutput()).isEmpty();
-		assertThat(systemStream.consumeErrorOutput()).isEmpty();
 	}
 
 	/**

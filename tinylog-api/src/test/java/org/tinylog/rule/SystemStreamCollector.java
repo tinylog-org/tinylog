@@ -11,12 +11,17 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.util;
+package org.tinylog.rule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+
+import org.assertj.core.api.Assertions;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * Collector for standard output stream {@link System#out} and error output stream {@link System#err}.
@@ -26,22 +31,51 @@ import java.nio.charset.StandardCharsets;
  * by {@link #close()}.
  * </p>
  */
-public final class SystemStreamCollector implements AutoCloseable {
+public final class SystemStreamCollector implements TestRule {
 
-	private ByteArrayOutputStream standardStream;
-	private ByteArrayOutputStream errorStream;
+	private final boolean verifiyEmptyStreams;
 
-	private PrintStream originalStandardStream;
-	private PrintStream originalErrorStream;
+	private final ByteArrayOutputStream standardStream;
+	private final ByteArrayOutputStream errorStream;
 
-	/** */
-	public SystemStreamCollector() {
-		originalStandardStream = System.out;
-		originalErrorStream = System.err;
+	private final PrintStream originalStandardStream;
+	private final PrintStream originalErrorStream;
+
+	/**
+	 * @param verifiyEmptyStreams
+	 *            if {@code true}, output streams while be checked whether they are empty after each test method,
+	 *            otherwise the streams will be cleaned silently
+	 */
+	public SystemStreamCollector(final boolean verifiyEmptyStreams) {
+		this.verifiyEmptyStreams = verifiyEmptyStreams;
 
 		standardStream = new ByteArrayOutputStream();
 		errorStream = new ByteArrayOutputStream();
 
+		originalStandardStream = System.out;
+		originalErrorStream = System.err;
+	}
+
+	@Override
+	public Statement apply(final Statement base, final Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				start();
+				try {
+					base.evaluate();
+				} finally {
+					stop();
+				}
+			}
+		};
+	}
+
+	/**
+	 * Starts collecting outputs form standard output stream {@link System#out} and error output stream
+	 * {@link System#err} instead of writing them to console.
+	 */
+	public void start() {
 		try {
 			System.setOut(new PrintStream(standardStream, true, StandardCharsets.UTF_8.name()));
 			System.setErr(new PrintStream(errorStream, true, StandardCharsets.UTF_8.name()));
@@ -49,6 +83,22 @@ public final class SystemStreamCollector implements AutoCloseable {
 			// UTF-8 should be supported on all platforms
 			throw new RuntimeException(ex);
 		}
+	}
+
+	/**
+	 * Stops collecting outputs form standard output stream {@link System#out} and error output stream
+	 * {@link System#err}.
+	 */
+	public void stop() {
+		System.setOut(originalStandardStream);
+		System.setErr(originalErrorStream);
+
+		if (verifiyEmptyStreams) {
+			Assertions.assertThat(consumeStandardOutput()).isEmpty();
+			Assertions.assertThat(consumeErrorOutput()).isEmpty();
+		}
+
+		clear();
 	}
 
 	/**
@@ -97,16 +147,6 @@ public final class SystemStreamCollector implements AutoCloseable {
 		synchronized (errorStream) {
 			errorStream.reset();
 		}
-	}
-
-	/**
-	 * Stops collecting outputs form standard output stream {@link System#out} and error output stream
-	 * {@link System#err}.
-	 */
-	@Override
-	public void close() {
-		System.setOut(originalStandardStream);
-		System.setErr(originalErrorStream);
 	}
 
 }

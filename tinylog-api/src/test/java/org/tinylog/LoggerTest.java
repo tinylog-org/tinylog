@@ -33,7 +33,7 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
-import org.tinylog.util.SystemStreamCollector;
+import org.tinylog.rule.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
@@ -56,6 +56,12 @@ public final class LoggerTest {
 	@Rule
 	public PowerMockRule rule = new PowerMockRule();
 
+	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
+
 	private Level level;
 
 	private boolean traceEnabled;
@@ -64,7 +70,6 @@ public final class LoggerTest {
 	private boolean warnEnabled;
 	private boolean errorEnabled;
 
-	private SystemStreamCollector systemStream;
 	private LoggingProvider loggingProvider;
 
 	/**
@@ -114,26 +119,24 @@ public final class LoggerTest {
 	}
 
 	/**
-	 * Redirects {@link System#out} and {@link System#err} as well as mocks the underlying logging provider.
+	 * Mocks the underlying logging provider.
 	 *
 	 * @throws ReflectiveOperationException
 	 *             Failed mocking logging provider
 	 */
 	@Before
 	public void init() throws ReflectiveOperationException {
-		systemStream = new SystemStreamCollector();
 		loggingProvider = mockLoggingProvider();
 	}
 
 	/**
-	 * Stops redirecting {@link System#out} and {@link System#err} and resets the underlying logging provider.
+	 * Resets the underlying logging provider.
 	 *
 	 * @throws Exception
 	 *             Failed reseting logging provider
 	 */
 	@After
 	public void reset() throws Exception {
-		systemStream.close();
 		resetLoggingProvider();
 	}
 

@@ -16,14 +16,13 @@ package org.tinylog.provider;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.tinylog.Level;
-import org.tinylog.util.SystemStreamCollector;
+import org.tinylog.rule.SystemStreamCollector;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,10 +33,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(Parameterized.class)
 public final class InternalLoggerTest {
 
+	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
 	private Level severityLevel;
 	private String outputLevel;
-
-	private SystemStreamCollector systemStream;
 
 	/**
 	 * @param severityLevel
@@ -59,25 +62,6 @@ public final class InternalLoggerTest {
 	@Parameters(name = "{1}")
 	public static Collection<Object[]> getLevels() {
 		return asList(new Object[][] { { Level.WARNING, "WARNING" }, { Level.ERROR, "ERROR" } });
-	}
-
-	/**
-	 * Redirects {@link System#out} and {@link System#err}.
-	 */
-	@Before
-	public void init() {
-		systemStream = new SystemStreamCollector();
-	}
-
-	/**
-	 * Stops redirecting {@link System#out} and {@link System#err}.
-	 */
-	@After
-	public void reset() {
-		systemStream.close();
-
-		assertThat(systemStream.consumeStandardOutput()).isEmpty();
-		assertThat(systemStream.consumeErrorOutput()).isEmpty();
 	}
 
 	/**
