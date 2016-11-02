@@ -1,5 +1,10 @@
 <FindBugsFilter>
 	<Match>
+		<!-- Logger Classes -->
+		<Source name="~.*Logger\.java" />
+		<Bug pattern="UC_USELESS_VOID_METHOD" />
+	</Match>
+	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
