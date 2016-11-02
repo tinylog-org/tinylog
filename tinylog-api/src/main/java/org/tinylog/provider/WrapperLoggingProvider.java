@@ -23,7 +23,6 @@ import org.tinylog.Level;
 final class WrapperLoggingProvider implements LoggingProvider {
 
 	private final LoggingProvider[] providers;
-	private final Level minimumLevel;
 
 	/**
 	 * @param providers
@@ -31,18 +30,24 @@ final class WrapperLoggingProvider implements LoggingProvider {
 	 */
 	WrapperLoggingProvider(final Collection<LoggingProvider> providers) {
 		this.providers = providers.toArray(new LoggingProvider[providers.size()]);
-		this.minimumLevel = evaluateMinimumLevel(this.providers);
 	}
 
 	@Override
-	public Level getMinimumLevel() {
+	public Level getMinimumLevel(final String tag) {
+		Level minimumLevel = Level.OFF;
+		for (int i = 0; i < providers.length; ++i) {
+			Level level = providers[i].getMinimumLevel(tag);
+			if (level.ordinal() < minimumLevel.ordinal()) {
+				minimumLevel = level;
+			}
+		}
 		return minimumLevel;
 	}
 
 	@Override
-	public boolean isEnabled(final int depth, final Level level) {
+	public boolean isEnabled(final int depth, final String tag, final Level level) {
 		for (int i = 0; i < providers.length; ++i) {
-			if (providers[i].isEnabled(depth + 1, level)) {
+			if (providers[i].isEnabled(depth + 1, tag, level)) {
 				return true;
 			}
 		}
@@ -51,9 +56,10 @@ final class WrapperLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final Level level, final Throwable exception, final Object obj, final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
+		final Object... arguments) {
 		for (int i = 0; i < providers.length; ++i) {
-			providers[i].log(depth + 1, level, exception, obj, arguments);
+			providers[i].log(depth + 1, tag, level, exception, obj, arguments);
 		}
 	}
 
@@ -62,24 +68,6 @@ final class WrapperLoggingProvider implements LoggingProvider {
 		for (int i = 0; i < providers.length; ++i) {
 			providers[i].internal(depth + 1, level, exception, message);
 		}
-	}
-
-	/**
-	 * Evaluates the lowest minimum severity level of all logging providers.
-	 *
-	 * @param providers
-	 *            Base logging providers
-	 * @return Minimum severity level
-	 */
-	private static Level evaluateMinimumLevel(final LoggingProvider[] providers) {
-		Level minimumLevel = Level.OFF;
-		for (int i = 0; i < providers.length; ++i) {
-			Level level = providers[i].getMinimumLevel();
-			if (level.ordinal() < minimumLevel.ordinal()) {
-				minimumLevel = level;
-			}
-		}
-		return minimumLevel;
 	}
 
 }

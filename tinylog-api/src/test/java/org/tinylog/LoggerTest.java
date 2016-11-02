@@ -38,6 +38,7 @@ import org.tinylog.util.SystemStreamCollector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.verifyZeroInteractions;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -167,7 +168,7 @@ public final class LoggerTest {
 		Logger.trace("Hello World!");
 
 		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.TRACE, null, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -181,7 +182,7 @@ public final class LoggerTest {
 		Logger.trace("Hello {}!", "World");
 
 		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.TRACE, null, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -197,7 +198,7 @@ public final class LoggerTest {
 		Logger.trace(exception);
 
 		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.TRACE, exception, null, (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, null, (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -213,7 +214,7 @@ public final class LoggerTest {
 		Logger.trace(exception, "Hello World!");
 
 		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -230,7 +231,7 @@ public final class LoggerTest {
 		Logger.trace(exception, "Hello {}!", "World");
 
 		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.TRACE, exception, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -252,7 +253,7 @@ public final class LoggerTest {
 		Logger.debug("Hello World!");
 
 		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -266,7 +267,7 @@ public final class LoggerTest {
 		Logger.debug("Hello {}!", "World");
 
 		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.DEBUG, null, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -282,7 +283,7 @@ public final class LoggerTest {
 		Logger.debug(exception);
 
 		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.DEBUG, exception, null, (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, null, (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -298,7 +299,7 @@ public final class LoggerTest {
 		Logger.debug(exception, "Hello World!");
 
 		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -315,7 +316,7 @@ public final class LoggerTest {
 		Logger.debug(exception, "Hello {}!", "World");
 
 		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.DEBUG, exception, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -337,7 +338,7 @@ public final class LoggerTest {
 		Logger.info("Hello World!");
 
 		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.INFO, null, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.INFO, null, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -351,7 +352,7 @@ public final class LoggerTest {
 		Logger.info("Hello {}!", "World");
 
 		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.INFO, null, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.INFO, null, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -367,7 +368,7 @@ public final class LoggerTest {
 		Logger.info(exception);
 
 		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.INFO, exception, null, (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, null, (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -383,7 +384,7 @@ public final class LoggerTest {
 		Logger.info(exception, "Hello World!");
 
 		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.INFO, exception, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -400,7 +401,7 @@ public final class LoggerTest {
 		Logger.info(exception, "Hello {}!", "World");
 
 		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.INFO, exception, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -422,7 +423,7 @@ public final class LoggerTest {
 		Logger.warn("Hello World!");
 
 		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.WARNING, null, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -436,7 +437,7 @@ public final class LoggerTest {
 		Logger.warn("Hello {}!", "World");
 
 		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.WARNING, null, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -452,7 +453,7 @@ public final class LoggerTest {
 		Logger.warn(exception);
 
 		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.WARNING, exception, null, (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, null, (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -468,7 +469,7 @@ public final class LoggerTest {
 		Logger.warn(exception, "Hello World!");
 
 		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.WARNING, exception, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -485,7 +486,7 @@ public final class LoggerTest {
 		Logger.warn(exception, "Hello {}!", "World");
 
 		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.WARNING, exception, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -507,7 +508,7 @@ public final class LoggerTest {
 		Logger.error("Hello World!");
 
 		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.ERROR, null, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -521,7 +522,7 @@ public final class LoggerTest {
 		Logger.error("Hello {}!", "World");
 
 		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.ERROR, null, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -537,7 +538,7 @@ public final class LoggerTest {
 		Logger.error(exception);
 
 		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.ERROR, exception, null, (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, null, (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -553,7 +554,7 @@ public final class LoggerTest {
 		Logger.error(exception, "Hello World!");
 
 		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -570,7 +571,7 @@ public final class LoggerTest {
 		Logger.error(exception, "Hello {}!", "World");
 
 		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, Level.ERROR, exception, "Hello {}!", "World");
+			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello {}!", "World");
 		} else {
 			verifyZeroInteractions(loggingProvider);
 		}
@@ -586,12 +587,12 @@ public final class LoggerTest {
 	private LoggingProvider mockLoggingProvider() throws ReflectiveOperationException {
 		LoggingProvider provider = mock(LoggingProvider.class);
 
-		when(provider.getMinimumLevel()).thenReturn(level);
-		when(provider.isEnabled(anyInt(), eq(Level.TRACE))).thenReturn(traceEnabled);
-		when(provider.isEnabled(anyInt(), eq(Level.DEBUG))).thenReturn(debugEnabled);
-		when(provider.isEnabled(anyInt(), eq(Level.INFO))).thenReturn(infoEnabled);
-		when(provider.isEnabled(anyInt(), eq(Level.WARNING))).thenReturn(warnEnabled);
-		when(provider.isEnabled(anyInt(), eq(Level.ERROR))).thenReturn(errorEnabled);
+		when(provider.getMinimumLevel(null)).thenReturn(level);
+		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(traceEnabled);
+		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(debugEnabled);
+		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(infoEnabled);
+		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
+		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
 
 		updateField(Logger.class, "LOGGING_PROVIDER", provider);
 		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);

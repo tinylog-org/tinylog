@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -42,7 +43,7 @@ public final class WrapperLoggingProviderTest {
 	@Test
 	public void getSameMinimumLevel() {
 		init(Level.TRACE, Level.TRACE);
-		assertThat(wrapped.getMinimumLevel()).isEqualTo(Level.TRACE);
+		assertThat(wrapped.getMinimumLevel(null)).isEqualTo(Level.TRACE);
 	}
 
 	/**
@@ -52,7 +53,7 @@ public final class WrapperLoggingProviderTest {
 	@Test
 	public void getDifferentMinimumLevel() {
 		init(Level.DEBUG, Level.WARNING);
-		assertThat(wrapped.getMinimumLevel()).isEqualTo(Level.DEBUG);
+		assertThat(wrapped.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
 	}
 
 	/**
@@ -63,26 +64,26 @@ public final class WrapperLoggingProviderTest {
 	public void isEnabled() {
 		init(Level.TRACE, Level.TRACE);
 
-		when(first.isEnabled(anyInt(), eq(Level.TRACE))).thenReturn(false);
-		when(first.isEnabled(anyInt(), eq(Level.DEBUG))).thenReturn(false);
-		when(first.isEnabled(anyInt(), eq(Level.INFO))).thenReturn(false);
-		when(first.isEnabled(anyInt(), eq(Level.WARNING))).thenReturn(true);
-		when(first.isEnabled(anyInt(), eq(Level.ERROR))).thenReturn(true);
+		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(true);
+		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(true);
 
-		when(second.isEnabled(anyInt(), eq(Level.TRACE))).thenReturn(false);
-		when(second.isEnabled(anyInt(), eq(Level.DEBUG))).thenReturn(true);
-		when(second.isEnabled(anyInt(), eq(Level.INFO))).thenReturn(true);
-		when(second.isEnabled(anyInt(), eq(Level.WARNING))).thenReturn(true);
-		when(second.isEnabled(anyInt(), eq(Level.ERROR))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(false);
+		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(true);
 
-		assertThat(wrapped.isEnabled(1, Level.TRACE)).isEqualTo(false);
-		assertThat(wrapped.isEnabled(1, Level.DEBUG)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, Level.INFO)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, Level.WARNING)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, Level.ERROR)).isEqualTo(true);
+		assertThat(wrapped.isEnabled(1, null, Level.TRACE)).isEqualTo(false);
+		assertThat(wrapped.isEnabled(1, null, Level.DEBUG)).isEqualTo(true);
+		assertThat(wrapped.isEnabled(1, null, Level.INFO)).isEqualTo(true);
+		assertThat(wrapped.isEnabled(1, null, Level.WARNING)).isEqualTo(true);
+		assertThat(wrapped.isEnabled(1, null, Level.ERROR)).isEqualTo(true);
 
-		verify(first, atLeastOnce()).isEnabled(eq(2), any());
-		verify(second, atLeastOnce()).isEnabled(eq(2), any());
+		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
+		verify(second, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
 	}
 
 	/**
@@ -93,10 +94,10 @@ public final class WrapperLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		wrapped.log(1, Level.INFO, exception, "Test", 42);
+		wrapped.log(1, "technical", Level.INFO, exception, "Test", 42);
 
-		verify(first).log(2, Level.INFO, exception, "Test", 42);
-		verify(second).log(2, Level.INFO, exception, "Test", 42);
+		verify(first).log(2, "technical", Level.INFO, exception, "Test", 42);
+		verify(second).log(2, "technical", Level.INFO, exception, "Test", 42);
 	}
 
 	/**
@@ -125,8 +126,8 @@ public final class WrapperLoggingProviderTest {
 		first = mock(LoggingProvider.class);
 		second = mock(LoggingProvider.class);
 
-		when(first.getMinimumLevel()).thenReturn(firstLevel);
-		when(second.getMinimumLevel()).thenReturn(secondLevel);
+		when(first.getMinimumLevel(null)).thenReturn(firstLevel);
+		when(second.getMinimumLevel(null)).thenReturn(secondLevel);
 
 		wrapped = new WrapperLoggingProvider(asList(first, second));
 	}

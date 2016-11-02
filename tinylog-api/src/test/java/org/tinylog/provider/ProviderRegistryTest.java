@@ -124,12 +124,12 @@ public final class ProviderRegistryTest {
 	public void multipleLoggingProviders() throws Exception {
 		List<LoggingProvider> registerProviders = registerProviders(LoggingProvider.class, 2);
 		for (LoggingProvider provider : registerProviders) {
-			when(provider.getMinimumLevel()).thenReturn(Level.DEBUG);
+			when(provider.getMinimumLevel(null)).thenReturn(Level.DEBUG);
 		}
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(WrapperLoggingProvider.class);
-		assertThat(createdProvider.getMinimumLevel()).isEqualTo(Level.DEBUG);
+		assertThat(createdProvider.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
 	}
 
 	/**

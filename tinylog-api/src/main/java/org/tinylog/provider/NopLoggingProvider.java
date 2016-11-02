@@ -25,17 +25,18 @@ final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public Level getMinimumLevel() {
+	public Level getMinimumLevel(final String tag) {
 		return Level.OFF;
 	}
 
 	@Override
-	public boolean isEnabled(final int depth, final Level level) {
+	public boolean isEnabled(final int depth, final String tag, final Level level) {
 		return false;
 	}
 
 	@Override
-	public void log(final int depth, final Level level, final Throwable exception, final Object obj, final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
+		final Object... arguments) {
 		// Ignore
 	}
 

@@ -39,19 +39,32 @@ public final class NopLoggingProviderTest {
 	 */
 	@Test
 	public void getMinimumLevel() {
-		assertThat(provider.getMinimumLevel()).isEqualTo(Level.OFF);
+		assertThat(provider.getMinimumLevel(null)).isEqualTo(Level.OFF);
+		assertThat(provider.getMinimumLevel("test")).isEqualTo(Level.OFF);
 	}
 
 	/**
-	 * Verifies that all severity levels are disabled.
+	 * Verifies that all severity levels for untagged log entries are disabled.
 	 */
 	@Test
-	public void isEnabled() {
-		assertThat(provider.isEnabled(0, Level.TRACE)).isFalse();
-		assertThat(provider.isEnabled(1, Level.DEBUG)).isFalse();
-		assertThat(provider.isEnabled(2, Level.INFO)).isFalse();
-		assertThat(provider.isEnabled(3, Level.WARNING)).isFalse();
-		assertThat(provider.isEnabled(4, Level.ERROR)).isFalse();
+	public void isEnabledUntagged() {
+		assertThat(provider.isEnabled(0, null, Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled(1, null, Level.DEBUG)).isFalse();
+		assertThat(provider.isEnabled(2, null, Level.INFO)).isFalse();
+		assertThat(provider.isEnabled(3, null, Level.WARNING)).isFalse();
+		assertThat(provider.isEnabled(4, null, Level.ERROR)).isFalse();
+	}
+
+	/**
+	 * Verifies that all severity levels for tagged log entries are disabled.
+	 */
+	@Test
+	public void isEnabledTagged() {
+		assertThat(provider.isEnabled(0, "test", Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled(1, "test", Level.DEBUG)).isFalse();
+		assertThat(provider.isEnabled(2, "test", Level.INFO)).isFalse();
+		assertThat(provider.isEnabled(3, "test", Level.WARNING)).isFalse();
+		assertThat(provider.isEnabled(4, "test", Level.ERROR)).isFalse();
 	}
 
 	/**
@@ -59,8 +72,8 @@ public final class NopLoggingProviderTest {
 	 */
 	@Test
 	public void log() {
-		provider.log(0, Level.DEBUG, null, null, (Object[]) null);
-		provider.log(1, Level.ERROR, null, null, (Object[]) null);
+		provider.log(0, null, Level.DEBUG, null, null, (Object[]) null);
+		provider.log(1, null, Level.ERROR, null, null, (Object[]) null);
 	}
 
 	/**
