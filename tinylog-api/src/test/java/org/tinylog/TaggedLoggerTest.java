@@ -41,7 +41,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static org.tinylog.util.Reflections.updateField;
 
 /**
  * Tests for {@link TaggedLogger}.
@@ -586,7 +585,7 @@ public final class TaggedLoggerTest {
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.WARNING))).thenReturn(warnEnabled);
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-		updateField(TaggedLogger.class, "LOGGING_PROVIDER", provider);
+		Whitebox.setInternalState(TaggedLogger.class, "LOGGING_PROVIDER", provider);
 
 		return provider;
 	}
@@ -598,13 +597,13 @@ public final class TaggedLoggerTest {
 	 *             Failed updating fields
 	 */
 	private void resetLoggingProvider() throws Exception {
-		updateField(TaggedLogger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
+		Whitebox.setInternalState(TaggedLogger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
 
-		updateField(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE));
-		updateField(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG));
-		updateField(logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO));
-		updateField(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARNING));
-		updateField(logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR));
+		Whitebox.setInternalState(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE));
+		Whitebox.setInternalState(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG));
+		Whitebox.setInternalState(logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO));
+		Whitebox.setInternalState(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARNING));
+		Whitebox.setInternalState(logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR));
 	}
 
 	/**

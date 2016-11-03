@@ -43,7 +43,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static org.tinylog.util.Reflections.updateField;
 
 /**
  * Tests for {@link Logger}.
@@ -606,12 +605,12 @@ public final class LoggerTest {
 			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
 			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-			updateField(Logger.class, "LOGGING_PROVIDER", provider);
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(Logger.class, "LOGGING_PROVIDER", provider);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
 
 			return provider;
 		}
@@ -623,12 +622,12 @@ public final class LoggerTest {
 		 *             Failed updating fields
 		 */
 		private void resetLoggingProvider() throws Exception {
-			updateField(Logger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", isCoveredByMinimumLevel(Level.TRACE));
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", isCoveredByMinimumLevel(Level.DEBUG));
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", isCoveredByMinimumLevel(Level.INFO));
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", isCoveredByMinimumLevel(Level.WARNING));
-			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", isCoveredByMinimumLevel(Level.ERROR));
+			Whitebox.setInternalState(Logger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", isCoveredByMinimumLevel(Level.TRACE));
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", isCoveredByMinimumLevel(Level.DEBUG));
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", isCoveredByMinimumLevel(Level.INFO));
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", isCoveredByMinimumLevel(Level.WARNING));
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", isCoveredByMinimumLevel(Level.ERROR));
 		}
 
 		/**
