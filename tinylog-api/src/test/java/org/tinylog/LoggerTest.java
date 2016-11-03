@@ -13,8 +13,6 @@
 
 package org.tinylog;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,10 +21,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
@@ -36,626 +34,661 @@ import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rule.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.verifyZeroInteractions;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static org.tinylog.util.Reflections.updateField;
 
 /**
  * Tests for {@link Logger}.
  */
-@RunWith(Parameterized.class)
-@PrepareForTest(Logger.class)
+@RunWith(Enclosed.class)
 public final class LoggerTest {
 
 	/**
-	 * Activates Power Mock as alternative to {@link PowerMockRunner}.
+	 * Tests for logging methods.
 	 */
-	@Rule
-	public PowerMockRule rule = new PowerMockRule();
+	@RunWith(Parameterized.class)
+	@PrepareForTest(Logger.class)
+	public static final class Logging {
 
-	/**
-	 * Redirects and collects system output streams.
-	 */
-	@Rule
-	public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
+		/**
+		 * Activates PowerMock (alternative to {@link PowerMockRunner}).
+		 */
+		@Rule
+		public PowerMockRule rule = new PowerMockRule();
 
-	private Level level;
+		/**
+		 * Redirects and collects system output streams.
+		 */
+		@Rule
+		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
-	private boolean traceEnabled;
-	private boolean debugEnabled;
-	private boolean infoEnabled;
-	private boolean warnEnabled;
-	private boolean errorEnabled;
+		private Level level;
 
-	private LoggingProvider loggingProvider;
+		private boolean traceEnabled;
+		private boolean debugEnabled;
+		private boolean infoEnabled;
+		private boolean warnEnabled;
+		private boolean errorEnabled;
 
-	/**
-	 * @param level
-	 *            Actual severity level under test
-	 * @param traceEnabled
-	 *            Determines if {@link Level#TRACE TRACE} level is enabled
-	 * @param debugEnabled
-	 *            Determines if {@link Level#DEBUG DEBUG} level is enabled
-	 * @param infoEnabled
-	 *            Determines if {@link Level#INFO INFO} level is enabled
-	 * @param warnEnabled
-	 *            Determines if {@link Level#WARNING WARNING} level is enabled
-	 * @param errorEnabled
-	 *            Determines if {@link Level#ERROR ERROR} level is enabled
-	 */
-	public LoggerTest(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
-		final boolean warnEnabled, final boolean errorEnabled) {
-		this.level = level;
-		this.traceEnabled = traceEnabled;
-		this.debugEnabled = debugEnabled;
-		this.infoEnabled = infoEnabled;
-		this.warnEnabled = warnEnabled;
-		this.errorEnabled = errorEnabled;
-	}
+		private LoggingProvider loggingProvider;
 
-	/**
-	 * Returns for all severity levels which severity level are enabled.
-	 *
-	 * @return Each object array contains the severity level itself and five booleans for {@link Level#TRACE TRACE} ...
-	 *         {@link Level#ERROR ERROR} to determine whether these severity levels are enabled
-	 */
-	@Parameters(name = "{0}")
-	public static Collection<Object[]> getLevels() {
-		List<Object[]> levels = new ArrayList<>();
-
-		// @formatter:off
-		levels.add(new Object[] { Level.TRACE,   true,  true,  true,  true,  true });
-		levels.add(new Object[] { Level.DEBUG,   false, true,  true,  true,  true });
-		levels.add(new Object[] { Level.INFO,    false, false, true,  true,  true });
-		levels.add(new Object[] { Level.WARNING, false, false, false, true,  true });
-		levels.add(new Object[] { Level.ERROR,   false, false, false, false, true });
-		levels.add(new Object[] { Level.OFF,     false, false, false, false, false });
-		// @formatter:on
-
-		return levels;
-	}
-
-	/**
-	 * Mocks the underlying logging provider.
-	 *
-	 * @throws ReflectiveOperationException
-	 *             Failed mocking logging provider
-	 */
-	@Before
-	public void init() throws ReflectiveOperationException {
-		loggingProvider = mockLoggingProvider();
-	}
-
-	/**
-	 * Resets the underlying logging provider.
-	 *
-	 * @throws Exception
-	 *             Failed reseting logging provider
-	 */
-	@After
-	public void reset() throws Exception {
-		resetLoggingProvider();
-	}
-
-	/**
-	 * Verifies evaluating whether a specific severity level is covered by the minimum severity level.
-	 *
-	 * @throws Exception
-	 *             Failed invoking private {@link Logger#isCoveredByMinimumLevel()} method
-	 */
-	@Test
-	public void coveredByMinimumLevel() throws Exception {
-		assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(traceEnabled);
-		assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(debugEnabled);
-		assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(infoEnabled);
-		assertThat(isCoveredByMinimumLevel(Level.WARNING)).isEqualTo(warnEnabled);
-		assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(errorEnabled);
-	}
-
-	/**
-	 * Verifies evaluating whether {@link Level#TRACE TRACE} level is enabled.
-	 */
-	@Test
-	public void isTraceEnabled() {
-		assertThat(Logger.isTraceEnabled()).isEqualTo(traceEnabled);
-	}
-
-	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#TRACE TRACE} level.
-	 */
-	@Test
-	public void traceObject() {
-		Logger.trace("Hello World!");
-
-		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * @param level
+		 *            Actual severity level under test
+		 * @param traceEnabled
+		 *            Determines if {@link Level#TRACE TRACE} level is enabled
+		 * @param debugEnabled
+		 *            Determines if {@link Level#DEBUG DEBUG} level is enabled
+		 * @param infoEnabled
+		 *            Determines if {@link Level#INFO INFO} level is enabled
+		 * @param warnEnabled
+		 *            Determines if {@link Level#WARNING WARNING} level is enabled
+		 * @param errorEnabled
+		 *            Determines if {@link Level#ERROR ERROR} level is enabled
+		 */
+		public Logging(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
+			final boolean warnEnabled, final boolean errorEnabled) {
+			this.level = level;
+			this.traceEnabled = traceEnabled;
+			this.debugEnabled = debugEnabled;
+			this.infoEnabled = infoEnabled;
+			this.warnEnabled = warnEnabled;
+			this.errorEnabled = errorEnabled;
 		}
-	}
 
-	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#TRACE TRACE} level.
-	 */
-	@Test
-	public void traceMessageAndArguments() {
-		Logger.trace("Hello {}!", "World");
+		/**
+		 * Returns for all severity levels which severity level are enabled.
+		 *
+		 * @return Each object array contains the severity level itself and five booleans for {@link Level#TRACE TRACE}
+		 *         ... {@link Level#ERROR ERROR} to determine whether these severity levels are enabled
+		 */
+		@Parameters(name = "{0}")
+		public static Collection<Object[]> getLevels() {
+			List<Object[]> levels = new ArrayList<>();
 
-		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			// @formatter:off
+			levels.add(new Object[] { Level.TRACE,   true,  true,  true,  true,  true  });
+			levels.add(new Object[] { Level.DEBUG,   false, true,  true,  true,  true  });
+			levels.add(new Object[] { Level.INFO,    false, false, true,  true,  true  });
+			levels.add(new Object[] { Level.WARNING, false, false, false, true,  true  });
+			levels.add(new Object[] { Level.ERROR,   false, false, false, false, true  });
+			levels.add(new Object[] { Level.OFF,     false, false, false, false, false });
+			// @formatter:on
+
+			return levels;
 		}
-	}
 
-	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#TRACE TRACE} level.
-	 */
-	@Test
-	public void traceException() {
-		Exception exception = new NullPointerException();
-
-		Logger.trace(exception);
-
-		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, null, (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Mocks the underlying logging provider.
+		 *
+		 * @throws ReflectiveOperationException
+		 *             Failed mocking logging provider
+		 */
+		@Before
+		public void init() throws ReflectiveOperationException {
+			loggingProvider = mockLoggingProvider();
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#TRACE TRACE} level.
-	 */
-	@Test
-	public void traceExceptionWithMessage() {
-		Exception exception = new NullPointerException();
-
-		Logger.trace(exception, "Hello World!");
-
-		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Resets the underlying logging provider.
+		 *
+		 * @throws Exception
+		 *             Failed reseting logging provider
+		 */
+		@After
+		public void reset() throws Exception {
+			resetLoggingProvider();
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#TRACE TRACE}
-	 * level.
-	 */
-	@Test
-	public void traceExceptionWithMessageAndArguments() {
-		Exception exception = new NullPointerException();
-
-		Logger.trace(exception, "Hello {}!", "World");
-
-		if (traceEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Verifies evaluating whether a specific severity level is covered by the minimum severity level.
+		 *
+		 * @throws Exception
+		 *             Failed invoking private {@link Logger#isCoveredByMinimumLevel()} method
+		 */
+		@Test
+		public void coveredByMinimumLevel() throws Exception {
+			assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(traceEnabled);
+			assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(debugEnabled);
+			assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(infoEnabled);
+			assertThat(isCoveredByMinimumLevel(Level.WARNING)).isEqualTo(warnEnabled);
+			assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(errorEnabled);
 		}
-	}
 
-	/**
-	 * Verifies evaluating whether {@link Level#DEBUG DEBUG} level is enabled.
-	 */
-	@Test
-	public void isDebugEnabled() {
-		assertThat(Logger.isDebugEnabled()).isEqualTo(debugEnabled);
-	}
-
-	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#DEBUG DEBUG} level.
-	 */
-	@Test
-	public void debugObject() {
-		Logger.debug("Hello World!");
-
-		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Verifies evaluating whether {@link Level#TRACE TRACE} level is enabled.
+		 */
+		@Test
+		public void isTraceEnabled() {
+			assertThat(Logger.isTraceEnabled()).isEqualTo(traceEnabled);
 		}
-	}
 
-	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#DEBUG DEBUG} level.
-	 */
-	@Test
-	public void debugMessageAndArguments() {
-		Logger.debug("Hello {}!", "World");
+		/**
+		 * Verifies that a plain message object will be logged correctly at {@link Level#TRACE TRACE} level.
+		 */
+		@Test
+		public void traceObject() {
+			Logger.trace("Hello World!");
 
-		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (traceEnabled) {
+				verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#DEBUG DEBUG} level.
-	 */
-	@Test
-	public void debugException() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a formatted text message will be logged correctly at {@link Level#TRACE TRACE} level.
+		 */
+		@Test
+		public void traceMessageAndArguments() {
+			Logger.trace("Hello {}!", "World");
 
-		Logger.debug(exception);
-
-		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, null, (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (traceEnabled) {
+				verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#DEBUG DEBUG} level.
-	 */
-	@Test
-	public void debugExceptionWithMessage() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that an exception will be logged correctly at {@link Level#TRACE TRACE} level.
+		 */
+		@Test
+		public void traceException() {
+			Exception exception = new NullPointerException();
 
-		Logger.debug(exception, "Hello World!");
+			Logger.trace(exception);
 
-		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (traceEnabled) {
+				verify(loggingProvider).log(1, null, Level.TRACE, exception, null, (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#DEBUG DEBUG}
-	 * level.
-	 */
-	@Test
-	public void debugExceptionWithMessageAndArguments() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that an exception with a custom message will be logged correctly at {@link Level#TRACE TRACE} level.
+		 */
+		@Test
+		public void traceExceptionWithMessage() {
+			Exception exception = new NullPointerException();
 
-		Logger.debug(exception, "Hello {}!", "World");
+			Logger.trace(exception, "Hello World!");
 
-		if (debugEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (traceEnabled) {
+				verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies evaluating whether {@link Level#INFO INFO} level is enabled.
-	 */
-	@Test
-	public void isInfoEnabled() {
-		assertThat(Logger.isInfoEnabled()).isEqualTo(infoEnabled);
-	}
+		/**
+		 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#TRACE
+		 * TRACE} level.
+		 */
+		@Test
+		public void traceExceptionWithMessageAndArguments() {
+			Exception exception = new NullPointerException();
 
-	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#INFO INFO} level.
-	 */
-	@Test
-	public void infoObject() {
-		Logger.info("Hello World!");
+			Logger.trace(exception, "Hello {}!", "World");
 
-		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.INFO, null, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (traceEnabled) {
+				verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#INFO INFO} level.
-	 */
-	@Test
-	public void infoMessageAndArguments() {
-		Logger.info("Hello {}!", "World");
-
-		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.INFO, null, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Verifies evaluating whether {@link Level#DEBUG DEBUG} level is enabled.
+		 */
+		@Test
+		public void isDebugEnabled() {
+			assertThat(Logger.isDebugEnabled()).isEqualTo(debugEnabled);
 		}
-	}
 
-	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#INFO INFO} level.
-	 */
-	@Test
-	public void infoException() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a plain message object will be logged correctly at {@link Level#DEBUG DEBUG} level.
+		 */
+		@Test
+		public void debugObject() {
+			Logger.debug("Hello World!");
 
-		Logger.info(exception);
-
-		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, null, (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (debugEnabled) {
+				verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#INFO INFO} level.
-	 */
-	@Test
-	public void infoExceptionWithMessage() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a formatted text message will be logged correctly at {@link Level#DEBUG DEBUG} level.
+		 */
+		@Test
+		public void debugMessageAndArguments() {
+			Logger.debug("Hello {}!", "World");
 
-		Logger.info(exception, "Hello World!");
-
-		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (debugEnabled) {
+				verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#INFO INFO}
-	 * level.
-	 */
-	@Test
-	public void infoExceptionWithMessageAndArguments() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that an exception will be logged correctly at {@link Level#DEBUG DEBUG} level.
+		 */
+		@Test
+		public void debugException() {
+			Exception exception = new NullPointerException();
 
-		Logger.info(exception, "Hello {}!", "World");
+			Logger.debug(exception);
 
-		if (infoEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (debugEnabled) {
+				verify(loggingProvider).log(1, null, Level.DEBUG, exception, null, (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies evaluating whether {@link Level#WARNING WARNING} level is enabled.
-	 */
-	@Test
-	public void isWarnEnabled() {
-		assertThat(Logger.isWarnEnabled()).isEqualTo(warnEnabled);
-	}
+		/**
+		 * Verifies that an exception with a custom message will be logged correctly at {@link Level#DEBUG DEBUG} level.
+		 */
+		@Test
+		public void debugExceptionWithMessage() {
+			Exception exception = new NullPointerException();
 
-	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#WARNING WARNING} level.
-	 */
-	@Test
-	public void warnObject() {
-		Logger.warn("Hello World!");
+			Logger.debug(exception, "Hello World!");
 
-		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (debugEnabled) {
+				verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#WARNING WARNING} level.
-	 */
-	@Test
-	public void warnMessageAndArguments() {
-		Logger.warn("Hello {}!", "World");
+		/**
+		 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#DEBUG
+		 * DEBUG} level.
+		 */
+		@Test
+		public void debugExceptionWithMessageAndArguments() {
+			Exception exception = new NullPointerException();
 
-		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			Logger.debug(exception, "Hello {}!", "World");
+
+			if (debugEnabled) {
+				verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#WARNING WARNING} level.
-	 */
-	@Test
-	public void warnException() {
-		Exception exception = new NullPointerException();
-
-		Logger.warn(exception);
-
-		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, null, (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Verifies evaluating whether {@link Level#INFO INFO} level is enabled.
+		 */
+		@Test
+		public void isInfoEnabled() {
+			assertThat(Logger.isInfoEnabled()).isEqualTo(infoEnabled);
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#WARNING WARNING} level.
-	 */
-	@Test
-	public void warnExceptionWithMessage() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a plain message object will be logged correctly at {@link Level#INFO INFO} level.
+		 */
+		@Test
+		public void infoObject() {
+			Logger.info("Hello World!");
 
-		Logger.warn(exception, "Hello World!");
-
-		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (infoEnabled) {
+				verify(loggingProvider).log(1, null, Level.INFO, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#WARNING
-	 * WARNING} level.
-	 */
-	@Test
-	public void warnExceptionWithMessageAndArguments() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a formatted text message will be logged correctly at {@link Level#INFO INFO} level.
+		 */
+		@Test
+		public void infoMessageAndArguments() {
+			Logger.info("Hello {}!", "World");
 
-		Logger.warn(exception, "Hello {}!", "World");
-
-		if (warnEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (infoEnabled) {
+				verify(loggingProvider).log(1, null, Level.INFO, null, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies evaluating whether {@link Level#ERROR ERROR} level is enabled.
-	 */
-	@Test
-	public void isErrorEnabled() {
-		assertThat(Logger.isErrorEnabled()).isEqualTo(errorEnabled);
-	}
+		/**
+		 * Verifies that an exception will be logged correctly at {@link Level#INFO INFO} level.
+		 */
+		@Test
+		public void infoException() {
+			Exception exception = new NullPointerException();
 
-	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#ERROR ERROR} level.
-	 */
-	@Test
-	public void errorObject() {
-		Logger.error("Hello World!");
+			Logger.info(exception);
 
-		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (infoEnabled) {
+				verify(loggingProvider).log(1, null, Level.INFO, exception, null, (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#ERROR ERROR} level.
-	 */
-	@Test
-	public void errorMessageAndArguments() {
-		Logger.error("Hello {}!", "World");
+		/**
+		 * Verifies that an exception with a custom message will be logged correctly at {@link Level#INFO INFO} level.
+		 */
+		@Test
+		public void infoExceptionWithMessage() {
+			Exception exception = new NullPointerException();
 
-		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			Logger.info(exception, "Hello World!");
+
+			if (infoEnabled) {
+				verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#ERROR ERROR} level.
-	 */
-	@Test
-	public void errorException() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#INFO
+		 * INFO} level.
+		 */
+		@Test
+		public void infoExceptionWithMessageAndArguments() {
+			Exception exception = new NullPointerException();
 
-		Logger.error(exception);
+			Logger.info(exception, "Hello {}!", "World");
 
-		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, null, (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (infoEnabled) {
+				verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#ERROR ERROR} level.
-	 */
-	@Test
-	public void errorExceptionWithMessage() {
-		Exception exception = new NullPointerException();
-
-		Logger.error(exception, "Hello World!");
-
-		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
-		} else {
-			verifyZeroInteractions(loggingProvider);
+		/**
+		 * Verifies evaluating whether {@link Level#WARNING WARNING} level is enabled.
+		 */
+		@Test
+		public void isWarnEnabled() {
+			assertThat(Logger.isWarnEnabled()).isEqualTo(warnEnabled);
 		}
-	}
 
-	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#ERROR ERROR}
-	 * level.
-	 */
-	@Test
-	public void errorExceptionWithMessageAndArguments() {
-		Exception exception = new NullPointerException();
+		/**
+		 * Verifies that a plain message object will be logged correctly at {@link Level#WARNING WARNING} level.
+		 */
+		@Test
+		public void warnObject() {
+			Logger.warn("Hello World!");
 
-		Logger.error(exception, "Hello {}!", "World");
-
-		if (errorEnabled) {
-			Mockito.verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello {}!", "World");
-		} else {
-			verifyZeroInteractions(loggingProvider);
+			if (warnEnabled) {
+				verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
 		}
+
+		/**
+		 * Verifies that a formatted text message will be logged correctly at {@link Level#WARNING WARNING} level.
+		 */
+		@Test
+		public void warnMessageAndArguments() {
+			Logger.warn("Hello {}!", "World");
+
+			if (warnEnabled) {
+				verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception will be logged correctly at {@link Level#WARNING WARNING} level.
+		 */
+		@Test
+		public void warnException() {
+			Exception exception = new NullPointerException();
+
+			Logger.warn(exception);
+
+			if (warnEnabled) {
+				verify(loggingProvider).log(1, null, Level.WARNING, exception, null, (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception with a custom message will be logged correctly at {@link Level#WARNING WARNING}
+		 * level.
+		 */
+		@Test
+		public void warnExceptionWithMessage() {
+			Exception exception = new NullPointerException();
+
+			Logger.warn(exception, "Hello World!");
+
+			if (warnEnabled) {
+				verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#WARNING
+		 * WARNING} level.
+		 */
+		@Test
+		public void warnExceptionWithMessageAndArguments() {
+			Exception exception = new NullPointerException();
+
+			Logger.warn(exception, "Hello {}!", "World");
+
+			if (warnEnabled) {
+				verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#ERROR ERROR} level is enabled.
+		 */
+		@Test
+		public void isErrorEnabled() {
+			assertThat(Logger.isErrorEnabled()).isEqualTo(errorEnabled);
+		}
+
+		/**
+		 * Verifies that a plain message object will be logged correctly at {@link Level#ERROR ERROR} level.
+		 */
+		@Test
+		public void errorObject() {
+			Logger.error("Hello World!");
+
+			if (errorEnabled) {
+				verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message will be logged correctly at {@link Level#ERROR ERROR} level.
+		 */
+		@Test
+		public void errorMessageAndArguments() {
+			Logger.error("Hello {}!", "World");
+
+			if (errorEnabled) {
+				verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception will be logged correctly at {@link Level#ERROR ERROR} level.
+		 */
+		@Test
+		public void errorException() {
+			Exception exception = new NullPointerException();
+
+			Logger.error(exception);
+
+			if (errorEnabled) {
+				verify(loggingProvider).log(1, null, Level.ERROR, exception, null, (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception with a custom message will be logged correctly at {@link Level#ERROR ERROR} level.
+		 */
+		@Test
+		public void errorExceptionWithMessage() {
+			Exception exception = new NullPointerException();
+
+			Logger.error(exception, "Hello World!");
+
+			if (errorEnabled) {
+				verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#ERROR
+		 * ERROR} level.
+		 */
+		@Test
+		public void errorExceptionWithMessageAndArguments() {
+			Exception exception = new NullPointerException();
+
+			Logger.error(exception, "Hello {}!", "World");
+
+			if (errorEnabled) {
+				verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello {}!", "World");
+			} else {
+				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Mocks the logging provider for {@link Logger} and overrides all depending fields.
+		 *
+		 * @return Mock instance for logging provider
+		 * @throws ReflectiveOperationException
+		 *             Failed overriding fields in {@link Logger}
+		 */
+		private LoggingProvider mockLoggingProvider() throws ReflectiveOperationException {
+			LoggingProvider provider = mock(LoggingProvider.class);
+
+			when(provider.getMinimumLevel(null)).thenReturn(level);
+			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(traceEnabled);
+			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(debugEnabled);
+			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(infoEnabled);
+			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
+			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
+
+			updateField(Logger.class, "LOGGING_PROVIDER", provider);
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
+
+			return provider;
+		}
+
+		/**
+		 * Resets the logging provider and all overridden fields in {@link Logger}.
+		 *
+		 * @throws Exception
+		 *             Failed updating fields
+		 */
+		private void resetLoggingProvider() throws Exception {
+			updateField(Logger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", isCoveredByMinimumLevel(Level.TRACE));
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", isCoveredByMinimumLevel(Level.DEBUG));
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", isCoveredByMinimumLevel(Level.INFO));
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", isCoveredByMinimumLevel(Level.WARNING));
+			updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", isCoveredByMinimumLevel(Level.ERROR));
+		}
+
+		/**
+		 * Invokes the private method {@link Logger#isCoveredByMinimumLevel()}.
+		 *
+		 * @param level
+		 *            Severity level to check
+		 * @return {@code true} if given severity level is covered, otherwise {@code false}
+		 * @throws Exception
+		 *             Failed invoking method
+		 */
+		private boolean isCoveredByMinimumLevel(final Level level) throws Exception {
+			return Whitebox.invokeMethod(Logger.class, "isCoveredByMinimumLevel", level);
+		}
+
 	}
 
 	/**
-	 * Mocks the logging provider for logger class and overrides all depending fields.
-	 *
-	 * @return Mock instance for logging provide
-	 * @throws ReflectiveOperationException
-	 *             Failed overriding fields in logger class
+	 * Tests for receiving tagged logger instances.
 	 */
-	private LoggingProvider mockLoggingProvider() throws ReflectiveOperationException {
-		LoggingProvider provider = mock(LoggingProvider.class);
+	@RunWith(PowerMockRunner.class)
+	@PrepareForTest(TaggedLogger.class)
+	public static final class Tagging {
 
-		when(provider.getMinimumLevel(null)).thenReturn(level);
-		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(traceEnabled);
-		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(debugEnabled);
-		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(infoEnabled);
-		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
-		when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
+		/**
+		 * Redirects and collects system output streams.
+		 */
+		@Rule
+		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
-		updateField(Logger.class, "LOGGING_PROVIDER", provider);
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
+		/**
+		 * Verifies that {@link Logger#tag(String)} returns the same unntagged instance of {@link TaggedLogger} for
+		 * {@code null} and empty strings.
+		 *
+		 * @throws Exception
+		 *             Failed getting tag
+		 */
+		@Test
+		public void untagged() throws Exception {
+			TaggedLogger logger = Logger.tag(null);
 
-		return provider;
-	}
+			assertThat(logger).isNotNull().isSameAs(Logger.tag(""));
+			assertThat(Whitebox.<String>getInternalState(logger, "tag")).isNull();
+		}
 
-	/**
-	 * Updates a static field in a class.
-	 *
-	 * @param type
-	 *            Class which contains the field to update
-	 * @param name
-	 *            Name of the field to update
-	 * @param value
-	 *            New value for the field to update
-	 * @throws ReflectiveOperationException
-	 *             Failed updating
-	 */
-	private void updateField(final Class<?> type, final String name, final Object value) throws ReflectiveOperationException {
-		Field field = type.getDeclaredField(name);
-		field.setAccessible(true);
+		/**
+		 * Verifies that {@link Logger#tag(String)} returns the same tagged instance of {@link TaggedLogger} for each
+		 * tag.
+		 *
+		 * @throws Exception
+		 *             Failed getting tag
+		 */
+		@Test
+		public void tagged() throws Exception {
+			TaggedLogger logger = Logger.tag("test");
 
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
-		modifiersField.setAccessible(true);
-		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+			assertThat(logger).isNotNull().isSameAs(Logger.tag("test")).isNotSameAs(Logger.tag("other"));
+			assertThat(Whitebox.<String>getInternalState(logger, "tag")).isEqualTo("test");
+		}
 
-		field.set(null, value);
-	}
-
-	/**
-	 * Resets the logging provider and all overridden fields in logger class.
-	 *
-	 * @throws Exception
-	 *             Failed updating fields
-	 */
-	private void resetLoggingProvider() throws Exception {
-		updateField(Logger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", isCoveredByMinimumLevel(Level.TRACE));
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", isCoveredByMinimumLevel(Level.DEBUG));
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", isCoveredByMinimumLevel(Level.INFO));
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", isCoveredByMinimumLevel(Level.WARNING));
-		updateField(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", isCoveredByMinimumLevel(Level.ERROR));
-	}
-
-	/**
-	 * Invokes the private method {@link Logger#isCoveredByMinimumLevel()}.
-	 *
-	 * @param level
-	 *            Severity level to check
-	 * @return {@code true} if given severity level is covered, otherwise {@code false}
-	 * @throws Exception
-	 *             Failed invoking method
-	 */
-	private boolean isCoveredByMinimumLevel(final Level level) throws Exception {
-		return Whitebox.invokeMethod(Logger.class, "isCoveredByMinimumLevel", level);
 	}
 
 }

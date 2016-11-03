@@ -13,56 +13,42 @@
 
 package org.tinylog;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
 /**
- * Static logger for issuing log entries.
+ * Logger for issuing tagged log entries. Tagged loggers can be received by calling {@link Logger#tag(String)}.
+ *
+ * @see Logger#tag(String)
  */
-public final class Logger {
+public final class TaggedLogger {
 
 	private static final LoggingProvider LOGGING_PROVIDER = ProviderRegistry.getLoggingProvider();
-	private static final TaggedLogger INSTANCE = new TaggedLogger(null);
 
 	private static final int STACKTRACE_DEPTH = 1;
 
-	// @formatter:off
-	private static final boolean MINIMUM_LEVEL_COVERS_TRACE = isCoveredByMinimumLevel(Level.TRACE);
-	private static final boolean MINIMUM_LEVEL_COVERS_DEBUG = isCoveredByMinimumLevel(Level.DEBUG);
-	private static final boolean MINIMUM_LEVEL_COVERS_INFO  = isCoveredByMinimumLevel(Level.INFO);
-	private static final boolean MINIMUM_LEVEL_COVERS_WARN  = isCoveredByMinimumLevel(Level.WARNING);
-	private static final boolean MINIMUM_LEVEL_COVERS_ERROR = isCoveredByMinimumLevel(Level.ERROR);
-	// @formatter:on
+	private final boolean minimumLevelCoversTrace;
+	private final boolean minimumLevelCoversDebug;
+	private final boolean minimumLevelCoversInfo;
+	private final boolean minimumLevelCoversWarn;
+	private final boolean minimumLevelCoversError;
 
-	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<String, TaggedLogger>();
-
-	/** */
-	private Logger() {
-	}
+	private final String tag;
 
 	/**
-	 * Gets a tagged logger instance. Tags are case-sensitive.
-	 *
 	 * @param tag
-	 *            Tag for logger or {@code null} for receiving an untagged logger
-	 * @return Logger instance
+	 *            Case-sensitive tag for logger instance
 	 */
-	public static TaggedLogger tag(final String tag) {
-		if (tag == null || tag.isEmpty()) {
-			return INSTANCE;
-		} else {
-			TaggedLogger logger = loggers.get(tag);
-			if (logger == null) {
-				logger = new TaggedLogger(tag);
-				TaggedLogger existing = loggers.putIfAbsent(tag, logger);
-				return existing == null ? logger : existing;
-			} else {
-				return logger;
-			}
-		}
+	TaggedLogger(final String tag) {
+		this.tag = tag;
+
+		// @formatter:off
+		minimumLevelCoversTrace = isCoveredByMinimumLevel(tag, Level.TRACE);
+		minimumLevelCoversDebug = isCoveredByMinimumLevel(tag, Level.DEBUG);
+		minimumLevelCoversInfo  = isCoveredByMinimumLevel(tag, Level.INFO);
+		minimumLevelCoversWarn  = isCoveredByMinimumLevel(tag, Level.WARNING);
+		minimumLevelCoversError = isCoveredByMinimumLevel(tag, Level.ERROR);
+		// @formatter:on
 	}
 
 	/**
@@ -70,8 +56,8 @@ public final class Logger {
 	 *
 	 * @return {@code true} if {@link Level#TRACE TRACE} level is enabled, {@code false} if disabled
 	 */
-	public static boolean isTraceEnabled() {
-		return MINIMUM_LEVEL_COVERS_TRACE && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, Level.TRACE);
+	public boolean isTraceEnabled() {
+		return minimumLevelCoversTrace && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.TRACE);
 	}
 
 	/**
@@ -80,9 +66,9 @@ public final class Logger {
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
-	public static void trace(final Object message) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, (Object[]) null);
+	public void trace(final Object message) {
+		if (minimumLevelCoversTrace) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
@@ -95,9 +81,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void trace(final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, arguments);
+	public void trace(final String message, final Object... arguments) {
+		if (minimumLevelCoversTrace) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, arguments);
 		}
 	}
 
@@ -107,9 +93,9 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
-	public static void trace(final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, (Object[]) null);
+	public void trace(final Throwable exception) {
+		if (minimumLevelCoversTrace) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, (Object[]) null);
 		}
 	}
 
@@ -121,9 +107,9 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void trace(final Throwable exception, final String message) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, (Object[]) null);
+	public void trace(final Throwable exception, final String message) {
+		if (minimumLevelCoversTrace) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
 		}
 	}
 
@@ -138,9 +124,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void trace(final Throwable exception, final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, arguments);
+	public void trace(final Throwable exception, final String message, final Object... arguments) {
+		if (minimumLevelCoversTrace) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, arguments);
 		}
 	}
 
@@ -149,8 +135,8 @@ public final class Logger {
 	 *
 	 * @return {@code true} if {@link Level#DEBUG DEBUG} level is enabled, {@code false} if disabled
 	 */
-	public static boolean isDebugEnabled() {
-		return MINIMUM_LEVEL_COVERS_DEBUG && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, Level.DEBUG);
+	public boolean isDebugEnabled() {
+		return minimumLevelCoversDebug && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.DEBUG);
 	}
 
 	/**
@@ -159,9 +145,9 @@ public final class Logger {
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
-	public static void debug(final Object message) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, (Object[]) null);
+	public void debug(final Object message) {
+		if (minimumLevelCoversDebug) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
@@ -174,9 +160,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void debug(final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, arguments);
+	public void debug(final String message, final Object... arguments) {
+		if (minimumLevelCoversDebug) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, arguments);
 		}
 	}
 
@@ -186,9 +172,9 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
-	public static void debug(final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, (Object[]) null);
+	public void debug(final Throwable exception) {
+		if (minimumLevelCoversDebug) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, (Object[]) null);
 		}
 	}
 
@@ -200,9 +186,9 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void debug(final Throwable exception, final String message) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, (Object[]) null);
+	public void debug(final Throwable exception, final String message) {
+		if (minimumLevelCoversDebug) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
 		}
 	}
 
@@ -217,9 +203,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void debug(final Throwable exception, final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, arguments);
+	public void debug(final Throwable exception, final String message, final Object... arguments) {
+		if (minimumLevelCoversDebug) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, arguments);
 		}
 	}
 
@@ -228,8 +214,8 @@ public final class Logger {
 	 *
 	 * @return {@code true} if {@link Level#INFO INFO} level is enabled, {@code false} if disabled
 	 */
-	public static boolean isInfoEnabled() {
-		return MINIMUM_LEVEL_COVERS_INFO && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, Level.INFO);
+	public boolean isInfoEnabled() {
+		return minimumLevelCoversInfo && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.INFO);
 	}
 
 	/**
@@ -238,9 +224,9 @@ public final class Logger {
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
-	public static void info(final Object message) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, (Object[]) null);
+	public void info(final Object message) {
+		if (minimumLevelCoversInfo) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
@@ -252,9 +238,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void info(final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, arguments);
+	public void info(final String message, final Object... arguments) {
+		if (minimumLevelCoversInfo) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, arguments);
 		}
 	}
 
@@ -264,9 +250,9 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
-	public static void info(final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, (Object[]) null);
+	public void info(final Throwable exception) {
+		if (minimumLevelCoversInfo) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, (Object[]) null);
 		}
 	}
 
@@ -278,9 +264,9 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void info(final Throwable exception, final String message) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, (Object[]) null);
+	public void info(final Throwable exception, final String message) {
+		if (minimumLevelCoversInfo) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
 		}
 	}
 
@@ -295,9 +281,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void info(final Throwable exception, final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, arguments);
+	public void info(final Throwable exception, final String message, final Object... arguments) {
+		if (minimumLevelCoversInfo) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, arguments);
 		}
 	}
 
@@ -306,8 +292,8 @@ public final class Logger {
 	 *
 	 * @return {@code true} if {@link Level#WARNING WARNING} level is enabled, {@code false} if disabled
 	 */
-	public static boolean isWarnEnabled() {
-		return MINIMUM_LEVEL_COVERS_WARN && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, Level.WARNING);
+	public boolean isWarnEnabled() {
+		return minimumLevelCoversWarn && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.WARNING);
 	}
 
 	/**
@@ -316,9 +302,9 @@ public final class Logger {
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
-	public static void warn(final Object message) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.WARNING, null, message, (Object[]) null);
+	public void warn(final Object message) {
+		if (minimumLevelCoversWarn) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) null);
 		}
 	}
 
@@ -331,9 +317,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void warn(final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.WARNING, null, message, arguments);
+	public void warn(final String message, final Object... arguments) {
+		if (minimumLevelCoversWarn) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, arguments);
 		}
 	}
 
@@ -343,9 +329,9 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
-	public static void warn(final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, null, (Object[]) null);
+	public void warn(final Throwable exception) {
+		if (minimumLevelCoversWarn) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, null, (Object[]) null);
 		}
 	}
 
@@ -357,9 +343,9 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void warn(final Throwable exception, final String message) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, message, (Object[]) null);
+	public void warn(final Throwable exception, final String message) {
+		if (minimumLevelCoversWarn) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) null);
 		}
 	}
 
@@ -374,9 +360,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void warn(final Throwable exception, final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, message, arguments);
+	public void warn(final Throwable exception, final String message, final Object... arguments) {
+		if (minimumLevelCoversWarn) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, arguments);
 		}
 	}
 
@@ -385,8 +371,8 @@ public final class Logger {
 	 *
 	 * @return {@code true} if {@link Level#ERROR ERROR} level is enabled, {@code false} if disabled
 	 */
-	public static boolean isErrorEnabled() {
-		return MINIMUM_LEVEL_COVERS_ERROR && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, Level.ERROR);
+	public boolean isErrorEnabled() {
+		return minimumLevelCoversError && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.ERROR);
 	}
 
 	/**
@@ -395,9 +381,9 @@ public final class Logger {
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
-	public static void error(final Object message) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, (Object[]) null);
+	public void error(final Object message) {
+		if (minimumLevelCoversError) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
@@ -410,9 +396,9 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void error(final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, arguments);
+	public void error(final String message, final Object... arguments) {
+		if (minimumLevelCoversError) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, arguments);
 		}
 	}
 
@@ -422,9 +408,9 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
-	public static void error(final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, (Object[]) null);
+	public void error(final Throwable exception) {
+		if (minimumLevelCoversError) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, (Object[]) null);
 		}
 	}
 
@@ -436,9 +422,9 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void error(final Throwable exception, final String message) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, (Object[]) null);
+	public void error(final Throwable exception, final String message) {
+		if (minimumLevelCoversError) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
 		}
 	}
 
@@ -453,21 +439,23 @@ public final class Logger {
 	 * @param arguments
 	 *            Arguments for formatted text message
 	 */
-	public static void error(final Throwable exception, final String message, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, arguments);
+	public void error(final Throwable exception, final String message, final Object... arguments) {
+		if (minimumLevelCoversError) {
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, arguments);
 		}
 	}
 
 	/**
-	 * Checks if a given severity level is covered by the logging providers minimum level.
+	 * Checks if a given tag and severity level is covered by the logging providers minimum level.
 	 *
+	 * @param tag
+	 *            Tag to check
 	 * @param level
 	 *            Severity level to check
 	 * @return {@code true} if given severity level is covered, otherwise {@code false}
 	 */
-	private static boolean isCoveredByMinimumLevel(final Level level) {
-		return LOGGING_PROVIDER.getMinimumLevel(null).ordinal() <= level.ordinal();
+	private static boolean isCoveredByMinimumLevel(final String tag, final Level level) {
+		return LOGGING_PROVIDER.getMinimumLevel(tag).ordinal() <= level.ordinal();
 	}
 
 }
