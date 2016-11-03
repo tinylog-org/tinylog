@@ -13,6 +13,7 @@
 
 	<modules>
 		<module>tinylog-api</module>
+		<module>tinylog-backend</module>
 	</modules>
 
 	<prerequisites>
