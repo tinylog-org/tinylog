@@ -300,7 +300,6 @@
 					<artifactId>flatten-maven-plugin</artifactId>
 					<version>${flatten-maven-plugin.version}</version>
 					<configuration>
-						<outputDirectory>${project.build.directory}</outputDirectory>
 						<pomElements>
 							<name />
 							<description />
