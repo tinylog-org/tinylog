@@ -37,6 +37,21 @@ public final class WrapperLoggingProviderTest {
 	private LoggingProvider wrapped;
 
 	/**
+	 * Verifies that returned context provider combines all context providers from underlying logging providers.
+	 */
+	@Test
+	public void getContextProvider() {
+		init(Level.TRACE, Level.TRACE);
+
+		ContextProvider contextProvider = wrapped.getContextProvider();
+		assertThat(contextProvider).isInstanceOf(WrapperContextProvider.class);
+
+		contextProvider.put("test", "42");
+		verify(first.getContextProvider()).put("test", "42");
+		verify(second.getContextProvider()).put("test", "42");
+	}
+
+	/**
 	 * Verifies that {@code getMinimumLevel()} method returns the minimum severity level of underlying logging
 	 * providers, if all have the same minimum severity level.
 	 */
@@ -125,6 +140,9 @@ public final class WrapperLoggingProviderTest {
 	private void init(final Level firstLevel, final Level secondLevel) {
 		first = mock(LoggingProvider.class);
 		second = mock(LoggingProvider.class);
+
+		when(first.getContextProvider()).thenReturn(mock(ContextProvider.class));
+		when(second.getContextProvider()).thenReturn(mock(ContextProvider.class));
 
 		when(first.getMinimumLevel(null)).thenReturn(firstLevel);
 		when(second.getMinimumLevel(null)).thenReturn(secondLevel);

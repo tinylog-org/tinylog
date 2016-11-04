@@ -20,20 +20,19 @@ import java.util.ServiceLoader;
 import org.tinylog.Level;
 
 /**
- * Registry for receiving the actual logging and context provider.
+ * Registry for receiving the actual logging provider.
  *
  * <p>
- * All as service registered providers will be loaded from <tt>META-INF/services</tt>. Multiple providers of the same
- * type will be combined to one.
+ * As service registered logging providers will be loaded from <tt>META-INF/services</tt>. If there are multiple logging
+ * providers, they will be combined to one.
  * </p>
  */
 public final class ProviderRegistry {
 
 	private static final String WARNING_MESSAGE =
-		"No logging framework implementation found in classpath. Add tinylog-backend.jar for outputting log entries.";
+			"No logging framework implementation found in classpath. Add tinylog-backend.jar for outputting log entries.";
 
-	private static final LoggingProvider LOGGING_PROVIDER = loadLoggingProvider();
-	private static final ContextProvider CONTEXT_PROVIDER = loadContextProvider();
+	private static final LoggingProvider loggingProvider = loadLoggingProvider();
 
 	/** */
 	private ProviderRegistry() {
@@ -50,21 +49,7 @@ public final class ProviderRegistry {
 	 * @return Actual logging provider
 	 */
 	public static LoggingProvider getLoggingProvider() {
-		return LOGGING_PROVIDER;
-	}
-
-	/**
-	 * Returns the actual context provider.
-	 *
-	 * <p>
-	 * Multiple providers will be combined to one. If there are no context providers, a stub implementation will be
-	 * returned instead of {@code null}.
-	 * </p>
-	 *
-	 * @return Actual logging provider
-	 */
-	public static ContextProvider getContextProvider() {
-		return CONTEXT_PROVIDER;
+		return loggingProvider;
 	}
 
 	/**
@@ -87,28 +72,6 @@ public final class ProviderRegistry {
 				return providers.get(0);
 			default:
 				return new WrapperLoggingProvider(providers);
-		}
-	}
-
-	/**
-	 * Loads the actual context provider.
-	 *
-	 * @return New context provider instance
-	 */
-	private static ContextProvider loadContextProvider() {
-		List<ContextProvider> providers = new ArrayList<ContextProvider>(1);
-
-		for (ContextProvider provider : ServiceLoader.load(ContextProvider.class)) {
-			providers.add(provider);
-		}
-
-		switch (providers.size()) {
-			case 0:
-				return new NopContextProvider();
-			case 1:
-				return providers.get(0);
-			default:
-				return new WrapperContextProvider(providers);
 		}
 	}
 

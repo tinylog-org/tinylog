@@ -28,7 +28,6 @@ import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.rule.SystemStreamCollector;
 
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -60,16 +59,8 @@ public final class ProviderRegistryTest {
 	 * Verifies that the expected logging provider will be returned.
 	 */
 	@Test
-	public void defaultLoggingProvider() {
+	public void defaultProvider() {
 		assertThat(ProviderRegistry.getLoggingProvider()).isInstanceOf(NopLoggingProvider.class);
-	}
-
-	/**
-	 * Verifies that the expected context provider will be returned.
-	 */
-	@Test
-	public void defaultContextProvider() {
-		assertThat(ProviderRegistry.getContextProvider()).isInstanceOf(NopContextProvider.class);
 	}
 
 	/**
@@ -79,8 +70,8 @@ public final class ProviderRegistryTest {
 	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
 	 */
 	@Test
-	public void noLoggingProviders() throws Exception {
-		registerProviders(LoggingProvider.class, 0);
+	public void noProviders() throws Exception {
+		registerProviders(0);
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
@@ -99,8 +90,8 @@ public final class ProviderRegistryTest {
 	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
 	 */
 	@Test
-	public void singleLoggingProvider() throws Exception {
-		List<LoggingProvider> registerProviders = registerProviders(LoggingProvider.class, 1);
+	public void singleProvider() throws Exception {
+		List<LoggingProvider> registerProviders = registerProviders(1);
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isSameAs(registerProviders.get(0));
@@ -113,8 +104,8 @@ public final class ProviderRegistryTest {
 	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
 	 */
 	@Test
-	public void multipleLoggingProviders() throws Exception {
-		List<LoggingProvider> registerProviders = registerProviders(LoggingProvider.class, 2);
+	public void multipleProviders() throws Exception {
+		List<LoggingProvider> registerProviders = registerProviders(2);
 		for (LoggingProvider provider : registerProviders) {
 			when(provider.getMinimumLevel(null)).thenReturn(Level.DEBUG);
 		}
@@ -125,70 +116,20 @@ public final class ProviderRegistryTest {
 	}
 
 	/**
-	 * Verifies that a {@link NopContextProvider} will be created if there are no registered context providers.
+	 * Registers a defined number of logging providers as service.
 	 *
-	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
-	 */
-	@Test
-	public void noContextProviders() throws Exception {
-		registerProviders(ContextProvider.class, 0);
-
-		ContextProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadContextProvider");
-		assertThat(createdProvider).isInstanceOf(NopContextProvider.class);
-	}
-
-	/**
-	 * Verifies that the registered context provider will be used if there is only one.
-	 *
-	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
-	 */
-	@Test
-	public void singleContextProvider() throws Exception {
-		List<ContextProvider> registerProviders = registerProviders(ContextProvider.class, 1);
-
-		ContextProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadContextProvider");
-		assertThat(createdProvider).isSameAs(registerProviders.get(0));
-	}
-
-	/**
-	 * Verifies that multiple registered context providers will be combined to one.
-	 *
-	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
-	 */
-	@Test
-	public void multipleContextProviders() throws Exception {
-		List<ContextProvider> registerProviders = registerProviders(ContextProvider.class, 2);
-		for (ContextProvider provider : registerProviders) {
-			when(provider.getMapping()).thenReturn(singletonMap("test", "42"));
-		}
-
-		ContextProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadContextProvider");
-		assertThat(createdProvider).isInstanceOf(WrapperContextProvider.class);
-		assertThat(createdProvider.getMapping()).isEqualTo(singletonMap("test", "42"));
-	}
-
-	/**
-	 * Registers a defined number of providers as service.
-	 *
-	 * @param providerType
-	 *            Provider interface class
 	 * @param times
 	 *            Number of mocks that should be registered
-	 * @param <T>
-	 *            Provider interface type
 	 * @return All registered mocks
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static <T> List<T> registerProviders(final Class<T> providerType, final int times) {
+	private static List<LoggingProvider> registerProviders(final int times) {
 		PowerMockito.mockStatic(ServiceLoader.class);
 		ServiceLoader serviceLoaderMock = mock(ServiceLoader.class);
 
-		List<T> providers = new ArrayList<>();
+		List<LoggingProvider> providers = new ArrayList<>();
 		for (int i = 0; i < times; ++i) {
-			providers.add(mock(providerType));
+			providers.add(mock(LoggingProvider.class));
 		}
 
 		when(serviceLoaderMock.iterator()).thenReturn(providers.iterator());

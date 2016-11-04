@@ -35,6 +35,14 @@ public final class NopLoggingProviderTest {
 	}
 
 	/**
+	 * Verifies that there is an associated NOP context provider.
+	 */
+	@Test
+	public void getContextProvider() {
+		assertThat(provider.getContextProvider()).isInstanceOf(NopContextProvider.class);
+	}
+
+	/**
 	 * Verifies that the minimum severity level is {@link Level#OFF}.
 	 */
 	@Test

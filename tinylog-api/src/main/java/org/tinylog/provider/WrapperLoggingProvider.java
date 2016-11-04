@@ -13,6 +13,7 @@
 
 package org.tinylog.provider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.tinylog.Level;
@@ -22,21 +23,28 @@ import org.tinylog.Level;
  */
 final class WrapperLoggingProvider implements LoggingProvider {
 
-	private final LoggingProvider[] providers;
+	private final LoggingProvider[] loggingProviders;
+	private final ContextProvider contextProvider;
 
 	/**
 	 * @param providers
 	 *            Base logging providers
 	 */
 	WrapperLoggingProvider(final Collection<LoggingProvider> providers) {
-		this.providers = providers.toArray(new LoggingProvider[providers.size()]);
+		loggingProviders = providers.toArray(new LoggingProvider[providers.size()]);
+		contextProvider = createContextProvider(providers);
+	}
+
+	@Override
+	public ContextProvider getContextProvider() {
+		return contextProvider;
 	}
 
 	@Override
 	public Level getMinimumLevel(final String tag) {
 		Level minimumLevel = Level.OFF;
-		for (int i = 0; i < providers.length; ++i) {
-			Level level = providers[i].getMinimumLevel(tag);
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			Level level = loggingProviders[i].getMinimumLevel(tag);
 			if (level.ordinal() < minimumLevel.ordinal()) {
 				minimumLevel = level;
 			}
@@ -46,8 +54,8 @@ final class WrapperLoggingProvider implements LoggingProvider {
 
 	@Override
 	public boolean isEnabled(final int depth, final String tag, final Level level) {
-		for (int i = 0; i < providers.length; ++i) {
-			if (providers[i].isEnabled(depth + 1, tag, level)) {
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			if (loggingProviders[i].isEnabled(depth + 1, tag, level)) {
 				return true;
 			}
 		}
@@ -57,17 +65,32 @@ final class WrapperLoggingProvider implements LoggingProvider {
 
 	@Override
 	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
-		for (int i = 0; i < providers.length; ++i) {
-			providers[i].log(depth + 1, tag, level, exception, obj, arguments);
+			final Object... arguments) {
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			loggingProviders[i].log(depth + 1, tag, level, exception, obj, arguments);
 		}
 	}
 
 	@Override
 	public void internal(final int depth, final Level level, final Throwable exception, final String message) {
-		for (int i = 0; i < providers.length; ++i) {
-			providers[i].internal(depth + 1, level, exception, message);
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			loggingProviders[i].internal(depth + 1, level, exception, message);
 		}
+	}
+
+	/**
+	 * Gets all context providers from given logging providers and combine them into a new one.
+	 * 
+	 * @param loggingProviders
+	 *            Context providers of these logging providers will be fetched
+	 * @return All context providers combined into a new one
+	 */
+	private static ContextProvider createContextProvider(final Collection<LoggingProvider> loggingProviders) {
+		Collection<ContextProvider> contextProviders = new ArrayList<ContextProvider>(loggingProviders.size());
+		for (LoggingProvider loggingProvider : loggingProviders) {
+			contextProviders.add(loggingProvider.getContextProvider());
+		}
+		return new WrapperContextProvider(contextProviders);
 	}
 
 }

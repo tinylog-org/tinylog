@@ -19,6 +19,13 @@ import org.tinylog.Level;
  * API for providing log entries to a concrete logging framework implementation.
  */
 public interface LoggingProvider {
+	
+	/**
+	 * Returns the corresponding context provider.
+	 *
+	 * @return Corresponding context provider
+	 */
+	ContextProvider getContextProvider();
 
 	/**
 	 * Gets the lowest activated severity level for a tag.
