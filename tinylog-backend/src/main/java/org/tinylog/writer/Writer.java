@@ -31,14 +31,6 @@ public interface Writer {
 	Set<LogEntryValue> getRequiredLogEntryValues();
 
 	/**
-	 * Initializes the writer. All resources should be allocated in this method instead of in the constructor.
-	 *
-	 * @throws Exception
-	 *             Any exception can be thrown if initializing has been failed
-	 */
-	void init() throws Exception;
-
-	/**
 	 * Outputs a given log entry.
 	 *
 	 * <p>
