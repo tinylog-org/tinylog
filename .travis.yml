@@ -6,7 +6,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvn clean install -Dmaven.compiler.source=1.6 -Dmaven.compiler.target=1.6  | egrep -v '^Download(ing|ed): '
+  - mvn clean install -Dmaven.compiler.source=1.6 -Dmaven.compiler.target=1.6  | egrep -v ''^Download(ing|ed): ''
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
