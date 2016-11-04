@@ -7,7 +7,7 @@
 	<Match>
 		<!-- Log Entry Class -->
 		<Class name="org.tinylog.backend.LogEntry" />
-		<Bug pattern="EI_EXPOSE_REP2" />
+		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
 		<!-- JUnit Tests -->
