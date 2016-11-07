@@ -14,4 +14,4 @@
 /**
  * Writers for outputting log entries.
  */
-package org.tinylog.writer;
+package org.tinylog.writers;
