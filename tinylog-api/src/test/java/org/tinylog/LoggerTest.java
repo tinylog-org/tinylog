@@ -151,7 +151,7 @@ public final class LoggerTest {
 		 * Verifies evaluating whether a specific severity level is covered by the minimum severity level.
 		 *
 		 * @throws Exception
-		 *             Failed invoking private {@link Logger#isCoveredByMinimumLevel()} method
+		 *             Failed invoking private {@link Logger#isCoveredByMinimumLevel(Level)} method
 		 */
 		@Test
 		public void coveredByMinimumLevel() throws Exception {
@@ -631,7 +631,7 @@ public final class LoggerTest {
 		}
 
 		/**
-		 * Invokes the private method {@link Logger#isCoveredByMinimumLevel()}.
+		 * Invokes the private method {@link Logger#isCoveredByMinimumLevel(Level)}.
 		 *
 		 * @param level
 		 *            Severity level to check

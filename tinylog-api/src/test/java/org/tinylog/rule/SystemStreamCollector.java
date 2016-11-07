@@ -28,7 +28,7 @@ import org.junit.runners.model.Statement;
  *
  * <p>
  * All outputs to one of the streams will be stored instead of being displayed in the console. Collecting can be stopped
- * by {@link #close()}.
+ * by {@link #stop()}.
  * </p>
  */
 public final class SystemStreamCollector implements TestRule {

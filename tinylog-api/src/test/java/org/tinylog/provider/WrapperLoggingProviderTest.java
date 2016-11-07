@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link WrappedLoggingProvider}.
+ * Tests for {@link WrapperLoggingProvider}.
  */
 public final class WrapperLoggingProviderTest {
 

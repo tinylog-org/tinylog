@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.tinylog.util.Maps.doubletonMap;
 
 /**
- * Tests for {@link WrappedContextProvider}.
+ * Tests for {@link WrapperContextProvider}.
  */
 public final class WrapperContextProviderTest {
 

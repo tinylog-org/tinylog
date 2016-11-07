@@ -67,7 +67,7 @@ public final class ProviderRegistryTest {
 	 * Verifies that a {@link NopLoggingProvider} will be created if there are no registered logging providers.
 	 *
 	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
+	 *             Failed invoking private method {@link ProviderRegistry#loadLoggingProvider()}
 	 */
 	@Test
 	public void noProviders() throws Exception {
@@ -87,7 +87,7 @@ public final class ProviderRegistryTest {
 	 * Verifies that the registered logging provider will be used if there is only one.
 	 *
 	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
+	 *             Failed invoking private method {@link ProviderRegistry#loadLoggingProvider()}
 	 */
 	@Test
 	public void singleProvider() throws Exception {
@@ -101,7 +101,7 @@ public final class ProviderRegistryTest {
 	 * Verifies that multiple registered logging providers will be combined to one.
 	 *
 	 * @throws Exception
-	 *             Required for invoking private method via {@link Whitebox#invokeMethod()}
+	 *             Failed invoking private method {@link ProviderRegistry#loadLoggingProvider()}
 	 */
 	@Test
 	public void multipleProviders() throws Exception {

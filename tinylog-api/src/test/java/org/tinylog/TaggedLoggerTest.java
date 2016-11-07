@@ -607,7 +607,7 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
-	 * Invokes the private method {@link TaggedLogger#isCoveredByMinimumLevel()}.
+	 * Invokes the private method {@link TaggedLogger#isCoveredByMinimumLevel(String, Level)}.
 	 *
 	 * @param level
 	 *            Severity level to check
