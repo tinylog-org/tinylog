@@ -47,7 +47,7 @@ public final class FileSystem {
 	}
 
 	/**
-	 * Creates or overrides a defined resource in the default classpath. The created resource will be deleted
+	 * Creates or overrides a defined resource in the default class path. The created resource will be deleted
 	 * automatically when the virtual machine terminates.
 	 *
 	 * @param name
@@ -57,7 +57,7 @@ public final class FileSystem {
 	 * @throws IOException
 	 *             Failed creating resource
 	 * @throws URISyntaxException
-	 *             Invalid classpath URL
+	 *             Invalid class path URL
 	 */
 	public static void createResource(final String name, final String... lines) throws IOException, URISyntaxException {
 		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();
@@ -67,7 +67,7 @@ public final class FileSystem {
 	}
 
 	/**
-	 * Creates a new temporary resource in the default classpath. The created resource will be deleted automatically
+	 * Creates a new temporary resource in the default class path. The created resource will be deleted automatically
 	 * when the virtual machine terminates.
 	 *
 	 * @param lines
@@ -76,7 +76,7 @@ public final class FileSystem {
 	 * @throws IOException
 	 *             Failed creating resource
 	 * @throws URISyntaxException
-	 *             Invalid classpath URL
+	 *             Invalid class path URL
 	 */
 	public static String createTemporaryResource(final String... lines) throws IOException, URISyntaxException {
 		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();
@@ -87,14 +87,14 @@ public final class FileSystem {
 	}
 
 	/**
-	 * Deletes a resource from default classpath.
+	 * Deletes a resource from default class path.
 	 *
 	 * @param name
 	 *            File name of resource
 	 * @throws IOException
 	 *             Failed deleting resource
 	 * @throws URISyntaxException
-	 *             Invalid classpath URL
+	 *             Invalid class path URL
 	 */
 	public static void deleteResource(final String name) throws IOException, URISyntaxException {
 		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();

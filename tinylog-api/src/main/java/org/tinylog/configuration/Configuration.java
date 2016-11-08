@@ -30,7 +30,7 @@ import org.tinylog.provider.InternalLogger;
  * <p>
  * By default, the configuration will be loaded from <tt>tinylog.properties</tt> in the default package. Another
  * configuration file can be loaded by setting the system property <tt>tinylog.configuration</tt>. The configuration
- * file can be either a resource in the classpath or a file from file system. tinylog will find both.
+ * file can be either a resource in the class path or a file from file system. tinylog will find both.
  * </p>
  *
  * <p>

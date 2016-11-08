@@ -97,13 +97,13 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Verifies that a custom defined resource will be loaded from classpath.
+	 * Verifies that a custom defined resource will be loaded from class path.
 	 *
 	 * @throws Exception
 	 *             Failed creating temporary resource or invoking private method {@link Configuration#load()}
 	 */
 	@Test
-	public void propertiesFileFromClasspath() throws Exception {
+	public void propertiesFileFromClassPath() throws Exception {
 		loadProperies(FileSystem.createTemporaryResource("level = trace"));
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("trace");
 	}

@@ -30,7 +30,7 @@ import org.tinylog.Level;
 public final class ProviderRegistry {
 
 	private static final String WARNING_MESSAGE =
-			"No logging framework implementation found in classpath. Add tinylog-backend.jar for outputting log entries.";
+			"No logging framework implementation found in class path. Add tinylog-backend.jar for outputting log entries.";
 
 	private static final LoggingProvider loggingProvider = loadLoggingProvider();
 
