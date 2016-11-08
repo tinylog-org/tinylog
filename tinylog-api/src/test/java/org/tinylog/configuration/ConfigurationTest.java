@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
-import org.tinylog.rule.SystemStreamCollector;
+import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.tinylog.Level;
-import org.tinylog.rule.SystemStreamCollector;
+import org.tinylog.rules.SystemStreamCollector;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.rule;
+package org.tinylog.rules;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

@@ -14,4 +14,4 @@
 /**
  * Rules for JUnit tests.
  */
-package org.tinylog.rule;
+package org.tinylog.rules;
