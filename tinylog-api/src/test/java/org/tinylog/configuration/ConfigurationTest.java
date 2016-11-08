@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.provider;
+package org.tinylog.configuration;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,8 +23,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.rule.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
@@ -35,7 +33,6 @@ import static org.assertj.core.api.Assertions.entry;
 /**
  * Tests for {@link Configuration}.
  */
-@RunWith(PowerMockRunner.class)
 public final class ConfigurationTest {
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";

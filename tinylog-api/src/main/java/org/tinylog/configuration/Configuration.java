@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.provider;
+package org.tinylog.configuration;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.tinylog.Level;
+import org.tinylog.provider.InternalLogger;
 
 /**
  * Immutable global configuration for tinylog API and backend.
