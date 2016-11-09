@@ -108,7 +108,7 @@ public final class ProviderRegistryTest {
 		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
-		assertThat(createdProvider).isInstanceOf(WrapperLoggingProvider.class);
+		assertThat(createdProvider).isInstanceOf(BundleLoggingProvider.class);
 		assertThat(Whitebox.getInternalState(createdProvider, LoggingProvider[].class))
 			.hasSize(2)
 			.hasAtLeastOneElementOfType(LoggingProviderOne.class)

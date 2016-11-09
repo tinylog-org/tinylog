@@ -21,7 +21,7 @@ import org.tinylog.Level;
 /**
  * Logging provider that combines multiple logging providers into one.
  */
-final class WrapperLoggingProvider implements LoggingProvider {
+final class BundleLoggingProvider implements LoggingProvider {
 
 	private final LoggingProvider[] loggingProviders;
 	private final ContextProvider contextProvider;
@@ -30,7 +30,7 @@ final class WrapperLoggingProvider implements LoggingProvider {
 	 * @param providers
 	 *            Base logging providers
 	 */
-	WrapperLoggingProvider(final Collection<LoggingProvider> providers) {
+	BundleLoggingProvider(final Collection<LoggingProvider> providers) {
 		loggingProviders = providers.toArray(new LoggingProvider[providers.size()]);
 		contextProvider = createContextProvider(providers);
 	}
@@ -90,7 +90,7 @@ final class WrapperLoggingProvider implements LoggingProvider {
 		for (LoggingProvider loggingProvider : loggingProviders) {
 			contextProviders.add(loggingProvider.getContextProvider());
 		}
-		return new WrapperContextProvider(contextProviders);
+		return new BundleContextProvider(contextProviders);
 	}
 
 }

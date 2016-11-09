@@ -28,13 +28,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link WrapperLoggingProvider}.
+ * Tests for {@link BundleLoggingProvider}.
  */
-public final class WrapperLoggingProviderTest {
+public final class BundleLoggingProviderTest {
 
 	private LoggingProvider first;
 	private LoggingProvider second;
-	private LoggingProvider wrapped;
+	private LoggingProvider bundle;
 
 	/**
 	 * Verifies that returned context provider combines all context providers from underlying logging providers.
@@ -43,8 +43,8 @@ public final class WrapperLoggingProviderTest {
 	public void getContextProvider() {
 		init(Level.TRACE, Level.TRACE);
 
-		ContextProvider contextProvider = wrapped.getContextProvider();
-		assertThat(contextProvider).isInstanceOf(WrapperContextProvider.class);
+		ContextProvider contextProvider = bundle.getContextProvider();
+		assertThat(contextProvider).isInstanceOf(BundleContextProvider.class);
 
 		contextProvider.put("test", "42");
 		verify(first.getContextProvider()).put("test", "42");
@@ -58,7 +58,7 @@ public final class WrapperLoggingProviderTest {
 	@Test
 	public void getSameMinimumLevel() {
 		init(Level.TRACE, Level.TRACE);
-		assertThat(wrapped.getMinimumLevel(null)).isEqualTo(Level.TRACE);
+		assertThat(bundle.getMinimumLevel(null)).isEqualTo(Level.TRACE);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public final class WrapperLoggingProviderTest {
 	@Test
 	public void getDifferentMinimumLevel() {
 		init(Level.DEBUG, Level.WARNING);
-		assertThat(wrapped.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
+		assertThat(bundle.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
 	}
 
 	/**
@@ -91,11 +91,11 @@ public final class WrapperLoggingProviderTest {
 		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(true);
 		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(true);
 
-		assertThat(wrapped.isEnabled(1, null, Level.TRACE)).isEqualTo(false);
-		assertThat(wrapped.isEnabled(1, null, Level.DEBUG)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, null, Level.INFO)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, null, Level.WARNING)).isEqualTo(true);
-		assertThat(wrapped.isEnabled(1, null, Level.ERROR)).isEqualTo(true);
+		assertThat(bundle.isEnabled(1, null, Level.TRACE)).isEqualTo(false);
+		assertThat(bundle.isEnabled(1, null, Level.DEBUG)).isEqualTo(true);
+		assertThat(bundle.isEnabled(1, null, Level.INFO)).isEqualTo(true);
+		assertThat(bundle.isEnabled(1, null, Level.WARNING)).isEqualTo(true);
+		assertThat(bundle.isEnabled(1, null, Level.ERROR)).isEqualTo(true);
 
 		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
 		verify(second, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
@@ -109,7 +109,7 @@ public final class WrapperLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		wrapped.log(1, "technical", Level.INFO, exception, "Test", 42);
+		bundle.log(1, "technical", Level.INFO, exception, "Test", 42);
 
 		verify(first).log(2, "technical", Level.INFO, exception, "Test", 42);
 		verify(second).log(2, "technical", Level.INFO, exception, "Test", 42);
@@ -123,7 +123,7 @@ public final class WrapperLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		wrapped.internal(1, Level.INFO, exception, "Test");
+		bundle.internal(1, Level.INFO, exception, "Test");
 
 		verify(first).internal(2, Level.INFO, exception, "Test");
 		verify(second).internal(2, Level.INFO, exception, "Test");
@@ -147,7 +147,7 @@ public final class WrapperLoggingProviderTest {
 		when(first.getMinimumLevel(null)).thenReturn(firstLevel);
 		when(second.getMinimumLevel(null)).thenReturn(secondLevel);
 
-		wrapped = new WrapperLoggingProvider(asList(first, second));
+		bundle = new BundleLoggingProvider(asList(first, second));
 	}
 
 }

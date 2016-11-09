@@ -70,7 +70,7 @@ public final class ProviderRegistry {
 				case 1:
 					return providers.iterator().next();
 				default:
-					return new WrapperLoggingProvider(providers);
+					return new BundleLoggingProvider(providers);
 			}
 		} else {
 			LoggingProvider provider = loader.create(name);

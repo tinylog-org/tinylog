@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Context provider that combines multiple context providers into one.
  */
-final class WrapperContextProvider implements ContextProvider {
+final class BundleContextProvider implements ContextProvider {
 
 	private final ContextProvider[] providers;
 
@@ -28,7 +28,7 @@ final class WrapperContextProvider implements ContextProvider {
 	 * @param providers
 	 *            Base context providers
 	 */
-	WrapperContextProvider(final Collection<ContextProvider> providers) {
+	BundleContextProvider(final Collection<ContextProvider> providers) {
 		this.providers = providers.toArray(new ContextProvider[providers.size()]);
 	}
 

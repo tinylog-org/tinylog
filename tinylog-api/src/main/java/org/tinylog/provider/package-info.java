@@ -12,6 +12,6 @@
  */
 
 /**
- * Wrapper API for logging framework implementations.
+ * API for logging framework implementations.
  */
 package org.tinylog.provider;

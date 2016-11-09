@@ -32,13 +32,13 @@ import static org.mockito.Mockito.when;
 import static org.tinylog.util.Maps.doubletonMap;
 
 /**
- * Tests for {@link WrapperContextProvider}.
+ * Tests for {@link BundleContextProvider}.
  */
-public final class WrapperContextProviderTest {
+public final class BundleContextProviderTest {
 
 	private ContextProvider first;
 	private ContextProvider second;
-	private ContextProvider wrapped;
+	private ContextProvider bundle;
 
 	/**
 	 * Creates mocks for underlying context providers.
@@ -47,7 +47,7 @@ public final class WrapperContextProviderTest {
 	public void init() {
 		first = mock(ContextProvider.class);
 		second = mock(ContextProvider.class);
-		wrapped = new WrapperContextProvider(asList(first, second));
+		bundle = new BundleContextProvider(asList(first, second));
 	}
 
 	/**
@@ -58,7 +58,7 @@ public final class WrapperContextProviderTest {
 		when(first.getMapping()).thenReturn(emptyMap());
 		when(second.getMapping()).thenReturn(emptyMap());
 
-		assertThat(wrapped.getMapping()).isEmpty();
+		assertThat(bundle.getMapping()).isEmpty();
 	}
 
 	/**
@@ -70,7 +70,7 @@ public final class WrapperContextProviderTest {
 		when(first.getMapping()).thenReturn(doubletonMap("pi", "3.14", "e", "2.71"));
 		when(second.getMapping()).thenReturn(doubletonMap("pi", "3.14", "e", "2.71"));
 
-		assertThat(wrapped.getMapping()).containsOnly(entry("pi", "3.14"), entry("e", "2.71"));
+		assertThat(bundle.getMapping()).containsOnly(entry("pi", "3.14"), entry("e", "2.71"));
 	}
 
 	/**
@@ -82,7 +82,7 @@ public final class WrapperContextProviderTest {
 		when(first.getMapping()).thenReturn(doubletonMap("pi", "3.14", "e", "2.71"));
 		when(second.getMapping()).thenReturn(singletonMap("pi", "3.14"));
 
-		assertThat(wrapped.getMapping()).containsOnly(entry("pi", "3.14"), entry("e", "2.71"));
+		assertThat(bundle.getMapping()).containsOnly(entry("pi", "3.14"), entry("e", "2.71"));
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class WrapperContextProviderTest {
 		when(first.getMapping()).thenReturn(doubletonMap("pi", "3.14", "G", "0.91"));
 		when(second.getMapping()).thenReturn(doubletonMap("pi", "3.14", "G", "0.92"));
 
-		assertThat(wrapped.getMapping()).containsEntry("pi", "3.14").has(anyOf("G", "0.91", "0.92")).hasSize(2);
+		assertThat(bundle.getMapping()).containsEntry("pi", "3.14").has(anyOf("G", "0.91", "0.92")).hasSize(2);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public final class WrapperContextProviderTest {
 		when(first.get("pi")).thenReturn(null);
 		when(second.get("pi")).thenReturn(null);
 
-		assertThat(wrapped.get("pi")).isNull();
+		assertThat(bundle.get("pi")).isNull();
 	}
 
 	/**
@@ -117,7 +117,7 @@ public final class WrapperContextProviderTest {
 		when(first.get("pi")).thenReturn("3.14");
 		when(second.get("pi")).thenReturn("3.14");
 
-		assertThat(wrapped.get("pi")).isEqualTo("3.14");
+		assertThat(bundle.get("pi")).isEqualTo("3.14");
 	}
 
 	/**
@@ -129,7 +129,7 @@ public final class WrapperContextProviderTest {
 		when(first.get("pi")).thenReturn("3.14");
 		when(second.get("pi")).thenReturn(null);
 
-		assertThat(wrapped.get("pi")).isEqualTo("3.14");
+		assertThat(bundle.get("pi")).isEqualTo("3.14");
 	}
 
 	/**
@@ -141,7 +141,7 @@ public final class WrapperContextProviderTest {
 		when(first.get("pi")).thenReturn(null);
 		when(second.get("pi")).thenReturn("3.14");
 
-		assertThat(wrapped.get("pi")).isEqualTo("3.14");
+		assertThat(bundle.get("pi")).isEqualTo("3.14");
 	}
 
 	/**
@@ -149,7 +149,7 @@ public final class WrapperContextProviderTest {
 	 */
 	@Test
 	public void putValue() {
-		wrapped.put("pi", "3.14");
+		bundle.put("pi", "3.14");
 
 		verify(first).put("pi", "3.14");
 		verify(second).put("pi", "3.14");
@@ -160,7 +160,7 @@ public final class WrapperContextProviderTest {
 	 */
 	@Test
 	public void removeValue() {
-		wrapped.remove("pi");
+		bundle.remove("pi");
 
 		verify(first).remove("pi");
 		verify(second).remove("pi");
@@ -171,7 +171,7 @@ public final class WrapperContextProviderTest {
 	 */
 	@Test
 	public void clear() {
-		wrapped.clear();
+		bundle.clear();
 
 		verify(first).clear();
 		verify(second).clear();
