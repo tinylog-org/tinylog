@@ -100,7 +100,7 @@ public final class FileSystem {
 	 */
 	public static void deleteResource(final String name) throws IOException, URISyntaxException {
 		Path path = Paths.get(getClassPathUri()).resolve(name);
-		Files.delete(path);
+		Files.deleteIfExists(path);
 	}
 
 	/**
