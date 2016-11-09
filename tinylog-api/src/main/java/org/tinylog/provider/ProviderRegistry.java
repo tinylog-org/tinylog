@@ -16,6 +16,7 @@ package org.tinylog.provider;
 import java.util.Collection;
 
 import org.tinylog.Level;
+import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
 
 /**
@@ -28,8 +29,7 @@ import org.tinylog.configuration.ServiceLoader;
  */
 public final class ProviderRegistry {
 
-	private static final String WARNING_MESSAGE =
-			"No logging framework implementation found in class path. Add tinylog-backend.jar for outputting log entries.";
+	private static final String PROVIDER_PROPERTY = "provider";
 
 	private static final LoggingProvider loggingProvider = loadLoggingProvider();
 
@@ -58,16 +58,28 @@ public final class ProviderRegistry {
 	 */
 	private static LoggingProvider loadLoggingProvider() {
 		ServiceLoader<LoggingProvider> loader = new ServiceLoader<LoggingProvider>(LoggingProvider.class);
+		String name = Configuration.get(PROVIDER_PROPERTY);
 
-		Collection<LoggingProvider> providers = loader.createAll();
-		switch (providers.size()) {
-			case 0:
-				InternalLogger.log(Level.WARNING, WARNING_MESSAGE);
+		if (name == null) {
+			Collection<LoggingProvider> providers = loader.createAll();
+			switch (providers.size()) {
+				case 0:
+					InternalLogger.log(Level.WARNING, "No logging framework implementation found in class path."
+						+ "Add tinylog-backend.jar for outputting log entries.");
+					return new NopLoggingProvider();
+				case 1:
+					return providers.iterator().next();
+				default:
+					return new WrapperLoggingProvider(providers);
+			}
+		} else {
+			LoggingProvider provider = loader.create(name);
+			if (provider == null) {
+				InternalLogger.log(Level.ERROR, "Requested logging provider is not available. Logging will be disabled.");
 				return new NopLoggingProvider();
-			case 1:
-				return providers.iterator().next();
-			default:
-				return new WrapperLoggingProvider(providers);
+			} else {
+				return provider;
+			}
 		}
 	}
 

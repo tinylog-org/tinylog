@@ -17,16 +17,23 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
+import org.tinylog.configuration.Configuration;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link ProviderRegistry}.
  */
+@RunWith(PowerMockRunner.class)
 public final class ProviderRegistryTest {
 
 	/**
@@ -73,11 +80,7 @@ public final class ProviderRegistryTest {
 	public void noProviders() throws Exception {
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
-
-		assertThat(systemStream.consumeErrorOutput())
-			.containsOnlyOnce("WARNING")
-			.containsOnlyOnce("logging")
-			.hasLineCount(1);
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce("logging");
 	}
 
 	/**
@@ -110,6 +113,44 @@ public final class ProviderRegistryTest {
 			.hasSize(2)
 			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
 			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
+	}
+
+	/**
+	 * Verifies that a defined logging provider can be loaded if multiple are available.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void specificProvider() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+
+		spy(Configuration.class);
+		when(Configuration.get("provider")).thenReturn(LoggingProviderOne.class.getName());
+
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(LoggingProviderOne.class);
+	}
+
+	/**
+	 * Verifies that an accurate error message will be output, if a requested logging provider is not available.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void specificProviderIsMissing() throws Exception {
+		spy(Configuration.class);
+		when(Configuration.get("provider")).thenReturn(ProviderRegistryTest.class.getName() + "$AnotherLoggingProvider");
+
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
+
+		assertThat(systemStream.consumeErrorOutput())
+			.contains("ERROR")
+			.contains(ProviderRegistryTest.class.getName() + "$AnotherLoggingProvider");
 	}
 
 	/**
