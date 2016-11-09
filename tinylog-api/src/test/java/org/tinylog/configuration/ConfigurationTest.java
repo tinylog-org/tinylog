@@ -201,6 +201,100 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that system properties will be resolved.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void resolveSystemProperty() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${os.name}"));
+		assertThat(Configuration.get("test")).isEqualTo(System.getProperty("os.name"));
+	}
+
+	/**
+	 * Verifies that environment variables will be resolved.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void resolveEnvironmentVariable() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${PATH}"));
+		assertThat(Configuration.get("test")).isEqualTo(System.getenv("PATH"));
+	}
+
+	/**
+	 * Verifies that system properties will win, if there is a matching system property and environment variable.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void systemPropertyOverridesEnvironmentVariable() throws Exception {
+		System.setProperty("PATH", "Hello World!");
+		try {
+			loadProperies(FileSystem.createTemporaryFile("test = ${PATH}"));
+			assertThat(Configuration.get("test")).isEqualTo(System.getProperty("PATH"));
+		} finally {
+			System.clearProperty("PATH");
+		}
+	}
+
+	/**
+	 * Verifies that multiple variables will be resolved in a text.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void resolveMultipleVariables() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = JRE ${java.version} from ${java.vendor}"));
+		assertThat(Configuration.get("test"))
+			.isEqualTo("JRE " + System.getProperty("java.version") + " from " + System.getProperty("java.vendor"));
+	}
+
+	/**
+	 * Verifies that an accurate warning message will be output for empty variables.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void emptyVariable() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${}"));
+		assertThat(Configuration.get("test")).isEqualTo("${}");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("${}");
+	}
+
+	/**
+	 * Verifies that an accurate warning message will be output, if a closing curly brace is missing.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void incompleteVariable() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${os.name"));
+		assertThat(Configuration.get("test")).isEqualTo("${os.name");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("${os.name");
+	}
+
+	/**
+	 * Verifies that an accurate warning message will be output, if a variable exists neither as system property nor as
+	 * environment variable.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void nonExistentVariable() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${my.invalid.varaiable}"));
+		assertThat(Configuration.get("test")).isEqualTo("${my.invalid.varaiable}");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("my.invalid.varaiable");
+	}
+
+	/**
 	 * Triggers (re-)loading properties.
 	 *
 	 * @param path

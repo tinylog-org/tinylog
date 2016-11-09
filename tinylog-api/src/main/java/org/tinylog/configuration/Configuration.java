@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.tinylog.Level;
@@ -144,6 +145,13 @@ public final class Configuration {
 			}
 		}
 
+		for (Entry<Object, Object> entry : properties.entrySet()) {
+			String value = (String) entry.getValue();
+			if (value.contains("${")) {
+				properties.put(entry.getKey(), resolve(value));
+			}
+		}
+
 		return properties;
 	}
 
@@ -164,6 +172,64 @@ public final class Configuration {
 		} finally {
 			stream.close();
 		}
+	}
+
+	/**
+	 * Replaces <code>${}</code> placeholders with system properties or environment variables.
+	 *
+	 * @param value
+	 *            String with placeholders
+	 * @return Input value with resolved placeholders
+	 */
+	private static String resolve(final String value) {
+		StringBuilder builder = new StringBuilder();
+		int position = 0;
+
+		for (int index = value.indexOf("${"); index != -1; index = value.indexOf("${", position)) {
+			builder.append(value, position, index);
+
+			int start = index + 2;
+			int end = value.indexOf("}", start);
+
+			if (end == -1) {
+				InternalLogger.log(Level.WARNING, "Closing curly brace is missing for '" + value + "'");
+				return value;
+			}
+
+			String name = value.substring(start, end);
+			if (name.length() == 0) {
+				InternalLogger.log(Level.WARNING, "Empty variable names cannot be resolved: " + value);
+				return value;
+			}
+
+			String variable = getVariable(name);
+			if (variable == null) {
+				InternalLogger.log(Level.WARNING, "'" + name + "' could not be found in system properties nor in environment variables");
+				return value;
+			} else {
+				builder.append(variable);
+			}
+
+			position = end + 1;
+		}
+
+		builder.append(value, position, value.length());
+		return builder.toString();
+	}
+
+	/**
+	 * Resolves a system property or environment variable. If both exists, the system property will win.
+	 *
+	 * @param name
+	 *            Name of system property or environment variable
+	 * @return Found value or {@code null} if not set
+	 */
+	private static String getVariable(final String name) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+		}
+		return value;
 	}
 
 }
