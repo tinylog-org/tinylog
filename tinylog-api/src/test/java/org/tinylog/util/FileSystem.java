@@ -14,8 +14,8 @@
 package org.tinylog.util;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,8 +60,11 @@ public final class FileSystem {
 	 *             Invalid class path URL
 	 */
 	public static void createResource(final String name, final String... lines) throws IOException, URISyntaxException {
-		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();
-		Path path = Paths.get(defaultClasspath.toURI()).resolve(name);
+		Path path = Paths.get(getClassPathUri()).resolve(name);
+		Path parent = path.getParent();
+		if (parent != null) {
+			Files.createDirectories(parent);
+		}
 		Files.write(path, Arrays.asList(lines));
 		path.toFile().deleteOnExit();
 	}
@@ -79,8 +82,7 @@ public final class FileSystem {
 	 *             Invalid class path URL
 	 */
 	public static String createTemporaryResource(final String... lines) throws IOException, URISyntaxException {
-		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();
-		Path path = Files.createTempFile(Paths.get(defaultClasspath.toURI()), null, null);
+		Path path = Files.createTempFile(Paths.get(getClassPathUri()), null, null);
 		Files.write(path, Arrays.asList(lines));
 		path.toFile().deleteOnExit();
 		return path.toFile().getName();
@@ -97,9 +99,19 @@ public final class FileSystem {
 	 *             Invalid class path URL
 	 */
 	public static void deleteResource(final String name) throws IOException, URISyntaxException {
-		URL defaultClasspath = FileSystem.class.getProtectionDomain().getCodeSource().getLocation();
-		Path path = Paths.get(defaultClasspath.toURI()).resolve(name);
+		Path path = Paths.get(getClassPathUri()).resolve(name);
 		Files.delete(path);
+	}
+
+	/**
+	 * Returns the path to class path as URI.
+	 *
+	 * @return URI of class path
+	 * @throws URISyntaxException
+	 *             Failed converting class path URL to an URI
+	 */
+	private static URI getClassPathUri() throws URISyntaxException {
+		return FileSystem.class.getProtectionDomain().getCodeSource().getLocation().toURI();
 	}
 
 }
