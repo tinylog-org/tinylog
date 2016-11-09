@@ -98,7 +98,6 @@
 		<module name="MagicNumber" />
 		<module name="MissingCtor" />
 		<module name="MissingSwitchDefault" />
-		<module name="ModifiedControlVariable" />
 		<module name="MultipleVariableDeclarations" />
 		<module name="NoClone" />
 		<module name="NoFinalizer" />
