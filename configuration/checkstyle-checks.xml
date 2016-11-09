@@ -7,7 +7,7 @@
 	<!-- Suppressions -->
 	
 	<module name="SuppressionFilter">
-		<property name="file" value="configuration/checkstyle-suppressions.xml"/>
+		<property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
 		<property name="optional" value="false"/>
 	</module>
 	<module name="SuppressionCommentFilter">
@@ -19,7 +19,7 @@
 	<!-- Headers -->
 
 	<module name="Header">
-		<property name="headerFile" value="configuration/checkstyle-header.txt" />
+		<property name="headerFile" value="${workspace_loc}/configuration/checkstyle-header.txt" />
 		<property name="fileExtensions" value="java" />
 		<property name="ignoreLines" value="2" />
 	</module>

@@ -225,6 +225,7 @@
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
 						<failsOnError>true</failsOnError>
 						<configLocation>${project.parent.basedir}/configuration/checkstyle-checks.xml</configLocation>
+						<propertyExpansion>workspace_loc=${project.parent.basedir}</propertyExpansion>
 						<linkXRef>false</linkXRef>
 					</configuration>
 					<executions>
