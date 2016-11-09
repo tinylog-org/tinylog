@@ -35,7 +35,7 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class ServiceLoader<T> {
 
-	private static final String PREFIX = "META-INF/services/";
+	private static final String SERVICE_PREFIX = "META-INF/services/";
 
 	private static final Pattern splitPattern = Pattern.compile(" ");
 
@@ -120,7 +120,7 @@ public final class ServiceLoader<T> {
 	 * @return Class names
 	 */
 	private static <T> Collection<String> loadClasses(final Class<? extends T> service) {
-		String name = PREFIX + service.getName();
+		String name = SERVICE_PREFIX + service.getName();
 		Enumeration<URL> urls;
 		try {
 			urls = ClassLoader.getSystemResources(name);
