@@ -13,31 +13,20 @@
 
 package org.tinylog.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link ProviderRegistry}.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ProviderRegistry.class)
 public final class ProviderRegistryTest {
 
 	/**
@@ -56,6 +45,17 @@ public final class ProviderRegistryTest {
 	}
 
 	/**
+	 * Deletes created service file from class path.
+	 *
+	 * @throws Exception
+	 *             Failed deleting service file
+	 */
+	@After
+	public void clear() throws Exception {
+		FileSystem.deleteServiceFile(LoggingProvider.class);
+	}
+
+	/**
 	 * Verifies that the expected logging provider will be returned.
 	 */
 	@Test
@@ -71,15 +71,12 @@ public final class ProviderRegistryTest {
 	 */
 	@Test
 	public void noProviders() throws Exception {
-		registerProviders(0);
-
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
 
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("WARNING")
 			.containsOnlyOnce("logging")
-			.endsWith(System.lineSeparator())
 			.hasLineCount(1);
 	}
 
@@ -91,10 +88,10 @@ public final class ProviderRegistryTest {
 	 */
 	@Test
 	public void singleProvider() throws Exception {
-		List<LoggingProvider> registerProviders = registerProviders(1);
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName());
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
-		assertThat(createdProvider).isSameAs(registerProviders.get(0));
+		assertThat(createdProvider).isInstanceOf(LoggingProviderOne.class);
 	}
 
 	/**
@@ -105,37 +102,59 @@ public final class ProviderRegistryTest {
 	 */
 	@Test
 	public void multipleProviders() throws Exception {
-		List<LoggingProvider> registerProviders = registerProviders(2);
-		for (LoggingProvider provider : registerProviders) {
-			when(provider.getMinimumLevel(null)).thenReturn(Level.DEBUG);
-		}
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
 
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(WrapperLoggingProvider.class);
-		assertThat(createdProvider.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
+		assertThat(Whitebox.getInternalState(createdProvider, LoggingProvider[].class))
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
 	}
 
 	/**
-	 * Registers a defined number of logging providers as service.
-	 *
-	 * @param times
-	 *            Number of mocks that should be registered
-	 * @return All registered mocks
+	 * Dummy logging provider class for service loader.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static List<LoggingProvider> registerProviders(final int times) {
-		PowerMockito.mockStatic(ServiceLoader.class);
-		ServiceLoader serviceLoaderMock = mock(ServiceLoader.class);
+	public static final class LoggingProviderOne extends AbstractLoggingProvider {
 
-		List<LoggingProvider> providers = new ArrayList<>();
-		for (int i = 0; i < times; ++i) {
-			providers.add(mock(LoggingProvider.class));
+	}
+
+	/**
+	 * Another dummy logging provider class for service loader.
+	 */
+	public static final class LoggingProviderTwo extends AbstractLoggingProvider {
+
+	}
+
+	/**
+	 * Base dummy logging provider class that does nothing.
+	 */
+	public abstract static class AbstractLoggingProvider implements LoggingProvider {
+
+		@Override
+		public final ContextProvider getContextProvider() {
+			return new NopContextProvider();
 		}
 
-		when(serviceLoaderMock.iterator()).thenReturn(providers.iterator());
-		when(ServiceLoader.load(any())).thenReturn(serviceLoaderMock);
+		@Override
+		public final Level getMinimumLevel(final String tag) {
+			return Level.OFF;
+		}
 
-		return providers;
+		@Override
+		public final boolean isEnabled(final int depth, final String tag, final Level level) {
+			return false;
+		}
+
+		@Override
+		public final void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
+			final Object... arguments) {
+		}
+
+		@Override
+		public final void internal(final int depth, final Level level, final Throwable exception, final String message) {
+		}
+
 	}
 
 }

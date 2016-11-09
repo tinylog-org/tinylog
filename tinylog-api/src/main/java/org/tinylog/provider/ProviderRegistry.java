@@ -13,11 +13,10 @@
 
 package org.tinylog.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.Collection;
 
 import org.tinylog.Level;
+import org.tinylog.configuration.ServiceLoader;
 
 /**
  * Registry for receiving the actual logging provider.
@@ -58,18 +57,15 @@ public final class ProviderRegistry {
 	 * @return New logging provider instance
 	 */
 	private static LoggingProvider loadLoggingProvider() {
-		List<LoggingProvider> providers = new ArrayList<LoggingProvider>(1);
+		ServiceLoader<LoggingProvider> loader = new ServiceLoader<LoggingProvider>(LoggingProvider.class);
 
-		for (LoggingProvider provider : ServiceLoader.load(LoggingProvider.class)) {
-			providers.add(provider);
-		}
-
+		Collection<LoggingProvider> providers = loader.createAll();
 		switch (providers.size()) {
 			case 0:
 				InternalLogger.log(Level.WARNING, WARNING_MESSAGE);
 				return new NopLoggingProvider();
 			case 1:
-				return providers.get(0);
+				return providers.iterator().next();
 			default:
 				return new WrapperLoggingProvider(providers);
 		}
