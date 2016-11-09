@@ -259,7 +259,7 @@ public final class ServiceLoaderTest {
 	 * Verifies that an accurate error message will be output, if service files can be not loaded as resources.
 	 *
 	 * @throws IOException
-	 *             Failed invoking {@code getSystemResources()}
+	 *             Failed invoking {@link ClassLoader#getSystemResources(String)}
 	 */
 	@Test
 	@PrepareForTest(ServiceLoader.class)

@@ -663,7 +663,7 @@ public final class LoggerTest {
 		 * {@code null} and empty strings.
 		 *
 		 * @throws Exception
-		 *             Failed getting tag
+		 *             Failed getting tag from internal field
 		 */
 		@Test
 		public void untagged() throws Exception {
@@ -678,7 +678,7 @@ public final class LoggerTest {
 		 * tag.
 		 *
 		 * @throws Exception
-		 *             Failed getting tag
+		 *             Failed getting tag from internal field
 		 */
 		@Test
 		public void tagged() throws Exception {
