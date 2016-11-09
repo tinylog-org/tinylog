@@ -26,6 +26,8 @@ import java.util.Arrays;
  */
 public final class FileSystem {
 
+	private static final String SERVICE_PREFIX = "META-INF/services/";
+
 	/** */
 	private FileSystem() {
 	}
@@ -44,6 +46,23 @@ public final class FileSystem {
 		Files.write(path, Arrays.asList(lines));
 		path.toFile().deleteOnExit();
 		return path.toString();
+	}
+
+	/**
+	 * Creates or overrides a service file in class path.
+	 *
+	 * @param service
+	 *            Service interface
+	 * @param implementations
+	 *            Service implementation classes
+	 * @throws IOException
+	 *             Failed creating resource
+	 * @throws URISyntaxException
+	 *             Invalid class path URL
+	 */
+	public static void createServiceFile(final Class<?> service, final String... implementations)
+		throws IOException, URISyntaxException {
+		createResource(SERVICE_PREFIX + service.getName(), implementations);
 	}
 
 	/**
@@ -86,6 +105,20 @@ public final class FileSystem {
 		Files.write(path, Arrays.asList(lines));
 		path.toFile().deleteOnExit();
 		return path.toFile().getName();
+	}
+	/**
+	 * Deletes a service file from default class path.
+	 *
+	 * @param service
+	 *            Service interface
+	 * @throws IOException
+	 *             Failed deleting resource
+	 * @throws URISyntaxException
+	 *             Invalid class path URL
+	 */
+
+	public static void deleteServiceFile(final Class<?> service) throws IOException, URISyntaxException {
+		deleteResource(SERVICE_PREFIX + service.getName());
 	}
 
 	/**

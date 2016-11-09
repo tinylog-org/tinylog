@@ -63,7 +63,7 @@ public final class ServiceLoaderTest {
 	 */
 	@Before
 	public void init() throws Exception {
-		FileSystem.createResource(SERVICE_PREFIX + List.class.getName(), ArrayList.class.getName(), LinkedList.class.getName());
+		FileSystem.createServiceFile(List.class, ArrayList.class.getName(), LinkedList.class.getName());
 	}
 
 	/**
@@ -74,7 +74,7 @@ public final class ServiceLoaderTest {
 	 */
 	@After
 	public void clear() throws Exception {
-		FileSystem.deleteResource(SERVICE_PREFIX + List.class.getName());
+		FileSystem.deleteServiceFile(List.class);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public final class ServiceLoaderTest {
 	 */
 	@Test
 	public void noRegisteredServices() throws Exception {
-		FileSystem.deleteResource(SERVICE_PREFIX + List.class.getName());
+		FileSystem.deleteServiceFile(List.class);
 
 		ServiceLoader<?> loader = new ServiceLoader<>(List.class);
 		assertThat(loader.createAll()).isEmpty();
@@ -131,7 +131,7 @@ public final class ServiceLoaderTest {
 	 */
 	@Test
 	public void emptyLines() throws Exception {
-		FileSystem.createResource(SERVICE_PREFIX + List.class.getName(), "", ArrayList.class.getName(), "");
+		FileSystem.createServiceFile(List.class, "", ArrayList.class.getName(), "");
 
 		ServiceLoader<?> loader = new ServiceLoader<>(List.class);
 		assertThat(loader.createAll())
@@ -147,7 +147,7 @@ public final class ServiceLoaderTest {
 	 */
 	@Test
 	public void comments() throws Exception {
-		FileSystem.createResource(SERVICE_PREFIX + List.class.getName(), "#Comment", ArrayList.class.getName());
+		FileSystem.createServiceFile(List.class, "#Comment", ArrayList.class.getName());
 
 		ServiceLoader<?> loader = new ServiceLoader<>(List.class);
 		assertThat(loader.createAll())
