@@ -19,7 +19,7 @@ import org.tinylog.Level;
  * API for providing log entries to a concrete logging framework implementation.
  */
 public interface LoggingProvider {
-	
+
 	/**
 	 * Returns the corresponding context provider.
 	 *
@@ -75,19 +75,5 @@ public interface LoggingProvider {
 	 *            Arguments for message or {@code null}
 	 */
 	void log(int depth, String tag, Level level, Throwable exception, Object obj, Object... arguments);
-
-	/**
-	 * Provides an internal log entry (typically used for internal tinylog warnings and errors).
-	 *
-	 * @param depth
-	 *            Depth of caller in stack trace (e.g. '0' for direct calls)
-	 * @param level
-	 *            Severity level of log entry
-	 * @param exception
-	 *            Exception to log or {@code null}
-	 * @param message
-	 *            Message to log or {@code null}
-	 */
-	void internal(int depth, Level level, Throwable exception, String message);
 
 }

@@ -71,16 +71,9 @@ final class BundleLoggingProvider implements LoggingProvider {
 		}
 	}
 
-	@Override
-	public void internal(final int depth, final Level level, final Throwable exception, final String message) {
-		for (int i = 0; i < loggingProviders.length; ++i) {
-			loggingProviders[i].internal(depth + 1, level, exception, message);
-		}
-	}
-
 	/**
 	 * Gets all context providers from given logging providers and combine them into a new one.
-	 * 
+	 *
 	 * @param loggingProviders
 	 *            Context providers of these logging providers will be fetched
 	 * @return All context providers combined into a new one

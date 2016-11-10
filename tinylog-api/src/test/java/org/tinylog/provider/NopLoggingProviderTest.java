@@ -84,13 +84,4 @@ public final class NopLoggingProviderTest {
 		provider.log(1, null, Level.ERROR, null, null, (Object[]) null);
 	}
 
-	/**
-	 * Verifies that {@code internal()} method is invokable without throwing any exceptions.
-	 */
-	@Test
-	public void internal() {
-		provider.internal(0, Level.DEBUG, null, null);
-		provider.internal(1, Level.ERROR, null, null);
-	}
-
 }

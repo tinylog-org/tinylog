@@ -192,10 +192,6 @@ public final class ProviderRegistryTest {
 			final Object... arguments) {
 		}
 
-		@Override
-		public final void internal(final int depth, final Level level, final Throwable exception, final String message) {
-		}
-
 	}
 
 }

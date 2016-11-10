@@ -116,20 +116,6 @@ public final class BundleLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that {@code internal()} method invokes {@code internal()} methods from underlying logging providers.
-	 */
-	@Test
-	public void internal() {
-		init(Level.TRACE, Level.TRACE);
-
-		NullPointerException exception = new NullPointerException();
-		bundle.internal(1, Level.INFO, exception, "Test");
-
-		verify(first).internal(2, Level.INFO, exception, "Test");
-		verify(second).internal(2, Level.INFO, exception, "Test");
-	}
-
-	/**
 	 * Creates underlying logging providers as well as the wrapper logging provider.
 	 *
 	 * @param firstLevel
