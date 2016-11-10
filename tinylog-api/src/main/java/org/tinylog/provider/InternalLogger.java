@@ -53,7 +53,7 @@ public final class InternalLogger {
 		if (messageOfException == null || messageOfException.isEmpty()) {
 			System.err.println("LOGGER " + level + ": " + nameOfException);
 		} else {
-			System.err.println("LOGGER " + level + ": " + nameOfException + " (" + messageOfException + ")");
+			System.err.println("LOGGER " + level + ": " + messageOfException + " (" + nameOfException + ")");
 		}
 	}
 
