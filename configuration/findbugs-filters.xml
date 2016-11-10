@@ -5,13 +5,16 @@
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
 	</Match>
 	<Match>
-		<!-- Log Entry Class -->
-		<Class name="org.tinylog.backend.LogEntry" />
+		<!-- Log Entry Class and Log Entry Builder -->
+		<Or>
+			<Class name="org.tinylog.backend.LogEntry" />
+			<Class name="org.tinylog.backend.util.LogEntryBuilder" />
+		</Or>
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
-		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD, DM_USELESS_THREAD" />
 	</Match>
 </FindBugsFilter>
