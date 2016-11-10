@@ -120,7 +120,7 @@ public final class LogEntry {
 	}
 
 	/**
-	 * Gets the name of class in which this log entry has been issued.
+	 * Gets the name of the class in which this log entry has been issued.
 	 *
 	 * @return Name of class
 	 */
@@ -129,7 +129,7 @@ public final class LogEntry {
 	}
 
 	/**
-	 * Gets the name of method in which this log entry has been issued.
+	 * Gets the name of the method in which this log entry has been issued.
 	 *
 	 * @return Name of method
 	 */
@@ -138,7 +138,7 @@ public final class LogEntry {
 	}
 
 	/**
-	 * Gets the name of source file in which this log entry has been issued.
+	 * Gets the name of the source file in which this log entry has been issued.
 	 *
 	 * @return Name of source file
 	 */

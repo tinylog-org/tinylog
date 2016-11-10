@@ -93,7 +93,7 @@ public final class LogEntryBuilder {
 	}
 
 	/**
-	 * Sets the name of class in which this log entry has been issued.
+	 * Sets the name of the class in which this log entry has been issued.
 	 *
 	 * @param name
 	 *            Name of class
@@ -105,7 +105,7 @@ public final class LogEntryBuilder {
 	}
 
 	/**
-	 * Sets the name of method in which this log entry has been issued.
+	 * Sets the name of the method in which this log entry has been issued.
 	 *
 	 * @param name
 	 *            Name of method
@@ -117,7 +117,7 @@ public final class LogEntryBuilder {
 	}
 
 	/**
-	 * Sets the name of source file in which this log entry has been issued.
+	 * Sets the name of the source file in which this log entry has been issued.
 	 *
 	 * @param name
 	 *            Name of source file
