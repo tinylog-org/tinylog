@@ -15,6 +15,7 @@ package org.tinylog.configuration;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -29,6 +30,7 @@ import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.tinylog.util.Maps.doubletonMap;
 
 /**
  * Tests for {@link Configuration}.
@@ -67,7 +69,7 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Clears all tinylog properties.
+	 * Clears configuration and all tinylog properties.
 	 */
 	@After
 	public void clear() {
@@ -77,6 +79,8 @@ public final class ConfigurationTest {
 				System.clearProperty(property);
 			}
 		}
+
+		Configuration.replace(Collections.emptyMap());
 	}
 
 	/**
@@ -292,6 +296,55 @@ public final class ConfigurationTest {
 		loadProperies(FileSystem.createTemporaryFile("test = ${my.invalid.varaiable}"));
 		assertThat(Configuration.get("test")).isEqualTo("${my.invalid.varaiable}");
 		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("my.invalid.varaiable");
+	}
+
+	/**
+	 * Verifies that a new property can be added.
+	 *
+	 * @throws Exception
+	 *             Failed invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void addProperty() throws Exception {
+		loadProperies(null);
+
+		assertThat(Configuration.get("test")).isNull();
+		Configuration.set("test", "Hello World!");
+		assertThat(Configuration.get("test")).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that an already existing property can be overridden.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void overrideProperty() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = Hello World!"));
+
+		assertThat(Configuration.get("test")).isEqualTo("Hello World!");
+		Configuration.set("test", "Bye World!");
+		assertThat(Configuration.get("test")).isEqualTo("Bye World!");
+	}
+
+	/**
+	 * Verifies that the actual configuration can be replaced by a new one.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void replaceProperties() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("a = 1", "b = 2"));
+
+		assertThat(Configuration.get("a")).isEqualTo("1");
+		assertThat(Configuration.get("b")).isEqualTo("2");
+
+		Configuration.replace(doubletonMap("a", "0", "c", "42"));
+
+		assertThat(Configuration.get("a")).isEqualTo("0");
+		assertThat(Configuration.get("c")).isEqualTo("42");
 	}
 
 	/**

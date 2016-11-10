@@ -113,6 +113,41 @@ public final class Configuration {
 	}
 
 	/**
+	 * Sets a property. If there is already a value for the given key, it will be overridden by the new value.
+	 *
+	 * <p>
+	 * Configuration properties must be set before calling any logging methods. If the framework has been initialized
+	 * once, the configuration is immutable and further configuration changes will be just ignored.
+	 * </p>
+	 *
+	 * @param key
+	 *            Name of the property
+	 * @param value
+	 *            Value of the property
+	 */
+	public static void set(final String key, final String value) {
+		properties.put(key, value);
+	}
+
+	/**
+	 * Replaces the current configuration by a new one. Already existing properties will be dropped.
+	 *
+	 * <p>
+	 * Configuration properties must be set before calling any logging methods. If the framework has been initialized
+	 * once, the configuration is immutable and further configuration changes will be just ignored.
+	 * </p>
+	 *
+	 * @param configuration
+	 *            New configuration
+	 */
+	public static void replace(final Map<String, String> configuration) {
+		synchronized (properties) {
+			properties.clear();
+			properties.putAll(configuration);
+		}
+	}
+
+	/**
 	 * Loads all configuration properties.
 	 *
 	 * @return Found properties
