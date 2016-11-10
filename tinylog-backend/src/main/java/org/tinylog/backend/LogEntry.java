@@ -67,8 +67,8 @@ public final class LogEntry {
 	 *            Catched exception or throwable associated with this log entry
 	 */
 	public LogEntry(final Date date, final String processId, final Thread thread, final Map<String, String> context,
-		final String className, final String methodName, final String fileName, final int lineNumber, final String tag, final Level level,
-		final String message, final Throwable exception) {
+		final String className, final String methodName, final String fileName, final int lineNumber, final String tag,
+		final Level level, final String message, final Throwable exception) {
 		this.date = date;
 		this.processId = processId;
 		this.thread = thread;
