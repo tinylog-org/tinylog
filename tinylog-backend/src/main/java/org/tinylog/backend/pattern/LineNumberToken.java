@@ -14,7 +14,7 @@
 package org.tinylog.backend.pattern;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Collections;
 
 import org.tinylog.backend.LogEntry;
 import org.tinylog.backend.LogEntryValue;
@@ -30,7 +30,7 @@ final class LineNumberToken implements Token {
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.LINE);
+		return Collections.singleton(LogEntryValue.LINE);
 	}
 
 	@Override

@@ -14,7 +14,7 @@
 package org.tinylog.backend.pattern;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Collections;
 
 import org.tinylog.backend.LogEntry;
 import org.tinylog.backend.LogEntryValue;
@@ -43,7 +43,7 @@ final class LoggerTagToken implements Token {
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.TAG);
+		return Collections.singleton(LogEntryValue.TAG);
 	}
 
 	@Override
