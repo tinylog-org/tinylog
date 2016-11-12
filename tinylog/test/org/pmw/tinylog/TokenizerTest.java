@@ -369,12 +369,12 @@ public class TokenizerTest extends AbstractCoreTest {
 
 		List<Token> tokens = new Tokenizer(locale, 0).parse("{message}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 
 		tokens = new Tokenizer(locale, 0).parse("{message:abc}");
 		assertEquals("LOGGER WARNING: \"{message}\" does not support parameters", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 
 		assertEquals("", render(tokens, new LogEntryBuilder().message(null)));
 		assertEquals("Hello world", render(tokens, new LogEntryBuilder().message("Hello world")));
@@ -386,7 +386,7 @@ public class TokenizerTest extends AbstractCoreTest {
 
 		tokens = new Tokenizer(locale, 1).parse("{message}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 
 		String renderedLogEntry = render(tokens, new LogEntryBuilder().message(null).exception(new Exception("Test")));
 		assertThat(renderedLogEntry, matchesPattern("java\\.lang\\.Exception\\: Test" + newLine
@@ -396,7 +396,7 @@ public class TokenizerTest extends AbstractCoreTest {
 
 		tokens = new Tokenizer(locale, Integer.MAX_VALUE).parse("{message}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 
 		renderedLogEntry = render(tokens, new LogEntryBuilder().message(null).exception(new RuntimeException(new NullPointerException())));
 		assertThat(renderedLogEntry, containsPattern("java\\.lang\\.RuntimeException.*" + newLine
@@ -559,61 +559,61 @@ public class TokenizerTest extends AbstractCoreTest {
 
 		List<Token> tokens = tokenizer.parse("{message|indent=0}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("Hello\nWorld", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{message|indent=1}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals(" Hello\r World", render(tokens, new LogEntryBuilder().message("Hello\rWorld")));
 
 		tokens = tokenizer.parse("{message|indent=1}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals(" Hello\r\n World", render(tokens, new LogEntryBuilder().message("Hello\r\nWorld")));
 
 		tokens = tokenizer.parse("{message|indent=1}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals(" Hello\n World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{message| indent = 1 }");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals(" TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals(" Hello\n World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{{message}|indent=2}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("  TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("  Hello\n  World", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{{message}!|indent=2}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("  TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("  Hello\n  World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{{message}!|indent=3,}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("   TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("   Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("{!{message}!|indent=3}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("   !TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("   !Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
 		tokens = tokenizer.parse("!{message|indent=3}!");
 		assertEquals(3, tokens.size());
-		assertThat(tokens.get(1).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(1).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("!TEST!", render(tokens, new LogEntryBuilder().message("TEST")));
 		assertEquals("!Hello\n   World!", render(tokens, new LogEntryBuilder().message("Hello\nWorld")));
 
@@ -621,7 +621,7 @@ public class TokenizerTest extends AbstractCoreTest {
 
 		tokens = tokenizer.parse("{message|indent=1}");
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("  Hello\n World!", render(tokens, new LogEntryBuilder().message("\tHello\nWorld!")));
 		assertEquals(" Hello\n  World!", render(tokens, new LogEntryBuilder().message("Hello\n\tWorld!")));
 
@@ -630,25 +630,25 @@ public class TokenizerTest extends AbstractCoreTest {
 		tokens = tokenizer.parse("{message|indent}");
 		assertEquals("LOGGER WARNING: No value set for \"indent\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 
 		tokens = tokenizer.parse("{message|indent=-1}");
 		assertEquals("LOGGER WARNING: \"-1\" is an invalid number for \"indent\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 
 		tokens = tokenizer.parse("{message|indent=abc}");
 		assertEquals("LOGGER WARNING: \"abc\" is an invalid number for \"indent\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 
 		tokens = tokenizer.parse("{message|indent=}");
 		assertEquals("LOGGER WARNING: No value set for \"indent\"", getErrorStream().nextLine());
 		assertEquals(1, tokens.size());
-		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE));
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION));
 		assertEquals("TEST", render(tokens, new LogEntryBuilder().message("TEST")));
 	}
 
