@@ -705,7 +705,7 @@ final class Tokenizer {
 
 		@Override
 		public Collection<LogEntryValue> getRequiredLogEntryValues() {
-			return Collections.singletonList(LogEntryValue.MESSAGE);
+			EnumSet.of(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 		}
 
 		@Override
