@@ -1,7 +1,7 @@
 <FindBugsFilter>
 	<Match>
-		<!-- Logger Classes -->
-		<Source name="~.*Logger\.java" />
+		<!-- Loggers and Thread Context -->
+		<Source name="~.*(Logger|ThreadContext)\.java" />
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
 	</Match>
 	<Match>
