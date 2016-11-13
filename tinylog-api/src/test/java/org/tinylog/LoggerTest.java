@@ -127,12 +127,9 @@ public final class LoggerTest {
 
 		/**
 		 * Mocks the underlying logging provider.
-		 *
-		 * @throws ReflectiveOperationException
-		 *             Failed mocking logging provider
 		 */
 		@Before
-		public void init() throws ReflectiveOperationException {
+		public void init() {
 			loggingProvider = mockLoggingProvider();
 		}
 
@@ -592,10 +589,8 @@ public final class LoggerTest {
 		 * Mocks the logging provider for {@link Logger} and overrides all depending fields.
 		 *
 		 * @return Mock instance for logging provider
-		 * @throws ReflectiveOperationException
-		 *             Failed overriding fields in {@link Logger}
 		 */
-		private LoggingProvider mockLoggingProvider() throws ReflectiveOperationException {
+		private LoggingProvider mockLoggingProvider() {
 			LoggingProvider provider = mock(LoggingProvider.class);
 
 			when(provider.getMinimumLevel(null)).thenReturn(level);

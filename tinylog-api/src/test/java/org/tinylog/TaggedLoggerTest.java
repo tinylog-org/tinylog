@@ -122,12 +122,9 @@ public final class TaggedLoggerTest {
 
 	/**
 	 * Mocks the underlying logging provider and creates a new tagged logger instance.
-	 *
-	 * @throws ReflectiveOperationException
-	 *             Failed mocking logging provider
 	 */
 	@Before
-	public void init() throws ReflectiveOperationException {
+	public void init() {
 		loggingProvider = mockLoggingProvider();
 		logger = new TaggedLogger(TAG);
 	}
@@ -572,10 +569,8 @@ public final class TaggedLoggerTest {
 	 * Mocks the logging provider for {@link TaggedLogger} and overrides all depending fields.
 	 *
 	 * @return Mock instance for logging provider
-	 * @throws ReflectiveOperationException
-	 *             Failed overriding fields in {@link TaggedLogger}
 	 */
-	private LoggingProvider mockLoggingProvider() throws ReflectiveOperationException {
+	private LoggingProvider mockLoggingProvider() {
 		LoggingProvider provider = mock(LoggingProvider.class);
 
 		when(provider.getMinimumLevel(TAG)).thenReturn(level);
