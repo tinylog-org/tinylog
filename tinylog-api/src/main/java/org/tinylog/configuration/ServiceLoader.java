@@ -36,8 +36,7 @@ import org.tinylog.provider.InternalLogger;
 public final class ServiceLoader<T> {
 
 	private static final String SERVICE_PREFIX = "META-INF/services/";
-
-	private static final Pattern splitPattern = Pattern.compile(" ");
+	private static final Pattern SPLIT_PATTERN = Pattern.compile(" ");
 
 	private final Class<? extends T> service;
 	private final Class<?>[] argumentTypes;
@@ -173,7 +172,7 @@ public final class ServiceLoader<T> {
 	 */
 	private String toSimpleClassName(final String name) {
 		StringBuilder builder = new StringBuilder(name.length());
-		for (String token : splitPattern.split(name)) {
+		for (String token : SPLIT_PATTERN.split(name)) {
 			if (!token.isEmpty()) {
 				builder.append(Character.toUpperCase(token.charAt(0)));
 				builder.append(token, 1, token.length());
