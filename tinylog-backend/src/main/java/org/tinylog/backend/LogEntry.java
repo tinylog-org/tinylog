@@ -28,7 +28,6 @@ import org.tinylog.Level;
 public final class LogEntry {
 
 	private final Date date;
-	private final String processId;
 	private final Thread thread;
 	private final Map<String, String> context;
 	private final String className;
@@ -43,8 +42,6 @@ public final class LogEntry {
 	/**
 	 * @param date
 	 *            Issuing date and time of this log entry
-	 * @param processId
-	 *            Process ID of application
 	 * @param thread
 	 *            Thread that has issued this log entry
 	 * @param context
@@ -66,11 +63,10 @@ public final class LogEntry {
 	 * @param exception
 	 *            Catched exception or throwable associated with this log entry
 	 */
-	public LogEntry(final Date date, final String processId, final Thread thread, final Map<String, String> context,
-		final String className, final String methodName, final String fileName, final int lineNumber, final String tag,
-		final Level level, final String message, final Throwable exception) {
+	public LogEntry(final Date date, final Thread thread, final Map<String, String> context, final String className,
+		final String methodName, final String fileName, final int lineNumber, final String tag, final Level level,
+		final String message, final Throwable exception) {
 		this.date = date;
-		this.processId = processId;
 		this.thread = thread;
 		this.context = context;
 		this.className = className;
@@ -90,15 +86,6 @@ public final class LogEntry {
 	 */
 	public Date getDate() {
 		return date;
-	}
-
-	/**
-	 * Gets the process ID of the application.
-	 *
-	 * @return Process ID of application
-	 */
-	public String getProcessId() {
-		return processId;
 	}
 
 	/**

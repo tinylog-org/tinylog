@@ -26,7 +26,6 @@ import org.tinylog.backend.LogEntry;
 public final class LogEntryBuilder {
 
 	private Date date;
-	private String processId;
 	private Thread thread;
 	private Map<String, String> context = new HashMap<>();
 	private String className;
@@ -51,18 +50,6 @@ public final class LogEntryBuilder {
 	 */
 	public LogEntryBuilder date(final Date date) {
 		this.date = date;
-		return this;
-	}
-
-	/**
-	 * Sets the process ID.
-	 *
-	 * @param id
-	 *            Process ID
-	 * @return Actual log entry builder
-	 */
-	public LogEntryBuilder processId(final String id) {
-		this.processId = id;
 		return this;
 	}
 
@@ -194,7 +181,7 @@ public final class LogEntryBuilder {
 	 * @return Created log entry
 	 */
 	public LogEntry create() {
-		return new LogEntry(date, processId, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
+		return new LogEntry(date, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
 	}
 
 }

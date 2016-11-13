@@ -26,13 +26,6 @@ public enum LogEntryValue {
 	DATE,
 
 	/**
-	 * Process ID of application.
-	 *
-	 * @see LogEntry#getProcessId()
-	 */
-	PROCESS_ID,
-
-	/**
 	 * Issuing thread.
 	 *
 	 * @see LogEntry#getThread()
