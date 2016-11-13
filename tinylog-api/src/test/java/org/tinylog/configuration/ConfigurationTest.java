@@ -13,6 +13,7 @@
 
 package org.tinylog.configuration;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -101,6 +102,20 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that properties from a custom defined URL will be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file URL or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void propertiesFileFromUrl() throws Exception {
+		String path = FileSystem.createTemporaryFile("level = debug");
+		String url = new File(path).getAbsoluteFile().toURI().toURL().toString();
+		loadProperies(url);
+		assertThat(Configuration.get("level")).isEqualToIgnoringCase("debug");
+	}
+
+	/**
 	 * Verifies that a custom defined resource will be loaded from class path.
 	 *
 	 * @throws Exception
@@ -108,8 +123,8 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void propertiesFileFromClassPath() throws Exception {
-		loadProperies(FileSystem.createTemporaryResource("level = trace"));
-		assertThat(Configuration.get("level")).isEqualToIgnoringCase("trace");
+		loadProperies(FileSystem.createTemporaryResource("level = info"));
+		assertThat(Configuration.get("level")).isEqualToIgnoringCase("info");
 	}
 
 	/**
@@ -120,8 +135,8 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void propertiesFileFromFileSystem() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info"));
-		assertThat(Configuration.get("level")).isEqualToIgnoringCase("info");
+		loadProperies(FileSystem.createTemporaryFile("level = warning"));
+		assertThat(Configuration.get("level")).isEqualToIgnoringCase("warning");
 	}
 
 	/**

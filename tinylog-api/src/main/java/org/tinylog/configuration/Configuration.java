@@ -16,11 +16,13 @@ package org.tinylog.configuration;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
@@ -46,6 +48,8 @@ public final class Configuration {
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";
 	private static final String CONFIGURATION_PROPERTY = PROPERTIES_PREFIX + "configuration";
+
+	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
 
 	private static final Properties properties = load();
 
@@ -158,9 +162,14 @@ public final class Configuration {
 		String file = System.getProperty(CONFIGURATION_PROPERTY);
 		try {
 			if (file != null) {
-				InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
-				if (stream == null) {
-					stream = new FileInputStream(file);
+				InputStream stream;
+				if (URL_DETECTION_PATTERN.matcher(file).matches()) {
+					stream = new URL(file).openStream();
+				} else {
+					stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+					if (stream == null) {
+						stream = new FileInputStream(file);
+					}
 				}
 				load(properties, stream);
 			} else {
