@@ -55,6 +55,7 @@
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.5.1</maven-site-plugin.version>
 
+		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.5.2</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
 		<junit.version>4.12</junit.version>
@@ -99,6 +100,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.google.android</groupId>
+				<artifactId>android</artifactId>
+				<version>${android.version}</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.jacoco</groupId>
 				<artifactId>org.jacoco.agent</artifactId>
