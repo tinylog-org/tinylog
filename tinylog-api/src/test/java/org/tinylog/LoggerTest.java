@@ -605,7 +605,7 @@ public final class LoggerTest {
 			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
 			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-			Whitebox.setInternalState(Logger.class, "LOGGING_PROVIDER", provider);
+			Whitebox.setInternalState(Logger.class, provider);
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
@@ -622,7 +622,7 @@ public final class LoggerTest {
 		 *             Failed updating fields
 		 */
 		private void resetLoggingProvider() throws Exception {
-			Whitebox.setInternalState(Logger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
+			Whitebox.setInternalState(Logger.class, ProviderRegistry.getLoggingProvider());
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", isCoveredByMinimumLevel(Level.TRACE));
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", isCoveredByMinimumLevel(Level.DEBUG));
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", isCoveredByMinimumLevel(Level.INFO));

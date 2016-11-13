@@ -585,7 +585,7 @@ public final class TaggedLoggerTest {
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.WARNING))).thenReturn(warnEnabled);
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-		Whitebox.setInternalState(TaggedLogger.class, "LOGGING_PROVIDER", provider);
+		Whitebox.setInternalState(TaggedLogger.class, provider);
 
 		return provider;
 	}
@@ -597,7 +597,7 @@ public final class TaggedLoggerTest {
 	 *             Failed updating fields
 	 */
 	private void resetLoggingProvider() throws Exception {
-		Whitebox.setInternalState(TaggedLogger.class, "LOGGING_PROVIDER", ProviderRegistry.getLoggingProvider());
+		Whitebox.setInternalState(TaggedLogger.class, ProviderRegistry.getLoggingProvider());
 
 		Whitebox.setInternalState(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE));
 		Whitebox.setInternalState(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG));

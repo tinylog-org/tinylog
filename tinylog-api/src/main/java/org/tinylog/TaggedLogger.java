@@ -23,9 +23,9 @@ import org.tinylog.provider.ProviderRegistry;
  */
 public final class TaggedLogger {
 
-	private static final LoggingProvider LOGGING_PROVIDER = ProviderRegistry.getLoggingProvider();
-
 	private static final int STACKTRACE_DEPTH = 1;
+
+	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	private final boolean minimumLevelCoversTrace;
 	private final boolean minimumLevelCoversDebug;
@@ -57,7 +57,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if {@link Level#TRACE TRACE} level is enabled, {@code false} if disabled
 	 */
 	public boolean isTraceEnabled() {
-		return minimumLevelCoversTrace && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.TRACE);
+		return minimumLevelCoversTrace && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.TRACE);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Object message) {
 		if (minimumLevelCoversTrace) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
@@ -83,7 +83,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final String message, final Object... arguments) {
 		if (minimumLevelCoversTrace) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, arguments);
 		}
 	}
 
@@ -95,7 +95,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception) {
 		if (minimumLevelCoversTrace) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, (Object[]) null);
 		}
 	}
 
@@ -109,7 +109,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final String message) {
 		if (minimumLevelCoversTrace) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
 		}
 	}
 
@@ -126,7 +126,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversTrace) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, arguments);
 		}
 	}
 
@@ -136,7 +136,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if {@link Level#DEBUG DEBUG} level is enabled, {@code false} if disabled
 	 */
 	public boolean isDebugEnabled() {
-		return minimumLevelCoversDebug && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.DEBUG);
+		return minimumLevelCoversDebug && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.DEBUG);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Object message) {
 		if (minimumLevelCoversDebug) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
@@ -162,7 +162,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final String message, final Object... arguments) {
 		if (minimumLevelCoversDebug) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, arguments);
 		}
 	}
 
@@ -174,7 +174,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception) {
 		if (minimumLevelCoversDebug) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, (Object[]) null);
 		}
 	}
 
@@ -188,7 +188,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final String message) {
 		if (minimumLevelCoversDebug) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
 		}
 	}
 
@@ -205,7 +205,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversDebug) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, arguments);
 		}
 	}
 
@@ -215,7 +215,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if {@link Level#INFO INFO} level is enabled, {@code false} if disabled
 	 */
 	public boolean isInfoEnabled() {
-		return minimumLevelCoversInfo && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.INFO);
+		return minimumLevelCoversInfo && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.INFO);
 	}
 
 	/**
@@ -226,7 +226,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Object message) {
 		if (minimumLevelCoversInfo) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
@@ -240,7 +240,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final String message, final Object... arguments) {
 		if (minimumLevelCoversInfo) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, arguments);
 		}
 	}
 
@@ -252,7 +252,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception) {
 		if (minimumLevelCoversInfo) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, (Object[]) null);
 		}
 	}
 
@@ -266,7 +266,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final String message) {
 		if (minimumLevelCoversInfo) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
 		}
 	}
 
@@ -283,7 +283,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversInfo) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, arguments);
 		}
 	}
 
@@ -293,7 +293,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if {@link Level#WARNING WARNING} level is enabled, {@code false} if disabled
 	 */
 	public boolean isWarnEnabled() {
-		return minimumLevelCoversWarn && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.WARNING);
+		return minimumLevelCoversWarn && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.WARNING);
 	}
 
 	/**
@@ -304,7 +304,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Object message) {
 		if (minimumLevelCoversWarn) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) null);
 		}
 	}
 
@@ -319,7 +319,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, arguments);
 		}
 	}
 
@@ -331,7 +331,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception) {
 		if (minimumLevelCoversWarn) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, null, (Object[]) null);
 		}
 	}
 
@@ -345,7 +345,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message) {
 		if (minimumLevelCoversWarn) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) null);
 		}
 	}
 
@@ -362,7 +362,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, arguments);
 		}
 	}
 
@@ -372,7 +372,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if {@link Level#ERROR ERROR} level is enabled, {@code false} if disabled
 	 */
 	public boolean isErrorEnabled() {
-		return minimumLevelCoversError && LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, tag, Level.ERROR);
+		return minimumLevelCoversError && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.ERROR);
 	}
 
 	/**
@@ -383,7 +383,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Object message) {
 		if (minimumLevelCoversError) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
@@ -398,7 +398,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final String message, final Object... arguments) {
 		if (minimumLevelCoversError) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, arguments);
 		}
 	}
 
@@ -410,7 +410,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception) {
 		if (minimumLevelCoversError) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, (Object[]) null);
 		}
 	}
 
@@ -424,7 +424,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final String message) {
 		if (minimumLevelCoversError) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
 		}
 	}
 
@@ -441,7 +441,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversError) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, arguments);
 		}
 	}
 
@@ -455,7 +455,7 @@ public final class TaggedLogger {
 	 * @return {@code true} if given severity level is covered, otherwise {@code false}
 	 */
 	private static boolean isCoveredByMinimumLevel(final String tag, final Level level) {
-		return LOGGING_PROVIDER.getMinimumLevel(tag).ordinal() <= level.ordinal();
+		return provider.getMinimumLevel(tag).ordinal() <= level.ordinal();
 	}
 
 }
