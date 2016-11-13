@@ -36,7 +36,7 @@ final class NopContextProvider implements ContextProvider {
 	}
 
 	@Override
-	public void put(final String key, final String value) {
+	public void put(final String key, final Object value) {
 		// Ignore
 	}
 

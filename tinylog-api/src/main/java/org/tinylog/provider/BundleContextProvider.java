@@ -54,7 +54,7 @@ final class BundleContextProvider implements ContextProvider {
 	}
 
 	@Override
-	public void put(final String key, final String value) {
+	public void put(final String key, final Object value) {
 		for (int i = 0; i < providers.length; ++i) {
 			providers[i].put(key, value);
 		}

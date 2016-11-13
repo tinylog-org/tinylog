@@ -22,14 +22,14 @@ public interface ContextProvider {
 
 	/**
 	 * Gets a read-only copy with all values from thread context.
-	 * 
+	 *
 	 * @return Read-only copy
 	 */
 	Map<String, String> getMapping();
 
 	/**
 	 * Gets a value by key from thread context.
-	 * 
+	 *
 	 * @param key
 	 *            Key of mapping
 	 * @return Found value or {@code null}
@@ -38,17 +38,17 @@ public interface ContextProvider {
 
 	/**
 	 * Stores a value in thread context. If the key already exists, the original value will be overridden.
-	 * 
+	 *
 	 * @param key
 	 *            Key of mapping
 	 * @param value
 	 *            Value of mapping
 	 */
-	void put(String key, String value);
+	void put(String key, Object value);
 
 	/**
 	 * Removes a value from thread context. If there is no mapping with the given key, this method will quit silently.
-	 * 
+	 *
 	 * @param key
 	 *            Key of mapping
 	 */
