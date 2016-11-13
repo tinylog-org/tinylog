@@ -27,7 +27,11 @@
 		<dependency>
 			<groupId>org.tinylog</groupId>
 			<artifactId>tinylog-api</artifactId>
-			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tinylog</groupId>
+			<artifactId>tinylog-api</artifactId>
+			<type>test-jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.jacoco</groupId>
