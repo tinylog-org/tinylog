@@ -253,6 +253,16 @@ public final class PatternParserTest {
 	}
 
 	/**
+	 * Verifies that special characters can be escaped.
+	 */
+	@Test
+	public void escaped() {
+		assertThat(render("\\\\", new LogEntryBuilder().create())).isEqualTo("\\");
+		assertThat(render("\\ ", new LogEntryBuilder().create())).isEqualTo(" ");
+		assertThat(render("\\{\\}", new LogEntryBuilder().create())).isEqualTo("{}");
+	}
+
+	/**
 	 * Verifies that a combination of multiple placeholders can be parsed and the returned token will output the
 	 * expected values.
 	 */

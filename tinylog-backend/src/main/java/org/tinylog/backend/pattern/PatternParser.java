@@ -65,6 +65,8 @@ public final class PatternParser {
 						start = i + 1;
 					}
 				}
+			} else if (character == '\\') {
+				++i; // Do not parse next character, because it should be output and not interpreted
 			}
 		}
 

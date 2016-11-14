@@ -29,6 +29,7 @@ final class PlainTextToken implements Token {
 
 	private static final Pattern TABULATOR_PATTERN = Pattern.compile("\t|\\\\t");
 	private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\\\\r\\\\n|\n|\\\\n|\r|\\\\r");
+	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\(.?)");
 
 	private final String text;
 
@@ -37,7 +38,9 @@ final class PlainTextToken implements Token {
 	 *            Static text
 	 */
 	PlainTextToken(final String text) {
-		this.text = NEW_LINE_PATTERN.matcher(TABULATOR_PATTERN.matcher(text).replaceAll("\t")).replaceAll(NEW_LINE);
+		String normalized = TABULATOR_PATTERN.matcher(text).replaceAll("\t");
+		normalized = NEW_LINE_PATTERN.matcher(normalized).replaceAll(NEW_LINE);
+		this.text = ESCAPE_PATTERN.matcher(normalized).replaceAll("$1");
 	}
 
 	@Override
