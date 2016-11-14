@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -168,6 +169,32 @@ public final class Configurator {
 			properties.load(stream);
 			return PropertiesLoader.readProperties(properties);
 		}
+	}
+
+	/**
+	 * Load a properties file from a URL.
+	 *
+	 * @param url
+	 *            Properties file
+	 * @return A new configurator
+	 * @throws IOException
+	 *             Failed to read from url
+	 */
+	public static Configurator fromURL(final URL url) throws IOException {
+		Properties properties = new Properties();
+
+		InputStream stream = url.openStream();
+		if (stream == null) {
+			throw new FileNotFoundException();
+		} else {
+			try {
+				properties.load(stream);
+			} finally {
+				stream.close();
+			}
+		}
+
+		return PropertiesLoader.readProperties(properties);
 	}
 
 	/**

@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
@@ -284,6 +285,29 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 		
 		try {
 			configuration = Configurator.fromStream(null).create();
+			fail("FileNotFoundException expected");
+		} catch (FileNotFoundException ex) {
+			// Expected
+		}
+		assertEquals("TEST", configuration.getFormatPattern());
+	}
+
+	/**
+	 * Test loading the configuration from a URL.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testLoadFromURL() throws IOException {
+		classLoaderMock.set("my/package/tinylog.properties", "tinylog.format=TEST");
+		URL url = getClass().getClassLoader().getResource("my/package/tinylog.properties");
+		Configuration configuration = Configurator.fromURL(url).create();
+		assertEquals("TEST", configuration.getFormatPattern());
+
+		classLoaderMock.remove("my/package/tinylog.properties");
+		try {
+			configuration = Configurator.fromURL(url).create();
 			fail("FileNotFoundException expected");
 		} catch (FileNotFoundException ex) {
 			// Expected
