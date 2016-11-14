@@ -69,7 +69,7 @@ public final class PatternParser {
 		}
 
 		if (count > 0) {
-			InternalLogger.log(Level.ERROR, "CLosing curly bracket is missing: '" + pattern + "'");
+			InternalLogger.log(Level.ERROR, "Closing curly bracket is missing: '" + pattern + "'");
 		}
 
 		if (start < pattern.length()) {
