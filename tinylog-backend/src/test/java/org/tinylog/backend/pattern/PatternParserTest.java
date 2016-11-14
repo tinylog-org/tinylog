@@ -268,8 +268,8 @@ public final class PatternParserTest {
 	 */
 	@Test
 	public void combined() {
-		assertThat(render("{file}/{message}", new LogEntryBuilder().fileName("MyFile.java").message("Hello World!").create()))
-			.isEqualTo("MyFile.java/Hello World!");
+		assertThat(render("<{file}/{message}>", new LogEntryBuilder().fileName("MyFile.java").message("Hello World!").create()))
+			.isEqualTo("<MyFile.java/Hello World!>");
 	}
 
 	/**
