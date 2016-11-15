@@ -103,6 +103,17 @@ abstract class ConfigurationObserver extends Thread {
 		};
 	}
 
+	/**
+	 * Create a thread to observe a file from URL.
+	 *
+	 * @param configurator
+	 *            Basis configuration
+	 * @param properties
+	 *            Basis properties
+	 * @param url
+	 *            Configuration file to observe
+	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
+	 */
 	static ConfigurationObserver createURLConfigurationObserver(final Configurator configurator, final Properties properties, final URL url) {
 		return new ConfigurationObserver(configurator, properties, url.toString()) {
 
