@@ -31,6 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class PatternParserTest {
 
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	/**
 	 * Redirects and collects system output streams.
 	 */
@@ -253,6 +255,47 @@ public final class PatternParserTest {
 	}
 
 	/**
+	 * Verifies that <tt>{any | min-size=X}</tt> can be parsed and the returned token will apply minimum size.
+	 */
+	@Test
+	public void minimumSize() {
+		assertThat(render("{level | min-size=6}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO  ");
+	}
+
+	/**
+	 * Verifies that invalid minimum size values will produce an error.
+	 */
+	@Test
+	public void invalidMinimumSize() {
+		assertThat(render("{level | min-size=-1}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("min-size")
+			.containsOnlyOnce("-1");
+	}
+
+	/**
+	 * Verifies that <tt>{any | indent=X}</tt> can be parsed and the returned token will apply indentation.
+	 */
+	@Test
+	public void indentation() {
+		assertThat(render("{message | indent=2}", new LogEntryBuilder().message("12" + NEW_LINE + "3").create()))
+			.isEqualTo("12" + NEW_LINE + "  3");
+	}
+
+	/**
+	 * Verifies that invalid indentation values will produce an error.
+	 */
+	@Test
+	public void invalidIndentation() {
+		assertThat(render("{level | indent=ABC}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("indent")
+			.containsOnlyOnce("ABC");
+	}
+
+	/**
 	 * Verifies that special characters can be escaped.
 	 */
 	@Test
@@ -302,6 +345,28 @@ public final class PatternParserTest {
 			.containsOnlyOnce("ERROR")
 			.containsIgnoringCase("closing curly bracket")
 			.containsOnlyOnce("{message");
+	}
+
+	/**
+	 * Verifies that missing values for a style option will produce an error.
+	 */
+	@Test
+	public void missingStyleOptionValue() {
+		assertThat(render("{level | min-size}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("min-size");
+	}
+
+	/**
+	 * Verifies that unknown style options will produce an error.
+	 */
+	@Test
+	public void unknownStyleOption() {
+		assertThat(render("{level | test=42}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("test");
 	}
 
 	/**

@@ -15,6 +15,7 @@ package org.tinylog.backend.pattern;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
@@ -25,6 +26,8 @@ import org.tinylog.runtime.RuntimeProvider;
  * entries.
  */
 public final class PatternParser {
+
+	private static final Pattern SPLIT_PATTERN = Pattern.compile(",");
 
 	/** */
 	private PatternParser() {
@@ -75,7 +78,7 @@ public final class PatternParser {
 		}
 
 		if (start == 0) {
-			tokens.add(create(pattern));
+			tokens.add(createStyledToken(pattern));
 		} else if (start < pattern.length()) {
 			tokens.add(new PlainTextToken(pattern.substring(start)));
 		}
@@ -88,22 +91,41 @@ public final class PatternParser {
 	}
 
 	/**
+	 * Creates a new token for a given placeholder with optional style options.
+	 *
+	 * @param placeholder
+	 *            Placeholder with optional style options but without surrounding curly brackets
+	 * @return Created token
+	 */
+	private static Token createStyledToken(final String placeholder) {
+		int splitIndex = placeholder.indexOf('|');
+		if (splitIndex == -1) {
+			return createPlainToken(placeholder);
+		} else {
+			String plainPlaceholder = placeholder.substring(0, splitIndex).trim();
+			String[] styleOptions = SPLIT_PATTERN.split(placeholder.substring(splitIndex + 1));
+			return styleToken(createPlainToken(plainPlaceholder), styleOptions);
+		}
+
+	}
+
+	/**
 	 * Creates a new token for a given placeholder.
 	 *
 	 * @param placeholder
-	 *            Placeholder without surrounding curly brackets
-	 * @return Created token or {@code null} if there is no associated token for the passed placeholder
+	 *            Placeholder without style options and surrounding curly brackets
+	 * @return Created token
 	 */
-	private static Token create(final String placeholder) {
+	private static Token createPlainToken(final String placeholder) {
 		int splitIndex = placeholder.indexOf(':');
 		Token token;
 
 		if (splitIndex == -1) {
-			token = create(placeholder.trim(), null);
+			token = createPlainToken(placeholder.trim(), null);
 		} else {
 			String name = placeholder.substring(0, splitIndex).trim();
 			String configuration = placeholder.substring(splitIndex + 1).trim();
-			token = create(name, configuration);
+			token = createPlainToken(name, configuration);
 		}
 
 		return token == null ? new PlainTextToken(placeholder) : token;
@@ -118,7 +140,7 @@ public final class PatternParser {
 	 *            Configuration for token or {@code null} if not defined
 	 * @return Created token or {@code null} if there is no token for the passed parameters
 	 */
-	private static Token create(final String name, final String configuration) {
+	private static Token createPlainToken(final String name, final String configuration) {
 		if (name.equals("date")) {
 			return createDateToken(configuration);
 		} else if ("pid".equals(name)) {
@@ -197,6 +219,66 @@ public final class PatternParser {
 				String defaultValue = splitIndex == -1 ? null : configuration.substring(splitIndex + 1).trim();
 				return defaultValue == null ? new ThreadContextToken(key) : new ThreadContextToken(key, defaultValue);
 			}
+		}
+	}
+
+	/**
+	 * Creates style decorators for a token.
+	 *
+	 * @param token
+	 *            Token to style
+	 * @param options
+	 *            Style options
+	 * @return Styled token
+	 */
+	private static Token styleToken(final Token token, final String[] options) {
+		Token styledToken = token;
+
+		for (String option : options) {
+			int splitIndex = option.indexOf('=');
+			if (splitIndex == -1) {
+				InternalLogger.log(Level.ERROR, "No value set for '" + option.trim() + "'");
+			} else {
+				String key = option.substring(0, splitIndex).trim();
+				String value = option.substring(splitIndex + 1).trim();
+
+				int number;
+				try {
+					number = parsePositiveInteger(value);
+				} catch (NumberFormatException ex) {
+					InternalLogger.log(Level.ERROR, "'" + value + "' is an invalid value for '" + key + "'");
+					continue;
+				}
+
+				if ("min-size".equals(key)) {
+					styledToken = new MinimumSizeToken(styledToken, number);
+				} else if ("indent".equals(key)) {
+					styledToken = new IndentationToken(styledToken, number);
+				} else {
+					InternalLogger.log(Level.ERROR, "Unknown style option: '" + key + "'");
+				}
+			}
+		}
+
+		return styledToken;
+	}
+
+	/**
+	 * Parses a positive integer. In opposite to {@link Integer#parseInt(String)}, this method throws a
+	 * {@link NumberFormatException} for negative values.
+	 *
+	 * @param value
+	 *            Number as text
+	 * @return Parsed integer
+	 * @throws NumberFormatException
+	 *             Text doesn't contain a valid positive integer
+	 */
+	private static int parsePositiveInteger(final String value) throws NumberFormatException {
+		int number = Integer.parseInt(value);
+		if (number >= 0) {
+			return number;
+		} else {
+			throw new NumberFormatException();
 		}
 	}
 
