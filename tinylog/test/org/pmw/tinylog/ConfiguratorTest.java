@@ -42,8 +42,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -190,6 +192,27 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 		Configurator.shutdownConfigurationObserver(true);
 		assertEquals(threadCount, Thread.activeCount());
 		file.delete();
+
+		file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST4");
+		URL url = file.toURI().toURL();
+		System.setProperty("tinylog.configuration", url.toString());
+		configuration = Configurator.init().create();
+		System.clearProperty("tinylog.configuration");
+		assertEquals("TEST4", configuration.getFormatPattern());
+		file.delete();
+
+		file = FileHelper.createTemporaryFile("properties", "tinylog.format=TEST5");
+		url = file.toURI().toURL();
+		System.setProperty("tinylog.configuration", url.toString());
+		System.setProperty("tinylog.configuration.observe", "true");
+		configuration = Configurator.init().create();
+		assertEquals("TEST5", configuration.getFormatPattern());
+		assertEquals(threadCount + 1, Thread.activeCount());
+		System.clearProperty("tinylog.configuration");
+		System.clearProperty("tinylog.configuration.observe");
+		Configurator.shutdownConfigurationObserver(true);
+		assertEquals(threadCount, Thread.activeCount());
+		file.delete();
 	}
 
 	/**
@@ -224,6 +247,48 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 		Configurator.init();
 		String line = getErrorStream().nextLine();
 		assertThat(line, allOf(containsString("ERROR"), containsString(IOException.class.getName()), containsString(file.getName())));
+	}
+
+	
+	/**
+	 * Test initialization with an invalid URL.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testInitWithInvalidURL() throws IOException {
+		System.setProperty("tinylog.configuration", "xy:/");
+		
+		Configurator.init();
+		String line = getErrorStream().nextLine();
+		assertThat(line, allOf(containsString("ERROR"), containsString(MalformedURLException.class.getName()), containsString("xy:/")));
+
+		System.clearProperty("tinylog.configuration");
+	}
+
+	/**
+	 * Test initialization with a not accessible URL.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testInitWithNotAccessibleURL() throws IOException {
+		new MockUp<URL>() {
+			@Mock
+			public InputStream openStream() throws UnknownHostException {
+				throw new UnknownHostException(); // Throw it throw mock for performance reasons
+			}
+		};
+		
+		System.setProperty("tinylog.configuration", "http://test.invalid");
+		
+		Configurator.init();
+		String line = getErrorStream().nextLine();
+		assertThat(line, allOf(containsString("ERROR"), containsString(UnknownHostException.class.getName()), containsString("http://test.invalid")));
+
+		System.clearProperty("tinylog.configuration");
 	}
 
 	/**

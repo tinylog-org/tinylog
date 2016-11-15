@@ -28,6 +28,7 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -114,6 +115,20 @@ public class ConfigurationObserverTest extends AbstractTinylogTest {
 			@Override
 			public String toString() {
 				return "file";
+			}
+
+		} }, new Object[] { new ConfigurationObserverInitializer() {
+
+			@Override
+			public void create(final ClassLoaderMock classLoaderMock) throws IOException {
+				File localFile = FileHelper.createTemporaryFile("properties");
+				URL url = localFile.toURI().toURL();
+				init(localFile, ConfigurationObserver.createURLConfigurationObserver(Configurator.defaultConfig(), properties, url));
+			}
+
+			@Override
+			public String toString() {
+				return "url";
 			}
 
 		} });

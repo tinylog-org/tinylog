@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -97,6 +98,21 @@ abstract class ConfigurationObserver extends Thread {
 			@Override
 			protected InputStream openInputStream() {
 				return ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
+			}
+
+		};
+	}
+
+	static ConfigurationObserver createURLConfigurationObserver(final Configurator configurator, final Properties properties, final URL url) {
+		return new ConfigurationObserver(configurator, properties, url.toString()) {
+
+			@Override
+			protected InputStream openInputStream() {
+				try {
+					return url.openStream();
+				} catch (IOException ex) {
+					return null;
+				}
 			}
 
 		};

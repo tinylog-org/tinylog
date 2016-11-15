@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.Writer;
@@ -41,6 +43,8 @@ public final class Configurator {
 	private static final String DEFAULT_PROPERTIES_FILE = "tinylog.properties";
 	private static final String DEFAULT_THREAD_TO_OBSERVE_BY_WRITING_THREAD = "main";
 	private static final int DEFAULT_PRIORITY_FOR_WRITING_THREAD = (Thread.MIN_PRIORITY + Thread.NORM_PRIORITY) / 2;
+
+	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
 
 	private static WritingThread activeWritingThread = null;
 	private static final Object lock = new Object();
@@ -178,7 +182,7 @@ public final class Configurator {
 	 *            Properties file
 	 * @return A new configurator
 	 * @throws IOException
-	 *             Failed to read from url
+	 *             Failed to read from URL
 	 */
 	public static Configurator fromURL(final URL url) throws IOException {
 		Properties properties = new Properties();
@@ -681,18 +685,40 @@ public final class Configurator {
 		Properties properties = new Properties();
 
 		String file = System.getProperty("tinylog.configuration", DEFAULT_PROPERTIES_FILE);
-		InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file);
-		boolean isResource = true;
-		if (stream == null) {
+
+		URL url = null;
+		InputStream stream = null;
+
+		boolean isResource = false;
+		boolean isFile = false;
+		boolean isURL = false;
+		
+		if (URL_DETECTION_PATTERN.matcher(file).matches()) {
 			try {
-				stream = new FileInputStream(file);
-				isResource = false;
-			} catch (FileNotFoundException ex) {
-				if (file != DEFAULT_PROPERTIES_FILE) {
-					InternalLogger.error(ex, "Cannot find \"{}\"", file);
+				url = new URL(file);
+				stream = url.openStream();
+				isURL = true;
+			} catch (MalformedURLException ex) {
+				InternalLogger.error(ex, "Invalid URL: \"{}\"", file);
+			} catch (IOException ex) {
+				InternalLogger.error(ex, "Cannot connect to \"{}\"", file);
+			}
+		} else {
+			stream = Configurator.class.getClassLoader().getResourceAsStream(file);
+			if (stream == null) {
+				try {
+					stream = new FileInputStream(file);
+					isFile = true;
+				} catch (FileNotFoundException ex) {
+					if (file != DEFAULT_PROPERTIES_FILE) {
+						InternalLogger.error(ex, "Cannot find \"{}\"", file);
+					}
 				}
+			} else {
+				isResource = true;
 			}
 		}
+		
 		if (stream != null) {
 			try {
 				try {
@@ -721,8 +747,10 @@ public final class Configurator {
 				Configurator configurator = PropertiesLoader.readProperties(properties);
 				if (isResource) {
 					ConfigurationObserver.createResourceConfigurationObserver(configurator, properties, file).start();
-				} else {
+				} else if (isFile) {
 					ConfigurationObserver.createFileConfigurationObserver(configurator, properties, file).start();
+				} else if (isURL) {
+					ConfigurationObserver.createURLConfigurationObserver(configurator, properties, url).start();
 				}
 				return configurator;
 			} else {
