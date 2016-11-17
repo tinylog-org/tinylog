@@ -25,12 +25,12 @@ import org.tinylog.runtime.RuntimeProvider;
  * Parser for format patterns. It produces tokens combined to a root token that can be used by writers for rendering log
  * entries.
  */
-public final class PatternParser {
+public final class FormatPatternParser {
 
 	private static final Pattern SPLIT_PATTERN = Pattern.compile(",");
 
 	/** */
-	private PatternParser() {
+	private FormatPatternParser() {
 	}
 
 	/**

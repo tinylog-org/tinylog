@@ -27,9 +27,9 @@ import org.tinylog.rules.SystemStreamCollector;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link PatternParser}.
+ * Tests for {@link FormatPatternParser}.
  */
-public final class PatternParserTest {
+public final class FormatPatternParserTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -379,7 +379,7 @@ public final class PatternParserTest {
 	 * @return Render result of produced token
 	 */
 	private String render(final String pattern, final LogEntry entry) {
-		Token token = PatternParser.parse(pattern);
+		Token token = FormatPatternParser.parse(pattern);
 		if (token == null) {
 			return null;
 		} else {
