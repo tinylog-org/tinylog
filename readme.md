@@ -23,7 +23,7 @@ tinylog can be built with Maven:
 
 	mvn clean install
 
-tinylog is compatible with Java 6 (and higher) but the JUnit tests require Java 8. Eclipse and IntelliJ have problems with different Java versions for main and test sources. Therefore Java 8 is defined for both and has to be overridden via system properties.
+tinylog is compatible with Java 6 (and higher) but the JUnit tests require Java 8. Eclipse and IntelliJ have problems with different Java versions for main and test sources. Therefore Java 8 is defined for both in the parent POM and has to be overridden via system properties.
 
 	"-Dbootclasspath=JAVA_6_HOME/lib/rt.jar"
 	-Dmaven.compiler.source=1.6
