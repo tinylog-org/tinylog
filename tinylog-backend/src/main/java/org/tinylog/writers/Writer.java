@@ -13,7 +13,7 @@
 
 package org.tinylog.writers;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.tinylog.backend.LogEntry;
 import org.tinylog.backend.LogEntryValue;
@@ -28,26 +28,17 @@ public interface Writer {
 	 *
 	 * @return All returned values will be filled in passed {@link LogEntry} objects
 	 */
-	Set<LogEntryValue> getRequiredLogEntryValues();
+	Collection<LogEntryValue> getRequiredLogEntryValues();
 
 	/**
 	 * Outputs a given log entry.
 	 *
-	 * <p>
-	 * A writer will be called either always or never by writing thread. This depends on the configuration. If a writer
-	 * is called by writing thread, it is guaranteed that all calls are from the same thread. In this no synchronization
-	 * necessary. If loggers call a writer directly, the calls can be from different threads and synchronization is
-	 * required.
-	 * </p>
-	 *
 	 * @param logEntry
 	 *            Log entry to output
-	 * @param writingThread
-	 *            {@code true} if called by writing thread, {@code false} if called directly by logger
 	 * @throws Exception
 	 *             Any exception can be thrown if writing has been failed
 	 */
-	void write(LogEntry logEntry, boolean writingThread) throws Exception;
+	void write(LogEntry logEntry) throws Exception;
 
 	/**
 	 * Outputs buffered log entries immediately.
