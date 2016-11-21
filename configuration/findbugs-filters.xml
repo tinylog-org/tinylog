@@ -13,6 +13,12 @@
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
+		<!-- Writers -->
+		<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
+		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+	</Match>
+	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD, DM_USELESS_THREAD" />

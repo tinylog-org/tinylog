@@ -8,7 +8,7 @@
 	
 	<module name="SuppressionFilter">
 		<property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
-		<property name="optional" value="false"/>
+		<property name="optional" value="false" />
 	</module>
 	<module name="SuppressionCommentFilter">
 		<property name="offCommentFormat" value="@formatter\:off" />
@@ -71,7 +71,6 @@
 
 		<!-- Class Design -->
 
-		<module name="DesignForExtension" />
 		<module name="FinalClass" />
 		<module name="HideUtilityClassConstructor" />
 		<module name="InnerTypeLast" />
