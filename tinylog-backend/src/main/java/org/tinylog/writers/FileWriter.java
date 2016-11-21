@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+import org.tinylog.backend.LogEntry;
 import org.tinylog.writers.raw.ByteArrayWriter;
 
 /**
@@ -51,6 +52,12 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	}
 
 	@Override
+	public void write(final LogEntry logEntry) throws IOException {
+		byte[] data = render(logEntry).getBytes(charset);
+		writer.write(data, data.length);
+	}
+
+	@Override
 	public void flush() throws IOException {
 		writer.flush();
 	}
@@ -58,12 +65,6 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	@Override
 	public void close() throws IOException {
 		writer.close();
-	}
-
-	@Override
-	protected void write(final String logEntry) throws IOException {
-		byte[] data = logEntry.getBytes(charset);
-		writer.write(data, data.length);
 	}
 
 }

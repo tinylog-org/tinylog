@@ -49,11 +49,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that log entries will be immediately output, if buffer is disabled.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void unbufferedWriting() throws Exception {
+	public void unbufferedWriting() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "buffered", "false"));
 
@@ -67,11 +67,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that log entries will be output after flushing, if buffer is enabled.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void bufferedWriting() throws Exception {
+	public void bufferedWriting() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "buffered", "true"));
 
@@ -88,11 +88,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that an already existing file will be overridden, if append mode is disabled.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void appendingDisabled() throws Exception {
+	public void appendingDisabled() throws IOException {
 		String file = FileSystem.createTemporaryFile("Test");
 
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "append", "false"));
@@ -105,11 +105,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that an already existing file will be continued, if append mode is enabled.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void appendingEnabled() throws Exception {
+	public void appendingEnabled() throws IOException {
 		String file = FileSystem.createTemporaryFile("Test");
 
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "append", "true"));
@@ -122,11 +122,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that writing works and underlying byte array writer is thread-safe, if writing thread is disable.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void writingThreadDisabled() throws Exception {
+	public void writingThreadDisabled() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingThread", "false"));
 
@@ -140,11 +140,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that writing works and underlying byte array writer is not thread-safe, if writing thread is enabled.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void writingThreadEnabled() throws Exception {
+	public void writingThreadEnabled() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingThread", "true"));
 
@@ -158,11 +158,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that a configured charset will be used for encoding text.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void definedCharset() throws Exception {
+	public void definedCharset() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 
 		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "charset", "UTF-16"));
@@ -175,11 +175,11 @@ public final class FileWriterTest {
 	/**
 	 * Verifies that the default pattern contains a minimum set of informations.
 	 *
-	 * @throws Exception
+	 * @throws IOException
 	 *             Failed writing to file
 	 */
 	@Test
-	public void defaultFormatPattern() throws Exception {
+	public void defaultFormatPattern() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		FileWriter writer = new FileWriter(singletonMap("file", file));
 

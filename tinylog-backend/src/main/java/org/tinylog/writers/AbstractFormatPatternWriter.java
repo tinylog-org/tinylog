@@ -69,29 +69,6 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 		return token.getRequiredLogEntryValues();
 	}
 
-	@Override
-	public final void write(final LogEntry logEntry) throws Exception {
-		if (builder == null) {
-			StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
-			token.render(logEntry, builder);
-			write(builder.toString());
-		} else {
-			token.render(logEntry, builder);
-			write(builder.toString());
-			builder.setLength(0);
-		}
-	}
-
-	/**
-	 * Outputs a rendered log entry.
-	 *
-	 * @param logEntry
-	 *            Log entry to output
-	 * @throws Exception
-	 *             Any exception can be thrown if writing has been failed
-	 */
-	protected abstract void write(String logEntry) throws Exception;
-
 	/**
 	 * Extracts the log file name from configuration.
 	 *
@@ -160,6 +137,25 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 		}
 
 		return writer;
+	}
+
+	/**
+	 * Renders a log entry.
+	 *
+	 * @param logEntry
+	 *            Log entry to render
+	 * @return Rendered log entry
+	 */
+	protected String render(final LogEntry logEntry) {
+		if (builder == null) {
+			StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
+			token.render(logEntry, builder);
+			return builder.toString();
+		} else {
+			builder.setLength(0);
+			token.render(logEntry, builder);
+			return builder.toString();
+		}
 	}
 
 }
