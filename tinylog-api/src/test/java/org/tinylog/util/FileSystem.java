@@ -16,6 +16,7 @@ package org.tinylog.util;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -106,6 +107,36 @@ public final class FileSystem {
 		path.toFile().deleteOnExit();
 		return path.toFile().getName();
 	}
+
+	/**
+	 * Reads the content of a text file.
+	 *
+	 * @param path
+	 *            Path to text file
+	 * @return Content
+	 * @throws IOException
+	 *             Failed reading file
+	 */
+	public static String readFile(final String path) throws IOException {
+		return readFile(path, Charset.defaultCharset());
+	}
+
+	/**
+	 * Reads the content of a text file.
+	 *
+	 * @param path
+	 *            Path to text file
+	 * @param charset
+	 *            Charset for decoding text
+	 * @return Content
+	 * @throws IOException
+	 *             Failed reading file
+	 */
+	public static String readFile(final String path, final Charset charset) throws IOException {
+		byte[] data = Files.readAllBytes(Paths.get(path));
+		return new String(data, charset);
+	}
+
 	/**
 	 * Deletes a service file from default class path.
 	 *
