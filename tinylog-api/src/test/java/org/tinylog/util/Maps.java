@@ -35,7 +35,7 @@ public final class Maps {
 	 * @param secondKey
 	 *            Key of second entry
 	 * @param secondValue
-	 *            Value of send entry
+	 *            Value of second entry
 	 * @param <K>
 	 *            Key type
 	 * @param <V>
@@ -46,6 +46,36 @@ public final class Maps {
 		Map<K, V> map = new TreeMap<>();
 		map.put(firstKey, firstValue);
 		map.put(secondKey, secondValue);
+		return map;
+	}
+
+	/**
+	 * Creates a map with three entries.
+	 *
+	 * @param firstKey
+	 *            Key of first entry
+	 * @param firstValue
+	 *            Value of first entry
+	 * @param secondKey
+	 *            Key of second entry
+	 * @param secondValue
+	 *            Value of second entry
+	 * @param thirdKey
+	 *            Key of third entry
+	 * @param thirdValue
+	 *            Value of third entry
+	 * @param <K>
+	 *            Key type
+	 * @param <V>
+	 *            Value type
+	 * @return Map with specified entries
+	 */
+	public static <K, V> Map<K, V> tripletonMap(final K firstKey, final V firstValue, final K secondKey, final V secondValue,
+		final K thirdKey, final V thirdValue) {
+		Map<K, V> map = new TreeMap<>();
+		map.put(firstKey, firstValue);
+		map.put(secondKey, secondValue);
+		map.put(thirdKey, thirdValue);
 		return map;
 	}
 
