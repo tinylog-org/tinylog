@@ -166,7 +166,7 @@ public final class DateTokenTest {
 	private String render(final Token token, final LocalDateTime timestamp) {
 		ZonedDateTime zonedDateTime = ZonedDateTime.of(timestamp, ZoneOffset.systemDefault());
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().date(Date.from(zonedDateTime.toInstant())).create(), builder);
+		token.render(LogEntryBuilder.empty().date(Date.from(zonedDateTime.toInstant())).create(), builder);
 		return builder.toString();
 	}
 

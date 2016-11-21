@@ -53,7 +53,7 @@ public final class FileNameTokenTest {
 	 */
 	private String render(final Token token, final String fileName) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().fileName(fileName).create(), builder);
+		token.render(LogEntryBuilder.empty().fileName(fileName).create(), builder);
 		return builder.toString();
 	}
 

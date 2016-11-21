@@ -53,7 +53,7 @@ public final class MethodNameTokenTest {
 	 */
 	private String render(final Token token, final String methodName) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().methodName(methodName).create(), builder);
+		token.render(LogEntryBuilder.empty().methodName(methodName).create(), builder);
 		return builder.toString();
 	}
 

@@ -54,7 +54,7 @@ public final class ThreadIdTokenTest {
 	 */
 	private String render(final Token token, final Thread thread) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().thread(thread).create(), builder);
+		token.render(LogEntryBuilder.empty().thread(thread).create(), builder);
 		return builder.toString();
 	}
 

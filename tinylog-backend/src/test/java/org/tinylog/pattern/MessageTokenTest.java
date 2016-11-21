@@ -62,7 +62,7 @@ public final class MessageTokenTest {
 	 */
 	private String render(final Token token, final String message) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().message(message).create(), builder);
+		token.render(LogEntryBuilder.empty().message(message).create(), builder);
 		return builder.toString();
 	}
 

@@ -44,7 +44,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void plainText() {
-		assertThat(render("Hello World!", new LogEntryBuilder().create())).isEqualTo("Hello World!");
+		assertThat(render("Hello World!", LogEntryBuilder.empty().create())).isEqualTo("Hello World!");
 	}
 
 	/**
@@ -53,7 +53,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void dateWithDefaultPattern() {
 		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
-		assertThat(render("date", new LogEntryBuilder().date(date).create())).contains("1985", "06", "03");
+		assertThat(render("date", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 	}
 
 	/**
@@ -63,7 +63,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void dateWithDefinedPattern() {
 		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
-		assertThat(render("date: yyyy-MM-dd", new LogEntryBuilder().date(date).create())).isEqualTo("1985-06-03");
+		assertThat(render("date: yyyy-MM-dd", LogEntryBuilder.empty().date(date).create())).isEqualTo("1985-06-03");
 	}
 
 	/**
@@ -72,7 +72,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void dateWithInvalidPattern() {
 		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
-		assertThat(render("date: inval'd", new LogEntryBuilder().date(date).create())).contains("1985", "06", "03");
+		assertThat(render("date: inval'd", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("inval'd");
 	}
 
@@ -82,7 +82,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void processId() {
 		String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		assertThat(render("pid", new LogEntryBuilder().create())).isEqualTo(pid);
+		assertThat(render("pid", LogEntryBuilder.empty().create())).isEqualTo(pid);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void threadName() {
 		Thread thread = new Thread("My Thread");
-		assertThat(render("thread", new LogEntryBuilder().thread(thread).create())).isEqualTo("My Thread");
+		assertThat(render("thread", LogEntryBuilder.empty().thread(thread).create())).isEqualTo("My Thread");
 	}
 
 	/**
@@ -100,7 +100,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void threadId() {
 		Thread thread = Thread.currentThread();
-		assertThat(render("threadId", new LogEntryBuilder().thread(thread).create())).isEqualTo(Long.toString(thread.getId()));
+		assertThat(render("threadId", LogEntryBuilder.empty().thread(thread).create())).isEqualTo(Long.toString(thread.getId()));
 	}
 
 	/**
@@ -109,8 +109,8 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void context() {
-		assertThat(render("context: pi", new LogEntryBuilder().create())).isEmpty();
-		assertThat(render("context: pi", new LogEntryBuilder().context("pi", "3.14").create())).isEqualTo("3.14");
+		assertThat(render("context: pi", LogEntryBuilder.empty().create())).isEmpty();
+		assertThat(render("context: pi", LogEntryBuilder.empty().context("pi", "3.14").create())).isEqualTo("3.14");
 	}
 
 	/**
@@ -118,7 +118,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void contextMissingKey() {
-		assertThat(render("context", new LogEntryBuilder().create())).isEmpty();
+		assertThat(render("context", LogEntryBuilder.empty().create())).isEmpty();
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("context");
 	}
 
@@ -129,8 +129,8 @@ public final class FormatPatternParserTest {
 
 	@Test
 	public void contextDefault() {
-		assertThat(render("context: pi, -", new LogEntryBuilder().create())).isEqualTo("-");
-		assertThat(render("context: pi, -", new LogEntryBuilder().context("pi", "3.14").create())).isEqualTo("3.14");
+		assertThat(render("context: pi, -", LogEntryBuilder.empty().create())).isEqualTo("-");
+		assertThat(render("context: pi, -", LogEntryBuilder.empty().context("pi", "3.14").create())).isEqualTo("3.14");
 	}
 
 	/**
@@ -139,7 +139,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void contextDefaultMissingKey() {
-		assertThat(render("context: ,-", new LogEntryBuilder().create())).isEmpty();
+		assertThat(render("context: ,-", LogEntryBuilder.empty().create())).isEmpty();
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("context");
 	}
 
@@ -148,7 +148,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void fullClassName() {
-		assertThat(render("class", new LogEntryBuilder().className("my.package.MyClass").create())).isEqualTo("my.package.MyClass");
+		assertThat(render("class", LogEntryBuilder.empty().className("my.package.MyClass").create())).isEqualTo("my.package.MyClass");
 	}
 
 	/**
@@ -157,7 +157,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void simpleClassName() {
-		assertThat(render("className", new LogEntryBuilder().className("my.package.MyClass").create())).isEqualTo("MyClass");
+		assertThat(render("className", LogEntryBuilder.empty().className("my.package.MyClass").create())).isEqualTo("MyClass");
 	}
 
 	/**
@@ -165,7 +165,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void packageName() {
-		assertThat(render("package", new LogEntryBuilder().className("my.package.MyClass").create())).isEqualTo("my.package");
+		assertThat(render("package", LogEntryBuilder.empty().className("my.package.MyClass").create())).isEqualTo("my.package");
 	}
 
 	/**
@@ -173,7 +173,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void methodName() {
-		assertThat(render("method", new LogEntryBuilder().methodName("foo").create())).isEqualTo("foo");
+		assertThat(render("method", LogEntryBuilder.empty().methodName("foo").create())).isEqualTo("foo");
 	}
 
 	/**
@@ -181,7 +181,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void fileName() {
-		assertThat(render("file", new LogEntryBuilder().fileName("MyFile.java").create())).isEqualTo("MyFile.java");
+		assertThat(render("file", LogEntryBuilder.empty().fileName("MyFile.java").create())).isEqualTo("MyFile.java");
 	}
 
 	/**
@@ -189,7 +189,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void lineNumber() {
-		assertThat(render("line", new LogEntryBuilder().lineNumber(42).create())).isEqualTo("42");
+		assertThat(render("line", LogEntryBuilder.empty().lineNumber(42).create())).isEqualTo("42");
 	}
 
 	/**
@@ -197,8 +197,8 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void tag() {
-		assertThat(render("tag", new LogEntryBuilder().tag("SYSTEM").create())).isEqualTo("SYSTEM");
-		assertThat(render("tag", new LogEntryBuilder().create())).isEmpty();
+		assertThat(render("tag", LogEntryBuilder.empty().tag("SYSTEM").create())).isEqualTo("SYSTEM");
+		assertThat(render("tag", LogEntryBuilder.empty().create())).isEmpty();
 	}
 
 	/**
@@ -207,8 +207,8 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void tagDefault() {
-		assertThat(render("tag", new LogEntryBuilder().tag("SYSTEM").create())).isEqualTo("SYSTEM");
-		assertThat(render("tag: -", new LogEntryBuilder().create())).isEqualTo("-");
+		assertThat(render("tag", LogEntryBuilder.empty().tag("SYSTEM").create())).isEqualTo("SYSTEM");
+		assertThat(render("tag: -", LogEntryBuilder.empty().create())).isEqualTo("-");
 	}
 
 	/**
@@ -216,7 +216,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void level() {
-		assertThat(render("level", new LogEntryBuilder().level(Level.DEBUG).create())).isEqualTo("DEBUG");
+		assertThat(render("level", LogEntryBuilder.empty().level(Level.DEBUG).create())).isEqualTo("DEBUG");
 	}
 
 	/**
@@ -226,7 +226,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void message() {
 		Exception exception = new NullPointerException();
-		assertThat(render("message", new LogEntryBuilder().message("Hello World!").exception(exception).create()))
+		assertThat(render("message", LogEntryBuilder.empty().message("Hello World!").exception(exception).create()))
 			.startsWith("Hello World!")
 			.contains(NullPointerException.class.getName())
 			.hasLineCount(exception.getStackTrace().length + 1);
@@ -239,7 +239,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void messageOnly() {
 		Exception exception = new NullPointerException();
-		assertThat(render("messageOnly", new LogEntryBuilder().message("Hello World!").exception(exception).create()))
+		assertThat(render("messageOnly", LogEntryBuilder.empty().message("Hello World!").exception(exception).create()))
 			.isEqualTo("Hello World!");
 	}
 
@@ -249,7 +249,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void exception() {
 		Exception exception = new NullPointerException();
-		assertThat(render("exception", new LogEntryBuilder().exception(exception).create()))
+		assertThat(render("exception", LogEntryBuilder.empty().exception(exception).create()))
 			.contains(NullPointerException.class.getName())
 			.hasLineCount(exception.getStackTrace().length + 1);
 	}
@@ -259,7 +259,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void minimumSize() {
-		assertThat(render("{level | min-size=6}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO  ");
+		assertThat(render("{level | min-size=6}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO  ");
 	}
 
 	/**
@@ -267,7 +267,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void invalidMinimumSize() {
-		assertThat(render("{level | min-size=-1}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(render("{level | min-size=-1}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("min-size")
@@ -279,7 +279,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void indentation() {
-		assertThat(render("{message | indent=2}", new LogEntryBuilder().message("12" + NEW_LINE + "3").create()))
+		assertThat(render("{message | indent=2}", LogEntryBuilder.empty().message("12" + NEW_LINE + "3").create()))
 			.isEqualTo("12" + NEW_LINE + "  3");
 	}
 
@@ -288,7 +288,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void invalidIndentation() {
-		assertThat(render("{level | indent=ABC}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(render("{level | indent=ABC}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("indent")
@@ -300,9 +300,9 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void escaped() {
-		assertThat(render("\\\\", new LogEntryBuilder().create())).isEqualTo("\\");
-		assertThat(render("\\ ", new LogEntryBuilder().create())).isEqualTo(" ");
-		assertThat(render("\\{\\}", new LogEntryBuilder().create())).isEqualTo("{}");
+		assertThat(render("\\\\", LogEntryBuilder.empty().create())).isEqualTo("\\");
+		assertThat(render("\\ ", LogEntryBuilder.empty().create())).isEqualTo(" ");
+		assertThat(render("\\{\\}", LogEntryBuilder.empty().create())).isEqualTo("{}");
 	}
 
 	/**
@@ -311,7 +311,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void combined() {
-		assertThat(render("<{file}/{message}>", new LogEntryBuilder().fileName("MyFile.java").message("Hello World!").create()))
+		assertThat(render("<{file}/{message}>", LogEntryBuilder.empty().fileName("MyFile.java").message("Hello World!").create()))
 			.isEqualTo("<MyFile.java/Hello World!>");
 	}
 
@@ -320,7 +320,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void nested() {
-		assertThat(render("{{message}}", new LogEntryBuilder().message("Hello World!").create())).isEqualTo("Hello World!");
+		assertThat(render("{{message}}", LogEntryBuilder.empty().message("Hello World!").create())).isEqualTo("Hello World!");
 	}
 
 	/**
@@ -328,7 +328,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void missingOpeningCurlyBracket() {
-		assertThat(render("message}", new LogEntryBuilder().message("Hello World!").create())).isEqualTo("message}");
+		assertThat(render("message}", LogEntryBuilder.empty().message("Hello World!").create())).isEqualTo("message}");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsIgnoringCase("opening curly bracket")
@@ -340,7 +340,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void missingClosingCurlyBracket() {
-		assertThat(render("{message", new LogEntryBuilder().message("Hello World!").create())).isEqualTo("{message");
+		assertThat(render("{message", LogEntryBuilder.empty().message("Hello World!").create())).isEqualTo("{message");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsIgnoringCase("closing curly bracket")
@@ -352,7 +352,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void missingStyleOptionValue() {
-		assertThat(render("{level | min-size}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(render("{level | min-size}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("min-size");
@@ -363,7 +363,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void unknownStyleOption() {
-		assertThat(render("{level | test=42}", new LogEntryBuilder().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(render("{level | test=42}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO");
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("test");

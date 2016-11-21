@@ -97,7 +97,7 @@ public final class ExceptionTokenTest {
 	 */
 	private String render(final Token token, final Throwable exception) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().exception(exception).create(), builder);
+		token.render(LogEntryBuilder.empty().exception(exception).create(), builder);
 		return builder.toString();
 	}
 

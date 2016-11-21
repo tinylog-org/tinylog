@@ -13,7 +13,9 @@
 
 package org.tinylog.backend.util;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +26,26 @@ import org.tinylog.backend.LogEntry;
  * Fluent API for creating a {@link LogEntry}.
  */
 public final class LogEntryBuilder {
+
+	/**
+	 * Default date for prefilled log entry builders.
+	 */
+	public static final Date DEFAULT_DATE = new GregorianCalendar(1985, Calendar.JUNE, 03).getTime();
+
+	/**
+	 * Default method name for prefilled log entry builders.
+	 */
+	public static final String DEFAULT_METHOD = "foo";
+
+	/**
+	 * Default severity level for prefilled log entry builders.
+	 */
+	public static final Level DEFAULT_LEVEL = Level.TRACE;
+
+	/**
+	 * Default text message for prefilled log entry builders.
+	 */
+	public static final String DEFAULT_MESSAGE = "Hello World!";
 
 	private Date date;
 	private Thread thread;
@@ -38,7 +60,76 @@ public final class LogEntryBuilder {
 	private Throwable exception;
 
 	/** */
-	public LogEntryBuilder() {
+	private LogEntryBuilder() {
+	}
+
+	/**
+	 * Creates a new empty instance.
+	 *
+	 * <p>
+	 * Line number is -1 and thread context is empty by default. All other value are {@code null}.
+	 * </p>
+	 *
+	 * @return Empty log entry builder
+	 */
+	public static LogEntryBuilder empty() {
+		return new LogEntryBuilder();
+	}
+
+	/**
+	 * Creates a new prefilled instance.
+	 *
+	 * <p>
+	 * <table>
+	 * <tr>
+	 * <td>Date</td>
+	 * <td>1985-06-03 ({@link #DEFAULT_DATE})</td>
+	 * </tr>
+	 * <tr>
+	 * <td>Thread</td>
+	 * <td>Current thread ({@link Thread#currentThread()})</td>
+	 * </tr>
+	 * <tr>
+	 * <td>Class name</td>
+	 * <td>Fully-qualified class name of caller parameter</td>
+	 * </tr>
+	 * <tr>
+	 * <td>Method name</td>
+	 * <td>foo ({@link #DEFAULT_METHOD})</td>
+	 * </tr>
+	 * <tr>
+	 * <td>File name</td>
+	 * <td>Simple class name of caller plus ".java" file extension</td>
+	 * </tr>
+	 * <tr>
+	 * <td>Level</td>
+	 * <td>TRACE ({@link #DEFAULT_LEVEL})</td>
+	 * </tr>
+	 * <tr>
+	 * <td>Message</td>
+	 * <td>Hello World! ({@link #DEFAULT_MESSAGE})</td>
+	 * </tr>
+	 * </table>
+	 * </p>
+	 *
+	 * <p>
+	 * Tag and exception are {@code null}, line number is -1 and thread context is empty by default.
+	 * </p>
+	 *
+	 * @param caller
+	 *            Caller class
+	 * @return Prefilled log entry builder
+	 */
+	public static LogEntryBuilder prefilled(final Class<?> caller) {
+		LogEntryBuilder builder = new LogEntryBuilder();
+		builder.date(DEFAULT_DATE);
+		builder.thread(Thread.currentThread());
+		builder.className(caller.getName());
+		builder.methodName(DEFAULT_METHOD);
+		builder.fileName(caller.getSimpleName() + ".java");
+		builder.level(Level.TRACE);
+		builder.message(DEFAULT_MESSAGE);
+		return builder;
 	}
 
 	/**

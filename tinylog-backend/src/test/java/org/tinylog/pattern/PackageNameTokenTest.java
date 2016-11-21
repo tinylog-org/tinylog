@@ -62,7 +62,7 @@ public final class PackageNameTokenTest {
 	 */
 	private String render(final Token token, final String className) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().className(className).create(), builder);
+		token.render(LogEntryBuilder.empty().className(className).create(), builder);
 		return builder.toString();
 	}
 

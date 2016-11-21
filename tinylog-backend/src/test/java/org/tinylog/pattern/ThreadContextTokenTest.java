@@ -74,7 +74,7 @@ public final class ThreadContextTokenTest {
 	 * @return Result text
 	 */
 	private String render(final Token token, final Map<String, String> context) {
-		LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
+		LogEntryBuilder logEntryBuilder = LogEntryBuilder.empty();
 		context.forEach((key, value) -> logEntryBuilder.context(key, value));
 
 		StringBuilder stringBuilder = new StringBuilder();

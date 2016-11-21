@@ -72,7 +72,7 @@ public final class LoggerTagTokenTest {
 	 */
 	private String render(final Token token, final String tag) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().tag(tag).create(), builder);
+		token.render(LogEntryBuilder.empty().tag(tag).create(), builder);
 		return builder.toString();
 	}
 

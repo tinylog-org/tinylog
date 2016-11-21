@@ -90,7 +90,7 @@ public final class SeverityLevelTokenTest {
 	 */
 	private String render(final Token token, final Level level) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().level(level).create(), builder);
+		token.render(LogEntryBuilder.empty().level(level).create(), builder);
 		return builder.toString();
 	}
 

@@ -52,7 +52,7 @@ public final class BundleTokenTest {
 	 */
 	private String render(final Token token) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().create(), builder);
+		token.render(LogEntryBuilder.empty().create(), builder);
 		return builder.toString();
 	}
 

@@ -93,7 +93,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	private String render(final Token token, final String message, final Throwable exception) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().message(message).exception(exception).create(), builder);
+		token.render(LogEntryBuilder.empty().message(message).exception(exception).create(), builder);
 		return builder.toString();
 	}
 

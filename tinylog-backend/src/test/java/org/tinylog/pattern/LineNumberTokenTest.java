@@ -53,7 +53,7 @@ public final class LineNumberTokenTest {
 	 */
 	private String render(final Token token, final int line) {
 		StringBuilder builder = new StringBuilder();
-		token.render(new LogEntryBuilder().lineNumber(line).create(), builder);
+		token.render(LogEntryBuilder.empty().lineNumber(line).create(), builder);
 		return builder.toString();
 	}
 
