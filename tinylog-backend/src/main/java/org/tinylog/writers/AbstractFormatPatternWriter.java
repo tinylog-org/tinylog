@@ -122,8 +122,8 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 	 */
 	protected static ByteArrayWriter createByteArrayWriter(final String fileName, final boolean append, final boolean buffered,
 		final boolean threadSafe) throws FileNotFoundException {
-		File file = new File(fileName);
-		file.mkdirs();
+		File file = new File(fileName).getAbsoluteFile();
+		file.getParentFile().mkdirs();
 
 		OutputStream stream = new FileOutputStream(file, append);
 		ByteArrayWriter writer = new OutputStreamWriter(stream);
