@@ -55,7 +55,7 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 		}
 
 		token = FormatPatternParser.parse(pattern + NEW_LINE);
-		builder = Boolean.parseBoolean(properties.get("writingThread")) ? new StringBuilder(BUILDER_CAPACITY) : null;
+		builder = Boolean.parseBoolean(properties.get("writingthread")) ? new StringBuilder(BUILDER_CAPACITY) : null;
 	}
 
 	/**

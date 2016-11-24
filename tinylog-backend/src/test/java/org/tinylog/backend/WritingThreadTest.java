@@ -87,7 +87,7 @@ public final class WritingThreadTest {
 		configuration.put("file", file);
 		configuration.put("buffered", "true");
 		configuration.put("format", "{message}");
-		configuration.put("writingThread", "true");
+		configuration.put("writingthread", "true");
 
 		Writer writer = new FileWriter(configuration);
 		LogEntry entry = LogEntryBuilder.empty().message("Hello World!").create();

@@ -45,7 +45,7 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 		String fileName = getFileName(properties);
 		boolean append = Boolean.parseBoolean(properties.get("append"));
 		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
-		boolean writingThread = Boolean.parseBoolean(properties.get("writingThread"));
+		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
 
 		charset = getCharset(properties);
 		writer = createByteArrayWriter(fileName, append, buffered, !writingThread);

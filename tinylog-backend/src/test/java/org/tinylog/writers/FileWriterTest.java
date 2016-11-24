@@ -128,7 +128,7 @@ public final class FileWriterTest {
 	@Test
 	public void writingThreadDisabled() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingThread", "false"));
+		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingthread", "false"));
 
 		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
 		assertThat(FileSystem.readFile(file)).isEqualTo("Hello World!" + NEW_LINE);
@@ -146,7 +146,7 @@ public final class FileWriterTest {
 	@Test
 	public void writingThreadEnabled() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingThread", "true"));
+		FileWriter writer = new FileWriter(tripletonMap("file", file, "format", "{message}", "writingthread", "true"));
 
 		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
 		assertThat(FileSystem.readFile(file)).isEqualTo("Hello World!" + NEW_LINE);
