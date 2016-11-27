@@ -23,6 +23,6 @@ public interface RuntimeDialect {
 	 *
 	 * @return ID of the current process
 	 */
-	String getProcessId();
+	int getProcessId();
 
 }

@@ -39,7 +39,7 @@ public final class AndroidRuntimeTest {
 		mockStatic(Process.class);
 		when(Process.myPid()).thenReturn(123);
 
-		assertThat(new AndroidRuntime().getProcessId()).isEqualTo("123");
+		assertThat(new AndroidRuntime().getProcessId()).isEqualTo(123);
 	}
 
 }

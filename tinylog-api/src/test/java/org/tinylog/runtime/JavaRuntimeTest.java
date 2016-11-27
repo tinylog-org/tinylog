@@ -16,10 +16,12 @@ package org.tinylog.runtime;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -33,28 +35,50 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public final class JavaRuntimeTest {
 
 	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	/**
 	 * Verifies that the process ID will be returned.
 	 */
 	@Test
 	public void processId() {
 		String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		assertThat(new JavaRuntime().getProcessId()).isEqualTo(pid).matches("\\d+");
+		assertThat(new JavaRuntime().getProcessId()).isEqualTo(Integer.parseInt(pid));
 	}
 
 	/**
-	 * Verifies that the whole name of a runtime MX bean will be returned, if the name doesn't contain the expected '@'
-	 * character.
+	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain the expected '@' character.
 	 */
 	@Test
 	@PrepareForTest(JavaRuntime.class)
-	public void fallbackProcessId() {
+	public void invalidJvmName() {
 		RuntimeMXBean bean = mock(RuntimeMXBean.class);
 		when(bean.getName()).thenReturn("test");
 
 		mockStatic(ManagementFactory.class);
 		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
 
-		assertThat(new JavaRuntime().getProcessId()).isEqualTo("test");
+		assertThat(new JavaRuntime().getProcessId()).isEqualTo(-1);
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("test");
+	}
+
+	/**
+	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain a numeric process ID (pid).
+	 */
+	@Test
+	@PrepareForTest(JavaRuntime.class)
+	public void invalidProcessId() {
+		RuntimeMXBean bean = mock(RuntimeMXBean.class);
+		when(bean.getName()).thenReturn("abc@test");
+
+		mockStatic(ManagementFactory.class);
+		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
+
+		assertThat(new JavaRuntime().getProcessId()).isEqualTo(-1);
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("abc");
 	}
 
 }

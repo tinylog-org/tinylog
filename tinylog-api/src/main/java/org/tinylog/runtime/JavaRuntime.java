@@ -15,6 +15,9 @@ package org.tinylog.runtime;
 
 import java.lang.management.ManagementFactory;
 
+import org.tinylog.Level;
+import org.tinylog.provider.InternalLogger;
+
 /**
  * Runtime dialect implementation for Sun's and Oracle's Java Virtual Machines.
  */
@@ -25,13 +28,16 @@ final class JavaRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	public String getProcessId() {
+	public int getProcessId() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
-		int index = name.indexOf('@');
-		if (index > 0) {
-			return name.substring(0, index);
-		} else {
-			return name;
+		try {
+			return Integer.parseInt(name.substring(0, name.indexOf('@')));
+		} catch (NumberFormatException ex) {
+			InternalLogger.log(Level.ERROR, "Illegal process ID: " + name.substring(0, name.indexOf('@')));
+			return -1;
+		} catch (IndexOutOfBoundsException ex) {
+			InternalLogger.log(Level.ERROR, "Name of virtual machine does not contain a process ID: " + name);
+			return -1;
 		}
 	}
 
