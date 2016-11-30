@@ -42,13 +42,16 @@ abstract class ConfigurationObserver extends Thread {
 	private final Configurator basisConfigurator;
 	private final Properties basisProperties;
 	private final String file;
+	private final long interval;
 
 	private volatile boolean shutdown;
 
-	private ConfigurationObserver(final Configurator basisConfigurator, final Properties basisProperties, final String file) {
+	private ConfigurationObserver(final Configurator basisConfigurator, final Properties basisProperties, final String file,
+			final long interval) {
 		this.basisConfigurator = basisConfigurator;
 		this.basisProperties = basisProperties;
 		this.file = file;
+		this.interval = interval;
 		this.shutdown = false;
 		setName(THREAD_NAME);
 		setPriority((NORM_PRIORITY + MIN_PRIORITY) / 2);
@@ -67,7 +70,7 @@ abstract class ConfigurationObserver extends Thread {
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createFileConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
-		return new ConfigurationObserver(configurator, properties, file) {
+		return new ConfigurationObserver(configurator, properties, file, 1000) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -93,7 +96,7 @@ abstract class ConfigurationObserver extends Thread {
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createResourceConfigurationObserver(final Configurator configurator, final Properties properties, final String file) {
-		return new ConfigurationObserver(configurator, properties, file) {
+		return new ConfigurationObserver(configurator, properties, file, 1000) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -115,7 +118,7 @@ abstract class ConfigurationObserver extends Thread {
 	 * @return A new instance of {@link org.pmw.tinylog.ConfigurationObserver ConfigurationObserver}
 	 */
 	static ConfigurationObserver createURLConfigurationObserver(final Configurator configurator, final Properties properties, final URL url) {
-		return new ConfigurationObserver(configurator, properties, url.toString()) {
+		return new ConfigurationObserver(configurator, properties, url.toString(), 60 * 1000) {
 
 			@Override
 			protected InputStream openInputStream() {
@@ -210,7 +213,7 @@ abstract class ConfigurationObserver extends Thread {
 			oldProperties = properties;
 
 			try {
-				sleep(1000L);
+				sleep(interval);
 			} catch (InterruptedException ex) {
 				// Ignore and continue
 			}
