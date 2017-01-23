@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tinylog</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.2-rc-1</version>
+	<version>1.2-rc-2</version>
 	<packaging>pom</packaging>
 	<url>${website.url}</url>
 
@@ -348,10 +348,10 @@
 				<version>${nexus-staging-maven-plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					 <serverId>ossrh</serverId>
-					 <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					 <autoReleaseAfterClose>true</autoReleaseAfterClose>
-					 <skipStaging>true</skipStaging>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<skipStaging>true</skipStaging>
 				</configuration>
 			</plugin>
 
