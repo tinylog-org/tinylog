@@ -30,7 +30,7 @@ public final class StartupPolicy implements Policy {
 
 	@Override
 	public boolean check(final File logFile) {
-		return !logFile.exists();
+		return false;
 	}
 
 	@Override

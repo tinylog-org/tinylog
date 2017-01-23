@@ -49,7 +49,9 @@ public final class CountLabeler implements Labeler {
 
 	@Override
 	public File roll(final File file, final int maxBackups) throws IOException {
-		roll(file, 0, maxBackups);
+		if (file.exists()) {
+			roll(file, 0, maxBackups);
+		}
 		return file;
 	}
 

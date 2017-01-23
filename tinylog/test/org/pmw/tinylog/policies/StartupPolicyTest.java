@@ -52,7 +52,7 @@ public class StartupPolicyTest extends AbstractPolicyTest {
 
 		policy = new StartupPolicy();
 		policy.init(null);
-		assertTrue(policy.check(file));
+		assertFalse(policy.check(file));
 		assertTrue(policy.check((String) null));
 		assertTrue(policy.check((String) null));
 		policy.reset();
