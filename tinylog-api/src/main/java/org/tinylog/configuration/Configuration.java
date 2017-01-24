@@ -28,7 +28,7 @@ import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 /**
- * Immutable global configuration for tinylog API and backend.
+ * Immutable global configuration for tinylog.
  *
  * <p>
  * By default, the configuration will be loaded from <tt>tinylog.properties</tt> in the default package. Another

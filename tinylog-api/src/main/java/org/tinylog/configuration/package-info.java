@@ -12,6 +12,6 @@
  */
 
 /**
- * Configuration for tinylog API and backend.
+ * Configuration for tinylog.
  */
 package org.tinylog.configuration;

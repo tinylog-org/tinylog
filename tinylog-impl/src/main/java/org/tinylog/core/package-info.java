@@ -12,6 +12,6 @@
  */
 
 /**
- * tinylog 2 native backend implementation.
+ * tinylog 2 native implementation.
  */
 package org.tinylog.core;

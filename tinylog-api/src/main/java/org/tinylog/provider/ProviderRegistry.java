@@ -65,7 +65,7 @@ public final class ProviderRegistry {
 			switch (providers.size()) {
 				case 0:
 					InternalLogger.log(Level.WARNING, "No logging framework implementation found in class path."
-						+ "Add tinylog-backend.jar for outputting log entries.");
+						+ "Add tinylog-impl.jar for outputting log entries.");
 					return new NopLoggingProvider();
 				case 1:
 					return providers.iterator().next();
