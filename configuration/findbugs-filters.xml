@@ -13,6 +13,15 @@
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
+		<!-- Runtime Dialects -->
+		<Or>
+			<Class name="org.tinylog.runtime.AndroidRuntime" />
+			<Class name="org.tinylog.runtime.JavaRuntime" />
+		</Or>
+		<!-- Runtime dialects use non-public API that throws maybe unknown exceptions -->
+		<Bug pattern="REC_CATCH_EXCEPTION" />
+	</Match>
+	<Match>
 		<!-- Writers -->
 		<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
@@ -21,6 +30,6 @@
 	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
-		<Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD, DM_USELESS_THREAD" />
+		<Bug pattern="DM_USELESS_THREAD, DP_DO_INSIDE_DO_PRIVILEGED, RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, UPM_UNCALLED_PRIVATE_METHOD, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
 	</Match>
 </FindBugsFilter>
