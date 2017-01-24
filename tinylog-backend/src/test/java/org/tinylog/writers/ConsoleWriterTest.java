@@ -17,8 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.backend.LogEntryValue;
-import org.tinylog.backend.util.LogEntryBuilder;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;

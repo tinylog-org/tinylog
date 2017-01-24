@@ -14,7 +14,7 @@
 package org.tinylog.pattern;
 
 import org.junit.Test;
-import org.tinylog.backend.util.LogEntryBuilder;
+import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

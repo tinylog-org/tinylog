@@ -14,4 +14,4 @@
 /**
  * Utility classes for simplifying JUnit tests.
  */
-package org.tinylog.backend.util;
+package org.tinylog.util;

@@ -23,8 +23,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.backend.LogEntryValue;
-import org.tinylog.backend.util.LogEntryBuilder;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;

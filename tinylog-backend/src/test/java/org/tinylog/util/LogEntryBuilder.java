@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.backend.util;
+package org.tinylog.util;
 
 import java.util.Calendar;
 import java.util.Date;

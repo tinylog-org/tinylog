@@ -8,7 +8,7 @@
 		<!-- Log Entry Class and Log Entry Builder -->
 		<Or>
 			<Class name="org.tinylog.backend.LogEntry" />
-			<Class name="org.tinylog.backend.util.LogEntryBuilder" />
+			<Class name="org.tinylog.util.LogEntryBuilder" />
 		</Or>
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>

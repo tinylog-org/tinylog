@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.tinylog.backend.util.LogEntryBuilder;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
+import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.writers.FileWriter;
 import org.tinylog.writers.Writer;
 

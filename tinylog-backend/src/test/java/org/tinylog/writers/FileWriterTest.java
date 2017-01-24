@@ -20,9 +20,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.backend.LogEntryValue;
-import org.tinylog.backend.util.LogEntryBuilder;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
+import org.tinylog.util.LogEntryBuilder;
 import org.tinylog.writers.raw.ByteArrayWriter;
 import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 

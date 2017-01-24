@@ -21,8 +21,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.util.LogEntryBuilder;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
