@@ -25,4 +25,22 @@ public interface RuntimeDialect {
 	 */
 	int getProcessId();
 
+	/**
+	 * Gets the class name of a caller from stack trace.
+	 *
+	 * @param depth
+	 *            Position of caller in stack trace
+	 * @return Fully-qualified class name of caller
+	 */
+	String getCallerClassName(int depth);
+
+	/**
+	 * Gets the complete stack trace element of a caller from stack trace.
+	 *
+	 * @param depth
+	 *            Position of caller in stack trace
+	 * @return Stack trace element of a caller
+	 */
+	StackTraceElement getCallerStackTraceElement(int depth);
+
 }

@@ -15,12 +15,14 @@ package org.tinylog.runtime;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,6 +81,92 @@ public final class JavaRuntimeTest {
 
 		assertThat(new JavaRuntime().getProcessId()).isEqualTo(-1);
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("abc");
+	}
+
+	/**
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly.
+	 */
+	@Test
+	public void callerClassName() {
+		assertThat(new JavaRuntime().getCallerClassName(1)).isEqualTo(JavaRuntimeTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the fully-qualified class name of a caller can be returned, if {@link sun.reflect.Reflection} is
+	 * not available.
+	 */
+	@SuppressWarnings("restriction")
+	@Test
+	public void missingSunReflection() {
+		JavaRuntime runtime = new JavaRuntime();
+		Whitebox.setInternalState(runtime, boolean.class, false);
+		assertThat(runtime.getCallerClassName(1)).isEqualTo(JavaRuntimeTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly.
+	 */
+	@Test
+	public void callerStackTraceElement() {
+		assertThat(new JavaRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller can be returned, if
+	 * {@link Throwable#getStackTraceElement(int)} is not available.
+	 */
+	@Test
+	public void missingStackTraceElementGetter() {
+		JavaRuntime runtime = new JavaRuntime();
+		Whitebox.setInternalState(runtime, Method.class, (Object) null);
+		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller can be returned, if
+	 * {@link Throwable#getStackTraceElement(int)} is not accessible.
+	 */
+	@Test
+	public void notAccessibleSingleStackTraceElementGetter() {
+		JavaRuntime runtime = new JavaRuntime();
+
+		Method method = Whitebox.getInternalState(runtime, Method.class);
+		method.setAccessible(false);
+
+		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce(IllegalAccessException.class.getName());
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller can be returned, if
+	 * {@link Throwable#getStackTraceElement(int)} throws an exception.
+	 */
+	@Test
+	public void stackTraceElementGetterThrowsException() {
+		JavaRuntime runtime = new JavaRuntime();
+
+		Method method = Whitebox.getMethod(JavaRuntimeTest.class, "getStackTraceElement", int.class);
+		Whitebox.setInternalState(runtime, Method.class, method);
+
+		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce(UnsupportedOperationException.class.getName());
+	}
+
+	/**
+	 * Used in {@link #stackTraceElementGetterThrowsException()} as replacement for
+	 * {@link Throwable#getStackTraceElement(int)} to test exception handling.
+	 *
+	 * @param index
+	 *            Position of stack trace element
+	 * @return Nothing, will always throw an exception
+	 */
+	@SuppressWarnings("unused")
+	private static StackTraceElement getStackTraceElement(final int index) {
+		throw new UnsupportedOperationException();
 	}
 
 }

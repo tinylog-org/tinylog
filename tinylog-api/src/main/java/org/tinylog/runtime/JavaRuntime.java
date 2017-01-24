@@ -14,6 +14,8 @@
 package org.tinylog.runtime;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
@@ -23,8 +25,13 @@ import org.tinylog.provider.InternalLogger;
  */
 final class JavaRuntime implements RuntimeDialect {
 
+	private final boolean hasSunReflection;
+	private final Method stackTraceElementGetter;
+
 	/** */
 	JavaRuntime() {
+		hasSunReflection = hasSunReflection();
+		stackTraceElementGetter = getStackTraceElementGetter();
 	}
 
 	@Override
@@ -38,6 +45,69 @@ final class JavaRuntime implements RuntimeDialect {
 		} catch (IndexOutOfBoundsException ex) {
 			InternalLogger.log(Level.ERROR, "Name of virtual machine does not contain a process ID: " + name);
 			return -1;
+		}
+	}
+
+	@Override
+	@SuppressWarnings({ "restriction", "deprecation" })
+	public String getCallerClassName(final int depth) {
+		if (hasSunReflection) {
+			return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
+		} else {
+			return getCallerStackTraceElement(depth + 1).getClassName();
+		}
+	}
+
+	@Override
+	public StackTraceElement getCallerStackTraceElement(final int depth) {
+		if (stackTraceElementGetter != null) {
+			try {
+				return (StackTraceElement) stackTraceElementGetter.invoke(new Throwable(), depth);
+			} catch (IllegalAccessException ex) {
+				InternalLogger.log(Level.ERROR, ex, "Failed getting single stack trace element from throwable");
+			} catch (InvocationTargetException ex) {
+				InternalLogger.log(Level.ERROR, ex.getTargetException(), "Failed getting single stack trace element from throwable");
+			}
+		}
+
+		return new Throwable().getStackTrace()[depth];
+	}
+
+	/**
+	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
+	 *
+	 * @return {@code true} if available, {@code true} if not
+	 */
+	@SuppressWarnings({ "restriction", "deprecation", "javadoc" })
+	private static boolean hasSunReflection() {
+		try {
+			return JavaRuntime.class.equals(sun.reflect.Reflection.getCallerClass(1));
+		} catch (NoClassDefFoundError error) {
+			return false;
+		} catch (NoSuchMethodError error) {
+			return false;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+
+	/**
+	 * Gets {@link Throwable#getStackTraceElement(int)} as accessible method.
+	 *
+	 * @return Instance if available, {@code null} if not
+	 */
+	private static Method getStackTraceElementGetter() {
+		try {
+			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
+			method.setAccessible(true);
+			StackTraceElement stackTraceElement = (StackTraceElement) method.invoke(new Throwable(), 0);
+			if (JavaRuntime.class.getName().equals(stackTraceElement.getClassName())) {
+				return method;
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			return null;
 		}
 	}
 
