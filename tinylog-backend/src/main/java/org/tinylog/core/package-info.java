@@ -14,4 +14,4 @@
 /**
  * tinylog 2 native backend implementation.
  */
-package org.tinylog.backend;
+package org.tinylog.core;

@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import org.tinylog.backend.LogEntry;
+import org.tinylog.core.LogEntry;
 import org.tinylog.writers.raw.ByteArrayWriter;
 
 /**

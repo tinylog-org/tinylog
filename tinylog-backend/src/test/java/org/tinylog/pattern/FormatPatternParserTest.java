@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
-import org.tinylog.backend.LogEntry;
+import org.tinylog.core.LogEntry;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
 

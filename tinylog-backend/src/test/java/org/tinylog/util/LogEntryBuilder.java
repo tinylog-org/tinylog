@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.tinylog.Level;
-import org.tinylog.backend.LogEntry;
+import org.tinylog.core.LogEntry;
 
 /**
  * Fluent API for creating a {@link LogEntry}.

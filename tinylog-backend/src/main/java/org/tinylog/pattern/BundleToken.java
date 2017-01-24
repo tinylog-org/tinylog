@@ -16,8 +16,8 @@ package org.tinylog.pattern;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Bundler for combining multiple tokens to one.

@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;

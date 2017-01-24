@@ -16,7 +16,7 @@ package org.tinylog.pattern;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;

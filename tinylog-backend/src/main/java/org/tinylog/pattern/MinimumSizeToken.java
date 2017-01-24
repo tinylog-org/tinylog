@@ -15,8 +15,8 @@ package org.tinylog.pattern;
 
 import java.util.Collection;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Decorator token for ensuring a minimum size. If the output of the underlying token is shorter than the defined

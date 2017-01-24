@@ -16,7 +16,7 @@ package org.tinylog.writers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
 

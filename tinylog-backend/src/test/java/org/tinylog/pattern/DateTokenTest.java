@@ -22,8 +22,8 @@ import java.util.Locale;
 import org.junit.After;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
-import org.tinylog.backend.LogEntryValue;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;

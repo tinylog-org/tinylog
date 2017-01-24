@@ -16,8 +16,8 @@ package org.tinylog.pattern;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Token for outputting the tag of a logger.

@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.tinylog.Level;
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 import org.tinylog.pattern.FormatPatternParser;
 import org.tinylog.pattern.Token;
 import org.tinylog.provider.InternalLogger;

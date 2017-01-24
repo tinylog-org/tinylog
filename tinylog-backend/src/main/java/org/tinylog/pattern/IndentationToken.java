@@ -16,8 +16,8 @@ package org.tinylog.pattern;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Decorator token for indenting new lines. Each new line, which is produced by the underlying token, will be indented

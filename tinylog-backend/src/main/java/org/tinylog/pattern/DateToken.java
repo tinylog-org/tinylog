@@ -20,9 +20,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Token for outputting the date and time of issue of a log entry.

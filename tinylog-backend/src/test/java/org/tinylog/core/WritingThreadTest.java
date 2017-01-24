@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.backend;
+package org.tinylog.core;
 
 import java.io.IOException;
 import java.nio.file.Files;

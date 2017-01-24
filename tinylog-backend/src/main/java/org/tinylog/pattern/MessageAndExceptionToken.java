@@ -16,8 +16,8 @@ package org.tinylog.pattern;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import org.tinylog.backend.LogEntry;
-import org.tinylog.backend.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
 
 /**
  * Token for outputting the text message and the exception or other throwable of a log entry.
