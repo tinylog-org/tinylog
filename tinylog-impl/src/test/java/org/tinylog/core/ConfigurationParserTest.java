@@ -14,6 +14,7 @@
 package org.tinylog.core;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -24,6 +25,7 @@ import org.tinylog.rules.SystemStreamCollector;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * Tests for {@link ConfigurationParser}.
@@ -122,9 +124,59 @@ public final class ConfigurationParserTest {
 		assertThat(level).isEqualTo(Level.TRACE);
 
 		assertThat(systemStream.consumeErrorOutput())
-			.containsOnlyOnce("ERROR")
-			.containsOnlyOnce("severity level")
-			.containsOnlyOnce("test");
+			.containsOnlyOnce("ERROR").containsOnlyOnce("severity level").containsOnlyOnce("test");
+	}
+
+	/**
+	 * Verifies that no severity levels will be returned for an empty configuration.
+	 */
+	@Test
+	public void noCustomLevels() {
+		Map<String, Level> levels = ConfigurationParser.getCustomLevels();
+		assertThat(levels).isEmpty();
+	}
+
+	/**
+	 * Verifies that a single severity level will be parsed correctly.
+	 */
+	@Test
+	public void singleCustomLevel() {
+		Configuration.set("level@com.test", "info");
+
+		Map<String, Level> levels = ConfigurationParser.getCustomLevels();
+		assertThat(levels).containsOnly(entry("com.test", Level.INFO));
+	}
+
+	/**
+	 * Verifies that multiple severity level will be found and parsed correctly.
+	 */
+	@Test
+	public void multipleCustomLevels() {
+		Configuration.set("level@test", "debug");
+		Configuration.set("level@test.a", "info");
+		Configuration.set("level@test.b", "warning");
+		Configuration.set("level@other", "error");
+
+		Map<String, Level> levels = ConfigurationParser.getCustomLevels();
+		assertThat(levels).containsOnly(
+			entry("test", Level.DEBUG),
+			entry("test.a", Level.INFO),
+			entry("test.b", Level.WARNING),
+			entry("other", Level.ERROR));
+	}
+
+	/**
+	 * Verifies that an invalid custom severity level will be ignored and an error message will be output.
+	 */
+	@Test
+	public void illegalCustomLevel() {
+		Configuration.set("level@test", "42");
+		Configuration.set("level@other", "info");
+
+		Map<String, Level> levels = ConfigurationParser.getCustomLevels();
+		assertThat(levels).containsOnly(entry("other", Level.INFO));
+
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("severity level").containsOnlyOnce("42");
 	}
 
 }

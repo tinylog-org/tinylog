@@ -13,7 +13,10 @@
 
 package org.tinylog.core;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
@@ -60,6 +63,23 @@ public final class ConfigurationParser {
 	 */
 	public static Level getGlobalLevel() {
 		return parse(Configuration.get("level"), Level.TRACE);
+	}
+
+	/**
+	 * Loads custom severity levels for packages or classes from configuration.
+	 *
+	 * @return All found custom severity levels
+	 */
+	public static Map<String, Level> getCustomLevels() {
+		Map<String, Level> levels = new HashMap<String, Level>();
+		for (Entry<String, String> entry : Configuration.getSiblings("level@").entrySet()) {
+			String packageOrClass = entry.getKey().substring("level@".length());
+			Level level = parse(entry.getValue(), null);
+			if (level != null) {
+				levels.put(packageOrClass, level);
+			}
+		}
+		return levels;
 	}
 
 	/**
