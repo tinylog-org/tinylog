@@ -140,7 +140,7 @@ final class WritingThread extends Thread {
 				writers.add(writer);
 			}
 		} catch (Exception ex) {
-			InternalLogger.log(Level.ERROR, ex, "Failed to write log entry");
+			InternalLogger.log(Level.ERROR, ex, "Failed to write log entry '" + task.logEntry.getMessage() + "'");
 		}
 	}
 
