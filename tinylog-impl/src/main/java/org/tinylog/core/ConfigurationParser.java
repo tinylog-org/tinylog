@@ -13,7 +13,9 @@
 
 package org.tinylog.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,6 +82,22 @@ public final class ConfigurationParser {
 			}
 		}
 		return levels;
+	}
+
+	/**
+	 * Loads all tags from writers in configuration.
+	 *
+	 * @return Found tags
+	 */
+	public static List<String> getTags() {
+		List<String> tags = new ArrayList<String>();
+		for (String writerProperty : Configuration.getSiblings("writer").keySet()) {
+			String tag = Configuration.get(writerProperty + ".tag");
+			if (tag != null && !tag.isEmpty() && !tag.equals("-") && !tags.contains(tag)) {
+				tags.add(tag);
+			}
+		}
+		return tags;
 	}
 
 	/**

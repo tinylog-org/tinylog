@@ -13,6 +13,7 @@
 
 package org.tinylog.core;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -177,6 +178,69 @@ public final class ConfigurationParserTest {
 		assertThat(levels).containsOnly(entry("other", Level.INFO));
 
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("severity level").containsOnlyOnce("42");
+	}
+
+	/**
+	 * Verifies that no tags will be returned for a writer without tags.
+	 */
+	@Test
+	public void writerWithoutTag() {
+		Configuration.set("writer", "console");
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).isEmpty();
+	}
+
+	/**
+	 * Verifies that a tag from a writer will be found.
+	 */
+	@Test
+	public void writerWithTag() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", "system");
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).containsExactly("system");
+	}
+
+	/**
+	 * Verifies that an empty tag from a writer will be ignored.
+	 */
+	@Test
+	public void writerWithEmptyTag() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", "");
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).isEmpty();
+	}
+
+	/**
+	 * Verifies that a minus tag from a writer will be ignored.
+	 */
+	@Test
+	public void writerWithMinusTag() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", "-");
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).isEmpty();
+	}
+
+	/**
+	 * Verifies that tags can be read from multiple writers and each tag will be returned only once.
+	 */
+	@Test
+	public void multipleWritersWithTags() {
+		Configuration.set("writer1", "console");
+		Configuration.set("writer1.tag", "system");
+		Configuration.set("writer2", "console");
+		Configuration.set("writer2.tag", "technical");
+		Configuration.set("writer3", "console");
+		Configuration.set("writer3.tag", "system");
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).containsExactlyInAnyOrder("system", "technical");
 	}
 
 }
