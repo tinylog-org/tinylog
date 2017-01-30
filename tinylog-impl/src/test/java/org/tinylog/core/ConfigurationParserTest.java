@@ -16,8 +16,11 @@ package org.tinylog.core;
 import java.util.Locale;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.rules.SystemStreamCollector;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +31,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class ConfigurationParserTest {
 
 	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	/**
 	 * Resets configuration.
 	 */
 	@After
@@ -36,7 +45,7 @@ public final class ConfigurationParserTest {
 	}
 
 	/**
-	 * Verifies that {@link Locale#getDefault()} will be used, if there is no defined locale.
+	 * Verifies that {@link Locale#ROOT} will be used, if there is no defined locale.
 	 */
 	@Test
 	public void defaultLocale() {
@@ -82,6 +91,40 @@ public final class ConfigurationParserTest {
 		Configuration.set("locale", "no_NO_NY");
 		Locale locale = ConfigurationParser.getLocale();
 		assertThat(locale).isEqualTo(new Locale("no", "NO", "NY"));
+	}
+
+	/**
+	 * Verifies that {@link Level#TRACE} will be used, if there is no defined global severity level.
+	 */
+	@Test
+	public void defaultGlobalLevel() {
+		Level level = ConfigurationParser.getGlobalLevel();
+		assertThat(level).isEqualTo(Level.TRACE);
+	}
+
+	/**
+	 * Verifies that a defined global severity level will be parsed correctly.
+	 */
+	@Test
+	public void definedGlobalLevel() {
+		Configuration.set("level", "info");
+		Level level = ConfigurationParser.getGlobalLevel();
+		assertThat(level).isEqualTo(Level.INFO);
+	}
+
+	/**
+	 * Verifies that an invalid global severity level will be detected and {@link Level#TRACE} returned.
+	 */
+	@Test
+	public void illegalGlobalLevel() {
+		Configuration.set("level", "test");
+		Level level = ConfigurationParser.getGlobalLevel();
+		assertThat(level).isEqualTo(Level.TRACE);
+
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("severity level")
+			.containsOnlyOnce("test");
 	}
 
 }

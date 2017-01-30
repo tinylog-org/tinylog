@@ -15,7 +15,9 @@ package org.tinylog.core;
 
 import java.util.Locale;
 
+import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.provider.InternalLogger;
 
 /**
  * Parser for properties based configuration.
@@ -47,6 +49,37 @@ public final class ConfigurationParser {
 				return new Locale(splittedTag[0], splittedTag[1]);
 			} else {
 				return new Locale(splittedTag[0], splittedTag[1], splittedTag[2]);
+			}
+		}
+	}
+
+	/**
+	 * Loads the global severity level from configuration.
+	 *
+	 * @return Severity level from configuration or {@link Level#TRACE} if no severity level is configured
+	 */
+	public static Level getGlobalLevel() {
+		return parse(Configuration.get("level"), Level.TRACE);
+	}
+
+	/**
+	 * Reads a severity level from configuration.
+	 *
+	 * @param property
+	 *            Key of property
+	 * @param defaultValue
+	 *            Default value, if property doesn't exist or is invalid
+	 * @return Severity level
+	 */
+	private static Level parse(final String property, final Level defaultValue) {
+		if (property == null) {
+			return defaultValue;
+		} else {
+			try {
+				return Level.valueOf(property.toUpperCase(Locale.ROOT));
+			} catch (IllegalArgumentException ex) {
+				InternalLogger.log(Level.ERROR, "Illegal severity level: " + property);
+				return defaultValue;
 			}
 		}
 	}
