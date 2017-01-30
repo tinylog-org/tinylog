@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
-import org.tinylog.configuration.Configuration;
+import org.tinylog.core.ConfigurationParser;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 
@@ -30,13 +30,12 @@ import org.tinylog.core.LogEntryValue;
 final class DateToken implements Token {
 
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-	private static final int MAX_LOCALE_ARGUMENTS = 3;
 
 	private static final int MILLISECONDS_PRECISION = 1;
 	private static final int SECONDS_PRECISION = 1000;
 	private static final int MINUTES_PRECISION = 60000;
 
-	private static final Locale locale = getLocale();
+	private static final Locale locale = ConfigurationParser.getLocale();
 
 	private final DateFormat formatter;
 	private final long divisor;
@@ -83,27 +82,6 @@ final class DateToken implements Token {
 				lastFormat = formatter.format(date);
 			}
 			return lastFormat;
-		}
-	}
-
-	/**
-	 * Loads the locale from configuration.
-	 *
-	 * @return Locale from configuration or {@link Locale#getDefault()} if no locale is configured
-	 */
-	private static Locale getLocale() {
-		String locale = Configuration.get("locale");
-		if (locale == null) {
-			return Locale.getDefault();
-		} else {
-			String[] localeArray = locale.split("_", MAX_LOCALE_ARGUMENTS);
-			if (localeArray.length == 1) {
-				return new Locale(localeArray[0]);
-			} else if (localeArray.length == 2) {
-				return new Locale(localeArray[0], localeArray[1]);
-			} else {
-				return new Locale(localeArray[0], localeArray[1], localeArray[2]);
-			}
 		}
 	}
 
