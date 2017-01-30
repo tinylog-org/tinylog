@@ -182,6 +182,20 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that {@link Configuration#getSiblings(String)} finds the expected sibling properties even if there are
+	 * dots after a prefix ending with an at sign.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void foundSiblingsWithAtSign() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("level = info", "level@org.test = trace", "level@com = info"));
+		assertThat(Configuration.getSiblings("level@"))
+			.containsOnly(entry("level@org.test", "trace"), entry("level@com", "info"));
+	}
+
+	/**
 	 * Verifies that {@link Configuration#getSiblings(String)} can handle requests without any matching sibling
 	 * properties.
 	 *

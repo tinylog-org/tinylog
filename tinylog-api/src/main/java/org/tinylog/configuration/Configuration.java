@@ -72,8 +72,14 @@ public final class Configuration {
 	 * Gets all siblings with a defined prefix. Child properties will be not returned.
 	 *
 	 * <p>
-	 * For example: <code>getSiblings("writer")</code> will return properties with the keys <tt>writer</tt> as well as
-	 * <tt>writerTest</tt> but not with the key <tt>writer.test</tt>.
+	 * <strong>Example:</strong>
+	 * </p>
+	 *
+	 * <p>
+	 * <code>getSiblings("writer")</code> will return properties with the keys <tt>writer</tt> as well as
+	 * <tt>writerTest</tt> but not with the key <tt>writer.test</tt>. Dots after a prefix ending with an at sign will be
+	 * not handled as children. Therefore, <code>getSiblings("level@")</code> will return a property with the key
+	 * <tt>level@com.test</tt>.
 	 * </p>
 	 *
 	 * @param prefix
@@ -84,7 +90,7 @@ public final class Configuration {
 		Map<String, String> map = new HashMap<String, String>();
 		for (Enumeration<Object> enumeration = properties.keys(); enumeration.hasMoreElements();) {
 			String key = (String) enumeration.nextElement();
-			if (key.startsWith(prefix) && key.indexOf('.', prefix.length()) == -1) {
+			if (key.startsWith(prefix) && (prefix.endsWith("@") || key.indexOf('.', prefix.length()) == -1)) {
 				map.put(key, (String) properties.get(key));
 			}
 		}
