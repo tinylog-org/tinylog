@@ -101,6 +101,15 @@ public final class ConfigurationParser {
 	}
 
 	/**
+	 * Detects whether writing thread is enabled in configuration.
+	 *
+	 * @return {@code true} if writing thread is explicitly enabled, otherwise {@code false}
+	 */
+	public static boolean isWritingThreadEnabled() {
+		return Boolean.parseBoolean(Configuration.get("writingthread"));
+	}
+
+	/**
 	 * Reads a severity level from configuration.
 	 *
 	 * @param property

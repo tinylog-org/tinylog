@@ -243,4 +243,35 @@ public final class ConfigurationParserTest {
 		assertThat(tags).containsExactlyInAnyOrder("system", "technical");
 	}
 
+	/**
+	 * Verifies that writing thread is disabled by default.
+	 */
+	@Test
+	public void noConfiguredWritingThread() {
+		boolean enabled = ConfigurationParser.isWritingThreadEnabled();
+		assertThat(enabled).isFalse();
+	}
+
+	/**
+	 * Verifies that disabling of writing thread will be detected.
+	 */
+	@Test
+	public void disabledWritingThread() {
+		Configuration.set("writingthread", "false");
+
+		boolean enabled = ConfigurationParser.isWritingThreadEnabled();
+		assertThat(enabled).isFalse();
+	}
+
+	/**
+	 * Verifies that enabling of writing thread will be detected.
+	 */
+	@Test
+	public void enabledWritingThread() {
+		Configuration.set("writingthread", "true");
+
+		boolean enabled = ConfigurationParser.isWritingThreadEnabled();
+		assertThat(enabled).isTrue();
+	}
+
 }
