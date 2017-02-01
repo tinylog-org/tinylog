@@ -14,7 +14,7 @@
 package org.tinylog.runtime;
 
 /**
- * Provider for getting the runtime dialect for the current VM.
+ * Provider for getting runtime specific data from Virtual Machine.
  */
 public final class RuntimeProvider {
 
@@ -25,12 +25,44 @@ public final class RuntimeProvider {
 	}
 
 	/**
-	 * Gets the runtime dialect for the current VM.
+	 * Gets the ID of the current process (pid).
 	 *
-	 * @return Runtime dialect
+	 * @return ID of the current process
 	 */
-	public static RuntimeDialect getDialect() {
-		return dialect;
+	public static int getProcessId() {
+		return dialect.getProcessId();
+	}
+
+	/**
+	 * Gets the class name of a caller from stack trace. Any anonymous part will be stripped from class name.
+	 *
+	 * @param depth
+	 *            Position of caller in stack trace
+	 * @return Fully-qualified class name of caller
+	 */
+	public static String getCallerClassName(final int depth) {
+		String caller = dialect.getCallerClassName(depth + 1);
+		return stripAnonymousPart(caller);
+	}
+
+	/**
+	 * Gets the complete stack trace element of a caller from stack trace. Any anonymous part will be stripped from
+	 * class name.
+	 *
+	 * @param depth
+	 *            Position of caller in stack trace
+	 * @return Stack trace element of a caller
+	 */
+	public static StackTraceElement getCallerStackTraceElement(final int depth) {
+		StackTraceElement element = dialect.getCallerStackTraceElement(depth + 1);
+		String className = element.getClassName();
+		int dollarIndex = className.indexOf("$");
+		if (dollarIndex == -1) {
+			return element;
+		} else {
+			className = stripAnonymousPart(className);
+			return new StackTraceElement(className, element.getMethodName(), element.getFileName(), element.getLineNumber());
+		}
 	}
 
 	/**
@@ -44,6 +76,30 @@ public final class RuntimeProvider {
 		} else {
 			return new JavaRuntime();
 		}
+	}
+
+	/**
+	 * Strips the the anonymous part from a class name.
+	 *
+	 * @param className
+	 *            Fully-qualified class name
+	 * @return Human-readable class name without any anonymous part
+	 */
+	private static String stripAnonymousPart(final String className) {
+		for (int index = className.indexOf("$", 0); index != -1; index = className.indexOf('$', index + 2)) {
+			/* Trailing dollar sign */
+			if (index >= className.length() - 1) {
+				return className.substring(0, index);
+			}
+
+			char firstLetter = className.charAt(index + 1);
+			/* First letter after dollar sign is not a capital letter of a named inner class */
+			if (firstLetter < 'A' || firstLetter > 'Z') {
+				return className.substring(0, index);
+			}
+		}
+
+		return className;
 	}
 
 }

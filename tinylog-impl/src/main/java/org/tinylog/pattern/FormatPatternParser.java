@@ -144,7 +144,7 @@ public final class FormatPatternParser {
 		if (name.equals("date")) {
 			return createDateToken(configuration);
 		} else if ("pid".equals(name)) {
-			return new PlainTextToken(Integer.toString(RuntimeProvider.getDialect().getProcessId()));
+			return new PlainTextToken(Integer.toString(RuntimeProvider.getProcessId()));
 		} else if ("thread".equals(name)) {
 			return new ThreadNameToken();
 		} else if ("threadId".equals(name)) {

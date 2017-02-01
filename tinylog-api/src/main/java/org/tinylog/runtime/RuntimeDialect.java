@@ -16,7 +16,7 @@ package org.tinylog.runtime;
 /**
  * VM runtime specific functionality.
  */
-public interface RuntimeDialect {
+interface RuntimeDialect {
 
 	/**
 	 * Gets the ID of the current process (pid).
