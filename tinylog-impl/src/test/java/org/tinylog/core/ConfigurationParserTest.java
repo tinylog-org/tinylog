@@ -13,6 +13,9 @@
 
 package org.tinylog.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,8 +26,13 @@ import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.writers.ConsoleWriter;
+import org.tinylog.writers.FileWriter;
+import org.tinylog.writers.Writer;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
@@ -272,6 +280,155 @@ public final class ConfigurationParserTest {
 
 		boolean enabled = ConfigurationParser.isWritingThreadEnabled();
 		assertThat(enabled).isTrue();
+	}
+
+	/**
+	 * Verifies that a {@link ConsoleWriter} will be created, if logging is enabled but no writer explicitly defined.
+	 */
+	@Test
+	public void defaultWriter() {
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
+
+		assertThat(writers).hasSize(2).allSatisfy(element ->
+			assertThat(element).hasSize(5).allSatisfy(collection -> {
+				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+			})
+		);
+	}
+
+	/**
+	 * Verifies that no writer will be created, if logging is disabled.
+	 */
+	@Test
+	public void noWriters() {
+		Configuration.set("writer", "console");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.OFF, false);
+
+		assertThat(writers).hasSize(2).allSatisfy(element ->
+			assertThat(element).hasSize(5).allSatisfy(Collection::isEmpty)
+		);
+	}
+
+	/**
+	 * Verifies that a single tagged writer will be created and assigned correctly.
+	 */
+	@Test
+	public void singleTaggedWriter() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", "SYSTEM");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(singletonList("SYSTEM"), Level.TRACE, false);
+
+		assertThat(writers)
+			.hasSize(3)
+			.allSatisfy(element -> assertThat(element).hasSize(5));
+
+		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
+		assertThat(writers[1]).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+		assertThat(writers[2]).allSatisfy(collection -> assertThat(collection).isEmpty());
+	}
+
+	/**
+	 * Verifies that a single explicitly untagged writer will be created and assigned correctly.
+	 */
+	@Test
+	public void singleUntaggedWriter() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", "-");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
+
+		assertThat(writers).hasSize(2);
+		assertThat(writers[0]).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+		assertThat(writers[1]).allSatisfy(collection -> assertThat(collection).isEmpty());
+	}
+
+	/**
+	 * Verifies that two tagged writers will be created and assigned correctly.
+	 *
+	 * @throws IOException
+	 *             Failed to create temporary log file
+	 */
+	@Test
+	public void multipleTaggedWriter() throws IOException {
+		Configuration.set("writer1", "console");
+		Configuration.set("writer1.tag", "SYSTEM");
+
+		Configuration.set("writer2", "file");
+		Configuration.set("writer2.tag", "SYSTEM");
+		Configuration.set("writer2.file", File.createTempFile("tinylog", ".log").getAbsolutePath());
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(singletonList("SYSTEM"), Level.TRACE, false);
+
+		assertThat(writers)
+			.hasSize(3)
+			.allSatisfy(element -> assertThat(element).hasSize(5));
+
+		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
+		assertThat(writers[1]).allSatisfy(collection -> {
+			assertThat(collection)
+				.hasSize(2)
+				.hasAtLeastOneElementOfType(ConsoleWriter.class)
+				.hasAtLeastOneElementOfType(FileWriter.class);
+		});
+		assertThat(writers[2]).allSatisfy(collection -> assertThat(collection).isEmpty());
+	}
+
+	/**
+	 * Verifies that a writer with a defined severity level, which is above the minimum severity level, will be only
+	 * assigned to the configured severity levels.
+	 */
+	@Test
+	public void levelOfWriterAboveMinimumLevel() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.level", "WARNING");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
+
+		assertThat(writers).hasSize(2).allSatisfy(element -> {
+			assertThat(element).hasSize(5);
+			assertThat(element[Level.TRACE.ordinal()]).isEmpty();
+			assertThat(element[Level.DEBUG.ordinal()]).isEmpty();
+			assertThat(element[Level.INFO.ordinal()]).isEmpty();
+			assertThat(element[Level.WARNING.ordinal()])
+				.hasSize(1)
+				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+			assertThat(element[Level.ERROR.ordinal()])
+				.hasSize(1)
+				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+	}
+
+	/**
+	 * Verifies that a writer with a defined severity level, which is below the minimum severity level, will be not
+	 * assigned to severity levels below the minimum severity level.
+	 */
+	@Test
+	public void levelOfWriterBelowMinimumLevel() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.level", "trace");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.INFO, false);
+
+		assertThat(writers).hasSize(2).allSatisfy(element -> {
+			assertThat(element).hasSize(5);
+			assertThat(element[Level.TRACE.ordinal()]).isEmpty();
+			assertThat(element[Level.DEBUG.ordinal()]).isEmpty();
+			assertThat(element[Level.INFO.ordinal()])
+				.hasSize(1)
+				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+			assertThat(element[Level.WARNING.ordinal()])
+				.hasSize(1)
+				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+			assertThat(element[Level.ERROR.ordinal()])
+				.hasSize(1)
+				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
 	}
 
 }
