@@ -3,9 +3,9 @@ sudo: false
 
 script:
   - set -o pipefail
-  - mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
+  - "mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5 | egrep -v 'Download(ing|ed): '"
   - cd benchmark
-  - mvn clean package
+  - "mvn clean package | egrep -v 'Download(ing|ed): '"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
