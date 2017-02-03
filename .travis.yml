@@ -2,6 +2,7 @@ language: java
 sudo: false
 
 script:
+  - set -o pipefail
   - mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5
   - cd benchmark
   - mvn clean package
