@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
+import org.pmw.tinylog.utils.ClassLoaderResolver;
 import org.pmw.tinylog.writers.Writer;
 
 /**
@@ -358,7 +359,9 @@ final class PropertiesLoader {
 
 	private static Collection<Class<?>> findImplementations(final Class<?> service) {
 		try {
-			Enumeration<URL> urls = PropertiesLoader.class.getClassLoader().getResources(SERVICES_PREFIX + service.getPackage().getName());
+			Enumeration<URL> urls = ClassLoaderResolver
+					.resolve(PropertiesLoader.class)
+					.getResources(SERVICES_PREFIX + service.getPackage().getName());
 			if (urls == null || !urls.hasMoreElements()) {
 				return Collections.emptyList();
 			} else {
