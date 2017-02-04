@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.pmw.tinylog.utils.ClassLoaderResolver;
 import org.pmw.tinylog.writers.Writer;
 
 /**
@@ -100,7 +101,7 @@ abstract class ConfigurationObserver extends Thread {
 
 			@Override
 			protected InputStream openInputStream() {
-				return ConfigurationObserver.class.getClassLoader().getResourceAsStream(file);
+				return ClassLoaderResolver.resolve(ConfigurationObserver.class).getResourceAsStream(file);
 			}
 
 		};

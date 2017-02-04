@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.pmw.tinylog.utils.ClassLoaderResolver;
 import org.pmw.tinylog.writers.ConsoleWriter;
 import org.pmw.tinylog.writers.Writer;
 
@@ -115,7 +116,7 @@ public final class Configurator {
 	public static Configurator fromResource(final String file) throws IOException {
 		Properties properties = new Properties();
 
-		InputStream stream = Configurator.class.getClassLoader().getResourceAsStream(file);
+		InputStream stream = ClassLoaderResolver.resolve(Configurator.class).getResourceAsStream(file);
 		if (stream == null) {
 			throw new FileNotFoundException(file);
 		} else {
@@ -704,7 +705,7 @@ public final class Configurator {
 				InternalLogger.error(ex, "Cannot connect to \"{}\"", file);
 			}
 		} else {
-			stream = Configurator.class.getClassLoader().getResourceAsStream(file);
+			stream = ClassLoaderResolver.resolve(Configurator.class).getResourceAsStream(file);;
 			if (stream == null) {
 				try {
 					stream = new FileInputStream(file);
