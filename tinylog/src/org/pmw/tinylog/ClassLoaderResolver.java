@@ -11,13 +11,14 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.pmw.tinylog.utils;
+package org.pmw.tinylog;
 
-final public class ClassLoaderResolver {
+final class ClassLoaderResolver {
 
-	private ClassLoaderResolver() {}
+	private ClassLoaderResolver() {
+	}
 
-	public static ClassLoader resolve(Class<?> clazz) {
+	static ClassLoader resolve(Class<?> clazz) {
 		return clazz.getClassLoader() == null ? ClassLoader.getSystemClassLoader() : clazz.getClassLoader();
 	}
 

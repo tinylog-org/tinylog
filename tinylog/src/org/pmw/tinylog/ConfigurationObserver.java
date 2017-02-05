@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.pmw.tinylog.utils.ClassLoaderResolver;
 import org.pmw.tinylog.writers.Writer;
 
 /**

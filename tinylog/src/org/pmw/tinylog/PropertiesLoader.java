@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import org.pmw.tinylog.labelers.Labeler;
 import org.pmw.tinylog.policies.Policy;
-import org.pmw.tinylog.utils.ClassLoaderResolver;
 import org.pmw.tinylog.writers.Writer;
 
 /**
