@@ -704,7 +704,7 @@ public final class Configurator {
 				InternalLogger.error(ex, "Cannot connect to \"{}\"", file);
 			}
 		} else {
-			stream = ClassLoaderResolver.resolve(Configurator.class).getResourceAsStream(file);;
+			stream = ClassLoaderResolver.resolve(Configurator.class).getResourceAsStream(file);
 			if (stream == null) {
 				try {
 					stream = new FileInputStream(file);
