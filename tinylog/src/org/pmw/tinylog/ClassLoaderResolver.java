@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Martin Winandy
+ * Copyright 2017 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,12 +13,23 @@
 
 package org.pmw.tinylog;
 
+/**
+ * Resolver for getting a non-null instance of {@link ClassLoader}.
+ */
 final class ClassLoaderResolver {
 
 	private ClassLoaderResolver() {
 	}
 
-	static ClassLoader resolve(Class<?> clazz) {
+	/**
+	 * Return the class loader for a class. If there is no assigned class loader, the system class loader will be
+	 * returned.
+	 * 
+	 * @param clazz
+	 *            Main source for getting class loader
+	 * @return An instance of {@link ClassLoader}
+	 */
+	static ClassLoader resolve(final Class<?> clazz) {
 		return clazz.getClassLoader() == null ? ClassLoader.getSystemClassLoader() : clazz.getClassLoader();
 	}
 
