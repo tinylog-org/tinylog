@@ -30,7 +30,8 @@ final class ClassLoaderResolver {
 	 * @return An instance of {@link ClassLoader}
 	 */
 	static ClassLoader resolve(final Class<?> clazz) {
-		return clazz.getClassLoader() == null ? ClassLoader.getSystemClassLoader() : clazz.getClassLoader();
+		ClassLoader classLoader = clazz.getClassLoader();
+		return classLoader == null ? ClassLoader.getSystemClassLoader() : classLoader;
 	}
 
 }
