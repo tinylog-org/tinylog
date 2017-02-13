@@ -61,7 +61,7 @@ public final class LogEntry {
 	 * @param message
 	 *            Text message of this log entry
 	 * @param exception
-	 *            Catched exception or throwable associated with this log entry
+	 *            Caught exception or throwable associated with this log entry
 	 */
 	public LogEntry(final Date date, final Thread thread, final Map<String, String> context, final String className,
 		final String methodName, final String fileName, final int lineNumber, final String tag, final Level level,
