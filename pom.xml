@@ -70,13 +70,6 @@
 		</license>
 	</licenses>
 
-	<developers>
-		<developer>
-			<name>Martin Winandy</name>
-			<email>martin.winandy@tinylog.org</email>
-		</developer>
-	</developers>
-
 	<scm>
 		<url>${git.url}</url>
 		<connection>${git.connection}</connection>
