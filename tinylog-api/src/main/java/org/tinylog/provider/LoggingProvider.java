@@ -76,4 +76,10 @@ public interface LoggingProvider {
 	 */
 	void log(int depth, String tag, Level level, Throwable exception, Object obj, Object... arguments);
 
+	/**
+	 * Shuts down the logging provider and frees all allocated resources. This method should be called only if auto
+	 * shutdown is explicitly disabled.
+	 */
+	void shutdown();
+
 }

@@ -47,4 +47,9 @@ final class NopLoggingProvider implements LoggingProvider {
 		// Ignore
 	}
 
+	@Override
+	public void shutdown() {
+		// Ignore
+	}
+
 }

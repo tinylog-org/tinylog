@@ -192,6 +192,10 @@ public final class ProviderRegistryTest {
 			final Object... arguments) {
 		}
 
+		@Override
+		public void shutdown() {
+		}
+
 	}
 
 }

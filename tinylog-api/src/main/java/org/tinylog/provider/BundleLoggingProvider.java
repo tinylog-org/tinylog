@@ -71,6 +71,13 @@ final class BundleLoggingProvider implements LoggingProvider {
 		}
 	}
 
+	@Override
+	public void shutdown() {
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			loggingProviders[i].shutdown();
+		}
+	}
+
 	/**
 	 * Gets all context providers from given logging providers and combine them into a new one.
 	 *

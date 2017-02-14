@@ -84,4 +84,12 @@ public final class NopLoggingProviderTest {
 		provider.log(1, null, Level.ERROR, null, null, (Object[]) null);
 	}
 
+	/**
+	 * Verifies that {@code shutdown()} method is invokable without throwing any exceptions.
+	 */
+	@Test
+	public void shutdown() {
+		provider.shutdown();
+	}
+
 }

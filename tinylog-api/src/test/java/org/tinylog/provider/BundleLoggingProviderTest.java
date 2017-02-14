@@ -116,6 +116,19 @@ public final class BundleLoggingProviderTest {
 	}
 
 	/**
+	 * Verifies that {@code shutdown()} method invokes {@code shutdown()} methods from underlying logging providers.
+	 */
+	@Test
+	public void shutdown() {
+		init(Level.OFF, Level.OFF);
+
+		bundle.shutdown();
+
+		verify(first).shutdown();
+		verify(second).shutdown();
+	}
+
+	/**
 	 * Creates underlying logging providers as well as the wrapper logging provider.
 	 *
 	 * @param firstLevel
