@@ -283,6 +283,37 @@ public final class ConfigurationParserTest {
 	}
 
 	/**
+	 * Verifies that auto shutdown is disabled by default.
+	 */
+	@Test
+	public void noConfiguredAutoShutdown() {
+		boolean enabled = ConfigurationParser.isAutoShutdownEnabled();
+		assertThat(enabled).isTrue();
+	}
+
+	/**
+	 * Verifies that disabling of auto shutdown will be detected.
+	 */
+	@Test
+	public void disabledAutoShutdown() {
+		Configuration.set("autoshutdown", "false");
+
+		boolean enabled = ConfigurationParser.isAutoShutdownEnabled();
+		assertThat(enabled).isFalse();
+	}
+
+	/**
+	 * Verifies that enabling of auto shutdown will be detected.
+	 */
+	@Test
+	public void enabledAutoShutdown() {
+		Configuration.set("autoshutdown", "true");
+
+		boolean enabled = ConfigurationParser.isAutoShutdownEnabled();
+		assertThat(enabled).isTrue();
+	}
+
+	/**
 	 * Verifies that a {@link ConsoleWriter} will be created, if logging is enabled but no writer explicitly defined.
 	 */
 	@Test

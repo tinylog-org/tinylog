@@ -110,7 +110,16 @@ public final class ConfigurationParser {
 	 * @return {@code true} if writing thread is explicitly enabled, otherwise {@code false}
 	 */
 	public static boolean isWritingThreadEnabled() {
-		return Boolean.parseBoolean(Configuration.get("writingthread"));
+		return "true".equalsIgnoreCase(Configuration.get("writingthread"));
+	}
+
+	/**
+	 * Detects whether auto shutdown is enabled in configuration.
+	 *
+	 * @return {@code false} if auto shutdown is explicitly disabled, otherwise {@code true}
+	 */
+	public static boolean isAutoShutdownEnabled() {
+		return !"false".equalsIgnoreCase(Configuration.get("autoshutdown"));
 	}
 
 	/**
