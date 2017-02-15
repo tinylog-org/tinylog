@@ -4,5 +4,5 @@
 	<!-- All Test Classes -->
 	<suppress files="[/\\]src[/\\]test[/\\].*\.java" checks="MagicNumber"/>
 	<!-- JUnit Tests -->
-	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|JavadocPackage|MissingCtor)"/>
+	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|JavadocPackage|MissingCtor|VisibilityModifier)"/>
 </suppressions>
