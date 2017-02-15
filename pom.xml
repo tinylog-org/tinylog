@@ -55,6 +55,7 @@
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.5.1</maven-site-plugin.version>
+		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.6.2</assertj-core.version>
@@ -353,6 +354,24 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>${maven-assembly-plugin.version}</version>
+					<configuration>
+						<appendAssemblyId>false</appendAssemblyId>
+						<outputDirectory>${project.parent.build.directory}</outputDirectory>
+						<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
