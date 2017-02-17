@@ -545,7 +545,7 @@ public final class TinylogLoggingProviderTest {
 	 */
 	public static final class WritingThreadEnabled extends AbstractTest {
 
-		private static final Condition<Thread> writingThread = new Condition<>(WritingThread.class::isInstance, "writing thread");
+		private static final Condition<Thread> writingThread = new Condition<>(WritingThread.class::isInstance, "WritingThread");
 
 		/**
 		 * Activates writing thread and disables auto shutdown.
@@ -561,6 +561,12 @@ public final class TinylogLoggingProviderTest {
 		@After
 		public void shutdown() {
 			provider.shutdown();
+			
+			waitFor(() -> Thread.getAllStackTraces().keySet(),
+					threads -> threads.stream().filter(WritingThread.class::isInstance).count() == 0,
+					1000);
+			
+			assertThat(Thread.getAllStackTraces().keySet()).doNotHave(writingThread);
 		}
 
 		/**
@@ -603,9 +609,9 @@ public final class TinylogLoggingProviderTest {
 		public void logging() {
 			provider.log(1, null, Level.INFO, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput())
-				.containsOnlyOnce("ERROR")
-				.containsOnlyOnce(IOException.class.getName())
-				.containsOnlyOnce("Hello World!");
+					.containsOnlyOnce("ERROR")
+					.containsOnlyOnce(IOException.class.getName())
+					.containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -716,8 +722,8 @@ public final class TinylogLoggingProviderTest {
 			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
 
 			assertThat(StorageWriter.consumeEntries())
-				.extracting(LogEntry::getFileName)
-				.containsOnly(TinylogLoggingProviderTest.class.getSimpleName() + ".java");
+					.extracting(LogEntry::getFileName)
+					.containsOnly(TinylogLoggingProviderTest.class.getSimpleName() + ".java");
 		}
 
 		/**
