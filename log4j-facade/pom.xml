@@ -14,6 +14,10 @@
 	<name>Log4j Facade</name>
 	<description>Log4j Facade is a Log4j 1.x compatible logging API for tinylog</description>
 	<url>${website.url}</url>
+	
+	<properties>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>

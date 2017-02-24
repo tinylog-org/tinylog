@@ -15,6 +15,10 @@
 	<description>tinylog API for JBoss Logging based application and web servers</description>
 	<url>${website.url}</url>
 	
+	<properties>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.jboss.logging</groupId>

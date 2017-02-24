@@ -15,6 +15,10 @@
 	<description>Shared basis for tinylog and compatible server replacements</description>
 	<url>${website.url}</url>
 	
+	<properties>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.google.android</groupId>

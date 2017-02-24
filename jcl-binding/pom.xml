@@ -14,6 +14,10 @@
 	<name>Apache Commons Logging Binding</name>
 	<description>Apache Commons Logging (JCL) binding for tinylog</description>
 	<url>${website.url}</url>
+	
+	<properties>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>

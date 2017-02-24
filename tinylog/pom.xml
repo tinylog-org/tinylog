@@ -14,6 +14,10 @@
 	<name>tinylog</name>
 	<description>Lightweight logging framework for Java and Android</description>
 	<url>${website.url}</url>
+	
+	<properties>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>
