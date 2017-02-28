@@ -44,7 +44,6 @@ public final class ConsoleWriterTest {
 	public void requiredLogEntryValues() {
 		ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
 		assertThat(writer.getRequiredLogEntryValues()).containsOnly(LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
-
 	}
 
 	/**
