@@ -22,13 +22,13 @@ import org.tinylog.core.LogEntry;
 import org.tinylog.writers.raw.ByteArrayWriter;
 
 /**
- * Writer to output log entries to a log file. Already existing files can be continued and the output can be buffered
- * for improving performance.
+ * Writer for outputting log entries to a log file. Already existing files can be continued and the output can be
+ * buffered for improving performance.
  */
 public final class FileWriter extends AbstractFormatPatternWriter {
 
 	private final Charset charset;
-	private ByteArrayWriter writer;
+	private final ByteArrayWriter writer;
 
 	/**
 	 * @param properties

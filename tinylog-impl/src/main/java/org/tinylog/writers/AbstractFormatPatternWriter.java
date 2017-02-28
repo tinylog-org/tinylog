@@ -38,8 +38,8 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 public abstract class AbstractFormatPatternWriter implements Writer {
 
 	private static final String DEFAULT_FORMAT_PATTERN = "{date} [{thread}] {class}.{method}()\n{level}: {message}";
-	private static final int BUILDER_CAPACITY = 1024;
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final int BUILDER_CAPACITY = 1024;
 
 	private final StringBuilder builder;
 	private final Token token;
@@ -140,13 +140,13 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 	}
 
 	/**
-	 * Renders a log entry.
+	 * Renders a log entry as string.
 	 *
 	 * @param logEntry
 	 *            Log entry to render
 	 * @return Rendered log entry
 	 */
-	protected String render(final LogEntry logEntry) {
+	protected final String render(final LogEntry logEntry) {
 		if (builder == null) {
 			StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
 			token.render(logEntry, builder);

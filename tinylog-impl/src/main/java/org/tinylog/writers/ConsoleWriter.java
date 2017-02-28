@@ -20,11 +20,11 @@ import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 
 /**
- * Writer to send log entries to console.
+ * Writer for outputting log entries to system output streams.
  *
  * <p>
- * The error output stream will be used for log entries with the severity level warning and error and the standard
- * output stream will used for all other log entries.
+ * The error output stream will be used for log entries with the severity level warning and error. The standard output
+ * stream will used for all other log entries.
  * </p>
  */
 public final class ConsoleWriter extends AbstractFormatPatternWriter {
