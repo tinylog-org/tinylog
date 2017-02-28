@@ -47,7 +47,7 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void defaultWriter() {
-		assertThat(new AndroidRuntime().getDefaultWriter()).isEqualTo("console");
+		assertThat(new JavaRuntime().getDefaultWriter()).isEqualTo("console");
 	}
 
 	/**
