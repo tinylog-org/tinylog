@@ -26,6 +26,7 @@ import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.writers.Writer;
 
 /**
@@ -144,7 +145,7 @@ public final class ConfigurationParser {
 		Map<String, String> writerProperties = Configuration.getSiblings("writer");
 
 		if (writerProperties.isEmpty()) {
-			writerProperties = Collections.singletonMap("writer", "console");
+			writerProperties = Collections.singletonMap("writer", RuntimeProvider.getDefaultWriter());
 		}
 
 		for (Entry<String, String> entry : writerProperties.entrySet()) {

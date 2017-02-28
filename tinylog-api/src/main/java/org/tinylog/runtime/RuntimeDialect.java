@@ -19,6 +19,13 @@ package org.tinylog.runtime;
 interface RuntimeDialect {
 
 	/**
+	 * Gets the name of the default writer.
+	 *
+	 * @return Name of default writer
+	 */
+	String getDefaultWriter();
+
+	/**
 	 * Gets the ID of the current process (pid).
 	 *
 	 * @return ID of the current process

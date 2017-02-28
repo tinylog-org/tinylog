@@ -35,6 +35,11 @@ final class JavaRuntime implements RuntimeDialect {
 	}
 
 	@Override
+	public String getDefaultWriter() {
+		return "console";
+	}
+
+	@Override
 	public int getProcessId() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		try {

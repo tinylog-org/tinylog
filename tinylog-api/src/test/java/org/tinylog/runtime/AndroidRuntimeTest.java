@@ -69,6 +69,14 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
+	 * Verifies that Android's logcat writer will be returned as default writer.
+	 */
+	@Test
+	public void defaultWriter() {
+		assertThat(new AndroidRuntime().getDefaultWriter()).isEqualTo("logcat");
+	}
+
+	/**
 	 * Verifies that the process ID will be returned.
 	 */
 	@Test

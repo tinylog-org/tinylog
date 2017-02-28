@@ -52,6 +52,14 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
+	 * Verifies that the name of a default writer will be returned.
+	 */
+	@Test
+	public void defaultWriter() {
+		assertThat(RuntimeProvider.getDefaultWriter()).isNotEmpty();
+	}
+
+	/**
 	 * Verifies that the process ID will be returned.
 	 */
 	@Test

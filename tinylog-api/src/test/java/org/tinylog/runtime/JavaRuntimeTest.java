@@ -43,6 +43,14 @@ public final class JavaRuntimeTest {
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
+	 * Verifies that the console writer will be returned as default writer.
+	 */
+	@Test
+	public void defaultWriter() {
+		assertThat(new AndroidRuntime().getDefaultWriter()).isEqualTo("console");
+	}
+
+	/**
 	 * Verifies that the process ID will be returned.
 	 */
 	@Test

@@ -314,7 +314,8 @@ public final class ConfigurationParserTest {
 	}
 
 	/**
-	 * Verifies that a {@link ConsoleWriter} will be created, if logging is enabled but no writer explicitly defined.
+	 * Verifies that a default writer will be created for all tags and severity levels, if logging is enabled but no
+	 * writer explicitly defined.
 	 */
 	@Test
 	public void defaultWriter() {
@@ -322,7 +323,7 @@ public final class ConfigurationParserTest {
 
 		assertThat(writers).hasSize(2).allSatisfy(element ->
 			assertThat(element).hasSize(5).allSatisfy(collection -> {
-				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isNotNull());
 			})
 		);
 	}

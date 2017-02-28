@@ -25,6 +25,15 @@ public final class RuntimeProvider {
 	}
 
 	/**
+	 * Gets the name of the default writer.
+	 *
+	 * @return Name of default writer
+	 */
+	public static String getDefaultWriter() {
+		return dialect.getDefaultWriter();
+	}
+
+	/**
 	 * Gets the ID of the current process (pid).
 	 *
 	 * @return ID of the current process

@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import android.os.Process;
+
 import dalvik.system.VMStack;
 
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +38,11 @@ final class AndroidRuntime implements RuntimeDialect {
 		StackTraceElementsFiller filler = getStackTraceElementsFiller();
 		stackTraceElementsFiller = filler.method;
 		stackTraceOffset = filler.index;
+	}
+
+	@Override
+	public String getDefaultWriter() {
+		return "logcat";
 	}
 
 	@Override
