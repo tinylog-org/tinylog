@@ -1,2 +1,3 @@
 org.tinylog.writers.ConsoleWriter
 org.tinylog.writers.FileWriter
+org.tinylog.writers.LogcatWriter
