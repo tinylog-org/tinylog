@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>org.tinylog</groupId>
@@ -13,9 +13,9 @@
 		<version>2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>tinylog-api</artifactId>
-	<name>tinylog API</name>
-	<description>tinylog logging API</description>
+	<artifactId>test-helpers</artifactId>
+	<name>test helpers</name>
+	<description>JUnit rules, AssertJ assertions and other utility classes for testing</description>
 	<url>${website.url}</url>
 
 	<scm>
@@ -26,41 +26,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jacoco</groupId>
-			<artifactId>org.jacoco.agent</artifactId>
-			<classifier>runtime</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4-rule</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-classloading-xstream</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>test-helpers</artifactId>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -77,26 +50,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<Import-Package>!android*,!dalvik*</Import-Package>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
