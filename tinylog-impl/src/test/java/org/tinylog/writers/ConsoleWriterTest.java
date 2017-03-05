@@ -13,9 +13,12 @@
 
 package org.tinylog.writers;
 
+import java.util.Map;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
+import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
@@ -119,6 +122,15 @@ public final class ConsoleWriterTest {
 		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
 
 		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
+	
+	/**
+	 * Verifies that writer is registered as service under the name "console".
+	 */
+	@Test
+	public void isRegistered() {
+		Writer writer = new ServiceLoader<Writer>(Writer.class, Map.class).create("console", emptyMap());
+		assertThat(writer).isInstanceOf(ConsoleWriter.class);
 	}
 
 }

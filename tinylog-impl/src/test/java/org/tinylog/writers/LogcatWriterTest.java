@@ -15,6 +15,8 @@ package org.tinylog.writers;
 
 import android.util.Log;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,6 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.tinylog.Level;
+import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
@@ -210,6 +213,15 @@ public final class LogcatWriterTest {
 		assertThat(messageCaptor.getAllValues()).isEmpty();
 
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("OFF");
+	}
+	
+	/**
+	 * Verifies that writer is registered as service under the name "logcat".
+	 */
+	@Test
+	public void isRegistered() {
+		Writer writer = new ServiceLoader<Writer>(Writer.class, Map.class).create("logcat", emptyMap());
+		assertThat(writer).isInstanceOf(LogcatWriter.class);
 	}
 
 }

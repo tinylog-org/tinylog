@@ -15,10 +15,12 @@ package org.tinylog.writers;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
@@ -217,6 +219,19 @@ public final class FileWriterTest {
 		new FileWriter(doubletonMap("file", file, "charset", "UTF-42")).close();
 
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("charset").containsOnlyOnce("UTF-42");
+	}
+
+	/**
+	 * Verifies that writer is registered as service under the name "file".
+	 * 
+	 * @throws IOException
+	 *             Failed creating temporary file
+	 */
+	@Test
+	public void isRegistered() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Writer writer = new ServiceLoader<Writer>(Writer.class, Map.class).create("file", singletonMap("file", file));
+		assertThat(writer).isInstanceOf(FileWriter.class);
 	}
 
 }
