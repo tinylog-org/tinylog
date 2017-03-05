@@ -392,29 +392,6 @@
 			</plugins>
 		</pluginManagement>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<dependencySourceIncludes>
-						<dependencySourceInclude>${project.groupId}:tinylog-api</dependencySourceInclude>
-						<dependencySourceInclude>${project.groupId}:tinylog-impl</dependencySourceInclude>
-					</dependencySourceIncludes>
-					<inherited>false</inherited>
-				</configuration>
-				<executions>
-					<execution>
-						<id>aggregate</id>
-						<phase>site</phase>
-						<goals>
-							<goal>aggregate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
 	</build>
 
 </project>
