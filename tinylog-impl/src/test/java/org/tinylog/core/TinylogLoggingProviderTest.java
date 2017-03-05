@@ -31,6 +31,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.provider.LoggingProvider;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.EvilWriter;
 import org.tinylog.util.StorageWriter;
@@ -830,6 +832,22 @@ public final class TinylogLoggingProviderTest {
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello 42!" + NEW_LINE);
 		}
 
+	}
+	
+	/**
+	 * Tests for service registration.
+	 */
+	public static final class ServiceRegistration {
+		
+		/**
+		 * Verifies that logging provider is registered under the name "tinylog".
+		 */
+		@Test
+		public void isRegistered() {
+			LoggingProvider provider = new ServiceLoader<LoggingProvider>(LoggingProvider.class).create("tinylog");
+			assertThat(provider).isInstanceOf(TinylogLoggingProvider.class);
+		}
+		
 	}
 
 	/**
