@@ -33,7 +33,6 @@ import org.tinylog.util.LogEntryBuilder;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.Maps.tripletonMap;
@@ -51,6 +50,7 @@ public final class LogcatWriterTest {
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
+	private ArgumentCaptor<Integer> levelCaptor;
 	private ArgumentCaptor<String> tagCaptor;
 	private ArgumentCaptor<String> messageCaptor;
 
@@ -59,16 +59,13 @@ public final class LogcatWriterTest {
 	 */
 	@Before
 	public void mockLog() {
+		levelCaptor = ArgumentCaptor.forClass(Integer.class);
 		tagCaptor = ArgumentCaptor.forClass(String.class);
 		messageCaptor = ArgumentCaptor.forClass(String.class);
 
 		mockStatic(Log.class);
 
-		when(Log.v(tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
-		when(Log.d(tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
-		when(Log.i(tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
-		when(Log.w(tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
-		when(Log.e(tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
+		when(Log.println(levelCaptor.capture(), tagCaptor.capture(), messageCaptor.capture())).thenReturn(0);
 	}
 
 	/**
@@ -94,11 +91,9 @@ public final class LogcatWriterTest {
 		writer.write(LogEntryBuilder.prefilled(LogcatWriterTest.class).create());
 		writer.close();
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.VERBOSE);
 		assertThat(tagCaptor.getAllValues()).containsOnly(LogcatWriterTest.class.getSimpleName());
 		assertThat(messageCaptor.getAllValues()).containsOnly(LogEntryBuilder.DEFAULT_MESSAGE);
-
-		verifyStatic();
-		Log.v(LogcatWriterTest.class.getSimpleName(), LogEntryBuilder.DEFAULT_MESSAGE);
 	}
 
 	/**
@@ -109,11 +104,9 @@ public final class LogcatWriterTest {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{className}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.TRACE).className("MyClass").message("Hello World!").create());
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.VERBOSE);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");
 		assertThat(messageCaptor.getAllValues()).containsOnly("Hello World!");
-
-		verifyStatic();
-		Log.v("MyClass", "Hello World!");
 	}
 
 	/**
@@ -124,11 +117,9 @@ public final class LogcatWriterTest {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{className}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.DEBUG).className("MyClass").message("Hello World!").create());
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.DEBUG);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");
 		assertThat(messageCaptor.getAllValues()).containsOnly("Hello World!");
-
-		verifyStatic();
-		Log.d("MyClass", "Hello World!");
 	}
 
 	/**
@@ -139,11 +130,9 @@ public final class LogcatWriterTest {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{className}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.INFO).className("MyClass").message("Hello World!").create());
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.INFO);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");
 		assertThat(messageCaptor.getAllValues()).containsOnly("Hello World!");
-
-		verifyStatic();
-		Log.i("MyClass", "Hello World!");
 	}
 
 	/**
@@ -154,11 +143,9 @@ public final class LogcatWriterTest {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{className}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.WARNING).className("MyClass").message("Hello World!").create());
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.WARN);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");
 		assertThat(messageCaptor.getAllValues()).containsOnly("Hello World!");
-
-		verifyStatic();
-		Log.w("MyClass", "Hello World!");
 	}
 
 	/**
@@ -169,11 +156,9 @@ public final class LogcatWriterTest {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{className}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.ERROR).className("MyClass").message("Hello World!").create());
 
+		assertThat(levelCaptor.getAllValues()).containsOnly(Log.ERROR);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");
 		assertThat(messageCaptor.getAllValues()).containsOnly("Hello World!");
-
-		verifyStatic();
-		Log.e("MyClass", "Hello World!");
 	}
 
 	/**
@@ -214,7 +199,7 @@ public final class LogcatWriterTest {
 
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("OFF");
 	}
-	
+
 	/**
 	 * Verifies that writer is registered as service under the name "logcat".
 	 */

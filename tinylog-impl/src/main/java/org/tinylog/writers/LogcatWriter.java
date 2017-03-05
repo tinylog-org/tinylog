@@ -83,23 +83,23 @@ public final class LogcatWriter implements Writer {
 
 		switch (logEntry.getLevel()) {
 			case TRACE:
-				Log.v(tag, message);
+				Log.println(Log.VERBOSE, tag, message);
 				break;
 
 			case DEBUG:
-				Log.d(tag, message);
+				Log.println(Log.DEBUG, tag, message);
 				break;
 
 			case INFO:
-				Log.i(tag, message);
+				Log.println(Log.INFO, tag, message);
 				break;
 
 			case WARNING:
-				Log.w(tag, message);
+				Log.println(Log.WARN, tag, message);
 				break;
 
 			case ERROR:
-				Log.e(tag, message);
+				Log.println(Log.ERROR, tag, message);
 				break;
 
 			default:
