@@ -30,7 +30,7 @@ import org.apache.log4j.PatternLayout;
  */
 public final class Log4j implements Framework {
 
-	private static final String NAME = "Log4j";
+	private static final String NAME = "Log4j 1";
 	private static final String NAME_ASYNC = NAME + " with async appender";
 
 	private final boolean location;
