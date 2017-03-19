@@ -31,12 +31,12 @@ Differences to version 1.x
 
 **New features**
 
-* Multiple logging implementations can be combined (log entries can be redirectly to the logging system of the Application server and additionally be written to a seperate log file by tinylog itself)
+* Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
 
 **Dropped features:**
 
-* Fluent-API (The recommended way to configure tinylog are properties file. Nevertheless the configuration can be changed or set programmatically via the [Configuration](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
-* Mutable configurations (for performance reasons, the configuration is becoming immuttable while calling the first logging method)
+* Fluent-API (The recommended way to configure tinylog are properties files. Nevertheless the configuration can be changed or set programmatically via the [Configuration](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
+* Mutable configurations (For performance reasons, the configuration becomes immutable, when the first logging method is called.)
 
 Build tinylog
 -------------
