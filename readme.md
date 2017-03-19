@@ -26,11 +26,15 @@ Differences to version 1.x
 * Separation of API and implementation (tinylog-api.jar and tinylog-impl.jar)
 * Compiled with debug information as it is nowadays common
 * Root package is `org.tinylog` instead of `org.pmw.tinylog`
-* Properties are set without `tinylog.` prefix in tinylog.properties (for example: just `level` instead of `tinylog.level`)
+* Logger class contains only methods relevant to logging
+* Properties are set without `tinylog.` prefix in `tinylog.properties` (for example: just `level` instead of `tinylog.level`)
 * Logcat writer is the default writer on Android
 
 **New features**
 
+* Log entries can be [tagged](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/Logger.java#L53)
+  * Tags can be output via {tag}
+  * A writer cann be bind to a tag via the property `writer.tag`
 * Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
 
 **Dropped features**
