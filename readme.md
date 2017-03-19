@@ -21,7 +21,7 @@ public class Application {
 Differences to version 1.x
 --------------------------
 
-**Changes:**
+**Changes**
 
 * Separation of API and implementation (tinylog-api.jar and tinylog-impl.jar)
 * Compiled with debug information as it is nowadays common
@@ -33,7 +33,7 @@ Differences to version 1.x
 
 * Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
 
-**Dropped features:**
+**Dropped features**
 
 * Fluent-API (The recommended way to configure tinylog are properties files. Nevertheless the configuration can be changed or set programmatically via the [Configuration](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
 * Mutable configurations (For performance reasons, the configuration becomes immutable, when the first logging method is called.)
