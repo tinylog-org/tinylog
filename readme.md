@@ -32,14 +32,14 @@ Differences to version 1.x
 
 **New features**
 
-* Log entries can be optionally [tagged](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/Logger.java#L53)
+* Log entries can be optionally [tagged](tinylog-api/src/main/java/org/tinylog/Logger.java#L53)
   * Tags can be output via {tag}
   * A writer can be bound to a tag via the property `writer.tag`
 * Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
 
 **Dropped features**
 
-* Fluent-API (The recommended way to configure tinylog are properties files. Nevertheless the configuration can be changed or set programmatically via the [Configuration](https://github.com/pmwmedia/tinylog/blob/v2.0/tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
+* Fluent-API (The recommended way to configure tinylog are properties files. Nevertheless the configuration can be changed or set programmatically via the [Configuration](tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
 * Mutable configurations (For performance reasons, the configuration becomes immutable, when the first logging method is called.)
 
 Build tinylog
