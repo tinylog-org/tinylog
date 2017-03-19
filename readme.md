@@ -6,15 +6,17 @@ tinylog 2
 Example
 -------
 
-    import org.tinylog.Logger;
+```java
+import org.tinylog.Logger;
     
-    public class Application {
-    
-        public static void main(String[] args) {
-            Logger.info("Hello World!");
-        }
-    
+public class Application {
+
+    public static void main(String[] args) {
+        Logger.info("Hello World!");
     }
+
+}
+```
 
 Build tinylog
 -------------
