@@ -8,15 +8,17 @@ tinylog
 Example
 -------
 
-    import org.pmw.tinylog.Logger;
-    
-    public class Application {
-    
-        public static void main(String[] args) {
-            Logger.info("Hello World!");
-        }
-    
+```java
+import org.pmw.tinylog.Logger;
+
+public class Application {
+
+    public static void main(String[] args) {
+        Logger.info("Hello World!");
     }
+
+}
+```
 
 Projects
 --------
