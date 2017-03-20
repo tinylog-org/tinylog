@@ -33,7 +33,7 @@ Differences to version 1.x
 **New features**
 
 * Log entries can be optionally [tagged](tinylog-api/src/main/java/org/tinylog/Logger.java#L53)
-  * Tags can be output via {tag}
+  * Tags can be output via `{tag}`
   * A writer can be bound to a tag via the property `writer.tag`
 * Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
 
