@@ -24,6 +24,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.security.Permission;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractCoreTest;
 
@@ -37,6 +38,14 @@ import mockit.MockUp;
  * @see JavaRuntime
  */
 public class JavaRuntimeTest extends AbstractCoreTest {
+
+	/**
+	 * Ensure that {@class JavaRuntime} is initialized properly.
+	 */
+	@BeforeClass
+	public static void init() {
+		new JavaRuntime();
+	}
 
 	/**
 	 * Test getting the current process ID.
