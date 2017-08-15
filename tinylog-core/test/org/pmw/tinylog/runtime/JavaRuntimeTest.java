@@ -57,7 +57,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 		new Expectations(ManagementFactory.getRuntimeMXBean()) {
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
-				returns("1234");
+				result = "1234";
 			}
 		};
 
@@ -72,7 +72,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 		new Expectations(ManagementFactory.getRuntimeMXBean()) {
 			{
 				ManagementFactory.getRuntimeMXBean().getName();
-				returns("5678@localhost");
+				result = "5678@localhost";
 			}
 		};
 

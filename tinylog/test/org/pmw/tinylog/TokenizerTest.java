@@ -126,7 +126,7 @@ public class TokenizerTest extends AbstractCoreTest {
 		assertEquals(expected, render(tokens, logEntryBuilder));
 		assertEquals(expected, render(tokens, logEntryBuilder));
 
-		new Verifications(1) {
+		new Verifications() {
 			{
 				formatter.format((Date) any, (StringBuffer) any, (FieldPosition) any);
 			}
