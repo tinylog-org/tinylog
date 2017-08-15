@@ -36,6 +36,7 @@ Differences to tinylog 1.x
   * Tags can be output via `{tag}` placeholder
   * A writer can be bound to a tag via the property `writer.tag`
 * Multiple logging implementations can be combined (log entries can be redirected to the logging system of the Application server and additionally be written to a separate log file by tinylog itself)
+* Charset can be defined for file based writer (for example: `writer.charset = UTF-8`)
 
 **Dropped features**
 
