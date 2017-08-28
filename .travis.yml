@@ -3,6 +3,7 @@ sudo: required
 dist: trusty
 group: edge
 jdk: oraclejdk9
+install: false
 
 script:
   - set -o pipefail
