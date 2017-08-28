@@ -6,7 +6,7 @@ jdk: oraclejdk9
 
 script:
   - set -o pipefail
-  - "mvn clean checkstyle:checkstyle findbugs:findbugs install -Dmaven.compiler.source=1.6 -Dmaven.compiler.target=1.6 | egrep -v 'Download(ing|ed): '"
+  - "mvn clean checkstyle:checkstyle findbugs:findbugs install -P release | egrep -v 'Download(ing|ed): '"
   - cd benchmark
   - "mvn clean package | egrep -v 'Download(ing|ed): '"
 
