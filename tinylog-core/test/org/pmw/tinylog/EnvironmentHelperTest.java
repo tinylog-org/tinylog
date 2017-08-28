@@ -80,6 +80,46 @@ public class EnvironmentHelperTest extends AbstractCoreTest {
 	}
 
 	/**
+	 * Test if Java versions 9 or higher will be detected correctly.
+	 */
+	@Test
+	public final void testDetectingJava9OrHigher() {
+		String version = System.getProperty("java.version");
+		try {
+			System.setProperty("java.version", "9");
+			assertTrue(EnvironmentHelper.isAtLeastJava9());
+
+			System.setProperty("java.version", "10");
+			assertTrue(EnvironmentHelper.isAtLeastJava9());
+		} finally {
+			System.setProperty("java.version", version);
+		}
+	}
+
+	/**
+	 * Test if Java versions prior 9 will be detected correctly.
+	 */
+	@Test
+	public final void testDetectingJavaBeforeVersion9() {
+		String version = System.getProperty("java.version");
+		try {
+			System.setProperty("java.version", "1");
+			assertFalse(EnvironmentHelper.isAtLeastJava9());
+
+			System.setProperty("java.version", "1.5");
+			assertFalse(EnvironmentHelper.isAtLeastJava9());
+
+			System.setProperty("java.version", "1.8");
+			assertFalse(EnvironmentHelper.isAtLeastJava9());
+
+			System.setProperty("java.version", "8");
+			assertFalse(EnvironmentHelper.isAtLeastJava9());
+		} finally {
+			System.setProperty("java.version", version);
+		}
+	}
+
+	/**
 	 * Test if common Windows versions will be detected.
 	 */
 	@Test

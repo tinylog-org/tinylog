@@ -32,6 +32,16 @@ public final class EnvironmentHelper {
 	}
 
 	/**
+	 * Determine whether running on Java 9 or newer.
+	 *
+	 * @return <code>true</code> if Java version is 9 or higher, <code>false</code> if not
+	 */
+	public static boolean isAtLeastJava9() {
+		String version = System.getProperty("java.version");
+		return version != null && version.matches("[0-9]{1,8}") && Integer.parseInt(version) >= 9;
+	}
+
+	/**
 	 * Determine whether running on Android.
 	 *
 	 * @return <code>true</code> if operating system is Android, <code>false</code> if not
@@ -81,8 +91,7 @@ public final class EnvironmentHelper {
 	}
 
 	private static RuntimeDialect resolveDialect() {
-		String version = System.getProperty("java.version");
-		if (version != null && version.matches("[0-9]{1,8}") && Integer.parseInt(version) >= 9) {
+		if (isAtLeastJava9()) {
 			return new ModernJavaRuntime();
 		} else if (isAndroid()) {
 			return new AndroidRuntime();
