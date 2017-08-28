@@ -36,6 +36,7 @@
 		<h2.version>1.4.192</h2.version>
 		<java16.version>1.1</java16.version>
 
+		<maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.6.2</maven-compiler-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
@@ -99,7 +100,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-
+	
 	<profiles>
 
 		<profile>
@@ -135,6 +136,27 @@
 		<testSourceDirectory>test</testSourceDirectory>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${maven-enforcer-plugin.version}</version>
+				<configuration>
+					<rules>
+						<requireJavaVersion>
+							<version>[9,)</version>
+						</requireJavaVersion>
+					</rules>
+				</configuration>
+				<executions>
+					<execution>
+						<id>enforce-java</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
