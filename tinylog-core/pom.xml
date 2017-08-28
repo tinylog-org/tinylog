@@ -57,6 +57,23 @@
 		<plugins>
 
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<configuration>
+					<ignores>
+						<!-- Ignore classes that are used in org.pmw.tinylog.runtime.ModernJavaRuntime -->
+						<ignore>java.lang.ProcessHandle</ignore>
+						<ignore>java.lang.StackWalker</ignore>
+						<ignore>java.lang.StackWalker$StackFrame</ignore>
+						<ignore>java.util.stream.Stream</ignore>
+						<ignore>java.util.Optional</ignore>
+						<!-- Ignore classes that are used in org.pmw.tinylog.runtime.LegacyJavaRuntime -->
+						<ignore>sun.reflect.Reflection</ignore>
+					</ignores>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
