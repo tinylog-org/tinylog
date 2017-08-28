@@ -12,8 +12,11 @@
  */
 
 package org.pmw.tinylog;
+
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -21,6 +24,11 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.pmw.tinylog.runtime.AndroidRuntime;
+import org.pmw.tinylog.runtime.LegacyJavaRuntime;
+import org.pmw.tinylog.runtime.ModernJavaRuntime;
+
+import mockit.Deencapsulation;
 
 /**
  * Tests the environment helper.
@@ -146,6 +154,64 @@ public class EnvironmentHelperTest extends AbstractCoreTest {
 			assertFalse(testFile.exists());
 		} finally {
 			folder.delete();
+		}
+	}
+
+	/**
+	 * Test receiving {@class LegacyJavaRuntime} as runtime dialect on Java 1.8 and below.
+	 */
+	@Test
+	public final void testReceivingLegacyJavaDialect() {
+		String version = System.getProperty("java.version");
+		try {
+			System.setProperty("java.version", "1.6");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(LegacyJavaRuntime.class));
+
+			System.setProperty("java.version", "1.7");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(LegacyJavaRuntime.class));
+
+			System.setProperty("java.version", "1.8");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(LegacyJavaRuntime.class));
+		} finally {
+			System.setProperty("java.version", version);
+		}
+	}
+
+
+	/**
+	 * Test receiving {@class ModernJavaRuntime} as runtime dialect on Java 9 or higher.
+	 */
+	@Test
+	public final void testReceivingModernJavaDialect() {
+		String version = System.getProperty("java.version");
+		try {
+			System.setProperty("java.version", "9");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(ModernJavaRuntime.class));
+
+			System.setProperty("java.version", "10");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(ModernJavaRuntime.class));
+		} finally {
+			System.setProperty("java.version", version);
+		}
+	}
+
+	/**
+	 * Test receiving {@class AndroidRuntime} as runtime dialect on Android.
+	 */
+	@Test
+	public final void testReceivingAndroidDialect() {
+		String version = System.getProperty("java.version");
+		String runtime = System.getProperty("java.runtime.name");
+		try {
+			System.setProperty("java.version", "0");
+			System.setProperty("java.runtime.name", "Android Runtime");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(AndroidRuntime.class));
+
+			System.setProperty("java.runtime.name", "android runtime");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(AndroidRuntime.class));
+		} finally {
+			System.setProperty("java.runtime.name", runtime);
+			System.setProperty("java.version", version);
 		}
 	}
 

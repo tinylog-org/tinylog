@@ -19,15 +19,15 @@ import java.lang.reflect.Method;
 import org.pmw.tinylog.InternalLogger;
 
 /**
- * Runtime dialect implementation for Sun's and Oracle's Java Virtual Machines.
+ * Runtime dialect implementation for legacy Sun's and Oracle's Java Virtual Machines prior version 9.
  */
-public final class JavaRuntime implements RuntimeDialect {
+public final class LegacyJavaRuntime implements RuntimeDialect {
 
 	private final boolean hasSunReflection;
 	private final Method stackTraceMethod;
 
 	/** */
-	public JavaRuntime() {
+	public LegacyJavaRuntime() {
 		hasSunReflection = hasSunReflection();
 		stackTraceMethod = getStackTraceMethod();
 	}
@@ -75,7 +75,7 @@ public final class JavaRuntime implements RuntimeDialect {
 		try {
 			@SuppressWarnings("deprecation")
 			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
-			return JavaRuntime.class.equals(caller);
+			return LegacyJavaRuntime.class.equals(caller);
 		} catch (Throwable ex) {
 			return false;
 		}
@@ -86,7 +86,7 @@ public final class JavaRuntime implements RuntimeDialect {
 			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			method.setAccessible(true);
 			StackTraceElement stackTraceElement = (StackTraceElement) method.invoke(new Throwable(), 0);
-			if (JavaRuntime.class.getName().equals(stackTraceElement.getClassName())) {
+			if (LegacyJavaRuntime.class.getName().equals(stackTraceElement.getClassName())) {
 				return method;
 			} else {
 				return null;

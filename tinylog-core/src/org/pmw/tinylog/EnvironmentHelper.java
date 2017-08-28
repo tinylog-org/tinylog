@@ -16,7 +16,8 @@ package org.pmw.tinylog;
 import java.io.File;
 
 import org.pmw.tinylog.runtime.AndroidRuntime;
-import org.pmw.tinylog.runtime.JavaRuntime;
+import org.pmw.tinylog.runtime.LegacyJavaRuntime;
+import org.pmw.tinylog.runtime.ModernJavaRuntime;
 import org.pmw.tinylog.runtime.RuntimeDialect;
 
 /**
@@ -24,7 +25,7 @@ import org.pmw.tinylog.runtime.RuntimeDialect;
  */
 public final class EnvironmentHelper {
 
-	private static final RuntimeDialect DIALECT = isAndroid() ? new AndroidRuntime() : new JavaRuntime();
+	private static final RuntimeDialect DIALECT = resolveDialect();
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private EnvironmentHelper() {
@@ -76,6 +77,17 @@ public final class EnvironmentHelper {
 		File parent = file.getParentFile();
 		if (parent != null) {
 			parent.mkdirs();
+		}
+	}
+
+	private static RuntimeDialect resolveDialect() {
+		String version = System.getProperty("java.version");
+		if (version != null && version.matches("[0-9]{1,8}") && Integer.parseInt(version) >= 9) {
+			return new ModernJavaRuntime();
+		} else if (isAndroid()) {
+			return new AndroidRuntime();
+		} else {
+			return new LegacyJavaRuntime();
 		}
 	}
 

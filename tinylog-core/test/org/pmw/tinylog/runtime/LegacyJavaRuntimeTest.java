@@ -13,8 +13,6 @@
 
 package org.pmw.tinylog.runtime;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -35,18 +33,18 @@ import mockit.Mock;
 import mockit.MockUp;
 
 /**
- * Tests for Sun's and Oracle's Java runtime implementation.
+ * Tests for Sun's and Oracle's legacy Java runtime implementation.
  *
- * @see JavaRuntime
+ * @see LegacyJavaRuntime
  */
-public class JavaRuntimeTest extends AbstractCoreTest {
+public class LegacyJavaRuntimeTest extends AbstractCoreTest {
 
 	/**
-	 * Ensure that {@class JavaRuntime} is initialized properly.
+	 * Ensure that {@class LegacyJavaRuntime} is initialized properly.
 	 */
 	@BeforeClass
 	public static void init() {
-		new JavaRuntime();
+		new LegacyJavaRuntime();
 	}
 
 	/**
@@ -54,10 +52,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testCurrentProcessId() {
-		String pid = new JavaRuntime().getProcessId();
-		assertThat(pid, instanceOf(String.class));
-		assertThat(pid, matchesPattern("\\d+"));
-		assertThat(ManagementFactory.getRuntimeMXBean().getName(), startsWith(pid));
+		assertEquals(Long.toString(ProcessHandle.current().pid()), new LegacyJavaRuntime().getProcessId());
 	}
 
 	/**
@@ -72,7 +67,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 			}
 		};
 
-		assertEquals("1234", new JavaRuntime().getProcessId());
+		assertEquals("1234", new LegacyJavaRuntime().getProcessId());
 	}
 
 	/**
@@ -87,7 +82,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 			}
 		};
 
-		assertEquals("5678", new JavaRuntime().getProcessId());
+		assertEquals("5678", new LegacyJavaRuntime().getProcessId());
 	}
 
 	/**
@@ -95,8 +90,8 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testGettingClassName() {
-		String name = new JavaRuntime().getClassName(1);
-		assertEquals(JavaRuntimeTest.class.getName(), name);
+		String name = new LegacyJavaRuntime().getClassName(1);
+		assertEquals(LegacyJavaRuntimeTest.class.getName(), name);
 	}
 
 	/**
@@ -104,9 +99,9 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testGettingStackTraceElement() {
-		StackTraceElement stackTraceElement = new JavaRuntime().getStackTraceElement(1);
+		StackTraceElement stackTraceElement = new LegacyJavaRuntime().getStackTraceElement(1);
 		assertNotNull(stackTraceElement);
-		assertEquals(JavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
+		assertEquals(LegacyJavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
 		assertEquals("testGettingStackTraceElement", stackTraceElement.getMethodName());
 	}
 
@@ -124,8 +119,8 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 			}
 		};
 
-		String name = new JavaRuntime().getClassName(1);
-		assertEquals(JavaRuntimeTest.class.getName(), name);
+		String name = new LegacyJavaRuntime().getClassName(1);
+		assertEquals(LegacyJavaRuntimeTest.class.getName(), name);
 	}
 
 	/**
@@ -143,9 +138,9 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 		});
 
 		try {
-			StackTraceElement stackTraceElement = new JavaRuntime().getStackTraceElement(1);
+			StackTraceElement stackTraceElement = new LegacyJavaRuntime().getStackTraceElement(1);
 			assertNotNull(stackTraceElement);
-			assertEquals(JavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
+			assertEquals(LegacyJavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
 		} finally {
 			System.setSecurityManager(null);
 		}
@@ -157,7 +152,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public final void testErrorWhileCallingSunReflection() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
 		new Expectations(sun.reflect.Reflection.class) {
 			{
@@ -168,7 +163,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 		};
 
 		String name = runtime.getClassName(1);
-		assertEquals(JavaRuntimeTest.class.getName(), name);
+		assertEquals(LegacyJavaRuntimeTest.class.getName(), name);
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get caller class from sun.reflect.Reflection \\(.+\\)"));
 	}
 
@@ -180,7 +175,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testErrorWhileGettingSingleStackTraceElement() throws NoSuchMethodException, SecurityException {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
 		final StackTraceElement[] stackTrace = new StackTraceElement[] { runtime.getStackTraceElement(0), runtime.getStackTraceElement(1) };
 
@@ -203,7 +198,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 
 		StackTraceElement stackTraceElement = runtime.getStackTraceElement(1);
 		assertNotNull(stackTraceElement);
-		assertEquals(JavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
+		assertEquals(LegacyJavaRuntimeTest.class.getName(), stackTraceElement.getClassName());
 		assertEquals("testErrorWhileGettingSingleStackTraceElement", stackTraceElement.getMethodName());
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER WARNING\\: Failed to get single stack trace element from throwable \\(.+\\)"));
 	}
