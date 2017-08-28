@@ -22,12 +22,14 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
 import java.security.Permission;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pmw.tinylog.AbstractCoreTest;
 
+import mockit.Deencapsulation;
 import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
@@ -111,7 +113,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	/**
 	 * Test getting the right class name of caller even if sun.reflect.Reflection is not supported.
 	 */
-	@SuppressWarnings({ "restriction", "deprecation" })
+	@SuppressWarnings("deprecation")
 	@Test
 	public final void testWithoutSupportingSunReflection() {
 		new Expectations(sun.reflect.Reflection.class) {
@@ -152,7 +154,7 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 	/**
 	 * Test getting the right class name of caller even if calling sun.reflect.Reflection will fail.
 	 */
-	@SuppressWarnings({ "restriction", "deprecation" })
+	@SuppressWarnings("deprecation")
 	@Test
 	public final void testErrorWhileCallingSunReflection() {
 		JavaRuntime runtime = new JavaRuntime();
@@ -172,26 +174,32 @@ public class JavaRuntimeTest extends AbstractCoreTest {
 
 	/**
 	 * Test getting the right stack trace element even if getting single stack trace element will fail.
+	 * 
+	 * @throws NoSuchMethodException
+	 *             Failed getting mock method {@code getStackTraceElement(int)}.
 	 */
 	@Test
-	public final void testErrorWhileGettingSingleStackTraceElement() {
+	public final void testErrorWhileGettingSingleStackTraceElement() throws NoSuchMethodException, SecurityException {
 		JavaRuntime runtime = new JavaRuntime();
-		
+
 		final StackTraceElement[] stackTrace = new StackTraceElement[] { runtime.getStackTraceElement(0), runtime.getStackTraceElement(1) };
 
-		new MockUp<Throwable>() {
-			
+		MockUp<Throwable> mock = new MockUp<Throwable>() {
+
 			@Mock
 			public StackTraceElement getStackTraceElement(final int index) {
 				throw new UnsupportedOperationException();
 			}
-			
+
 			@Mock
 			public StackTraceElement[] getStackTrace() {
 				return stackTrace;
 			}
-			
+
 		};
+
+		Method method = mock.getClass().getDeclaredMethod("getStackTraceElement", int.class);
+		Deencapsulation.setField(runtime, "stackTraceMethod", method);
 
 		StackTraceElement stackTraceElement = runtime.getStackTraceElement(1);
 		assertNotNull(stackTraceElement);

@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.util.Properties;
 
 import org.pmw.tinylog.AbstractTinylogTest;
@@ -70,7 +69,7 @@ public abstract class AbstractLabelerTest extends AbstractTinylogTest {
 	 * @return Created labeler
 	 */
 	protected final Labeler createFromProperties(final String property) {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) Labeler.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(Labeler.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			Configurator configurator = ConfigurationCreator.getDummyConfigurator();
 			PropertiesBuilder properties = new PropertiesBuilder().set("tinylog.writer", "properties").set("tinylog.writer.labeler", property);

@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -142,7 +141,7 @@ public class ConfigurationObserverTest extends AbstractTinylogTest {
 	 */
 	@Before
 	public final void init() throws IOException {
-		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
+		classLoaderMock = new ClassLoaderMock(ConfigurationObserverTest.class.getClassLoader());
 
 		initializer.create(classLoaderMock);
 		observer = initializer.observer;

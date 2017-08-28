@@ -40,7 +40,7 @@ public abstract class AbstractApplication {
 		} else if (count == 1) {
 			return FRAMEWORK_MAPPING.get(name).getConstructor(boolean.class).newInstance(locationInformation);
 		} else {
-			return FRAMEWORK_MAPPING.get(name).newInstance();
+			return FRAMEWORK_MAPPING.get(name).getConstructor().newInstance();
 		}
 	}
 

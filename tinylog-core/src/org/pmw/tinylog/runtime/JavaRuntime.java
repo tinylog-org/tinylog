@@ -47,7 +47,7 @@ public final class JavaRuntime implements RuntimeDialect {
 	public String getClassName(final int depth) {
 		if (hasSunReflection) {
 			try {
-				@SuppressWarnings({ "restriction", "deprecation" })
+				@SuppressWarnings("deprecation")
 				Class<?> caller = sun.reflect.Reflection.getCallerClass(depth + 1);
 				return caller.getName();
 			} catch (Exception ex) {
@@ -73,7 +73,7 @@ public final class JavaRuntime implements RuntimeDialect {
 
 	private static boolean hasSunReflection() {
 		try {
-			@SuppressWarnings({ "restriction", "deprecation" })
+			@SuppressWarnings("deprecation")
 			Class<?> caller = sun.reflect.Reflection.getCallerClass(1);
 			return JavaRuntime.class.equals(caller);
 		} catch (Throwable ex) {

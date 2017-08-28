@@ -27,15 +27,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.deploy.skip>true</maven.deploy.skip>
 
-		<!-- tinylog requires Java 1.5, but Java 1.7 is defined here due to limitations of Eclipse -->
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.9</maven.compiler.source>
+		<maven.compiler.target>1.9</maven.compiler.target>
 
-		<!-- Tests require Java 1.7 -->
-		<maven.compiler.testSource>1.7</maven.compiler.testSource>
-		<maven.compiler.testTarget>1.7</maven.compiler.testTarget>
-
-		<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
+		<maven.compiler.testSource>1.9</maven.compiler.testSource>
+		<maven.compiler.testTarget>1.9</maven.compiler.testTarget>
 
 		<android.version>1.5_r3</android.version>
 		<jcl.version>1.2</jcl.version>
@@ -63,8 +59,8 @@
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
-		<!-- Avoid inlining, because it breaks mocks -->
-		<argLine>-XX:-Inline</argLine>
+		<!-- Avoid inlining (it breaks mocks) allow agents to attach themselves and open required packages for mocking via JMockit -->
+		<argLine>-XX:-Inline -Djdk.attach.allowAttachSelf --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED</argLine>
 
 		<website.url>http://www.tinylog.org/</website.url>
 		<git.url>https://github.com/pmwmedia/tinylog</git.url>
@@ -126,14 +122,6 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<executions>
-					<execution>
-						<id>default-compile</id>
-						<configuration>
-							<compilerArguments>
-								<bootclasspath>${bootclasspath}</bootclasspath>
-							</compilerArguments>
-						</configuration>
-					</execution>
 					<execution>
 						<id>default-testCompile</id>
 						<configuration>

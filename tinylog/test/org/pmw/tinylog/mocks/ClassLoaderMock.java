@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -35,18 +34,19 @@ import org.pmw.tinylog.util.FileHelper;
 /**
  * Mock for class loader that allows to define removable additional resources.
  * 
- * @see URLClassLoader
+ * @see ClassLoader
  */
-public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Closeable {
+public final class ClassLoaderMock extends MockUp<ClassLoader> implements Closeable {
 
-	private final URLClassLoader classLoader;
+	private final ClassLoader classLoader;
 	private final Map<String, File> resources;
 
 	/**
 	 * @param classLoader
 	 *            Class loader instance to mock
 	 */
-	public ClassLoaderMock(final URLClassLoader classLoader) {
+	public ClassLoaderMock(final ClassLoader classLoader) {
+		super(classLoader);
 		this.classLoader = classLoader;
 		this.resources = new HashMap<String, File>();
 	}
@@ -130,7 +130,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	}
 
 	/**
-	 * Mocked method {@link URLClassLoader#findResource(String)}.
+	 * Mocked method {@code findResource(String)} of class loader.
 	 * 
 	 * @param invocation
 	 *            Context of the current invocation
@@ -159,7 +159,7 @@ public final class ClassLoaderMock extends MockUp<URLClassLoader> implements Clo
 	}
 
 	/**
-	 * Mocked method {@link URLClassLoader#findResources(String)}.
+	 * Mocked method {@code findResources(String)} of class loader.
 	 * 
 	 * @param invocation
 	 *            Context of the current invocation

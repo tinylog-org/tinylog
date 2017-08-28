@@ -34,7 +34,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -302,7 +301,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithoutProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -533,7 +532,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithBooleanProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -571,7 +570,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithIntegerProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -601,7 +600,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithStringProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -622,7 +621,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithStringArrayProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -668,7 +667,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithLabelerProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -701,7 +700,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithPolicyProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -731,7 +730,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithPolicyArrayProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			PropertiesBuilder propertiesBuilder = new PropertiesBuilder().set("tinylog.writer", "properties");
 
@@ -775,7 +774,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithUnsupportedProperties() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), ClassPropertyWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -809,7 +808,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadInvalidLabeler() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -828,7 +827,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadInvalidPolicy() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -853,7 +852,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterIfNoRegistered() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), (String) null);
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -872,7 +871,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadLabelerIfNoRegistered() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), (String) null);
 
@@ -892,7 +891,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadPolicyIfNoRegistered() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), (String) null);
 
@@ -942,7 +941,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterWithMissingClass() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), "a.b.c.MyWriter");
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -962,7 +961,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadLabelerWithMissingClass() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), "a.b.c.MyLabeler");
 
@@ -983,7 +982,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadPolicyWithMissingClass() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), "a.b.c.MyPolicy");
 
@@ -1011,7 +1010,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadWriterIfInstantiationFailed() throws IOException {
-		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			String writerClassName = EvilWriter.class.getName();
 			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), writerClassName);
 
@@ -1051,7 +1050,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadLabelerIfInstantiationFailed() throws IOException {
-		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			String labelerClassName = EvilLabeler.class.getName();
 			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			classLoaderMock.set("META-INF/services/" + Labeler.class.getPackage().getName(), labelerClassName);
@@ -1101,7 +1100,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadPolicyIfInstantiationFailed() throws IOException {
-		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock classLoaderMock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			String policyClassName = EvilPolicy.class.getName();
 			classLoaderMock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			classLoaderMock.set("META-INF/services/" + Policy.class.getPackage().getName(), policyClassName);
@@ -1151,7 +1150,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadLabelerWithoutDefaultConstructor() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			String labelerClassName = LabelerWithoutDefaultConstructor.class.getName();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Labeler.class.getPackage().getName(), labelerClassName);
@@ -1173,7 +1172,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadPolicyWithoutDefaultConstructor() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			String policyClassName = PolicyWithoutDefaultConstructor.class.getName();
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 			mock.set("META-INF/services/" + Policy.class.getPackage().getName(), policyClassName);
@@ -1195,7 +1194,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadLabelerWithUnsupportedParameters() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();
@@ -1213,7 +1212,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 	 */
 	@Test
 	public final void testReadPolicyWithUnsupportedParameters() throws IOException {
-		try (ClassLoaderMock mock = new ClassLoaderMock((URLClassLoader) PropertiesLoader.class.getClassLoader())) {
+		try (ClassLoaderMock mock = new ClassLoaderMock(PropertiesLoader.class.getClassLoader())) {
 			mock.set("META-INF/services/" + Writer.class.getPackage().getName(), PropertiesWriter.class.getName());
 
 			Configurator configurator = Configurator.defaultConfig();

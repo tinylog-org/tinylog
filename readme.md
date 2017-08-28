@@ -56,15 +56,11 @@ A detailed user manual and the Javadoc documentation can be found on http://www.
 Build tinylog
 -------------
 
-tinylog can be built with Maven:
+tinylog requires at least Maven 3.5 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
 
-	mvn clean checkstyle:checkstyle findbugs:findbugs install
-	
-tinylog is compatible with Java 5 (and higher). Therefore it is recommend to build tinylog at least once against a Java 5 runtime before commiting something. The path to "rt.jar" as well as the source and target version can be set via properties.
+Build command:
 
-	"-Dbootclasspath=JAVA_5_HOME/lib/rt.jar"
-	-Dmaven.compiler.source=1.5
-	-Dmaven.compiler.target=1.5
+	mvn clean checkstyle:checkstyle findbugs:findbugs install "-Dmaven.compiler.source=1.6" "-Dmaven.compiler.target=1.6"
 
 A new folder "target" with Javadoc documentation and all JARs will be created in the root directory.
 

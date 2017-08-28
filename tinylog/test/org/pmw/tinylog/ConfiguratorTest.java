@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,7 +80,7 @@ public class ConfiguratorTest extends AbstractTinylogTest {
 	 */
 	@Before
 	public final void init() {
-		classLoaderMock = new ClassLoaderMock((URLClassLoader) ConfigurationObserverTest.class.getClassLoader());
+		classLoaderMock = new ClassLoaderMock(ConfigurationObserverTest.class.getClassLoader());
 	}
 
 	/**

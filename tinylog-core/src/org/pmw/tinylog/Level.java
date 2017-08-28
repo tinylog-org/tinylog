@@ -14,7 +14,7 @@
 package org.pmw.tinylog;
 
 /**
- * Severity levels of {@link org.pmw.tinylog.Logger Logger}.
+ * Severity levels of logger.
  */
 public enum Level {
 
