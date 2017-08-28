@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
-			<version>1.5_r3</version>
+			<version>${android.version}</version>
 			<optional>true</optional>
 			<scope>provided</scope>
 		</dependency>
