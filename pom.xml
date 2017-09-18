@@ -263,7 +263,7 @@
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 						<manifestEntries>
-							<Built-By>${project.organization.name}</Built-By>
+							<Built-By>tinylog.org</Built-By>
 						</manifestEntries>
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
@@ -317,11 +317,11 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Built-By>${project.organization.name}</Built-By>
+							<Built-By>tinylog.org</Built-By>
 							<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
 							<Bundle-Name>${project.name}</Bundle-Name>
 							<Bundle-SymbolicName>org.pmw.${project.artifactId}.source</Bundle-SymbolicName>
-							<Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+							<Bundle-Vendor>tinylog.org</Bundle-Vendor>
 							<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
 							<Eclipse-SourceBundle>org.pmw.${project.artifactId};version="${parsedVersion.osgiVersion}";roots:="."</Eclipse-SourceBundle>
 						</manifestEntries>
@@ -343,7 +343,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Built-By>${project.organization.name}</Built-By>
+							<Built-By>tinylog.org</Built-By>
 						</manifestEntries>
 					</archive>
 				</configuration>
