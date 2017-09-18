@@ -104,7 +104,7 @@
 	<profiles>
 
 		<profile>
-			<id>IDE</id>
+			<id>dev</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
