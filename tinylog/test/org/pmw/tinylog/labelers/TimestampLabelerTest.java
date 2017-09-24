@@ -24,10 +24,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import mockit.Expectations;
+import mockit.Mock;
+import mockit.MockUp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -227,6 +233,28 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		stream.close();
 		backupFile.delete();
+	}
+
+	@Test
+	public final void testPreciseDate() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile("tmp");
+
+		new MockUp<Instant>() {
+
+			@Mock
+			public Instant now() {
+				return LocalDate.of(1970, 01,01).atTime(01, 02, 03,123456789).toInstant(ZoneOffset.UTC);
+			}
+
+		};
+
+		TimestampLabeler labeler = new TimestampLabeler("HH-mm-ss.SSSSSS");
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+
+		File expectedFile = getBackupFile(baseFile, "tmp", "01-02-03.123456");
+		File currentFile = labeler.getLogFile(baseFile);
+
+		assertEquals(expectedFile, currentFile);
 	}
 
 	/**

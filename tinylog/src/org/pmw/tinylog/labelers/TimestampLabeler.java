@@ -16,10 +16,15 @@ package org.pmw.tinylog.labelers;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.EnvironmentHelper;
 import org.pmw.tinylog.InternalLogger;
 
 /**
@@ -28,10 +33,10 @@ import org.pmw.tinylog.InternalLogger;
 @PropertiesSupport(name = "timestamp")
 public final class TimestampLabeler implements Labeler {
 
-	private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH-mm-ss";
+	private static final String DEFAULT_TIMESTAMP_PATTERN = "yyyy-MM-dd HH-mm-ss";
 
-	private final String timestampFormat;
-	private DateFormat dateFormat;
+	private final String pattern;
+	private TimestampFormatter formatter;
 
 	private LogFileFilter logFileFilter;
 
@@ -43,22 +48,31 @@ public final class TimestampLabeler implements Labeler {
 	 * Use the default timestamp: yyyy-MM-dd HH-mm-ss.
 	 */
 	public TimestampLabeler() {
-		this(DEFAULT_TIMESTAMP_FORMAT);
+		this(DEFAULT_TIMESTAMP_PATTERN);
 	}
 
 	/**
 	 * Timestamp pattern is compatible with {@link SimpleDateFormat#SimpleDateFormat(String)}.
 	 *
-	 * @param timestampFormat
+	 * @param pattern
 	 *            Timestamp pattern for formatting the time-based identify
 	 */
-	public TimestampLabeler(final String timestampFormat) {
-		this.timestampFormat = timestampFormat;
+	public TimestampLabeler(final String pattern) {
+		this.pattern = pattern;
 	}
 
 	@Override
 	public void init(final Configuration configuration) {
-		dateFormat = new SimpleDateFormat(timestampFormat, configuration.getLocale());
+		if (pattern.contains("SSSS") || pattern.contains("n") || pattern.contains("N")) {
+			if (EnvironmentHelper.isAtLeastJava9()) {
+				formatter = new PreciseTimestampFormatter(pattern, configuration.getLocale());
+			} else {
+				InternalLogger.warn("Java supports microseconds and nanoseconds only from version 9 onwards");
+				formatter = new LegacyTimestampFormatter(pattern, configuration.getLocale());
+			}
+		} else {
+			formatter = new LegacyTimestampFormatter(pattern, configuration.getLocale());
+		}
 	}
 
 	@Override
@@ -96,7 +110,41 @@ public final class TimestampLabeler implements Labeler {
 	}
 
 	private File createFile() {
-		return new File(directory, filenameWithoutExtension + "." + dateFormat.format(new Date()) + filenameExtension);
+		return new File(directory, filenameWithoutExtension + "." + formatter.getCurrentTimestamp() + filenameExtension);
+	}
+
+	private interface TimestampFormatter {
+
+		String getCurrentTimestamp();
+
+	}
+
+	private static final class LegacyTimestampFormatter implements TimestampFormatter {
+
+		private final DateFormat format;
+
+		private LegacyTimestampFormatter(final String pattern, final Locale locale) {
+			format = new SimpleDateFormat(pattern, locale);
+		}
+
+		public String getCurrentTimestamp() {
+			return format.format(new Date());
+		}
+
+	}
+
+	private static final class PreciseTimestampFormatter implements TimestampFormatter {
+
+		private final DateTimeFormatter formatter;
+
+		private PreciseTimestampFormatter(final String pattern, final Locale locale) {
+			formatter = DateTimeFormatter.ofPattern(pattern, locale).withZone(ZoneId.systemDefault());
+		}
+
+		public String getCurrentTimestamp() {
+			return formatter.format(Instant.now());
+		}
+
 	}
 
 }
