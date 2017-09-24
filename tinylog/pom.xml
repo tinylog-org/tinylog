@@ -81,6 +81,21 @@
 		<plugins>
 
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<configuration>
+					<ignores>
+						<!-- Ignore modern date time API as there is a fall-back -->
+						<ignore>java.time.Instant</ignore>
+						<ignore>java.time.format.DateTimeFormatter</ignore>
+						<ignore>java.time.ZoneId</ignore>
+						<ignore>java.util.Date</ignore>
+						<ignore>java.sql.Timestamp</ignore>
+					</ignores>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>

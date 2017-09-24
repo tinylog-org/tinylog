@@ -410,7 +410,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE));
 
 		writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList(Value.values()));
-		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(LogEntryValue.values()));
+		assertThat(writer.getRequiredLogEntryValues(), containsInAnyOrder(filter(LogEntryValue.values(), LogEntryValue.DATE)));
 	}
 
 	/**
@@ -1552,6 +1552,13 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		assertEquals("admin", jdbcWriter.getUsername());
 		assertEquals("123", jdbcWriter.getPassword());
 		assertTrue(jdbcWriter.getReconnetInterval() < 0);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T[] filter(T[] values, T... excludes) {
+		List<T> list = new ArrayList<T>(Arrays.asList(values));
+		list.removeAll(Arrays.asList(excludes));
+		return (T[]) list.toArray(Arrays.copyOf(values, 0, values.getClass()));
 	}
 
 	private void shutdown() throws SQLException {

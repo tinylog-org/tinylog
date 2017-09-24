@@ -13,6 +13,7 @@
 
 package org.pmw.tinylog;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public final class Logger {
 	 */
 	static final int DEPTH_OF_STACK_TRACE = 3;
 
+	private static final boolean JAVA_OR_NEWER = EnvironmentHelper.isAtLeastJava9();
 	private static final String NEW_LINE = EnvironmentHelper.getNewLine();
 
 	private static final RuntimeDialect dialect = EnvironmentHelper.getRuntimeDialect();
@@ -603,7 +605,8 @@ public final class Logger {
 		List<Token>[] formatTokens = currentConfiguration.getEffectiveFormatTokens(level);
 		LogEntry[] entries = new LogEntry[formatTokens.length];
 
-		Date now = null;
+		boolean preciseDate = false;
+		Object timestamp = null;
 		String processId = null;
 		Thread thread = null;
 		Map<String, String> context = null;
@@ -617,7 +620,18 @@ public final class Logger {
 		for (LogEntryValue logEntryValue : requiredLogEntryValues) {
 			switch (logEntryValue) {
 				case DATE:
-					now = new Date();
+					if (!requiredLogEntryValues.contains(LogEntryValue.PRECISE_DATE)) {
+						timestamp = new Date();
+					}
+					break;
+
+				case PRECISE_DATE:
+					if (JAVA_OR_NEWER) {
+						preciseDate = true;
+						timestamp = Instant.now();
+					} else {
+						timestamp = new Date();
+					}
 					break;
 
 				case PROCESS_ID:
@@ -692,7 +706,15 @@ public final class Logger {
 		}
 
 		for (int i = 0; i < entries.length; ++i) {
-			LogEntry logEntry = new LogEntry(now, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+			LogEntry logEntry;
+			if (timestamp == null) {
+				logEntry = new UndatedLogEntry(processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+			} else if (preciseDate) {
+				logEntry = new PreciseLogEntry((Instant) timestamp, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+			} else {
+				logEntry = new LegacyLogEntry((Date) timestamp, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+			}
+
 			List<Token> formatTokensOfWriter = formatTokens[i];
 			if (formatTokensOfWriter != null) {
 				StringBuilder builder = new StringBuilder(exception == null ? 256 : 1024);
@@ -702,6 +724,7 @@ public final class Logger {
 				builder.append(NEW_LINE);
 				logEntry.setRenderedLogEntry(builder.toString());
 			}
+
 			entries[i] = logEntry;
 		}
 

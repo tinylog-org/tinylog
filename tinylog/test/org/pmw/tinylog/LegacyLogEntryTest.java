@@ -24,11 +24,11 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * Tests the log entry data class.
+ * Tests the legacy log entry data class.
  *
- * @see LogEntry
+ * @see LegacyLogEntry
  */
-public class LogEntryTest extends AbstractCoreTest {
+public class LegacyLogEntryTest extends AbstractCoreTest {
 
 	/**
 	 * Test all getters.
@@ -48,9 +48,10 @@ public class LogEntryTest extends AbstractCoreTest {
 		RuntimeException exception = new RuntimeException("Hello from Exception!");
 		String renderedLogEntry = "My log entry";
 
-		LogEntry logEntry = new LogEntry(date, processId, thread, context, className, method, file, lineNumber, level, message, exception);
+		LegacyLogEntry logEntry = new LegacyLogEntry(date, processId, thread, context, className, method, file, lineNumber, level, message, exception);
 
 		assertSame(date, logEntry.getDate());
+		assertEquals(date, logEntry.getTimestamp());
 		assertSame(processId, logEntry.getProcessId());
 		assertSame(thread, logEntry.getThread());
 		assertSame(context, logEntry.getContext());

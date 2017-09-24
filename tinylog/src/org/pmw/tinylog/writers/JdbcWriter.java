@@ -17,7 +17,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -725,7 +724,7 @@ public final class JdbcWriter implements Writer {
 		for (int i = 0; i < values.size(); ++i) {
 			switch (values.get(i)) {
 				case DATE:
-					statement.setTimestamp(i + 1, new Timestamp(logEntry.getDate().getTime()));
+					statement.setTimestamp(i + 1, logEntry.getTimestamp());
 					break;
 				case PROCESS_ID:
 					statement.setString(i + 1, logEntry.getProcessId());
@@ -886,7 +885,7 @@ public final class JdbcWriter implements Writer {
 		 *
 		 * @see Date
 		 */
-		DATE(LogEntryValue.DATE),
+		DATE(LogEntryValue.PRECISE_DATE),
 
 		/**
 		 * The ID of the process (pid).

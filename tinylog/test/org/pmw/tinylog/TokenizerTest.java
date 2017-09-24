@@ -26,6 +26,9 @@ import static org.pmw.tinylog.hamcrest.StringMatchers.matchesPattern;
 
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -85,24 +88,29 @@ public class TokenizerTest extends AbstractCoreTest {
 	 */
 	@Test
 	public final void testDateToken() {
-		Date date = new Date();
+		Instant instant = Instant.now();
 		Tokenizer tokenizer = new Tokenizer(locale, 0);
 
 		List<Token> tokens = tokenizer.parse("{date}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(format("yyyy-MM-dd HH:mm:ss", instant), render(tokens, new LogEntryBuilder().date(instant)));
 
 		tokens = tokenizer.parse("{date:yyyy}");
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(format("yyyy", instant), render(tokens, new LogEntryBuilder().date(instant)));
+
+		tokens = tokenizer.parse("{date:HH:mm:ss,SSSSSS}");
+		assertEquals(1, tokens.size());
+		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.PRECISE_DATE));
+		assertEquals(format("HH:mm:ss,SSSSSS", instant), render(tokens, new LogEntryBuilder().date(instant)));
 
 		tokens = tokenizer.parse("{date:'}");
 		assertThat(getErrorStream().nextLine(), matchesPattern("LOGGER ERROR\\: \"\\'\" is an invalid date format pattern \\(.+\\)"));
 		assertEquals(1, tokens.size());
 		assertThat(tokens.get(0).getRequiredLogEntryValues(), sameContent(LogEntryValue.DATE));
-		assertEquals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date), render(tokens, new LogEntryBuilder().date(date)));
+		assertEquals(format("yyyy-MM-dd HH:mm:ss", instant), render(tokens, new LogEntryBuilder().date(instant)));
 	}
 
 	/**
@@ -772,6 +780,10 @@ public class TokenizerTest extends AbstractCoreTest {
 			token.render(logEntry, stringBuilder);
 		}
 		return stringBuilder.toString();
+	}
+
+	private String format(String pattern, Instant instant) {
+		return DateTimeFormatter.ofPattern(pattern, locale).withZone(ZoneId.systemDefault()).format(instant);
 	}
 
 }

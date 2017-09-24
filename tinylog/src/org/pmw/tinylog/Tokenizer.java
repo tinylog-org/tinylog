@@ -15,6 +15,9 @@ package org.pmw.tinylog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -155,14 +158,14 @@ final class Tokenizer {
 
 	private Token getToken(final String text) {
 		if (text.equals("date")) {
-			return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
+			return getDateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 		} else if (text.startsWith("date:")) {
 			String dateFormatPattern = text.substring(5, text.length()).trim();
 			try {
-				return new DateToken(dateFormatPattern, locale);
+				return getDateToken(dateFormatPattern, locale);
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(ex, "\"{}\" is an invalid date format pattern", dateFormatPattern);
-				return new DateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
+				return getDateToken(DEFAULT_DATE_FORMAT_PATTERN, locale);
 			}
 		} else if ("pid".equals(text)) {
 			return new PlainTextToken(EnvironmentHelper.getRuntimeDialect().getProcessId());
@@ -235,7 +238,20 @@ final class Tokenizer {
 		}
 	}
 
-	private Token getPlainTextToken(final String text) {
+	private static Token getDateToken(String pattern, Locale locale) {
+		if (pattern.contains("SSSS") || pattern.contains("n") || pattern.contains("N")) {
+			if (EnvironmentHelper.isAtLeastJava9()) {
+				return new PreciseDateToken(pattern, locale);
+			} else {
+				InternalLogger.warn("Java prior version 9 does not support microseconds or nanoseconds");
+				return new LegacyDateToken(pattern, locale);
+			}
+		} else {
+			return new LegacyDateToken(pattern, locale);
+		}
+	}
+
+	private static Token getPlainTextToken(final String text) {
 		String plainText = NEW_LINE_REPLACER.matcher(text).replaceAll(NEW_LINE);
 		plainText = TAB_REPLACER.matcher(plainText).replaceAll(TAB);
 		return new PlainTextToken(plainText);
@@ -473,7 +489,7 @@ final class Tokenizer {
 
 	}
 
-	private static final class DateToken implements Token {
+	private static final class LegacyDateToken implements Token {
 
 		private final DateFormat formatter;
 		private final long divisor;
@@ -481,9 +497,9 @@ final class Tokenizer {
 		private Date lastDate;
 		private String lastFormat;
 
-		private DateToken(final String pattern, final Locale locale) {
+		private LegacyDateToken(final String pattern, final Locale locale) {
 			this.formatter = new SimpleDateFormat(pattern, locale);
-			this.divisor = pattern.contains("SSS") ? 1 : pattern.contains("ss") ? 1000 : 60000;
+			this.divisor = pattern.contains("S") ? 1 : pattern.contains("s") ? 1000 : 60000;
 		}
 
 		@Override
@@ -506,6 +522,26 @@ final class Tokenizer {
 					return lastFormat;
 				}
 			}
+		}
+
+	}
+
+	private static final class PreciseDateToken implements Token {
+		
+		private final DateTimeFormatter formatter;
+
+		private PreciseDateToken(final String pattern, final Locale locale) {
+			formatter = DateTimeFormatter.ofPattern(pattern, locale).withZone(ZoneId.systemDefault());
+		}
+
+		@Override
+		public Collection<LogEntryValue> getRequiredLogEntryValues() {
+			return Collections.singletonList(LogEntryValue.PRECISE_DATE);
+		}
+
+		@Override
+		public void render(final LogEntry logEntry, final StringBuilder builder) {
+			builder.append(formatter.format(((PreciseLogEntry) logEntry).getInstant()));
 		}
 
 	}

@@ -14,19 +14,21 @@
 package org.pmw.tinylog.util;
 
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.LogEntry;
+import org.pmw.tinylog.PreciseLogEntry;
 
 /**
  * Fluent API to create and fill {@link LogEntry}.
  */
 public final class LogEntryBuilder {
 
-	private Date date = null;
+	private Instant instant = null;
 	private String processId = null;
 	private Thread thread = null;
 	private Map<String, String> context = new HashMap<String, String>();
@@ -47,7 +49,18 @@ public final class LogEntryBuilder {
 	 * @return The current log entry builder
 	 */
 	public LogEntryBuilder date(final Date date) {
-		this.date = date;
+		return date(date == null ? null : date.toInstant());
+	}
+
+	/**
+	 * Set the current date as instant.
+	 *
+	 * @param date
+	 *            Current date
+	 * @return The current log entry builder
+	 */
+	public LogEntryBuilder date(final Instant instant) {
+		this.instant = instant;
 		return this;
 	}
 
@@ -192,7 +205,7 @@ public final class LogEntryBuilder {
 	 * @return Created log entry
 	 */
 	public LogEntry create() {
-		LogEntry logEntry = new LogEntry(date, processId, thread, context, className, method, file, lineNumber, level, message, exception);
+		LogEntry logEntry = new PreciseLogEntry(instant, processId, thread, context, className, method, file, lineNumber, level, message, exception);
 		try {
 			Method setter = LogEntry.class.getDeclaredMethod("setRenderedLogEntry", String.class);
 			setter.setAccessible(true);

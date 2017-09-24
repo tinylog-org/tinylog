@@ -13,15 +13,15 @@
 
 package org.pmw.tinylog;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
 /**
  * Log entry object for {@link org.pmw.tinylog.writers.Writer#write(LogEntry) Writer.write(LogEntry)}.
  */
-public final class LogEntry {
+public abstract class LogEntry {
 
-	private final Date date;
 	private final String processId;
 	private final Thread thread;
 	private final Map<String, String> context;
@@ -35,8 +35,6 @@ public final class LogEntry {
 	private String renderedLogEntry;
 
 	/**
-	 * @param date
-	 *            The current date
 	 * @param processId
 	 *            The ID of the process (pid)
 	 * @param thread
@@ -58,9 +56,8 @@ public final class LogEntry {
 	 * @param exception
 	 *            The exception of the log entry
 	 */
-	public LogEntry(final Date date, final String processId, final Thread thread, final Map<String, String> context, final String className,
-			final String methodName, final String filename, final int lineNumber, final Level level, final String message, final Throwable exception) {
-		this.date = date;
+	public LogEntry(final String processId, final Thread thread, final Map<String, String> context, final String className, final String methodName,
+			final String filename, final int lineNumber, final Level level, final String message, final Throwable exception) {
 		this.processId = processId;
 		this.thread = thread;
 		this.context = context;
@@ -78,16 +75,21 @@ public final class LogEntry {
 	 *
 	 * @return Current date
 	 */
-	public Date getDate() {
-		return date;
-	}
+	public abstract Date getDate(); 
+	
+	/**
+	 * Get the current date as SQL timestamp.
+	 *
+	 * @return Current date
+	 */
+	public abstract Timestamp getTimestamp();
 
 	/**
 	 * Get the ID of the process (pid).
 	 *
 	 * @return ID of the process
 	 */
-	public String getProcessId() {
+	public final String getProcessId() {
 		return processId;
 	}
 
@@ -96,7 +98,7 @@ public final class LogEntry {
 	 *
 	 * @return Current thread
 	 */
-	public Thread getThread() {
+	public final Thread getThread() {
 		return thread;
 	}
 
@@ -105,7 +107,7 @@ public final class LogEntry {
 	 *
 	 * @return Mapped diagnostic context
 	 */
-	public Map<String, String> getContext() {
+	public final Map<String, String> getContext() {
 		return context;
 	}
 
@@ -114,7 +116,7 @@ public final class LogEntry {
 	 *
 	 * @return Fully qualified class name of the caller
 	 */
-	public String getClassName() {
+	public final String getClassName() {
 		return className;
 	}
 
@@ -123,7 +125,7 @@ public final class LogEntry {
 	 *
 	 * @return Method name of the caller
 	 */
-	public String getMethodName() {
+	public final String getMethodName() {
 		return methodName;
 	}
 
@@ -132,7 +134,7 @@ public final class LogEntry {
 	 *
 	 * @return Source filename of the caller
 	 */
-	public String getFilename() {
+	public final String getFilename() {
 		return filename;
 	}
 
@@ -141,7 +143,7 @@ public final class LogEntry {
 	 *
 	 * @return Line number of calling
 	 */
-	public int getLineNumber() {
+	public final int getLineNumber() {
 		return lineNumber;
 	}
 
@@ -150,7 +152,7 @@ public final class LogEntry {
 	 *
 	 * @return Severity level
 	 */
-	public Level getLevel() {
+	public final Level getLevel() {
 		return level;
 	}
 
@@ -159,7 +161,7 @@ public final class LogEntry {
 	 *
 	 * @return Message of the logging event
 	 */
-	public String getMessage() {
+	public final String getMessage() {
 		return message;
 	}
 
@@ -168,7 +170,7 @@ public final class LogEntry {
 	 *
 	 * @return Exception of the log entry
 	 */
-	public Throwable getException() {
+	public final Throwable getException() {
 		return exception;
 	}
 
@@ -177,7 +179,7 @@ public final class LogEntry {
 	 *
 	 * @return Rendered log entry
 	 */
-	public String getRenderedLogEntry() {
+	public final String getRenderedLogEntry() {
 		return renderedLogEntry;
 	}
 
@@ -187,7 +189,7 @@ public final class LogEntry {
 	 * @param renderedLogEntry
 	 *            Rendered log entry
 	 */
-	void setRenderedLogEntry(final String renderedLogEntry) {
+	final void setRenderedLogEntry(final String renderedLogEntry) {
 		this.renderedLogEntry = renderedLogEntry;
 	}
 

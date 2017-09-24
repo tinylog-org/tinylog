@@ -25,7 +25,7 @@ import org.pmw.tinylog.InternalLogger;
 public final class ModernJavaRuntime implements RuntimeDialect {
 	
 	private static final ProcessHandle currentProcess = getCurrentProcess();
-	
+
 	/** */
 	public ModernJavaRuntime() {
 	}
@@ -54,8 +54,8 @@ public final class ModernJavaRuntime implements RuntimeDialect {
 		}
 	}
 
-	private final static class StackTraceElementExtractor implements Function<Stream<StackFrame>, StackFrame> {
-		
+	private static final class StackTraceElementExtractor implements Function<Stream<StackFrame>, StackFrame> {
+
 		private final int depth;
 
 		private StackTraceElementExtractor(int depth) {
@@ -66,7 +66,7 @@ public final class ModernJavaRuntime implements RuntimeDialect {
 		public StackFrame apply(Stream<StackFrame> stream) {
 			return stream.skip(depth).findFirst().get();
 		}
-		
+
 	}
 
 }

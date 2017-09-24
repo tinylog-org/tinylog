@@ -31,6 +31,11 @@ public enum LogEntryValue {
 	DATE,
 
 	/**
+	 * The current date with nanosecond precision if supported.
+	 */
+	PRECISE_DATE,
+
+	/**
 	 * The ID of the process (pid).
 	 */
 	PROCESS_ID,
