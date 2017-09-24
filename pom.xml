@@ -59,7 +59,7 @@
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 
 		<android.version>1.5_r3</android.version>
-		<assertj-core.version>3.6.2</assertj-core.version>
+		<assertj-core.version>3.8.0</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
 		<junit.version>4.12</junit.version>
 		<powermock.version>1.6.6</powermock.version>
