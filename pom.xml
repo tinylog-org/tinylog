@@ -24,6 +24,7 @@
 	<properties>
 
 		<website.url>http://www.tinylog.org/</website.url>
+		<builder.name>tinylog.org</builder.name>
 
 		<git.url>https://github.com/pmwmedia/tinylog</git.url>
 		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
@@ -299,6 +300,9 @@
 					<configuration>
 						<archive>
 							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>
@@ -306,6 +310,14 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
+						</archive>
+					</configuration>
 					<executions>
 						<execution>
 							<goals>
@@ -321,6 +333,9 @@
 					<configuration>
 						<archive>
 							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
 						</archive>
 					</configuration>
 					<executions>
