@@ -18,10 +18,10 @@ import org.tinylog.Level;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -79,17 +79,17 @@ public final class BundleLoggingProviderTest {
 	public void isEnabled() {
 		init(Level.TRACE, Level.TRACE);
 
-		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(false);
-		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(false);
-		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(false);
-		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(true);
-		when(first.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(true);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(false);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.WARNING))).thenReturn(true);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(true);
 
-		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(false);
-		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(true);
-		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(true);
-		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(true);
-		when(second.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(false);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.WARNING))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(true);
 
 		assertThat(bundle.isEnabled(1, null, Level.TRACE)).isEqualTo(false);
 		assertThat(bundle.isEnabled(1, null, Level.DEBUG)).isEqualTo(true);
@@ -97,8 +97,8 @@ public final class BundleLoggingProviderTest {
 		assertThat(bundle.isEnabled(1, null, Level.WARNING)).isEqualTo(true);
 		assertThat(bundle.isEnabled(1, null, Level.ERROR)).isEqualTo(true);
 
-		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
-		verify(second, atLeastOnce()).isEnabled(eq(2), isNull(String.class), any());
+		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(), any());
+		verify(second, atLeastOnce()).isEnabled(eq(2), isNull(), any());
 	}
 
 	/**

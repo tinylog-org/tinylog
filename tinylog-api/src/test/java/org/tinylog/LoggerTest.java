@@ -34,11 +34,11 @@ import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -594,11 +594,11 @@ public final class LoggerTest {
 			LoggingProvider provider = mock(LoggingProvider.class);
 
 			when(provider.getMinimumLevel(null)).thenReturn(level);
-			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.TRACE))).thenReturn(traceEnabled);
-			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.DEBUG))).thenReturn(debugEnabled);
-			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.INFO))).thenReturn(infoEnabled);
-			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.WARNING))).thenReturn(warnEnabled);
-			when(provider.isEnabled(anyInt(), isNull(String.class), eq(Level.ERROR))).thenReturn(errorEnabled);
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(traceEnabled);
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(debugEnabled);
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(infoEnabled);
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.WARNING))).thenReturn(warnEnabled);
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(errorEnabled);
 
 			Whitebox.setInternalState(Logger.class, provider);
 			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
