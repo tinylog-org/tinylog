@@ -371,6 +371,7 @@
 					<descriptors>
 						<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 			</plugin>
 
