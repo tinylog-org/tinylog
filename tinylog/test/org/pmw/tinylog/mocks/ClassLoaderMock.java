@@ -45,6 +45,7 @@ public final class ClassLoaderMock extends MockUp<ClassLoader> implements Closea
 	 * @param classLoader
 	 *            Class loader instance to mock
 	 */
+	@SuppressWarnings("deprecation")
 	public ClassLoaderMock(final ClassLoader classLoader) {
 		super(classLoader);
 		this.classLoader = classLoader;
