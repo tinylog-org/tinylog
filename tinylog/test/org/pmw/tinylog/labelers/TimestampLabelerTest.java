@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
 import org.junit.After;

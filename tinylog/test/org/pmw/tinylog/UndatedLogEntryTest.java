@@ -16,7 +16,6 @@ package org.pmw.tinylog;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 import static org.junit.Assert.*;
