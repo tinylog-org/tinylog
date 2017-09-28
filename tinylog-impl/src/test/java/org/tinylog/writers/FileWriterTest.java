@@ -30,6 +30,7 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.tinylog.util.Maps.doubletonMap;
@@ -223,7 +224,7 @@ public final class FileWriterTest {
 
 	/**
 	 * Verifies that writer is registered as service under the name "file".
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed creating temporary file
 	 */

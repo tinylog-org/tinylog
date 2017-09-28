@@ -25,6 +25,7 @@ import org.tinylog.Level;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static java.util.Arrays.asList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

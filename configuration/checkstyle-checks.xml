@@ -116,8 +116,10 @@
 		<module name="AvoidStarImport" />
 		<module name="AvoidStaticImport" />
 		<module name="ImportOrder">
+			<property name="groups" value="java,javax,javassist,android,dalvik,org,com"/>
 			<property name="ordered" value="true" />
 			<property name="separated" value="true" />
+			<property name="option" value="bottom"/>
 			<property name="sortStaticImportsAlphabetically" value="true" />
 		</module>
 		<module name="RedundantImport" />

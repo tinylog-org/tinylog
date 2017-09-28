@@ -13,15 +13,15 @@
 
 package org.tinylog.runtime;
 
-import android.os.Process;
-
-import dalvik.system.VMStack;
-
 import java.lang.reflect.Method;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtNewMethod;
+
+import android.os.Process;
+
+import dalvik.system.VMStack;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;

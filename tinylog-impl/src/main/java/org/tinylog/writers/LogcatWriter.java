@@ -13,11 +13,11 @@
 
 package org.tinylog.writers;
 
-import android.util.Log;
-
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
+
+import android.util.Log;
 
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;

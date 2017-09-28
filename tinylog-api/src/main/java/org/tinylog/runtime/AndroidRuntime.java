@@ -13,12 +13,12 @@
 
 package org.tinylog.runtime;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import android.os.Process;
 
 import dalvik.system.VMStack;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;

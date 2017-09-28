@@ -25,6 +25,7 @@ import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -123,7 +124,7 @@ public final class ConsoleWriterTest {
 
 		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
 	}
-	
+
 	/**
 	 * Verifies that writer is registered as service under the name "console".
 	 */

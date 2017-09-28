@@ -41,6 +41,7 @@ import org.tinylog.writers.ConsoleWriter;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.ResultObserver.waitFor;
@@ -563,11 +564,11 @@ public final class TinylogLoggingProviderTest {
 		@After
 		public void shutdown() {
 			provider.shutdown();
-			
+
 			waitFor(() -> Thread.getAllStackTraces().keySet(),
 					threads -> threads.stream().filter(WritingThread.class::isInstance).count() == 0,
 					1000);
-			
+
 			assertThat(Thread.getAllStackTraces().keySet()).doNotHave(writingThread);
 		}
 
@@ -833,12 +834,12 @@ public final class TinylogLoggingProviderTest {
 		}
 
 	}
-	
+
 	/**
 	 * Tests for service registration.
 	 */
 	public static final class ServiceRegistration {
-		
+
 		/**
 		 * Verifies that logging provider is registered under the name "tinylog".
 		 */
@@ -847,7 +848,7 @@ public final class TinylogLoggingProviderTest {
 			LoggingProvider provider = new ServiceLoader<LoggingProvider>(LoggingProvider.class).create("tinylog");
 			assertThat(provider).isInstanceOf(TinylogLoggingProvider.class);
 		}
-		
+
 	}
 
 	/**

@@ -13,9 +13,9 @@
 
 package org.tinylog.writers;
 
-import android.util.Log;
-
 import java.util.Map;
+
+import android.util.Log;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +31,7 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
