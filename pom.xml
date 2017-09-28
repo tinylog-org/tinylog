@@ -15,6 +15,7 @@
 		<module>test-helpers</module>
 		<module>tinylog-api</module>
 		<module>tinylog-impl</module>
+		<module>benchmarks</module>
 	</modules>
 
 	<prerequisites>
@@ -49,11 +50,13 @@
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.5.1</maven-site-plugin.version>
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.8.0</assertj-core.version>
 		<checkstyle.version>8.1</checkstyle.version>
 		<java16.version>1.1</java16.version>
+		<jmh.version>1.19</jmh.version>
 		<junit.version>4.12</junit.version>
 		<powermock.version>1.7.3</powermock.version>
 	</properties>
@@ -187,6 +190,16 @@
 				<artifactId>assertj-core</artifactId>
 				<version>${assertj-core.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openjdk.jmh</groupId>
+				<artifactId>jmh-core</artifactId>
+				<version>${jmh.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openjdk.jmh</groupId>
+				<artifactId>jmh-generator-annprocess</artifactId>
+				<version>${jmh.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -428,6 +441,14 @@
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>${exec-maven-plugin.version}</version>
+					<configuration>
+						<executable>${java.home}/bin/java</executable>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

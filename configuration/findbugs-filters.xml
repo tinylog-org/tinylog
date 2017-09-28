@@ -1,5 +1,9 @@
 <FindBugsFilter>
 	<Match>
+		<!-- Generated Sources -->
+		<Package name="~.*\.generated.*" />
+	</Match>
+	<Match>
 		<!-- Loggers and Thread Context -->
 		<Source name="~.*(Logger|ThreadContext)\.java" />
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
@@ -31,5 +35,11 @@
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="DM_USELESS_THREAD, DP_DO_INSIDE_DO_PRIVILEGED, RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, SIC_INNER_SHOULD_BE_STATIC_ANON, UPM_UNCALLED_PRIVATE_METHOD, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+	</Match>
+	<Match>
+		<!-- Benchmarks -->
+		<Class name="org.tinylog.benchmarks.WritingBenchmark$Configuration" />
+		<!-- It doesn't matter for the benchmark if "File.delete()" fails or not -->
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
 </FindBugsFilter>
