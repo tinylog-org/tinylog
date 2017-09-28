@@ -10,11 +10,6 @@
 		<property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
 		<property name="optional" value="false" />
 	</module>
-	<module name="SuppressionCommentFilter">
-		<property name="offCommentFormat" value="@formatter\:off" />
-		<property name="onCommentFormat" value="@formatter\:on" />
-		<property name="checkFormat" value="SingleSpaceSeparator" />
-	</module>
 
 	<!-- Headers -->
 
@@ -184,6 +179,14 @@
 			<property name="max" value="200" />
 		</module>
 		<module name="OuterTypeNumber" />
+
+		<!-- Suppressions -->
+
+		<module name="SuppressionCommentFilter">
+			<property name="offCommentFormat" value="@formatter\:off" />
+			<property name="onCommentFormat" value="@formatter\:on" />
+			<property name="checkFormat" value="SingleSpaceSeparator" />
+		</module>
 
 		<!-- Whitespace -->
 
