@@ -32,19 +32,10 @@
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- tinylog 2 requires only Java 6, but Java 8 is defined here due to limitations of Eclipse and IntelliJ -->
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-
-		<!-- Tests require Java 8 -->
-		<maven.compiler.testSource>1.8</maven.compiler.testSource>
-		<maven.compiler.testTarget>1.8</maven.compiler.testTarget>
-
-		<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
-
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
 		<maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+		<animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
@@ -62,6 +53,7 @@
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.8.0</assertj-core.version>
 		<checkstyle.version>7.1.2</checkstyle.version>
+		<java16.version>1.1</java16.version>
 		<junit.version>4.12</junit.version>
 		<powermock.version>1.7.3</powermock.version>
 	</properties>
@@ -102,6 +94,32 @@
 		</repository>
 	</distributionManagement>
 
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- Ensure that Eclipse and IntelliJ use Java 8 -->
+				<maven.compiler.source>1.8</maven.compiler.source>
+				<maven.compiler.target>1.8</maven.compiler.target>
+				<maven.compiler.testSource>1.8</maven.compiler.testSource>
+				<maven.compiler.testTarget>1.8</maven.compiler.testTarget>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<properties>
+				<!-- Real Java versions for clean release build -->
+				<maven.compiler.source>1.6</maven.compiler.source>
+				<maven.compiler.target>1.6</maven.compiler.target>
+				<maven.compiler.testSource>1.8</maven.compiler.testSource>
+				<maven.compiler.testTarget>1.8</maven.compiler.testTarget>
+			</properties>
+		</profile>
+	</profiles>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -117,10 +135,8 @@
 			</dependency>
 			<dependency>
 				<groupId>org.tinylog</groupId>
-				<artifactId>tinylog-api</artifactId>
+				<artifactId>tinylog-impl</artifactId>
 				<version>${project.version}</version>
-				<type>test-jar</type>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.android</groupId>
@@ -192,14 +208,24 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>animal-sniffer-maven-plugin</artifactId>
+					<version>${animal-sniffer-maven-plugin.version}</version>
+					<configuration>
+						<signature>
+							<groupId>org.codehaus.mojo.signature</groupId>
+							<artifactId>java16</artifactId>
+							<version>${java16.version}</version>
+						</signature>
+					</configuration>
 					<executions>
 						<execution>
-							<id>default-compile</id>
-							<configuration>
-								<compilerArguments>
-									<bootclasspath>${bootclasspath}</bootclasspath>
-								</compilerArguments>
-							</configuration>
+							<phase>compile</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
 						</execution>
 					</executions>
 				</plugin>

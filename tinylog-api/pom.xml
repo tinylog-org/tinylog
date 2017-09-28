@@ -67,6 +67,16 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<configuration>
+					<ignores>
+						<!-- sun.reflect.Reflection is used for performance reasons, but there is a fallback -->
+						<ignore>sun.reflect.Reflection</ignore>
+					</ignores>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
