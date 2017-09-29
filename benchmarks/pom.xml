@@ -14,7 +14,7 @@
 	</parent>
 
 	<artifactId>benchmarks</artifactId>
-	<name>Benchmarks</name>
+	<name>benchmarks</name>
 	<description>Benchmarks for tinylog and other logging frameworks</description>
 	<url>${website.url}</url>
 
