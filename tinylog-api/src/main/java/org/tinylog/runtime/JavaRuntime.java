@@ -83,7 +83,7 @@ final class JavaRuntime implements RuntimeDialect {
 	 *
 	 * @return {@code true} if available, {@code true} if not
 	 */
-	@SuppressWarnings({ "restriction", "deprecation", "javadoc" })
+	@SuppressWarnings({ "restriction", "deprecation" })
 	private static boolean hasSunReflection() {
 		try {
 			return JavaRuntime.class.equals(sun.reflect.Reflection.getCallerClass(1));
