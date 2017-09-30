@@ -201,6 +201,12 @@
 				<artifactId>jmh-generator-annprocess</artifactId>
 				<version>${jmh.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-annotations</artifactId>
+				<version>${animal-sniffer-maven-plugin.version}</version>
+				<optional>true</optional>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

@@ -17,12 +17,14 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 /**
  * Runtime dialect implementation for Sun's and Oracle's Java Virtual Machines.
  */
+@IgnoreJRERequirement
 final class JavaRuntime implements RuntimeDialect {
 
 	private final boolean hasSunReflection;
