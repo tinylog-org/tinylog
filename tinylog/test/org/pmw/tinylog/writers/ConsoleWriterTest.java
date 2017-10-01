@@ -19,6 +19,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.pmw.tinylog.hamcrest.CollectionMatchers.types;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -88,13 +91,108 @@ public class ConsoleWriterTest extends AbstractWriterTest {
 		ConsoleWriter writer = new ConsoleWriter();
 		writer.init(null);
 
-		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello").create());
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello\n").create());
 		writer.flush();
 
 		assertEquals("Hello", getOutputStream().nextLine());
 		assertFalse(getErrorStream().hasLines());
 
 		writer.close();
+	}
+
+	/**
+	 * Test using custom output stream.
+	 *
+	 * @throws UnsupportedEncodingException
+	 *             UTF-8 is not supported
+	 */
+	@Test
+	public void testCustomOutputStream() throws UnsupportedEncodingException {
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		ConsoleWriter writer = new ConsoleWriter(new PrintStream(stream, true, "UTF-8"));
+
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello\n").create());
+		writer.flush();
+
+		assertEquals("Hello\n", new String(stream.toByteArray(), "UTF-8"));
+		assertFalse(getOutputStream().hasLines());
+		assertFalse(getErrorStream().hasLines());
+
+		writer.close();
+	}
+
+	/**
+	 * Test string parameter for {@link System#out}.
+	 */
+	@Test
+	public final void testStringParameterForSystemOut() {
+		ConsoleWriter writer = new ConsoleWriter("out");
+
+		writer.write(new LogEntryBuilder().level(Level.TRACE).renderedLogEntry("Hello\n").create());
+		writer.flush();
+
+		assertEquals("Hello", getOutputStream().nextLine());
+		assertFalse(getErrorStream().hasLines());
+
+		writer.write(new LogEntryBuilder().level(Level.ERROR).renderedLogEntry("Bye\n").create());
+		writer.flush();
+
+		assertEquals("Bye", getOutputStream().nextLine());
+		assertFalse(getErrorStream().hasLines());
+
+		writer.close();
+	}
+
+	/**
+	 * Test string parameter for {@link System#err}.
+	 */
+	@Test
+	public final void testStringParameterForSystemErr() {
+		ConsoleWriter writer = new ConsoleWriter("err");
+
+		writer.write(new LogEntryBuilder().level(Level.TRACE).renderedLogEntry("Hello\n").create());
+		writer.flush();
+
+		assertEquals("Hello", getErrorStream().nextLine());
+		assertFalse(getOutputStream().hasLines());
+
+		writer.write(new LogEntryBuilder().level(Level.ERROR).renderedLogEntry("Bye\n").create());
+		writer.flush();
+
+		assertEquals("Bye", getErrorStream().nextLine());
+		assertFalse(getOutputStream().hasLines());
+
+		writer.close();
+	}
+
+	/**
+	 * Test <code>null</code> as string parameter.
+	 */
+	@Test
+	public final void testNullStringParameter() {
+		ConsoleWriter writer = new ConsoleWriter((String) null);
+
+		writer.write(new LogEntryBuilder().level(Level.INFO).renderedLogEntry("Hello\n").create());
+		writer.flush();
+
+		assertEquals("Hello", getOutputStream().nextLine());
+		assertFalse(getErrorStream().hasLines());
+
+		writer.write(new LogEntryBuilder().level(Level.WARNING).renderedLogEntry("Bye\n").create());
+		writer.flush();
+
+		assertEquals("Bye", getErrorStream().nextLine());
+		assertFalse(getOutputStream().hasLines());
+
+		writer.close();
+	}
+
+	/**
+	 * Test exception for "abc".
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public final void testStringParameterForInvalidString() {
+		new ConsoleWriter("abc");
 	}
 
 	/**

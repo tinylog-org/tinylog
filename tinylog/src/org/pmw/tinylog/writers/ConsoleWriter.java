@@ -24,8 +24,36 @@ import org.pmw.tinylog.LogEntry;
 /**
  * Writes log entries to the console.
  */
-@PropertiesSupport(name = "console", properties = { })
+@PropertiesSupport(name = "console", properties = { @Property(name = "stream", type = String.class, optional = true) })
 public final class ConsoleWriter implements Writer {
+
+	private final PrintStream err;
+	private final PrintStream out;
+
+	public ConsoleWriter() {
+		err = System.err;
+		out = System.out;
+	}
+
+	public ConsoleWriter(final PrintStream stream) {
+		err = stream;
+		out = stream;
+	}
+
+	ConsoleWriter(final String stream) {
+		if (stream == null) {
+			err = System.err;
+			out = System.out;
+		} else if ("err".equalsIgnoreCase(stream)) {
+			err = System.err;
+			out = System.err;
+		} else if ("out".equalsIgnoreCase(stream)) {
+			err = System.out;
+			out = System.out;
+		} else {
+			throw new IllegalArgumentException("Stream must be \"out\" or \"err\", \"" + stream + "\" is not a valid stream name");
+		}
+	}
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
@@ -52,11 +80,11 @@ public final class ConsoleWriter implements Writer {
 		// Do nothing
 	}
 
-	private static PrintStream getPrintStream(final Level level) {
+	private PrintStream getPrintStream(final Level level) {
 		if (level == Level.ERROR || level == Level.WARNING) {
-			return System.err;
+			return err;
 		} else {
-			return System.out;
+			return out;
 		}
 	}
 
