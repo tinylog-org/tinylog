@@ -41,7 +41,6 @@ import org.tinylog.writers.ConsoleWriter;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.ResultObserver.waitFor;
@@ -845,7 +844,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void isRegistered() {
-			LoggingProvider provider = new ServiceLoader<LoggingProvider>(LoggingProvider.class).create("tinylog");
+			LoggingProvider provider = new ServiceLoader<>(LoggingProvider.class).create("tinylog");
 			assertThat(provider).isInstanceOf(TinylogLoggingProvider.class);
 		}
 
@@ -890,12 +889,14 @@ public final class TinylogLoggingProviderTest {
 		@Rule
 		public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
-		protected final TinylogLoggingProvider provider;
+		protected TinylogLoggingProvider provider;
 
-		/** */
-		private AbstractTest() {
+		/**
+		 * Creates logging provider.
+		 */
+		@Before
+		public void init() {
 			this.provider = new TinylogLoggingProvider();
-
 		}
 
 		/**

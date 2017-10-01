@@ -25,8 +25,8 @@ import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.tinylog.util.Maps.doubletonMap;
 
 /**
  * Tests for {@link ConsoleWriter}.
@@ -126,11 +126,55 @@ public final class ConsoleWriterTest {
 	}
 
 	/**
+	 * Verifies that log entries will be written to standard output stream, if property "stream" is set to "out".
+	 */
+	@Test
+	public void standardOutputStream() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "out", "format", "{message}"));
+
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+	}
+
+	/**
+	 * Verifies that log entries will be written to error output stream, if property "stream" is set to "err".
+	 */
+	@Test
+	public void errorOutputStream() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "err", "format", "{message}"));
+
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
+
+	/**
+	 * Verifies that an error message will be output for an invalid stream name. Nevertheless the console writer should
+	 * work normally.
+	 */
+	@Test
+	public void invalidOutputStream() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "test", "format", "{message}"));
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("test");
+
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
+
+	/**
 	 * Verifies that writer is registered as service under the name "console".
 	 */
 	@Test
 	public void isRegistered() {
-		Writer writer = new ServiceLoader<Writer>(Writer.class, Map.class).create("console", emptyMap());
+		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("console", emptyMap());
 		assertThat(writer).isInstanceOf(ConsoleWriter.class);
 	}
 
