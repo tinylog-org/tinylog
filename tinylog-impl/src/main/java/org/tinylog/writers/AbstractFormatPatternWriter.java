@@ -16,7 +16,6 @@ package org.tinylog.writers;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
@@ -29,6 +28,7 @@ import org.tinylog.pattern.Token;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.writers.raw.BufferedWriterDecorator;
 import org.tinylog.writers.raw.ByteArrayWriter;
+import org.tinylog.writers.raw.LockedFileOutputStreamWriter;
 import org.tinylog.writers.raw.OutputStreamWriter;
 import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
@@ -116,17 +116,19 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 	 *            Output should be buffered
 	 * @param threadSafe
 	 *            Created writer must be thread-safe
+	 * @param shared
+	 *            Output file is shared with other processes
 	 * @return Writer for writing to passed file
 	 * @throws FileNotFoundException
 	 *             File does not exist or cannot be opened for any other reason
 	 */
 	protected static ByteArrayWriter createByteArrayWriter(final String fileName, final boolean append, final boolean buffered,
-		final boolean threadSafe) throws FileNotFoundException {
+		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
 		File file = new File(fileName).getAbsoluteFile();
 		file.getParentFile().mkdirs();
 
-		OutputStream stream = new FileOutputStream(file, append);
-		ByteArrayWriter writer = new OutputStreamWriter(stream);
+		FileOutputStream stream = new FileOutputStream(file, append);
+		ByteArrayWriter writer = shared ? new LockedFileOutputStreamWriter(stream) : new OutputStreamWriter(stream);
 
 		if (buffered) {
 			writer = new BufferedWriterDecorator(writer);

@@ -48,7 +48,7 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
 
 		charset = getCharset(properties);
-		writer = createByteArrayWriter(fileName, append, buffered, !writingThread);
+		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false);
 	}
 
 	@Override
