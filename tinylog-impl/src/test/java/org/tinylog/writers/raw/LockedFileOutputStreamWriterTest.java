@@ -17,12 +17,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.tinylog.util.FileSystem;
+import org.tinylog.util.JvmProcessBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,47 +68,38 @@ public final class LockedFileOutputStreamWriterTest {
 	@Test
 	public void multipleProcesses() throws IOException, InterruptedException {
 		File file = new File(FileSystem.createTemporaryFile());
-		
+		String path = file.getAbsolutePath();
+
 		if (!file.delete()) {
-			throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
+			throw new IOException("Failed to delete temporary file: " + path);
 		}
 
-		String separator = System.getProperty("file.separator");
-		String classpath = System.getProperty("java.class.path");
-		String path = System.getProperty("java.home") + separator + "bin" + separator + "java";
-		String className = LockedFileOutputStreamWriterTest.class.getCanonicalName();
-		ProcessBuilder processBuilder = new ProcessBuilder(path, "-cp", classpath, className, file.getAbsolutePath());
-		processBuilder.redirectErrorStream(true);
-
-		List<Process> processes = new ArrayList<>();
-		for (int i = 0; i < NUMBER_OF_PROCESSES; ++i) {
-			processes.add(processBuilder.start());
-		}
+		List<Process> processes = new JvmProcessBuilder(LockedFileOutputStreamWriterTest.class, path).start(NUMBER_OF_PROCESSES);
 
 		if (!file.createNewFile()) {
-			throw new IOException("Failed to recreate temporary file: " + file.getAbsolutePath());
+			throw new IOException("Failed to recreate temporary file: " + path);
 		}
 
 		for (Process process : processes) {
 			process.waitFor();
 		}
 
-		assertThat(FileSystem.readFile(file.getAbsolutePath()))
-				.hasLineCount(NUMBER_OF_PROCESSES * NUMBER_OF_LINES)
-				.matches("(" + Pattern.quote(LINE) + "){" + (NUMBER_OF_PROCESSES * NUMBER_OF_LINES) + "}");
+		assertThat(FileSystem.readFile(path))
+			.hasLineCount(NUMBER_OF_PROCESSES * NUMBER_OF_LINES)
+			.matches("(" + Pattern.quote(LINE) + "){" + (NUMBER_OF_PROCESSES * NUMBER_OF_LINES) + "}");
 	}
 
 	/**
 	 * Writes a defined number of lines to a given target file. This main method is used to test writing simultaneously
 	 * to the same file by multiple processes.
 	 * 
-	 * @param args
+	 * @param arguments
 	 *            First element will be used as file name for target file
 	 * @throws IOException
 	 *             Failed accessing target file
 	 */
-	public static void main(final String[] args) throws IOException {
-		File file = new File(args[0]);
+	public static void main(final String[] arguments) throws IOException {
+		File file = new File(arguments[0]);
 		while (!file.exists()) {
 			Thread.yield();
 		}
