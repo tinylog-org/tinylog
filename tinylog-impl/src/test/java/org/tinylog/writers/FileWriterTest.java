@@ -30,7 +30,6 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.tinylog.util.Maps.doubletonMap;
@@ -41,7 +40,7 @@ import static org.tinylog.util.Maps.tripletonMap;
  */
 public final class FileWriterTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = System.lineSeparator();
 
 	/**
 	 * Redirects and collects system output streams.
@@ -231,7 +230,7 @@ public final class FileWriterTest {
 	@Test
 	public void isRegistered() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		Writer writer = new ServiceLoader<Writer>(Writer.class, Map.class).create("file", singletonMap("file", file));
+		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("file", singletonMap("file", file));
 		assertThat(writer).isInstanceOf(FileWriter.class);
 	}
 

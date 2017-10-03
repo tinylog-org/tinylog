@@ -51,7 +51,7 @@ import static org.tinylog.util.ResultObserver.waitFor;
 @RunWith(Enclosed.class)
 public final class TinylogLoggingProviderTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = System.lineSeparator();
 
 	/**
 	 * Tests for default configuration (trace severity level and console writer).

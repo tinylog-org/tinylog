@@ -33,7 +33,7 @@ import static org.tinylog.util.Maps.doubletonMap;
  */
 public final class ConsoleWriterTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = System.lineSeparator();
 
 	/**
 	 * Redirects and collects system output streams.

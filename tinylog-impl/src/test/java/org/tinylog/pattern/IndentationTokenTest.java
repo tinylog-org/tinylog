@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class IndentationTokenTest {
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final String NEW_LINE = System.lineSeparator();
 
 	/**
 	 * Verifies that required log entry values from child token will be passed-through.
