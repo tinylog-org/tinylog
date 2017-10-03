@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.tinylog.Level;
+import org.tinylog.Supplier;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.provider.LoggingProvider;
@@ -821,6 +822,16 @@ public final class TinylogLoggingProviderTest {
 		public void plainText() {
 			provider.log(1, null, Level.INFO, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello World!" + NEW_LINE);
+		}
+
+		/**
+		 * Verifies that a lazy message supplier can be evaluated.
+		 */
+		@Test
+		public void lazy() {
+			Supplier<String> supplier = () -> "It is " + 42;
+			provider.log(1, null, Level.INFO, null, supplier);
+			assertThat(systemStream.consumeStandardOutput()).isEqualTo("It is 42" + NEW_LINE);
 		}
 
 		/**

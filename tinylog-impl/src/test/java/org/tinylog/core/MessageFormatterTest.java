@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.tinylog.Supplier;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +68,17 @@ public final class MessageFormatterTest {
 	}
 
 	/**
+	 * Verifies that lazy argument suppliers can be evaluated.
+	 * 
+	 * @see Supplier
+	 */
+	@Test
+	public void lazyArgumentSupplier() {
+		Supplier<Integer> supplier = () -> 42;
+		assertThat(format("It is {}", supplier)).isEqualTo("It is 42");
+	}
+
+	/**
 	 * Verifies that {@link ChoiceFormat} compatible patterns are supported.
 	 */
 	@Test
@@ -106,7 +118,7 @@ public final class MessageFormatterTest {
 	 * Verifies that text messages with less arguments than placeholders can be handled.
 	 */
 	@Test
-	public void tooLittleArguments() {
+	public void tooFewArguments() {
 		assertThat(format("Hello {}!")).containsSequence("Hello", "!");
 	}
 

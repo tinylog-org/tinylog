@@ -33,10 +33,10 @@ import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -163,6 +163,22 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceLazyMessage() {
+		Supplier<String> supplier = mockSupplier("Hello World!");
+		logger.trace(supplier);
+		verify(supplier, never()).get();
+
+		if (traceEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.TRACE, null, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that a formatted text message will be logged correctly at {@link Level#TRACE TRACE} level.
 	 */
 	@Test
@@ -171,6 +187,23 @@ public final class TaggedLoggerTest {
 
 		if (traceEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.TRACE, null, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at
+	 * {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceMessageAndLazyArguments() {
+		Supplier<Integer> supplier = mockSupplier(42);
+		logger.trace("The number is {}", supplier);
+		verify(supplier, never()).get();
+
+		if (traceEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.TRACE, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -209,6 +242,26 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#TRACE
+	 * TRACE} level.
+	 */
+	@Test
+	public void traceExceptionWithLazyMessage() {
+		Exception exception = new NullPointerException();
+		Supplier<String> supplier = mockSupplier("Hello World!");
+
+		logger.trace(exception, supplier);
+
+		verify(supplier, never()).get();
+
+		if (traceEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.TRACE, exception, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#TRACE TRACE}
 	 * level.
 	 */
@@ -220,6 +273,26 @@ public final class TaggedLoggerTest {
 
 		if (traceEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.TRACE, exception, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
+	 * at {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceExceptionWithMessageAndLazyArguments() {
+		Exception exception = new NullPointerException();
+		Supplier<Integer> supplier = mockSupplier(42);
+
+		logger.trace(exception, "The number is {}", supplier);
+
+		verify(supplier, never()).get();
+
+		if (traceEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.TRACE, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -248,6 +321,22 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugLazyMessage() {
+		Supplier<String> supplier = mockSupplier("Hello World!");
+		logger.debug(supplier);
+		verify(supplier, never()).get();
+
+		if (debugEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.DEBUG, null, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that a formatted text message will be logged correctly at {@link Level#DEBUG DEBUG} level.
 	 */
 	@Test
@@ -256,6 +345,23 @@ public final class TaggedLoggerTest {
 
 		if (debugEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.DEBUG, null, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at
+	 * {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugMessageAndLazyArguments() {
+		Supplier<Integer> supplier = mockSupplier(42);
+		logger.debug("The number is {}", supplier);
+		verify(supplier, never()).get();
+
+		if (debugEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.DEBUG, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -294,6 +400,26 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#DEBUG
+	 * DEBUG} level.
+	 */
+	@Test
+	public void debugExceptionWithLazyMessage() {
+		Exception exception = new NullPointerException();
+		Supplier<String> supplier = mockSupplier("Hello World!");
+
+		logger.debug(exception, supplier);
+
+		verify(supplier, never()).get();
+
+		if (debugEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.DEBUG, exception, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#DEBUG DEBUG}
 	 * level.
 	 */
@@ -305,6 +431,26 @@ public final class TaggedLoggerTest {
 
 		if (debugEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.DEBUG, exception, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
+	 * at {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugExceptionWithMessageAndLazyArguments() {
+		Exception exception = new NullPointerException();
+		Supplier<Integer> supplier = mockSupplier(42);
+
+		logger.debug(exception, "The number is {}", supplier);
+
+		verify(supplier, never()).get();
+
+		if (debugEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.DEBUG, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -333,6 +479,22 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#INFO INFO} level.
+	 */
+	@Test
+	public void infoLazyMessage() {
+		Supplier<String> supplier = mockSupplier("Hello World!");
+		logger.info(supplier);
+		verify(supplier, never()).get();
+
+		if (infoEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.INFO, null, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that a formatted text message will be logged correctly at {@link Level#INFO INFO} level.
 	 */
 	@Test
@@ -341,6 +503,23 @@ public final class TaggedLoggerTest {
 
 		if (infoEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.INFO, null, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at {@link Level#INFO
+	 * INFO} level.
+	 */
+	@Test
+	public void infoMessageAndLazyArguments() {
+		Supplier<Integer> supplier = mockSupplier(42);
+		logger.info("The number is {}", supplier);
+		verify(supplier, never()).get();
+
+		if (infoEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.INFO, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -379,6 +558,26 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#INFO
+	 * INFO} level.
+	 */
+	@Test
+	public void infoExceptionWithLazyMessage() {
+		Exception exception = new NullPointerException();
+		Supplier<String> supplier = mockSupplier("Hello World!");
+
+		logger.info(exception, supplier);
+
+		verify(supplier, never()).get();
+
+		if (infoEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.INFO, exception, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#INFO INFO}
 	 * level.
 	 */
@@ -390,6 +589,26 @@ public final class TaggedLoggerTest {
 
 		if (infoEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.INFO, exception, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
+	 * at {@link Level#INFO INFO} level.
+	 */
+	@Test
+	public void infoExceptionWithMessageAndLazyArguments() {
+		Exception exception = new NullPointerException();
+		Supplier<Integer> supplier = mockSupplier(42);
+
+		logger.info(exception, "The number is {}", supplier);
+
+		verify(supplier, never()).get();
+
+		if (infoEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.INFO, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -418,6 +637,22 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#WARNING WARNING} level.
+	 */
+	@Test
+	public void warnLazyMessage() {
+		Supplier<String> supplier = mockSupplier("Hello World!");
+		logger.warn(supplier);
+		verify(supplier, never()).get();
+
+		if (warnEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.WARNING, null, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that a formatted text message will be logged correctly at {@link Level#WARNING WARNING} level.
 	 */
 	@Test
@@ -426,6 +661,23 @@ public final class TaggedLoggerTest {
 
 		if (warnEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.WARNING, null, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at
+	 * {@link Level#WARNING WARNING} level.
+	 */
+	@Test
+	public void warnMessageAndLazyArguments() {
+		Supplier<Integer> supplier = mockSupplier(42);
+		logger.warn("The number is {}", supplier);
+		verify(supplier, never()).get();
+
+		if (warnEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.WARNING, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -464,6 +716,26 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#WARNING
+	 * WARNING} level.
+	 */
+	@Test
+	public void warnExceptionWithLazyMessage() {
+		Exception exception = new NullPointerException();
+		Supplier<String> supplier = mockSupplier("Hello World!");
+
+		logger.warn(exception, supplier);
+
+		verify(supplier, never()).get();
+
+		if (warnEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.WARNING, exception, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#WARNING
 	 * WARNING} level.
 	 */
@@ -475,6 +747,26 @@ public final class TaggedLoggerTest {
 
 		if (warnEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.WARNING, exception, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
+	 * at {@link Level#WARNING WARNING} level.
+	 */
+	@Test
+	public void warnExceptionWithMessageAndLazyArguments() {
+		Exception exception = new NullPointerException();
+		Supplier<Integer> supplier = mockSupplier(42);
+
+		logger.warn(exception, "The number is {}", supplier);
+
+		verify(supplier, never()).get();
+
+		if (warnEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.WARNING, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -503,6 +795,22 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorLazyMessage() {
+		Supplier<String> supplier = mockSupplier("Hello World!");
+		logger.error(supplier);
+		verify(supplier, never()).get();
+
+		if (errorEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.ERROR, null, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that a formatted text message will be logged correctly at {@link Level#ERROR ERROR} level.
 	 */
 	@Test
@@ -511,6 +819,23 @@ public final class TaggedLoggerTest {
 
 		if (errorEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.ERROR, null, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at
+	 * {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorMessageAndLazyArguments() {
+		Supplier<Integer> supplier = mockSupplier(42);
+		logger.error("The number is {}", supplier);
+		verify(supplier, never()).get();
+
+		if (errorEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.ERROR, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -549,6 +874,26 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#ERROR
+	 * ERROR} level.
+	 */
+	@Test
+	public void errorExceptionWithLazyMessage() {
+		Exception exception = new NullPointerException();
+		Supplier<String> supplier = mockSupplier("Hello World!");
+
+		logger.error(exception, supplier);
+
+		verify(supplier, never()).get();
+
+		if (errorEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.ERROR, exception, supplier, (Object[]) null);
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
 	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#ERROR ERROR}
 	 * level.
 	 */
@@ -560,6 +905,26 @@ public final class TaggedLoggerTest {
 
 		if (errorEnabled) {
 			verify(loggingProvider).log(1, TAG, Level.ERROR, exception, "Hello {}!", "World");
+		} else {
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+		}
+	}
+
+	/**
+	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
+	 * at {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorExceptionWithMessageAndLazyArguments() {
+		Exception exception = new NullPointerException();
+		Supplier<Integer> supplier = mockSupplier(42);
+
+		logger.error(exception, "The number is {}", supplier);
+
+		verify(supplier, never()).get();
+
+		if (errorEnabled) {
+			verify(loggingProvider).log(1, TAG, Level.ERROR, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -583,6 +948,22 @@ public final class TaggedLoggerTest {
 		Whitebox.setInternalState(TaggedLogger.class, provider);
 
 		return provider;
+	}
+
+	/**
+	 * Creates a mocked supplier that returns the given value.
+	 * 
+	 * @param value
+	 *            Value that should be returned by the created supplier
+	 * @param <T>
+	 *            Type of value
+	 * @return A new supplier
+	 */
+	@SuppressWarnings("unchecked")
+	private <T> Supplier<T> mockSupplier(final T value) {
+		Supplier<T> supplier = mock(Supplier.class);
+		when(supplier.get()).thenReturn(value);
+		return supplier;
 	}
 
 	/**

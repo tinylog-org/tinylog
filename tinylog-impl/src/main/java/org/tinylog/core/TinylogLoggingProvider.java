@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.tinylog.Level;
+import org.tinylog.Supplier;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
@@ -126,7 +127,17 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			String message = arguments == null || arguments.length == 0 ? String.valueOf(obj) : formatter.format((String) obj, arguments);
+			String message;
+			if (arguments == null || arguments.length == 0) {
+				if (obj instanceof Supplier<?>) {
+					message = String.valueOf(((Supplier<?>) obj).get());
+				} else {
+					message = String.valueOf(obj);
+				}
+			} else {
+				message = formatter.format((String) obj, arguments);
+			}
+			
 			LogEntry logEntry = createLogEntry(depth + 1, tag, tagIndex, level, exception, message, stackTraceElement);
 			if (writingThread == null) {
 				for (Writer writer : writers[tagIndex][level.ordinal()]) {

@@ -87,6 +87,19 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs a lazy message at {@link Level#TRACE TRACE} level. The message will be only evaluated if the log entry is
+	 * really output.
+	 *
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void trace(final Supplier<?> message) {
+		if (MINIMUM_LEVEL_COVERS_TRACE) {
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs a formatted message at {@link Level#TRACE TRACE} level. "{}" placeholders will be replaced by given
 	 * arguments.
 	 *
@@ -98,6 +111,21 @@ public final class Logger {
 	public static void trace(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs a formatted message at {@link Level#TRACE TRACE} level. "{}" placeholders will be replaced by given lazy
+	 * arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void trace(final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_TRACE) {
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, (Object[]) arguments);
 		}
 	}
 
@@ -128,6 +156,21 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs an exception with a custom lazy message at {@link Level#TRACE TRACE} level. The message will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void trace(final Throwable exception, final Supplier<String> message) {
+		if (MINIMUM_LEVEL_COVERS_TRACE) {
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs an exception with a formatted custom message at {@link Level#TRACE TRACE} level. "{}" placeholders will be
 	 * replaced by given arguments.
 	 *
@@ -141,6 +184,23 @@ public final class Logger {
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs an exception with a formatted message at {@link Level#TRACE TRACE} level. "{}" placeholders will be replaced
+	 * by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void trace(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_TRACE) {
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, (Object[]) arguments);
 		}
 	}
 
@@ -166,6 +226,19 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs a lazy message at {@link Level#DEBUG DEBUG} level. The message will be only evaluated if the log entry is
+	 * really output.
+	 *
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void debug(final Supplier<?> message) {
+		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs a formatted message at {@link Level#DEBUG DEBUG} level. "{}" placeholders will be replaced by given
 	 * arguments.
 	 *
@@ -177,6 +250,21 @@ public final class Logger {
 	public static void debug(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs a formatted message at {@link Level#DEBUG DEBUG} level. "{}" placeholders will be replaced by given lazy
+	 * arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void debug(final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, (Object[]) arguments);
 		}
 	}
 
@@ -207,6 +295,21 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs an exception with a custom lazy message at {@link Level#DEBUG DEBUG} level. The message will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void debug(final Throwable exception, final Supplier<String> message) {
+		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs an exception with a formatted custom message at {@link Level#DEBUG DEBUG} level. "{}" placeholders will be
 	 * replaced by given arguments.
 	 *
@@ -220,6 +323,23 @@ public final class Logger {
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs an exception with a formatted message at {@link Level#DEBUG DEBUG} level. "{}" placeholders will be replaced
+	 * by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void debug(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, (Object[]) arguments);
 		}
 	}
 
@@ -245,6 +365,19 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs a lazy message at {@link Level#INFO INFO} level. The message will be only evaluated if the log entry is
+	 * really output.
+	 *
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void info(final Supplier<?> message) {
+		if (MINIMUM_LEVEL_COVERS_INFO) {
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs a formatted message at {@link Level#INFO INFO} level. "{}" placeholders will be replaced by given arguments.
 	 *
 	 * @param message
@@ -255,6 +388,21 @@ public final class Logger {
 	public static void info(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs a formatted message at {@link Level#INFO INFO} level. "{}" placeholders will be replaced by given lazy
+	 * arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void info(final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_INFO) {
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, (Object[]) arguments);
 		}
 	}
 
@@ -285,6 +433,21 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs an exception with a custom lazy message at {@link Level#INFO INFO} level. The message will be only evaluated
+	 * if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void info(final Throwable exception, final Supplier<String> message) {
+		if (MINIMUM_LEVEL_COVERS_INFO) {
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs an exception with a formatted custom message at {@link Level#INFO INFO} level. "{}" placeholders will be
 	 * replaced by given arguments.
 	 *
@@ -298,6 +461,23 @@ public final class Logger {
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs an exception with a formatted message at {@link Level#INFO INFO} level. "{}" placeholders will be replaced
+	 * by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void info(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_INFO) {
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, (Object[]) arguments);
 		}
 	}
 
@@ -323,6 +503,19 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs a lazy message at {@link Level#WARNING WARNING} level. The message will be only evaluated if the log entry
+	 * is really output.
+	 *
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void warn(final Supplier<?> message) {
+		if (MINIMUM_LEVEL_COVERS_WARN) {
+			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, null, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be replaced by given
 	 * arguments.
 	 *
@@ -334,6 +527,21 @@ public final class Logger {
 	public static void warn(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be replaced by given lazy
+	 * arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void warn(final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_WARN) {
+			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, null, message, (Object[]) arguments);
 		}
 	}
 
@@ -364,6 +572,21 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs an exception with a custom lazy message at {@link Level#WARNING WARNING} level. The message will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void warn(final Throwable exception, final Supplier<String> message) {
+		if (MINIMUM_LEVEL_COVERS_WARN) {
+			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs an exception with a formatted custom message at {@link Level#WARNING WARNING} level. "{}" placeholders will
 	 * be replaced by given arguments.
 	 *
@@ -377,6 +600,23 @@ public final class Logger {
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs an exception with a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be
+	 * replaced by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void warn(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_WARN) {
+			provider.log(STACKTRACE_DEPTH, null, Level.WARNING, exception, message, (Object[]) arguments);
 		}
 	}
 
@@ -402,6 +642,19 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs a lazy message at {@link Level#ERROR ERROR} level. The message will be only evaluated if the log entry is
+	 * really output.
+	 *
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void error(final Supplier<?> message) {
+		if (MINIMUM_LEVEL_COVERS_ERROR) {
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs a formatted message at {@link Level#ERROR ERROR} level. "{}" placeholders will be replaced by given
 	 * arguments.
 	 *
@@ -413,6 +666,21 @@ public final class Logger {
 	public static void error(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs a formatted message at {@link Level#ERROR ERROR} level. "{}" placeholders will be replaced by given lazy
+	 * arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void error(final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_ERROR) {
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, (Object[]) arguments);
 		}
 	}
 
@@ -443,6 +711,21 @@ public final class Logger {
 	}
 
 	/**
+	 * Logs an exception with a custom lazy message at {@link Level#ERROR ERROR} level. The message will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Function that produce the message
+	 */
+	public static void error(final Throwable exception, final Supplier<String> message) {
+		if (MINIMUM_LEVEL_COVERS_ERROR) {
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, (Object[]) null);
+		}
+	}
+
+	/**
 	 * Logs an exception with a formatted custom message at {@link Level#ERROR ERROR} level. "{}" placeholders will be
 	 * replaced by given arguments.
 	 *
@@ -456,6 +739,23 @@ public final class Logger {
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Logs an exception with a formatted message at {@link Level#ERROR ERROR} level. "{}" placeholders will be replaced
+	 * by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
+	 * 
+	 * @param exception
+	 *            Caught exception or any other throwable to log
+	 * @param message
+	 *            Formatted text message to log
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void error(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		if (MINIMUM_LEVEL_COVERS_ERROR) {
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, (Object[]) arguments);
 		}
 	}
 

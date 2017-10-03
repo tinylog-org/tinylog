@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.tinylog.Level;
+import org.tinylog.Supplier;
 import org.tinylog.provider.InternalLogger;
 
 /**
@@ -75,6 +76,10 @@ final class MessageFormatter {
 				if (--openBraces == 0) {
 					if (argumentIndex < arguments.length) {
 						Object argument = arguments[argumentIndex++];
+						if (argument instanceof Supplier) {
+							argument = ((Supplier<?>) argument).get();
+						}
+
 						if (index == start + 1) {
 							builder.append(argument);
 						} else {
