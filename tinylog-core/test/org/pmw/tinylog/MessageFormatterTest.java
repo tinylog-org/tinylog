@@ -53,6 +53,15 @@ public class MessageFormatterTest extends AbstractCoreTest {
 	}
 
 	/**
+	 * Test format patterns with lazy supplier arguments.
+	 */
+	@Test
+	public final void testWithLazySuppliers() {
+		assertEquals("Hello World!", MessageFormatter.format("Hello {}!", ((Supplier) () -> "World")));
+		assertEquals("Hello World!", MessageFormatter.format("{} {}!", ((Supplier) () -> "Hello"), ((Supplier) () -> "World")));
+		assertEquals("Hello 42!", MessageFormatter.format("Hello {}!", ((Supplier) () -> 42)));
+	}
+	/**
 	 * Test number format patterns with given arguments.
 	 */
 	@Test

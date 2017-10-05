@@ -694,6 +694,11 @@ public final class Logger {
 					if (message != null) {
 						if (message instanceof String) {
 							renderedMessage = MessageFormatter.format((String) message, arguments);
+						} else if (message instanceof Supplier) {
+							Object value = ((Supplier) message).get();
+							if (value != null) {
+								renderedMessage = value.toString();
+							}
 						} else {
 							renderedMessage = message.toString();
 						}

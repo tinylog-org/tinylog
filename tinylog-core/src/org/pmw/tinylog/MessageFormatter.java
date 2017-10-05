@@ -59,6 +59,10 @@ final class MessageFormatter {
 					if (--openBraces == 0) {
 						if (argumentIndex < arguments.length) {
 							Object argument = arguments[argumentIndex++];
+							if (argument instanceof Supplier) {
+								argument = ((Supplier) argument).get();
+							}
+
 							if (index == start + 1) {
 								builder.append(argument);
 							} else {
