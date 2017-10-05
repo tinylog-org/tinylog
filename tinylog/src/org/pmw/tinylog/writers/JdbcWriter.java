@@ -66,7 +66,7 @@ public final class JdbcWriter implements Writer {
 
 	private String sql;
 	private volatile Connection connection;
-	private PreparedStatement batchStatement;
+	private PreparedStatement statement;
 	private int batchCount;
 
 	private long lostTimestamp;
@@ -471,37 +471,25 @@ public final class JdbcWriter implements Writer {
 	public void write(final LogEntry logEntry) throws SQLException {
 		repairConnectionIfBroken();
 
-		if (batchMode) {
-			synchronized (lock) {
-				if (connection != null) {
+		synchronized (lock) {
+			if (connection != null) {
+				if (batchMode) {
 					try {
 						if (batchCount >= MAX_BATCH_SIZE) {
 							executeBatch();
 						}
-						fillStatement(batchStatement, values, logEntry);
-						batchStatement.addBatch();
+						fillStatement(statement, values, logEntry);
+						statement.addBatch();
 						++batchCount;
 					} catch (SQLException ex) {
 						failed(ex);
 					}
-				}
-			}
-		} else {
-			Connection currentConnection = connection;
-			if (currentConnection != null) {
-				try {
-					PreparedStatement statement = currentConnection.prepareStatement(sql);
+				} else{
 					try {
 						fillStatement(statement, values, logEntry);
 						statement.executeUpdate();
-					} finally {
-						statement.close();
-					}
-				} catch (SQLException ex) {
-					synchronized (lock) {
-						if (connection == currentConnection) {
-							failed(ex);
-						}
+					} catch (SQLException ex) {
+						failed(ex);
 					}
 				}
 			}
@@ -824,20 +812,16 @@ public final class JdbcWriter implements Writer {
 			sql = renderSql(connection, table, columns, values);
 		}
 
+		statement = connection.prepareStatement(sql);
+
 		if (batchMode) {
-			batchStatement = connection.prepareStatement(sql);
 			batchCount = 0;
 		}
 	}
 
 	private void executeBatch() throws SQLException {
-		try {
-			batchStatement.executeBatch();
-			batchCount = 0;
-			batchStatement.close();
-		} finally {
-			batchStatement = connection.prepareStatement(sql);
-		}
+		statement.executeBatch();
+		batchCount = 0;
 	}
 
 	private void repairConnectionIfBroken() {

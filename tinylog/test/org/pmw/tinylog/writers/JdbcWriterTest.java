@@ -36,6 +36,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
+import org.h2.jdbc.JdbcConnection;
 import org.h2.jdbc.JdbcDatabaseMetaData;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.After;
@@ -508,6 +510,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testTableNamesWithQuotingSupport() throws SQLException, NamingException {
 		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+		new ConnectionMock();
 
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
 			mock.identifierQuote = identifierQuote;
@@ -549,6 +552,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testTableNamesWithoutQuotingSupport() throws SQLException, NamingException {
 		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+		new ConnectionMock();
 
 		for (String identifierQuote : Arrays.asList(null, " ")) {
 			mock.identifierQuote = identifierQuote;
@@ -602,6 +606,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testColumnNamesWithQuotingSupport() throws SQLException, NamingException {
 		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+		new ConnectionMock();
 
 		for (String identifierQuote : Arrays.asList("\"", "'", "`")) {
 			mock.identifierQuote = identifierQuote;
@@ -643,6 +648,7 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	@Test
 	public final void testColumnNamesWithoutQuotingSupport() throws SQLException, NamingException {
 		DatabaseMetaDataMock mock = new DatabaseMetaDataMock();
+		new ConnectionMock();
 
 		for (String identifierQuote : Arrays.asList(null, " ")) {
 			mock.identifierQuote = identifierQuote;
@@ -695,6 +701,8 @@ public class JdbcWriterTest extends AbstractWriterTest {
 	 */
 	@Test
 	public final void testSizeOfColumnsAndValues() throws SQLException, NamingException {
+		new ConnectionMock();
+
 		JdbcWriter writer = new JdbcWriter(JDBC_URL, "log", Arrays.asList("MESSAGE"), Arrays.asList(Value.MESSAGE));
 		try {
 			writer.init(null);
@@ -1630,6 +1638,16 @@ public class JdbcWriterTest extends AbstractWriterTest {
 		@Mock
 		public String getIdentifierQuoteString() {
 			return identifierQuote;
+		}
+
+	}
+
+	private static final class ConnectionMock extends MockUp<JdbcConnection> {
+
+		@Mock
+		public PreparedStatement prepareStatement(String sql) {
+			return new MockUp<PreparedStatement>() {
+			}.getMockInstance();
 		}
 
 	}
