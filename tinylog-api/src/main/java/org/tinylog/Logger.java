@@ -91,7 +91,7 @@ public final class Logger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void trace(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
@@ -162,7 +162,7 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void trace(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
@@ -230,7 +230,7 @@ public final class Logger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void debug(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
@@ -301,7 +301,7 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void debug(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
@@ -369,7 +369,7 @@ public final class Logger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void info(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
@@ -439,7 +439,7 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void info(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
@@ -507,7 +507,7 @@ public final class Logger {
 	 * is really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void warn(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
@@ -578,7 +578,7 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void warn(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
@@ -646,7 +646,7 @@ public final class Logger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void error(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
@@ -717,7 +717,7 @@ public final class Logger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public static void error(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {

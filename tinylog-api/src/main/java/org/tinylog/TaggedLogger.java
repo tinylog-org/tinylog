@@ -77,7 +77,7 @@ public final class TaggedLogger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void trace(final Supplier<?> message) {
 		if (minimumLevelCoversTrace) {
@@ -148,7 +148,7 @@ public final class TaggedLogger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void trace(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversTrace) {
@@ -216,7 +216,7 @@ public final class TaggedLogger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void debug(final Supplier<?> message) {
 		if (minimumLevelCoversDebug) {
@@ -287,7 +287,7 @@ public final class TaggedLogger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void debug(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversDebug) {
@@ -355,7 +355,7 @@ public final class TaggedLogger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void info(final Supplier<?> message) {
 		if (minimumLevelCoversInfo) {
@@ -425,7 +425,7 @@ public final class TaggedLogger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void info(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversInfo) {
@@ -493,7 +493,7 @@ public final class TaggedLogger {
 	 * is really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void warn(final Supplier<?> message) {
 		if (minimumLevelCoversWarn) {
@@ -564,7 +564,7 @@ public final class TaggedLogger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void warn(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversWarn) {
@@ -632,7 +632,7 @@ public final class TaggedLogger {
 	 * really output.
 	 *
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void error(final Supplier<?> message) {
 		if (minimumLevelCoversError) {
@@ -703,7 +703,7 @@ public final class TaggedLogger {
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 * @param message
-	 *            Function that produce the message
+	 *            Function that produces the message
 	 */
 	public void error(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversError) {
