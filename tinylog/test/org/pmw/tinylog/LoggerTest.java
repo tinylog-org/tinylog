@@ -121,7 +121,17 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
+			Logger.trace(() -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.TRACE, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+
 			Logger.trace("Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.TRACE, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+
+			Logger.trace("Hello {}!", () -> "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -133,10 +143,28 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.TRACE, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
-			Logger.trace(exception, "Test");
+			Logger.trace(exception, "Hello!");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.TRACE, logEntry.getLevel());
-			assertEquals("Test", logEntry.getMessage());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.trace(exception, () -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.TRACE, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.trace(exception, "Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.TRACE, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.trace(exception, "Hello {}!", () -> "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.TRACE, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
 			Configurator.currentConfig().level(Level.DEBUG).activate();
@@ -172,7 +200,17 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
+			Logger.debug(() -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.DEBUG, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+
 			Logger.debug("Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.DEBUG, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+
+			Logger.debug("Hello {}!", () -> "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -184,10 +222,28 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.DEBUG, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
-			Logger.debug(exception, "Test");
+			Logger.debug(exception, "Hello!");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.DEBUG, logEntry.getLevel());
-			assertEquals("Test", logEntry.getMessage());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.debug(exception, () -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.DEBUG, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.debug(exception, "Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.DEBUG, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.debug(exception, "Hello {}!", () -> "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.DEBUG, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
 			Configurator.currentConfig().level(Level.INFO).activate();
@@ -223,7 +279,17 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
+			Logger.info(() -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.INFO, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+
 			Logger.info("Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.INFO, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+
+			Logger.info("Hello {}!", () -> "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -235,10 +301,28 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.INFO, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
-			Logger.info(exception, "Test");
+			Logger.info(exception, "Hello!");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.INFO, logEntry.getLevel());
-			assertEquals("Test", logEntry.getMessage());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.info(exception, () -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.INFO, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.info(exception, "Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.INFO, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.info(exception, "Hello {}!", () -> "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.INFO, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
 			Configurator.currentConfig().level(Level.WARNING).activate();
@@ -274,7 +358,17 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
+			Logger.warn(() -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.WARNING, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+
 			Logger.warn("Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.WARNING, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+
+			Logger.warn("Hello {}!", () -> "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -286,10 +380,28 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.WARNING, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
-			Logger.warn(exception, "Test");
+			Logger.warn(exception, "Hello!");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.WARNING, logEntry.getLevel());
-			assertEquals("Test", logEntry.getMessage());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.warn(exception, () -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.WARNING, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.warn(exception, "Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.WARNING, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.warn(exception, "Hello {}!", () -> "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.WARNING, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
 			Configurator.currentConfig().level(Level.ERROR).activate();
@@ -325,7 +437,17 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello!", logEntry.getMessage());
 
+			Logger.error(() -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.ERROR, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+
 			Logger.error("Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.ERROR, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+
+			Logger.error("Hello {}!", () -> "World");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals("Hello World!", logEntry.getMessage());
@@ -337,10 +459,28 @@ public class LoggerTest extends AbstractTinylogTest {
 			assertEquals(Level.ERROR, logEntry.getLevel());
 			assertEquals(exception, logEntry.getException());
 
-			Logger.error(exception, "Test");
+			Logger.error(exception, "Hello!");
 			logEntry = writer.consumeLogEntry();
 			assertEquals(Level.ERROR, logEntry.getLevel());
-			assertEquals("Test", logEntry.getMessage());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.error(exception, () -> "Hello!");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.ERROR, logEntry.getLevel());
+			assertEquals("Hello!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.error(exception, "Hello {}!", "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.ERROR, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
+			assertEquals(exception, logEntry.getException());
+
+			Logger.error(exception, "Hello {}!", () -> "World");
+			logEntry = writer.consumeLogEntry();
+			assertEquals(Level.ERROR, logEntry.getLevel());
+			assertEquals("Hello World!", logEntry.getMessage());
 			assertEquals(exception, logEntry.getException());
 
 			Configurator.currentConfig().level(Level.OFF).activate();
@@ -596,7 +736,7 @@ public class LoggerTest extends AbstractTinylogTest {
 		Configurator.currentConfig().writer(writer).level(Level.INFO).activate();
 
 		Exception exception = new Exception();
-		Logger.warn(exception, null);
+		Logger.warn(exception);
 		logEntry = writer.consumeLogEntry();
 		assertEquals(Level.WARNING, logEntry.getLevel());
 		assertEquals(exception, logEntry.getException());

@@ -121,10 +121,23 @@ public final class Logger {
 	}
 
 	/**
+	 * Create a trace log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void trace(final Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, null, supplier, null);
+		}
+	}
+
+	/**
 	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -136,19 +149,18 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
 	 *
-	 * @param exception
-	 *            Exception to log
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
-	 *            Arguments for the text message
+	 *            Functions that produce the arguments for formatted text message
 	 */
-	public static void trace(final Throwable exception, final String message, final Object... arguments) {
+	public static void trace(final String message, final Supplier<?>... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
-			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, null, message, arguments);
 		}
 	}
 
@@ -162,6 +174,71 @@ public final class Logger {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, null, null);
+		}
+	}
+
+	/**
+	 * Create a trace log entry.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Text message to log
+	 */
+	public static void trace(final Throwable exception, String message) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, null);
+		}
+	}
+
+	/**
+	 * Create a trace log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void trace(final Throwable exception, Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Arguments for the text message
+	 */
+	public static void trace(final Throwable exception, final String message, final Object... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a trace log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void trace(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, arguments);
 		}
 	}
 
@@ -192,10 +269,23 @@ public final class Logger {
 	}
 
 	/**
+	 * Create a debug log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void debug(final Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, null, supplier, null);
+		}
+	}
+
+	/**
 	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -207,19 +297,18 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
 	 *
-	 * @param exception
-	 *            Exception to log
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
-	 *            Arguments for the text message
+	 *            Functions that produce the arguments for formatted text message
 	 */
-	public static void debug(final Throwable exception, final String message, final Object... arguments) {
+	public static void debug(final String message, final Supplier<?>... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
-			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, null, message, arguments);
 		}
 	}
 
@@ -237,7 +326,72 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry.
+	 * Create a debug log entry.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Text message to log
+	 */
+	public static void debug(final Throwable exception, String message) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, null);
+		}
+	}
+
+	/**
+	 * Create a debug log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void debug(final Throwable exception, Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Arguments for the text message
+	 */
+	public static void debug(final Throwable exception, final String message, final Object... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a debug log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void debug(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a info log entry.
 	 *
 	 * @param obj
 	 *            The result of the <code>toString()</code> method will be logged
@@ -250,7 +404,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry.
+	 * Create a info log entry.
 	 *
 	 * @param message
 	 *            Text message to log
@@ -263,10 +417,23 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a info log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void info(final Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.INFO)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, null, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a info log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -278,12 +445,71 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a info log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void info(final String message, final Supplier<?>... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.INFO)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a info log entry.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 */
+	public static void info(final Throwable exception) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.INFO)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, null, null);
+		}
+	}
+
+	/**
+	 * Create a info log entry.
 	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Text message to log
+	 */
+	public static void info(final Throwable exception, String message) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.INFO)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, message, null);
+		}
+	}
+
+	/**
+	 * Create a info log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void info(final Throwable exception, Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.INFO)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a info log entry. "{}" placeholders will be replaced by the given arguments.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -295,15 +521,20 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an info log entry.
+	 * Create a info log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
 	 *
 	 * @param exception
 	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
 	 */
-	public static void info(final Throwable exception) {
+	public static void info(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
-			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, message, arguments);
 		}
 	}
 
@@ -334,10 +565,23 @@ public final class Logger {
 	}
 
 	/**
+	 * Create a warning log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void warn(final Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, null, supplier, null);
+		}
+	}
+
+	/**
 	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -349,19 +593,18 @@ public final class Logger {
 	}
 
 	/**
-	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
 	 *
-	 * @param exception
-	 *            Exception to log
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
-	 *            Arguments for the text message
+	 *            Functions that produce the arguments for formatted text message
 	 */
-	public static void warn(final Throwable exception, final String message, final Object... arguments) {
+	public static void warn(final String message, final Supplier<?>... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
-			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, null, message, arguments);
 		}
 	}
 
@@ -379,7 +622,72 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry.
+	 * Create a warning log entry.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Text message to log
+	 */
+	public static void warn(final Throwable exception, String message) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, null);
+		}
+	}
+
+	/**
+	 * Create a warning log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void warn(final Throwable exception, Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Arguments for the text message
+	 */
+	public static void warn(final Throwable exception, final String message, final Object... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a warning log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void warn(final Throwable exception, final String message, final Supplier<?>... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a error log entry.
 	 *
 	 * @param obj
 	 *            The result of the <code>toString()</code> method will be logged
@@ -392,7 +700,7 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry.
+	 * Create a error log entry.
 	 *
 	 * @param message
 	 *            Text message to log
@@ -405,10 +713,23 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a error log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void error(final Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, null, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a error log entry. "{}" placeholders will be replaced by the given arguments.
 	 *
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -420,12 +741,71 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry. "{}" placeholders will be replaced by the given arguments.
+	 * Create a error log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
+	 *
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
+	 */
+	public static void error(final String message, final Supplier<?>... arguments) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, null, message, arguments);
+		}
+	}
+
+	/**
+	 * Create a error log entry.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 */
+	public static void error(final Throwable exception) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, null, null);
+		}
+	}
+
+	/**
+	 * Create a error log entry.
 	 *
 	 * @param exception
 	 *            Exception to log
 	 * @param message
-	 *            Formated text for the log entry
+	 *            Text message to log
+	 */
+	public static void error(final Throwable exception, String message) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, message, null);
+		}
+	}
+
+	/**
+	 * Create a error log entry. The message will be only evaluated if the log entry is really output.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param supplier
+	 *            Function that produces the message
+	 */
+	public static void error(final Throwable exception, Supplier<?> supplier) {
+		Configuration currentConfiguration = configuration;
+		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, supplier, null);
+		}
+	}
+
+	/**
+	 * Create a error log entry. "{}" placeholders will be replaced by the given arguments.
+	 *
+	 * @param exception
+	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -437,15 +817,20 @@ public final class Logger {
 	}
 
 	/**
-	 * Create an error log entry.
+	 * Create a error log entry. "{}" placeholders will be replaced by the given arguments. The arguments will be only
+	 * evaluated if the log entry is really output.
 	 *
 	 * @param exception
 	 *            Exception to log
+	 * @param message
+	 *            Formatted text for the log entry
+	 * @param arguments
+	 *            Functions that produce the arguments for formatted text message
 	 */
-	public static void error(final Throwable exception) {
+	public static void error(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
-			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, null, null);
+			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, message, arguments);
 		}
 	}
 
@@ -492,13 +877,13 @@ public final class Logger {
 	 * Add a log entry. This method is helpful for adding log entries form logger bridges.
 	 *
 	 * @param strackTraceDepth
-	 *            Depth of stack trace for finding the class, source line etc.
+	 *            Depth of stack error for finding the class, source line etc.
 	 * @param level
 	 *            Severity level
 	 * @param exception
 	 *            Exception to log (can be <code>null</code> if there is no exception to log)
 	 * @param message
-	 *            Formated text or a object to log
+	 *            Formatted text or a object to log
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
@@ -519,7 +904,7 @@ public final class Logger {
 	 * @param exception
 	 *            Exception to log (can be <code>null</code> if there is no exception to log)
 	 * @param message
-	 *            Formated text or a object to log
+	 *            Formatted text or a object to log
 	 * @param arguments
 	 *            Arguments for the text message
 	 */
