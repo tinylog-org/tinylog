@@ -24,9 +24,9 @@ import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.tinylog.util.Maps.doubletonMap;
 
 /**

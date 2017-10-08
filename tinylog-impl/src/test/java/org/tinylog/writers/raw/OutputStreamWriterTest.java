@@ -20,9 +20,9 @@ import java.io.OutputStream;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Tests for {@link OutputStreamWriter}.
@@ -36,7 +36,7 @@ public final class OutputStreamWriterTest {
 	 *             Failed invoking writer
 	 */
 	@Test
-	public void test() throws IOException {
+	public void wrapping() throws IOException {
 		ByteArrayOutputStream stream = spy(new ByteArrayOutputStream());
 		OutputStreamWriter writer = new OutputStreamWriter(stream);
 
