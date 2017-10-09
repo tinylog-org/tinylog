@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -36,6 +38,11 @@ final class SeverityLevelToken implements Token {
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		builder.append(logEntry.getLevel());
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		statement.setString(index, logEntry.getLevel().toString());
 	}
 
 }

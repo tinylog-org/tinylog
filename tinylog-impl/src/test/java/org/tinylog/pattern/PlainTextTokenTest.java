@@ -13,10 +13,16 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link PlainTextToken}.
@@ -35,19 +41,36 @@ public final class PlainTextTokenTest {
 	}
 
 	/**
-	 * Verifies that a simple text without tabulators and new lines will be rendered correctly.
+	 * Verifies that a simple text without tabulators and new lines will be appended unmodified to a
+	 * {@link StringBuilder}.
 	 */
 	@Test
-	public void simpleText() {
+	public void renderSimpleText() {
 		PlainTextToken token = new PlainTextToken("Hello World!");
 		assertThat(render(token)).isEqualTo("Hello World!");
 	}
 
 	/**
-	 * Verifies that tabulators will be rendered correctly.
+	 * Verifies that a simple text without tabulators and new lines will be added unmodified to a
+	 * {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void tabulators() {
+	public void applySimpleText() throws SQLException {
+		PlainTextToken token = new PlainTextToken("Hello World!");
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "Hello World!");
+	}
+
+	/**
+	 * Verifies that tabulators will be rendered correctly for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderTabulators() {
 		PlainTextToken token = new PlainTextToken("\t");
 		assertThat(render(token)).isEqualTo("\t");
 
@@ -56,10 +79,29 @@ public final class PlainTextTokenTest {
 	}
 
 	/**
-	 * Verifies that Windows line breaks will be rendered correctly.
+	 * Verifies that tabulators will be added correctly to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void windowsNewLines() {
+	public void applyTabulators() throws SQLException {
+		LogEntry logEntry = LogEntryBuilder.empty().create();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		new PlainTextToken("\t").apply(logEntry, statement, 1);
+		verify(statement).setString(1, "\t");
+
+		statement = mock(PreparedStatement.class);
+		new PlainTextToken("\\t").apply(logEntry, statement, 1);
+		verify(statement).setString(1, "\t");
+	}
+
+	/**
+	 * Verifies that Windows line breaks will be rendered as system-dependent line breaks for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderWindowsNewLines() {
 		PlainTextToken token = new PlainTextToken("\r\n");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 
@@ -67,12 +109,30 @@ public final class PlainTextTokenTest {
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 	}
 
-
 	/**
-	 * Verifies that Unix line breaks will be rendered correctly.
+	 * Verifies that Windows line breaks will be added as system-dependent line breaks to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void unixNewLines() {
+	public void applyWindowsNewLines() throws SQLException {
+		LogEntry logEntry = LogEntryBuilder.empty().create();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		new PlainTextToken("\r\n").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
+
+		statement = mock(PreparedStatement.class);
+		new PlainTextToken("\\r\\n").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
+	}
+
+	/**
+	 * Verifies that Unix line breaks will be rendered as system-dependent line breaks for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderUnixNewLines() {
 		PlainTextToken token = new PlainTextToken("\n");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 
@@ -80,17 +140,55 @@ public final class PlainTextTokenTest {
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 	}
 
-
 	/**
-	 * Verifies that classic Mac OS line breaks will be rendered correctly.
+	 * Verifies that Unix line breaks will be added as system-dependent line breaks to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void macNewLines() {
+	public void applyUnixNewLines() throws SQLException {
+		LogEntry logEntry = LogEntryBuilder.empty().create();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		new PlainTextToken("\n").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
+
+		statement = mock(PreparedStatement.class);
+		new PlainTextToken("\\n").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
+	}
+
+	/**
+	 * Verifies that classic Mac OS line breaks will be rendered as system-dependent line breaks for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderMacNewLines() {
 		PlainTextToken token = new PlainTextToken("\r");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 
 		token = new PlainTextToken("\\r");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
+	}
+
+	/**
+	 * Verifies that classic Mac OS line breaks will be added as system-dependent line breaks to a
+	 * {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyMacNewLines() throws SQLException {
+		LogEntry logEntry = LogEntryBuilder.empty().create();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		new PlainTextToken("\r").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
+
+		statement = mock(PreparedStatement.class);
+		new PlainTextToken("\\r").apply(logEntry, statement, 1);
+		verify(statement).setString(1, NEW_LINE);
 	}
 
 	/**
@@ -100,7 +198,7 @@ public final class PlainTextTokenTest {
 	 *            Token to render
 	 * @return Result text
 	 */
-	private String render(final Token token) {
+	private static String render(final Token token) {
 		StringBuilder builder = new StringBuilder();
 		token.render(LogEntryBuilder.empty().create(), builder);
 		return builder.toString();

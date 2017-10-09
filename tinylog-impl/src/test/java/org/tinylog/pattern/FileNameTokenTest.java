@@ -13,11 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link FileNameToken}.
@@ -34,12 +40,52 @@ public final class FileNameTokenTest {
 	}
 
 	/**
-	 * Verifies that the name of a source file will be output correctly.
+	 * Verifies that the name of a source file will be will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void fileName() {
+	public void renderFileName() {
 		FileNameToken token = new FileNameToken();
 		assertThat(render(token, "TestClass.java")).isEqualTo("TestClass.java");
+	}
+
+	/**
+	 * Verifies that the name of a source file will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyFileName() throws SQLException {
+		FileNameToken token = new FileNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("TestClass.java"), statement, 1);
+		verify(statement).setString(1, "TestClass.java");
+	}
+
+	/**
+	 * Verifies that {@code null} will be rendered as "&lt;unknown&gt;" for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderNull() {
+		FileNameToken token = new FileNameToken();
+		assertThat(render(token, null)).isEqualTo("<unknown>");
+	}
+
+	/**
+	 * Verifies that {@code null} will be added to a {@link PreparedStatement}, if there is no name of a source file in
+	 * a log entry.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyNull() throws SQLException {
+		FileNameToken token = new FileNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(null), statement, 1);
+		verify(statement).setString(1, null);
 	}
 
 	/**
@@ -51,10 +97,21 @@ public final class FileNameTokenTest {
 	 *            Name of source file for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final String fileName) {
+	private static String render(final Token token, final String fileName) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().fileName(fileName).create(), builder);
+		token.render(createLogEntry(fileName), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a file name.
+	 *
+	 * @param fileName
+	 *            File name for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final String fileName) {
+		return LogEntryBuilder.empty().fileName(fileName).create();
 	}
 
 }

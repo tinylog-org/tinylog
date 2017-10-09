@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -39,6 +41,11 @@ final class MessageToken implements Token {
 		if (message != null) {
 			builder.append(message);
 		}
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		statement.setString(index, logEntry.getMessage());
 	}
 
 }

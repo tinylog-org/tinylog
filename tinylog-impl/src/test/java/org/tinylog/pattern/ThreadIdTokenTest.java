@@ -13,11 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link ThreadIdToken}.
@@ -34,13 +40,29 @@ public final class ThreadIdTokenTest {
 	}
 
 	/**
-	 * Verifies that the ID of the thread will be output.
+	 * Verifies that the ID of the thread will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void threadId() {
+	public void renderThreadId() {
 		ThreadIdToken token = new ThreadIdToken();
 		Thread thread = new Thread();
 		assertThat(render(token, thread)).isEqualTo(String.valueOf(thread.getId()));
+	}
+
+	/**
+	 * Verifies that the ID of the thread will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyThreadId() throws SQLException {
+		ThreadIdToken token = new ThreadIdToken();
+		Thread thread = new Thread();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(thread), statement, 1);
+		verify(statement).setLong(1, thread.getId());
 	}
 
 	/**
@@ -52,10 +74,21 @@ public final class ThreadIdTokenTest {
 	 *            Thread for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final Thread thread) {
+	private static String render(final Token token, final Thread thread) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().thread(thread).create(), builder);
+		token.render(createLogEntry(thread), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a thread.
+	 *
+	 * @param thread
+	 *            Thread for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final Thread thread) {
+		return LogEntryBuilder.empty().thread(thread).create();
 	}
 
 }

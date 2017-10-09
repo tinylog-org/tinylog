@@ -13,6 +13,9 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -37,6 +40,7 @@ final class DateToken implements Token {
 
 	private static final Locale locale = ConfigurationParser.getLocale();
 
+	private final boolean formatted;
 	private final DateFormat formatter;
 	private final long divisor;
 
@@ -45,6 +49,7 @@ final class DateToken implements Token {
 
 	/**	*/
 	DateToken() {
+		this.formatted = false;
 		this.formatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale);
 		this.divisor = SECONDS_PRECISION;
 	}
@@ -54,6 +59,7 @@ final class DateToken implements Token {
 	 *            Format pattern for formatting dates
 	 */
 	DateToken(final String pattern) {
+		this.formatted = true;
 		this.formatter = new SimpleDateFormat(pattern, locale);
 		this.divisor = pattern.contains("SSS") ? MILLISECONDS_PRECISION : pattern.contains("ss") ? SECONDS_PRECISION : MINUTES_PRECISION;
 	}
@@ -66,6 +72,15 @@ final class DateToken implements Token {
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		builder.append(format(logEntry.getDate()));
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		if (formatted) {
+			statement.setString(index, format(logEntry.getDate()));
+		} else {
+			statement.setTimestamp(index, new Timestamp(logEntry.getDate().getTime()));
+		}
 	}
 
 	/**

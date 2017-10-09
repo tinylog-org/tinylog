@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -39,12 +41,27 @@ final class SimpleClassNameToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		String fullyQualifiedClassName = logEntry.getClassName();
+		builder.append(getSimpleClassName(logEntry.getClassName()));
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		statement.setString(index, getSimpleClassName(logEntry.getClassName()));
+	}
+
+	/**
+	 * Gets the simple class name from a fully qualified class name.
+	 * 
+	 * @param fullyQualifiedClassName
+	 *            Fully qualified class name
+	 * @return Class name without package prefix
+	 */
+	private static String getSimpleClassName(final String fullyQualifiedClassName) {
 		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
 		if (dotIndex < 0) {
-			builder.append(fullyQualifiedClassName);
+			return fullyQualifiedClassName;
 		} else {
-			builder.append(fullyQualifiedClassName.substring(dotIndex + 1));
+			return fullyQualifiedClassName.substring(dotIndex + 1);
 		}
 	}
 

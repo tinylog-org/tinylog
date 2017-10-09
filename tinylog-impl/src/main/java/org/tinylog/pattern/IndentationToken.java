@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -67,6 +69,13 @@ class IndentationToken implements Token {
 		}
 
 		builder.append(source, head, source.length());
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		StringBuilder builder = new StringBuilder();
+		render(logEntry, builder);
+		statement.setString(index, builder.toString());
 	}
 
 }

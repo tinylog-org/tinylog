@@ -13,11 +13,18 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link LineNumberToken}.
@@ -34,12 +41,52 @@ public final class LineNumberTokenTest {
 	}
 
 	/**
-	 * Verifies that a source file line number will be output correctly.
+	 * Verifies that a valid source file line number will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void lineNumber() {
+	public void renderValidLineNumber() {
 		LineNumberToken token = new LineNumberToken();
 		assertThat(render(token, 42)).isEqualTo("42");
+	}
+
+	/**
+	 * Verifies that a valid source file line number will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyValidLineNumber() throws SQLException {
+		LineNumberToken token = new LineNumberToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(42), statement, 1);
+		verify(statement).setInt(1, 42);
+	}
+
+	/**
+	 * Verifies that a invalid source file line number will be rendered as question mark ("?") for a
+	 * {@link StringBuilder}.
+	 */
+	@Test
+	public void renderInvalidLineNumber() {
+		LineNumberToken token = new LineNumberToken();
+		assertThat(render(token, -1)).isEqualTo("?");
+	}
+
+	/**
+	 * Verifies that a invalid source file line number will be added as {@code null} to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyInvalidLineNumber() throws SQLException {
+		LineNumberToken token = new LineNumberToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(-1), statement, 1);
+		verify(statement).setNull(1, Types.INTEGER);
 	}
 
 	/**
@@ -48,13 +95,24 @@ public final class LineNumberTokenTest {
 	 * @param token
 	 *            Token to render
 	 * @param line
-	 *            Line number in source file for log entry
+	 *            Line number for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final int line) {
+	private static String render(final Token token, final int line) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().lineNumber(line).create(), builder);
+		token.render(createLogEntry(line), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a source file line number.
+	 *
+	 * @param line
+	 *            Line number for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final int line) {
+		return LogEntryBuilder.empty().lineNumber(line).create();
 	}
 
 }

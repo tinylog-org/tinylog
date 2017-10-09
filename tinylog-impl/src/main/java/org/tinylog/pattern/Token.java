@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.tinylog.core.LogEntry;
@@ -39,5 +41,19 @@ public interface Token {
 	 *            Output will be appended to this string builder
 	 */
 	void render(LogEntry logEntry, StringBuilder builder);
+
+	/**
+	 * Adds the value of this token to a prepared SQL statement.
+	 * 
+	 * @param logEntry
+	 *            Log entry that contains the source value(s)
+	 * @param statement
+	 *            Target prepared SQL statement
+	 * @param index
+	 *            Index for value
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	void apply(LogEntry logEntry, PreparedStatement statement, int index) throws SQLException;
 
 }

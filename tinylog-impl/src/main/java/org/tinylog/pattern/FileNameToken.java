@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -35,7 +37,17 @@ final class FileNameToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(logEntry.getFileName());
+		String fileName = logEntry.getFileName();
+		if (fileName == null) {
+			builder.append("<unknown>");
+		} else {
+			builder.append(fileName);
+		}
+	}
+
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		statement.setString(index, logEntry.getFileName());
 	}
 
 }

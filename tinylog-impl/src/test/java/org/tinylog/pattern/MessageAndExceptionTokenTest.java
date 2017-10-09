@@ -13,11 +13,19 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link MessageAndExceptionToken}.
@@ -35,49 +43,127 @@ public final class MessageAndExceptionTokenTest {
 	}
 
 	/**
-	 * Verifies that nothing will be output if there is neither a text message nor an exception or throwable in a log
-	 * entry.
+	 * Verifies that nothing will be rendered for a {@link StringBuilder}, if there is neither a text message nor an
+	 * exception or throwable in a log entry.
 	 */
 	@Test
-	public void neitherMessageNorException() {
+	public void renderNeitherMessageNorException() {
 		MessageAndExceptionToken token = new MessageAndExceptionToken();
 		assertThat(render(token, null, null)).isEmpty();
 	}
 
 	/**
-	 * Verifies that a text message will be output correctly.
+	 * Verifies that {@code null} will be added to a {@link PreparedStatement}, if there is neither a text message nor
+	 * an exception or throwable in a log entry.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void messageOnly() {
+	public void applyNeitherMessageNorException() throws SQLException {
+		MessageAndExceptionToken token = new MessageAndExceptionToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(null, null), statement, 1);
+		verify(statement).setString(1, null);
+	}
+
+	/**
+	 * Verifies that a text message will be rendered correctly for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderMessageOnly() {
 		MessageAndExceptionToken token = new MessageAndExceptionToken();
 		assertThat(render(token, "Hello World!", null)).isEqualTo("Hello World!");
 	}
 
 	/**
-	 * Verifies that an exception will be output correctly.
+	 * Verifies that a text message will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void exceptionOnly() {
-		Exception exception = new UnsupportedOperationException();
+	public void applyMessageOnly() throws SQLException {
 		MessageAndExceptionToken token = new MessageAndExceptionToken();
-		assertThat(render(token, null, exception))
-				.startsWith(UnsupportedOperationException.class.getName())
-				.contains(MessageAndExceptionTokenTest.class.getName(), "exceptionOnly")
-				.hasLineCount(exception.getStackTrace().length + 1);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("Hello World!", null), statement, 1);
+		verify(statement).setString(1, "Hello World!");
 	}
 
 	/**
-	 * Verifies that a text message and an exception be output correctly in combination.
+	 * Verifies that an exception will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void messageAndException() {
+	public void renderExceptionOnly() {
 		Exception exception = new UnsupportedOperationException();
 		MessageAndExceptionToken token = new MessageAndExceptionToken();
+
+		assertThat(render(token, null, exception))
+			.startsWith(UnsupportedOperationException.class.getName())
+			.contains(MessageAndExceptionTokenTest.class.getName(), "renderExceptionOnly")
+			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that an exception will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyExceptionOnly() throws SQLException {
+		Exception exception = new UnsupportedOperationException();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+		new MessageAndExceptionToken().apply(createLogEntry(null, exception), statement, 1);
+
+		verify(statement).setString(eq(1), captor.capture());
+		assertThat(captor.getValue())
+			.startsWith(UnsupportedOperationException.class.getName())
+			.contains(MessageAndExceptionTokenTest.class.getName(), "applyExceptionOnly")
+			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that a text message and an exception will be added combined to a {@link PreparedStatement}.
+	 */
+	@Test
+	public void renderMessageAndException() {
+		Exception exception = new UnsupportedOperationException();
+		MessageAndExceptionToken token = new MessageAndExceptionToken();
+
 		assertThat(render(token, "Hello World!", exception))
-				.startsWith("Hello World!")
-				.contains(UnsupportedOperationException.class.getName())
-				.contains(MessageAndExceptionTokenTest.class.getName(), "messageAndException")
-				.hasLineCount(exception.getStackTrace().length + 1);
+			.startsWith("Hello World!")
+			.contains(UnsupportedOperationException.class.getName())
+			.contains(MessageAndExceptionTokenTest.class.getName(), "renderMessageAndException")
+			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that a text message and an exception will be rendered correctly in combination for a {@link StringBuilder}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyMessageAndException() throws SQLException {
+		Exception exception = new UnsupportedOperationException();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+		new MessageAndExceptionToken().apply(createLogEntry("Hello World!", exception), statement, 1);
+
+		verify(statement).setString(eq(1), captor.capture());
+		assertThat(captor.getValue())
+			.startsWith("Hello World!")
+			.contains(UnsupportedOperationException.class.getName())
+			.contains(MessageAndExceptionTokenTest.class.getName(), "applyMessageAndException")
+			.hasLineCount(exception.getStackTrace().length + 1);
 	}
 
 	/**
@@ -88,13 +174,26 @@ public final class MessageAndExceptionTokenTest {
 	 * @param message
 	 *            Text message for log entry
 	 * @param exception
-	 *            Catched exception or throwable for log entry
+	 *            Caught exception or throwable for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final String message, final Throwable exception) {
+	private static String render(final Token token, final String message, final Throwable exception) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().message(message).exception(exception).create(), builder);
+		token.render(createLogEntry(message, exception), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a message and an exception or throwable.
+	 *
+	 * @param message
+	 *            Text message for log entry
+	 * @param exception
+	 *            Caught exception or throwable for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final String message, final Throwable exception) {
+		return LogEntryBuilder.empty().message(message).exception(exception).create();
 	}
 
 }

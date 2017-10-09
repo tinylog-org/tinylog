@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -35,10 +37,30 @@ final class PackageNameToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		String fullyQualifiedClassName = logEntry.getClassName();
+		String packageName = getPackage(logEntry.getClassName());
+		if (packageName != null) {
+			builder.append(packageName);
+		}
+	}
+
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		statement.setString(index, getPackage(logEntry.getClassName()));
+	}
+
+	/**
+	 * Gets the package name from a fully qualified class name.
+	 * 
+	 * @param fullyQualifiedClassName
+	 *            Fully qualified class name
+	 * @return Package name or {@code null} for default package
+	 */
+	private static String getPackage(final String fullyQualifiedClassName) {
 		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
-		if (dotIndex != -1) {
-			builder.append(fullyQualifiedClassName.substring(0, dotIndex));
+		if (dotIndex == -1) {
+			return null;
+		} else {
+			return fullyQualifiedClassName.substring(0, dotIndex);
 		}
 	}
 

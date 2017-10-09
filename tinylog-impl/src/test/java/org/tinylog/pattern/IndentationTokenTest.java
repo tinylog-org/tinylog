@@ -13,11 +13,16 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link IndentationToken}.
@@ -36,40 +41,101 @@ public final class IndentationTokenTest {
 	}
 
 	/**
-	 * Verifies that a single line will be not indented.
+	 * Verifies that a single line will be not indented for a {@link StringBuilder}.
 	 */
 	@Test
-	public void singleLine() {
+	public void renderSingleLine() {
 		IndentationToken token = new IndentationToken(new PlainTextToken("Hello World!"), 2);
 		assertThat(render(token)).isEqualTo("Hello World!");
 	}
 
 	/**
-	 * Verifies that the second line will be not indented but not the first.
+	 * Verifies that a single line will be not indented for a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void twoLines() {
+	public void applySingleLine() throws SQLException {
+		IndentationToken token = new IndentationToken(new PlainTextToken("Hello World!"), 2);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "Hello World!");
+	}
+
+	/**
+	 * Verifies that the second line will be indented for a {@link StringBuilder}, but not the first line.
+	 */
+	@Test
+	public void renderTwoLines() {
 		IndentationToken token = new IndentationToken(new PlainTextToken("Hello" + NEW_LINE + "World!"), 2);
 		assertThat(render(token)).isEqualTo("Hello" + NEW_LINE + "  World!");
 	}
 
 	/**
-	 * Verifies that the second and third line will be not indented but not the first.
+	 * Verifies that the second line will be indented for a {@link PreparedStatement}, but not the first line.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void multipleLines() {
+	public void applyTwoLines() throws SQLException {
+		IndentationToken token = new IndentationToken(new PlainTextToken("Hello" + NEW_LINE + "World!"), 2);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "Hello" + NEW_LINE + "  World!");
+	}
+
+	/**
+	 * Verifies that the second and third line will be indented for a {@link StringBuilder}, but not the first line.
+	 */
+	@Test
+	public void renderMultipleLines() {
 		IndentationToken token = new IndentationToken(new PlainTextToken("A" + NEW_LINE + "B" + NEW_LINE + "C"), 2);
 		assertThat(render(token)).isEqualTo("A" + NEW_LINE + "  B" + NEW_LINE + "  C");
 	}
 
 	/**
-	 * Verifies that tabulators at the beginning of a new line will be replaced by the specified number of spaces. All
-	 * other tabulators should be kept untouched.
+	 * Verifies that the second and third line will be indented for a {@link PreparedStatement}, but not the first line.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void tabulators() {
+	public void applyMultipleLines() throws SQLException {
+		IndentationToken token = new IndentationToken(new PlainTextToken("A" + NEW_LINE + "B" + NEW_LINE + "C"), 2);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "A" + NEW_LINE + "  B" + NEW_LINE + "  C");
+	}
+
+	/**
+	 * Verifies that tabulators at the beginning of a new line will be replaced by the specified number of spaces for a
+	 * {@link StringBuilder}. All other tabulators should be kept untouched.
+	 */
+	@Test
+	public void renderTabulators() {
 		IndentationToken token = new IndentationToken(new PlainTextToken("Hello" + NEW_LINE + "\tWorld\t!"), 2);
 		assertThat(render(token)).isEqualTo("Hello" + NEW_LINE + "    World\t!");
+	}
+
+	/**
+	 * Verifies that tabulators at the beginning of a new line will be replaced by the specified number of spaces for a
+	 * {@link PreparedStatement}. All other tabulators should be kept untouched.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyTabulators() throws SQLException {
+		IndentationToken token = new IndentationToken(new PlainTextToken("Hello" + NEW_LINE + "\tWorld\t!"), 2);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "Hello" + NEW_LINE + "    World\t!");
 	}
 
 	/**
@@ -79,7 +145,7 @@ public final class IndentationTokenTest {
 	 *            Token to render
 	 * @return Result text
 	 */
-	private String render(final Token token) {
+	private static String render(final Token token) {
 		StringBuilder builder = new StringBuilder();
 		token.render(LogEntryBuilder.empty().create(), builder);
 		return builder.toString();

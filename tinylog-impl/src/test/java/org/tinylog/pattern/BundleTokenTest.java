@@ -13,13 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Arrays.asList;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link BundleToken}.
@@ -36,25 +40,30 @@ public final class BundleTokenTest {
 	}
 
 	/**
-	 * Verifies that all child tokens will be rendered in the given order.
+	 * Verifies that all child tokens will be rendered for a {@link StringBuilder} in the given order.
 	 */
 	@Test
-	public void combineOutput() {
+	public void render() {
 		BundleToken token = new BundleToken(asList(new PlainTextToken("Abc"), new PlainTextToken("123")));
-		assertThat(render(token)).isEqualTo("Abc123");
+
+		StringBuilder builder = new StringBuilder();
+		token.render(LogEntryBuilder.empty().create(), builder);
+		assertThat(builder).hasToString("Abc123");
 	}
 
 	/**
-	 * Renders a token.
-	 *
-	 * @param token
-	 *            Token to render
-	 * @return Result text
+	 * Verifies that all child tokens will be rendered for a {@link PreparedStatement} in the given order.
+	 * 
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
-	private String render(final Token token) {
-		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().create(), builder);
-		return builder.toString();
+	@Test
+	public void apply() throws SQLException {
+		BundleToken token = new BundleToken(asList(new PlainTextToken("Abc"), new PlainTextToken("123")));
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(LogEntryBuilder.empty().create(), statement, 1);
+		verify(statement).setString(1, "Abc123");
 	}
 
 }

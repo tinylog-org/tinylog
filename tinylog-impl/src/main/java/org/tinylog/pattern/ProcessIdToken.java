@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Martin Winandy
+ * Copyright 2017 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -16,52 +16,39 @@ package org.tinylog.pattern;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Collections;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.runtime.RuntimeProvider;
 
 /**
- * Token for outputting the text message and the exception or other throwable of a log entry.
+ * Token for outputting the process ID of the JVM that has issued a log entry.
  */
-final class MessageAndExceptionToken implements Token {
-
-	private ExceptionToken exceptionToken;
+final class ProcessIdToken implements Token {
+	
+	private int pid;
+	private String rendered;
 
 	/** */
-	MessageAndExceptionToken() {
-		this.exceptionToken = new ExceptionToken();
+	ProcessIdToken() {
+		pid = RuntimeProvider.getProcessId();
+		rendered = Integer.toString(pid);
 	}
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+		return Collections.emptySet();
 	}
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		String message = logEntry.getMessage();
-		if (message != null) {
-			builder.append(message);
-		}
-
-		if (logEntry.getException() != null) {
-			if (message != null) {
-				builder.append(": ");
-			}
-			exceptionToken.render(logEntry, builder);
-		}
+		builder.append(rendered);
 	}
-
+	
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		if (logEntry.getException() == null) {
-			statement.setString(index, logEntry.getMessage());
-		} else {
-			StringBuilder builder = new StringBuilder();
-			render(logEntry, builder);
-			statement.setString(index, builder.toString());
-		}
+		statement.setInt(index, pid);
 	}
 
 }

@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -53,6 +55,16 @@ final class LoggerTagToken implements Token {
 			builder.append(empty);
 		} else {
 			builder.append(tag);
+		}
+	}
+
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		String tag = logEntry.getTag();
+		if (tag == null) {
+			statement.setString(index, empty == DEFAULT_EMPTY_TAG ? null : empty);
+		} else {
+			statement.setString(index, tag);
 		}
 	}
 

@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.tinylog.core.LogEntry;
@@ -52,6 +54,13 @@ class MinimumSizeToken implements Token {
 		for (int i = 0; i < minimumSize - size; ++i) {
 			builder.append(' ');
 		}
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		StringBuilder builder = new StringBuilder();
+		render(logEntry, builder);
+		statement.setString(index, builder.toString());
 	}
 
 }

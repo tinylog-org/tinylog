@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
-import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Parser for format patterns. It produces tokens combined to a root token that can be used by writers for rendering log
@@ -144,7 +143,7 @@ public final class FormatPatternParser {
 		if (name.equals("date")) {
 			return createDateToken(configuration);
 		} else if ("pid".equals(name)) {
-			return new PlainTextToken(Integer.toString(RuntimeProvider.getProcessId()));
+			return new ProcessIdToken();
 		} else if ("thread".equals(name)) {
 			return new ThreadNameToken();
 		} else if ("threadId".equals(name)) {

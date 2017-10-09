@@ -13,11 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link MessageToken}.
@@ -34,21 +40,51 @@ public final class MessageTokenTest {
 	}
 
 	/**
-	 * Verifies that nothing will be output if there is no text message in a log entry.
+	 * Verifies that nothing will be rendered for a {@link StringBuilder}, if there is no text message in a log entry.
 	 */
 	@Test
-	public void missingMessage() {
+	public void renderMissingMessage() {
 		MessageToken token = new MessageToken();
 		assertThat(render(token, null)).isEmpty();
 	}
 
 	/**
-	 * Verifies that a text message will be output correctly.
+	 * Verifies that {@code null} will be added to a {@link PreparedStatement}, if there is no text message in a log entry.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void textMessage() {
+	public void applyMissingMessage() throws SQLException {
+		MessageToken token = new MessageToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(null), statement, 1);
+		verify(statement).setString(1, null);
+	}
+
+	/**
+	 * Verifies that a text message will be rendered correctly for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderTextMessage() {
 		MessageToken token = new MessageToken();
 		assertThat(render(token, "Hello World!")).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that a text message will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyTextMessage() throws SQLException {
+		MessageToken token = new MessageToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("Hello World!"), statement, 1);
+		verify(statement).setString(1, "Hello World!");
 	}
 
 	/**
@@ -60,10 +96,21 @@ public final class MessageTokenTest {
 	 *            Text message for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final String message) {
+	private static String render(final Token token, final String message) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().message(message).create(), builder);
+		token.render(createLogEntry(message), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a.
+	 *
+	 * @param message
+	 *            Text message for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final String message) {
+		return LogEntryBuilder.empty().message(message).create();
 	}
 
 }

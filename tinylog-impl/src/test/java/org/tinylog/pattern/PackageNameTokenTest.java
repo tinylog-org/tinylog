@@ -13,11 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link PackageNameToken}.
@@ -34,21 +40,51 @@ public final class PackageNameTokenTest {
 	}
 
 	/**
-	 * Verifies that the package name of a class will be output correctly.
+	 * Verifies that the package name of a fully-qualified class will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void classWithPackage() {
+	public void renderClassWithPackage() {
 		PackageNameToken token = new PackageNameToken();
 		assertThat(render(token, "my.package.TestClass")).isEqualTo("my.package");
 	}
 
 	/**
-	 * Verifies that nothing will be output for classes in the default package.
+	 * Verifies that the package name of a fully-qualified class will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void classWithoutPackage() {
+	public void applyClassWithPackage() throws SQLException {
+		PackageNameToken token = new PackageNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("my.package.TestClass"), statement, 1);
+		verify(statement).setString(1, "my.package");
+	}
+
+	/**
+	 * Verifies that nothing will be appended to a {@link StringBuilder} for classes in the default package.
+	 */
+	@Test
+	public void renderClassWithoutPackage() {
 		PackageNameToken token = new PackageNameToken();
 		assertThat(render(token, "AnotherClass")).isEmpty();
+	}
+
+	/**
+	 * Verifies that {@code null} will be added to a {@link PreparedStatement} for classes in the default package.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyClassWithoutPackage() throws SQLException {
+		PackageNameToken token = new PackageNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("AnotherClass"), statement, 1);
+		verify(statement).setString(1, null);
 	}
 
 	/**
@@ -60,10 +96,21 @@ public final class PackageNameTokenTest {
 	 *            Issuing class name for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final String className) {
+	private static String render(final Token token, final String className) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().className(className).create(), builder);
+		token.render(createLogEntry(className), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a class name.
+	 *
+	 * @param className
+	 *            Class name for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final String className) {
+		return LogEntryBuilder.empty().className(className).create();
 	}
 
 }

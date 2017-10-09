@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -40,6 +42,18 @@ final class ExceptionToken implements Token {
 		Throwable throwable = logEntry.getException();
 		if (throwable != null) {
 			render(throwable, builder);
+		}
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		Throwable throwable = logEntry.getException();
+		if (throwable == null) {
+			statement.setString(index, null);
+		} else {
+			StringBuilder builder = new StringBuilder();
+			render(throwable, builder);
+			statement.setString(index, builder.toString());
 		}
 	}
 

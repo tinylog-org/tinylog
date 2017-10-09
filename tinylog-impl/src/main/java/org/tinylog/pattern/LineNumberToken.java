@@ -13,6 +13,9 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -35,7 +38,22 @@ final class LineNumberToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(logEntry.getLineNumber());
+		int line = logEntry.getLineNumber();
+		if (line >= 0) {
+			builder.append(line);
+		} else {
+			builder.append("?");
+		}
+	}
+
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		int line = logEntry.getLineNumber();
+		if (line >= 0) {
+			statement.setInt(index, line);
+		} else {
+			statement.setNull(index, Types.INTEGER);
+		}
 	}
 
 }

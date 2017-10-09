@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.EnumSet;
 
@@ -48,6 +50,13 @@ final class BundleToken implements Token {
 		for (Token token : tokens) {
 			token.render(logEntry, builder);
 		}
+	}
+	
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		StringBuilder builder = new StringBuilder();
+		render(logEntry, builder);
+		statement.setString(index, builder.toString());
 	}
 
 }

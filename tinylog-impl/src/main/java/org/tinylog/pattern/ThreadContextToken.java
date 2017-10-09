@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -24,7 +26,7 @@ import org.tinylog.core.LogEntryValue;
  */
 final class ThreadContextToken implements Token {
 
-	private static final String DEFAULT_EMPTY_TAG = "";
+	private static final String DEFAULT_EMPTY_VALUE = "";
 
 	private final String key;
 	private final String defaultValue;
@@ -35,7 +37,7 @@ final class ThreadContextToken implements Token {
 	 */
 	ThreadContextToken(final String key) {
 		this.key = key;
-		this.defaultValue = DEFAULT_EMPTY_TAG;
+		this.defaultValue = DEFAULT_EMPTY_VALUE;
 	}
 
 	/**
@@ -63,4 +65,15 @@ final class ThreadContextToken implements Token {
 			builder.append(value);
 		}
 	}
+
+	@Override
+	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
+		String value = logEntry.getContext().get(key);
+		if (value == null && defaultValue != DEFAULT_EMPTY_VALUE) {
+			statement.setString(index, defaultValue);
+		} else {
+			statement.setString(index, value);
+		}
+	}
+
 }

@@ -13,11 +13,17 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.Test;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link MethodNameToken}.
@@ -34,12 +40,27 @@ public final class MethodNameTokenTest {
 	}
 
 	/**
-	 * Verifies that the name of methods will be output correctly.
+	 * Verifies that the name of a method will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void methodName() {
+	public void renderMethodName() {
 		MethodNameToken token = new MethodNameToken();
 		assertThat(render(token, "testMethod")).isEqualTo("testMethod");
+	}
+
+	/**
+	 * Verifies that the name of a method will be added to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyMethodName() throws SQLException {
+		MethodNameToken token = new MethodNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry("testMethod"), statement, 1);
+		verify(statement).setString(1, "testMethod");
 	}
 
 	/**
@@ -47,14 +68,25 @@ public final class MethodNameTokenTest {
 	 *
 	 * @param token
 	 *            Token to render
-	 * @param methodName
+	 * @param method
 	 *            Name of method for log entry
 	 * @return Result text
 	 */
-	private String render(final Token token, final String methodName) {
+	private static String render(final Token token, final String method) {
 		StringBuilder builder = new StringBuilder();
-		token.render(LogEntryBuilder.empty().methodName(methodName).create(), builder);
+		token.render(createLogEntry(method), builder);
 		return builder.toString();
+	}
+
+	/**
+	 * Creates a log entry that contains a method name.
+	 *
+	 * @param method
+	 *            Method name for log entry
+	 * @return Filled log entry
+	 */
+	private static LogEntry createLogEntry(final String method) {
+		return LogEntryBuilder.empty().methodName(method).create();
 	}
 
 }
