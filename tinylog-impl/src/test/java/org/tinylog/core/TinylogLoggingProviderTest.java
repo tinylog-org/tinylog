@@ -42,6 +42,7 @@ import org.tinylog.writers.ConsoleWriter;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.ResultObserver.waitFor;
@@ -822,6 +823,20 @@ public final class TinylogLoggingProviderTest {
 		public void plainText() {
 			provider.log(1, null, Level.INFO, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello World!" + NEW_LINE);
+		}
+
+		/**
+		 * Verifies that an exception can be logged.
+		 */
+		@Test
+		public void exception() {
+			UnsupportedOperationException exception = new UnsupportedOperationException();
+
+			provider.log(1, null, Level.ERROR, exception, null);
+			assertThat(systemStream.consumeErrorOutput())
+				.startsWith(UnsupportedOperationException.class.getName())
+				.contains(TinylogLoggingProviderTest.class.getName(), "exception")
+				.hasLineCount(exception.getStackTrace().length + 1);
 		}
 
 		/**

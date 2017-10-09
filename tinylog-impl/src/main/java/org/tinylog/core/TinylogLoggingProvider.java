@@ -129,15 +129,12 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			String message;
 			if (arguments == null || arguments.length == 0) {
-				if (obj instanceof Supplier<?>) {
-					message = String.valueOf(((Supplier<?>) obj).get());
-				} else {
-					message = String.valueOf(obj);
-				}
+				Object evaluatedObject = obj instanceof Supplier<?> ? ((Supplier<?>) obj).get() : obj;
+				message = evaluatedObject == null ? null : evaluatedObject.toString();
 			} else {
 				message = formatter.format((String) obj, arguments);
 			}
-			
+
 			LogEntry logEntry = createLogEntry(depth + 1, tag, tagIndex, level, exception, message, stackTraceElement);
 			if (writingThread == null) {
 				for (Writer writer : writers[tagIndex][level.ordinal()]) {
