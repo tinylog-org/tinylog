@@ -78,6 +78,7 @@ final class AndroidRuntime implements RuntimeDialect {
 	 *
 	 * @return Method and position if available, {@code null} if not
 	 */
+	@SuppressWarnings("javadoc")
 	private static StackTraceElementsFiller getStackTraceElementsFiller() {
 		try {
 			Method method = VMStack.class.getDeclaredMethod("fillStackTraceElements", Thread.class, StackTraceElement[].class);
@@ -113,6 +114,7 @@ final class AndroidRuntime implements RuntimeDialect {
 		 * @param index
 		 *            Offset position of caller
 		 */
+		@SuppressWarnings("javadoc")
 		private StackTraceElementsFiller(final Method method, final int index) {
 			this.method = method;
 			this.index = index;
