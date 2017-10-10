@@ -24,7 +24,6 @@ import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

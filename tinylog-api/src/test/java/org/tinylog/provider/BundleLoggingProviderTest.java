@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.tinylog.Level;
 
 import static java.util.Arrays.asList;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;

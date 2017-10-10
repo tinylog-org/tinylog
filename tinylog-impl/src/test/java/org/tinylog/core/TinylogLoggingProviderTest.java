@@ -42,7 +42,6 @@ import org.tinylog.writers.ConsoleWriter;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.ResultObserver.waitFor;

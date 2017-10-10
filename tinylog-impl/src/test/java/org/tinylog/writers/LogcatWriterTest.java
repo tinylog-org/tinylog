@@ -31,7 +31,6 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.LogEntryBuilder;
 
 import static java.util.Collections.emptyMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
