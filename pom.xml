@@ -55,6 +55,7 @@
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.8.0</assertj-core.version>
 		<checkstyle.version>8.2</checkstyle.version>
+		<h2.version>1.4.196</h2.version>
 		<java16.version>1.1</java16.version>
 		<jmh.version>1.19</jmh.version>
 		<junit.version>4.12</junit.version>
@@ -131,6 +132,12 @@
 				<version>${android.version}</version>
 				<optional>true</optional>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${h2.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
