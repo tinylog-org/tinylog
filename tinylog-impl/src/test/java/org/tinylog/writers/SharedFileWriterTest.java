@@ -61,7 +61,7 @@ import static org.tinylog.util.Maps.tripletonMap;
 public final class SharedFileWriterTest {
 
 	private static final int NUMBER_OF_PROCESSES = 5;
-	private static final int NUMBER_OF_LINES = 5_000;
+	private static final int NUMBER_OF_LINES = 10_000;
 
 	private static final String LOG_ENTRY_MESSAGE = "LOG ENTRY";
 	private static final String NEW_LINE = System.lineSeparator();
