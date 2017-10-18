@@ -303,9 +303,9 @@
 						</dependency>
 					</dependencies>
 					<configuration>
-						<consoleOutput>true</consoleOutput>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
-						<failsOnError>true</failsOnError>
+						<failOnViolation>true</failOnViolation>
+						<violationSeverity>warning</violationSeverity>
 						<configLocation>${project.parent.basedir}/configuration/checkstyle-checks.xml</configLocation>
 						<propertyExpansion>workspace_loc=${project.parent.basedir}</propertyExpansion>
 						<linkXRef>false</linkXRef>
