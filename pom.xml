@@ -25,7 +25,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<maven.deploy.skip>true</maven.deploy.skip>
+		<checkstyle.skip>true</checkstyle.skip>
+		<spotbugs.skip>true</spotbugs.skip>
 
 		<android.version>1.5_r3</android.version>
 		<jcl.version>1.2</jcl.version>
@@ -41,7 +44,7 @@
 		<maven-compiler-plugin.version>3.6.2</maven-compiler-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
-		<findbugs-maven-plugin.version>3.0.4</findbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.0-RC6</spotbugs-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -215,18 +218,36 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>${maven-checkstyle-plugin.version}</version>
 				<configuration>
-					<consoleOutput>true</consoleOutput>
+					<failOnViolation>true</failOnViolation>
+					<violationSeverity>warning</violationSeverity>
 					<configLocation>${project.parent.basedir}/configuration/tinylog-checkstyle.xml</configLocation>
+					<linkXRef>false</linkXRef>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>${findbugs-maven-plugin.version}</version>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs-maven-plugin.version}</version>
 				<configuration>
-					<excludeFilterFile>${project.parent.basedir}/configuration/tinylog-findbugs.xml</excludeFilterFile>
+					<excludeFilterFile>${project.parent.basedir}/configuration/tinylog-spotbugs.xml</excludeFilterFile>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>

@@ -7,7 +7,7 @@ install: true
 
 script:
   - set -o pipefail
-  - "mvn clean checkstyle:checkstyle findbugs:findbugs install -P release | egrep -v 'Download(ing|ed): '"
+  - "mvn clean install -P release | egrep -v 'Download(ing|ed): '"
   - cd benchmark
   - "mvn clean package | egrep -v 'Download(ing|ed): '"
 
