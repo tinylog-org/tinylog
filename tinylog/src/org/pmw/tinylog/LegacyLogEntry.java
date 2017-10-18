@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Log entry object with milliseconds precision for current date.
  */
-public class LegacyLogEntry extends LogEntry {
+public final class LegacyLogEntry extends LogEntry {
 
 	private final Date date;
 

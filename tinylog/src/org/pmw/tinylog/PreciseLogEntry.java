@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Log entry object with nanoseconds precision for current date.
  */
-public class PreciseLogEntry extends LogEntry {
+public final class PreciseLogEntry extends LogEntry {
 
 	private final Instant instant;
 

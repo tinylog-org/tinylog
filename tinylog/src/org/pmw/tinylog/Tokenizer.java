@@ -237,7 +237,7 @@ final class Tokenizer {
 		}
 	}
 
-	private static Token getDateToken(String pattern, Locale locale) {
+	private static Token getDateToken(final String pattern, final Locale locale) {
 		if (pattern.contains("SSSS") || pattern.contains("n") || pattern.contains("N")) {
 			if (EnvironmentHelper.isAtLeastJava9()) {
 				return new PreciseDateToken(pattern, locale);

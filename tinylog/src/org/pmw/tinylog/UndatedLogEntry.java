@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Log entry object without any date.
  */
-public class UndatedLogEntry extends LogEntry {
+public final class UndatedLogEntry extends LogEntry {
 
 	/**
 	 * @param processId

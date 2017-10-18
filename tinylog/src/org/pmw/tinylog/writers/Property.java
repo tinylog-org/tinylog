@@ -24,6 +24,8 @@ public @interface Property {
 
 	/**
 	 * Name of the property without the prefix "tinylog.writer.".
+	 *
+	 * @return Property name
 	 */
 	String name();
 
@@ -39,11 +41,15 @@ public @interface Property {
 	 * <li><code>Policy.class</code></li>
 	 * <li><code>Policy[].class</code></li>
 	 * </ul>
+	 *
+	 * @return Property type
 	 */
 	Class<?> type();
 
 	/**
 	 * Define if the property is optional. Default is <code>false</code>.
+	 *
+	 * @return <code>true</code> if property is optional, <code>false</code> if property is required
 	 */
 	boolean optional() default false;
 

@@ -58,12 +58,12 @@ public final class ModernJavaRuntime implements RuntimeDialect {
 
 		private final int depth;
 
-		private StackTraceElementExtractor(int depth) {
+		private StackTraceElementExtractor(final int depth) {
 			this.depth = depth;
 		}
 
 		@Override
-		public StackFrame apply(Stream<StackFrame> stream) {
+		public StackFrame apply(final Stream<StackFrame> stream) {
 			return stream.skip(depth).findFirst().get();
 		}
 

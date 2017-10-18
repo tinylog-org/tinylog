@@ -484,7 +484,7 @@ public final class JdbcWriter implements Writer {
 					} catch (SQLException ex) {
 						failed(ex);
 					}
-				} else{
+				} else {
 					try {
 						fillStatement(statement, values, logEntry);
 						statement.executeUpdate();
@@ -947,7 +947,11 @@ public final class JdbcWriter implements Writer {
 
 		private final LogEntryValue requiredLogEntryValue;
 
-		private Value(final LogEntryValue requiredLogEntryValue) {
+		/**
+		 * @param requiredLogEntryValue
+		 *            Mapping to required log entry value
+		 */
+		Value(final LogEntryValue requiredLogEntryValue) {
 			this.requiredLogEntryValue = requiredLogEntryValue;
 		}
 

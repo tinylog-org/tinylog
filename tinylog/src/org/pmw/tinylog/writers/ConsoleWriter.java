@@ -30,16 +30,25 @@ public final class ConsoleWriter implements Writer {
 	private final PrintStream err;
 	private final PrintStream out;
 
+	/** */
 	public ConsoleWriter() {
 		err = System.err;
 		out = System.out;
 	}
 
+	/**
+	 * @param stream
+	 *            Print stream for outputting log entries
+	 */
 	public ConsoleWriter(final PrintStream stream) {
 		err = stream;
 		out = stream;
 	}
 
+	/**
+	 * @param stream
+	 *            Name of system print stream for outputting log entries ("out" for {@link System.out} or "err" for {@link System.err})
+	 */
 	ConsoleWriter(final String stream) {
 		if (stream == null) {
 			err = System.err;

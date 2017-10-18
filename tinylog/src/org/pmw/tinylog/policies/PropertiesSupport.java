@@ -27,6 +27,8 @@ public @interface PropertiesSupport {
 
 	/**
 	 * Name of the policy for the properties.
+	 *
+	 * @return Name of policy
 	 */
 	String name();
 

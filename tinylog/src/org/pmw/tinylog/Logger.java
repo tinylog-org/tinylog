@@ -185,7 +185,7 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void trace(final Throwable exception, String message) {
+	public static void trace(final Throwable exception, final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, message, null);
@@ -200,7 +200,7 @@ public final class Logger {
 	 * @param supplier
 	 *            Function that produces the message
 	 */
-	public static void trace(final Throwable exception, Supplier<?> supplier) {
+	public static void trace(final Throwable exception, final Supplier<?> supplier) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.TRACE)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.TRACE, exception, supplier, null);
@@ -333,7 +333,7 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void debug(final Throwable exception, String message) {
+	public static void debug(final Throwable exception, final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, message, null);
@@ -348,7 +348,7 @@ public final class Logger {
 	 * @param supplier
 	 *            Function that produces the message
 	 */
-	public static void debug(final Throwable exception, Supplier<?> supplier) {
+	public static void debug(final Throwable exception, final Supplier<?> supplier) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.DEBUG)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.DEBUG, exception, supplier, null);
@@ -481,7 +481,7 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void info(final Throwable exception, String message) {
+	public static void info(final Throwable exception, final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, message, null);
@@ -496,7 +496,7 @@ public final class Logger {
 	 * @param supplier
 	 *            Function that produces the message
 	 */
-	public static void info(final Throwable exception, Supplier<?> supplier) {
+	public static void info(final Throwable exception, final Supplier<?> supplier) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.INFO)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.INFO, exception, supplier, null);
@@ -629,7 +629,7 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void warn(final Throwable exception, String message) {
+	public static void warn(final Throwable exception, final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, message, null);
@@ -644,7 +644,7 @@ public final class Logger {
 	 * @param supplier
 	 *            Function that produces the message
 	 */
-	public static void warn(final Throwable exception, Supplier<?> supplier) {
+	public static void warn(final Throwable exception, final Supplier<?> supplier) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.WARNING)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.WARNING, exception, supplier, null);
@@ -777,7 +777,7 @@ public final class Logger {
 	 * @param message
 	 *            Text message to log
 	 */
-	public static void error(final Throwable exception, String message) {
+	public static void error(final Throwable exception, final String message) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, message, null);
@@ -792,7 +792,7 @@ public final class Logger {
 	 * @param supplier
 	 *            Function that produces the message
 	 */
-	public static void error(final Throwable exception, Supplier<?> supplier) {
+	public static void error(final Throwable exception, final Supplier<?> supplier) {
 		Configuration currentConfiguration = configuration;
 		if (currentConfiguration.isOutputPossible(Level.ERROR)) {
 			output(currentConfiguration, DEPTH_OF_STACK_TRACE, Level.ERROR, exception, supplier, null);
@@ -998,7 +998,7 @@ public final class Logger {
 		StackTraceElement stackTraceElement = createdStackTraceElement;
 		String className = null;
 		String method = null;
-		String filename = null;
+		String file = null;
 		int line = -1;
 		String renderedMessage = null;
 
@@ -1065,7 +1065,7 @@ public final class Logger {
 					if (stackTraceElement == null) {
 						stackTraceElement = dialect.getStackTraceElement(strackTraceDepth);
 					}
-					filename = stackTraceElement.getFileName();
+					file = stackTraceElement.getFileName();
 					break;
 
 				case LINE:
@@ -1098,11 +1098,11 @@ public final class Logger {
 		for (int i = 0; i < entries.length; ++i) {
 			LogEntry logEntry;
 			if (timestamp == null) {
-				logEntry = new UndatedLogEntry(processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+				logEntry = new UndatedLogEntry(processId, thread, context, className, method, file, line, level, renderedMessage, exception);
 			} else if (preciseDate) {
-				logEntry = new PreciseLogEntry((Instant) timestamp, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+				logEntry = new PreciseLogEntry((Instant) timestamp, processId, thread, context, className, method, file, line, level, renderedMessage, exception);
 			} else {
-				logEntry = new LegacyLogEntry((Date) timestamp, processId, thread, context, className, method, filename, line, level, renderedMessage, exception);
+				logEntry = new LegacyLogEntry((Date) timestamp, processId, thread, context, className, method, file, line, level, renderedMessage, exception);
 			}
 
 			List<Token> formatTokensOfWriter = formatTokens[i];
