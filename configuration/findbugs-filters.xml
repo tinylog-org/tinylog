@@ -5,7 +5,11 @@
 	</Match>
 	<Match>
 		<!-- Loggers and Thread Context -->
-		<Source name="~.*(Logger|ThreadContext)\.java" />
+		<Or>
+			<Class name="org.tinylog.Logger" />
+			<Class name="org.tinylog.TaggedLogger" />
+			<Class name="org.tinylog.ThreadContext" />
+		</Or>
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
 	</Match>
 	<Match>
@@ -26,10 +30,16 @@
 		<Bug pattern="REC_CATCH_EXCEPTION" />
 	</Match>
 	<Match>
-		<!-- Writers -->
+		<!-- Base Class for Format Pattern Writers -->
 		<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+	</Match>
+	<Match>
+		<!-- JDBC Writer and its test -->
+		<Source name="~.*JdbcWriter(Test)?\.java" />
+		<!-- SQL for prepared statement cannot be constant -->
+		<Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING, SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
 	</Match>
 	<Match>
 		<!-- JUnit Tests -->
