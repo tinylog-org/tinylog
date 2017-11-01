@@ -383,7 +383,7 @@ public final class JdbcWriterTest {
 		 *             Failed to access database
 		 */
 		@Test
-		public void logLostEntriesWhileClsoing() throws NamingException, SQLException {
+		public void logLostEntriesWhileClosing() throws NamingException, SQLException {
 			createTable("MESSAGE CLOB NULL");
 
 			JdbcWriter writer = new JdbcWriter(createProperties(singletonMap("MESSAGE", "{message}"), singletonMap("reconnect", "true")));
@@ -442,6 +442,47 @@ public final class JdbcWriterTest {
 			writer.close();
 
 			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("Four");
+		}
+
+		/**
+		 * Verifies that a broken connection with enabled batch inserting will be re-establishing, if reconnecting is
+		 * enabled.
+		 *
+		 * @throws NamingException
+		 *             Failed to find data source
+		 * @throws SQLException
+		 *             Failed to access database
+		 * @throws InterruptedException
+		 *             Failed to sleep before reconnecting try
+		 */
+		@Test
+		public void repairBrokenBatchedConnection() throws NamingException, SQLException, InterruptedException {
+			createTable("MESSAGE CLOB NULL");
+
+			Map<String, String> properties = doubletonMap("batch", "true", "reconnect", "true");
+			JdbcWriter writer = new JdbcWriter(createProperties(singletonMap("MESSAGE", "{message}"), properties));
+
+			writer.write(LogEntryBuilder.empty().message("One").create());
+			assertThat(fetchTable(TABLE_NAME)).isEmpty();
+
+			shutdownDatabase();
+
+			assertThatThrownBy(() -> {
+				writer.flush();
+			}).isInstanceOf(SQLException.class);
+
+			writer.write(LogEntryBuilder.empty().message("Two").create());
+
+			createTable("MESSAGE CLOB NULL");
+
+			Thread.sleep(1000);
+
+			writer.write(LogEntryBuilder.empty().message("Three").create());
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("2");
+
+			writer.close();
+
+			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("Three");
 		}
 
 		/**

@@ -140,6 +140,10 @@ public final class JdbcWriter implements Writer {
 	 */
 	private void doWrite(final LogEntry logEntry) throws SQLException {
 		if (checkConnection()) {
+			if (batch) {
+				batchCount += 1;
+			}
+
 			try {
 				for (int i = 0; i < tokens.size(); ++i) {
 					tokens.get(i).apply(logEntry, statement, i + 1);
@@ -152,7 +156,6 @@ public final class JdbcWriter implements Writer {
 			try {
 				if (batch) {
 					statement.addBatch();
-					batchCount += 1;
 					if (batchCount >= MAX_BATCH_SIZE) {
 						statement.executeBatch();
 						batchCount = 0;
@@ -250,8 +253,8 @@ public final class JdbcWriter implements Writer {
 		if (reconnect) {
 			closeConnectionSilently();
 			statement = null;
-			batchCount = 0;
 			lostCount = batch ? batchCount : 1;
+			batchCount = 0;
 			reconnectTimestamp = 0;
 		}
 	}
