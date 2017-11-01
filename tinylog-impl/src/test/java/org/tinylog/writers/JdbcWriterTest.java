@@ -486,6 +486,57 @@ public final class JdbcWriterTest {
 		}
 
 		/**
+		 * Verifies that a broken connection without any pending log entries can be closed silently without throwing any
+		 * exception.
+		 *
+		 * @throws NamingException
+		 *             Failed to find data source
+		 * @throws SQLException
+		 *             Failed to access database
+		 */
+		@Test
+		public void closeBrokenConnection() throws NamingException, SQLException {
+			createTable("MESSAGE CLOB NULL");
+
+			JdbcWriter writer = new JdbcWriter(createProperties(singletonMap("MESSAGE", "{message}"), singletonMap("reconnect", "true")));
+
+			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("Hello World!");
+
+			shutdownDatabase();
+
+			writer.close();
+		}
+
+		/**
+		 * Verifies that the number of not inserted log entries will output for a broken connection with enabled batch
+		 * inserting while trying to close it.
+		 *
+		 * @throws NamingException
+		 *             Failed to find data source
+		 * @throws SQLException
+		 *             Failed to access database
+		 */
+		@Test
+		public void closeBrokenBatchedConnection() throws NamingException, SQLException {
+			createTable("MESSAGE CLOB NULL");
+
+			Map<String, String> properties = doubletonMap("batch", "true", "reconnect", "true");
+			JdbcWriter writer = new JdbcWriter(createProperties(singletonMap("MESSAGE", "{message}"), properties));
+
+			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+			assertThat(fetchTable(TABLE_NAME)).isEmpty();
+
+			shutdownDatabase();
+
+			assertThatThrownBy(() -> {
+				writer.close();
+			}).isInstanceOf(SQLException.class);
+
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("1");
+		}
+
+		/**
 		 * Verifies that a broken connection to a temporary disappeared {@link DataSource} will be re-establishing, if
 		 * reconnecting is enabled.
 		 *
