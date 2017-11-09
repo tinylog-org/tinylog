@@ -13,8 +13,8 @@
 		<version>2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>test-helpers</artifactId>
-	<name>test helpers</name>
+	<artifactId>test-core</artifactId>
+	<name>test core</name>
 	<description>JUnit rules, AssertJ assertions and other utility classes for testing</description>
 	<url>${website.url}</url>
 

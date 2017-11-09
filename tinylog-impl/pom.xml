@@ -68,7 +68,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.tinylog</groupId>
-			<artifactId>test-helpers</artifactId>
+			<artifactId>test-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.tinylog</groupId>
