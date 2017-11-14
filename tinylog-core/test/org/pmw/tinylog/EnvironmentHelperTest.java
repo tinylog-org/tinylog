@@ -89,6 +89,9 @@ public class EnvironmentHelperTest extends AbstractCoreTest {
 			System.setProperty("java.version", "9");
 			assertTrue(EnvironmentHelper.isAtLeastJava9());
 
+			System.setProperty("java.version", "9.0.1");
+			assertTrue(EnvironmentHelper.isAtLeastJava9());
+
 			System.setProperty("java.version", "10");
 			assertTrue(EnvironmentHelper.isAtLeastJava9());
 		} finally {
@@ -217,7 +220,6 @@ public class EnvironmentHelperTest extends AbstractCoreTest {
 		}
 	}
 
-
 	/**
 	 * Test receiving {@class ModernJavaRuntime} as runtime dialect on Java 9 or higher.
 	 */
@@ -226,6 +228,9 @@ public class EnvironmentHelperTest extends AbstractCoreTest {
 		String version = System.getProperty("java.version");
 		try {
 			System.setProperty("java.version", "9");
+			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(ModernJavaRuntime.class));
+
+			System.setProperty("java.version", "9.0.1");
 			assertThat(Deencapsulation.invoke(EnvironmentHelper.class, "resolveDialect"), instanceOf(ModernJavaRuntime.class));
 
 			System.setProperty("java.version", "10");

@@ -38,7 +38,15 @@ public final class EnvironmentHelper {
 	 */
 	public static boolean isAtLeastJava9() {
 		String version = System.getProperty("java.version");
-		return version != null && version.matches("[0-9]{1,8}") && Integer.parseInt(version) >= 9;
+		if (version == null) {
+			return false;
+		} else {
+			int index = version.indexOf('.');
+			if (index > 0) {
+				version = version.substring(0, index);
+			}
+			return version.matches("[0-9]{1,8}") && Integer.parseInt(version) >= 9;
+		}
 	}
 
 	/**
