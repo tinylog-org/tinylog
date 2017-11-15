@@ -4,13 +4,6 @@
 
 	<property name="fileExtensions" value="java, properties, xml" />
 
-	<!-- Suppressions -->
-	
-	<module name="SuppressionFilter">
-		<property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
-		<property name="optional" value="false" />
-	</module>
-
 	<!-- Headers -->
 
 	<module name="Header">
@@ -28,6 +21,13 @@
 	<module name="FileLength">
 		<property name="fileExtensions" value="java" />
 		<property name="max" value="1000" />
+	</module>
+
+	<!-- Suppressions -->
+	
+	<module name="SuppressionFilter">
+		<property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
+		<property name="optional" value="false" />
 	</module>
 
 	<!-- Miscellaneous -->
