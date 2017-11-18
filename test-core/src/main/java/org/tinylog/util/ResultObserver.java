@@ -26,7 +26,7 @@ public final class ResultObserver {
 	}
 
 	/**
-	 * Waits until the given supplier returns a result value that matches the given predicate or timeout expires.
+	 * Waits until the given supplier returns a result value that the given predicate accepts or timeout expires.
 	 *
 	 * @param <T>
 	 *            Type of return value
