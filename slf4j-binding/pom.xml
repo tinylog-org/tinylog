@@ -81,6 +81,7 @@
 				<configuration>
 					<instructions>
 						<Fragment-Host>slf4j.api</Fragment-Host>
+						<Export-Package>org.slf4j.impl;version=1.6.0</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
