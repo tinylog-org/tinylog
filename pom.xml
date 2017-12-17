@@ -299,6 +299,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.pmw.${project.artifactId};singleton:=true</Bundle-SymbolicName>
+						<_noee>true</_noee>
 					</instructions>
 				</configuration>
 				<executions>
