@@ -88,6 +88,7 @@
 				<configuration>
 					<instructions>
 						<Fragment-Host>org.apache.commons.logging</Fragment-Host>
+						<Export-Package>org.pmw.commons.logging</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
