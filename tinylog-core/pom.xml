@@ -93,7 +93,7 @@
 				<configuration>
 					<instructions>
 						<Import-Package>!*</Import-Package>
-						<Export-Package>org.pmw.tinylog, org.pmw.runtime</Export-Package>
+						<Export-Package>org.pmw.tinylog, org.pmw.tinylog.runtime</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
