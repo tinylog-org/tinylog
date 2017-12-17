@@ -126,6 +126,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
+						<Import-Package>!org.pmw.tinylog*,*</Import-Package>
 						<Export-Package>org.pmw.tinylog, org.pmw.tinylog.runtime,
 							org.pmw.tinylog.labelers, org.pmw.tinylog.policies,
 							org.pmw.tinylog.writers</Export-Package>

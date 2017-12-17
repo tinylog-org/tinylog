@@ -92,6 +92,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
+						<Import-Package>!org.pmw.tinylog*,*</Import-Package>
 						<Export-Package>org.pmw.tinylog, org.pmw.tinylog.runtime</Export-Package>
 					</instructions>
 				</configuration>
