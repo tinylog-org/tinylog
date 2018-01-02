@@ -28,6 +28,7 @@
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -91,7 +92,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Import-Package>!android.*,!dalvik.*,!sun.reflect,*</Import-Package>
+						<Import-Package>!sun.reflect,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -131,7 +131,6 @@
 				<groupId>com.google.android</groupId>
 				<artifactId>android</artifactId>
 				<version>${android.version}</version>
-				<optional>true</optional>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
