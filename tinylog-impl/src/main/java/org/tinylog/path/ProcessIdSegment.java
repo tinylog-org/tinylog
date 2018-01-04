@@ -45,7 +45,7 @@ public final class ProcessIdSegment extends AbstractSegment {
 	}
 
 	@Override
-	public final Collection<String> getAllFiles(final String prefix) {
+	public Collection<String> getAllFiles(final String prefix) {
 		String dictionary = getDictionary(prefix);
 		String[] entries = new File(dictionary).list();
 		if (entries == null || entries.length == 0) {
