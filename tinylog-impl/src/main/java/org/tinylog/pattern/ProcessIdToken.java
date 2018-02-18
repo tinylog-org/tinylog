@@ -26,9 +26,9 @@ import org.tinylog.runtime.RuntimeProvider;
  * Token for outputting the process ID of the JVM that has issued a log entry.
  */
 final class ProcessIdToken implements Token {
-	
-	private int pid;
-	private String rendered;
+
+	private final int pid;
+	private final String rendered;
 
 	/** */
 	ProcessIdToken() {
@@ -45,7 +45,7 @@ final class ProcessIdToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		builder.append(rendered);
 	}
-	
+
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		statement.setInt(index, pid);
