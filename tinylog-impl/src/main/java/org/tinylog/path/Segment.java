@@ -13,38 +13,42 @@
 
 package org.tinylog.path;
 
-import java.util.Collection;
+import java.util.Date;
 
 /**
- * Dynamic segment of a path to log files.
+ * Segment of a dynamic path.
+ *
+ * <p>
+ * A segment represents either a pattern or static text.
+ * </p>
  */
-public interface Segment {
+interface Segment {
 
 	/**
-	 * Gets the latest available log file.
-	 * 
-	 * @param prefix
-	 *            Static path prefix that is already resolved
-	 * @return Full path to the latest log file or {@code null} if there is none
+	 * Gets the static text if available.
+	 *
+	 * @return Static text or {@code null}
 	 */
-	String getLatestFile(String prefix);
+	String getStaticText();
 
 	/**
-	 * Collects all existing log files.
-	 * 
-	 * @param prefix
-	 *            Static path prefix that is already resolved
-	 * @return All existing log files in any order
+	 * Verifies whether a token matches with the segment.
+	 *
+	 * @param token
+	 *            Token to match
+	 * @return {@code true} if token matches with the segment, {@code false} if not
 	 */
-	Collection<String> getAllFiles(String prefix);
+	boolean validateToken(String token);
 
 	/**
-	 * Generates the full path for a new log file.
-	 * 
+	 * Generates a new token.
+	 *
 	 * @param prefix
-	 *            Static path prefix that is already resolved
-	 * @return Full path for new log file
+	 *            Already generated path
+	 * @param date
+	 *            Timestamp for date and time representations
+	 * @return Generated token
 	 */
-	String createNewFile(String prefix);
+	String createToken(String prefix, Date date);
 
 }

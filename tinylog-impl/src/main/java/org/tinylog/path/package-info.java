@@ -12,6 +12,6 @@
  */
 
 /**
- * Path segments for dynamic resolving of paths to log files.
+ * Dynamic path and segments for resolving log file paths with patterns.
  */
 package org.tinylog.path;
