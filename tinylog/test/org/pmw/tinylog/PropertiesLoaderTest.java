@@ -688,7 +688,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 			Labeler labeler = propertiesWriter.labeler;
 			assertThat(labeler, type(TimestampLabeler.class));
 			labeler.init(configurator.create());
-			assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
+			assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log"), 0));
 		}
 	}
 
@@ -1395,7 +1395,7 @@ public class PropertiesLoaderTest extends AbstractTinylogTest {
 		}
 
 		@Override
-		public File getLogFile(final File baseFile) {
+		public File getLogFile(final File baseFile, final int maxBackups) {
 			throw new UnsupportedOperationException();
 		}
 

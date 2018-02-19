@@ -76,7 +76,7 @@ public final class TimestampLabeler implements Labeler {
 	}
 
 	@Override
-	public File getLogFile(final File baseFile) {
+	public File getLogFile(final File baseFile, final int maxBackups) {
 		directory = baseFile.getAbsoluteFile().getParent();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
@@ -90,12 +90,22 @@ public final class TimestampLabeler implements Labeler {
 
 		logFileFilter = new LogFileFilter(filenameWithoutExtension, filenameExtension);
 
+		delete(baseFile.getAbsoluteFile().getParentFile().listFiles(logFileFilter), maxBackups);
+
 		return createFile();
 	}
 
 	@Override
 	public File roll(final File file, final int maxBackups) {
-		File[] files = file.getAbsoluteFile().getParentFile().listFiles(logFileFilter);
+		delete(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter), maxBackups);
+		return createFile();
+	}
+
+	private File createFile() {
+		return new File(directory, filenameWithoutExtension + "." + formatter.getCurrentTimestamp() + filenameExtension);
+	}
+
+	private void delete(final File[] files, final int maxBackups) {
 		if (files != null && files.length > maxBackups) {
 			Arrays.sort(files, LogFileComparator.getInstance());
 			for (int i = maxBackups; i < files.length; ++i) {
@@ -105,12 +115,6 @@ public final class TimestampLabeler implements Labeler {
 				}
 			}
 		}
-
-		return createFile();
-	}
-
-	private File createFile() {
-		return new File(directory, filenameWithoutExtension + "." + formatter.getCurrentTimestamp() + filenameExtension);
 	}
 
 	private interface TimestampFormatter {

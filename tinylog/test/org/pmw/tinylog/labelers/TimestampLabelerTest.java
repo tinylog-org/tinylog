@@ -84,7 +84,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		TimestampLabeler labeler = new TimestampLabeler(TIMESTAMP_FORMAT);
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeler.getLogFile(baseFile));
+		assertEquals(targetFile1, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
@@ -141,7 +141,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		TimestampLabeler labeler = new TimestampLabeler(TIMESTAMP_FORMAT);
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeler.getLogFile(baseFile));
+		assertEquals(targetFile1, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
@@ -187,7 +187,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		TimestampLabeler labeler = new TimestampLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile1, labeler.getLogFile(baseFile));
+		assertEquals(targetFile1, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		targetFile1.createNewFile();
 		targetFile1.setLastModified(systemTimeMock.currentTimeMillis());
 
@@ -220,7 +220,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 
 		TimestampLabeler labeler = new TimestampLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		File currentFile = labeler.getLogFile(baseFile);
+		File currentFile = labeler.getLogFile(baseFile, Integer.MAX_VALUE);
 
 		labeler.roll(currentFile, 0); // Works or fails depending on OS
 		
@@ -251,7 +251,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 
 		File expectedFile = getBackupFile(baseFile, "tmp", "01-02-03.123456");
-		File currentFile = labeler.getLogFile(baseFile);
+		File currentFile = labeler.getLogFile(baseFile, Integer.MAX_VALUE);
 
 		assertEquals(expectedFile, currentFile);
 	}
@@ -273,7 +273,7 @@ public class TimestampLabelerTest extends AbstractLabelerTest {
 		Labeler labeler = createFromProperties("timestamp: yyyy");
 		assertThat(labeler, type(TimestampLabeler.class));
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log")));
+		assertEquals(new File(MessageFormat.format("test.{0,date,yyyy}.log", new Date())).getAbsoluteFile(), labeler.getLogFile(new File("test.log"), 0));
 	}
 
 	private String formatCurrentTime() {

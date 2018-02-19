@@ -151,7 +151,7 @@ public class RegressionsTest extends AbstractTinylogTest {
 
 		TimestampLabeler labeler = new TimestampLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		file = labeler.getLogFile(file);
+		file = labeler.getLogFile(file, Integer.MAX_VALUE);
 		labeler.roll(file, 10); // Failed
 
 		file.delete();

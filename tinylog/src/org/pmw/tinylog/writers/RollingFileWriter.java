@@ -236,7 +236,7 @@ public final class RollingFileWriter implements Writer {
 		EnvironmentHelper.makeDirectories(baseFile);
 
 		labeler.init(configuration);
-		file = labeler.getLogFile(baseFile);
+		file = labeler.getLogFile(baseFile, backups);
 
 		for (Policy policy : policies) {
 			policy.init(configuration);

@@ -50,7 +50,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 		CountLabeler labeler = new CountLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
+		assertSame(baseFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 
 		FileHelper.write(baseFile, "1");
 		assertSame(baseFile, labeler.roll(baseFile, 2));
@@ -97,7 +97,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 		CountLabeler labeler = new CountLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
+		assertSame(baseFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 
 		FileHelper.write(baseFile, "1");
 		assertSame(baseFile, labeler.roll(baseFile, 1));
@@ -127,7 +127,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 		CountLabeler labeler = new CountLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
+		assertSame(baseFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		baseFile.createNewFile();
 		assertFalse(backupFile.exists());
 
@@ -136,6 +136,33 @@ public class CountLabelerTest extends AbstractLabelerTest {
 		assertFalse(backupFile.exists());
 
 		baseFile.delete();
+	}
+
+	/**
+	 * Test deleting redundant backups when getting the log file.
+	 *
+	 * @throws IOException
+	 *             Test failed
+	 */
+	@Test
+	public final void testDeletingBackupsAtStartUp() throws IOException {
+		File baseFile = FileHelper.createTemporaryFile(null);
+		File backupFile1 = getBackupFile(baseFile, null, "0");
+		File backupFile2 = getBackupFile(baseFile, null, "1");
+		File backupFile3 = getBackupFile(baseFile, null, "2");
+		
+		backupFile1.createNewFile();
+		backupFile2.createNewFile();
+		backupFile3.createNewFile();
+
+		CountLabeler labeler = new CountLabeler();
+		labeler.init(ConfigurationCreator.getDummyConfiguration());
+		assertSame(baseFile, labeler.getLogFile(baseFile, 1));
+		assertTrue(backupFile1.exists());
+		assertFalse(backupFile2.exists());
+		assertFalse(backupFile3.exists());
+
+		backupFile1.delete();
 	}
 
 	/**
@@ -155,7 +182,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 		CountLabeler labeler = new CountLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
+		assertSame(baseFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		try {
 			labeler.roll(baseFile, 2); // Works or fails depending on OS
 		} catch (IOException ex) {
@@ -182,7 +209,7 @@ public class CountLabelerTest extends AbstractLabelerTest {
 
 		CountLabeler labeler = new CountLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertSame(baseFile, labeler.getLogFile(baseFile));
+		assertSame(baseFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 
 		try {
 			labeler.roll(baseFile, 0); // Works or fails depending on OS

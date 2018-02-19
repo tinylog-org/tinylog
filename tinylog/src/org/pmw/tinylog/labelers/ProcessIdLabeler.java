@@ -14,7 +14,6 @@
 package org.pmw.tinylog.labelers;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.pmw.tinylog.Configuration;
@@ -51,30 +50,42 @@ public final class ProcessIdLabeler implements Labeler {
 	}
 
 	@Override
-	public File getLogFile(final File baseFile) {
+	public File getLogFile(final File baseFile, final int maxBackups) {
 		String directory = baseFile.getAbsoluteFile().getParent();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
+		
+		File file;
+		
 		if (index > 0) {
 			String filenameWithoutExtension = name.substring(0, index);
 			String filenameExtension = name.substring(index);
 			logFileFilter = new LogFileFilter(filenameWithoutExtension, filenameExtension);
-			return new File(directory, filenameWithoutExtension + "." + pid + filenameExtension);
+			file = new File(directory, filenameWithoutExtension + "." + pid + filenameExtension);
 		} else {
 			logFileFilter = new LogFileFilter(name, "");
-			return new File(directory, name + "." + pid);
+			file = new File(directory, name + "." + pid);
 		}
+
+		delete(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter), maxBackups);
+		
+		return file;
 	}
 
 	@Override
-	public File roll(final File file, final int maxBackups) throws IOException {
+	public File roll(final File file, final int maxBackups) {
 		if (file.exists()) {
 			if (!file.delete()) {
 				InternalLogger.warn("Failed to delete \"{}\"", file);
 			}
 		}
 
-		File[] files = file.getAbsoluteFile().getParentFile().listFiles(logFileFilter);
+		delete(file.getAbsoluteFile().getParentFile().listFiles(logFileFilter), maxBackups);
+
+		return file;
+	}
+
+	private void delete(final File[] files, final int maxBackups) {
 		if (files != null && files.length > maxBackups) {
 			Arrays.sort(files, LogFileComparator.getInstance());
 			for (int i = maxBackups; i < files.length; ++i) {
@@ -84,8 +95,6 @@ public final class ProcessIdLabeler implements Labeler {
 				}
 			}
 		}
-
-		return file;
 	}
 
 }

@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.pmw.tinylog.Configuration;
+import org.pmw.tinylog.InternalLogger;
 
 /**
  * Numbers the backups sequentially: "0" for the newest, "1" for the second newest etc.
@@ -33,7 +34,7 @@ public final class CountLabeler implements Labeler {
 	}
 
 	@Override
-	public File getLogFile(final File baseFile) {
+	public File getLogFile(final File baseFile, final int maxBackups) {
 		String path = baseFile.getPath();
 		String name = baseFile.getName();
 		int index = name.indexOf('.', 1);
@@ -44,6 +45,9 @@ public final class CountLabeler implements Labeler {
 			filenameWithoutExtension = path;
 			filenameExtension = "";
 		}
+
+		delete(maxBackups);
+
 		return baseFile;
 	}
 
@@ -68,6 +72,16 @@ public final class CountLabeler implements Labeler {
 			if (!sourceFile.delete()) {
 				throw new IOException("Failed to delete \"" + sourceFile + "\"");
 			}
+		}
+	}
+
+	private void delete(final int number) {
+		File file = new File(filenameWithoutExtension + "." + number + filenameExtension);
+		if (file.exists()) {
+			if (!file.delete()) {
+				InternalLogger.warn("Failed to delete \"{}\"", file);
+			}
+			delete(number + 1);
 		}
 	}
 

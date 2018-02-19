@@ -58,8 +58,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 
-		assertEquals(realFile, labeler.getLogFile(baseFile));
-
+		assertEquals(realFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		assertEquals(realFile, labeler.roll(realFile, 0));
 
 		realFile.createNewFile();
@@ -84,8 +83,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
 
-		assertEquals(realFile, labeler.getLogFile(baseFile));
-
+		assertEquals(realFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		assertEquals(realFile, labeler.roll(realFile, 0));
 
 		realFile.createNewFile();
@@ -111,7 +109,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		assertEquals(targetFile, labeler.getLogFile(baseFile));
+		assertEquals(targetFile, labeler.getLogFile(baseFile, Integer.MAX_VALUE));
 		assertTrue(targetFile.exists());
 		assertEquals(targetFile, labeler.roll(targetFile, 0));
 		assertFalse(targetFile.exists());
@@ -140,7 +138,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		labeler.roll(labeler.getLogFile(baseFile), 1);
+		labeler.roll(labeler.getLogFile(baseFile, Integer.MAX_VALUE), 1);
 
 		assertFalse(backupFile1.exists());
 		assertTrue(backupFile2.exists());
@@ -161,7 +159,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		File currentFile = labeler.getLogFile(baseFile);
+		File currentFile = labeler.getLogFile(baseFile, Integer.MAX_VALUE);
 		currentFile.createNewFile();
 		FileInputStream stream = new FileInputStream(currentFile);
 
@@ -193,7 +191,7 @@ public class ProcessIdLabelerTest extends AbstractLabelerTest {
 
 		ProcessIdLabeler labeler = new ProcessIdLabeler();
 		labeler.init(ConfigurationCreator.getDummyConfiguration());
-		File currentFile = labeler.getLogFile(baseFile);
+		File currentFile = labeler.getLogFile(baseFile, Integer.MAX_VALUE);
 
 		labeler.roll(currentFile, 0); // Works or fails depending on OS
 

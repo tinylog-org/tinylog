@@ -56,9 +56,11 @@ public interface Labeler {
 	 *
 	 * @param baseFile
 	 *            Defined log file by user
+	 * @param maxBackups
+	 *            Maximum number of backups to store
 	 * @return Real log file
 	 */
-	File getLogFile(File baseFile);
+	File getLogFile(File baseFile, int maxBackups);
 
 	/**
 	 * Rolls existing log files and backups and returns a new log file.
