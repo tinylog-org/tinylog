@@ -49,7 +49,7 @@
 		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>3.0.0-M1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
 		<maven-bundle-plugin.version>3.3.0</maven-bundle-plugin.version>
 		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 		<maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
