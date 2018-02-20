@@ -48,11 +48,14 @@ final class CountSegment implements Segment {
 		}
 
 		if (directory.isDirectory()) {
-			for (String entry : directory.list()) {
-				if (entry.startsWith(filePrefix)) {
-					Long foundCount = parseDigits(entry, filePrefix.length());
-					if (foundCount != null && foundCount + 1 > count) {
-						count = foundCount + 1;
+			String[] entries = directory.list();
+			if (entries != null) {
+				for (String entry : entries) {
+					if (entry.startsWith(filePrefix)) {
+						Long foundCount = parseDigits(entry, filePrefix.length());
+						if (foundCount != null && foundCount + 1 > count) {
+							count = foundCount + 1;
+						}
 					}
 				}
 			}
