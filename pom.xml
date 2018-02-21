@@ -37,7 +37,7 @@
 		<maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.0</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
 		<findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
