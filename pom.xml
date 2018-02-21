@@ -40,7 +40,7 @@
 		<jacoco-maven-plugin.version>0.8.0</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
-		<findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.1</spotbugs-maven-plugin.version>
 		<maven-bundle-plugin.version>3.4.0</maven-bundle-plugin.version>
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
@@ -326,15 +326,15 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>findbugs-maven-plugin</artifactId>
-					<version>${findbugs-maven-plugin.version}</version>
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs-maven-plugin.version}</version>
 					<configuration>
 						<effort>Max</effort>
 						<threshold>Low</threshold>
 						<includeTests>true</includeTests>
 						<failOnError>true</failOnError>
-						<excludeFilterFile>${project.parent.basedir}/configuration/findbugs-filters.xml</excludeFilterFile>
+						<excludeFilterFile>${project.parent.basedir}/configuration/spotbugs-filters.xml</excludeFilterFile>
 					</configuration>
 					<executions>
 						<execution>
