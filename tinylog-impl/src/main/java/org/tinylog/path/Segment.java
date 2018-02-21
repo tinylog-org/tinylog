@@ -16,7 +16,7 @@ package org.tinylog.path;
 import java.util.Date;
 
 /**
- * Segment of a dynamic path.
+ * Segment of a {@link org.tinylog.path.DynamicPath dynamic path} .
  *
  * <p>
  * A segment represents either a pattern or static text.
