@@ -6,8 +6,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - set -o pipefail
-  - "mvn clean install -P release | egrep -v 'Download(ing|ed): '"
+  - mvn clean install -P release
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
