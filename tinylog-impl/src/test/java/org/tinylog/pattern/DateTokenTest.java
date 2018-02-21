@@ -75,8 +75,8 @@ public final class DateTokenTest {
 	public void renderDefaultPattern() {
 		DateToken token = new DateToken();
 
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 00))).containsSequence("2016", "06", "30", "12", "00");
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 15))).containsSequence("2016", "06", "30", "12", "15");
+		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 00))).containsSubsequence("2016", "06", "30", "12", "00");
+		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 15))).containsSubsequence("2016", "06", "30", "12", "15");
 	}
 
 	/**

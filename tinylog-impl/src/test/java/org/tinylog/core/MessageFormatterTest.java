@@ -69,7 +69,7 @@ public final class MessageFormatterTest {
 
 	/**
 	 * Verifies that lazy argument suppliers can be evaluated.
-	 * 
+	 *
 	 * @see Supplier
 	 */
 	@Test
@@ -119,7 +119,7 @@ public final class MessageFormatterTest {
 	 */
 	@Test
 	public void tooFewArguments() {
-		assertThat(format("Hello {}!")).containsSequence("Hello", "!");
+		assertThat(format("Hello {}!")).containsSubsequence("Hello", "!");
 	}
 
 	/**
@@ -127,7 +127,7 @@ public final class MessageFormatterTest {
 	 */
 	@Test
 	public void missingOpenBrace() {
-		assertThat(format("Hello }!", "tinylog")).containsSequence("Hello", "!");
+		assertThat(format("Hello }!", "tinylog")).containsSubsequence("Hello", "!");
 	}
 
 	/**
@@ -135,7 +135,7 @@ public final class MessageFormatterTest {
 	 */
 	@Test
 	public void missingCloseBrace() {
-		assertThat(format("Hello {!", "tinylog")).containsSequence("Hello", "!");
+		assertThat(format("Hello {!", "tinylog")).containsSubsequence("Hello", "!");
 	}
 
 	/**
