@@ -27,6 +27,7 @@ public final class DynamicPath {
 
 	private final List<Segment> segments;
 	private final File folder;
+	private final List<String> plainTexts;
 	private final String suffix;
 
 	/**
@@ -37,6 +38,7 @@ public final class DynamicPath {
 		String normalizedPath = path.replace('/', File.separatorChar);
 
 		segments = new ArrayList<Segment>();
+		plainTexts = new ArrayList<String>();
 
 		String prefix = "";
 		int start = 0;
@@ -55,7 +57,10 @@ public final class DynamicPath {
 						if (prefix.isEmpty() && segments.isEmpty()) {
 							prefix = normalizedPath.substring(0, i);
 						}
-						segments.add(new PlainTextSegment(normalizedPath.substring(start, i)));
+
+						String text = normalizedPath.substring(start, i);
+						segments.add(new PlainTextSegment(text));
+						plainTexts.add(text);
 					}
 
 					start = i + 1;
@@ -82,6 +87,7 @@ public final class DynamicPath {
 			String text = normalizedPath.substring(start, normalizedPath.length());
 			int separator = Math.max(text.lastIndexOf(File.separatorChar), text.lastIndexOf('/'));
 			segments.add(new PlainTextSegment(text));
+			plainTexts.add(text);
 			suffix = separator == -1 ? text : text.substring(separator + 1);
 		} else {
 			suffix = "";
@@ -108,21 +114,11 @@ public final class DynamicPath {
 	/**
 	 * Gets all files that are compatible with the dynamic path.
 	 *
-	 * <p>
-	 * This method will simply return all files that are located in deepest directory that can be resolved without
-	 * parsing any patterns and have the same static suffix as the dynamic path.
-	 * </p>
-	 *
-	 * <p>
-	 * For example, the regular expression for getting all files for the dynamic path
-	 * "<code>logs/year-{yyyy}/{count}.log</code>" would be "<code>logs/year-.*\.log</code>".
-	 * </p>
-	 *
 	 * @return Found files
 	 */
 	public List<File> getAllFiles() {
 		List<File> files = new ArrayList<File>();
-		collectFiles(folder, suffix, files);
+		collectFiles(folder, files);
 		return files;
 	}
 
@@ -135,6 +131,38 @@ public final class DynamicPath {
 	 */
 	public boolean isValid(final File file) {
 		return isValid(file.getPath(), 0, 0);
+	}
+
+	/**
+	 * Collects files from a folder and all nested sub folders.
+	 *
+	 * @param folder
+	 *            Base folder for starting search
+	 * @param found
+	 *            All found files will be added to this list
+	 */
+	private void collectFiles(final File folder, final List<File> found) {
+		File[] files = folder.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					collectFiles(file, found);
+				} else if (file.isFile() && file.getPath().endsWith(suffix)) {
+					int index = 0;
+
+					for (String text : plainTexts) {
+						index = file.getPath().indexOf(text, index);
+						if (index == -1) {
+							break;
+						}
+					}
+
+					if (index >= 0) {
+						found.add(file);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -205,29 +233,6 @@ public final class DynamicPath {
 			return new ProcessIdSegment();
 		} else {
 			throw new IllegalArgumentException("Invalid token '" + token + "' in '" + path + "'");
-		}
-	}
-
-	/**
-	 * Collects files from a folder and all nested sub folders.
-	 *
-	 * @param folder
-	 *            Base folder for starting search
-	 * @param suffix
-	 *            Only files that ends with this suffix will be collected
-	 * @param found
-	 *            All found files will be added to this list
-	 */
-	private static void collectFiles(final File folder, final String suffix, final List<File> found) {
-		File[] files = folder.listFiles();
-		if (files != null) {
-			for (File file : files) {
-				if (file.isDirectory()) {
-					collectFiles(file, suffix, found);
-				} else if (file.isFile() && file.getPath().endsWith(suffix)) {
-					found.add(file);
-				}
-			}
 		}
 	}
 

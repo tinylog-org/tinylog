@@ -168,7 +168,7 @@ public final class DynamicPathTest {
 	}
 
 	/**
-	 * Verifies that all files of a folder will be returned that compatible with the configured dynamic path.
+	 * Verifies that all files of a folder will be returned that are compatible with the configured dynamic path.
 	 *
 	 * @throws IOException
 	 *             Failed to create files
@@ -185,7 +185,7 @@ public final class DynamicPathTest {
 	}
 
 	/**
-	 * Verifies that all files of subfolders will be returned that compatible with the configured dynamic path.
+	 * Verifies that all files of subfolders will be returned that are compatible with the configured dynamic path.
 	 *
 	 * @throws IOException
 	 *             Failed to create folder or files
@@ -200,6 +200,24 @@ public final class DynamicPathTest {
 		String pattern = new File(folder.getRoot(), "{date:YYYY}" + File.separator + "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
 		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(file);
+	}
+
+	/**
+	 * Verifies that all files of a folder will be returned that are compatible with a dynamic path that contains two
+	 * tokens.
+	 *
+	 * @throws IOException
+	 *             Failed to create files
+	 */
+	@Test
+	public void getMultiTokenFiles() throws IOException {
+		File first = folder.newFile("2018_1.log");
+		File second = folder.newFile("2018_2.log");
+		folder.newFile("2018+3.log");
+
+		String pattern = new File(folder.getRoot(), "{date:YYYY}_{count}.log").getAbsolutePath();
+		DynamicPath path = new DynamicPath(pattern);
+		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
