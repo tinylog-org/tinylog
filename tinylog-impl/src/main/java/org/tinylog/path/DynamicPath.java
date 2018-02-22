@@ -15,6 +15,7 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -112,13 +113,15 @@ public final class DynamicPath {
 	}
 
 	/**
-	 * Gets all files that are compatible with the dynamic path.
+	 * Gets all files that are compatible with the dynamic path. The returned files are sorted by the last modification
+	 * date. The most recently modified files are at the top, the oldest at the bottom of the list.
 	 *
 	 * @return Found files
 	 */
 	public List<File> getAllFiles() {
 		List<File> files = new ArrayList<File>();
 		collectFiles(folder, files);
+		Collections.sort(files, LastModifiedFileComparator.INSTANCE);
 		return files;
 	}
 

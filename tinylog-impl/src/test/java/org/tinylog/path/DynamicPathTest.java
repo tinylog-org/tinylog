@@ -16,6 +16,8 @@ package org.tinylog.path;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.junit.Rule;
@@ -218,6 +220,31 @@ public final class DynamicPathTest {
 		String pattern = new File(folder.getRoot(), "{date:YYYY}_{count}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
 		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(first, second);
+	}
+
+	/**
+	 * Verifies that all found files are sorted correctly by last modification date. The youngest file should come first
+	 * and the oldest last.
+	 *
+	 * @throws IOException
+	 *             Failed to create files
+	 */
+	@Test
+	public void getSortedFiles() throws IOException {
+		ZonedDateTime now = ZonedDateTime.now();
+
+		File first = folder.newFile("1.log");
+		first.setLastModified(now.toEpochSecond());
+
+		File second = folder.newFile("2.log");
+		second.setLastModified(now.minus(1, ChronoUnit.DAYS).toEpochSecond());
+
+		File third = folder.newFile("3.log");
+		third.setLastModified(now.plus(1, ChronoUnit.DAYS).toEpochSecond());
+
+		String pattern = new File(folder.getRoot(), "{count}.log").getAbsolutePath();
+		DynamicPath path = new DynamicPath(pattern);
+		assertThat(path.getAllFiles()).containsExactly(third, first, second);
 	}
 
 	/**
