@@ -82,7 +82,7 @@ public final class FileWriter implements Writer {
 	 *            Continuing existing file
 	 */
 	FileWriter(final String filename, final Boolean buffered, final Boolean append) {
-		this.filename = filename;
+		this.filename = PathResolver.resolve(filename);
 		this.buffered = buffered == null ? false : buffered;
 		this.append = append == null ? false : append;
 	}
