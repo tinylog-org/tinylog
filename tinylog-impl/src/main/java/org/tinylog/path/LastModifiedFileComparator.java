@@ -14,14 +14,17 @@
 package org.tinylog.path;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * Comparator for sorting files by last modification date. The most recently modified files come first, the oldest last.
  */
-final class LastModifiedFileComparator implements Comparator<File> {
+final class LastModifiedFileComparator implements Comparator<File>, Serializable {
 
 	static final LastModifiedFileComparator INSTANCE = new LastModifiedFileComparator();
+
+	private static final long serialVersionUID = 1L;
 
 	/** */
 	private LastModifiedFileComparator() {
