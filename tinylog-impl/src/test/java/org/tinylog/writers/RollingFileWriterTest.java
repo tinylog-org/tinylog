@@ -406,22 +406,22 @@ public final class RollingFileWriterTest {
 		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
 
 		File file1 = new File(folder.getRoot(), "0/log");
-		file1.mkdirs();
+		file1.getParentFile().mkdirs();
 		file1.createNewFile();
 		file1.setLastModified(System.currentTimeMillis() + 0000);
 
 		File file2 = new File(folder.getRoot(), "1/log");
-		file2.mkdirs();
+		file2.getParentFile().mkdirs();
 		file2.createNewFile();
 		file2.setLastModified(System.currentTimeMillis() + 1000);
 
 		File file3 = new File(folder.getRoot(), "2/log");
-		file3.mkdirs();
+		file3.getParentFile().mkdirs();
 		file3.createNewFile();
 		file3.setLastModified(System.currentTimeMillis() + 2000);
 
 		File file4 = new File(folder.getRoot(), "3/log");
-		file4.mkdirs();
+		file4.getParentFile().mkdirs();
 		file4.createNewFile();
 		file4.setLastModified(System.currentTimeMillis() + 3000);
 
