@@ -14,7 +14,7 @@
 package org.tinylog.policies;
 
 /**
- * Policies trigger rollover events.
+ * Policies are used by {@link org.tinylog.writers.RollingFileWriter RollingFileWriter} for triggering rollover events.
  */
 public interface Policy {
 

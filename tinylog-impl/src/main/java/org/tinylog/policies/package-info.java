@@ -12,6 +12,6 @@
  */
 
 /**
- * Policies for triggering rollover events.
+ * Policies for triggering rollover events for {@link org.tinylog.writers.RollingFileWriter RollingFileWriter}.
  */
 package org.tinylog.policies;
