@@ -362,8 +362,8 @@ public final class RollingFileWriterTest {
 	 *             Failed access to temporary folder or files
 	 */
 	@Test
-	public void warnIfDeletingFailedOnWindows() throws IOException {
-		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("dos"));
+	public void warnIfDeletionFailedOnWindows() throws IOException {
+		assumeTrue(System.getProperty("os.name").startsWith("Windows"));
 
 		File file1 = folder.newFile("0");
 		File file2 = folder.newFile("1");
@@ -402,7 +402,7 @@ public final class RollingFileWriterTest {
 	 *             Failed access to temporary folder or files
 	 */
 	@Test
-	public void warnIfDeletingFailedOnPosix() throws IOException {
+	public void warnIfDeletionFailedOnPosix() throws IOException {
 		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
 
 		File file1 = new File(folder.getRoot(), "0/log");
