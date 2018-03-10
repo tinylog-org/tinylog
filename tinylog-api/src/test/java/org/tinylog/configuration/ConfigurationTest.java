@@ -241,8 +241,21 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveSystemProperty() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${os.name}"));
+		loadProperies(FileSystem.createTemporaryFile("test = #{os.name}"));
 		assertThat(Configuration.get("test")).isEqualTo(System.getProperty("os.name"));
+	}
+
+	/**
+	 * Verifies that multiple system properties will be resolved in a text.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void resolveMultipleProperties() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = JRE #{java.version} from #{java.vendor}"));
+		assertThat(Configuration.get("test"))
+			.isEqualTo("JRE " + System.getProperty("java.version") + " from " + System.getProperty("java.vendor"));
 	}
 
 	/**
@@ -258,33 +271,15 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Verifies that system properties will win, if there is a matching system property and environment variable.
+	 * Verifies that mixed environment variables and system properties will be resolved in a text.
 	 *
 	 * @throws Exception
 	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
 	 */
 	@Test
-	public void systemPropertyOverridesEnvironmentVariable() throws Exception {
-		System.setProperty("PATH", "Hello World!");
-		try {
-			loadProperies(FileSystem.createTemporaryFile("test = ${PATH}"));
-			assertThat(Configuration.get("test")).isEqualTo(System.getProperty("PATH"));
-		} finally {
-			System.clearProperty("PATH");
-		}
-	}
-
-	/**
-	 * Verifies that multiple variables will be resolved in a text.
-	 *
-	 * @throws Exception
-	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
-	 */
-	@Test
-	public void resolveMultipleVariables() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = JRE ${java.version} from ${java.vendor}"));
-		assertThat(Configuration.get("test"))
-			.isEqualTo("JRE " + System.getProperty("java.version") + " from " + System.getProperty("java.vendor"));
+	public void resolveMixedVariablesAndProperties() throws Exception {
+		loadProperies(FileSystem.createTemporaryFile("test = ${path} read by JRE #{java.version}"));
+		assertThat(Configuration.get("test")).isEqualTo(System.getenv("path") + " read by JRE " + System.getProperty("java.version"));
 	}
 
 	/**

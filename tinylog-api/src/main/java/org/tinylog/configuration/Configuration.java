@@ -197,8 +197,10 @@ public final class Configuration {
 
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			String value = (String) entry.getValue();
-			if (value.contains("${")) {
-				properties.put(entry.getKey(), resolve(value));
+			if (value.indexOf('{') != -1) {
+				value = resolve(value, EnvironmentVariableResolver.INSTANCE);
+				value = resolve(value, SystemPropertyResolver.INSTANCE);
+				properties.put(entry.getKey(), value);
 			}
 		}
 
@@ -225,21 +227,26 @@ public final class Configuration {
 	}
 
 	/**
-	 * Replaces <code>${}</code> placeholders with system properties or environment variables.
+	 * Resolves placeholders with passed resolver.
 	 *
 	 * @param value
 	 *            String with placeholders
+	 * @param resolver
+	 *            Resolver for replacing placeholders
 	 * @return Input value with resolved placeholders
 	 */
-	private static String resolve(final String value) {
+	private static String resolve(final String value, final Resolver resolver) {
 		StringBuilder builder = new StringBuilder();
 		int position = 0;
 
-		for (int index = value.indexOf("${"); index != -1; index = value.indexOf("${", position)) {
+		String prefix = resolver.getPrefix() + "{";
+		String postfix = "}";
+
+		for (int index = value.indexOf(prefix); index != -1; index = value.indexOf(prefix, position)) {
 			builder.append(value, position, index);
 
 			int start = index + 2;
-			int end = value.indexOf("}", start);
+			int end = value.indexOf(postfix, start);
 
 			if (end == -1) {
 				InternalLogger.log(Level.WARNING, "Closing curly brace is missing for '" + value + "'");
@@ -252,12 +259,12 @@ public final class Configuration {
 				return value;
 			}
 
-			String variable = getVariable(name);
-			if (variable == null) {
-				InternalLogger.log(Level.WARNING, "'" + name + "' could not be found in system properties nor in environment variables");
+			String data = resolver.resolve(name);
+			if (data == null) {
+				InternalLogger.log(Level.WARNING, "'" + name + "' could not be found in " + resolver.getName());
 				return value;
 			} else {
-				builder.append(variable);
+				builder.append(data);
 			}
 
 			position = end + 1;
@@ -265,21 +272,6 @@ public final class Configuration {
 
 		builder.append(value, position, value.length());
 		return builder.toString();
-	}
-
-	/**
-	 * Resolves a system property or environment variable. If both exists, the system property will win.
-	 *
-	 * @param name
-	 *            Name of system property or environment variable
-	 * @return Found value or {@code null} if not set
-	 */
-	private static String getVariable(final String name) {
-		String value = System.getProperty(name);
-		if (value == null) {
-			value = System.getenv(name);
-		}
-		return value;
 	}
 
 }
