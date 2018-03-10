@@ -46,8 +46,10 @@ public final class DailyPolicy implements Policy {
 		} else {
 			Matcher matcher = TIME_PATTERN.matcher(argument);
 			if (matcher.matches()) {
-				calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(matcher.group(GROUP_HOUR)));
-				calendar.set(Calendar.MINUTE, matcher.groupCount() >= GROUP_MINUTE ? Integer.parseInt(matcher.group(GROUP_MINUTE)) : 0);
+				String hour = matcher.group(GROUP_HOUR);
+				String minute = matcher.group(GROUP_MINUTE);
+				calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+				calendar.set(Calendar.MINUTE, minute == null ? 0 : Integer.parseInt(minute));
 			} else {
 				throw new IllegalArgumentException("Invalid time for daily policy: " + argument);
 			}
