@@ -278,8 +278,8 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveMixedVariablesAndProperties() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${path} read by JRE #{java.version}"));
-		assertThat(Configuration.get("test")).isEqualTo(System.getenv("path") + " read by JRE " + System.getProperty("java.version"));
+		loadProperies(FileSystem.createTemporaryFile("test = ${PATH} read by JRE #{java.version}"));
+		assertThat(Configuration.get("test")).isEqualTo(System.getenv("PATH") + " read by JRE " + System.getProperty("java.version"));
 	}
 
 	/**
