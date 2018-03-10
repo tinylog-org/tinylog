@@ -33,6 +33,7 @@ import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -444,6 +445,30 @@ public final class DailyPolicyTest {
 
 			when(System.currentTimeMillis()).thenReturn(milliseconds);
 			when(Calendar.getInstance()).then(new CalendarAnswer(milliseconds));
+		}
+
+	}
+
+	/**
+	 * Tests for daily policy with invalid custom times.
+	 */
+	public static final class InvalidCustomTimeTest {
+
+		/**
+		 * Verifies that an illegal argument exception will be thrown if the time argument does not contain any digits.
+		 */
+		@Test
+		public void nonNumericString() {
+			assertThatThrownBy(() -> new DailyPolicy("abc")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("abc");
+		}
+
+		/**
+		 * Verifies that an illegal argument exception will be thrown if the time argument does not contain any digits
+		 * after the delimiter.
+		 */
+		@Test
+		public void delimiterWithoutMinutes() {
+			assertThatThrownBy(() -> new DailyPolicy("01:")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("01:");
 		}
 
 	}
