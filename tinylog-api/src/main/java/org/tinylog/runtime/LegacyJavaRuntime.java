@@ -23,23 +23,15 @@ import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 /**
- * Runtime dialect implementation for Sun's and Oracle's Java Virtual Machines.
+ * Runtime dialect implementation for Java 6-8.
  */
-@IgnoreJRERequirement
-final class JavaRuntime implements RuntimeDialect {
+final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
-	private final boolean hasSunReflection;
 	private final Method stackTraceElementGetter;
 
 	/** */
-	JavaRuntime() {
-		hasSunReflection = hasSunReflection();
+	LegacyJavaRuntime() {
 		stackTraceElementGetter = getStackTraceElementGetter();
-	}
-
-	@Override
-	public String getDefaultWriter() {
-		return "console";
 	}
 
 	@Override
@@ -57,9 +49,10 @@ final class JavaRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	@SuppressWarnings({ "restriction", "deprecation" })
+	@SuppressWarnings("deprecation")
+	@IgnoreJRERequirement
 	public String getCallerClassName(final int depth) {
-		if (hasSunReflection) {
+		if (isSunReflectionAvailable()) {
 			return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
 		} else {
 			return getCallerStackTraceElement(depth + 1).getClassName();
@@ -92,34 +85,17 @@ final class JavaRuntime implements RuntimeDialect {
 	}
 
 	/**
-	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
-	 *
-	 * @return {@code true} if available, {@code true} if not
-	 */
-	@SuppressWarnings({ "restriction", "deprecation", "javadoc" })
-	private static boolean hasSunReflection() {
-		try {
-			return JavaRuntime.class.equals(sun.reflect.Reflection.getCallerClass(1));
-		} catch (NoClassDefFoundError error) {
-			return false;
-		} catch (NoSuchMethodError error) {
-			return false;
-		} catch (Exception ex) {
-			return false;
-		}
-	}
-
-	/**
 	 * Gets {@link Throwable#getStackTraceElement(int)} as accessible method.
 	 *
 	 * @return Instance if available, {@code null} if not
 	 */
+	@SuppressWarnings("javadoc")
 	private static Method getStackTraceElementGetter() {
 		try {
 			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			method.setAccessible(true);
 			StackTraceElement stackTraceElement = (StackTraceElement) method.invoke(new Throwable(), 0);
-			if (JavaRuntime.class.getName().equals(stackTraceElement.getClassName())) {
+			if (LegacyJavaRuntime.class.getName().equals(stackTraceElement.getClassName())) {
 				return method;
 			} else {
 				return null;

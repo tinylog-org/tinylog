@@ -21,6 +21,8 @@ import java.util.Locale;
  */
 public final class RuntimeProvider {
 
+	private static final int MINIMUM_VERSION_MODERN_JAVA = 9;
+
 	private static final RuntimeDialect dialect = resolveDialect();
 
 	/** */
@@ -105,10 +107,35 @@ public final class RuntimeProvider {
 	 * @return Resolved runtime dialect
 	 */
 	private static RuntimeDialect resolveDialect() {
-		if ("Android Runtime".equalsIgnoreCase(System.getProperty("java.runtime.name"))) {
+		if (getJavaVersion() >= MINIMUM_VERSION_MODERN_JAVA) {
+			return new ModernJavaRuntime();
+		} else if ("Android Runtime".equalsIgnoreCase(System.getProperty("java.runtime.name"))) {
 			return new AndroidRuntime();
 		} else {
-			return new JavaRuntime();
+			return new LegacyJavaRuntime();
+		}
+	}
+
+	/**
+	 * Gets the major version number of Java.
+	 *
+	 * @return Major version number of Java or -1 if unknown
+	 */
+	private static int getJavaVersion() {
+		String version = System.getProperty("java.version");
+		if (version == null) {
+			return -1;
+		} else {
+			int index = version.indexOf('.');
+			if (index > 0) {
+				version = version.substring(0, index);
+			}
+
+			try {
+				return Integer.parseInt(version);
+			} catch (NumberFormatException ex) {
+				return -1;
+			}
 		}
 	}
 

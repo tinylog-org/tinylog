@@ -13,7 +13,6 @@
 
 package org.tinylog.pattern;
 
-import java.lang.management.ManagementFactory;
 import java.time.LocalDate;
 
 import org.junit.Rule;
@@ -80,8 +79,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void processId() {
-		String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		assertThat(render("pid", LogEntryBuilder.empty().create())).isEqualTo(pid);
+		assertThat(render("pid", LogEntryBuilder.empty().create())).isEqualTo(Long.toString(ProcessHandle.current().pid()));
 	}
 
 	/**

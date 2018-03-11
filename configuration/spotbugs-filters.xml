@@ -24,7 +24,7 @@
 		<!-- Runtime Dialects -->
 		<Or>
 			<Class name="org.tinylog.runtime.AndroidRuntime" />
-			<Class name="org.tinylog.runtime.JavaRuntime" />
+			<Class name="org.tinylog.runtime.LegacyJavaRuntime" />
 		</Or>
 		<!-- Runtime dialects use non-public API that throws maybe unknown exceptions -->
 		<Bug pattern="REC_CATCH_EXCEPTION" />
@@ -45,6 +45,11 @@
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="DM_USELESS_THREAD, DP_DO_INSIDE_DO_PRIVILEGED, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE, RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, SIC_INNER_SHOULD_BE_STATIC_ANON, UPM_UNCALLED_PRIVATE_METHOD, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+	</Match>
+	<Match>
+		<!-- Workaround for https://github.com/spotbugs/spotbugs/issues/493 -->
+		<Source name="~.*(Test|Benchmark)\.java" />
+		<Bug pattern="OBL_UNSATISFIED_OBLIGATION" />
 	</Match>
 	<Match>
 		<!-- Benchmarks -->

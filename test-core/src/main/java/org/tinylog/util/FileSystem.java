@@ -174,7 +174,7 @@ public final class FileSystem {
 	 * @throws URISyntaxException
 	 *             Failed converting class path URL to an URI
 	 */
-	@SuppressWarnings({ "deprecation", "restriction" })
+	@SuppressWarnings("deprecation")
 	private static URI getClassPathUri() throws URISyntaxException {
 		Class<?> caller;
 		int i = 1;

@@ -37,11 +37,11 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
- * Tests for {@link JavaRuntime}.
+ * Tests for {@link LegacyJavaRuntime}.
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
-public final class JavaRuntimeTest {
+public final class LegacyJavaRuntimeTest {
 
 	/**
 	 * Redirects and collects system output streams.
@@ -54,7 +54,7 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void defaultWriter() {
-		assertThat(new JavaRuntime().getDefaultWriter()).isEqualTo("console");
+		assertThat(new LegacyJavaRuntime().getDefaultWriter()).isEqualTo("console");
 	}
 
 	/**
@@ -62,15 +62,14 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void processId() {
-		String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		assertThat(new JavaRuntime().getProcessId()).isEqualTo(Integer.parseInt(pid));
+		assertThat(new LegacyJavaRuntime().getProcessId()).isEqualTo(ProcessHandle.current().pid());
 	}
 
 	/**
 	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain the expected '@' character.
 	 */
 	@Test
-	@PrepareForTest(JavaRuntime.class)
+	@PrepareForTest(LegacyJavaRuntime.class)
 	public void invalidJvmName() {
 		RuntimeMXBean bean = mock(RuntimeMXBean.class);
 		when(bean.getName()).thenReturn("test");
@@ -78,7 +77,7 @@ public final class JavaRuntimeTest {
 		mockStatic(ManagementFactory.class);
 		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
 
-		assertThat(new JavaRuntime().getProcessId()).isEqualTo(-1);
+		assertThat(new LegacyJavaRuntime().getProcessId()).isEqualTo(-1);
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("test");
 	}
 
@@ -86,7 +85,7 @@ public final class JavaRuntimeTest {
 	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain a numeric process ID (pid).
 	 */
 	@Test
-	@PrepareForTest(JavaRuntime.class)
+	@PrepareForTest(LegacyJavaRuntime.class)
 	public void invalidProcessId() {
 		RuntimeMXBean bean = mock(RuntimeMXBean.class);
 		when(bean.getName()).thenReturn("abc@test");
@@ -94,7 +93,7 @@ public final class JavaRuntimeTest {
 		mockStatic(ManagementFactory.class);
 		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
 
-		assertThat(new JavaRuntime().getProcessId()).isEqualTo(-1);
+		assertThat(new LegacyJavaRuntime().getProcessId()).isEqualTo(-1);
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("abc");
 	}
 
@@ -103,19 +102,18 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void callerClassName() {
-		assertThat(new JavaRuntime().getCallerClassName(1)).isEqualTo(JavaRuntimeTest.class.getName());
+		assertThat(new LegacyJavaRuntime().getCallerClassName(1)).isEqualTo(LegacyJavaRuntimeTest.class.getName());
 	}
 
 	/**
 	 * Verifies that the fully-qualified class name of a caller can be returned, if {@link sun.reflect.Reflection} is
 	 * not available.
 	 */
-	@SuppressWarnings("restriction")
 	@Test
 	public void missingSunReflection() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 		Whitebox.setInternalState(runtime, boolean.class, false);
-		assertThat(runtime.getCallerClassName(1)).isEqualTo(JavaRuntimeTest.class.getName());
+		assertThat(runtime.getCallerClassName(1)).isEqualTo(LegacyJavaRuntimeTest.class.getName());
 	}
 
 	/**
@@ -123,16 +121,17 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void callerStackTraceElement() {
-		assertThat(new JavaRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+		assertThat(new LegacyJavaRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
 	}
 
 	/**
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} is not available.
 	 */
+	@SuppressWarnings("javadoc")
 	@Test
 	public void missingStackTraceElementGetter() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 		Whitebox.setInternalState(runtime, Method.class, (Object) null);
 		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
 	}
@@ -141,12 +140,14 @@ public final class JavaRuntimeTest {
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} is not accessible.
 	 */
+	@SuppressWarnings("javadoc")
 	@Test
 	public void notAccessibleSingleStackTraceElementGetter() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
-		Method method = Whitebox.getInternalState(runtime, Method.class);
+		Method method = Whitebox.getMethod(LegacyJavaRuntimeTest.class, "getStackTraceElement", int.class);
 		method.setAccessible(false);
+		Whitebox.setInternalState(runtime, Method.class, method);
 
 		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
 		assertThat(systemStream.consumeErrorOutput())
@@ -158,11 +159,12 @@ public final class JavaRuntimeTest {
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} throws an exception.
 	 */
+	@SuppressWarnings("javadoc")
 	@Test
 	public void stackTraceElementGetterThrowsException() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
-		Method method = Whitebox.getMethod(JavaRuntimeTest.class, "getStackTraceElement", int.class);
+		Method method = Whitebox.getMethod(LegacyJavaRuntimeTest.class, "getStackTraceElement", int.class);
 		Whitebox.setInternalState(runtime, Method.class, method);
 
 		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
@@ -179,7 +181,7 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void creatingTimestamp() throws InterruptedException {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
 		Timestamp timestamp = runtime.createTimestamp();
 		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
@@ -195,7 +197,7 @@ public final class JavaRuntimeTest {
 	 */
 	@Test
 	public void creatingTimestampFormatter() {
-		JavaRuntime runtime = new JavaRuntime();
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
 		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
 		assertThat(formatter).isInstanceOf(FastTimestampFormatter.class);
@@ -214,7 +216,7 @@ public final class JavaRuntimeTest {
 	 *            Position of stack trace element
 	 * @return Nothing, will always throw an exception
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "javadoc" })
 	private static StackTraceElement getStackTraceElement(final int index) {
 		throw new UnsupportedOperationException();
 	}

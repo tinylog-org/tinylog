@@ -3,7 +3,7 @@ sudo: false
 install: true
 
 jdk:
-  - oraclejdk8
+  - oraclejdk9
 
 script:
   - mvn clean install -P release

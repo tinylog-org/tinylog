@@ -46,7 +46,7 @@ Differences to tinylog 1.x
 Build tinylog
 -------------
 
-tinylog requires at least Maven 3.2.5 and JDK 8 for building. The generated JARs are compatible with Java 6 and higher.
+tinylog requires at least Maven 3 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
 
 Build command:
 

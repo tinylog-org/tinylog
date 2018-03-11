@@ -209,7 +209,7 @@ public final class AndroidRuntimeTest {
 	 */
 	@Test
 	public void creatingTimestampFormatter() {
-		JavaRuntime runtime = new JavaRuntime();
+		AndroidRuntime runtime = new AndroidRuntime();
 
 		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
 		assertThat(formatter).isInstanceOf(FastTimestampFormatter.class);

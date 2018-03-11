@@ -13,7 +13,6 @@
 
 package org.tinylog.runtime;
 
-import java.lang.management.ManagementFactory;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -35,6 +34,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public final class RuntimeProviderTest {
 
 	private String runtime;
+	private String version;
 
 	/**
 	 * Stores backup of runtime name system property.
@@ -42,6 +42,7 @@ public final class RuntimeProviderTest {
 	@Before
 	public void init() {
 		runtime = System.getProperty("java.runtime.name");
+		version = System.getProperty("java.version");
 	}
 
 	/**
@@ -53,6 +54,7 @@ public final class RuntimeProviderTest {
 	@After
 	public void reset() throws Exception {
 		System.setProperty("java.runtime.name", runtime);
+		System.setProperty("java.version", version);
 
 		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
 		Whitebox.setInternalState(RuntimeProvider.class, RuntimeDialect.class, dialect);
@@ -71,8 +73,7 @@ public final class RuntimeProviderTest {
 	 */
 	@Test
 	public void processId() {
-		String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Integer.parseInt(pid));
+		assertThat(RuntimeProvider.getProcessId()).isEqualTo(ProcessHandle.current().pid());
 	}
 
 	/**
@@ -219,34 +220,55 @@ public final class RuntimeProviderTest {
 	@Test
 	public void detectAndroidRuntime() throws Exception {
 		System.setProperty("java.runtime.name", "Android Runtime");
+		System.setProperty("java.version", "0");
+
 		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
 		assertThat(dialect).isInstanceOf(AndroidRuntime.class);
 	}
 
 	/**
-	 * Verifies that {@link JavaRuntime} will be resolved as runtime dialect in Sun or Oracle Java Virtual Machines.
+	 * Verifies that {@link LegacyJavaRuntime} will be resolved as runtime dialect in Java 6 Virtual Machines.
 	 *
 	 * @throws Exception
 	 *             Failed invoking private method {@link RuntimeProvider#resolveDialect()}
 	 */
 	@Test
-	public void detectOracleJavaRuntime() throws Exception {
-		System.setProperty("java.runtime.name", "Java(TM) SE Runtime Environment");
+	public void detectJava6Runtime() throws Exception {
+		System.setProperty("java.runtime.name", "OpenJDK Runtime Environment");
+		System.setProperty("java.version", "1.6.0_23");
+
 		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
-		assertThat(dialect).isInstanceOf(JavaRuntime.class);
+		assertThat(dialect).isInstanceOf(LegacyJavaRuntime.class);
 	}
 
 	/**
-	 * Verifies that {@link JavaRuntime} will be resolved as runtime dialect in OpenJDK Java Virtual Machines.
+	 * Verifies that {@link LegacyJavaRuntime} will be resolved as runtime dialect in Java 8 Virtual Machines.
 	 *
 	 * @throws Exception
 	 *             Failed invoking private method {@link RuntimeProvider#resolveDialect()}
 	 */
 	@Test
-	public void detectOpenJdkRuntime() throws Exception {
-		System.setProperty("java.runtime.name", "OpenJDK Runtime Environment");
+	public void detectJava8Runtime() throws Exception {
+		System.setProperty("java.runtime.name", "Java(TM) SE Runtime Environment");
+		System.setProperty("java.version", "1.8.0_111");
+
 		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
-		assertThat(dialect).isInstanceOf(JavaRuntime.class);
+		assertThat(dialect).isInstanceOf(LegacyJavaRuntime.class);
+	}
+
+	/**
+	 * Verifies that {@link ModernJavaRuntime} will be resolved as runtime dialect in Java 9 Virtual Machines.
+	 *
+	 * @throws Exception
+	 *             Failed invoking private method {@link RuntimeProvider#resolveDialect()}
+	 */
+	@Test
+	public void detectJava9Runtime() throws Exception {
+		System.setProperty("java.runtime.name", "Java(TM) SE Runtime Environment");
+		System.setProperty("java.version", "9.0.4");
+
+		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
+		assertThat(dialect).isInstanceOf(ModernJavaRuntime.class);
 	}
 
 }
