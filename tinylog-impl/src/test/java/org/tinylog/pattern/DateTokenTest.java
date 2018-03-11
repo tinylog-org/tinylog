@@ -13,13 +13,10 @@
 
 package org.tinylog.pattern;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 import org.junit.Test;
 import org.tinylog.core.LogEntry;
@@ -130,13 +127,12 @@ public final class DateTokenTest {
 	/**
 	 * Creates a log entry that contains a date.
 	 *
-	 * @param timestamp
+	 * @param date
 	 *            Date for log entry
 	 * @return Filled log entry
 	 */
-	private static LogEntry createLogEntry(final LocalDateTime timestamp) {
-		ZonedDateTime zonedDateTime = ZonedDateTime.of(timestamp, ZoneOffset.systemDefault());
-		return LogEntryBuilder.empty().date(Date.from(zonedDateTime.toInstant())).create();
+	private static LogEntry createLogEntry(final LocalDateTime date) {
+		return LogEntryBuilder.empty().date(date).create();
 	}
 
 }

@@ -13,10 +13,10 @@
 
 package org.tinylog.core;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.tinylog.Level;
+import org.tinylog.runtime.Timestamp;
 
 /**
  * Immutable holder of all required data for writing a log entry.
@@ -27,7 +27,7 @@ import org.tinylog.Level;
  */
 public final class LogEntry {
 
-	private final Date date;
+	private final Timestamp timestamp;
 	private final Thread thread;
 	private final Map<String, String> context;
 	private final String className;
@@ -40,8 +40,8 @@ public final class LogEntry {
 	private final Throwable exception;
 
 	/**
-	 * @param date
-	 *            Issuing date and time of this log entry
+	 * @param timestamp
+	 *            Date and time of issuing this log entry
 	 * @param thread
 	 *            Thread that has issued this log entry
 	 * @param context
@@ -63,10 +63,10 @@ public final class LogEntry {
 	 * @param exception
 	 *            Caught exception or throwable associated with this log entry
 	 */
-	public LogEntry(final Date date, final Thread thread, final Map<String, String> context, final String className,
+	public LogEntry(final Timestamp timestamp, final Thread thread, final Map<String, String> context, final String className,
 		final String methodName, final String fileName, final int lineNumber, final String tag, final Level level,
 		final String message, final Throwable exception) {
-		this.date = date;
+		this.timestamp = timestamp;
 		this.thread = thread;
 		this.context = context;
 		this.className = className;
@@ -84,8 +84,8 @@ public final class LogEntry {
 	 *
 	 * @return Date and time of issue
 	 */
-	public Date getDate() {
-		return date;
+	public Timestamp getTimestamp() {
+		return timestamp;
 	}
 
 	/**

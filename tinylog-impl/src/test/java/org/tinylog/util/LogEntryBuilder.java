@@ -13,14 +13,18 @@
 
 package org.tinylog.util;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
+import org.tinylog.runtime.Timestamp;
 
 /**
  * Fluent API for creating a {@link LogEntry}.
@@ -30,7 +34,7 @@ public final class LogEntryBuilder {
 	/**
 	 * Default date for prefilled log entry builders.
 	 */
-	public static final Date DEFAULT_DATE = new GregorianCalendar(1985, Calendar.JUNE, 03).getTime();
+	public static final LocalDate DEFAULT_DATE = LocalDate.of(1985, Month.JUNE, 3);
 
 	/**
 	 * Default method name for prefilled log entry builders.
@@ -47,7 +51,7 @@ public final class LogEntryBuilder {
 	 */
 	public static final String DEFAULT_MESSAGE = "Hello World!";
 
-	private Date date;
+	private Timestamp timestamp;
 	private Thread thread;
 	private Map<String, String> context = new HashMap<>();
 	private String className;
@@ -133,14 +137,26 @@ public final class LogEntryBuilder {
 	}
 
 	/**
+	 * Sets the data when this log entry was issued.
+	 *
+	 * @param date
+	 *            Date of issue
+	 * @return Actual log entry builder
+	 */
+	public LogEntryBuilder date(final LocalDate date) {
+		this.timestamp = new InstantTimestamp(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		return this;
+	}
+
+	/**
 	 * Sets the data and time when this log entry was issued.
 	 *
 	 * @param date
 	 *            Date and time of issue
 	 * @return Actual log entry builder
 	 */
-	public LogEntryBuilder date(final Date date) {
-		this.date = date;
+	public LogEntryBuilder date(final LocalDateTime date) {
+		this.timestamp = new InstantTimestamp(date.atZone(ZoneId.systemDefault()).toInstant());
 		return this;
 	}
 
@@ -272,7 +288,39 @@ public final class LogEntryBuilder {
 	 * @return Created log entry
 	 */
 	public LogEntry create() {
-		return new LogEntry(date, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
+		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
+	}
+
+	/**
+	 * Wrapper class for using an {@link Instant} as a {@link Timestamp}.
+	 */
+	private static final class InstantTimestamp implements Timestamp {
+
+		private final Instant instant;
+
+		/**
+		 * @param instant
+		 *            Date and time for timestamp
+		 */
+		private InstantTimestamp(final Instant instant) {
+			this.instant = instant;
+		}
+
+		@Override
+		public Date toDate() {
+			return Date.from(instant);
+		}
+
+		@Override
+		public Instant toInstant() {
+			return instant;
+		}
+
+		@Override
+		public java.sql.Timestamp toSqlTimestamp() {
+			return java.sql.Timestamp.from(instant);
+		}
+
 	}
 
 }

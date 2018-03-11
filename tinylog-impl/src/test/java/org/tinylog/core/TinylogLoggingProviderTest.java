@@ -14,9 +14,9 @@
 package org.tinylog.core;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 
 import org.assertj.core.api.Condition;
 import org.junit.After;
@@ -658,8 +658,9 @@ public final class TinylogLoggingProviderTest {
 
 			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
 
-			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getDate).allSatisfy(date -> {
-				assertThat(date).isCloseTo(new Date(), 1000);
+			Instant now = Instant.now();
+			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getTimestamp).allSatisfy(timestamp -> {
+				assertThat(timestamp.toInstant()).isBetween(now.minusSeconds(1), now);
 			});
 		}
 

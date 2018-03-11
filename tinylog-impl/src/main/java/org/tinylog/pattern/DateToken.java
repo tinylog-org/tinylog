@@ -15,7 +15,6 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -71,15 +70,15 @@ final class DateToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(format(logEntry.getDate()));
+		builder.append(format(logEntry.getTimestamp().toDate()));
 	}
-	
+
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		if (formatted) {
-			statement.setString(index, format(logEntry.getDate()));
+			statement.setString(index, format(logEntry.getTimestamp().toDate()));
 		} else {
-			statement.setTimestamp(index, new Timestamp(logEntry.getDate().getTime()));
+			statement.setTimestamp(index, logEntry.getTimestamp().toSqlTimestamp());
 		}
 	}
 

@@ -16,7 +16,6 @@ package org.tinylog.core;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
 import org.tinylog.writers.Writer;
 
 /**
@@ -323,7 +323,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		final String message, final StackTraceElement stackTraceElement) {
 		Collection<LogEntryValue> required = requiredLogEntryValues[tagIndex][level.ordinal()];
 
-		Date date = required.contains(LogEntryValue.DATE) ? new Date() : null;
+		Timestamp timestamp = required.contains(LogEntryValue.DATE) ? RuntimeProvider.createTimestamp() : null;
 		Thread thread = required.contains(LogEntryValue.THREAD) ? Thread.currentThread() : null;
 		Map<String, String> context = required.contains(LogEntryValue.CONTEXT) ? this.context.getMapping() : null;
 
@@ -343,7 +343,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			lineNumber = stackTraceElement.getLineNumber();
 		}
 
-		return new LogEntry(date, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
+		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
 	}
 
 }

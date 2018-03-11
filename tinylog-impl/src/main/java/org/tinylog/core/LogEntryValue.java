@@ -19,9 +19,9 @@ package org.tinylog.core;
 public enum LogEntryValue {
 
 	/**
-	 * Issuing date and time.
+	 * Date and time of issue.
 	 *
-	 * @see LogEntry#getDate()
+	 * @see LogEntry#getTimestamp()
 	 */
 	DATE,
 

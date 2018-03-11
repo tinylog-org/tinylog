@@ -14,7 +14,6 @@
 package org.tinylog.pattern;
 
 import java.lang.management.ManagementFactory;
-import java.sql.Date;
 import java.time.LocalDate;
 
 import org.junit.Rule;
@@ -52,7 +51,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithDefaultPattern() {
-		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
+		LocalDate date = LocalDate.of(1985, 06, 03);
 		assertThat(render("date", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 	}
 
@@ -62,7 +61,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithDefinedPattern() {
-		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
+		LocalDate date = LocalDate.of(1985, 06, 03);
 		assertThat(render("date: yyyy-MM-dd", LogEntryBuilder.empty().date(date).create())).isEqualTo("1985-06-03");
 	}
 
@@ -71,7 +70,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithInvalidPattern() {
-		Date date = Date.valueOf(LocalDate.of(1985, 06, 03));
+		LocalDate date = LocalDate.of(1985, 06, 03);
 		assertThat(render("date: inval'd", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("inval'd");
 	}
