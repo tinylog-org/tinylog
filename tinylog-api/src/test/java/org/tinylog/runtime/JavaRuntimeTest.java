@@ -16,7 +16,11 @@ package org.tinylog.runtime;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
+import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Locale;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -184,6 +188,22 @@ public final class JavaRuntimeTest {
 		Thread.sleep(2);
 
 		assertThat(runtime.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
+	}
+
+	/**
+	 * Verifies that a correct timestamp formatter will be created.
+	 */
+	@Test
+	public void creatingTimestampFormatter() {
+		JavaRuntime runtime = new JavaRuntime();
+
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
+		assertThat(formatter).isInstanceOf(FastTimestampFormatter.class);
+
+		Timestamp timestamp = mock(Timestamp.class);
+		when(timestamp.toDate()).thenReturn(Date.from(LocalDateTime.of(1985, 06, 03, 12, 30).atZone(ZoneId.systemDefault()).toInstant()));
+
+		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");
 	}
 
 	/**

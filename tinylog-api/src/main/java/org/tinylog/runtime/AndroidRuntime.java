@@ -15,6 +15,7 @@ package org.tinylog.runtime;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import android.os.Process;
 
@@ -75,6 +76,11 @@ final class AndroidRuntime implements RuntimeDialect {
 	@Override
 	public Timestamp createTimestamp() {
 		return new FastTimestamp();
+	}
+
+	@Override
+	public TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
+		return new FastTimestampFormatter(pattern, locale);
 	}
 
 	/**

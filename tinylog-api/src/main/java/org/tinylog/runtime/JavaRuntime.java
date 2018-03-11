@@ -16,6 +16,7 @@ package org.tinylog.runtime;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
@@ -83,6 +84,11 @@ final class JavaRuntime implements RuntimeDialect {
 	@Override
 	public Timestamp createTimestamp() {
 		return new FastTimestamp();
+	}
+
+	@Override
+	public TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
+		return new FastTimestampFormatter(pattern, locale);
 	}
 
 	/**

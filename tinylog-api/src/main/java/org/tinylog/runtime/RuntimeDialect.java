@@ -13,6 +13,9 @@
 
 package org.tinylog.runtime;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
  * VM runtime specific functionality.
  */
@@ -56,5 +59,16 @@ interface RuntimeDialect {
 	 * @return Timestamp with current date and time
 	 */
 	Timestamp createTimestamp();
+
+	/**
+	 * Creates a formatter for {@link Timestamp Timestamps}.
+	 *
+	 * @param pattern
+	 *            Format pattern that is compatible with {@link DateTimeFormatter}
+	 * @param locale
+	 *            Locale for formatting
+	 * @return Formatter for formatting timestamps
+	 */
+	TimestampFormatter createTimestampFormatter(String pattern, Locale locale);
 
 }
