@@ -60,7 +60,7 @@
 		<java16.version>1.1</java16.version>
 		<jmh.version>1.20</jmh.version>
 		<junit.version>4.12</junit.version>
-		<powermock.version>1.7.3</powermock.version>
+		<powermock.version>2.0.0-beta.5</powermock.version>
 	</properties>
 
 	<licenses>
