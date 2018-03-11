@@ -43,11 +43,11 @@ public final class FastTimestampTest {
 	 */
 	@Test
 	public void convertingToDate() throws Exception {
-		setTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp fastTimestamp = new FastTimestamp();
+		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
+		FastTimestamp timestamp = new FastTimestamp();
 
-		setTime(LocalDate.now(), LocalTime.now());
-		assertThat(fastTimestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
+		setCurrentTime(LocalDate.now(), LocalTime.now());
+		assertThat(timestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
@@ -58,11 +58,11 @@ public final class FastTimestampTest {
 	 */
 	@Test
 	public void convertingToInstant() throws Exception {
-		setTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp fastTimestamp = new FastTimestamp();
+		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
+		FastTimestamp timestamp = new FastTimestamp();
 
-		setTime(LocalDate.now(), LocalTime.now());
-		assertThat(fastTimestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
+		setCurrentTime(LocalDate.now(), LocalTime.now());
+		assertThat(timestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
@@ -73,12 +73,11 @@ public final class FastTimestampTest {
 	 */
 	@Test
 	public void convertingToSqlTimestamp() throws Exception {
-		setTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp fastTimestamp = new FastTimestamp();
+		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
+		FastTimestamp timestamp = new FastTimestamp();
 
-		setTime(LocalDate.now(), LocalTime.now());
-		assertThat(fastTimestamp.toSqlTimestamp())
-			.isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
+		setCurrentTime(LocalDate.now(), LocalTime.now());
+		assertThat(timestamp.toSqlTimestamp()).isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
@@ -91,7 +90,7 @@ public final class FastTimestampTest {
 	 * @throws Exception
 	 *             Failed mocking {@link Date}
 	 */
-	private static void setTime(final LocalDate date, final LocalTime time) throws Exception {
+	private static void setCurrentTime(final LocalDate date, final LocalTime time) throws Exception {
 		long milliseconds = asInstant(date, time).toEpochMilli();
 		Date newDate = new Date(milliseconds);
 		whenNew(Date.class).withNoArguments().thenReturn(newDate);
