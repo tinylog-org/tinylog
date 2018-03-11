@@ -75,6 +75,15 @@ public final class RuntimeProvider {
 	}
 
 	/**
+	 * Creates a timestamp with the current date and time.
+	 *
+	 * @return Timestamp with current date and time
+	 */
+	public static Timestamp createTimestamp() {
+		return dialect.createTimestamp();
+	}
+
+	/**
 	 * Resolves the runtime dialect for the current VM.
 	 *
 	 * @return Resolved runtime dialect

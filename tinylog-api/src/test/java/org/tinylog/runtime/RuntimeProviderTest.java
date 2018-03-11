@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.lang.management.ManagementFactory;
+import java.time.Instant;
 
 import org.junit.After;
 import org.junit.Before;
@@ -172,6 +173,22 @@ public final class RuntimeProviderTest {
 	public void groovyClosure() throws Exception {
 		String className = Whitebox.invokeMethod(RuntimeProvider.class, "stripAnonymousPart", "groovyClosure$_runImpl_closure_1");
 		assertThat(className).isEqualTo("groovyClosure");
+	}
+
+	/**
+	 * Verifies that correct timestamps will be created.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting between creation of both timestamps
+	 */
+	@Test
+	public void creatingTimestamp() throws InterruptedException {
+		Timestamp timestamp = RuntimeProvider.createTimestamp();
+		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
+
+		Thread.sleep(2);
+
+		assertThat(RuntimeProvider.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**
