@@ -14,7 +14,8 @@
 package org.tinylog.path;
 
 import java.io.File;
-import java.util.Date;
+
+import org.tinylog.runtime.Timestamp;
 
 /**
  * Path segment that represents a sequential sequence of numbers.
@@ -34,7 +35,7 @@ final class CountSegment implements Segment {
 	}
 
 	@Override
-	public String createToken(final String prefix, final Date date) {
+	public String createToken(final String prefix, final Timestamp timestamp) {
 		int separator = Math.max(prefix.lastIndexOf(File.separatorChar), prefix.lastIndexOf('/'));
 
 		File directory;

@@ -18,8 +18,11 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 import org.junit.Test;
+import org.tinylog.runtime.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link DateSegment}.
@@ -41,8 +44,12 @@ public final class DateSegmentTest {
 	@Test
 	public void createToken() {
 		DateSegment segment = new DateSegment("yyyy-MM-dd");
+
 		Date date = Date.from(LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.systemDefault()).toInstant());
-		assertThat(segment.createToken(null, date)).isEqualTo("1985-06-03");
+		Timestamp timestamp = mock(Timestamp.class);
+		when(timestamp.toDate()).thenReturn(date);
+
+		assertThat(segment.createToken(null, timestamp)).isEqualTo("1985-06-03");
 	}
 
 	/**

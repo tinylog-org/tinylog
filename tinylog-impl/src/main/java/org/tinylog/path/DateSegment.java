@@ -13,13 +13,12 @@
 
 package org.tinylog.path;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import org.tinylog.core.ConfigurationParser;
+import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
+import org.tinylog.runtime.TimestampFormatter;
 
 /**
  * Path segment that represents a timestamp.
@@ -28,14 +27,14 @@ final class DateSegment implements Segment {
 
 	private static final Locale locale = ConfigurationParser.getLocale();
 
-	private final DateFormat formatter;
+	private final TimestampFormatter formatter;
 
 	/**
 	 * @param format
 	 *            Pattern for formatting timestamp
 	 */
 	DateSegment(final String format) {
-		formatter = new SimpleDateFormat(format, locale);
+		formatter = RuntimeProvider.createTimestampFormatter(format, locale);
 	}
 
 	@Override
@@ -45,17 +44,12 @@ final class DateSegment implements Segment {
 
 	@Override
 	public boolean validateToken(final String token) {
-		try {
-			formatter.parse(token);
-			return true;
-		} catch (ParseException ex) {
-			return false;
-		}
+		return formatter.isValid(token);
 	}
 
 	@Override
-	public String createToken(final String prefix, final Date date) {
-		return formatter.format(date);
+	public String createToken(final String prefix, final Timestamp timestamp) {
+		return formatter.format(timestamp);
 	}
 
 }

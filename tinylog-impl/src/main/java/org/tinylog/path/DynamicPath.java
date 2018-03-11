@@ -16,8 +16,10 @@ package org.tinylog.path;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+
+import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
 
 /**
  * A dynamic path represents a path with patterns that can be resolved as a real path to a file at runtime.
@@ -104,10 +106,10 @@ public final class DynamicPath {
 	 * @return Generated path
 	 */
 	public String resolve() {
-		Date date = new Date();
+		Timestamp timestamp = RuntimeProvider.createTimestamp();
 		StringBuilder builder = new StringBuilder();
 		for (Segment segment : segments) {
-			builder.append(segment.createToken(builder.toString(), date));
+			builder.append(segment.createToken(builder.toString(), timestamp));
 		}
 		return builder.toString();
 	}

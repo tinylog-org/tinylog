@@ -13,7 +13,7 @@
 
 package org.tinylog.path;
 
-import java.util.Date;
+import org.tinylog.runtime.Timestamp;
 
 /**
  * Segment of a {@link org.tinylog.path.DynamicPath dynamic path} .
@@ -45,10 +45,10 @@ interface Segment {
 	 *
 	 * @param prefix
 	 *            Already generated path
-	 * @param date
+	 * @param timestamp
 	 *            Timestamp for date and time representations
 	 * @return Generated token
 	 */
-	String createToken(String prefix, Date date);
+	String createToken(String prefix, Timestamp timestamp);
 
 }

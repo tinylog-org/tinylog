@@ -15,16 +15,15 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Locale;
 
 import org.tinylog.core.ConfigurationParser;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.TimestampFormatter;
 
 /**
  * Token for outputting the date and time of issue of a log entry.
@@ -33,24 +32,15 @@ final class DateToken implements Token {
 
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-	private static final int MILLISECONDS_PRECISION = 1;
-	private static final int SECONDS_PRECISION = 1000;
-	private static final int MINUTES_PRECISION = 60000;
-
 	private static final Locale locale = ConfigurationParser.getLocale();
 
 	private final boolean formatted;
-	private final DateFormat formatter;
-	private final long divisor;
-
-	private Date lastDate;
-	private String lastFormat;
+	private final TimestampFormatter formatter;
 
 	/**	*/
 	DateToken() {
 		this.formatted = false;
-		this.formatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN, locale);
-		this.divisor = SECONDS_PRECISION;
+		this.formatter = RuntimeProvider.createTimestampFormatter(DEFAULT_DATE_FORMAT_PATTERN, locale);
 	}
 
 	/**
@@ -59,8 +49,7 @@ final class DateToken implements Token {
 	 */
 	DateToken(final String pattern) {
 		this.formatted = true;
-		this.formatter = new SimpleDateFormat(pattern, locale);
-		this.divisor = pattern.contains("SSS") ? MILLISECONDS_PRECISION : pattern.contains("ss") ? SECONDS_PRECISION : MINUTES_PRECISION;
+		this.formatter = RuntimeProvider.createTimestampFormatter(pattern, locale);
 	}
 
 	@Override
@@ -70,32 +59,15 @@ final class DateToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(format(logEntry.getTimestamp().toDate()));
+		builder.append(formatter.format(logEntry.getTimestamp()));
 	}
 
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		if (formatted) {
-			statement.setString(index, format(logEntry.getTimestamp().toDate()));
+			statement.setString(index, formatter.format(logEntry.getTimestamp()));
 		} else {
 			statement.setTimestamp(index, logEntry.getTimestamp().toSqlTimestamp());
-		}
-	}
-
-	/**
-	 * Formats a date. The last formatted date will be cached.
-	 *
-	 * @param date
-	 *            Date to format
-	 * @return Formatted date
-	 */
-	private String format(final Date date) {
-		synchronized (formatter) {
-			if (lastDate == null || date.getTime() / divisor != lastDate.getTime() / divisor) {
-				lastDate = date;
-				lastFormat = formatter.format(date);
-			}
-			return lastFormat;
 		}
 	}
 

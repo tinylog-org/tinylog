@@ -15,7 +15,8 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -27,10 +28,13 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Tests for {@link DynamicPath}.
@@ -74,15 +78,13 @@ public final class DynamicPathTest {
 	 *             Test failed
 	 */
 	@Test
-	@PrepareForTest(DynamicPath.class)
+	@PrepareForTest(RuntimeProvider.class)
 	public void defaultDateToken() throws Exception {
-		Date date = new Date();
-		whenNew(Date.class).withNoArguments().thenReturn(date);
+		setCurrentTime(LocalDateTime.of(1985, 6, 3, 12, 30, 55));
 
 		String pattern = new File(folder.getRoot(), "{date}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.resolve())
-			.isEqualTo(folder.getRoot() + File.separator + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(date) + ".log");
+		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "1985-06-03_12-30-55.log");
 	}
 
 	/**
@@ -92,14 +94,13 @@ public final class DynamicPathTest {
 	 *             Test failed
 	 */
 	@Test
-	@PrepareForTest(DynamicPath.class)
+	@PrepareForTest(RuntimeProvider.class)
 	public void customDateToken() throws Exception {
-		Date date = new Date();
-		whenNew(Date.class).withNoArguments().thenReturn(date);
+		setCurrentTime(LocalDateTime.of(1985, 6, 3, 12, 30, 55));
 
 		String pattern = new File(folder.getRoot(), "{date:yyyy}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + new SimpleDateFormat("yyyy").format(date) + ".log");
+		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "1985.log");
 	}
 
 	/**
@@ -333,6 +334,22 @@ public final class DynamicPathTest {
 		String pattern = new File(folder.getRoot(), "log_{count}.txt").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
 		assertThat(path.isValid(new File(folder.getRoot(), "test_42.txt"))).isFalse();
+	}
+
+	/**
+	 * Overrides the current date and time.
+	 *
+	 * @param date
+	 *            New date and time
+	 */
+	private void setCurrentTime(final LocalDateTime date) {
+		Date instant = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
+
+		Timestamp timestamp = mock(Timestamp.class);
+		when(timestamp.toDate()).thenReturn(instant);
+
+		spy(RuntimeProvider.class);
+		when(RuntimeProvider.createTimestamp()).thenReturn(timestamp);
 	}
 
 }

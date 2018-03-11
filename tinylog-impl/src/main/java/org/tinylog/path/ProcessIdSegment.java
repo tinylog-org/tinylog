@@ -13,9 +13,8 @@
 
 package org.tinylog.path;
 
-import java.util.Date;
-
 import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
 
 /**
  * Path segment that represents the process ID.
@@ -40,7 +39,7 @@ final class ProcessIdSegment implements Segment {
 	}
 
 	@Override
-	public String createToken(final String prefix, final Date date) {
+	public String createToken(final String prefix, final Timestamp timestamp) {
 		return pid;
 	}
 
