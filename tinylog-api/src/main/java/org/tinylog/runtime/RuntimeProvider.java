@@ -13,6 +13,9 @@
 
 package org.tinylog.runtime;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
  * Provider for getting runtime specific data from Virtual Machine.
  */
@@ -81,6 +84,19 @@ public final class RuntimeProvider {
 	 */
 	public static Timestamp createTimestamp() {
 		return dialect.createTimestamp();
+	}
+
+	/**
+	 * Creates a formatter for {@link Timestamp Timestamps}.
+	 *
+	 * @param pattern
+	 *            Format pattern that is compatible with {@link DateTimeFormatter}
+	 * @param locale
+	 *            Locale for formatting
+	 * @return Formatter for formatting timestamps
+	 */
+	public static TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
+		return dialect.createTimestampFormatter(pattern, locale);
 	}
 
 	/**
