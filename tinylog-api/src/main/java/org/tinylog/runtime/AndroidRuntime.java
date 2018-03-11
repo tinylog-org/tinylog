@@ -72,6 +72,11 @@ final class AndroidRuntime implements RuntimeDialect {
 		return new Throwable().getStackTrace()[depth];
 	}
 
+	@Override
+	public Timestamp createTimestamp() {
+		return new FastTimestamp();
+	}
+
 	/**
 	 * Gets {@link VMStack#fillStackTraceElements(Thread, StackTraceElement[])} as accessible method including the
 	 * offset position of direct caller.

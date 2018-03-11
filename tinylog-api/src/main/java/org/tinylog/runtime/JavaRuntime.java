@@ -80,6 +80,11 @@ final class JavaRuntime implements RuntimeDialect {
 		return new Throwable().getStackTrace()[depth];
 	}
 
+	@Override
+	public Timestamp createTimestamp() {
+		return new FastTimestamp();
+	}
+
 	/**
 	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
 	 *

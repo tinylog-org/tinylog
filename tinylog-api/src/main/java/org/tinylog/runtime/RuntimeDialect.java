@@ -50,4 +50,11 @@ interface RuntimeDialect {
 	 */
 	StackTraceElement getCallerStackTraceElement(int depth);
 
+	/**
+	 * Creates a timestamp with the current date and time.
+	 *
+	 * @return Timestamp with current date and time
+	 */
+	Timestamp createTimestamp();
+
 }

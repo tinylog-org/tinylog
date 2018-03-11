@@ -16,6 +16,7 @@ package org.tinylog.runtime;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
+import java.time.Instant;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -164,6 +165,25 @@ public final class JavaRuntimeTest {
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce(UnsupportedOperationException.class.getName());
+	}
+
+	/**
+	 * Verifies that correct timestamps will be created.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting between creation of both timestamps
+	 */
+	@Test
+	public void creatingTimestamp() throws InterruptedException {
+		JavaRuntime runtime = new JavaRuntime();
+
+		Timestamp timestamp = runtime.createTimestamp();
+		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
+		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
+
+		Thread.sleep(2);
+
+		assertThat(runtime.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**

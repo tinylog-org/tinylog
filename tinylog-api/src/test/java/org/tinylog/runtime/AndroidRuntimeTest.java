@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.lang.reflect.Method;
+import java.time.Instant;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -177,6 +178,25 @@ public final class AndroidRuntimeTest {
 		Object result = Whitebox.invokeMethod(AndroidRuntime.class, "getStackTraceElementsFiller");
 		assertThat(Whitebox.getInternalState(result, Method.class)).hasParameterTypes(Thread.class, StackTraceElement[].class);
 		assertThat(Whitebox.getInternalState(result, int.class)).isNotNegative();
+	}
+
+	/**
+	 * Verifies that correct timestamps will be created.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting between creation of both timestamps
+	 */
+	@Test
+	public void creatingTimestamp() throws InterruptedException {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Timestamp timestamp = runtime.createTimestamp();
+		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
+		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
+
+		Thread.sleep(2);
+
+		assertThat(runtime.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**
