@@ -47,7 +47,7 @@ final class AndroidRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	public int getProcessId() {
+	public long getProcessId() {
 		return Process.myPid();
 	}
 

@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class ProcessIdSegmentTest {
 
-	private static final String PROCESS_ID = Integer.toString(RuntimeProvider.getProcessId());
+	private static final String PROCESS_ID = Long.toString(RuntimeProvider.getProcessId());
 
 	/**
 	 * Verifies that the current process ID will be returned as static text.

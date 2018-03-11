@@ -33,7 +33,7 @@ interface RuntimeDialect {
 	 *
 	 * @return ID of the current process
 	 */
-	int getProcessId();
+	long getProcessId();
 
 	/**
 	 * Gets the class name of a caller from stack trace.

@@ -43,10 +43,10 @@ final class JavaRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	public int getProcessId() {
+	public long getProcessId() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		try {
-			return Integer.parseInt(name.substring(0, name.indexOf('@')));
+			return Long.parseLong(name.substring(0, name.indexOf('@')));
 		} catch (NumberFormatException ex) {
 			InternalLogger.log(Level.ERROR, "Illegal process ID: " + name.substring(0, name.indexOf('@')));
 			return -1;

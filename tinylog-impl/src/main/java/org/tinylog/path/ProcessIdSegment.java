@@ -25,7 +25,7 @@ final class ProcessIdSegment implements Segment {
 
 	/** */
 	ProcessIdSegment() {
-		pid = Integer.toString(RuntimeProvider.getProcessId());
+		pid = Long.toString(RuntimeProvider.getProcessId());
 	}
 
 	@Override

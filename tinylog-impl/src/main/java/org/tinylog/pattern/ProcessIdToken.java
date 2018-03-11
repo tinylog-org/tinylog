@@ -27,13 +27,13 @@ import org.tinylog.runtime.RuntimeProvider;
  */
 final class ProcessIdToken implements Token {
 
-	private final int pid;
+	private final long pid;
 	private final String rendered;
 
 	/** */
 	ProcessIdToken() {
 		pid = RuntimeProvider.getProcessId();
-		rendered = Integer.toString(pid);
+		rendered = Long.toString(pid);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ final class ProcessIdToken implements Token {
 
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		statement.setInt(index, pid);
+		statement.setLong(index, pid);
 	}
 
 }

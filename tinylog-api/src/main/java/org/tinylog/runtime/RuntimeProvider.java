@@ -41,7 +41,7 @@ public final class RuntimeProvider {
 	 *
 	 * @return ID of the current process
 	 */
-	public static int getProcessId() {
+	public static long getProcessId() {
 		return dialect.getProcessId();
 	}
 

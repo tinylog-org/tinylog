@@ -44,7 +44,7 @@ public final class ProcessIdTokenTest {
 	@Test
 	public void render() {
 		ProcessIdToken token = new ProcessIdToken();
-		assertThat(render(token)).isEqualTo(Integer.toString(RuntimeProvider.getProcessId()));
+		assertThat(render(token)).isEqualTo(Long.toString(RuntimeProvider.getProcessId()));
 	}
 
 	/**
@@ -59,7 +59,7 @@ public final class ProcessIdTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(LogEntryBuilder.empty().create(), statement, 1);
-		verify(statement).setInt(1, RuntimeProvider.getProcessId());
+		verify(statement).setLong(1, RuntimeProvider.getProcessId());
 	}
 
 	/**
