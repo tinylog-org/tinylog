@@ -67,6 +67,24 @@ public final class FastTimestampFormatterTest {
 	}
 
 	/**
+	 * Verifies that a valid formatted timestamp will be accepted.
+	 */
+	@Test
+	public void acceptValidFormattedTimestamp() {
+		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
+		assertThat(formatter.isValid("12:30:55.999")).isTrue();
+	}
+
+	/**
+	 * Verifies that an invalid formatted timestamp will be refused.
+	 */
+	@Test
+	public void refuseInvalidFormattedTimestamp() {
+		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
+		assertThat(formatter.isValid("1985-06-03")).isFalse();
+	}
+
+	/**
 	 * Formats a {@link LocalDateTime} by using a given formatter.
 	 *
 	 * @param date

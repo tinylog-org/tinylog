@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -50,6 +51,16 @@ final class FastTimestampFormatter implements TimestampFormatter {
 		return format(timestamp.toDate());
 	}
 
+	@Override
+	public boolean isValid(final String timestamp) {
+		try {
+			parse(timestamp);
+			return true;
+		} catch (ParseException ex) {
+			return false;
+		}
+	}
+
 	/**
 	 * Formats a legacy {@link Date}.
 	 *
@@ -64,6 +75,21 @@ final class FastTimestampFormatter implements TimestampFormatter {
 				lastFormat = formatter.format(date);
 			}
 			return lastFormat;
+		}
+	}
+
+	/**
+	 * Tries to parse a formatted timestamp.
+	 *
+	 * @param timestamp
+	 *            Formatted timestamp
+	 * @return Parsed date
+	 * @throws ParseException
+	 *             Failed to parse given timestamp
+	 */
+	private Date parse(final String timestamp) throws ParseException {
+		synchronized (formatter) {
+			return formatter.parse(timestamp);
 		}
 	}
 

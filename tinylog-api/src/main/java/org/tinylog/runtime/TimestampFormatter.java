@@ -27,4 +27,14 @@ public interface TimestampFormatter {
 	 */
 	String format(Timestamp timestamp);
 
+	/**
+	 * Checks whether a formatted timestamp is compatible with the pattern of this formatter.
+	 *
+	 * @param timestamp
+	 *            Formatted timestamp
+	 * @return {@code true} if the given timestamp is compatible with the pattern of this formatter, {@code false} if
+	 *         not
+	 */
+	boolean isValid(String timestamp);
+
 }
