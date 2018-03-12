@@ -208,11 +208,11 @@ public final class AndroidRuntimeTest {
 	public void creatingTimestampFormatter() {
 		AndroidRuntime runtime = new AndroidRuntime();
 
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
-		assertThat(formatter).isInstanceOf(FastTimestampFormatter.class);
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm:ss.SSS", Locale.US);
+		assertThat(formatter.requiresNanoseconds()).isFalse();
 
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30);
-		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");
+		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
+		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999");
 	}
 
 	/**

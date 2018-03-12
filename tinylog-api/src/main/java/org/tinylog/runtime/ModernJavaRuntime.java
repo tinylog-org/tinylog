@@ -61,7 +61,11 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
-		return new FastTimestampFormatter(pattern, locale);
+		if (pattern.contains("n") || pattern.contains("N") || pattern.contains("SSSS")) {
+			return new PreciseTimestampFormatter(pattern, locale);
+		} else {
+			return new FastTimestampFormatter(pattern, locale);
+		}
 	}
 
 	/**
