@@ -58,7 +58,7 @@ public final class FastTimestampFormatterTest {
 	 * Verifies that timestamps can be formatted millisecond precise.
 	 */
 	@Test
-	public void milliseondPrecision() {
+	public void millisecondPrecision() {
 		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
 
 		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 000_000_000), formatter)).isEqualTo("12:30:55.000");
