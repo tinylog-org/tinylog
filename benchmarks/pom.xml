@@ -57,6 +57,31 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>stack-trace</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<arguments>
+								<argument>-classpath</argument>
+								<classpath />
+								<argument>org.openjdk.jmh.Main</argument>
+								<argument>org.tinylog.benchmarks.StackTraceBenchmark</argument>
+								<argument>-f</argument>
+								<argument>10</argument>
+								<argument>-wi</argument>
+								<argument>10</argument>
+								<argument>-i</argument>
+								<argument>10</argument>
+							</arguments>
+						</configuration>
+					</plugin>	
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<dependencies>
