@@ -74,7 +74,7 @@ final class AndroidRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	public Timestamp createTimestamp() {
+	public Timestamp createTimestamp(final boolean millisecondPrecision) {
 		return new FastTimestamp();
 	}
 

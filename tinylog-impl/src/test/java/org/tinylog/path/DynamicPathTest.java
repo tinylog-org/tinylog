@@ -32,6 +32,7 @@ import org.tinylog.runtime.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.spy;
@@ -349,7 +350,7 @@ public final class DynamicPathTest {
 		when(timestamp.toDate()).thenReturn(instant);
 
 		spy(RuntimeProvider.class);
-		when(RuntimeProvider.createTimestamp()).thenReturn(timestamp);
+		when(RuntimeProvider.createTimestamp(anyBoolean())).thenReturn(timestamp);
 	}
 
 }

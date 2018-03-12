@@ -55,8 +55,8 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
-	public Timestamp createTimestamp() {
-		return new FastTimestamp();
+	public Timestamp createTimestamp(final boolean millisecondPrecision) {
+		return millisecondPrecision ? new FastTimestamp() : new PreciseTimestamp();
 	}
 
 	@Override

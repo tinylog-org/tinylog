@@ -80,12 +80,16 @@ public final class RuntimeProvider {
 	}
 
 	/**
-	 * Creates a timestamp with the current date and time.
+	 * Creates a timestamp with the current date and time. Only millisecond precision can be guaranteed even if the flag
+	 * {@code millisecondPrecision} is set to {@code false}.
 	 *
+	 * @param millisecondPrecision
+	 *            {@code true} if millisecond precision is sufficient, {@code false} if nanosecond precision is
+	 *            preferred
 	 * @return Timestamp with current date and time
 	 */
-	public static Timestamp createTimestamp() {
-		return dialect.createTimestamp();
+	public static Timestamp createTimestamp(final boolean millisecondPrecision) {
+		return dialect.createTimestamp(millisecondPrecision);
 	}
 
 	/**

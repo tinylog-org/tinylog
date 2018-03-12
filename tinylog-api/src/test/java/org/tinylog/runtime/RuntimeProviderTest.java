@@ -179,19 +179,37 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that correct timestamps will be created.
+	 * Verifies that correct timestamps with millisecond precision will be created.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while waiting between creation of both timestamps
 	 */
 	@Test
-	public void creatingTimestamp() throws InterruptedException {
-		Timestamp timestamp = RuntimeProvider.createTimestamp();
+	public void creatingMillisecondPreciseTimestamp() throws InterruptedException {
+		Timestamp timestamp = RuntimeProvider.createTimestamp(true);
+		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
 		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
 
 		Thread.sleep(2);
 
-		assertThat(RuntimeProvider.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
+		assertThat(RuntimeProvider.createTimestamp(true).toInstant()).isAfter(timestamp.toInstant());
+	}
+
+	/**
+	 * Verifies that correct timestamps with nanosecond precision will be created.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting between creation of both timestamps
+	 */
+	@Test
+	public void creatingNanosecondPreciseTimestamp() throws InterruptedException {
+		Timestamp timestamp = RuntimeProvider.createTimestamp(false);
+		assertThat(timestamp).isInstanceOf(PreciseTimestamp.class);
+		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
+
+		Thread.sleep(2);
+
+		assertThat(RuntimeProvider.createTimestamp(false).toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**

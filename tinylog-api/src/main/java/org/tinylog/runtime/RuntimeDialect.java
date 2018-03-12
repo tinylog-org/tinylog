@@ -54,11 +54,15 @@ interface RuntimeDialect {
 	StackTraceElement getCallerStackTraceElement(int depth);
 
 	/**
-	 * Creates a timestamp with the current date and time.
+	 * Creates a timestamp with the current date and time. Only millisecond precision can be guaranteed even if the flag
+	 * {@code millisecondPrecision} is set to {@code false}.
 	 *
+	 * @param millisecondPrecision
+	 *            {@code true} if millisecond precision is sufficient, {@code false} if nanosecond precision is
+	 *            preferred
 	 * @return Timestamp with current date and time
 	 */
-	Timestamp createTimestamp();
+	Timestamp createTimestamp(boolean millisecondPrecision);
 
 	/**
 	 * Creates a formatter for {@link Timestamp Timestamps}.

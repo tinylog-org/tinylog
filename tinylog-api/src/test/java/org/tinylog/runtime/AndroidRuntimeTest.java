@@ -183,22 +183,41 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that correct timestamps will be created.
+	 * Verifies that correct timestamps with millisecond precision will be created.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while waiting between creation of both timestamps
 	 */
 	@Test
-	public void creatingTimestamp() throws InterruptedException {
+	public void creatingMillisecondPreciseTimestamp() throws InterruptedException {
 		AndroidRuntime runtime = new AndroidRuntime();
 
-		Timestamp timestamp = runtime.createTimestamp();
+		Timestamp timestamp = runtime.createTimestamp(true);
 		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
 		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
 
 		Thread.sleep(2);
 
-		assertThat(runtime.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
+		assertThat(runtime.createTimestamp(true).toInstant()).isAfter(timestamp.toInstant());
+	}
+
+	/**
+	 * Verifies that correct millisecond precise timestamps will be created, even if nanosecond precision is requested.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting between creation of both timestamps
+	 */
+	@Test
+	public void creatingNanosecondPreciseTimestamp() throws InterruptedException {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Timestamp timestamp = runtime.createTimestamp(false);
+		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
+		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
+
+		Thread.sleep(2);
+
+		assertThat(runtime.createTimestamp(false).toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**

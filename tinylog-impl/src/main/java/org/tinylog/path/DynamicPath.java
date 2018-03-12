@@ -106,7 +106,7 @@ public final class DynamicPath {
 	 * @return Generated path
 	 */
 	public String resolve() {
-		Timestamp timestamp = RuntimeProvider.createTimestamp();
+		Timestamp timestamp = RuntimeProvider.createTimestamp(false);
 		StringBuilder builder = new StringBuilder();
 		for (Segment segment : segments) {
 			builder.append(segment.createToken(builder.toString(), timestamp));
