@@ -47,8 +47,8 @@ final class FastTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public String format(final Timestamp timestamp) {
-		return format(timestamp.toDate());
+	public boolean isPrecise() {
+		return false;
 	}
 
 	@Override
@@ -59,6 +59,11 @@ final class FastTimestampFormatter implements TimestampFormatter {
 		} catch (ParseException ex) {
 			return false;
 		}
+	}
+
+	@Override
+	public String format(final Timestamp timestamp) {
+		return format(timestamp.toDate());
 	}
 
 	/**

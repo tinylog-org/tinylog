@@ -19,13 +19,11 @@ package org.tinylog.runtime;
 public interface TimestampFormatter {
 
 	/**
-	 * Formats a timestamp.
+	 * Checks whether timestamps with nanosecond precision are supported.
 	 *
-	 * @param timestamp
-	 *            Timestamp to format
-	 * @return Formatted timestamp
+	 * @return {@code true} if timestamps with nanosecond precision are supported, {@code false} if not
 	 */
-	String format(Timestamp timestamp);
+	boolean isPrecise();
 
 	/**
 	 * Checks whether a formatted timestamp is compatible with the pattern of this formatter.
@@ -36,5 +34,14 @@ public interface TimestampFormatter {
 	 *         not
 	 */
 	boolean isValid(String timestamp);
+
+	/**
+	 * Formats a timestamp.
+	 *
+	 * @param timestamp
+	 *            Timestamp to format
+	 * @return Formatted timestamp
+	 */
+	String format(Timestamp timestamp);
 
 }

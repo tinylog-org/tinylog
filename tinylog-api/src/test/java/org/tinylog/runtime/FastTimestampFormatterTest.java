@@ -31,6 +31,33 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public final class FastTimestampFormatterTest {
 
 	/**
+	 * Verifies that timestamps with nanosecond precision are not supported.
+	 */
+	@Test
+	public void notSupportPreciseTimestamps() {
+		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss", Locale.US);
+		assertThat(formatter.isPrecise()).isFalse();
+	}
+
+	/**
+	 * Verifies that a valid formatted timestamp will be accepted.
+	 */
+	@Test
+	public void acceptValidFormattedTimestamp() {
+		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
+		assertThat(formatter.isValid("12:30:55.999")).isTrue();
+	}
+
+	/**
+	 * Verifies that an invalid formatted timestamp will be refused.
+	 */
+	@Test
+	public void refuseInvalidFormattedTimestamp() {
+		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
+		assertThat(formatter.isValid("1985-06-03")).isFalse();
+	}
+
+	/**
 	 * Verifies that timestamps can be formatted minute precise.
 	 */
 	@Test
@@ -64,24 +91,6 @@ public final class FastTimestampFormatterTest {
 		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 000_000_000), formatter)).isEqualTo("12:30:55.000");
 		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 999_000_000), formatter)).isEqualTo("12:30:55.999");
 		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 56, 000_000_000), formatter)).isEqualTo("12:30:56.000");
-	}
-
-	/**
-	 * Verifies that a valid formatted timestamp will be accepted.
-	 */
-	@Test
-	public void acceptValidFormattedTimestamp() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
-		assertThat(formatter.isValid("12:30:55.999")).isTrue();
-	}
-
-	/**
-	 * Verifies that an invalid formatted timestamp will be refused.
-	 */
-	@Test
-	public void refuseInvalidFormattedTimestamp() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
-		assertThat(formatter.isValid("1985-06-03")).isFalse();
 	}
 
 	/**

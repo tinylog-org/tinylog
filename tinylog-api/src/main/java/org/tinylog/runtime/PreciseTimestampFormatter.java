@@ -39,8 +39,8 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public String format(final Timestamp timestamp) {
-		return formatter.format(timestamp.toInstant());
+	public boolean isPrecise() {
+		return true;
 	}
 
 	@Override
@@ -51,6 +51,11 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 		} catch (DateTimeParseException ex) {
 			return false;
 		}
+	}
+
+	@Override
+	public String format(final Timestamp timestamp) {
+		return formatter.format(timestamp.toInstant());
 	}
 
 }
