@@ -13,17 +13,12 @@
 
 package org.tinylog.runtime;
 
-import java.sql.Date;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link FastTimestampFormatter}.
@@ -64,9 +59,9 @@ public final class FastTimestampFormatterTest {
 	public void minutePrecision() {
 		FastTimestampFormatter formatter = new FastTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
 
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 000_000_000), formatter)).isEqualTo("2016-02-01 12:30");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 999_000_000), formatter)).isEqualTo("2016-02-01 12:30");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 56, 000_000_000), formatter)).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30");
 	}
 
 	/**
@@ -76,9 +71,9 @@ public final class FastTimestampFormatterTest {
 	public void secondPrecision() {
 		FastTimestampFormatter formatter = new FastTimestampFormatter("yyyy-MM-dd hh:mm:ss", Locale.US);
 
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 000_000_000), formatter)).isEqualTo("2016-02-01 12:30:55");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 999_000_000), formatter)).isEqualTo("2016-02-01 12:30:55");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 56, 000_000_000), formatter)).isEqualTo("2016-02-01 12:30:56");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30:56");
 	}
 
 	/**
@@ -88,27 +83,9 @@ public final class FastTimestampFormatterTest {
 	public void millisecondPrecision() {
 		FastTimestampFormatter formatter = new FastTimestampFormatter("hh:mm:ss.SSS", Locale.US);
 
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 000_000_000), formatter)).isEqualTo("12:30:55.000");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 55, 999_000_000), formatter)).isEqualTo("12:30:55.999");
-		assertThat(format(LocalDateTime.of(2016, 02, 01, 12, 30, 56, 000_000_000), formatter)).isEqualTo("12:30:56.000");
-	}
-
-	/**
-	 * Formats a {@link LocalDateTime} by using a given formatter.
-	 *
-	 * @param date
-	 *            Date to format
-	 * @param formatter
-	 *            Formatter for formatting the given date
-	 * @return Formatted date
-	 */
-	private String format(final LocalDateTime date, final FastTimestampFormatter formatter) {
-		Instant instant = date.atZone(ZoneId.systemDefault()).toInstant();
-
-		Timestamp timestamp = mock(Timestamp.class);
-		when(timestamp.toDate()).thenReturn(Date.from(instant));
-
-		return formatter.format(timestamp);
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("12:30:55.000");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");
+		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56.000");
 	}
 
 }

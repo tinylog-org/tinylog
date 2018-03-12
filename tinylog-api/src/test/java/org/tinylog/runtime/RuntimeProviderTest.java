@@ -13,20 +13,16 @@
 
 package org.tinylog.runtime;
 
-import java.sql.Date;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link RuntimeProvider}.
@@ -204,10 +200,7 @@ public final class RuntimeProviderTest {
 	@Test
 	public void creatingTimestampFormatter() {
 		TimestampFormatter formatter = RuntimeProvider.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
-
-		Timestamp timestamp = mock(Timestamp.class);
-		when(timestamp.toDate()).thenReturn(Date.from(LocalDateTime.of(1985, 06, 03, 12, 30).atZone(ZoneId.systemDefault()).toInstant()));
-
+		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");
 	}
 
