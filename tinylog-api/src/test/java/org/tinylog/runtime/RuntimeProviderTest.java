@@ -217,7 +217,7 @@ public final class RuntimeProviderTest {
 	 */
 	@Test
 	public void creatingTimestampFormatter() {
-		TimestampFormatter formatter = RuntimeProvider.createTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
+		TimestampFormatter formatter = RuntimeProvider.createTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");
 	}

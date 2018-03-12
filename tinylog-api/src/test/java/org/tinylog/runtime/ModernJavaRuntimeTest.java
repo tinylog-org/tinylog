@@ -109,13 +109,13 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an timestamp formatter with millisecond precision will be created for "yyyy-MM-dd hh:mm:ss.SSS",.
+	 * Verifies that an timestamp formatter with millisecond precision will be created for "yyyy-MM-dd HH:mm:ss.SSS",.
 	 */
 	@Test
 	public void creatingTimestampFormatterForTimeWithMilliseconds() {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
 
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm:ss.SSS", Locale.US);
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
 		assertThat(formatter.requiresNanoseconds()).isFalse();
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
@@ -123,13 +123,13 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd hh:mm:ss.SSSSSS".
+	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd HH:mm:ss.SSSSSS".
 	 */
 	@Test
 	public void creatingTimestampFormatterForTimeWithMicroseconds() {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
 
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm:ss.SSSSSS", Locale.US);
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.US);
 		assertThat(formatter.requiresNanoseconds()).isTrue();
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
@@ -137,13 +137,13 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd hh:mm:ss.n".
+	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd HH:mm:ss.n".
 	 */
 	@Test
 	public void creatingTimestampFormatterForTimeWithNanoseconds() {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
 
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm:ss.n", Locale.US);
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.n", Locale.US);
 		assertThat(formatter.requiresNanoseconds()).isTrue();
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);

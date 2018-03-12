@@ -216,7 +216,7 @@ public final class LegacyJavaRuntimeTest {
 	public void creatingTimestampFormatter() {
 		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd hh:mm:ss.SSS", Locale.US);
+		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
 		assertThat(formatter.requiresNanoseconds()).isFalse();
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);

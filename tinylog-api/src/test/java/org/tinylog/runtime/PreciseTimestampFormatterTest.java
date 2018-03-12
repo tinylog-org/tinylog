@@ -30,7 +30,7 @@ public final class PreciseTimestampFormatterTest {
 	 */
 	@Test
 	public void requireNanonseconds() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("hh:mm:ss.SSSS", Locale.US);
+		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSS", Locale.US);
 		assertThat(formatter.requiresNanoseconds()).isTrue();
 	}
 
@@ -39,7 +39,7 @@ public final class PreciseTimestampFormatterTest {
 	 */
 	@Test
 	public void acceptValidFormattedTimestamp() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("hh:mm:ss.SSSSSSSSS", Locale.US);
+		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSSSSSSS", Locale.US);
 		assertThat(formatter.isValid("12:30:55.999999999")).isTrue();
 	}
 
@@ -48,7 +48,7 @@ public final class PreciseTimestampFormatterTest {
 	 */
 	@Test
 	public void refuseInvalidFormattedTimestamp() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("hh:mm:ss.SSSSSSSSS", Locale.US);
+		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSSSSSSS", Locale.US);
 		assertThat(formatter.isValid("1985-06-03")).isFalse();
 	}
 
@@ -57,7 +57,7 @@ public final class PreciseTimestampFormatterTest {
 	 */
 	@Test
 	public void minutePrecision() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("yyyy-MM-dd hh:mm", Locale.US);
+		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30");
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
@@ -69,7 +69,7 @@ public final class PreciseTimestampFormatterTest {
 	 */
 	@Test
 	public void nanosecondPrecision() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("hh:mm:ss.SSSSSSSSS", Locale.US);
+		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSSSSSSS", Locale.US);
 
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("12:30:55.000000000");
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999999999");
