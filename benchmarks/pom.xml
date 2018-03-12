@@ -32,8 +32,8 @@
 	
 	<profiles>
 		<profile>
-			<!-- Benchmark for writing performance of Java I/O API -->
-			<id>java-io-api</id>
+			<!-- Benchmark for getting the current date and time and formatting it -->
+			<id>current-date-and-time</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -44,7 +44,7 @@
 								<argument>-classpath</argument>
 								<classpath />
 								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.WritingBenchmark</argument>
+								<argument>org.tinylog.benchmarks.CurrentDateAndTimeBenchmark</argument>
 								<argument>-f</argument>
 								<argument>10</argument>
 								<argument>-wi</argument>
@@ -58,6 +58,7 @@
 			</build>
 		</profile>
 		<profile>
+			<!-- Benchmark for extracting defined stack trace elements from stack trace -->
 			<id>stack-trace</id>
 			<build>
 				<plugins>
@@ -82,6 +83,32 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<!-- Benchmark for writing performance of Java I/O API -->
+			<id>java-io-api</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<arguments>
+								<argument>-classpath</argument>
+								<classpath />
+								<argument>org.openjdk.jmh.Main</argument>
+								<argument>org.tinylog.benchmarks.WritingBenchmark</argument>
+								<argument>-f</argument>
+								<argument>10</argument>
+								<argument>-wi</argument>
+								<argument>10</argument>
+								<argument>-i</argument>
+								<argument>10</argument>
+							</arguments>
+						</configuration>
+					</plugin>	
+				</plugins>
+			</build>
+		</profile>		
 	</profiles>
 
 	<dependencies>
