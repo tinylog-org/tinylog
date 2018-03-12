@@ -47,7 +47,7 @@ final class FastTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public boolean isPrecise() {
+	public boolean requiresNanoseconds() {
 		return false;
 	}
 

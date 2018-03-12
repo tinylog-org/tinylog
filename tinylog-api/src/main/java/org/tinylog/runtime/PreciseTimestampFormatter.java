@@ -39,7 +39,7 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public boolean isPrecise() {
+	public boolean requiresNanoseconds() {
 		return true;
 	}
 
