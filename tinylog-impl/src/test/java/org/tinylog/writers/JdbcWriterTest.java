@@ -185,6 +185,23 @@ public final class JdbcWriterTest {
 		}
 
 		/**
+		 * Verifies that dates are nanosecond precise.
+		 *
+		 * @throws NamingException
+		 *             Failed to find data source
+		 * @throws SQLException
+		 *             Failed to access database
+		 */
+		@Test
+		public void nanosecondPreciseDate() throws NamingException, SQLException {
+			createTable("ISSUE TIMESTAMP NOT NULL");
+
+			JdbcWriter writer = new JdbcWriter(createProperties(singletonMap("ISSUE", "{date}")));
+			assertThat(writer.getRequiredLogEntryValues()).containsOnly(LogEntryValue.DATE_WITH_NANOSECOND_PRECISION);
+			writer.close();
+		}
+
+		/**
 		 * Verifies that there is only a mutex object, if writhing thread is disabled.
 		 *
 		 * @throws NamingException

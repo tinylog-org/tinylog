@@ -58,7 +58,7 @@ public final class ConsoleWriterTest {
 		ConsoleWriter writer = new ConsoleWriter(emptyMap());
 
 		assertThat(writer.getRequiredLogEntryValues())
-			.contains(LogEntryValue.DATE, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			.contains(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 
 		writer.write(LogEntryBuilder.prefilled(FileWriterTest.class).create());
 		writer.close();

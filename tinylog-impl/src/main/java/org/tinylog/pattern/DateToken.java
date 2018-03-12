@@ -54,7 +54,11 @@ final class DateToken implements Token {
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return Collections.singletonList(LogEntryValue.DATE);
+		if (formatter.requiresNanoseconds()) {
+			return Collections.singletonList(LogEntryValue.DATE_WITH_NANOSECOND_PRECISION);
+		} else {
+			return Collections.singletonList(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION);
+		}
 	}
 
 	@Override

@@ -323,7 +323,15 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		final String message, final StackTraceElement stackTraceElement) {
 		Collection<LogEntryValue> required = requiredLogEntryValues[tagIndex][level.ordinal()];
 
-		Timestamp timestamp = required.contains(LogEntryValue.DATE) ? RuntimeProvider.createTimestamp(true) : null;
+		Timestamp timestamp;
+		if (required.contains(LogEntryValue.DATE_WITH_NANOSECOND_PRECISION)) {
+			timestamp = RuntimeProvider.createTimestamp(false);
+		} else if (required.contains(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION)) {
+			timestamp = RuntimeProvider.createTimestamp(true);
+		} else {
+			timestamp = null;
+		}
+
 		Thread thread = required.contains(LogEntryValue.THREAD) ? Thread.currentThread() : null;
 		Map<String, String> context = required.contains(LogEntryValue.CONTEXT) ? this.context.getMapping() : null;
 

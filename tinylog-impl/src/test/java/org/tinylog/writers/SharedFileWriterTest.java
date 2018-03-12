@@ -131,7 +131,7 @@ public final class SharedFileWriterTest {
 	/**
 	 * Verifies that multiple processes override an already existing file but don't override each other, if append mode
 	 * is disabled.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed writing to file or creating process
 	 * @throws InterruptedException
@@ -179,7 +179,7 @@ public final class SharedFileWriterTest {
 	/**
 	 * Verifies that multiple processes neither override an already existing file nor each other, if append mode is
 	 * enabled.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed writing to file or creating process
 	 * @throws InterruptedException
@@ -273,7 +273,7 @@ public final class SharedFileWriterTest {
 		SharedFileWriter writer = new SharedFileWriter(singletonMap("file", file));
 
 		assertThat(writer.getRequiredLogEntryValues())
-			.contains(LogEntryValue.DATE, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			.contains(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION, LogEntryValue.LEVEL, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 
 		writer.write(LogEntryBuilder.prefilled(SharedFileWriterTest.class).create());
 		writer.close();
@@ -310,7 +310,7 @@ public final class SharedFileWriterTest {
 
 	/**
 	 * Verifies that a warning will be output, if the operating system doesn't support shared locks.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Failed accessing target or lock file
 	 * @throws Exception
@@ -351,7 +351,7 @@ public final class SharedFileWriterTest {
 	/**
 	 * Writes a defined number of lines to a given target file. This main method is used to test writing simultaneously
 	 * to the same file by multiple processes.
-	 * 
+	 *
 	 * @param arguments
 	 *            First element will be used as file name for target file and second element for defining append mode
 	 * @throws IOException

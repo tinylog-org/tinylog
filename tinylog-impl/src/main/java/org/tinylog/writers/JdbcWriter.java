@@ -88,9 +88,16 @@ public final class JdbcWriter implements Writer {
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
 		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
+
 		for (Token token : tokens) {
-			values.addAll(token.getRequiredLogEntryValues());
+			Collection<LogEntryValue> valuesOfToken = token.getRequiredLogEntryValues();
+			if (valuesOfToken.size() == 1 && valuesOfToken.contains(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION)) {
+				values.add(LogEntryValue.DATE_WITH_NANOSECOND_PRECISION);
+			} else {
+				values.addAll(valuesOfToken);
+			}
 		}
+
 		return values;
 	}
 
