@@ -47,11 +47,6 @@ final class FastTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public boolean requiresNanoseconds() {
-		return false;
-	}
-
-	@Override
 	public boolean isValid(final String timestamp) {
 		try {
 			parse(timestamp);

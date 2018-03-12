@@ -75,7 +75,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
-	public Timestamp createTimestamp(final boolean millisecondPrecision) {
+	public Timestamp createTimestamp() {
 		return new FastTimestamp();
 	}
 

@@ -71,97 +71,36 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that correct timestamps with millisecond precision will be created.
+	 * Verifies that timestamps with nanosecond precision will be created.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while waiting between creation of both timestamps
 	 */
 	@Test
-	public void creatingMillisecondPreciseTimestamp() throws InterruptedException {
+	public void createTimestamp() throws InterruptedException {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
 
-		Timestamp timestamp = runtime.createTimestamp(true);
-		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
-		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
-
-		Thread.sleep(2);
-
-		assertThat(runtime.createTimestamp(true).toInstant()).isAfter(timestamp.toInstant());
-	}
-
-	/**
-	 * Verifies that correct timestamps with nanosecond precision will be created.
-	 *
-	 * @throws InterruptedException
-	 *             Interrupted while waiting between creation of both timestamps
-	 */
-	@Test
-	public void creatingNanosecondPreciseTimestamp() throws InterruptedException {
-		ModernJavaRuntime runtime = new ModernJavaRuntime();
-
-		Timestamp timestamp = runtime.createTimestamp(false);
+		Timestamp timestamp = runtime.createTimestamp();
 		assertThat(timestamp).isInstanceOf(PreciseTimestamp.class);
 		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
 
 		Thread.sleep(2);
 
-		assertThat(runtime.createTimestamp(false).toInstant()).isAfter(timestamp.toInstant());
+		assertThat(runtime.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**
-	 * Verifies that an timestamp formatter with millisecond precision will be created for "yyyy-MM-dd HH:mm:ss.SSS",.
+	 * Verifies that a precise timestamp formatter will be created.
 	 */
 	@Test
-	public void creatingTimestampFormatterForTimeWithMilliseconds() {
+	public void createTimestampFormatter() {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
 
 		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
-		assertThat(formatter.requiresNanoseconds()).isFalse();
+		assertThat(formatter).isInstanceOf(PreciseTimestampFormatter.class);
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999");
-	}
-
-	/**
-	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd HH:mm:ss.SSSSSS".
-	 */
-	@Test
-	public void creatingTimestampFormatterForTimeWithMicroseconds() {
-		ModernJavaRuntime runtime = new ModernJavaRuntime();
-
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.US);
-		assertThat(formatter.requiresNanoseconds()).isTrue();
-
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
-		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999001");
-	}
-
-	/**
-	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd HH:mm:ss.n".
-	 */
-	@Test
-	public void creatingTimestampFormatterForTimeWithNanoseconds() {
-		ModernJavaRuntime runtime = new ModernJavaRuntime();
-
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.n", Locale.US);
-		assertThat(formatter.requiresNanoseconds()).isTrue();
-
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
-		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999001002");
-	}
-
-	/**
-	 * Verifies that an timestamp formatter with nanosecond precision will be created for "yyyy-MM-dd N".
-	 */
-	@Test
-	public void creatingTimestampFormatterForNanosecondsOfDay() {
-		ModernJavaRuntime runtime = new ModernJavaRuntime();
-
-		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd N", Locale.US);
-		assertThat(formatter.requiresNanoseconds()).isTrue();
-
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
-		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 45055999001002");
 	}
 
 }

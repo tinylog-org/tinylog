@@ -33,33 +33,12 @@ import static org.mockito.Mockito.verify;
 public final class DateTokenTest {
 
 	/**
-	 * Verifies that {@link LogEntryValue#DATE_WITH_MILLISECOND_PRECISION} is the only required log entry value by
-	 * default.
+	 * Verifies that {@link LogEntryValue#DATE} is the only required log entry value.
 	 */
 	@Test
-	public void defaultRequiredLogEntryValues() {
+	public void requiredLogEntryValues() {
 		DateToken token = new DateToken();
-		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION);
-	}
-
-	/**
-	 * Verifies that {@link LogEntryValue#DATE_WITH_MILLISECOND_PRECISION} is the only required log entry value for a
-	 * date pattern that requires only millisecond precision.
-	 */
-	@Test
-	public void requiredLogEntryValuesForMillisecondPrecision() {
-		DateToken token = new DateToken("yyyy-MM-dd HH:mm:ss.SSS");
-		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.DATE_WITH_MILLISECOND_PRECISION);
-	}
-
-	/**
-	 * Verifies that {@link LogEntryValue#DATE_WITH_NANOSECOND_PRECISION} is the only required log entry value for a
-	 * date pattern that requires nanosecond precision.
-	 */
-	@Test
-	public void requiredLogEntryValuesForNanosecondPrecision() {
-		DateToken token = new DateToken("yyyy-MM-dd HH:mm:ss.SSSSSSSSS");
-		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.DATE_WITH_NANOSECOND_PRECISION);
+		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.DATE);
 	}
 
 	/**

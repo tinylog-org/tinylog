@@ -26,15 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class PreciseTimestampFormatterTest {
 
 	/**
-	 * Verifies that timestamps with nanosecond precision are required.
-	 */
-	@Test
-	public void requireNanonseconds() {
-		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSS", Locale.US);
-		assertThat(formatter.requiresNanoseconds()).isTrue();
-	}
-
-	/**
 	 * Verifies that a valid formatted timestamp will be accepted.
 	 */
 	@Test

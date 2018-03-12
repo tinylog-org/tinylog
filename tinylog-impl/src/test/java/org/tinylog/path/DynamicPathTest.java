@@ -15,6 +15,7 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -32,7 +33,6 @@ import org.tinylog.runtime.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.spy;
@@ -344,13 +344,14 @@ public final class DynamicPathTest {
 	 *            New date and time
 	 */
 	private void setCurrentTime(final LocalDateTime date) {
-		Date instant = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
+		Instant instant = date.atZone(ZoneId.systemDefault()).toInstant();
 
 		Timestamp timestamp = mock(Timestamp.class);
-		when(timestamp.toDate()).thenReturn(instant);
+		when(timestamp.toDate()).thenReturn(Date.from(instant));
+		when(timestamp.toInstant()).thenReturn(instant);
 
 		spy(RuntimeProvider.class);
-		when(RuntimeProvider.createTimestamp(anyBoolean())).thenReturn(timestamp);
+		when(RuntimeProvider.createTimestamp()).thenReturn(timestamp);
 	}
 
 }

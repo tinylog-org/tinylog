@@ -13,6 +13,7 @@
 
 package org.tinylog.path;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -45,9 +46,10 @@ public final class DateSegmentTest {
 	public void createToken() {
 		DateSegment segment = new DateSegment("yyyy-MM-dd");
 
-		Date date = Date.from(LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.systemDefault()).toInstant());
+		Instant instant = LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.systemDefault()).toInstant();
 		Timestamp timestamp = mock(Timestamp.class);
-		when(timestamp.toDate()).thenReturn(date);
+		when(timestamp.toDate()).thenReturn(Date.from(instant));
+		when(timestamp.toInstant()).thenReturn(instant);
 
 		assertThat(segment.createToken(null, timestamp)).isEqualTo("1985-06-03");
 	}

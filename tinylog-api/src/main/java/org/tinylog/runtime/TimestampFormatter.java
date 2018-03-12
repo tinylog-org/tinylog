@@ -19,13 +19,6 @@ package org.tinylog.runtime;
 public interface TimestampFormatter {
 
 	/**
-	 * Checks whether timestamps with nanosecond precision are required.
-	 *
-	 * @return {@code true} if timestamps with nanosecond precision are required, {@code false} if not
-	 */
-	boolean requiresNanoseconds();
-
-	/**
 	 * Checks whether a formatted timestamp is compatible with the pattern of this formatter.
 	 *
 	 * @param timestamp

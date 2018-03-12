@@ -39,11 +39,6 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 	}
 
 	@Override
-	public boolean requiresNanoseconds() {
-		return true;
-	}
-
-	@Override
 	public boolean isValid(final String timestamp) {
 		try {
 			formatter.parse(timestamp);

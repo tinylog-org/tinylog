@@ -19,18 +19,11 @@ package org.tinylog.core;
 public enum LogEntryValue {
 
 	/**
-	 * Date and time of issue with millisecond precision.
+	 * Date and time of issue.
 	 *
 	 * @see LogEntry#getTimestamp()
 	 */
-	DATE_WITH_MILLISECOND_PRECISION,
-
-	/**
-	 * Date and time of issue with nanosecond precision if available.
-	 *
-	 * @see LogEntry#getTimestamp()
-	 */
-	DATE_WITH_NANOSECOND_PRECISION,
+	DATE,
 
 	/**
 	 * Issuing thread.

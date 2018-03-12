@@ -179,44 +179,26 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that correct timestamps with millisecond precision will be created.
+	 * Verifies that correct timestamps will be created.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while waiting between creation of both timestamps
 	 */
 	@Test
-	public void creatingMillisecondPreciseTimestamp() throws InterruptedException {
-		Timestamp timestamp = RuntimeProvider.createTimestamp(true);
-		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
+	public void createTimestamp() throws InterruptedException {
+		Timestamp timestamp = RuntimeProvider.createTimestamp();
 		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
 
 		Thread.sleep(2);
 
-		assertThat(RuntimeProvider.createTimestamp(true).toInstant()).isAfter(timestamp.toInstant());
-	}
-
-	/**
-	 * Verifies that correct timestamps with nanosecond precision will be created.
-	 *
-	 * @throws InterruptedException
-	 *             Interrupted while waiting between creation of both timestamps
-	 */
-	@Test
-	public void creatingNanosecondPreciseTimestamp() throws InterruptedException {
-		Timestamp timestamp = RuntimeProvider.createTimestamp(false);
-		assertThat(timestamp).isInstanceOf(PreciseTimestamp.class);
-		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
-
-		Thread.sleep(2);
-
-		assertThat(RuntimeProvider.createTimestamp(false).toInstant()).isAfter(timestamp.toInstant());
+		assertThat(RuntimeProvider.createTimestamp().toInstant()).isAfter(timestamp.toInstant());
 	}
 
 	/**
 	 * Verifies that a correct timestamp formatter will be created.
 	 */
 	@Test
-	public void creatingTimestampFormatter() {
+	public void createTimestampFormatter() {
 		TimestampFormatter formatter = RuntimeProvider.createTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");

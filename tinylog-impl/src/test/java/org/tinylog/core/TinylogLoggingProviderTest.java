@@ -35,7 +35,6 @@ import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.rules.SystemStreamCollector;
-import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.util.EvilWriter;
 import org.tinylog.util.StorageWriter;
 import org.tinylog.util.Strings;
@@ -651,33 +650,16 @@ public final class TinylogLoggingProviderTest {
 		}
 
 		/**
-		 * Verifies that a millisecond precise date of issue is present in received log entry.
+		 * Verifies that the date of issue is present in received log entry.
 		 */
 		@Test
-		public void dateWithMillisecondPrecision() {
-			Configuration.set("writer.values", "date_with_millisecond_precision");
+		public void date() {
+			Configuration.set("writer.values", "date");
 
 			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
 
 			Instant now = Instant.now();
 			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getTimestamp).allSatisfy(timestamp -> {
-				assertThat(timestamp).hasSameClassAs(RuntimeProvider.createTimestamp(true));
-				assertThat(timestamp.toInstant()).isBetween(now.minusSeconds(1), now);
-			});
-		}
-
-		/**
-		 * Verifies that a nanosecond precise date of issue is present in received log entry.
-		 */
-		@Test
-		public void dateWithNanosecondPrecision() {
-			Configuration.set("writer.values", "date_with_nanosecond_precision");
-
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
-
-			Instant now = Instant.now();
-			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getTimestamp).allSatisfy(timestamp -> {
-				assertThat(timestamp).hasSameClassAs(RuntimeProvider.createTimestamp(false));
 				assertThat(timestamp.toInstant()).isBetween(now.minusSeconds(1), now);
 			});
 		}
