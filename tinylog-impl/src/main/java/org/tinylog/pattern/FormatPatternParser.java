@@ -67,8 +67,6 @@ public final class FormatPatternParser {
 						start = i + 1;
 					}
 				}
-			} else if (character == '\\') {
-				++i; // Do not parse next character, because it should be output and not interpreted
 			}
 		}
 
@@ -172,6 +170,10 @@ public final class FormatPatternParser {
 			return new MessageToken();
 		} else if ("exception".equals(name)) {
 			return new ExceptionToken();
+		} else if ("opening-curly-bracket".equals(name)) {
+			return new PlainTextToken("{");
+		} else if ("closing-curly-bracket".equals(name)) {
+			return new PlainTextToken("}");
 		} else {
 			return null;
 		}

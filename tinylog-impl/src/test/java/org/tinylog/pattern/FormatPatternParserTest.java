@@ -252,6 +252,22 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that <tt>{opening-curly-bracket"}</tt> can be parsed and outputs a single opening curly bracket '{'.
+	 */
+	@Test
+	public void openingCurlyBracket() {
+		assertThat(render("opening-curly-bracket", LogEntryBuilder.empty().create())).isEqualTo("{");
+	}
+
+	/**
+	 * Verifies that <tt>{closing-curly-bracket"}</tt> can be parsed and outputs a single closing curly bracket '}'.
+	 */
+	@Test
+	public void cClosingCurlyBracket() {
+		assertThat(render("closing-curly-bracket", LogEntryBuilder.empty().create())).isEqualTo("}");
+	}
+
+	/**
 	 * Verifies that <tt>{any | min-size=X}</tt> can be parsed and the returned token will apply minimum size.
 	 */
 	@Test
@@ -290,16 +306,6 @@ public final class FormatPatternParserTest {
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("indent")
 			.containsOnlyOnce("ABC");
-	}
-
-	/**
-	 * Verifies that special characters can be escaped.
-	 */
-	@Test
-	public void escaped() {
-		assertThat(render("\\\\", LogEntryBuilder.empty().create())).isEqualTo("\\");
-		assertThat(render("\\ ", LogEntryBuilder.empty().create())).isEqualTo(" ");
-		assertThat(render("\\{\\}", LogEntryBuilder.empty().create())).isEqualTo("{}");
 	}
 
 	/**
