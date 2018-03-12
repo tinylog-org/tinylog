@@ -123,18 +123,18 @@ public final class MessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that placeholders with a missing open brace can be handled.
+	 * Verifies that placeholders with a missing opening curly bracket can be handled.
 	 */
 	@Test
-	public void missingOpenBrace() {
+	public void missingOpeningCurlyBracket() {
 		assertThat(format("Hello }!", "tinylog")).containsSubsequence("Hello", "!");
 	}
 
 	/**
-	 * Verifies that placeholders with a missing close brace can be handled.
+	 * Verifies that placeholders with a missing closing curly bracket can be handled.
 	 */
 	@Test
-	public void missingCloseBrace() {
+	public void missingClosingCurlyBracket() {
 		assertThat(format("Hello {!", "tinylog")).containsSubsequence("Hello", "!");
 	}
 

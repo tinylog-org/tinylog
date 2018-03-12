@@ -63,17 +63,17 @@ final class MessageFormatter {
 
 		int argumentIndex = 0;
 		int start = 0;
-		int openBraces = 0;
+		int openingCurlyBrackets = 0;
 
 		for (int index = 0; index < message.length(); ++index) {
 			char character = message.charAt(index);
 			if (character == '{') {
-				if (openBraces++ == 0 && start < index) {
+				if (openingCurlyBrackets++ == 0 && start < index) {
 					builder.append(message, start, index);
 					start = index;
 				}
-			} else if (character == '}' && openBraces > 0) {
-				if (--openBraces == 0) {
+			} else if (character == '}' && openingCurlyBrackets > 0) {
+				if (--openingCurlyBrackets == 0) {
 					if (argumentIndex < arguments.length) {
 						Object argument = arguments[argumentIndex++];
 						if (argument instanceof Supplier) {

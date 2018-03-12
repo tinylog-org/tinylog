@@ -296,7 +296,7 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Verifies that an accurate warning message will be output, if a closing curly brace is missing.
+	 * Verifies that an accurate warning message will be output, if a closing curly bracket is missing.
 	 *
 	 * @throws Exception
 	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}

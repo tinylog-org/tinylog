@@ -249,7 +249,7 @@ public final class Configuration {
 			int end = value.indexOf(postfix, start);
 
 			if (end == -1) {
-				InternalLogger.log(Level.WARNING, "Closing curly brace is missing for '" + value + "'");
+				InternalLogger.log(Level.WARNING, "Closing curly bracket is missing for '" + value + "'");
 				return value;
 			}
 
