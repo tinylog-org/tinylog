@@ -13,20 +13,28 @@
 
 package org.tinylog.runtime;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Locale;
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 
 /**
- * Thread-safe formatter that based on {@link DateTimeFormatter} with nanosecond precision.
+ * Thread-safe formatter that based on {@link DateTimeFormatter} with nanosecond precision. The last formatted timestamp
+ * will be cached, if the formatter does neither output nanoseconds nor microseconds.
  */
 @IgnoreJRERequirement
 final class PreciseTimestampFormatter implements TimestampFormatter {
 
 	private final DateTimeFormatter formatter;
+	private final TemporalUnit truncationUnit;
+
+	private Instant lastInstant;
+	private String lastFormat;
 
 	/**
 	 * @param pattern
@@ -36,6 +44,16 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 	 */
 	PreciseTimestampFormatter(final String pattern, final Locale locale) {
 		formatter = DateTimeFormatter.ofPattern(pattern, locale).withZone(ZoneId.systemDefault());
+
+		if (pattern.contains("n") || pattern.contains("N") || pattern.contains("SSSS")) {
+			truncationUnit = null;
+		} else if (pattern.contains("S")) {
+			truncationUnit = ChronoUnit.MILLIS;
+		} else if (pattern.contains("s")) {
+			truncationUnit = ChronoUnit.SECONDS;
+		} else {
+			truncationUnit = ChronoUnit.MINUTES;
+		}
 	}
 
 	@Override
@@ -50,7 +68,25 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 
 	@Override
 	public String format(final Timestamp timestamp) {
-		return formatter.format(timestamp.toInstant());
+		Instant instant = timestamp.toInstant();
+		return truncationUnit == null ? formatter.format(instant) : format(instant.truncatedTo(truncationUnit));
+	}
+
+	/**
+	 * Formats an {@link Instant}.
+	 *
+	 * @param instant
+	 *            Instant to format
+	 * @return Formatted instant
+	 */
+	private String format(final Instant instant) {
+		synchronized (formatter) {
+			if (!instant.equals(lastInstant)) {
+				lastInstant = instant;
+				lastFormat = formatter.format(instant);
+			}
+			return lastFormat;
+		}
 	}
 
 }
