@@ -103,7 +103,7 @@ public class LogbackBenchmark {
 			logger = context.getLogger(LogbackBenchmark.class);
 			logger.setLevel(ch.qos.logback.classic.Level.INFO);
 
-			String logFile = Files.createTempFile("logback", ".log").toString();
+			String logFile = Files.createTempFile("logback_", ".log").toString();
 			appender = async ? createAsyncAppender(logFile) : createFileAppender(logFile);
 			appender.start();
 

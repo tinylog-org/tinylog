@@ -90,7 +90,7 @@ public class JulBenchmark {
 		@Setup(Level.Trial)
 		public void init() throws IOException {
 			logger = Logger.getLogger(JulBenchmark.class.getName());
-			handler = new FileHandler(Files.createTempFile("log4j1_", ".log").toString(), false);
+			handler = new FileHandler(Files.createTempFile("jul_", ".log").toString(), false);
 			handler.setFormatter(new SimpleFormatter());
 			logger.addHandler(handler);
 			logger.setUseParentHandlers(false);
