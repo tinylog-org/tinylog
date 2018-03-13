@@ -25,91 +25,15 @@
 	</scm>
 
 	<properties>
+		<!-- Maven -->
 		<maven.compiler.source>9</maven.compiler.source>
 		<maven.compiler.target>9</maven.compiler.target>
 		<maven.deploy.skip>true</maven.deploy.skip>
+		<!-- JMH -->
+		<benchmark.class>org\.tinylog\.benchmarks\.api\.\w+Benchmark</benchmark.class>
+		<benchmark.forks>10</benchmark.forks>
+		<benchmark.iterations>10</benchmark.iterations>
 	</properties>
-	
-	<profiles>
-		<profile>
-			<!-- Benchmark for getting the current date and time and formatting it -->
-			<id>date-and-time</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<configuration>
-							<arguments>
-								<argument>-classpath</argument>
-								<classpath />
-								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.api.DateAndTimeBenchmark</argument>
-								<argument>-f</argument>
-								<argument>10</argument>
-								<argument>-wi</argument>
-								<argument>10</argument>
-								<argument>-i</argument>
-								<argument>10</argument>
-							</arguments>
-						</configuration>
-					</plugin>	
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<!-- Benchmark for extracting defined stack trace elements from stack trace -->
-			<id>stack-trace</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<configuration>
-							<arguments>
-								<argument>-classpath</argument>
-								<classpath />
-								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.api.StackTraceBenchmark</argument>
-								<argument>-f</argument>
-								<argument>10</argument>
-								<argument>-wi</argument>
-								<argument>10</argument>
-								<argument>-i</argument>
-								<argument>10</argument>
-							</arguments>
-						</configuration>
-					</plugin>	
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<!-- Benchmark for writing performance of Java I/O API -->
-			<id>java-io-api</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<configuration>
-							<arguments>
-								<argument>-classpath</argument>
-								<classpath />
-								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.api.WritingBenchmark</argument>
-								<argument>-f</argument>
-								<argument>10</argument>
-								<argument>-wi</argument>
-								<argument>10</argument>
-								<argument>-i</argument>
-								<argument>10</argument>
-							</arguments>
-						</configuration>
-					</plugin>	
-				</plugins>
-			</build>
-		</profile>		
-	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -125,6 +49,36 @@
 			<artifactId>tinylog-impl</artifactId>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<!-- Java API -->
+		<profile>
+			<id>date-and-time</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.api\.DateAndTimeBenchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
+			<id>stack-trace</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.api\.StackTraceBenchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
+			<id>writing</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.api\.WritingBenchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
+			<!-- Fast Benchmarks -->
+			<id>fast</id>
+			<properties>
+				<benchmark.forks>1</benchmark.forks>
+				<benchmark.iterations>1</benchmark.iterations>
+			</properties>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
@@ -143,6 +97,24 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<arguments>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>org.openjdk.jmh.Main</argument>
+						<argument>${benchmark.class}</argument>
+						<argument>-f</argument>
+						<argument>${benchmark.forks}</argument>
+						<argument>-wi</argument>
+						<argument>${benchmark.iterations}</argument>
+						<argument>-i</argument>
+						<argument>${benchmark.iterations}</argument>
+					</arguments>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
