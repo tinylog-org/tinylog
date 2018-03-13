@@ -116,6 +116,12 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>jul</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.JulBenchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
 			<id>tinylog1</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog1Benchmark</benchmark.class>
