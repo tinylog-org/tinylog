@@ -24,7 +24,7 @@ import org.tinylog.provider.ProviderRegistry;
  */
 public final class Logger {
 
-	private static final int STACKTRACE_DEPTH = 1;
+	private static final int STACKTRACE_DEPTH = 2;
 
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 

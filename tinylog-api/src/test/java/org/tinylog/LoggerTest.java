@@ -175,7 +175,7 @@ public final class LoggerTest {
 			Logger.trace("Hello World!");
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.TRACE, null, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -191,7 +191,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, null, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.TRACE, null, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -205,7 +205,7 @@ public final class LoggerTest {
 			Logger.trace("Hello {}!", "World");
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, null, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.TRACE, null, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -222,7 +222,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, null, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.TRACE, null, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -238,7 +238,7 @@ public final class LoggerTest {
 			Logger.trace(exception);
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, exception, null, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.TRACE, exception, null, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -254,7 +254,7 @@ public final class LoggerTest {
 			Logger.trace(exception, "Hello World!");
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -274,7 +274,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, exception, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.TRACE, exception, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -291,7 +291,7 @@ public final class LoggerTest {
 			Logger.trace(exception, "Hello {}!", "World");
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, exception, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.TRACE, exception, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -311,7 +311,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (traceEnabled) {
-				verify(loggingProvider).log(1, null, Level.TRACE, exception, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.TRACE, exception, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -333,7 +333,7 @@ public final class LoggerTest {
 			Logger.debug("Hello World!");
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -349,7 +349,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, null, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.DEBUG, null, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -363,7 +363,7 @@ public final class LoggerTest {
 			Logger.debug("Hello {}!", "World");
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, null, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.DEBUG, null, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -380,7 +380,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, null, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.DEBUG, null, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -396,7 +396,7 @@ public final class LoggerTest {
 			Logger.debug(exception);
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, exception, null, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.DEBUG, exception, null, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -412,7 +412,7 @@ public final class LoggerTest {
 			Logger.debug(exception, "Hello World!");
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -432,7 +432,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, exception, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.DEBUG, exception, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -449,7 +449,7 @@ public final class LoggerTest {
 			Logger.debug(exception, "Hello {}!", "World");
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, exception, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.DEBUG, exception, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -469,7 +469,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (debugEnabled) {
-				verify(loggingProvider).log(1, null, Level.DEBUG, exception, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.DEBUG, exception, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -491,7 +491,7 @@ public final class LoggerTest {
 			Logger.info("Hello World!");
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, null, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.INFO, null, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -507,7 +507,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, null, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.INFO, null, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -521,7 +521,7 @@ public final class LoggerTest {
 			Logger.info("Hello {}!", "World");
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, null, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.INFO, null, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -538,7 +538,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, null, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.INFO, null, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -554,7 +554,7 @@ public final class LoggerTest {
 			Logger.info(exception);
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, exception, null, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.INFO, exception, null, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -570,7 +570,7 @@ public final class LoggerTest {
 			Logger.info(exception, "Hello World!");
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.INFO, exception, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -590,7 +590,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, exception, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.INFO, exception, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -607,7 +607,7 @@ public final class LoggerTest {
 			Logger.info(exception, "Hello {}!", "World");
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, exception, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.INFO, exception, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -627,7 +627,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (infoEnabled) {
-				verify(loggingProvider).log(1, null, Level.INFO, exception, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.INFO, exception, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -649,7 +649,7 @@ public final class LoggerTest {
 			Logger.warn("Hello World!");
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.WARNING, null, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -665,7 +665,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, null, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.WARNING, null, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -679,7 +679,7 @@ public final class LoggerTest {
 			Logger.warn("Hello {}!", "World");
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, null, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.WARNING, null, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -696,7 +696,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, null, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.WARNING, null, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -712,7 +712,7 @@ public final class LoggerTest {
 			Logger.warn(exception);
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, exception, null, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.WARNING, exception, null, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -729,7 +729,7 @@ public final class LoggerTest {
 			Logger.warn(exception, "Hello World!");
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.WARNING, exception, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -749,7 +749,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, exception, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.WARNING, exception, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -766,7 +766,7 @@ public final class LoggerTest {
 			Logger.warn(exception, "Hello {}!", "World");
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, exception, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.WARNING, exception, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -786,7 +786,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (warnEnabled) {
-				verify(loggingProvider).log(1, null, Level.WARNING, exception, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.WARNING, exception, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -808,7 +808,7 @@ public final class LoggerTest {
 			Logger.error("Hello World!");
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -824,7 +824,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, null, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.ERROR, null, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -838,7 +838,7 @@ public final class LoggerTest {
 			Logger.error("Hello {}!", "World");
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, null, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.ERROR, null, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -855,7 +855,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, null, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.ERROR, null, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -871,7 +871,7 @@ public final class LoggerTest {
 			Logger.error(exception);
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, exception, null, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.ERROR, exception, null, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -887,7 +887,7 @@ public final class LoggerTest {
 			Logger.error(exception, "Hello World!");
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -907,7 +907,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, exception, supplier, (Object[]) null);
+				verify(loggingProvider).log(2, null, Level.ERROR, exception, supplier, (Object[]) null);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -924,7 +924,7 @@ public final class LoggerTest {
 			Logger.error(exception, "Hello {}!", "World");
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, exception, "Hello {}!", "World");
+				verify(loggingProvider).log(2, null, Level.ERROR, exception, "Hello {}!", "World");
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
@@ -944,7 +944,7 @@ public final class LoggerTest {
 			verify(supplier, never()).get();
 
 			if (errorEnabled) {
-				verify(loggingProvider).log(1, null, Level.ERROR, exception, "The number is {}", supplier);
+				verify(loggingProvider).log(2, null, Level.ERROR, exception, "The number is {}", supplier);
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			}
