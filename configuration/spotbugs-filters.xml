@@ -53,13 +53,13 @@
 	</Match>
 	<Match>
 		<!-- Writing Benchmark -->
-		<Class name="org.tinylog.benchmarks.WritingBenchmark$Configuration" />
+		<Class name="org.tinylog.benchmarks.api.WritingBenchmark$Configuration" />
 		<!-- It doesn't matter for the benchmark if "File.delete()" fails or not -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
 	<Match>
 		<!-- Stack Trace Benchmark -->
-		<Class name="org.tinylog.benchmarks.StackTraceBenchmark" />
+		<Class name="org.tinylog.benchmarks.api.StackTraceBenchmark" />
 		<!-- Performance of inner anonymous class is the purpose of a benchmark -->
 		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 	</Match>

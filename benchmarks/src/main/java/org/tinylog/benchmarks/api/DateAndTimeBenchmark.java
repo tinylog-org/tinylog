@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks;
+package org.tinylog.benchmarks.api;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -24,10 +24,15 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 
 /**
- * Benchmark for comparing the legacy and modern date and time API for getting the current date and time and formatting
- * it.
+ * Benchmark for comparing the legacy and modern date and time API for getting the current date and time as well as
+ * formatting it.
+ * 
+ * @see Date
+ * @see SimpleDateFormat
+ * @see Instant
+ * @see DateTimeFormatter
  */
-public class CurrentDateAndTimeBenchmark {
+public class DateAndTimeBenchmark {
 
 	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
@@ -38,7 +43,7 @@ public class CurrentDateAndTimeBenchmark {
 	private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
 	/** */
-	public CurrentDateAndTimeBenchmark() {
+	public DateAndTimeBenchmark() {
 	}
 
 	/**

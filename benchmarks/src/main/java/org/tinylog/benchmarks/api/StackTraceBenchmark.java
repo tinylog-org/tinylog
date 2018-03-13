@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks;
+package org.tinylog.benchmarks.api;
 
 import java.lang.StackWalker.StackFrame;
 import java.util.function.Function;

@@ -12,6 +12,6 @@
  */
 
 /**
- * JMH benchmarks.
+ * JMH benchmarks for Java API.
  */
-package org.tinylog.benchmarks;
+package org.tinylog.benchmarks.api;

@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks;
+package org.tinylog.benchmarks.api;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

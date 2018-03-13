@@ -33,7 +33,7 @@
 	<profiles>
 		<profile>
 			<!-- Benchmark for getting the current date and time and formatting it -->
-			<id>current-date-and-time</id>
+			<id>date-and-time</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -44,7 +44,7 @@
 								<argument>-classpath</argument>
 								<classpath />
 								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.CurrentDateAndTimeBenchmark</argument>
+								<argument>org.tinylog.benchmarks.api.DateAndTimeBenchmark</argument>
 								<argument>-f</argument>
 								<argument>10</argument>
 								<argument>-wi</argument>
@@ -70,7 +70,7 @@
 								<argument>-classpath</argument>
 								<classpath />
 								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.StackTraceBenchmark</argument>
+								<argument>org.tinylog.benchmarks.api.StackTraceBenchmark</argument>
 								<argument>-f</argument>
 								<argument>10</argument>
 								<argument>-wi</argument>
@@ -96,7 +96,7 @@
 								<argument>-classpath</argument>
 								<classpath />
 								<argument>org.openjdk.jmh.Main</argument>
-								<argument>org.tinylog.benchmarks.WritingBenchmark</argument>
+								<argument>org.tinylog.benchmarks.api.WritingBenchmark</argument>
 								<argument>-f</argument>
 								<argument>10</argument>
 								<argument>-wi</argument>
