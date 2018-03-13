@@ -30,7 +30,7 @@
 		<maven.compiler.target>9</maven.compiler.target>
 		<maven.deploy.skip>true</maven.deploy.skip>
 		<!-- JMH -->
-		<benchmark.class>org\.tinylog\.benchmarks\.api\.\w+Benchmark</benchmark.class>
+		<benchmark.class>org\.tinylog\.benchmarks\.logging\.\w+Benchmark</benchmark.class>
 		<benchmark.forks>10</benchmark.forks>
 		<benchmark.iterations>10</benchmark.iterations>
 	</properties>
@@ -47,6 +47,12 @@
 		<dependency>
 			<groupId>org.tinylog</groupId>
 			<artifactId>tinylog-impl</artifactId>
+		</dependency>
+		<!-- Other Logging Frameworks -->
+		<dependency>
+			<groupId>org.tinylog</groupId>
+			<artifactId>tinylog</artifactId>
+			<version>1.3.4</version>
 		</dependency>
 	</dependencies>
 
@@ -70,8 +76,21 @@
 				<benchmark.class>org\.tinylog\.benchmarks\.api\.WritingBenchmark</benchmark.class>
 			</properties>
 		</profile>
+		<!-- Logging Frameworks -->
 		<profile>
-			<!-- Fast Benchmarks -->
+			<id>tinylog1</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog1Benchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
+			<id>tinylog2</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog2Benchmark</benchmark.class>
+			</properties>
+		</profile>
+		<!-- Fast Benchmarks -->
+		<profile>
 			<id>fast</id>
 			<properties>
 				<benchmark.forks>1</benchmark.forks>
