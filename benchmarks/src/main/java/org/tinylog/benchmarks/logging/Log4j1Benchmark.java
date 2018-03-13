@@ -16,6 +16,12 @@ package org.tinylog.benchmarks.logging;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -25,81 +31,104 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.tinylog.Logger;
-import org.tinylog.configuration.Configuration;
-import org.tinylog.provider.ProviderRegistry;
 
 /**
- * Benchmark for tinylog 2.
+ * Benchmark for Apache Log4j 1.
  */
-public class Tinylog2Benchmark {
+public class Log4j1Benchmark {
 
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
-	public Tinylog2Benchmark() {
+	public Log4j1Benchmark() {
 	}
 
 	/**
 	 * Benchmarks issuing log entries that will be discarded.
 	 *
 	 * @param lifeCycle
-	 *            Can be ignored
+	 *            Life cycle with logger instance
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void discard(final LifeCycle lifeCycle) {
-		Logger.debug("Hello {}!", MAGIC_NUMBER);
+		lifeCycle.logger.debug("Hello " + MAGIC_NUMBER + "!");
 	}
 
 	/**
 	 * Benchmarks issuing log entries that will be output.
 	 *
 	 * @param lifeCycle
-	 *            Can be ignored
+	 *            Life cycle with logger instance
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void output(final LifeCycle lifeCycle) {
-		Logger.info("Hello {}!", MAGIC_NUMBER);
+		lifeCycle.logger.info("Hello " + MAGIC_NUMBER + "!");
 	}
 
 	/**
-	 * Life cycle for initializing and shutting down tinylog.
+	 * Life cycle for initializing and shutting down Log4j.
 	 */
 	@State(Scope.Benchmark)
 	public static class LifeCycle {
 
+		private static final int BUFFER_SIZE = 64 * 1024;
+
 		@Param({ "false", "true" })
 		private boolean async;
+
+		private Logger logger;
+		private Appender appender;
 
 		/** */
 		public LifeCycle() {
 		}
 
 		/**
-		 * Initializes tinylog.
+		 * Initializes Log4j.
 		 *
 		 * @throws IOException
-		 *             Failed creating temporary log file
+		 *             Failed creating temporary log file or appender
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
-			Configuration.set("autoshutdown", "false");
-			Configuration.set("level", "info");
-			Configuration.set("writer", "file");
-			Configuration.set("writer.buffered", Boolean.toString(async));
-			Configuration.set("writer.file", Files.createTempFile("tinylog2_", ".log").toString());
-			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
-			Configuration.set("writingthread", Boolean.toString(async));
+			appender = createAppender(Files.createTempFile("log4j1_", ".log").toString());
+
+			logger = Logger.getLogger(Log4j1Benchmark.class);
+			logger.removeAllAppenders();
+			logger.addAppender(appender);
+			logger.setLevel(org.apache.log4j.Level.INFO);
 		}
 
 		/**
-		 * Shuts down tinylog.
+		 * Shuts down Log4j.
 		 */
 		@TearDown(Level.Trial)
-		public void shutDown() {
-			ProviderRegistry.getLoggingProvider().shutdown();
+		public void release() {
+			appender.close();
+		}
+
+		/**
+		 * Creates a file appender.
+		 *
+		 * @param file
+		 *            Path to log file
+		 * @return Created appender
+		 * @throws IOException
+		 *             Failed creating appender
+		 */
+		private Appender createAppender(final String file) throws IOException {
+			Layout layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+
+			if (async) {
+				AsyncAppender appender = new AsyncAppender();
+				appender.setLocationInfo(true);
+				appender.addAppender(new FileAppender(layout, file, false, true, BUFFER_SIZE));
+				return appender;
+			} else {
+				return new FileAppender(layout, file, false, false, 0);
+			}
 		}
 
 	}

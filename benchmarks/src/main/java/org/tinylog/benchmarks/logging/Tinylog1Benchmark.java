@@ -42,7 +42,7 @@ public class Tinylog1Benchmark {
 
 	/**
 	 * Benchmarks issuing log entries that will be discarded.
-	 * 
+	 *
 	 * @param lifeCycle
 	 *            Can be ignored
 	 */
@@ -54,7 +54,7 @@ public class Tinylog1Benchmark {
 
 	/**
 	 * Benchmarks issuing log entries that will be output.
-	 * 
+	 *
 	 * @param lifeCycle
 	 *            Can be ignored
 	 */
@@ -71,7 +71,7 @@ public class Tinylog1Benchmark {
 	public static class LifeCycle {
 
 		@Param({ "false", "true" })
-		private boolean writingThread;
+		private boolean async;
 
 		/** */
 		public LifeCycle() {
@@ -79,7 +79,7 @@ public class Tinylog1Benchmark {
 
 		/**
 		 * Initializes tinylog.
-		 * 
+		 *
 		 * @throws IOException
 		 *             Failed creating temporary log file
 		 */
@@ -88,9 +88,9 @@ public class Tinylog1Benchmark {
 			Configurator configurator = Configurator.defaultConfig()
 				.level(org.pmw.tinylog.Level.INFO)
 				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}")
-				.writer(new FileWriter(Files.createTempFile("tinylog1_", ".log").toString(), writingThread));
+				.writer(new FileWriter(Files.createTempFile("tinylog1_", ".log").toString(), async));
 
-			if (writingThread) {
+			if (async) {
 				configurator = configurator.writingThread(null);
 			}
 
@@ -102,7 +102,7 @@ public class Tinylog1Benchmark {
 		 */
 		@TearDown(Level.Trial)
 		public void release() {
-			if (writingThread) {
+			if (async) {
 				Configurator.shutdownWritingThread(true);
 			}
 		}
