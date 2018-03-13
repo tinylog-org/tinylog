@@ -55,6 +55,11 @@
 			<version>1.2.17</version>
 		</dependency>
 		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
 			<version>3.3.7</version>
@@ -102,6 +107,12 @@
 			<id>log4j2</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Log4j2Benchmark</benchmark.class>
+			</properties>
+		</profile>
+		<profile>
+			<id>logback</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.LogbackBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
