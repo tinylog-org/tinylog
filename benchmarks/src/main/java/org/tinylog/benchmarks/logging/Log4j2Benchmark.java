@@ -73,6 +73,8 @@ public class Log4j2Benchmark {
 	@State(Scope.Benchmark)
 	public static class LifeCycle {
 
+		private static final int BUFFER_SIZE = 64 * 1024;
+
 		@Param({ "false", "true" })
 		private boolean async;
 
@@ -100,7 +102,8 @@ public class Log4j2Benchmark {
 			builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			builder.append("<Configuration>");
 			builder.append("<Appenders>");
-			builder.append("<File name=\"file\" fileName=\"" + logFile + "\" bufferedIO=\"" + async + "\">");
+			builder.append("<File name=\"file\" fileName=\"" + logFile + "\"");
+			builder.append(" bufferedIO=\"" + async + "\" bufferSize=\"" + BUFFER_SIZE + "\">");
 			builder.append("<PatternLayout><Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n</Pattern></PatternLayout>");
 			builder.append("</File>");
 			builder.append("</Appenders>");
