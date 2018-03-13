@@ -76,12 +76,12 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public Timestamp createTimestamp() {
-		return new FastTimestamp();
+		return new LegacyTimestamp();
 	}
 
 	@Override
 	public TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
-		return new FastTimestampFormatter(pattern, locale);
+		return new LegacyTimestampFormatter(pattern, locale);
 	}
 
 	/**

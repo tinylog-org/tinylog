@@ -21,16 +21,16 @@ import org.tinylog.util.SimpleTimestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link FastTimestampFormatter}.
+ * Tests for {@link LegacyTimestampFormatter}.
  */
-public final class FastTimestampFormatterTest {
+public final class LegacyTimestampFormatterTest {
 
 	/**
 	 * Verifies that a valid formatted timestamp will be accepted.
 	 */
 	@Test
 	public void acceptValidFormattedTimestamp() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("HH:mm:ss.SSS", Locale.US);
+		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("HH:mm:ss.SSS", Locale.US);
 		assertThat(formatter.isValid("12:30:55.999")).isTrue();
 	}
 
@@ -39,7 +39,7 @@ public final class FastTimestampFormatterTest {
 	 */
 	@Test
 	public void refuseInvalidFormattedTimestamp() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("HH:mm:ss.SSS", Locale.US);
+		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("HH:mm:ss.SSS", Locale.US);
 		assertThat(formatter.isValid("1985-06-03")).isFalse();
 	}
 
@@ -48,7 +48,7 @@ public final class FastTimestampFormatterTest {
 	 */
 	@Test
 	public void minutePrecision() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
+		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30");
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
@@ -60,7 +60,7 @@ public final class FastTimestampFormatterTest {
 	 */
 	@Test
 	public void secondPrecision() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("yyyy-MM-dd HH:mm:ss", Locale.US);
+		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("yyyy-MM-dd HH:mm:ss", Locale.US);
 
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30:55");
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
@@ -72,7 +72,7 @@ public final class FastTimestampFormatterTest {
 	 */
 	@Test
 	public void millisecondPrecision() {
-		FastTimestampFormatter formatter = new FastTimestampFormatter("HH:mm:ss.SSS", Locale.US);
+		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("HH:mm:ss.SSS", Locale.US);
 
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("12:30:55.000");
 		assertThat(formatter.format(new SimpleTimestamp(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");

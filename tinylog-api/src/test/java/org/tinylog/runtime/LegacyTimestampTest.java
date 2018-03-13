@@ -29,11 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
- * Tests for {@link FastTimestamp}.
+ * Tests for {@link LegacyTimestamp}.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(FastTimestamp.class)
-public final class FastTimestampTest {
+@PrepareForTest(LegacyTimestamp.class)
+public final class LegacyTimestampTest {
 
 	/**
 	 * Verifies that a correct {@link Date} will be returned.
@@ -44,7 +44,7 @@ public final class FastTimestampTest {
 	@Test
 	public void convertingToDate() throws Exception {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp timestamp = new FastTimestamp();
+		LegacyTimestamp timestamp = new LegacyTimestamp();
 
 		setCurrentTime(LocalDate.now(), LocalTime.now());
 		assertThat(timestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
@@ -59,7 +59,7 @@ public final class FastTimestampTest {
 	@Test
 	public void convertingToInstant() throws Exception {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp timestamp = new FastTimestamp();
+		LegacyTimestamp timestamp = new LegacyTimestamp();
 
 		setCurrentTime(LocalDate.now(), LocalTime.now());
 		assertThat(timestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
@@ -74,7 +74,7 @@ public final class FastTimestampTest {
 	@Test
 	public void convertingToSqlTimestamp() throws Exception {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		FastTimestamp timestamp = new FastTimestamp();
+		LegacyTimestamp timestamp = new LegacyTimestamp();
 
 		setCurrentTime(LocalDate.now(), LocalTime.now());
 		assertThat(timestamp.toSqlTimestamp()).isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));

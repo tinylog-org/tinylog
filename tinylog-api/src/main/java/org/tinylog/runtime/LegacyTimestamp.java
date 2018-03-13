@@ -19,14 +19,14 @@ import java.util.Date;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 
 /**
- * Fast timestamp that based on a {@link Date} with millisecond precision.
+ * Legacy timestamp that based on a {@link Date} with millisecond precision.
  */
-final class FastTimestamp implements Timestamp {
+final class LegacyTimestamp implements Timestamp {
 
 	private final Date date;
 
 	/** */
-	FastTimestamp() {
+	LegacyTimestamp() {
 		date = new Date();
 	}
 

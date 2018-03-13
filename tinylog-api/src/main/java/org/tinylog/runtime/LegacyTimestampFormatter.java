@@ -23,7 +23,7 @@ import java.util.Locale;
  * Thread-safe formatter that based on {@link SimpleDateFormat} with millisecond precision. The last formatted timestamp
  * will be cached.
  */
-final class FastTimestampFormatter implements TimestampFormatter {
+final class LegacyTimestampFormatter implements TimestampFormatter {
 
 	private static final int MILLISECOND_PRECISION = 1;
 	private static final int SECOND_PRECISION = 1000;
@@ -41,7 +41,7 @@ final class FastTimestampFormatter implements TimestampFormatter {
 	 * @param locale
 	 *            Locale for formatting
 	 */
-	FastTimestampFormatter(final String pattern, final Locale locale) {
+	LegacyTimestampFormatter(final String pattern, final Locale locale) {
 		formatter = new SimpleDateFormat(pattern, locale);
 		divisor = pattern.contains("S") ? MILLISECOND_PRECISION : pattern.contains("s") ? SECOND_PRECISION : MINUTE_PRECISION;
 	}

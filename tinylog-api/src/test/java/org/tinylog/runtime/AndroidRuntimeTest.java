@@ -193,7 +193,7 @@ public final class AndroidRuntimeTest {
 		AndroidRuntime runtime = new AndroidRuntime();
 
 		Timestamp timestamp = runtime.createTimestamp();
-		assertThat(timestamp).isInstanceOf(FastTimestamp.class);
+		assertThat(timestamp).isInstanceOf(LegacyTimestamp.class);
 		assertThat(timestamp.toInstant()).isBetween(Instant.now().minusSeconds(1), Instant.now());
 
 		Thread.sleep(2);
@@ -202,14 +202,14 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that a fast timestamp formatter will be created.
+	 * Verifies that a legacy timestamp formatter will be created.
 	 */
 	@Test
 	public void createTimestampFormatter() {
 		AndroidRuntime runtime = new AndroidRuntime();
 
 		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
-		assertThat(formatter).isInstanceOf(FastTimestampFormatter.class);
+		assertThat(formatter).isInstanceOf(LegacyTimestampFormatter.class);
 
 		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999");
