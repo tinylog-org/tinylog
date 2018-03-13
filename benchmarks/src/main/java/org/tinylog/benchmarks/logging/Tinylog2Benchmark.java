@@ -81,7 +81,7 @@ public class Tinylog2Benchmark {
 		 * Initializes tinylog.
 		 * 
 		 * @throws IOException
-		 *             Failed crating temporary log file
+		 *             Failed creating temporary log file
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
