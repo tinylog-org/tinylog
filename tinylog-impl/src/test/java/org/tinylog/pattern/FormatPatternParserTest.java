@@ -97,7 +97,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void threadId() {
 		Thread thread = Thread.currentThread();
-		assertThat(render("threadId", LogEntryBuilder.empty().thread(thread).create())).isEqualTo(Long.toString(thread.getId()));
+		assertThat(render("thread-id", LogEntryBuilder.empty().thread(thread).create())).isEqualTo(Long.toString(thread.getId()));
 	}
 
 	/**
@@ -154,7 +154,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void simpleClassName() {
-		assertThat(render("className", LogEntryBuilder.empty().className("my.package.MyClass").create())).isEqualTo("MyClass");
+		assertThat(render("class-name", LogEntryBuilder.empty().className("my.package.MyClass").create())).isEqualTo("MyClass");
 	}
 
 	/**
@@ -236,7 +236,7 @@ public final class FormatPatternParserTest {
 	@Test
 	public void messageOnly() {
 		Exception exception = new NullPointerException();
-		assertThat(render("messageOnly", LogEntryBuilder.empty().message("Hello World!").exception(exception).create()))
+		assertThat(render("message-only", LogEntryBuilder.empty().message("Hello World!").exception(exception).create()))
 			.isEqualTo("Hello World!");
 	}
 

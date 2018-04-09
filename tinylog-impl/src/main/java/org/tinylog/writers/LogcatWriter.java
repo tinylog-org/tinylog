@@ -31,7 +31,7 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class LogcatWriter implements Writer {
 
-	private static final String DEFAULT_TAG_FORMAT_PATTERN = "{className}";
+	private static final String DEFAULT_TAG_FORMAT_PATTERN = "{class-name}";
 	private static final String DEFAULT_MESSAGE_FORMAT_PATTERN = "{message}";
 	private static final String ELLIPSIS = "...";
 

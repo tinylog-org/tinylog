@@ -144,13 +144,13 @@ public final class FormatPatternParser {
 			return new ProcessIdToken();
 		} else if ("thread".equals(name)) {
 			return new ThreadNameToken();
-		} else if ("threadId".equals(name)) {
+		} else if ("thread-id".equals(name)) {
 			return new ThreadIdToken();
 		} else if ("context".equals(name)) {
 			return createThreadContextToken(configuration);
 		} else if ("class".equals(name)) {
 			return new FullClassNameToken();
-		} else if ("className".equals(name)) {
+		} else if ("class-name".equals(name)) {
 			return new SimpleClassNameToken();
 		} else if ("package".equals(name)) {
 			return new PackageNameToken();
@@ -166,7 +166,7 @@ public final class FormatPatternParser {
 			return new SeverityLevelToken();
 		} else if ("message".equals(name)) {
 			return new MessageAndExceptionToken();
-		} else if ("messageOnly".equals(name)) {
+		} else if ("message-only".equals(name)) {
 			return new MessageToken();
 		} else if ("exception".equals(name)) {
 			return new ExceptionToken();
