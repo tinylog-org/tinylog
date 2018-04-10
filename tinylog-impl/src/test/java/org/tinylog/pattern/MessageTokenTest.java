@@ -88,6 +88,33 @@ public final class MessageTokenTest {
 	}
 
 	/**
+	 * Verifies that an Unix line separator ("\n") in a text message will be converted to a system line separator.
+	 */
+	@Test
+	public void convertUnixLineSeparator() {
+		MessageToken token = new MessageToken();
+		assertThat(render(token, "Hello\nWorld!")).isEqualTo("Hello" + System.lineSeparator() + "World!");
+	}
+
+	/**
+	 * Verifies that a class Macintosh line separator ("\r") in a text message will be converted to a system line separator.
+	 */
+	@Test
+	public void convertMacintoshLineSeparator() {
+		MessageToken token = new MessageToken();
+		assertThat(render(token, "Hello\rWorld!")).isEqualTo("Hello" + System.lineSeparator() + "World!");
+	}
+
+	/**
+	 * Verifies that a Windows line separator ("\r") in a text message will be converted to a system line separator.
+	 */
+	@Test
+	public void convertWindowsLineSeparator() {
+		MessageToken token = new MessageToken();
+		assertThat(render(token, "Hello\r\nWorld!")).isEqualTo("Hello" + System.lineSeparator() + "World!");
+	}
+
+	/**
 	 * Renders a token.
 	 *
 	 * @param token

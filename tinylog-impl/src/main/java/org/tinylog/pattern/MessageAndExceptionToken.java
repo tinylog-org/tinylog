@@ -26,11 +26,13 @@ import org.tinylog.core.LogEntryValue;
  */
 final class MessageAndExceptionToken implements Token {
 
-	private ExceptionToken exceptionToken;
+	private final MessageToken messageToken;
+	private final ExceptionToken exceptionToken;
 
 	/** */
 	MessageAndExceptionToken() {
-		this.exceptionToken = new ExceptionToken();
+		messageToken = new MessageToken();
+		exceptionToken = new ExceptionToken();
 	}
 
 	@Override
@@ -40,13 +42,10 @@ final class MessageAndExceptionToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		String message = logEntry.getMessage();
-		if (message != null) {
-			builder.append(message);
-		}
+		messageToken.render(logEntry, builder);
 
 		if (logEntry.getException() != null) {
-			if (message != null) {
+			if (logEntry.getMessage() != null) {
 				builder.append(": ");
 			}
 			exceptionToken.render(logEntry, builder);

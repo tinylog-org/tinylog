@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Pattern;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
@@ -25,6 +26,9 @@ import org.tinylog.core.LogEntryValue;
  * Token for outputting the text message of a log entry.
  */
 final class MessageToken implements Token {
+
+	private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\n|\r");
+	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	/** */
 	MessageToken() {
@@ -39,10 +43,10 @@ final class MessageToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		String message = logEntry.getMessage();
 		if (message != null) {
-			builder.append(message);
+			builder.append(NEW_LINE_PATTERN.matcher(message).replaceAll(NEW_LINE));
 		}
 	}
-	
+
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		statement.setString(index, logEntry.getMessage());
