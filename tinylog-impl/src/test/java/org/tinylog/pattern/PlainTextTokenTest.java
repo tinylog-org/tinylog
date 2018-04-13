@@ -67,45 +67,11 @@ public final class PlainTextTokenTest {
 	}
 
 	/**
-	 * Verifies that tabulators will be rendered correctly for a {@link StringBuilder}.
-	 */
-	@Test
-	public void renderTabulators() {
-		PlainTextToken token = new PlainTextToken("\t");
-		assertThat(render(token)).isEqualTo("\t");
-
-		token = new PlainTextToken("\\t");
-		assertThat(render(token)).isEqualTo("\t");
-	}
-
-	/**
-	 * Verifies that tabulators will be added correctly to a {@link PreparedStatement}.
-	 *
-	 * @throws SQLException
-	 *             Failed to add value to prepared SQL statement
-	 */
-	@Test
-	public void applyTabulators() throws SQLException {
-		LogEntry logEntry = LogEntryBuilder.empty().create();
-
-		PreparedStatement statement = mock(PreparedStatement.class);
-		new PlainTextToken("\t").apply(logEntry, statement, 1);
-		verify(statement).setString(1, "\t");
-
-		statement = mock(PreparedStatement.class);
-		new PlainTextToken("\\t").apply(logEntry, statement, 1);
-		verify(statement).setString(1, "\t");
-	}
-
-	/**
 	 * Verifies that Windows line breaks will be rendered as system-dependent line breaks for a {@link StringBuilder}.
 	 */
 	@Test
 	public void renderWindowsNewLines() {
 		PlainTextToken token = new PlainTextToken("\r\n");
-		assertThat(render(token)).isEqualTo(NEW_LINE);
-
-		token = new PlainTextToken("\\r\\n");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 	}
 
@@ -122,10 +88,6 @@ public final class PlainTextTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		new PlainTextToken("\r\n").apply(logEntry, statement, 1);
 		verify(statement).setString(1, NEW_LINE);
-
-		statement = mock(PreparedStatement.class);
-		new PlainTextToken("\\r\\n").apply(logEntry, statement, 1);
-		verify(statement).setString(1, NEW_LINE);
 	}
 
 	/**
@@ -134,9 +96,6 @@ public final class PlainTextTokenTest {
 	@Test
 	public void renderUnixNewLines() {
 		PlainTextToken token = new PlainTextToken("\n");
-		assertThat(render(token)).isEqualTo(NEW_LINE);
-
-		token = new PlainTextToken("\\n");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 	}
 
@@ -153,10 +112,6 @@ public final class PlainTextTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		new PlainTextToken("\n").apply(logEntry, statement, 1);
 		verify(statement).setString(1, NEW_LINE);
-
-		statement = mock(PreparedStatement.class);
-		new PlainTextToken("\\n").apply(logEntry, statement, 1);
-		verify(statement).setString(1, NEW_LINE);
 	}
 
 	/**
@@ -165,9 +120,6 @@ public final class PlainTextTokenTest {
 	@Test
 	public void renderMacNewLines() {
 		PlainTextToken token = new PlainTextToken("\r");
-		assertThat(render(token)).isEqualTo(NEW_LINE);
-
-		token = new PlainTextToken("\\r");
 		assertThat(render(token)).isEqualTo(NEW_LINE);
 	}
 
@@ -184,10 +136,6 @@ public final class PlainTextTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		new PlainTextToken("\r").apply(logEntry, statement, 1);
-		verify(statement).setString(1, NEW_LINE);
-
-		statement = mock(PreparedStatement.class);
-		new PlainTextToken("\\r").apply(logEntry, statement, 1);
 		verify(statement).setString(1, NEW_LINE);
 	}
 
