@@ -55,7 +55,7 @@ public final class EnvironmentHelper {
 	 * @return <code>true</code> if operating system is Android, <code>false</code> if not
 	 */
 	public static boolean isAndroid() {
-		return System.getProperty("java.runtime.name").equalsIgnoreCase("Android Runtime");
+		return System.getProperty("java.runtime.name") != null && System.getProperty("java.runtime.name").equalsIgnoreCase("Android Runtime");
 	}
 
 	/**
