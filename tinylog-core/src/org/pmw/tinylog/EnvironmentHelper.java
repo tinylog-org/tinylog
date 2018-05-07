@@ -55,7 +55,7 @@ public final class EnvironmentHelper {
 	 * @return <code>true</code> if operating system is Android, <code>false</code> if not
 	 */
 	public static boolean isAndroid() {
-		return System.getProperty("java.runtime.name") != null && System.getProperty("java.runtime.name").equalsIgnoreCase("Android Runtime");
+		return "Android Runtime".equalsIgnoreCase(System.getProperty("java.runtime.name"));
 	}
 
 	/**
@@ -64,7 +64,8 @@ public final class EnvironmentHelper {
 	 * @return <code>true</code> if operating system is Windows, <code>false</code> if not
 	 */
 	public static boolean isWindows() {
-		return System.getProperty("os.name").startsWith("Windows");
+		String operatingSystem = System.getProperty("os.name");
+		return operatingSystem != null && operatingSystem.startsWith("Windows");
 	}
 
 	/**
