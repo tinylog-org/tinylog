@@ -371,6 +371,7 @@
 								<Built-By>${builder.name}</Built-By>
 							</manifestEntries>
 						</archive>
+						<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 					</configuration>
 					<executions>
 						<execution>
