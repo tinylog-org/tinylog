@@ -1,0 +1,23 @@
+Benchmark                  (async)   Mode  Cnt           Score          Error  Units
+JulBenchmark.discard           N/A  thrpt  100  1101787278,001 ±  3189062,737  ops/s
+JulBenchmark.output            N/A  thrpt  100       49226,015 ±      687,493  ops/s
+Log4j1Benchmark.discard      false  thrpt  100   668569235,613 ±  1469813,492  ops/s
+Log4j1Benchmark.discard       true  thrpt  100   668787862,227 ±  1529073,910  ops/s
+Log4j1Benchmark.output       false  thrpt  100       29682,449 ±      272,866  ops/s
+Log4j1Benchmark.output        true  thrpt  100       48797,520 ±      653,166  ops/s
+Log4j2Benchmark.discard      false  thrpt  100   579524870,596 ±  3560938,272  ops/s
+Log4j2Benchmark.discard       true  thrpt  100   580301487,782 ±   633019,422  ops/s
+Log4j2Benchmark.output       false  thrpt  100       33108,667 ±      363,744  ops/s
+Log4j2Benchmark.output        true  thrpt  100      107886,826 ±     2156,474  ops/s
+LogbackBenchmark.discard     false  thrpt  100   660259625,355 ±  1465257,560  ops/s
+LogbackBenchmark.discard      true  thrpt  100   660040435,194 ±  1635425,162  ops/s
+LogbackBenchmark.output      false  thrpt  100       27049,517 ±      209,904  ops/s
+LogbackBenchmark.output       true  thrpt  100       43905,687 ±      412,666  ops/s
+Tinylog1Benchmark.discard    false  thrpt  100  1110895830,559 ±  4978971,355  ops/s
+Tinylog1Benchmark.discard     true  thrpt  100  1110169106,368 ±   793009,037  ops/s
+Tinylog1Benchmark.output     false  thrpt  100       79959,430 ±     1244,614  ops/s
+Tinylog1Benchmark.output      true  thrpt  100      250416,489 ±    12165,620  ops/s
+Tinylog2Benchmark.discard    false  thrpt  100  3919574011,273 ± 10097512,297  ops/s
+Tinylog2Benchmark.discard     true  thrpt  100  3916956169,532 ±  3259083,584  ops/s
+Tinylog2Benchmark.output     false  thrpt  100       77012,633 ±     1246,606  ops/s
+Tinylog2Benchmark.output      true  thrpt  100      280493,771 ±    14633,390  ops/s
