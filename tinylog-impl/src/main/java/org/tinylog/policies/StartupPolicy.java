@@ -27,7 +27,7 @@ public final class StartupPolicy implements Policy {
 	 */
 	public StartupPolicy(final String argument) {
 		if (argument != null) {
-			InternalLogger.log(Level.WARNING, "Startup policy does not support arguments");
+			InternalLogger.log(Level.WARN, "Startup policy does not support arguments");
 		}
 	}
 

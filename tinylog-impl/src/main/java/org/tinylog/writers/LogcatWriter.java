@@ -94,7 +94,7 @@ public final class LogcatWriter implements Writer {
 				Log.println(Log.INFO, tag, message);
 				break;
 
-			case WARNING:
+			case WARN:
 				Log.println(Log.WARN, tag, message);
 				break;
 

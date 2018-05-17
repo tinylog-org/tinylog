@@ -68,7 +68,7 @@ public final class StartupPolicyTest {
 	@Test
 	public void warnIfArgumentIsSet() {
 		new StartupPolicy("test");
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce("argument");
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("argument");
 	}
 
 	/**

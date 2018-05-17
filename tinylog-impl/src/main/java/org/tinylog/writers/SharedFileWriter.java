@@ -74,7 +74,7 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 			if (!lock.isShared()) {
 				append = true;
 				lock.release();
-				InternalLogger.log(Level.WARNING, "Operating system does not support shared locks. "
+				InternalLogger.log(Level.WARN, "Operating system does not support shared locks. "
 						+ "Shared file writer will only work properly, if append mode is enabled.");
 			}
 		}

@@ -61,7 +61,7 @@ public final class InternalLoggerTest {
 	 */
 	@Parameters(name = "{1}")
 	public static Collection<Object[]> getLevels() {
-		return asList(new Object[][] { { Level.WARNING, "WARNING" }, { Level.ERROR, "ERROR" } });
+		return asList(new Object[][] { { Level.WARN, "WARN" }, { Level.ERROR, "ERROR" } });
 	}
 
 	/**

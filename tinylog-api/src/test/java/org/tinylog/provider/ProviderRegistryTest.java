@@ -80,7 +80,7 @@ public final class ProviderRegistryTest {
 	public void noProviders() throws Exception {
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce("logging");
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("logging");
 	}
 
 	/**

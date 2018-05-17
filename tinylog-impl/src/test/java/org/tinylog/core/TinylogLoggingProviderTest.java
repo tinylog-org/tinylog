@@ -86,7 +86,7 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.isEnabled(1, tag, Level.TRACE)).isTrue();
 
 			provider.log(1, tag, Level.TRACE, null, "Hello World!");
-			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce(Level.TRACE.toString()).containsOnlyOnce("Hello World!");
+			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("TRACE").containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -97,7 +97,7 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.isEnabled(1, tag, Level.DEBUG)).isTrue();
 
 			provider.log(1, tag, Level.DEBUG, null, "Hello World!");
-			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce(Level.DEBUG.toString()).containsOnlyOnce("Hello World!");
+			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("DEBUG").containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -108,7 +108,7 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.isEnabled(1, tag, Level.INFO)).isTrue();
 
 			provider.log(1, tag, Level.INFO, null, "Hello World!");
-			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce(Level.INFO.toString()).containsOnlyOnce("Hello World!");
+			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("INFO").containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -116,10 +116,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void warningEnabled() {
-			assertThat(provider.isEnabled(1, tag, Level.WARNING)).isTrue();
+			assertThat(provider.isEnabled(1, tag, Level.WARN)).isTrue();
 
-			provider.log(1, tag, Level.WARNING, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce(Level.WARNING.toString()).containsOnlyOnce("Hello World!");
+			provider.log(1, tag, Level.WARN, null, "Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -130,7 +130,7 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.isEnabled(1, tag, Level.ERROR)).isTrue();
 
 			provider.log(1, tag, Level.ERROR, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce(Level.ERROR.toString()).containsOnlyOnce("Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("Hello World!");
 		}
 	}
 
@@ -204,9 +204,9 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void warningDisabled() {
-			assertThat(provider.isEnabled(1, tag, Level.WARNING)).isFalse();
+			assertThat(provider.isEnabled(1, tag, Level.WARN)).isFalse();
 
-			provider.log(1, tag, Level.WARNING, null, "Hello World!");
+			provider.log(1, tag, Level.WARN, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 		}
 
@@ -225,7 +225,7 @@ public final class TinylogLoggingProviderTest {
 
 	/**
 	 * Tests for custom severity level for a class (custom severity level is {@link Level#DEBUG} and global severity
-	 * level is {@link Level#WARNING}).
+	 * level is {@link Level#WARN}).
 	 */
 	@RunWith(Parameterized.class)
 	public static final class CustomSeverityLevelForClass extends AbstractTaggedTest {
@@ -253,7 +253,7 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer", "console");
 			Configuration.set("writer.format", "{level}: {message}");
 
-			Configuration.set("level", "warning");
+			Configuration.set("level", "warn");
 			Configuration.set("level@" + CustomSeverityLevelForClass.class.getName(), "debug");
 		}
 
@@ -336,10 +336,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void warningEnabledForInnerClass() {
-			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.WARNING)).isTrue();
+			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.WARN)).isTrue();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.WARNING, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARNING + ": Hello World!" + NEW_LINE);
+			provider.log(DEPTH_INNER_CLASS, tag, Level.WARN, null, "Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
 		/**
@@ -347,10 +347,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void warningEnabledForOuterClass() {
-			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.WARNING)).isTrue();
+			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.WARN)).isTrue();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.WARNING, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARNING + ": Hello World!" + NEW_LINE);
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.WARN, null, "Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
 		/**
@@ -487,10 +487,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void untaggedWarningEnabled() {
-			assertThat(provider.isEnabled(1, null, Level.WARNING)).isTrue();
+			assertThat(provider.isEnabled(1, null, Level.WARN)).isTrue();
 
-			provider.log(1, null, Level.WARNING, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARNING + ": Hello World!" + NEW_LINE);
+			provider.log(1, null, Level.WARN, null, "Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
 		/**
@@ -498,10 +498,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void taggedWarningEnabled() {
-			assertThat(provider.isEnabled(1, "test", Level.WARNING)).isTrue();
+			assertThat(provider.isEnabled(1, "test", Level.WARN)).isTrue();
 
-			provider.log(1, "test", Level.WARNING, null, "Hello World!");
-			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARNING + ": Hello World!" + NEW_LINE);
+			provider.log(1, "test", Level.WARN, null, "Hello World!");
+			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
 		/**

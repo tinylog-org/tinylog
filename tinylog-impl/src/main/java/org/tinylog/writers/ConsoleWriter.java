@@ -70,7 +70,7 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 	public void write(final LogEntry logEntry) {
 		switch (logEntry.getLevel()) {
 			case ERROR:
-			case WARNING:
+			case WARN:
 				err.print(render(logEntry));
 				break;
 

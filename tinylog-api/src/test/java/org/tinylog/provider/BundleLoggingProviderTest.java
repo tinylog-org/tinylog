@@ -67,7 +67,7 @@ public final class BundleLoggingProviderTest {
 	 */
 	@Test
 	public void getDifferentMinimumLevel() {
-		init(Level.DEBUG, Level.WARNING);
+		init(Level.DEBUG, Level.WARN);
 		assertThat(bundle.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
 	}
 
@@ -82,19 +82,19 @@ public final class BundleLoggingProviderTest {
 		when(first.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(false);
 		when(first.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(false);
 		when(first.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(false);
-		when(first.isEnabled(anyInt(), isNull(), eq(Level.WARNING))).thenReturn(true);
+		when(first.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(true);
 		when(first.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(true);
 
 		when(second.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(false);
 		when(second.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(true);
 		when(second.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(true);
-		when(second.isEnabled(anyInt(), isNull(), eq(Level.WARNING))).thenReturn(true);
+		when(second.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(true);
 		when(second.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(true);
 
 		assertThat(bundle.isEnabled(1, null, Level.TRACE)).isEqualTo(false);
 		assertThat(bundle.isEnabled(1, null, Level.DEBUG)).isEqualTo(true);
 		assertThat(bundle.isEnabled(1, null, Level.INFO)).isEqualTo(true);
-		assertThat(bundle.isEnabled(1, null, Level.WARNING)).isEqualTo(true);
+		assertThat(bundle.isEnabled(1, null, Level.WARN)).isEqualTo(true);
 		assertThat(bundle.isEnabled(1, null, Level.ERROR)).isEqualTo(true);
 
 		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(), any());

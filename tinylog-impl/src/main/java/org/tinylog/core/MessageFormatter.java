@@ -114,7 +114,7 @@ final class MessageFormatter {
 		try {
 			return getFormatter(pattern, argument).format(argument);
 		} catch (IllegalArgumentException ex) {
-			InternalLogger.log(Level.WARNING, "Illegal argument '" + String.valueOf(argument) + "' for pattern '" + pattern + "'");
+			InternalLogger.log(Level.WARN, "Illegal argument '" + String.valueOf(argument) + "' for pattern '" + pattern + "'");
 			return String.valueOf(argument);
 		}
 	}

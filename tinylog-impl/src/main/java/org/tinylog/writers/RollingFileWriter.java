@@ -240,7 +240,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (count >= 0) {
 			for (int i = files.size() - Math.max(0, files.size() - count); i < files.size(); ++i) {
 				if (!files.get(i).delete()) {
-					InternalLogger.log(Level.WARNING, "Failed to delete log file '" + files.get(i).getAbsolutePath() + "'");
+					InternalLogger.log(Level.WARN, "Failed to delete log file '" + files.get(i).getAbsolutePath() + "'");
 				}
 			}
 		}

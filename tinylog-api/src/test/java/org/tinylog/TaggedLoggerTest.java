@@ -84,7 +84,7 @@ public final class TaggedLoggerTest {
 	 * @param infoEnabled
 	 *            Determines if {@link Level#INFO INFO} level is enabled
 	 * @param warnEnabled
-	 *            Determines if {@link Level#WARNING WARNING} level is enabled
+	 *            Determines if {@link Level#WARN WARN} level is enabled
 	 * @param errorEnabled
 	 *            Determines if {@link Level#ERROR ERROR} level is enabled
 	 */
@@ -112,7 +112,7 @@ public final class TaggedLoggerTest {
 		levels.add(new Object[] { Level.TRACE,   true,  true,  true,  true,  true  });
 		levels.add(new Object[] { Level.DEBUG,   false, true,  true,  true,  true  });
 		levels.add(new Object[] { Level.INFO,    false, false, true,  true,  true  });
-		levels.add(new Object[] { Level.WARNING, false, false, false, true,  true  });
+		levels.add(new Object[] { Level.WARN,    false, false, false, true,  true  });
 		levels.add(new Object[] { Level.ERROR,   false, false, false, false, true  });
 		levels.add(new Object[] { Level.OFF,     false, false, false, false, false });
 		// @formatter:on
@@ -615,7 +615,7 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
-	 * Verifies evaluating whether {@link Level#WARNING WARNING} level is enabled.
+	 * Verifies evaluating whether {@link Level#WARN WARN} level is enabled.
 	 */
 	@Test
 	public void isWarnEnabled() {
@@ -623,21 +623,21 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
-	 * Verifies that a plain message object will be logged correctly at {@link Level#WARNING WARNING} level.
+	 * Verifies that a plain message object will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnObject() {
 		logger.warn("Hello World!");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(2, TAG, Level.WARN, null, "Hello World!", (Object[]) null);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#WARNING WARNING} level.
+	 * Verifies that a lazy message supplier will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnLazyMessage() {
@@ -646,29 +646,29 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(2, TAG, Level.WARN, null, supplier, (Object[]) null);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that a formatted text message will be logged correctly at {@link Level#WARNING WARNING} level.
+	 * Verifies that a formatted text message will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnMessageAndArguments() {
 		logger.warn("Hello {}!", "World");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, null, "Hello {}!", "World");
+			verify(loggingProvider).log(2, TAG, Level.WARN, null, "Hello {}!", "World");
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at
-	 * {@link Level#WARNING WARNING} level.
+	 * Verifies that a formatted text message with lazy argument suppliers will be logged correctly at {@link Level#WARN
+	 * WARN} level.
 	 */
 	@Test
 	public void warnMessageAndLazyArguments() {
@@ -677,14 +677,14 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, null, "The number is {}", supplier);
+			verify(loggingProvider).log(2, TAG, Level.WARN, null, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that an exception will be logged correctly at {@link Level#WARNING WARNING} level.
+	 * Verifies that an exception will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnException() {
@@ -693,14 +693,14 @@ public final class TaggedLoggerTest {
 		logger.warn(exception);
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, exception, null, (Object[]) null);
+			verify(loggingProvider).log(2, TAG, Level.WARN, exception, null, (Object[]) null);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#WARNING WARNING} level.
+	 * Verifies that an exception with a custom message will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnExceptionWithMessage() {
@@ -709,15 +709,15 @@ public final class TaggedLoggerTest {
 		logger.warn(exception, "Hello World!");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "Hello World!", (Object[]) null);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#WARNING
-	 * WARNING} level.
+	 * Verifies that an exception with a custom lazy message supplier will be logged correctly at {@link Level#WARN
+	 * WARN} level.
 	 */
 	@Test
 	public void warnExceptionWithLazyMessage() {
@@ -729,15 +729,15 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(2, TAG, Level.WARN, exception, supplier, (Object[]) null);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
 	}
 
 	/**
-	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#WARNING
-	 * WARNING} level.
+	 * Verifies that an exception with a formatted custom message will be logged correctly at {@link Level#WARN WARN}
+	 * level.
 	 */
 	@Test
 	public void warnExceptionWithMessageAndArguments() {
@@ -746,7 +746,7 @@ public final class TaggedLoggerTest {
 		logger.warn(exception, "Hello {}!", "World");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "Hello {}!", "World");
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -754,7 +754,7 @@ public final class TaggedLoggerTest {
 
 	/**
 	 * Verifies that an exception with a formatted custom message and lazy argument suppliers will be logged correctly
-	 * at {@link Level#WARNING WARNING} level.
+	 * at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnExceptionWithMessageAndLazyArguments() {
@@ -766,7 +766,7 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARNING, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "The number is {}", supplier);
 		} else {
 			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}
@@ -942,7 +942,7 @@ public final class TaggedLoggerTest {
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.TRACE))).thenReturn(traceEnabled);
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.DEBUG))).thenReturn(debugEnabled);
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.INFO))).thenReturn(infoEnabled);
-		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.WARNING))).thenReturn(warnEnabled);
+		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.WARN))).thenReturn(warnEnabled);
 		when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.ERROR))).thenReturn(errorEnabled);
 
 		Whitebox.setInternalState(TaggedLogger.class, provider);
@@ -978,7 +978,7 @@ public final class TaggedLoggerTest {
 		Whitebox.setInternalState(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE));
 		Whitebox.setInternalState(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG));
 		Whitebox.setInternalState(logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO));
-		Whitebox.setInternalState(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARNING));
+		Whitebox.setInternalState(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARN));
 		Whitebox.setInternalState(logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR));
 	}
 

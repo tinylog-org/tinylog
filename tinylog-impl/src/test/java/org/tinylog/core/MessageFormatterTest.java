@@ -144,7 +144,7 @@ public final class MessageFormatterTest {
 	@Test
 	public void illegalChoiceFormat() {
 		assertThat(format("Test {#|}!", 42)).isEqualTo("Test 42!");
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce("#|");
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("#|");
 	}
 
 	/**
@@ -153,7 +153,7 @@ public final class MessageFormatterTest {
 	@Test
 	public void illegalNumberFormat() {
 		assertThat(format("Test {#..#}!", 42)).isEqualTo("Test 42!");
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce("#..#");
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("#..#");
 	}
 
 	/**

@@ -163,14 +163,14 @@ public final class ConfigurationParserTest {
 	public void multipleCustomLevels() {
 		Configuration.set("level@test", "debug");
 		Configuration.set("level@test.a", "info");
-		Configuration.set("level@test.b", "warning");
+		Configuration.set("level@test.b", "warn");
 		Configuration.set("level@other", "error");
 
 		Map<String, Level> levels = ConfigurationParser.getCustomLevels();
 		assertThat(levels).containsOnly(
 			entry("test", Level.DEBUG),
 			entry("test.a", Level.INFO),
-			entry("test.b", Level.WARNING),
+			entry("test.b", Level.WARN),
 			entry("other", Level.ERROR));
 	}
 
@@ -418,7 +418,7 @@ public final class ConfigurationParserTest {
 	@Test
 	public void levelOfWriterAboveMinimumLevel() {
 		Configuration.set("writer", "console");
-		Configuration.set("writer.level", "WARNING");
+		Configuration.set("writer.level", "WARN");
 
 		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
 
@@ -427,7 +427,7 @@ public final class ConfigurationParserTest {
 			assertThat(element[Level.TRACE.ordinal()]).isEmpty();
 			assertThat(element[Level.DEBUG.ordinal()]).isEmpty();
 			assertThat(element[Level.INFO.ordinal()]).isEmpty();
-			assertThat(element[Level.WARNING.ordinal()])
+			assertThat(element[Level.WARN.ordinal()])
 				.hasSize(1)
 				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
 			assertThat(element[Level.ERROR.ordinal()])
@@ -454,7 +454,7 @@ public final class ConfigurationParserTest {
 			assertThat(element[Level.INFO.ordinal()])
 				.hasSize(1)
 				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
-			assertThat(element[Level.WARNING.ordinal()])
+			assertThat(element[Level.WARN.ordinal()])
 				.hasSize(1)
 				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
 			assertThat(element[Level.ERROR.ordinal()])

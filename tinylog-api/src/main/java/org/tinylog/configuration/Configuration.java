@@ -249,19 +249,19 @@ public final class Configuration {
 			int end = value.indexOf(postfix, start);
 
 			if (end == -1) {
-				InternalLogger.log(Level.WARNING, "Closing curly bracket is missing for '" + value + "'");
+				InternalLogger.log(Level.WARN, "Closing curly bracket is missing for '" + value + "'");
 				return value;
 			}
 
 			String name = value.substring(start, end);
 			if (name.length() == 0) {
-				InternalLogger.log(Level.WARNING, "Empty variable names cannot be resolved: " + value);
+				InternalLogger.log(Level.WARN, "Empty variable names cannot be resolved: " + value);
 				return value;
 			}
 
 			String data = resolver.resolve(name);
 			if (data == null) {
-				InternalLogger.log(Level.WARNING, "'" + name + "' could not be found in " + resolver.getName());
+				InternalLogger.log(Level.WARN, "'" + name + "' could not be found in " + resolver.getName());
 				return value;
 			} else {
 				builder.append(data);

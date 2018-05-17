@@ -46,7 +46,7 @@ public final class TaggedLogger {
 		minimumLevelCoversTrace = isCoveredByMinimumLevel(tag, Level.TRACE);
 		minimumLevelCoversDebug = isCoveredByMinimumLevel(tag, Level.DEBUG);
 		minimumLevelCoversInfo  = isCoveredByMinimumLevel(tag, Level.INFO);
-		minimumLevelCoversWarn  = isCoveredByMinimumLevel(tag, Level.WARNING);
+		minimumLevelCoversWarn  = isCoveredByMinimumLevel(tag, Level.WARN);
 		minimumLevelCoversError = isCoveredByMinimumLevel(tag, Level.ERROR);
 		// @formatter:on
 	}
@@ -468,28 +468,28 @@ public final class TaggedLogger {
 	}
 
 	/**
-	 * Checks whether log entries at {@link Level#WARNING WARNING} level will be output.
+	 * Checks whether log entries at {@link Level#WARN WARN} level will be output.
 	 *
-	 * @return {@code true} if {@link Level#WARNING WARNING} level is enabled, {@code false} if disabled
+	 * @return {@code true} if {@link Level#WARN WARN} level is enabled, {@code false} if disabled
 	 */
 	public boolean isWarnEnabled() {
-		return minimumLevelCoversWarn && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.WARNING);
+		return minimumLevelCoversWarn && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.WARN);
 	}
 
 	/**
-	 * Logs a message at {@link Level#WARNING WARNING} level.
+	 * Logs a message at {@link Level#WARN WARN} level.
 	 *
 	 * @param message
 	 *            String or any other object with meaningful {@link #toString()} method
 	 */
 	public void warn(final Object message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	/**
-	 * Logs a lazy message at {@link Level#WARNING WARNING} level. The message will be only evaluated if the log entry
+	 * Logs a lazy message at {@link Level#WARN WARN} level. The message will be only evaluated if the log entry
 	 * is really output.
 	 *
 	 * @param message
@@ -497,12 +497,12 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Supplier<?> message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	/**
-	 * Logs a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be replaced by given
+	 * Logs a formatted message at {@link Level#WARN WARN} level. "{}" placeholders will be replaced by given
 	 * arguments.
 	 *
 	 * @param message
@@ -512,12 +512,12 @@ public final class TaggedLogger {
 	 */
 	public void warn(final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, arguments);
 		}
 	}
 
 	/**
-	 * Logs a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be replaced by given lazy
+	 * Logs a formatted message at {@link Level#WARN WARN} level. "{}" placeholders will be replaced by given lazy
 	 * arguments. The arguments will be only evaluated if the log entry is really output.
 	 * 
 	 * @param message
@@ -527,24 +527,24 @@ public final class TaggedLogger {
 	 */
 	public void warn(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) arguments);
 		}
 	}
 
 	/**
-	 * Logs an exception at {@link Level#WARNING WARNING} level.
+	 * Logs an exception at {@link Level#WARN WARN} level.
 	 *
 	 * @param exception
 	 *            Caught exception or any other throwable to log
 	 */
 	public void warn(final Throwable exception) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, (Object[]) null);
 		}
 	}
 
 	/**
-	 * Logs an exception with a custom message at {@link Level#WARNING WARNING} level.
+	 * Logs an exception with a custom message at {@link Level#WARN WARN} level.
 	 *
 	 * @param exception
 	 *            Caught exception or any other throwable to log
@@ -553,12 +553,12 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
 		}
 	}
 
 	/**
-	 * Logs an exception with a custom lazy message at {@link Level#WARNING WARNING} level. The message will be only
+	 * Logs an exception with a custom lazy message at {@link Level#WARN WARN} level. The message will be only
 	 * evaluated if the log entry is really output.
 	 *
 	 * @param exception
@@ -568,12 +568,12 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
 		}
 	}
 
 	/**
-	 * Logs an exception with a formatted custom message at {@link Level#WARNING WARNING} level. "{}" placeholders will
+	 * Logs an exception with a formatted custom message at {@link Level#WARN WARN} level. "{}" placeholders will
 	 * be replaced by given arguments.
 	 *
 	 * @param exception
@@ -585,12 +585,12 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, arguments);
 		}
 	}
 
 	/**
-	 * Logs an exception with a formatted message at {@link Level#WARNING WARNING} level. "{}" placeholders will be
+	 * Logs an exception with a formatted message at {@link Level#WARN WARN} level. "{}" placeholders will be
 	 * replaced by given lazy arguments. The arguments will be only evaluated if the log entry is really output.
 	 * 
 	 * @param exception
@@ -602,7 +602,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARNING, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) arguments);
 		}
 	}
 

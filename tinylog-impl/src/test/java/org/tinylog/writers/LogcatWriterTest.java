@@ -141,7 +141,7 @@ public final class LogcatWriterTest {
 	@Test
 	public void warning() {
 		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
-		writer.write(LogEntryBuilder.empty().level(Level.WARNING).className("MyClass").message("Hello World!").create());
+		writer.write(LogEntryBuilder.empty().level(Level.WARN).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.WARN);
 		assertThat(tagCaptor.getAllValues()).containsOnly("MyClass");

@@ -113,16 +113,16 @@ public final class SeverityLevelTokenTest {
 	}
 
 	/**
-	 * Verifies that {@link Level#WARNING} will be rendered correctly for a {@link StringBuilder}.
+	 * Verifies that {@link Level#WARN} will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
 	public void renderWarning() {
 		SeverityLevelToken token = new SeverityLevelToken();
-		assertThat(render(token, Level.WARNING)).isEqualTo("WARNING");
+		assertThat(render(token, Level.WARN)).isEqualTo("WARN");
 	}
 
 	/**
-	 * Verifies that {@link Level#WARNING} will be added to a {@link PreparedStatement}.
+	 * Verifies that {@link Level#WARN} will be added to a {@link PreparedStatement}.
 	 *
 	 * @throws SQLException
 	 *             Failed to add value to prepared SQL statement
@@ -132,8 +132,8 @@ public final class SeverityLevelTokenTest {
 		SeverityLevelToken token = new SeverityLevelToken();
 
 		PreparedStatement statement = mock(PreparedStatement.class);
-		token.apply(createLogEntry(Level.WARNING), statement, 1);
-		verify(statement).setString(1, "WARNING");
+		token.apply(createLogEntry(Level.WARN), statement, 1);
+		verify(statement).setString(1, "WARN");
 	}
 
 	/**

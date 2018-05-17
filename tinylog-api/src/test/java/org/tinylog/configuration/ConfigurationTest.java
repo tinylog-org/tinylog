@@ -135,8 +135,8 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void propertiesFileFromFileSystem() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = warning"));
-		assertThat(Configuration.get("level")).isEqualToIgnoringCase("warning");
+		loadProperies(FileSystem.createTemporaryFile("level = warn"));
+		assertThat(Configuration.get("level")).isEqualToIgnoringCase("warn");
 	}
 
 	/**
@@ -292,7 +292,7 @@ public final class ConfigurationTest {
 	public void emptyVariable() throws Exception {
 		loadProperies(FileSystem.createTemporaryFile("test = ${}"));
 		assertThat(Configuration.get("test")).isEqualTo("${}");
-		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("${}");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("${}");
 	}
 
 	/**
@@ -305,7 +305,7 @@ public final class ConfigurationTest {
 	public void incompleteVariable() throws Exception {
 		loadProperies(FileSystem.createTemporaryFile("test = ${os.name"));
 		assertThat(Configuration.get("test")).isEqualTo("${os.name");
-		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("${os.name");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("${os.name");
 	}
 
 	/**
@@ -319,7 +319,7 @@ public final class ConfigurationTest {
 	public void nonExistentVariable() throws Exception {
 		loadProperies(FileSystem.createTemporaryFile("test = ${my.invalid.varaiable}"));
 		assertThat(Configuration.get("test")).isEqualTo("${my.invalid.varaiable}");
-		assertThat(systemStream.consumeErrorOutput()).contains("WARNING").containsOnlyOnce("my.invalid.varaiable");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("my.invalid.varaiable");
 	}
 
 	/**

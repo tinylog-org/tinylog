@@ -384,7 +384,7 @@ public final class RollingFileWriterTest {
 		try (FileInputStream stream = new FileInputStream(file2)) {
 			RollingFileWriter writer = new RollingFileWriter(properties);
 			try {
-				assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce(file2.getPath());
+				assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce(file2.getPath());
 				assertThat(file1).doesNotExist();
 				assertThat(file2).exists();
 				assertThat(file3).doesNotExist();
@@ -435,7 +435,7 @@ public final class RollingFileWriterTest {
 
 		RollingFileWriter writer = new RollingFileWriter(properties);
 		try {
-			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").containsOnlyOnce(file2.getPath());
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce(file2.getPath());
 			assertThat(file1).doesNotExist();
 			assertThat(file2).exists();
 			assertThat(file3).doesNotExist();

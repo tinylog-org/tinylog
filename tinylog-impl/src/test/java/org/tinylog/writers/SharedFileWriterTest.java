@@ -332,7 +332,7 @@ public final class SharedFileWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		new SharedFileWriter(doubletonMap("file", file, "append", "false")).close();
 
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARNING").contains("shared");
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").contains("shared");
 	}
 
 	/**

@@ -109,7 +109,7 @@ public final class ConsoleWriterTest {
 	@Test
 	public void warning() {
 		ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
-		writer.write(LogEntryBuilder.empty().level(Level.WARNING).message("Hello World!").create());
+		writer.write(LogEntryBuilder.empty().level(Level.WARN).message("Hello World!").create());
 
 		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
 	}
