@@ -117,9 +117,12 @@ public final class BundleLoggingProviderTest {
 
 	/**
 	 * Verifies that {@code shutdown()} method invokes {@code shutdown()} methods from underlying logging providers.
+	 * 
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for complete shutdown
 	 */
 	@Test
-	public void shutdown() {
+	public void shutdown() throws InterruptedException {
 		init(Level.OFF, Level.OFF);
 
 		bundle.shutdown();

@@ -66,7 +66,11 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				@Override
 				public void run() {
-					shutdown();
+					try {
+						shutdown();
+					} catch (InterruptedException ex) {
+						InternalLogger.log(Level.ERROR, ex, "Interrupted while waiting for shutdown");
+					}
 				}
 			});
 		}
@@ -153,7 +157,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws InterruptedException {
 		if (writingThread == null) {
 			for (Writer writer : getAllWriters(writers)) {
 				try {
@@ -164,6 +168,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			}
 		} else {
 			writingThread.shutdown();
+			writingThread.join();
 		}
 	}
 

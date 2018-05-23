@@ -72,7 +72,7 @@ final class BundleLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws InterruptedException {
 		for (int i = 0; i < loggingProviders.length; ++i) {
 			loggingProviders[i].shutdown();
 		}

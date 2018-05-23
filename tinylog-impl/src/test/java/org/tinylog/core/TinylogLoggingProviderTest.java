@@ -560,15 +560,13 @@ public final class TinylogLoggingProviderTest {
 
 		/**
 		 * Shuts down the logging provider.
+		 * 
+		 * @throws InterruptedException
+		 *             Interrupted while waiting for complete shutdown
 		 */
 		@After
-		public void shutdown() {
+		public void shutdown() throws InterruptedException {
 			provider.shutdown();
-
-			waitFor(() -> Thread.getAllStackTraces().keySet(),
-					threads -> threads.stream().filter(WritingThread.class::isInstance).count() == 0,
-					1000);
-
 			assertThat(Thread.getAllStackTraces().keySet()).doNotHave(writingThread);
 		}
 
@@ -619,9 +617,12 @@ public final class TinylogLoggingProviderTest {
 
 		/**
 		 * Verifies that a thrown exception will be reported while shutting down a writer.
+		 * 
+		 * @throws InterruptedException
+		 *             Interrupted while waiting for complete shutdown
 		 */
 		@Test
-		public void shutdown() {
+		public void shutdown() throws InterruptedException {
 			provider.shutdown();
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce(IOException.class.getName());
 		}

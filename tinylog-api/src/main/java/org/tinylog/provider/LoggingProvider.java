@@ -79,7 +79,10 @@ public interface LoggingProvider {
 	/**
 	 * Shuts down the logging provider and frees all allocated resources. This method should be called only if auto
 	 * shutdown is explicitly disabled.
+	 * 
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for complete shutdown
 	 */
-	void shutdown();
+	void shutdown() throws InterruptedException;
 
 }
