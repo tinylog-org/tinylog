@@ -15,6 +15,7 @@ package org.tinylog.benchmarks.logging;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -73,6 +74,8 @@ public class Tinylog2Benchmark {
 		@Param({ "false", "true" })
 		private boolean async;
 
+		private Path file;
+
 		/** */
 		public LifeCycle() {
 		}
@@ -85,21 +88,29 @@ public class Tinylog2Benchmark {
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
+			file = Files.createTempFile("tinylog2_", ".log");
+
 			Configuration.set("autoshutdown", "false");
 			Configuration.set("level", "info");
 			Configuration.set("writer", "file");
 			Configuration.set("writer.buffered", Boolean.toString(async));
-			Configuration.set("writer.file", Files.createTempFile("tinylog2_", ".log").toString());
+			Configuration.set("writer.file", file.toString());
 			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
 			Configuration.set("writingthread", Boolean.toString(async));
 		}
 
 		/**
 		 * Shuts down tinylog.
+		 * 
+		 * @throws InterruptedException
+		 *             Interrupted while waiting for complete shutdown
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void shutDown() {
+		public void shutDown() throws InterruptedException, IOException {		
 			ProviderRegistry.getLoggingProvider().shutdown();
+			Files.delete(file);
 		}
 
 	}

@@ -15,6 +15,7 @@ package org.tinylog.benchmarks.logging;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -84,6 +85,7 @@ public class LogbackBenchmark {
 
 		private LoggerContext context;
 		private Logger logger;
+		private Path file;
 		private Appender<ILoggingEvent> appender;
 
 		/** */
@@ -103,8 +105,9 @@ public class LogbackBenchmark {
 			logger = context.getLogger(LogbackBenchmark.class);
 			logger.setLevel(ch.qos.logback.classic.Level.INFO);
 
-			String logFile = Files.createTempFile("logback_", ".log").toString();
-			appender = async ? createAsyncAppender(logFile) : createFileAppender(logFile);
+			file = Files.createTempFile("logback_", ".log");
+
+			appender = async ? createAsyncAppender(file.toString()) : createFileAppender(file.toString());
 			appender.start();
 
 			context.getLogger(Logger.ROOT_LOGGER_NAME).detachAndStopAllAppenders();
@@ -113,11 +116,15 @@ public class LogbackBenchmark {
 
 		/**
 		 * Shuts down Logback.
+		 * 
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void release() {
+		public void release() throws IOException {
 			appender.stop();
 			context.stop();
+			Files.delete(file);
 		}
 
 		/**

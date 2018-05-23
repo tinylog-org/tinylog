@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.FileHandler;
@@ -75,6 +76,7 @@ public class JulBenchmark {
 	public static class LifeCycle {
 
 		private Logger logger;
+		private Path file;
 		private FileHandler handler;
 
 		/** */
@@ -90,7 +92,8 @@ public class JulBenchmark {
 		@Setup(Level.Trial)
 		public void init() throws IOException {
 			logger = Logger.getLogger(JulBenchmark.class.getName());
-			handler = new FileHandler(Files.createTempFile("jul_", ".log").toString(), false);
+			file = Files.createTempFile("jul_", ".log");
+			handler = new FileHandler(file.toString(), false);
 			handler.setFormatter(new SimpleFormatter());
 			logger.addHandler(handler);
 			logger.setUseParentHandlers(false);
@@ -99,11 +102,15 @@ public class JulBenchmark {
 
 		/**
 		 * Shuts down java.util.logging.
+		 * 
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void release() {
+		public void release() throws IOException {
 			handler.close();
 			logger.removeHandler(handler);
+			Files.delete(file);
 		}
 
 	}

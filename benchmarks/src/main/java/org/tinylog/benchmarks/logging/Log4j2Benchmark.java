@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,6 +80,7 @@ public class Log4j2Benchmark {
 		private boolean async;
 
 		private Logger logger;
+		private Path file;
 
 		/** */
 		public LifeCycle() {
@@ -96,13 +98,13 @@ public class Log4j2Benchmark {
 				System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 			}
 
-			String logFile = Files.createTempFile("log4j2_", ".log").toString();
+			file = Files.createTempFile("log4j2_", ".log");
 
 			StringBuilder builder = new StringBuilder();
 			builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			builder.append("<Configuration>");
 			builder.append("<Appenders>");
-			builder.append("<File name=\"file\" fileName=\"" + logFile + "\"");
+			builder.append("<File name=\"file\" fileName=\"" + file + "\"");
 			builder.append(" bufferedIO=\"" + async + "\" bufferSize=\"" + BUFFER_SIZE + "\">");
 			builder.append("<PatternLayout><Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n</Pattern></PatternLayout>");
 			builder.append("</File>");
@@ -123,10 +125,14 @@ public class Log4j2Benchmark {
 
 		/**
 		 * Shuts down Log4j.
+		 * 
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void release() {
+		public void release() throws IOException {
 			LogManager.shutdown();
+			Files.delete(file);
 		}
 
 	}

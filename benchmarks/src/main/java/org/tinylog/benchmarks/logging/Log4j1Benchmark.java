@@ -15,6 +15,7 @@ package org.tinylog.benchmarks.logging;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
@@ -79,6 +80,7 @@ public class Log4j1Benchmark {
 		private boolean async;
 
 		private Logger logger;
+		private Path file;
 		private Appender appender;
 
 		/** */
@@ -93,7 +95,8 @@ public class Log4j1Benchmark {
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
-			appender = createAppender(Files.createTempFile("log4j1_", ".log").toString());
+			file = Files.createTempFile("log4j1_", ".log");
+			appender = createAppender(file.toString());
 
 			logger = Logger.getLogger(Log4j1Benchmark.class);
 			logger.removeAllAppenders();
@@ -103,10 +106,14 @@ public class Log4j1Benchmark {
 
 		/**
 		 * Shuts down Log4j.
+		 * 
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void release() {
+		public void release() throws IOException {
 			appender.close();
+			Files.delete(file);
 		}
 
 		/**

@@ -15,6 +15,7 @@ package org.tinylog.benchmarks.logging;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -73,6 +74,9 @@ public class Tinylog1Benchmark {
 		@Param({ "false", "true" })
 		private boolean async;
 
+		private Path file;
+		private FileWriter writer;
+
 		/** */
 		public LifeCycle() {
 		}
@@ -85,10 +89,13 @@ public class Tinylog1Benchmark {
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
+			file = Files.createTempFile("tinylog2_", ".log");
+			writer = new FileWriter(file.toString(), async);
+
 			Configurator configurator = Configurator.defaultConfig()
 				.level(org.pmw.tinylog.Level.INFO)
 				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}")
-				.writer(new FileWriter(Files.createTempFile("tinylog1_", ".log").toString(), async));
+				.writer(writer);
 
 			if (async) {
 				configurator = configurator.writingThread(null);
@@ -99,12 +106,18 @@ public class Tinylog1Benchmark {
 
 		/**
 		 * Shuts down tinylog.
+		 * 
+		 * @throws IOException
+		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void release() {
+		public void release() throws IOException {
 			if (async) {
 				Configurator.shutdownWritingThread(true);
 			}
+
+			writer.close();
+			Files.delete(file);
 		}
 
 	}
