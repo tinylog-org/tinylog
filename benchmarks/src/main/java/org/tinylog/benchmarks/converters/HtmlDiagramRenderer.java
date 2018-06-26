@@ -29,6 +29,7 @@ public final class HtmlDiagramRenderer {
 
 	private static final BigDecimal PERCENTAGE = BigDecimal.valueOf(100);
 	private static final int DECIMAL_PLACES = 2;
+	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.ENGLISH);
 
 	private final Map<String, Framework> frameworks;
 
@@ -80,7 +81,7 @@ public final class HtmlDiagramRenderer {
 					System.out.println("\t\t\t<td>" + label + "</td>");
 					System.out.println("\t\t\t<td>");
 					System.out.println("\t\t\t\t<div class=\"bar\" style=\"width: " + percentage + "%\">&nbsp;</div>");
-					System.out.println("\t\t\t\t<div class=\"total\">" + NumberFormat.getInstance().format(total) + "</div></td>");
+					System.out.println("\t\t\t\t<div class=\"total\">" + NUMBER_FORMAT.format(total) + "</div></td>");
 					System.out.println("\t\t\t</td>");
 					System.out.println("\t\t</tr>");
 				}
