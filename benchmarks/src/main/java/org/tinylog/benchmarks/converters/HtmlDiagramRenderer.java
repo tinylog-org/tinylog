@@ -61,7 +61,7 @@ public final class HtmlDiagramRenderer {
 			System.out.println("\t<thead>");
 			System.out.println("\t\t<tr>");
 			System.out.println("\t\t\t<th>Framework</th>");
-			System.out.println("\t\t\t<th>Issued Log Entries per Second</th>");
+			System.out.println("\t\t\t<th>Processed Log Entries per Second</th>");
 			System.out.println("\t\t</tr>");
 			System.out.println("\t</thead>");
 
