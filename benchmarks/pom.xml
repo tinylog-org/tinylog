@@ -133,6 +133,12 @@
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog2Benchmark</benchmark.class>
 			</properties>
 		</profile>
+		<profile>
+			<id>no-op</id>
+			<properties>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.NoOpBenchmark</benchmark.class>
+			</properties>
+		</profile>
 		<!-- Fast Benchmarks -->
 		<profile>
 			<id>fast</id>
