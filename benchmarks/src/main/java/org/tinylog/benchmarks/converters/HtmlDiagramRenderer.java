@@ -76,7 +76,7 @@ public final class HtmlDiagramRenderer {
 
 					String label = i == 0 ? framework.getValue().getName() : framework.getValue().getAsync();
 
-					System.out.println("\t\t\t" + (i == 0 ? "<tr>" : "<tr class=\"advanced\">"));
+					System.out.println("\t\t" + (i == 0 ? "<tr>" : "<tr class=\"advanced\">"));
 					System.out.println("\t\t\t<td>" + label + "</td>");
 					System.out.println("\t\t\t<td>");
 					System.out.println("\t\t\t\t<div class=\"bar\" style=\"width: " + percentage + "%\">&nbsp;</div>");
