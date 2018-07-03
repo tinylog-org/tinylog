@@ -108,7 +108,7 @@ public class Tinylog2Benchmark {
 		 *             Failed to delete log file
 		 */
 		@TearDown(Level.Trial)
-		public void shutDown() throws InterruptedException, IOException {		
+		public void shutDown() throws InterruptedException, IOException {
 			ProviderRegistry.getLoggingProvider().shutdown();
 			Files.delete(file);
 		}
