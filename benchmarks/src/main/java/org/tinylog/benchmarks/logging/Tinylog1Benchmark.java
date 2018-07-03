@@ -89,7 +89,7 @@ public class Tinylog1Benchmark {
 		 */
 		@Setup(Level.Trial)
 		public void init() throws IOException {
-			file = Files.createTempFile("tinylog2_", ".log");
+			file = Files.createTempFile("tinylog1_", ".log");
 			writer = new FileWriter(file.toString(), async);
 
 			Configurator configurator = Configurator.defaultConfig()
