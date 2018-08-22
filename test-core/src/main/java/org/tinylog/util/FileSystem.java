@@ -14,6 +14,7 @@
 package org.tinylog.util;
 
 import java.io.IOException;
+import java.lang.StackWalker.StackFrame;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 /**
  * Utility class for simplifying frequent file system operations to have readable JUnit tests.
@@ -174,15 +176,11 @@ public final class FileSystem {
 	 * @throws URISyntaxException
 	 *             Failed converting class path URL to an URI
 	 */
-	@SuppressWarnings("deprecation")
 	private static URI getClassPathUri() throws URISyntaxException {
-		Class<?> caller;
-		int i = 1;
-		do {
-			caller = sun.reflect.Reflection.getCallerClass(i++);
-		} while (FileSystem.class.equals(caller));
-
-		return caller.getProtectionDomain().getCodeSource().getLocation().toURI();
+		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		Predicate<StackFrame> predicate = frame -> FileSystem.class.equals(frame.getDeclaringClass());
+		StackFrame caller = walker.walk(stream -> stream.dropWhile(predicate).findFirst().get());
+		return caller.getDeclaringClass().getProtectionDomain().getCodeSource().getLocation().toURI();
 	}
 
 }
