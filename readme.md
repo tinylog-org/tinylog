@@ -43,10 +43,15 @@ Differences to tinylog 1.x
 * Fluent-API (The recommended way to configure tinylog are properties files. Nevertheless the configuration can be changed or set programmatically via the [Configuration](tinylog-api/src/main/java/org/tinylog/configuration/Configuration.java) class.)
 * Mutable configurations (For performance reasons, the configuration becomes immutable, when the first logging method is called.)
 
+Support
+-------
+
+A detailed user manual and the Javadoc documentation can be found on https://tinylog.org/v2/. Bug reports and feature requests are welcome and can be created via [GitHub issues](https://github.com/pmwmedia/tinylog/issues).
+
 Build tinylog
 -------------
 
-tinylog requires at least Maven 3 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
+tinylog requires Maven 3 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
 
 Build command:
 
