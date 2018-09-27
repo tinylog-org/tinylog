@@ -13,7 +13,6 @@
 
 package org.tinylog.writers;
 
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -32,8 +31,7 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
-	private final PrintStream err;
-	private final PrintStream out;
+	private final Level errorLevel;
 
 	/**
 	 * @param properties
@@ -44,18 +42,14 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 		
 		String stream = properties.get("stream");
 		if (stream == null) {
-			err = System.err;
-			out = System.out;
+			errorLevel = Level.WARN;
 		} else if ("err".equalsIgnoreCase(stream)) {
-			err = System.err;
-			out = System.err;
+			errorLevel = Level.TRACE;
 		} else if ("out".equalsIgnoreCase(stream)) {
-			err = System.out;
-			out = System.out;
+			errorLevel = Level.OFF;
 		} else {
 			InternalLogger.log(Level.ERROR, "Stream must be \"out\" or \"err\", \"" + stream + "\" is an invalid stream name");
-			err = System.err;
-			out = System.out;
+			errorLevel = Level.WARN;
 		}
 	}
 
@@ -68,15 +62,10 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) {
-		switch (logEntry.getLevel()) {
-			case ERROR:
-			case WARN:
-				err.print(render(logEntry));
-				break;
-
-			default:
-				out.print(render(logEntry));
-				break;
+		if (logEntry.getLevel().ordinal() < errorLevel.ordinal()) {
+			System.out.print(render(logEntry));
+		} else {
+			System.err.print(render(logEntry));
 		}
 	}
 
