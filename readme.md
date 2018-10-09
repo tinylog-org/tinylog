@@ -51,7 +51,7 @@ A detailed user manual and the Javadoc documentation can be found on https://tin
 Build tinylog
 -------------
 
-tinylog requires Maven 3 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
+tinylog requires Maven 3 and JDK 9 or 10 for building. The generated JARs are compatible with Java 6 and higher.
 
 Build command:
 
