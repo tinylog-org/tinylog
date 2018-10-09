@@ -49,9 +49,9 @@
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
 		<android.version>1.5_r3</android.version>
-		<assertj-core.version>3.11.0</assertj-core.version>
+		<assertj-core.version>3.11.1</assertj-core.version>
 		<assertj-db.version>1.2.0</assertj-db.version>
-		<checkstyle.version>8.10</checkstyle.version>
+		<checkstyle.version>8.13</checkstyle.version>
 		<h2.version>1.4.197</h2.version>
 		<java16.version>1.1</java16.version>
 		<jmh.version>1.21</jmh.version>
