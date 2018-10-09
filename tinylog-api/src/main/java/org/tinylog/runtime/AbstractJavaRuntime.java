@@ -13,52 +13,18 @@
 
 package org.tinylog.runtime;
 
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
-
 /**
  * Base class for runtime dialect implementations for Java from Oracle and OpenJDK.
  */
 abstract class AbstractJavaRuntime implements RuntimeDialect {
 
-	private final boolean hasSunReflection;
-
 	/** */
 	AbstractJavaRuntime() {
-		hasSunReflection = verifySunReflection();
 	}
 
 	@Override
 	public String getDefaultWriter() {
 		return "console";
-	}
-
-	/**
-	 * Gets availability of {@link sun.reflect.Reflection#getCallerClass(int)}.
-	 *
-	 * @return {@code true} if Sun Reflection is available, {@code false} if not
-	 */
-	@SuppressWarnings("javadoc")
-	protected final boolean isSunReflectionAvailable() {
-		return hasSunReflection;
-	}
-
-	/**
-	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
-	 *
-	 * @return {@code true} if available, {@code true} if not
-	 */
-	@SuppressWarnings({ "deprecation", "javadoc" })
-	@IgnoreJRERequirement
-	private static boolean verifySunReflection() {
-		try {
-			return AbstractJavaRuntime.class.equals(sun.reflect.Reflection.getCallerClass(1));
-		} catch (NoClassDefFoundError error) {
-			return false;
-		} catch (NoSuchMethodError error) {
-			return false;
-		} catch (Exception ex) {
-			return false;
-		}
 	}
 
 }

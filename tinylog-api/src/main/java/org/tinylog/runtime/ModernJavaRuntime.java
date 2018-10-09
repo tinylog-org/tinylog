@@ -40,13 +40,8 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public String getCallerClassName(final int depth) {
-		if (isSunReflectionAvailable()) {
-			return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
-		} else {
-			return StackWalker.getInstance().walk(new StackFrameExtractor(depth)).getClassName();
-		}
+		return StackWalker.getInstance().walk(new StackFrameExtractor(depth)).getClassName();
 	}
 
 	@Override

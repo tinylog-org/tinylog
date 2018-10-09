@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.Locale;
 
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,17 +48,6 @@ public final class ModernJavaRuntimeTest {
 	@Test
 	public void callerClassName() {
 		assertThat(new ModernJavaRuntime().getCallerClassName(1)).isEqualTo(ModernJavaRuntimeTest.class.getName());
-	}
-
-	/**
-	 * Verifies that the fully-qualified class name of a caller can be returned, if {@link sun.reflect.Reflection} is
-	 * not available.
-	 */
-	@Test
-	public void missingSunReflection() {
-		ModernJavaRuntime runtime = new ModernJavaRuntime();
-		Whitebox.setInternalState(runtime, boolean.class, false);
-		assertThat(runtime.getCallerClassName(1)).isEqualTo(ModernJavaRuntimeTest.class.getName());
 	}
 
 	/**

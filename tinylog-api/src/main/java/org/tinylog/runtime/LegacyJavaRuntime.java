@@ -27,10 +27,12 @@ import org.tinylog.provider.InternalLogger;
  */
 final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
+	private final boolean hasSunReflection;
 	private final Method stackTraceElementGetter;
 
 	/** */
 	LegacyJavaRuntime() {
+		hasSunReflection = verifySunReflection();
 		stackTraceElementGetter = getStackTraceElementGetter();
 	}
 
@@ -52,7 +54,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	@SuppressWarnings("deprecation")
 	@IgnoreJRERequirement
 	public String getCallerClassName(final int depth) {
-		if (isSunReflectionAvailable()) {
+		if (hasSunReflection) {
 			return sun.reflect.Reflection.getCallerClass(depth + 1).getName();
 		} else {
 			return getCallerStackTraceElement(depth + 1).getClassName();
@@ -82,6 +84,25 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	@Override
 	public TimestampFormatter createTimestampFormatter(final String pattern, final Locale locale) {
 		return new LegacyTimestampFormatter(pattern, locale);
+	}
+
+	/**
+	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
+	 *
+	 * @return {@code true} if available, {@code true} if not
+	 */
+	@SuppressWarnings({ "deprecation", "javadoc" })
+	@IgnoreJRERequirement
+	private static boolean verifySunReflection() {
+		try {
+			return AbstractJavaRuntime.class.equals(sun.reflect.Reflection.getCallerClass(1));
+		} catch (NoClassDefFoundError error) {
+			return false;
+		} catch (NoSuchMethodError error) {
+			return false;
+		} catch (Exception ex) {
+			return false;
+		}
 	}
 
 	/**
