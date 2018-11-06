@@ -2,6 +2,7 @@ tinylog 2
 =========
 [![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.0)](https://travis-ci.org/pmwmedia/tinylog)
 [![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.0/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog)
 
 Example
 -------
