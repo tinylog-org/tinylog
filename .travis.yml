@@ -4,6 +4,8 @@ install: true
 
 jdk:
   - oraclejdk9
+  - openjdk9
+  - openjdk10
 
 script:
   - mvn clean install -P release
