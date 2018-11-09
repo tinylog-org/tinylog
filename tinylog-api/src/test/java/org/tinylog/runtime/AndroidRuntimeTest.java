@@ -32,10 +32,12 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.Logger;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.tinylog.assertions.Assertions.assertThat;
@@ -92,10 +94,11 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that the fully-qualified class name of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerClassName() {
+	public void callerClassNameByIndex() {
 		AndroidRuntime runtime = new AndroidRuntime();
 
 		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
@@ -106,10 +109,26 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that the complete stack trace element of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if successor in stack trace
+	 * is defined.
 	 */
 	@Test
-	public void callerStackTraceElement() {
+	public void callerClassNameBySuccessor() {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
+		Whitebox.setInternalState(runtime, Method.class, method);
+		Whitebox.setInternalState(runtime, int.class, 5);
+
+		assertThat(runtime.getCallerClassName(AndroidRuntime.class.getName())).isEqualTo(AndroidRuntimeTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
+	 */
+	@Test
+	public void callerStackTraceElementByIndex() {
 		AndroidRuntime runtime = new AndroidRuntime();
 
 		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
@@ -117,6 +136,37 @@ public final class AndroidRuntimeTest {
 		Whitebox.setInternalState(runtime, int.class, 5);
 
 		assertThat(runtime.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if successor in stack
+	 * trace is defined.
+	 */
+	@Test
+	public void callerStackTraceElementBySuccessor() {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
+		Whitebox.setInternalState(runtime, Method.class, method);
+		Whitebox.setInternalState(runtime, int.class, 5);
+
+		assertThat(runtime.getCallerStackTraceElement(AndroidRuntime.class.getName())).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerStackTraceElement() {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
+		Whitebox.setInternalState(runtime, Method.class, method);
+		Whitebox.setInternalState(runtime, int.class, 5);
+
+		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining(Logger.class.getName());
 	}
 
 	/**
@@ -130,6 +180,7 @@ public final class AndroidRuntimeTest {
 		Whitebox.setInternalState(runtime, int.class, -1);
 
 		assertThat(new AndroidRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+		assertThat(runtime.getCallerStackTraceElement(AndroidRuntime.class.getName())).isEqualTo(new Throwable().getStackTrace()[0]);
 	}
 
 	/**

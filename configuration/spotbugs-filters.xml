@@ -26,8 +26,8 @@
 			<Class name="org.tinylog.runtime.AndroidRuntime" />
 			<Class name="org.tinylog.runtime.LegacyJavaRuntime" />
 		</Or>
-		<!-- Runtime dialects use non-public API that throws maybe unknown exceptions -->
-		<Bug pattern="REC_CATCH_EXCEPTION" />
+		<!-- Runtime dialects use non-public API that throws maybe unknown exceptions / Null is a valid return value for arrays to distinguish between empty and unloaded stack traces -->
+		<Bug pattern="REC_CATCH_EXCEPTION, PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
 	</Match>
 	<Match>
 		<!-- Base Class for Format Pattern Writers -->

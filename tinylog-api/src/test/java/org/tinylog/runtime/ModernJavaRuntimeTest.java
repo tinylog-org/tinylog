@@ -17,9 +17,11 @@ import java.time.Instant;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.tinylog.Logger;
 import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link ModernJavaRuntime}.
@@ -43,19 +45,53 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that the fully-qualified class name of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerClassName() {
+	public void callerClassNameByIndex() {
 		assertThat(new ModernJavaRuntime().getCallerClassName(1)).isEqualTo(ModernJavaRuntimeTest.class.getName());
 	}
 
 	/**
-	 * Verifies that the complete stack trace element of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if successor in stack trace
+	 * is defined.
 	 */
 	@Test
-	public void callerStackTraceElement() {
+	public void callerClassNameBySuccessor() {
+		assertThat(new ModernJavaRuntime().getCallerClassName(ModernJavaRuntime.class.getName()))
+			.isEqualTo(ModernJavaRuntimeTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
+	 */
+	@Test
+	public void callerStackTraceElementByIndex() {
 		assertThat(new ModernJavaRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if successor in stack
+	 * trace is defined.
+	 */
+	@Test
+	public void callerStackTraceElementBySuccessor() {
+		String className = ModernJavaRuntime.class.getName();
+		assertThat(new ModernJavaRuntime().getCallerStackTraceElement(className)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerStackTraceElement() {
+		ModernJavaRuntime runtime = new ModernJavaRuntime();
+
+		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining(Logger.class.getName());
 	}
 
 	/**

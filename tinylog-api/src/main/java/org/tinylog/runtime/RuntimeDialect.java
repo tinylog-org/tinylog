@@ -45,6 +45,15 @@ interface RuntimeDialect {
 	String getCallerClassName(int depth);
 
 	/**
+	 * Gets the class name of a caller from stack trace.
+	 * 
+	 * @param loggerClassName
+	 *            Logger class name that should appear before the real caller
+	 * @return Fully-qualified class name of caller
+	 */
+	String getCallerClassName(String loggerClassName);
+
+	/**
 	 * Gets the complete stack trace element of a caller from stack trace.
 	 *
 	 * @param depth
@@ -52,6 +61,15 @@ interface RuntimeDialect {
 	 * @return Stack trace element of a caller
 	 */
 	StackTraceElement getCallerStackTraceElement(int depth);
+
+	/**
+	 * Gets the complete stack trace element of a caller from stack trace.
+	 *
+	 * @param loggerClassName
+	 *            Logger class name that should appear before the real caller
+	 * @return Stack trace element of a caller
+	 */
+	StackTraceElement getCallerStackTraceElement(String loggerClassName);
 
 	/**
 	 * Creates a timestamp with the current date and time.

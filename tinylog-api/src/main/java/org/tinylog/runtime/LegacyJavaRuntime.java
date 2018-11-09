@@ -62,6 +62,11 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
+	public String getCallerClassName(final String loggerClassName) {
+		return getCallerStackTraceElement(loggerClassName).getClassName();
+	}
+
+	@Override
 	public StackTraceElement getCallerStackTraceElement(final int depth) {
 		if (stackTraceElementGetter != null) {
 			try {
@@ -74,6 +79,26 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 		}
 
 		return new Throwable().getStackTrace()[depth];
+	}
+
+	@Override
+	public StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		int index = 0;
+		
+		while (index < trace.length && !loggerClassName.equals(trace[index].getClassName())) {
+			index = index + 1;
+		}
+		
+		while (index < trace.length && loggerClassName.equals(trace[index].getClassName())) {
+			index = index + 1;
+		}
+		
+		if (index < trace.length) {
+			return trace[index];
+		} else {
+			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
+		}
 	}
 
 	@Override

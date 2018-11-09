@@ -26,10 +26,12 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.Logger;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -96,11 +98,22 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that the fully-qualified class name of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerClassName() {
+	public void callerClassNameByIndex() {
 		assertThat(new LegacyJavaRuntime().getCallerClassName(1)).isEqualTo(LegacyJavaRuntimeTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if successor in stack
+	 * trace is defined.
+	 */
+	@Test
+	public void callerClassNameBySuccessor() {
+		assertThat(new LegacyJavaRuntime().getCallerClassName(LegacyJavaRuntime.class.getName()))
+			.isEqualTo(LegacyJavaRuntimeTest.class.getName());
 	}
 
 	/**
@@ -115,11 +128,34 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that the complete stack trace element of a caller will be returned correctly.
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerStackTraceElement() {
+	public void callerStackTraceElementByIndex() {
 		assertThat(new LegacyJavaRuntime().getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if successor in stack
+	 * trace is defined.
+	 */
+	@Test
+	public void callerStackTraceElementBySuccessor() {
+		String className = LegacyJavaRuntime.class.getName();
+		assertThat(new LegacyJavaRuntime().getCallerStackTraceElement(className)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerStackTraceElement() {
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
+
+		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining(Logger.class.getName());
 	}
 
 	/**

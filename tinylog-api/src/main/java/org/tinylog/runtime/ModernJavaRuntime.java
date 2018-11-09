@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.lang.StackWalker.StackFrame;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -41,12 +42,22 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final int depth) {
-		return StackWalker.getInstance().walk(new StackFrameExtractor(depth)).getClassName();
+		return StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth)).getClassName();
+	}
+
+	@Override
+	public String getCallerClassName(final String loggerClassName) {
+		return StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName)).getClassName();
 	}
 
 	@Override
 	public StackTraceElement getCallerStackTraceElement(final int depth) {
-		return StackWalker.getInstance().walk(new StackFrameExtractor(depth)).toStackTraceElement();
+		return StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth)).toStackTraceElement();
+	}
+
+	@Override
+	public StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
+		return StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName)).toStackTraceElement();
 	}
 
 	@Override
@@ -74,10 +85,10 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	/**
-	 * Extractor for extracting a defined stack frame from stack trace.
+	 * Extractor for extracting a stack frame from stack trace at a defined index.
 	 */
 	@IgnoreJRERequirement
-	private static final class StackFrameExtractor implements Function<Stream<StackFrame>, StackFrame> {
+	private static final class FixedStackFrameExtractor implements Function<Stream<StackFrame>, StackFrame> {
 
 		private final int index;
 
@@ -85,7 +96,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 		 * @param index
 		 *            Index of stack frame in stack trace
 		 */
-		private StackFrameExtractor(final int index) {
+		private FixedStackFrameExtractor(final int index) {
 			this.index = index;
 		}
 
@@ -96,4 +107,38 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	}
 
+	/**
+	 * Extractor for extracting a stack frame from stack trace that appears before an expected class name.
+	 */
+	@IgnoreJRERequirement
+	private static final class DynamicStackFrameExtractor implements Function<Stream<StackFrame>, StackFrame> {
+
+		private final String loggerClassName;
+
+		/**
+		 * @param loggerClassName
+		 *            Name of expected logger class name
+		 */
+		private DynamicStackFrameExtractor(final String loggerClassName) {
+			this.loggerClassName = loggerClassName;
+		}
+
+		@Override
+		public StackFrame apply(final Stream<StackFrame> stream) {
+			Iterator<StackFrame> iterator = stream.iterator();
+			while (iterator.hasNext()) {
+				if (loggerClassName.equals(iterator.next().getClassName())) {
+					while (iterator.hasNext()) {
+						StackFrame frame = iterator.next();
+						if (!loggerClassName.equals(iterator.next().getClassName())) {
+							return frame;
+						}
+					}
+				}
+			}
+
+			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
+		}
+	}
+	
 }

@@ -57,20 +57,32 @@ final class AndroidRuntime implements RuntimeDialect {
 	}
 
 	@Override
+	public String getCallerClassName(final String loggerClassName) {
+		return getCallerStackTraceElement(loggerClassName).getClassName();
+	}
+
+	@Override
 	public StackTraceElement getCallerStackTraceElement(final int depth) {
-		if (stackTraceElementsFiller != null) {
-			try {
-				StackTraceElement[] trace = new StackTraceElement[depth + stackTraceOffset + 1];
-				stackTraceElementsFiller.invoke(null, Thread.currentThread(), trace);
-				return trace[depth + stackTraceOffset];
-			} catch (IllegalAccessException ex) {
-				InternalLogger.log(Level.ERROR, ex, "Failed getting stack trace element from dalvik.system.VMStack");
-			} catch (InvocationTargetException ex) {
-				InternalLogger.log(Level.ERROR, ex.getTargetException(), "Failed getting stack trace element from dalvik.system.VMStack");
+		StackTraceElement[] trace = extractCallerStackTraceElements(depth + stackTraceOffset + 1);
+		return trace == null ? new Throwable().getStackTrace()[depth] : trace[trace.length - 1];
+	}
+
+	@Override
+	public StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
+		StackTraceElement[] trace = extractCallerStackTraceElements(stackTraceOffset + STACK_TRACE_SIZE);
+		if (trace != null) {
+			StackTraceElement element = findStackTraceElement(loggerClassName, trace);
+			if (element != null) {
+				return element;
 			}
 		}
 
-		return new Throwable().getStackTrace()[depth];
+		StackTraceElement element = findStackTraceElement(loggerClassName, new Throwable().getStackTrace());
+		if (element == null) {
+			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
+		} else {
+			return element;
+		}
 	}
 
 	@Override
@@ -108,6 +120,56 @@ final class AndroidRuntime implements RuntimeDialect {
 		} catch (Exception ex) {
 			return new StackTraceElementsFiller(null, -1);
 		}
+	}
+
+	/**
+	 * Gets the stack trace element that appears before the passed logger class name.
+	 * 
+	 * @param loggerClassName
+	 *            Logger class name that should appear before the expected stack trace element
+	 * @param trace
+	 *            Source stack trace
+	 * @return Found stack trace element or {@code null}
+	 */
+	private static StackTraceElement findStackTraceElement(final String loggerClassName, final StackTraceElement[] trace) {
+		int index = 0;
+		
+		while (index < trace.length && !loggerClassName.equals(trace[index].getClassName())) {
+			index = index + 1;
+		}
+		
+		while (index < trace.length && loggerClassName.equals(trace[index].getClassName())) {
+			index = index + 1;
+		}
+		
+		if (index < trace.length) {
+			return trace[index];
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Extracts a defined number of elements from stack trace.
+	 * 
+	 * @param count
+	 *            Number of stack trace elements to extract
+	 * @return Extracted stack trace elements
+	 */
+	private StackTraceElement[] extractCallerStackTraceElements(final int count) {
+		if (stackTraceElementsFiller != null) {
+			try {
+				StackTraceElement[] trace = new StackTraceElement[count + 1];
+				stackTraceElementsFiller.invoke(null, Thread.currentThread(), trace);
+				return trace;
+			} catch (IllegalAccessException ex) {
+				InternalLogger.log(Level.ERROR, ex, "Failed getting stack trace element from dalvik.system.VMStack");
+			} catch (InvocationTargetException ex) {
+				InternalLogger.log(Level.ERROR, ex.getTargetException(), "Failed getting stack trace element from dalvik.system.VMStack");
+			}
+		}
+
+		return null;
 	}
 
 	/**
