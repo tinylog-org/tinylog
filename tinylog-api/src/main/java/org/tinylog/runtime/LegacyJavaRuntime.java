@@ -91,7 +91,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	 *
 	 * @return {@code true} if available, {@code true} if not
 	 */
-	@SuppressWarnings({ "removal", "javadoc" })
+	@SuppressWarnings("removal")
 	@IgnoreJRERequirement
 	private static boolean verifySunReflection() {
 		try {
@@ -110,7 +110,6 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	 *
 	 * @return Instance if available, {@code null} if not
 	 */
-	@SuppressWarnings("javadoc")
 	private static Method getStackTraceElementGetter() {
 		try {
 			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);

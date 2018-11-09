@@ -212,7 +212,7 @@ public final class LegacyJavaRuntimeTest {
 	 *            Position of stack trace element
 	 * @return Nothing, will always throw an exception
 	 */
-	@SuppressWarnings({ "unused", "javadoc" })
+	@SuppressWarnings("unused")
 	private static StackTraceElement getStackTraceElement(final int index) {
 		throw new UnsupportedOperationException();
 	}
