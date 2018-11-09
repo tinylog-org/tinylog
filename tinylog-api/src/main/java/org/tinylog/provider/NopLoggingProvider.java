@@ -48,6 +48,12 @@ final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
+		final Object... arguments) {
+		// Ignore
+	}
+
+	@Override
 	public void shutdown() {
 		// Ignore
 	}

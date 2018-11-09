@@ -65,9 +65,17 @@ final class BundleLoggingProvider implements LoggingProvider {
 
 	@Override
 	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-			final Object... arguments) {
+		final Object... arguments) {
 		for (int i = 0; i < loggingProviders.length; ++i) {
 			loggingProviders[i].log(depth + 1, tag, level, exception, obj, arguments);
+		}
+	}
+
+	@Override
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
+		final Object... arguments) {
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			loggingProviders[i].log(loggerClassName, tag, level, exception, obj, arguments);
 		}
 	}
 

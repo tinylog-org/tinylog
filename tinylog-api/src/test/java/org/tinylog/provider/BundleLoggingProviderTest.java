@@ -102,10 +102,11 @@ public final class BundleLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that {@code log()} method invokes {@code log()} methods from underlying logging providers.
+	 * Verifies that {@link BundleLoggingProvider#log(int, String, Level, Throwable, Object, Object...)} invokes
+	 * {@link LoggingProvider#log(int, String, Level, Throwable, Object, Object...)} from underlying logging providers.
 	 */
 	@Test
-	public void log() {
+	public void logWithDepthIndex() {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
@@ -113,6 +114,22 @@ public final class BundleLoggingProviderTest {
 
 		verify(first).log(2, "technical", Level.INFO, exception, "Test", 42);
 		verify(second).log(2, "technical", Level.INFO, exception, "Test", 42);
+	}
+
+	/**
+	 * Verifies that {@link BundleLoggingProvider#log(String, String, Level, Throwable, Object, Object...)} invokes
+	 * {@link LoggingProvider#log(String, String, Level, Throwable, Object, Object...)} from underlying logging
+	 * providers.
+	 */
+	@Test
+	public void logWithLoggerClass() {
+		init(Level.TRACE, Level.TRACE);
+
+		NullPointerException exception = new NullPointerException();
+		bundle.log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
+
+		verify(first).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
+		verify(second).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
 	}
 
 	/**

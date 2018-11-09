@@ -193,6 +193,11 @@ public final class ProviderRegistryTest {
 		}
 
 		@Override
+		public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
+			final Object... arguments) {
+		}
+
+		@Override
 		public void shutdown() {
 		}
 

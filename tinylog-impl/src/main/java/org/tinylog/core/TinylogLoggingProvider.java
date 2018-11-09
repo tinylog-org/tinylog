@@ -119,40 +119,52 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		Level activeLevel;
-
 		if (customLevels.isEmpty()) {
+			if (stackTraceElement == null && requiredLogEntryValues[tagIndex][level.ordinal()].contains(LogEntryValue.CLASS)) {
+				stackTraceElement = new StackTraceElement(RuntimeProvider.getCallerClassName(depth + 1), "<unknown>", null, -1);
+			}
 			activeLevel = globalLevel;
 		} else {
 			if (stackTraceElement == null) {
-				String className = RuntimeProvider.getCallerClassName(depth + 1);
-				stackTraceElement = new StackTraceElement(className, "<unknown>", "<unknown>", -1);
+				stackTraceElement = new StackTraceElement(RuntimeProvider.getCallerClassName(depth + 1), "<unknown>", null, -1);
 			}
 			activeLevel = getLevel(stackTraceElement.getClassName());
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			String message;
-			if (arguments == null || arguments.length == 0) {
-				Object evaluatedObject = obj instanceof Supplier<?> ? ((Supplier<?>) obj).get() : obj;
-				message = evaluatedObject == null ? null : evaluatedObject.toString();
-			} else {
-				message = formatter.format((String) obj, arguments);
-			}
+			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, obj, arguments);
+			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
+		}
+	}
 
-			LogEntry logEntry = createLogEntry(depth + 1, tag, tagIndex, level, exception, message, stackTraceElement);
-			if (writingThread == null) {
-				for (Writer writer : writers[tagIndex][level.ordinal()]) {
-					try {
-						writer.write(logEntry);
-					} catch (Exception ex) {
-						InternalLogger.log(Level.ERROR, ex, "Failed to write log entry '" + logEntry.getMessage() + "'");
-					}
-				}
-			} else {
-				for (Writer writer : writers[tagIndex][level.ordinal()]) {
-					writingThread.add(writer, logEntry);
-				}
+	@Override
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
+		final Object... arguments) {
+		int tagIndex = getTagIndex(tag);
+
+		StackTraceElement stackTraceElement;
+		if (fullStackTraceRequired.get(tagIndex)) {
+			stackTraceElement = RuntimeProvider.getCallerStackTraceElement(loggerClassName);
+		} else {
+			stackTraceElement = null;
+		}
+
+		Level activeLevel;
+		if (customLevels.isEmpty()) {
+			if (stackTraceElement == null && requiredLogEntryValues[tagIndex][level.ordinal()].contains(LogEntryValue.CLASS)) {
+				stackTraceElement = new StackTraceElement(RuntimeProvider.getCallerClassName(loggerClassName), "<unknown>", null, -1);
 			}
+			activeLevel = globalLevel;
+		} else {
+			if (stackTraceElement == null) {
+				stackTraceElement = new StackTraceElement(RuntimeProvider.getCallerClassName(loggerClassName), "<unknown>", null, -1);
+			}
+			activeLevel = getLevel(stackTraceElement.getClassName());
+		}
+
+		if (activeLevel.ordinal() <= level.ordinal()) {
+			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, obj, arguments);
+			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
 
@@ -308,8 +320,8 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	/**
 	 * Creates a new log entry.
 	 *
-	 * @param depth
-	 *            Position of caller in stack trace
+	 * @param stackTraceElement
+	 *            Optional stack trace element of caller
 	 * @param tag
 	 *            Tag name if issued from a tagged logger
 	 * @param tagIndex
@@ -318,14 +330,14 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	 *            Severity level
 	 * @param exception
 	 *            Caught exception or throwable to log
-	 * @param message
-	 *            Text message to log
-	 * @param stackTraceElement
-	 *            Stack trace element of caller if already fetched
+	 * @param obj
+	 *            Message to log
+	 * @param arguments
+	 *            Arguments for message
 	 * @return Filled log entry
 	 */
-	private LogEntry createLogEntry(final int depth, final String tag, final int tagIndex, final Level level, final Throwable exception,
-		final String message, final StackTraceElement stackTraceElement) {
+	private LogEntry createLogEntry(final StackTraceElement stackTraceElement, final String tag, final int tagIndex, final Level level,
+		final Throwable exception, final Object obj, final Object[] arguments) {
 		Collection<LogEntryValue> required = requiredLogEntryValues[tagIndex][level.ordinal()];
 
 		Timestamp timestamp = RuntimeProvider.createTimestamp();
@@ -337,7 +349,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		String fileName;
 		int lineNumber;
 		if (stackTraceElement == null) {
-			className = required.contains(LogEntryValue.CLASS) ? RuntimeProvider.getCallerClassName(depth + 1) : null;
+			className = null;
 			methodName = null;
 			fileName = null;
 			lineNumber = -1;
@@ -348,7 +360,39 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			lineNumber = stackTraceElement.getLineNumber();
 		}
 
+		String message;
+		if (arguments == null || arguments.length == 0) {
+			Object evaluatedObject = obj instanceof Supplier<?> ? ((Supplier<?>) obj).get() : obj;
+			message = evaluatedObject == null ? null : evaluatedObject.toString();
+		} else {
+			message = formatter.format((String) obj, arguments);
+		}
+
 		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
+	}
+
+	/**
+	 * Outputs a log entry to all passed writers.
+	 * 
+	 * @param logEntry
+	 *            Log entry to be output
+	 * @param writers
+	 *            All writers for outputting the passed log entry
+	 */
+	private void output(final LogEntry logEntry, final Iterable<Writer> writers) {
+		if (writingThread == null) {
+			for (Writer writer : writers) {
+				try {
+					writer.write(logEntry);
+				} catch (Exception ex) {
+					InternalLogger.log(Level.ERROR, ex, "Failed to write log entry '" + logEntry.getMessage() + "'");
+				}
+			}
+		} else {
+			for (Writer writer : writers) {
+				writingThread.add(writer, logEntry);
+			}
+		}
 	}
 
 }

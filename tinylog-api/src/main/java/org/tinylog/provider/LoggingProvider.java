@@ -77,6 +77,24 @@ public interface LoggingProvider {
 	void log(int depth, String tag, Level level, Throwable exception, Object obj, Object... arguments);
 
 	/**
+	 * Provides a regular log entry.
+	 *
+	 * @param loggerClassName
+	 *            Fully-qualified class name of the logger instance
+	 * @param tag
+	 *            Tag of log entry or {@code null} if untagged
+	 * @param level
+	 *            Severity level of log entry
+	 * @param exception
+	 *            Exception to log or {@code null}
+	 * @param obj
+	 *            Message to log or {@code null}
+	 * @param arguments
+	 *            Arguments for message or {@code null}
+	 */
+	void log(String loggerClassName, String tag, Level level, Throwable exception, Object obj, Object... arguments);
+
+	/**
 	 * Shuts down the logging provider and frees all allocated resources. This method should be called only if auto
 	 * shutdown is explicitly disabled.
 	 * 

@@ -76,12 +76,22 @@ public final class NopLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that {@code log()} method is invokable without throwing any exceptions.
+	 * Verifies that {@link NopLoggingProvider#log(int, String, Level, Throwable, Object, Object...)} is invokable
+	 * without throwing any exceptions.
 	 */
 	@Test
-	public void log() {
+	public void logWithDepthIndex() {
 		provider.log(0, null, Level.DEBUG, null, null, (Object[]) null);
 		provider.log(1, null, Level.ERROR, null, null, (Object[]) null);
+	}
+
+	/**
+	 * Verifies that {@link NopLoggingProvider#log(String, String, Level, Throwable, Object, Object...)} is invokable
+	 * without throwing any exceptions.
+	 */
+	@Test
+	public void logWithLoggerClass() {
+		provider.log(NopLoggingProvider.class.getName(), null, Level.DEBUG, null, null, (Object[]) null);
 	}
 
 	/**
