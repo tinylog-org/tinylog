@@ -73,11 +73,21 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that the fully-qualified class name of a caller will be returned correctly.
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerClassName() {
+	public void callerClassNameByIndex() {
 		assertThat(RuntimeProvider.getCallerClassName(1)).isEqualTo(RuntimeProviderTest.class.getName());
+	}
+
+	/**
+	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if successor in stack trace
+	 * is defined.
+	 */
+	@Test
+	public void callerClassNameBySuccessor() {
+		assertThat(RuntimeProvider.getCallerClassName(RuntimeProvider.class.getName())).isEqualTo(RuntimeProviderTest.class.getName());
 	}
 
 	/**
@@ -93,11 +103,22 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that the complete stack trace element of a caller will be returned correctly.
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
+	 * defined as index.
 	 */
 	@Test
-	public void callerStackTraceElement() {
+	public void callerStackTraceElementByIndex() {
 		assertThat(RuntimeProvider.getCallerStackTraceElement(1)).isEqualTo(new Throwable().getStackTrace()[0]);
+	}
+
+	/**
+	 * Verifies that the complete stack trace element of a caller will be returned correctly, if successor in stack trace
+	 * is defined.
+	 */
+	@Test
+	public void callerStackTraceElementBySuccessor() {
+		String className = RuntimeProvider.class.getName();
+		assertThat(RuntimeProvider.getCallerStackTraceElement(className)).isEqualTo(new Throwable().getStackTrace()[0]);
 	}
 
 	/**
@@ -107,13 +128,13 @@ public final class RuntimeProviderTest {
 	public void anonymousCallerStackTraceElement() {
 		new Object() {
 			{
-				StackTraceElement realStackTraceElement = new Throwable().getStackTrace()[0];
-				StackTraceElement expectedStackTraceElement = new StackTraceElement(
-					RuntimeProviderTest.class.getName(),
-					realStackTraceElement.getMethodName(),
-					realStackTraceElement.getFileName(),
-					realStackTraceElement.getLineNumber() + 6);
-				assertThat(RuntimeProvider.getCallerStackTraceElement(1)).isEqualTo(expectedStackTraceElement);
+				StackTraceElement currentElement = new Throwable().getStackTrace()[0];
+				StackTraceElement fetchedElement = RuntimeProvider.getCallerStackTraceElement(1);
+	
+				assertThat(fetchedElement.getClassName()).isEqualTo(RuntimeProviderTest.class.getName());
+				assertThat(fetchedElement.getMethodName()).isEqualTo(currentElement.getMethodName());
+				assertThat(fetchedElement.getFileName()).isEqualTo(currentElement.getFileName());
+				assertThat(fetchedElement.getLineNumber()).isEqualTo(currentElement.getLineNumber() + 1);
 			}
 		};
 	}

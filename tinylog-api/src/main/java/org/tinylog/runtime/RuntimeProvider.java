@@ -55,8 +55,18 @@ public final class RuntimeProvider {
 	 * @return Fully-qualified class name of caller
 	 */
 	public static String getCallerClassName(final int depth) {
-		String caller = dialect.getCallerClassName(depth + 1);
-		return stripAnonymousPart(caller);
+		return stripAnonymousPart(dialect.getCallerClassName(depth + 1));
+	}
+
+	/**
+	 * Gets the class name of a caller from stack trace. Any anonymous part will be stripped from class name.
+	 *
+	 * @param loggerClassName
+	 *            Logger class name that should appear before the real caller
+	 * @return Fully-qualified class name of caller
+	 */
+	public static String getCallerClassName(final String loggerClassName) {
+		return stripAnonymousPart(dialect.getCallerClassName(loggerClassName));
 	}
 
 	/**
@@ -68,15 +78,19 @@ public final class RuntimeProvider {
 	 * @return Stack trace element of a caller
 	 */
 	public static StackTraceElement getCallerStackTraceElement(final int depth) {
-		StackTraceElement element = dialect.getCallerStackTraceElement(depth + 1);
-		String className = element.getClassName();
-		int dollarIndex = className.indexOf("$");
-		if (dollarIndex == -1) {
-			return element;
-		} else {
-			className = stripAnonymousPart(className);
-			return new StackTraceElement(className, element.getMethodName(), element.getFileName(), element.getLineNumber());
-		}
+		return normalizeClassName(dialect.getCallerStackTraceElement(depth + 1));
+	}
+
+	/**
+	 * Gets the complete stack trace element of a caller from stack trace. Any anonymous part will be stripped from
+	 * class name.
+	 *
+	 * @param loggerClassName
+	 *            Logger class name that should appear before the real caller
+	 * @return Stack trace element of a caller
+	 */
+	public static StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
+		return normalizeClassName(dialect.getCallerStackTraceElement(loggerClassName));
 	}
 
 	/**
@@ -161,6 +175,24 @@ public final class RuntimeProvider {
 		}
 
 		return className;
+	}
+
+	/**
+	 * Strips the the anonymous part from a class name of stack trace element.
+	 * 
+	 * @param element
+	 *            Original stack trace element
+	 * @return New or same stack trace element with an human-readable class name without any anonymous part
+	 */
+	private static StackTraceElement normalizeClassName(final StackTraceElement element) {
+		String className = element.getClassName();
+		int dollarIndex = className.indexOf("$");
+		if (dollarIndex == -1) {
+			return element;
+		} else {
+			className = stripAnonymousPart(className);
+			return new StackTraceElement(className, element.getMethodName(), element.getFileName(), element.getLineNumber());
+		}
 	}
 
 }
