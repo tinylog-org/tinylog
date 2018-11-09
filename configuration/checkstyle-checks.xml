@@ -187,6 +187,12 @@
 			<property name="checkFormat" value="SingleSpaceSeparator" />
 		</module>
 
+		<module name="SuppressionCommentFilter">
+			<property name="offCommentFormat" value="@checkstyle off\: ([\w\|]+)"/>
+			<property name="onCommentFormat" value="@checkstyle on\: ([\w\|]+)"/>
+			<property name="checkFormat" value="$1"/>
+		</module>
+
 		<!-- Whitespace -->
 
 		<module name="EmptyForInitializerPad" />
