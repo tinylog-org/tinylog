@@ -79,7 +79,7 @@ public class StackTraceBenchmark {
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("removal")
 	public Class<?> sunReflection() {
 		return sun.reflect.Reflection.getCallerClass(1);
 	}

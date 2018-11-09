@@ -51,7 +51,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("removal")
 	@IgnoreJRERequirement
 	public String getCallerClassName(final int depth) {
 		if (hasSunReflection) {
@@ -91,7 +91,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	 *
 	 * @return {@code true} if available, {@code true} if not
 	 */
-	@SuppressWarnings({ "deprecation", "javadoc" })
+	@SuppressWarnings({ "removal", "javadoc" })
 	@IgnoreJRERequirement
 	private static boolean verifySunReflection() {
 		try {
