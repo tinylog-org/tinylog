@@ -42,6 +42,12 @@
 		<Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING, SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
 	</Match>
 	<Match>
+		<!-- Static logger factory for SLF4J -->
+		<Class name="org.slf4j.impl.StaticLoggerBinder" />
+		<!-- Field REQUESTED_API_VERSION is required by SLF4J and must not be final to avoid constant folding by the compiler. -->
+		<Bug pattern="MS_SHOULD_BE_FINAL, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+	</Match>
+	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="DM_USELESS_THREAD, DP_DO_INSIDE_DO_PRIVILEGED, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE, RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, SIC_INNER_SHOULD_BE_STATIC_ANON, UPM_UNCALLED_PRIVATE_METHOD, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
