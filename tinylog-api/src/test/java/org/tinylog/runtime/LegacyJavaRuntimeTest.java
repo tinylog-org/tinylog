@@ -162,7 +162,6 @@ public final class LegacyJavaRuntimeTest {
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} is not available.
 	 */
-	@SuppressWarnings("javadoc")
 	@Test
 	public void missingStackTraceElementGetter() {
 		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
@@ -174,7 +173,6 @@ public final class LegacyJavaRuntimeTest {
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} is not accessible.
 	 */
-	@SuppressWarnings("javadoc")
 	@Test
 	public void notAccessibleSingleStackTraceElementGetter() {
 		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
@@ -193,7 +191,6 @@ public final class LegacyJavaRuntimeTest {
 	 * Verifies that the complete stack trace element of a caller can be returned, if
 	 * {@link Throwable#getStackTraceElement(int)} throws an exception.
 	 */
-	@SuppressWarnings("javadoc")
 	@Test
 	public void stackTraceElementGetterThrowsException() {
 		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
