@@ -37,7 +37,7 @@
 		<jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
-		<spotbugs-maven-plugin.version>3.1.6</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.8</spotbugs-maven-plugin.version>
 		<maven-bundle-plugin.version>4.0.0</maven-bundle-plugin.version>
 		<maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
@@ -59,8 +59,7 @@
 		<java16.version>1.1</java16.version>
 		<jmh.version>1.21</jmh.version>
 		<junit.version>4.12</junit.version>
-		<mockito.version>2.23.0</mockito.version>
-		<powermock.version>2.0.0-beta.5</powermock.version>
+		<powermock.version>2.0.0-RC.3</powermock.version>
 		<slf4j.version>1.7.25</slf4j.version>
 	</properties>
 
@@ -172,12 +171,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.openjdk.jmh</groupId>
 				<artifactId>jmh-core</artifactId>
 				<version>${jmh.version}</version>
@@ -192,16 +185,6 @@
 				<artifactId>powermock-api-mockito2</artifactId>
 				<version>${powermock.version}</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>net.bytebuddy</groupId>
-						<artifactId>byte-buddy-parent</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.mockito</groupId>
-						<artifactId>mockito-core</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.powermock</groupId>
