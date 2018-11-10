@@ -109,12 +109,12 @@ public final class TaggedLoggerTest {
 		List<Object[]> levels = new ArrayList<>();
 
 		// @formatter:off
-		levels.add(new Object[] { Level.TRACE,   true,  true,  true,  true,  true  });
-		levels.add(new Object[] { Level.DEBUG,   false, true,  true,  true,  true  });
-		levels.add(new Object[] { Level.INFO,    false, false, true,  true,  true  });
-		levels.add(new Object[] { Level.WARN,    false, false, false, true,  true  });
-		levels.add(new Object[] { Level.ERROR,   false, false, false, false, true  });
-		levels.add(new Object[] { Level.OFF,     false, false, false, false, false });
+		levels.add(new Object[] { Level.TRACE, true,  true,  true,  true,  true  });
+		levels.add(new Object[] { Level.DEBUG, false, true,  true,  true,  true  });
+		levels.add(new Object[] { Level.INFO,  false, false, true,  true,  true  });
+		levels.add(new Object[] { Level.WARN,  false, false, false, true,  true  });
+		levels.add(new Object[] { Level.ERROR, false, false, false, false, true  });
+		levels.add(new Object[] { Level.OFF,   false, false, false, false, false });
 		// @formatter:on
 
 		return levels;
