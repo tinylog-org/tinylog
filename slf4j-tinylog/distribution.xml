@@ -25,26 +25,6 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.parent.basedir}/tinylog-api/target</directory>
-			<outputDirectory></outputDirectory>
-			<includes>
-				<include>*-${project.version}.jar</include>
-				<include>*-${project.version}-javadoc.jar</include>
-				<include>*-${project.version}-sources.jar</include>
-			</includes>
-		</fileSet>
-
-		<fileSet>
-			<directory>${project.parent.basedir}/tinylog-impl/target</directory>
-			<outputDirectory></outputDirectory>
-			<includes>
-				<include>*-${project.version}.jar</include>
-				<include>*-${project.version}-javadoc.jar</include>
-				<include>*-${project.version}-sources.jar</include>
-			</includes>
-		</fileSet>
-
-		<fileSet>
 			<directory>${project.parent.basedir}</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
