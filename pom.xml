@@ -14,8 +14,8 @@
 	<modules>
 		<module>test-core</module>
 		<module>tinylog-api</module>
-		<module>slf4j-tinylog</module>
 		<module>tinylog-impl</module>
+		<module>slf4j-tinylog</module>
 		<module>benchmarks</module>
 	</modules>
 
@@ -469,7 +469,7 @@
 						<appendAssemblyId>false</appendAssemblyId>
 						<outputDirectory>${project.parent.build.directory}</outputDirectory>
 						<descriptors>
-							<descriptor>${project.parent.basedir}/distribution.xml</descriptor>
+							<descriptor>${project.basedir}/distribution.xml</descriptor>
 						</descriptors>
 					</configuration>
 					<executions>
