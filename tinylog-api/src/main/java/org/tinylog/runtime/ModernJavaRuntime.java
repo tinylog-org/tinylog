@@ -126,14 +126,17 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 		@Override
 		public StackFrame apply(final Stream<StackFrame> stream) {
 			Iterator<StackFrame> iterator = stream.iterator();
+
 			while (iterator.hasNext()) {
 				if (loggerClassName.equals(iterator.next().getClassName())) {
-					while (iterator.hasNext()) {
-						StackFrame frame = iterator.next();
-						if (!loggerClassName.equals(iterator.next().getClassName())) {
-							return frame;
-						}
-					}
+					break;
+				}
+			}
+
+			while (iterator.hasNext()) {
+				StackFrame frame = iterator.next();
+				if (!loggerClassName.equals(frame.getClassName())) {
+					return frame;
 				}
 			}
 
