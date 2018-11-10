@@ -15,27 +15,10 @@ specific language governing permissions and limitations under the License.
    Using tinylog
 -------------------
 
-1) Add "tinylog-api.jar" and "tinylog-impl.jar" to your classpath
+To use tinylog as a logging framework, add tinylog-api.jar and an
+implementation such as tinylog-impl.jar to the classpath.
 
-2) Optionally attach "tinylog-api-javadoc.jar" and "tinylog-impl-javadoc.jar"
-   for Javadoc documentation and/or "tinylog-api-sources.jar" and 
-   "tinylog-impl-sources.jar" for source code attachment
-   
-3) Now you can test tinylog by the following simple program:
-
-      import org.tinylog.Logger;
-
-      public class Application {
-         public static void main(String[] args) {
-            Logger.info("Hello World!");
-         }
-      }
-
-   After compilation, try it out by issuing the command
-
-      java Application
-  
-   You should see a log statement appearing on the console.
-
-4) A detailed user manual and the Javadoc documentation can be found on
-   http://www.tinylog.org/
+tinylog-impl.jar is the default implementation for tinylog. There are also
+implementations for application and web servers to use their logging
+frameworks. Since tinylog 2, multiple implementations can even be used in
+parallel.

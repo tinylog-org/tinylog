@@ -15,31 +15,17 @@ specific language governing permissions and limitations under the License.
    Using tinylog's SLF4J binding
 -----------------------------------
 
-1) Add "slf4j-tinylog.jar", "tinylog-api.jar", and "tinylog-impl.jar" to your
-   classpath
+slf4j-tinylog.jar is a binding for SLF4J 1.6 and 1.7.
 
-2) Optionally attach "slf4j-tinylog-javadoc.jar", "tinylog-api-javadoc.jar",
-   and "tinylog-impl-javadoc.jar" for Javadoc documentation and/or
-   "slf4j-tinylog-sources.jar", "tinylog-api-sources.jar", and 
-   "tinylog-impl-sources.jar" for source code attachment
-   
-3) Now you can test tinylog's SLF4J binding by the following simple program:
+The following JARs are required in the classpath:
 
-      import org.slf4j.Logger;
-      import org.slf4j.LoggerFactory;
-
-      public class Application {
-         public static void main(String[] args) {
-            Logger logger = LoggerFactory.getLogger(Application.class);
-            logger.info("Hello World!");
-         }
-      }
-
-   After compilation, try it out by issuing the command
-
-      java Application
+  - slf4j-api.jar (https://www.slf4j.org/download.html)
   
-   You should see a log statement appearing on the console.
+  - slf4j-tinylog.jar
+  
+  - tinylog-api.jar (https://tinylog.org/v2/download/)
+  
+  - tinylog-impl.jar or any other implementation
 
-4) A detailed user manual and the Javadoc documentation can be found on
-   http://www.tinylog.org/
+Log entries are forwarded from slf4j-api.jar to tinylog-api.jar and processed
+by the tinylog implementation like other log entries.
