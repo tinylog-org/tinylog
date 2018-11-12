@@ -16,6 +16,7 @@
 		<module>tinylog-api</module>
 		<module>tinylog-impl</module>
 		<module>slf4j-tinylog</module>
+		<module>tinylog1.3-api</module>
 		<module>benchmarks</module>
 	</modules>
 
