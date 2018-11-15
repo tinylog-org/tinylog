@@ -98,10 +98,11 @@ public final class LoggerTest {
 	}
 
 	/**
-	 * Returns for all severity levels which severity level are enabled.
+	 * Returns for all severity levels which severity levels are enabled.
 	 *
-	 * @return Each object array contains the severity level itself and five booleans for {@link Level#TRACE TRACE} ...
-	 *         {@link Level#ERROR ERROR} to determine whether these severity levels are enabled
+	 * @return Each object array contains the severity level itself and five booleans for
+	 *         {@link org.pmw.tinylog.Level#TRACE TRACE} ... {@link org.pmw.tinylog.Level#ERROR ERROR} to determine
+	 *         whether these severity levels are enabled
 	 */
 	@Parameters(name = "{0}")
 	public static Collection<Object[]> getLevels() {

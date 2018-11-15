@@ -99,7 +99,7 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
-	 * Returns for all severity levels which severity level are enabled.
+	 * Returns for all severity levels which severity levels are enabled.
 	 *
 	 * @return Each object array contains the severity level itself and five booleans for {@link Level#TRACE TRACE} ...
 	 *         {@link Level#ERROR ERROR} to determine whether these severity levels are enabled
