@@ -27,5 +27,5 @@ The following JARs are required in the classpath:
   
   - tinylog-impl.jar or any other implementation
 
-Log entries are forwarded from jul-tinylog.jar to tinylog-api.jar and processed
-by the tinylog implementation like other log entries.
+Log entries are forwarded from java.util.logging.Logger to tinylog-api.jar and
+processed by the tinylog implementation like other log entries.
