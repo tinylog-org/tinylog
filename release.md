@@ -15,14 +15,14 @@ Preconditions
 Steps for Each Release
 ----------------------
 
- 1. Set new version: mvn versions:set -DnewVersion=<VERSION> -DgenerateBackupPoms=false
+ 1. Set new version: mvn versions:set -DnewVersion=VERSION -DgenerateBackupPoms=false
  2. Create a tag with new version number as name
  3. Deploy with JDK 9 or 10: mvn clean deploy -P release
  4. Login to https://oss.sonatype.org/ to close and release the created repository under Staging Repositories
  5. Upload ZIP archives from target to website
  6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc -P release
  7. Upload generated Javadoc for tinylog API to website
- 8. Restore snapshot version: mvn versions:set -DnewVersion=2.<MINOR>-SNAPSHOT -DgenerateBackupPoms=false
+ 8. Restore snapshot version: mvn versions:set -DnewVersion=2.MINOR-SNAPSHOT -DgenerateBackupPoms=false
  9. Push all commits and tags
 10. Create release on GitHub with ZIP archives from target
 11. Update tinylog version on website
