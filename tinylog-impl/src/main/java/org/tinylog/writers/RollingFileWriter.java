@@ -181,7 +181,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			ServiceLoader<Policy> loader = new ServiceLoader<Policy>(Policy.class, String.class);
 			List<Policy> policies = new ArrayList<Policy>();
 			for (String entry : property.split(",")) {
-				int separator = property.indexOf(':');
+				int separator = entry.indexOf(':');
 				if (separator == -1) {
 					policies.add(loader.create(entry, (String) null));
 				} else {
