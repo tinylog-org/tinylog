@@ -163,7 +163,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>animal-sniffer-annotations</artifactId>
 				<version>${animal-sniffer-maven-plugin.version}</version>
-				<optional>true</optional>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jacoco</groupId>
