@@ -16,13 +16,6 @@
 
 	<module name="JavadocPackage" />
 
-	<!-- Size Violations -->
-
-	<module name="FileLength">
-		<property name="fileExtensions" value="java" />
-		<property name="max" value="1000" />
-	</module>
-
 	<!-- Suppressions -->
 	
 	<module name="SuppressionFilter">
