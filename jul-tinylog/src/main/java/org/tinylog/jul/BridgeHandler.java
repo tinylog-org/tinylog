@@ -86,7 +86,7 @@ final class BridgeHandler extends Handler {
 			case OFF:
 				return Level.OFF;
 			default:
-				throw new IllegalArgumentException("Unknown severity level \"" + level + "\"");
+				throw new IllegalArgumentException("Unknown JUL severity level \"" + level + "\"");
 		}
 	}
 

@@ -810,7 +810,7 @@ public final class Logger {
 			case OFF:
 				return Level.OFF;
 			default:
-				throw new IllegalArgumentException("Unknown severity level \"" + level + "\"");
+				throw new IllegalArgumentException("Unknown tinylog 1 severity level \"" + level + "\"");
 		}
 	}
 
