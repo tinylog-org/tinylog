@@ -504,7 +504,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	 *            Severity level code from SLF4J
 	 * @return Responding severity level of tinylog
 	 */
-	private Level translateLevel(final int level) {
+	private static Level translateLevel(final int level) {
 		if (level <= TRACE_INT) {
 			return Level.TRACE;
 		} else if (level <= DEBUG_INT) {
