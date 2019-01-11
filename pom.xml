@@ -16,6 +16,7 @@
 		<module>tinylog-api</module>
 		<module>tinylog-impl</module>
 		<module>jboss-tinylog</module>
+		<module>jcl-tinylog</module>
 		<module>jul-tinylog</module>
 		<module>slf4j-tinylog</module>
 		<module>tinylog1.3-api</module>
@@ -58,6 +59,7 @@
 		<assertj-core.version>3.11.1</assertj-core.version>
 		<assertj-db.version>1.2.0</assertj-db.version>
 		<checkstyle.version>8.14</checkstyle.version>
+		<commons-logging.version>1.2</commons-logging.version>
 		<h2.version>1.4.197</h2.version>
 		<java16.version>1.1</java16.version>
 		<jboss-logging.version>3.3.2.Final</jboss-logging.version>
@@ -142,6 +144,11 @@
 				<artifactId>h2</artifactId>
 				<version>${h2.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${commons-logging.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
