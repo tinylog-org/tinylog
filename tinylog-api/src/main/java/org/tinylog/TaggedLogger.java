@@ -746,7 +746,7 @@ public final class TaggedLogger {
 	}
 
 	/**
-	 * Checks if a given tag and severity level is covered by the logging providers minimum level.
+	 * Checks if a given tag and severity level is covered by the logging provider's minimum level.
 	 *
 	 * @param tag
 	 *            Tag to check

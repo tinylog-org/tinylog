@@ -487,7 +487,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	}
 
 	/**
-	 * Checks if a given severity level is covered by the logging providers minimum level.
+	 * Checks if a given severity level is covered by the logging provider's minimum level.
 	 *
 	 * @param level
 	 *            Severity level to check
