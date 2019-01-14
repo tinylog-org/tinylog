@@ -30,6 +30,7 @@ import org.tinylog.configuration.ServiceLoader;
 public final class ProviderRegistry {
 
 	private static final String PROVIDER_PROPERTY = "provider";
+	private static final String NOP_PROVIDER_NAME = "nop";
 
 	private static final LoggingProvider loggingProvider = loadLoggingProvider();
 
@@ -72,6 +73,8 @@ public final class ProviderRegistry {
 				default:
 					return new BundleLoggingProvider(providers);
 			}
+		} else if (NOP_PROVIDER_NAME.equalsIgnoreCase(name)) {
+			return new NopLoggingProvider();
 		} else {
 			LoggingProvider provider = loader.create(name);
 			if (provider == null) {

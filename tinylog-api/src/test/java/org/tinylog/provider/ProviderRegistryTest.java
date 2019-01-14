@@ -154,6 +154,24 @@ public final class ProviderRegistryTest {
 	}
 
 	/**
+	 * Verifies that {@link NopLoggingProvider} can be set explicitly if multiple  logging providers are available.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void nopProvider() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+	
+		spy(Configuration.class);
+		when(Configuration.get("provider")).thenReturn("nop");
+	
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
+	}
+
+	/**
 	 * Dummy logging provider class for service loader.
 	 */
 	public static final class LoggingProviderOne extends AbstractLoggingProvider {
