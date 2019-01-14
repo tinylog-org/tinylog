@@ -15,13 +15,11 @@ package org.pmw.tinylog;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.ThreadContext;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.ProviderRegistry;
-import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -34,12 +32,6 @@ import static org.tinylog.util.Maps.doubletonMap;
  * Tests for {@link LoggingContext}.
  */
 public final class LoggingContextTest {
-
-	/**
-	 * Redirects and collects system output streams.
-	 */
-	@Rule
-	public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 	private ContextProvider provider;
 

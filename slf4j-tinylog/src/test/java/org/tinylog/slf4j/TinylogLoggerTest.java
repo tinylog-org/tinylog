@@ -34,7 +34,6 @@ import org.slf4j.helpers.BasicMarkerFactory;
 import org.tinylog.Level;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
-import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,12 +63,6 @@ public final class TinylogLoggerTest {
 		 */
 		@Rule
 		public PowerMockRule rule = new PowerMockRule();
-
-		/**
-		 * Redirects and collects system output streams.
-		 */
-		@Rule
-		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 		private Level level;
 
@@ -629,12 +622,6 @@ public final class TinylogLoggerTest {
 		 */
 		@Rule
 		public PowerMockRule rule = new PowerMockRule();
-
-		/**
-		 * Redirects and collects system output streams.
-		 */
-		@Rule
-		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 		private Marker marker;
 		private Level level;

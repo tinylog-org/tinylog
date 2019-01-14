@@ -18,13 +18,11 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.ThreadContext;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.ProviderRegistry;
-import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -35,12 +33,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Tests for {@link TinylogMdcAdapter}.
  */
 public final class TinylogMdcAdapterTest {
-
-	/**
-	 * Redirects and collects system output streams.
-	 */
-	@Rule
-	public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 	private ContextProvider provider;
 

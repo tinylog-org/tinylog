@@ -15,12 +15,10 @@ package org.tinylog.slf4j;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
-import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -29,12 +27,6 @@ import static org.mockito.Mockito.mock;
  * Tests for {@link TinylogLoggerFactory}.
  */
 public final class TinylogLoggerFactoryTest {
-
-	/**
-	 * Redirects and collects system output streams.
-	 */
-	@Rule
-	public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 	private LoggingProvider provider;
 
