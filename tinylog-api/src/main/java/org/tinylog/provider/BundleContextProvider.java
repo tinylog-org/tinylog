@@ -29,7 +29,7 @@ final class BundleContextProvider implements ContextProvider {
 	 *            Base context providers
 	 */
 	BundleContextProvider(final Collection<ContextProvider> providers) {
-		this.providers = providers.toArray(new ContextProvider[providers.size()]);
+		this.providers = providers.toArray(new ContextProvider[0]);
 	}
 
 	@Override

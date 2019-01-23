@@ -48,7 +48,7 @@ public final class TinylogLogFactory extends LogFactory {
 	@Override
 	public String[] getAttributeNames() {
 		Set<String> names = attributes.keySet();
-		return names.toArray(new String[names.size()]);
+		return names.toArray(new String[0]);
 	}
 
 	@Override

@@ -31,7 +31,7 @@ final class BundleLoggingProvider implements LoggingProvider {
 	 *            Base logging providers
 	 */
 	BundleLoggingProvider(final Collection<LoggingProvider> providers) {
-		loggingProviders = providers.toArray(new LoggingProvider[providers.size()]);
+		loggingProviders = providers.toArray(new LoggingProvider[0]);
 		contextProvider = createContextProvider(providers);
 	}
 
