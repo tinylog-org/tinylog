@@ -18,6 +18,7 @@
 		<module>jboss-tinylog</module>
 		<module>jcl-tinylog</module>
 		<module>jul-tinylog</module>
+		<module>log4j1.2-api</module>
 		<module>slf4j-tinylog</module>
 		<module>tinylog1.3-api</module>
 		<module>benchmarks</module>
