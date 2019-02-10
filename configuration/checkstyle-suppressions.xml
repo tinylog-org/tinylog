@@ -1,10 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN" "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
+
 	<!-- Generated Sources -->
 	<suppress files="[/\\]target[/\\]generated\-sources[/\\].*\.java" checks=".*"/>
+
+	<!-- Original Apache Log4j 1.2 Files -->
+	<suppress files="[/\\]src[/\\]main[/\\]java[/\\]org[/\\]apache[/\\]log4j[/\\](Level|Priority)\.java" checks="Header"/>
+
 	<!-- All Test Classes -->
 	<suppress files="[/\\]src[/\\]test[/\\].*\.java" checks="MagicNumber"/>
+
 	<!-- JUnit Tests -->
 	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|JavadocPackage|MissingCtor|VisibilityModifier)"/>
+
 </suppressions>

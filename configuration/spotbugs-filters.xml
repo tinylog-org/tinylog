@@ -48,6 +48,15 @@
 		<Bug pattern="MS_SHOULD_BE_FINAL, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
 	</Match>
 	<Match>
+		<!-- Original Apache Log4j 1.2 Classes -->
+		<Or>
+			<Class name="org.apache.log4j.Level" />
+			<Class name="org.apache.log4j.Priority" />
+		</Or>
+		<!-- Ignore unchecked casts as Apache Log4j 1.2 does -->
+		<Bug pattern="BC_UNCONFIRMED_CAST" />
+	</Match>
+	<Match>
 		<!-- JUnit Tests -->
 		<Source name="~.*Test\.java" />
 		<Bug pattern="DM_USELESS_THREAD, DP_DO_INSIDE_DO_PRIVILEGED, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE, RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT, SIC_INNER_SHOULD_BE_STATIC_ANON, UPM_UNCALLED_PRIVATE_METHOD, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
