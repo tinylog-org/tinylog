@@ -49,10 +49,7 @@
 	</Match>
 	<Match>
 		<!-- Original Apache Log4j 1.2 Classes -->
-		<Or>
-			<Class name="org.apache.log4j.Level" />
-			<Class name="org.apache.log4j.Priority" />
-		</Or>
+		<Class name="org.apache.log4j.Priority" />
 		<!-- Ignore unchecked casts as Apache Log4j 1.2 does -->
 		<Bug pattern="BC_UNCONFIRMED_CAST" />
 	</Match>
