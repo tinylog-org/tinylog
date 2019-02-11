@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -188,10 +189,10 @@ public final class Configuration {
 			InternalLogger.log(Level.ERROR, "Failed loading configuration from '" + file + "'");
 		}
 
-		for (Enumeration<Object> enumeration = System.getProperties().keys(); enumeration.hasMoreElements();) {
-			String property = (String) enumeration.nextElement();
-			if (property.startsWith(PROPERTIES_PREFIX)) {
-				properties.put(property.substring(PROPERTIES_PREFIX.length()), System.getProperty(property));
+		for (Object key : new ArrayList<Object>(System.getProperties().keySet())) {
+			String name = (String) key;
+			if (name.startsWith(PROPERTIES_PREFIX)) {
+				properties.put(name.substring(PROPERTIES_PREFIX.length()), System.getProperty(name));
 			}
 		}
 
