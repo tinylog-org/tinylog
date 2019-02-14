@@ -18,7 +18,7 @@
 package org.apache.log4j;
 
 /**
- * <em style="color:#A44">Refrain from using this class directly, use the {@link Level} class instead.</em>
+ * <b>Refrain from using this class directly, use the {@link Level} class instead.</b>
  */
 public class Priority {
 
