@@ -92,7 +92,7 @@ public class Priority {
 	transient int level;
 	transient String levelStr;
 	transient int syslogEquivalent;
-	// @checkstyle off: VisibilityModifier
+	// @checkstyle on: VisibilityModifier
 
 	/**
 	 * Default constructor for deserialization.
