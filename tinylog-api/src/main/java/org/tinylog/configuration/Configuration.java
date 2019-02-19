@@ -32,14 +32,14 @@ import org.tinylog.provider.InternalLogger;
  * Global configuration for tinylog.
  *
  * <p>
- * By default, the configuration will be loaded from <tt>tinylog.properties</tt> in the default package. Another
- * configuration file can be loaded by setting the system property <tt>tinylog.configuration</tt>. The configuration
- * file can be a resource in the classpath, a file from file system or an URL
+ * By default, the configuration will be loaded from {@code tinylog.properties} in the default package. Another
+ * configuration file can be loaded by setting the system property {@code tinylog.configuration}. The configuration file
+ * can be a resource in the classpath, a file from file system or an URL
  * </p>
  *
  * <p>
  * Alternately configuration properties can be set via system properties. These properties must be prefixed by
- * "<tt>tinylog.</tt>". For example: "<tt>level = debug</tt>" becomes "<tt>tinylog.level=debug</tt>". If a configuration
+ * "{@code tinylog.}". For example: "{@code level = debug}" becomes "{@code tinylog.level=debug}". If a configuration
  * property exists as system property and in configuration file, the system property will win.
  * </p>
  */
@@ -77,10 +77,9 @@ public final class Configuration {
 	 * </p>
 	 *
 	 * <p>
-	 * <code>getSiblings("writer")</code> will return properties with the keys <tt>writer</tt> as well as
-	 * <tt>writerTest</tt> but not with the key <tt>writer.test</tt>. Dots after a prefix ending with an at sign will be
-	 * not handled as children. Therefore, <code>getSiblings("level@")</code> will return a property with the key
-	 * <tt>level@com.test</tt>.
+	 * {@code getSiblings("writer")} will return properties with the keys {@code writer} as well as {@code writerTest}
+	 * but not with the key {@code writer.test}. Dots after a prefix ending with an at sign will be not handled as
+	 * children. Therefore, {@code getSiblings("level@")} will return a property with the key {@code level@com.test}.
 	 * </p>
 	 *
 	 * @param prefix
@@ -103,7 +102,7 @@ public final class Configuration {
 	 * will be returned without parent key prefix.
 	 *
 	 * <p>
-	 * For example: <code>getChildren("writer")</code> will return the property <tt>writer.level</tt> as <tt>level</tt>.
+	 * For example: {@code getChildren("writer")} will return the property {@code writer.level} as {@code level}.
 	 * </p>
 	 *
 	 * @param key

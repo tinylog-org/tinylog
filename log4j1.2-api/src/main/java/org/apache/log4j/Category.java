@@ -31,11 +31,11 @@ import org.tinylog.provider.ProviderRegistry;
  * preserve backward compatibility until mid 2003.
  * 
  * <p>
- * <code>Logger</code> is a subclass of Category, i.e. it extends Category. In other words, a logger <em>is</em> a
- * category. Thus, all operations that can be performed on a category can be performed on a logger. Internally, whenever
- * log4j is asked to produce a Category object, it will instead produce a Logger object. Log4j 1.2 will <em>never</em>
- * produce Category objects but only <code>Logger</code> instances. In order to preserve backward compatibility, methods
- * that previously accepted category objects still continue to accept category objects.
+ * {@code Logger} is a subclass of Category, i.e. it extends Category. In other words, a logger <em>is</em> a category.
+ * Thus, all operations that can be performed on a category can be performed on a logger. Internally, whenever log4j is
+ * asked to produce a Category object, it will instead produce a Logger object. Log4j 1.2 will <em>never</em> produce
+ * Category objects but only {@code Logger} instances. In order to preserve backward compatibility, methods that
+ * previously accepted category objects still continue to accept category objects.
  * </p>
  * 
  * <p>
@@ -55,7 +55,7 @@ import org.tinylog.provider.ProviderRegistry;
  * </p>
  * 
  * <p>
- * <b>There is absolutely no need for new client code to use or refer to the <code>Category</code> class.</b> Whenever
+ * <b>There is absolutely no need for new client code to use or refer to the {@code Category} class.</b> Whenever
  * possible, please avoid referring to it or using it.
  * </p>
  * 
@@ -105,10 +105,10 @@ public class Category {
 	}
 
 	/**
-	 * Add <code>newAppender</code> to the list of appenders of this Category instance.
+	 * Add {@code newAppender} to the list of appenders of this Category instance.
 	 * 
 	 * <p>
-	 * If <code>newAppender</code> is already in the list of appenders, then it won't be added again.
+	 * If {@code newAppender} is already in the list of appenders, then it won't be added again.
 	 * </p>
 	 * 
 	 * @param newAppender
@@ -119,18 +119,18 @@ public class Category {
 	}
 
 	/**
-	 * If <code>assertion</code> parameter is <code>false</code>, then logs <code>msg</code> as an {@link #error(Object)
-	 * error} statement.
+	 * If {@code assertion} parameter is {@code false}, then logs {@code msg} as an {@link #error(Object) error}
+	 * statement.
 	 * 
 	 * <p>
-	 * The <code>assert</code> method has been renamed to <code>assertLog</code> because <code>assert</code> is a
-	 * language reserved word in JDK 1.4.
+	 * The {@code assert} method has been renamed to {@code assertLog} because {@code assert} is a language reserved
+	 * word in JDK 1.4.
 	 * </p>
 	 * 
 	 * @param assertion
 	 *            {@code true} for dropping the passed message, {@code false} for outputting
 	 * @param msg
-	 *            The message to print if <code>assertion</code> is false.
+	 *            The message to print if {@code assertion} is false.
 	 * 
 	 * @since 1.2
 	 */
@@ -141,8 +141,7 @@ public class Category {
 	}
 
 	/**
-	 * Call the appenders in the hierarchy starting at <code>this</code>. If no appenders could be found, emit a
-	 * warning.
+	 * Call the appenders in the hierarchy starting at {@code this}. If no appenders could be found, emit a warning.
 	 * 
 	 * <p>
 	 * This method calls all the appenders inherited from the hierarchy circumventing any evaluation of whether to log
@@ -160,16 +159,15 @@ public class Category {
 	 * Log a message object with the {@link Level#DEBUG DEBUG} level.
 	 * 
 	 * <p>
-	 * This method first checks if this category is <code>DEBUG</code> enabled by comparing the level of this category
-	 * with the {@link Level#DEBUG DEBUG} level. If this category is <code>DEBUG</code> enabled, then it converts the
-	 * message object (passed as parameter) to a string. It then proceeds to call all the registered appenders in this
-	 * category and also higher in the hierarchy depending on the value of the additivity flag.
+	 * This method first checks if this category is {@code DEBUG} enabled by comparing the level of this category with
+	 * the {@link Level#DEBUG DEBUG} level. If this category is {@code DEBUG} enabled, then it converts the message
+	 * object (passed as parameter) to a string. It then proceeds to call all the registered appenders in this category
+	 * and also higher in the hierarchy depending on the value of the additivity flag.
 	 * </p>
 	 * 
 	 * <p>
-	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of the
-	 * <code>Throwable</code> but no stack trace. To print a stack trace use the {@link #debug(Object, Throwable)} form
-	 * instead.
+	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of the {@code Throwable}
+	 * but no stack trace. To print a stack trace use the {@link #debug(Object, Throwable)} form instead.
 	 * </p>
 	 * 
 	 * @param message
@@ -182,8 +180,8 @@ public class Category {
 	}
 
 	/**
-	 * Log a message object with the <code>DEBUG</code> level including the stack trace of the {@link Throwable}
-	 * <code>t</code> passed as parameter.
+	 * Log a message object with the {@code DEBUG} level including the stack trace of the {@link Throwable} {@code t}
+	 * passed as parameter.
 	 * 
 	 * <p>
 	 * See {@link #debug(Object)} form for more detailed information.
@@ -204,16 +202,15 @@ public class Category {
 	 * Log a message object with the {@link Level#ERROR ERROR} Level.
 	 * 
 	 * <p>
-	 * This method first checks if this category is <code>ERROR</code> enabled by comparing the level of this category
-	 * with {@link Level#ERROR ERROR} Level. If this category is <code>ERROR</code> enabled, then it converts the
-	 * message object passed as parameter to a string. It proceeds to call all the registered appenders in this category
-	 * and also higher in the hierarchy depending on the value of the additivity flag.
+	 * This method first checks if this category is {@code ERROR} enabled by comparing the level of this category with
+	 * {@link Level#ERROR ERROR} Level. If this category is {@code ERROR} enabled, then it converts the message object
+	 * passed as parameter to a string. It proceeds to call all the registered appenders in this category and also
+	 * higher in the hierarchy depending on the value of the additivity flag.
 	 * </p>
 	 * 
 	 * <p>
-	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of the
-	 * <code>Throwable</code> but no stack trace. To print a stack trace use the {@link #error(Object, Throwable)} form
-	 * instead.
+	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of the {@code Throwable}
+	 * but no stack trace. To print a stack trace use the {@link #error(Object, Throwable)} form instead.
 	 * </p>
 	 * 
 	 * @param message
@@ -226,8 +223,8 @@ public class Category {
 	}
 
 	/**
-	 * Log a message object with the <code>ERROR</code> level including the stack trace of the {@link Throwable}
-	 * <code>t</code> passed as parameter.
+	 * Log a message object with the {@code ERROR} level including the stack trace of the {@link Throwable} {@code t}
+	 * passed as parameter.
 	 * 
 	 * <p>
 	 * See {@link #error(Object)} form for more detailed information.
@@ -246,7 +243,7 @@ public class Category {
 
 	/**
 	 * If the named category exists (in the default hierarchy) then it returns a reference to the category, otherwise it
-	 * returns <code>null</code>.
+	 * returns {@code null}.
 	 * 
 	 * @param name
 	 *            Name of the category
@@ -264,10 +261,10 @@ public class Category {
 	 * Log a message object with the {@link Level#FATAL FATAL} Level.
 	 * 
 	 * <p>
-	 * This method first checks if this category is <code>FATAL</code> enabled by comparing the level of this category
-	 * with {@link Level#FATAL FATAL} Level. If the category is <code>FATAL</code> enabled, then it converts the message
-	 * object passed as parameter to a string. It proceeds to call all the registered appenders in this category and
-	 * also higher in the hierarchy depending on the value of the additivity flag.
+	 * This method first checks if this category is {@code FATAL} enabled by comparing the level of this category with
+	 * {@link Level#FATAL FATAL} Level. If the category is {@code FATAL} enabled, then it converts the message object
+	 * passed as parameter to a string. It proceeds to call all the registered appenders in this category and also
+	 * higher in the hierarchy depending on the value of the additivity flag.
 	 * </p>
 	 * 
 	 * <p>
@@ -285,8 +282,8 @@ public class Category {
 	}
 
 	/**
-	 * Log a message object with the <code>FATAL</code> level including the stack trace of the {@link Throwable}
-	 * <code>t</code> passed as parameter.
+	 * Log a message object with the {@code FATAL} level including the stack trace of the {@link Throwable} {@code t}
+	 * passed as parameter.
 	 * 
 	 * <p>
 	 * See {@link #fatal(Object)} for more detailed information.
@@ -340,12 +337,12 @@ public class Category {
 	}
 
 	/**
-	 * Look for the appender named as <code>name</code>.
+	 * Look for the appender named as {@code name}.
 	 * 
 	 * @param name
 	 *            Name of the appender
 	 * 
-	 * @return Return the appender with that name if in the list. Return <code>null</code> otherwise.
+	 * @return Return the appender with that name if in the list. Return {@code null} otherwise.
 	 */
 	public Appender getAppender(final String name) {
 		return null;
@@ -434,7 +431,7 @@ public class Category {
 	 * the category.
 	 * 
 	 * <p>
-	 * The root category will return <code>null</code>.
+	 * The root category will return {@code null}.
 	 * </p>
 	 * 
 	 * @return Parent logger instance
@@ -480,7 +477,7 @@ public class Category {
 	 * <p>
 	 * This method walks the hierarchy to find the appropriate resource bundle. It will return the resource bundle
 	 * attached to the closest ancestor of this category, much like the way priorities are searched. In case there is no
-	 * bundle in the hierarchy then <code>null</code> is returned.
+	 * bundle in the hierarchy then {@code null} is returned.
 	 * </p>
 	 * 
 	 * @return Current resource bundle
@@ -495,10 +492,10 @@ public class Category {
 	 * Log a message object with the {@link Level#INFO INFO} Level.
 	 * 
 	 * <p>
-	 * This method first checks if this category is <code>INFO</code> enabled by comparing the level of this category
-	 * with {@link Level#INFO INFO} Level. If the category is <code>INFO</code> enabled, then it converts the message
-	 * object passed as parameter to a string. It proceeds to call all the registered appenders in this category and
-	 * also higher in the hierarchy depending on the value of the additivity flag.
+	 * This method first checks if this category is {@code INFO} enabled by comparing the level of this category with
+	 * {@link Level#INFO INFO} Level. If the category is {@code INFO} enabled, then it converts the message object
+	 * passed as parameter to a string. It proceeds to call all the registered appenders in this category and also
+	 * higher in the hierarchy depending on the value of the additivity flag.
 	 * </p>
 	 * 
 	 * <p>
@@ -516,8 +513,8 @@ public class Category {
 	}
 
 	/**
-	 * Log a message object with the <code>INFO</code> level including the stack trace of the {@link Throwable}
-	 * <code>t</code> passed as parameter.
+	 * Log a message object with the {@code INFO} level including the stack trace of the {@link Throwable} {@code t}
+	 * passed as parameter.
 	 * 
 	 * <p>
 	 * See {@link #info(Object)} for more detailed information.
@@ -547,14 +544,14 @@ public class Category {
 	}
 
 	/**
-	 * Check whether this category is enabled for the <code>DEBUG</code> Level.
+	 * Check whether this category is enabled for the {@code DEBUG} Level.
 	 *
 	 * <p>
 	 * This function is intended to lessen the computational cost of disabled log debug statements.
 	 * </p>
 	 *
 	 * <p>
-	 * For some <code>cat</code> Category object, when you write,
+	 * For some {@code cat} Category object, when you write,
 	 * </p>
 	 * 
 	 * <pre>
@@ -577,13 +574,13 @@ public class Category {
 	 * </pre>
 	 *
 	 * <p>
-	 * This way you will not incur the cost of parameter construction if debugging is disabled for <code>cat</code>. On
-	 * the other hand, if the <code>cat</code> is debug enabled, you will incur the cost of evaluating whether the
-	 * category is debug enabled twice. Once in <code>isDebugEnabled</code> and once in the <code>debug</code>. This is
-	 * an insignificant overhead since evaluating a category takes about 1%% of the time it takes to actually log.
+	 * This way you will not incur the cost of parameter construction if debugging is disabled for {@code cat}. On the
+	 * other hand, if the {@code cat} is debug enabled, you will incur the cost of evaluating whether the category is
+	 * debug enabled twice. Once in {@code isDebugEnabled} and once in the {@code debug}. This is an insignificant
+	 * overhead since evaluating a category takes about 1%% of the time it takes to actually log.
 	 * </p>
 	 *
-	 * @return boolean - <code>true</code> if this category is debug enabled, <code>false</code> otherwise.
+	 * @return boolean - {@code true} if this category is debug enabled, {@code false} otherwise.
 	 */
 	public boolean isDebugEnabled() {
 		return MINIMUM_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG);
@@ -598,7 +595,7 @@ public class Category {
 	 * 
 	 * @param level
 	 *            Priority to check whether enabled
-	 * @return boolean True if this category is enabled for <code>level</code>.
+	 * @return boolean True if this category is enabled for {@code level}.
 	 */
 	public boolean isEnabledFor(final Priority level) {
 		return provider.isEnabled(STACKTRACE_DEPTH, null, translatePriority(level));
@@ -607,15 +604,15 @@ public class Category {
 	/**
 	 * Check whether this category is enabled for the info Level. See also {@link #isDebugEnabled}.
 	 * 
-	 * @return boolean - <code>true</code> if this category is enabled for level info, <code>false</code> otherwise.
+	 * @return boolean - {@code true} if this category is enabled for level info, {@code false} otherwise.
 	 */
 	public boolean isInfoEnabled() {
 		return MINIMUM_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO);
 	}
 
 	/**
-	 * Log a localized message. The user supplied parameter <code>key</code> is replaced by its localized version from
-	 * the resource bundle.
+	 * Log a localized message. The user supplied parameter {@code key} is replaced by its localized version from the
+	 * resource bundle.
 	 *
 	 * @param priority
 	 *            Priority for log entry
@@ -636,9 +633,9 @@ public class Category {
 	}
 
 	/**
-	 * Log a localized and parameterized message. First, the user supplied <code>key</code> is searched in the resource
+	 * Log a localized and parameterized message. First, the user supplied {@code key} is searched in the resource
 	 * bundle. Next, the resulting pattern is formatted using {@link java.text.MessageFormat#format(String,Object[])}
-	 * method with the user supplied object array <code>params</code>.
+	 * method with the user supplied object array {@code params}.
 	 * 
 	 * @param priority
 	 *            Priority for log entry
@@ -749,9 +746,8 @@ public class Category {
 	}
 
 	/**
-	 * Set the level of this Category. If you are passing any of <code>Level.DEBUG</code>, <code>Level.INFO</code>,
-	 * <code>Level.WARN</code>, <code>Level.ERROR</code>, <code>Level.FATAL</code> as a parameter, you need to case them
-	 * as Level.
+	 * Set the level of this Category. If you are passing any of {@code Level.DEBUG}, {@code Level.INFO},
+	 * {@code Level.WARN}, {@code Level.ERROR}, {@code Level.FATAL} as a parameter, you need to case them as Level.
 	 * 
 	 * <p>
 	 * As in
@@ -807,8 +803,8 @@ public class Category {
 	 * contained in the default hierarchy.
 	 * 
 	 * <p>
-	 * The <code>shutdown</code> method is careful to close nested appenders before closing regular appenders. This is
-	 * allows configurations where a regular appender is attached to a category and again to a nested appender.
+	 * The {@code shutdown} method is careful to close nested appenders before closing regular appenders. This is allows
+	 * configurations where a regular appender is attached to a category and again to a nested appender.
 	 * </p>
 	 * 
 	 * @deprecated Please use {@link LogManager#shutdown()} instead.
@@ -824,10 +820,10 @@ public class Category {
 	 * Log a message object with the {@link Level#WARN WARN} Level.
 	 * 
 	 * <p>
-	 * This method first checks if this category is <code>WARN</code> enabled by comparing the level of this category
-	 * with {@link Level#WARN WARN} Level. If the category is <code>WARN</code> enabled, then it converts the message
-	 * object passed as parameter to a string. It proceeds to call all the registered appenders in this category and
-	 * also higher in the hierarchy depending on the value of the additivity flag.
+	 * This method first checks if this category is {@code WARN} enabled by comparing the level of this category with
+	 * {@link Level#WARN WARN} Level. If the category is {@code WARN} enabled, then it converts the message object
+	 * passed as parameter to a string. It proceeds to call all the registered appenders in this category and also
+	 * higher in the hierarchy depending on the value of the additivity flag.
 	 * </p>
 	 * 
 	 * <p>
@@ -845,8 +841,8 @@ public class Category {
 	}
 
 	/**
-	 * Log a message with the <code>WARN</code> level including the stack trace of the {@link Throwable} <code>t</code>
-	 * passed as parameter.
+	 * Log a message with the {@code WARN} level including the stack trace of the {@link Throwable} {@code t} passed as
+	 * parameter.
 	 * 
 	 * <p>
 	 * See {@link #warn(Object)} for more detailed information.

@@ -46,7 +46,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{date}</tt> can be parsed and the returned token will output the date of issue.
+	 * Verifies that {@code {date}} can be parsed and the returned token will output the date of issue.
 	 */
 	@Test
 	public void dateWithDefaultPattern() {
@@ -55,7 +55,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{date}</tt> can be parsed with a defined pattern and the returned token will output the date of
+	 * Verifies that {@code {date}} can be parsed with a defined pattern and the returned token will output the date of
 	 * issue as defined in that pattern.
 	 */
 	@Test
@@ -65,7 +65,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that a default pattern will be used, if the custom pattern for <tt>{date}</tt> is invalid.
+	 * Verifies that a default pattern will be used, if the custom pattern for {@code {date}} is invalid.
 	 */
 	@Test
 	public void dateWithInvalidPattern() {
@@ -75,7 +75,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{pid}</tt> can be parsed and the returned token will output the process ID.
+	 * Verifies that {@code {pid}} can be parsed and the returned token will output the process ID.
 	 */
 	@Test
 	public void processId() {
@@ -83,7 +83,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{thread}</tt> can be parsed and the returned token will output the thread name.
+	 * Verifies that {@code {thread}} can be parsed and the returned token will output the thread name.
 	 */
 	@Test
 	public void threadName() {
@@ -92,7 +92,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{threadId}</tt> can be parsed and the returned token will output the thread ID.
+	 * Verifies that {@code {threadId}} can be parsed and the returned token will output the thread ID.
 	 */
 	@Test
 	public void threadId() {
@@ -101,7 +101,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{context}</tt> can be parsed and the returned token will output the defined thread context
+	 * Verifies that {@code {context}} can be parsed and the returned token will output the defined thread context
 	 * value.
 	 */
 	@Test
@@ -111,7 +111,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{context}</tt> without a defined key will produce an error.
+	 * Verifies that {@code {context}} without a defined key will produce an error.
 	 */
 	@Test
 	public void contextMissingKey() {
@@ -120,7 +120,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{context}</tt> can be parsed with a default value for non-existent mappings and the returned
+	 * Verifies that {@code {context}} can be parsed with a default value for non-existent mappings and the returned
 	 * token will output the defined thread context value.
 	 */
 
@@ -131,7 +131,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{context}</tt> with a default value for non-existent mappings, but without a defined key will
+	 * Verifies that {@code {context}} with a default value for non-existent mappings, but without a defined key will
 	 * produce an error.
 	 */
 	@Test
@@ -141,7 +141,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{class}</tt> can be parsed and the returned token will output the fully-qualified class name.
+	 * Verifies that {@code {class}} can be parsed and the returned token will output the fully-qualified class name.
 	 */
 	@Test
 	public void fullClassName() {
@@ -149,7 +149,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{className}</tt> can be parsed and the returned token will output the class name without
+	 * Verifies that {@code {className}} can be parsed and the returned token will output the class name without
 	 * package.
 	 */
 	@Test
@@ -158,7 +158,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{package}</tt> can be parsed and the returned token will output the package name.
+	 * Verifies that {@code {package}} can be parsed and the returned token will output the package name.
 	 */
 	@Test
 	public void packageName() {
@@ -166,7 +166,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{method}</tt> can be parsed and the returned token will output the method name.
+	 * Verifies that {@code {method}} can be parsed and the returned token will output the method name.
 	 */
 	@Test
 	public void methodName() {
@@ -174,7 +174,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{file}</tt> can be parsed and the returned token will output the file name.
+	 * Verifies that {@code {file}} can be parsed and the returned token will output the file name.
 	 */
 	@Test
 	public void fileName() {
@@ -182,7 +182,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{line}</tt> can be parsed and the returned token will output the source line number.
+	 * Verifies that {@code {line}} can be parsed and the returned token will output the source line number.
 	 */
 	@Test
 	public void lineNumber() {
@@ -190,7 +190,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{tag}</tt> can be parsed and the returned token will output the logger tag if existing.
+	 * Verifies that {@code {tag}} can be parsed and the returned token will output the logger tag if existing.
 	 */
 	@Test
 	public void tag() {
@@ -199,7 +199,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{tag}</tt> can be parsed with a default value for non-existent tags and the returned token will
+	 * Verifies that {@code {tag}} can be parsed with a default value for non-existent tags and the returned token will
 	 * output the logger tag if existing.
 	 */
 	@Test
@@ -209,7 +209,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{level}</tt> can be parsed and the returned token will output the severity level.
+	 * Verifies that {@code {level}} can be parsed and the returned token will output the severity level.
 	 */
 	@Test
 	public void level() {
@@ -217,7 +217,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{message}</tt> can be parsed and the returned token will output the text message as well as the
+	 * Verifies that {@code {message}} can be parsed and the returned token will output the text message as well as the
 	 * exception.
 	 */
 	@Test
@@ -230,7 +230,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{messageOnly}</tt> can be parsed and the returned token will output the text message, but not
+	 * Verifies that {@code {messageOnly}} can be parsed and the returned token will output the text message, but not
 	 * the exception.
 	 */
 	@Test
@@ -241,7 +241,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{exception}</tt> can be parsed and the returned token will output the exception.
+	 * Verifies that {@code {exception}} can be parsed and the returned token will output the exception.
 	 */
 	@Test
 	public void exception() {
@@ -252,7 +252,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{opening-curly-bracket"}</tt> can be parsed and outputs a single opening curly bracket '{'.
+	 * Verifies that {@code {opening-curly-bracket"}} can be parsed and outputs a single opening curly bracket '{'.
 	 */
 	@Test
 	public void openingCurlyBracket() {
@@ -260,7 +260,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{closing-curly-bracket"}</tt> can be parsed and outputs a single closing curly bracket '}'.
+	 * Verifies that {@code {closing-curly-bracket"}} can be parsed and outputs a single closing curly bracket '}'.
 	 */
 	@Test
 	public void cClosingCurlyBracket() {
@@ -268,7 +268,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{any | min-size=X}</tt> can be parsed and the returned token will apply minimum size.
+	 * Verifies that {@code {any | min-size=X}} can be parsed and the returned token will apply minimum size.
 	 */
 	@Test
 	public void minimumSize() {
@@ -288,7 +288,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that <tt>{any | indent=X}</tt> can be parsed and the returned token will apply indentation.
+	 * Verifies that {@code {any | indent=X}} can be parsed and the returned token will apply indentation.
 	 */
 	@Test
 	public void indentation() {

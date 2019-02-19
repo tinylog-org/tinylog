@@ -57,7 +57,7 @@ public final class MDC {
 	}
 
 	/**
-	 * Get the context identified by the <code>key</code> parameter.
+	 * Get the context identified by the {@code key} parameter.
 	 * 
 	 * <p>
 	 * This method has no side effects.
@@ -72,8 +72,8 @@ public final class MDC {
 	}
 
 	/**
-	 * Put a context value (the <code>o</code> parameter) as identified with the <code>key</code> parameter into the
-	 * current thread's context map.
+	 * Put a context value (the {@code o} parameter) as identified with the {@code key} parameter into the current
+	 * thread's context map.
 	 * 
 	 * <p>
 	 * If the current thread does not have a context map it is created as a side effect.
@@ -89,7 +89,7 @@ public final class MDC {
 	}
 
 	/**
-	 * Remove the the context identified by the <code>key</code> parameter.
+	 * Remove the the context identified by the {@code key} parameter.
 	 *
 	 * @param key
 	 *            Key of parameter to remove

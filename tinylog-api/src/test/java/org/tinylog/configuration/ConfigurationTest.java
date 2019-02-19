@@ -85,10 +85,10 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Verifies that <tt>tinylog.properties</tt> will be loaded by default.
+	 * Verifies that {@code tinylog.properties} will be loaded by default.
 	 *
 	 * @throws Exception
-	 *             Failed creating <tt>tinylog.properties</tt> or invoking private method {@link Configuration#load()}
+	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
 	 */
 	@Test
 	public void defaultPropertiesFile() throws Exception {

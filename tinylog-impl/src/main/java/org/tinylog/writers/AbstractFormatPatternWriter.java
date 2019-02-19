@@ -33,7 +33,7 @@ import org.tinylog.writers.raw.OutputStreamWriter;
 import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 /**
- * Base writer for outputting rendered log entries. The format pattern will be read from property <tt>format</tt>.
+ * Base writer for outputting rendered log entries. The format pattern will be read from property {@code format}.
  */
 public abstract class AbstractFormatPatternWriter implements Writer {
 

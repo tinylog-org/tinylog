@@ -23,7 +23,7 @@ import org.tinylog.configuration.ServiceLoader;
  * Registry for receiving the actual logging provider.
  *
  * <p>
- * As service registered logging providers will be loaded from <tt>META-INF/services</tt>. If there are multiple logging
+ * As service registered logging providers will be loaded from {@code META-INF/services}. If there are multiple logging
  * providers, they will be combined to one.
  * </p>
  */

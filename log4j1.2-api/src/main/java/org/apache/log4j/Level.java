@@ -25,11 +25,11 @@ import java.io.Serializable;
 import java.util.Locale;
 
 /**
- * Defines the minimum set of levels recognized by the system, that is <code>OFF</code>, <code>FATAL</code>,
- * <code>ERROR</code>, <code>WARN</code>, <code>INFO</code>, <code>DEBUG</code> and <code>ALL</code>.
+ * Defines the minimum set of levels recognized by the system, that is {@code OFF}, {@code FATAL}, {@code ERROR},
+ * {@code WARN}, {@code INFO}, {@code DEBUG} and {@code ALL}.
  * 
  * <p>
- * The <code>Level</code> class may be subclassed to define a larger level set.
+ * The {@code Level} class may be subclassed to define a larger level set.
  * </p>
  */
 public class Level extends Priority implements Serializable {
@@ -42,45 +42,44 @@ public class Level extends Priority implements Serializable {
 	public static final int TRACE_INT = 5000;
 
 	/**
-	 * The <code>OFF</code> has the highest possible rank and is intended to turn off logging.
+	 * The {@code OFF} has the highest possible rank and is intended to turn off logging.
 	 */
 	public static final Level OFF = new Level(OFF_INT, "OFF", 0);
 
 	/**
-	 * The <code>FATAL</code> level designates very severe error events that will presumably lead the application to
-	 * abort.
+	 * The {@code FATAL} level designates very severe error events that will presumably lead the application to abort.
 	 */
 	public static final Level FATAL = new Level(FATAL_INT, "FATAL", 0);
 
 	/**
-	 * The <code>ERROR</code> level designates error events that might still allow the application to continue running.
+	 * The {@code ERROR} level designates error events that might still allow the application to continue running.
 	 */
 	public static final Level ERROR = new Level(ERROR_INT, "ERROR", 3);
 
 	/**
-	 * The <code>WARN</code> level designates potentially harmful situations.
+	 * The {@code WARN} level designates potentially harmful situations.
 	 */
 	public static final Level WARN = new Level(WARN_INT, "WARN", 4);
 
 	/**
-	 * The <code>INFO</code> level designates informational messages that highlight the progress of the application at
+	 * The {@code INFO} level designates informational messages that highlight the progress of the application at
 	 * coarse-grained level.
 	 */
 	public static final Level INFO = new Level(INFO_INT, "INFO", 6);
 
 	/**
-	 * The <code>DEBUG</code> Level designates fine-grained informational events that are most useful to debug an
+	 * The {@code DEBUG} Level designates fine-grained informational events that are most useful to debug an
 	 * application.
 	 */
 	public static final Level DEBUG = new Level(DEBUG_INT, "DEBUG", 7);
 
 	/**
-	 * The <code>TRACE</code> Level designates finer-grained informational events than the <code>DEBUG</code> level.
+	 * The {@code TRACE} Level designates finer-grained informational events than the {@code DEBUG} level.
 	 */
 	public static final Level TRACE = new Level(TRACE_INT, "TRACE", 7);
 
 	/**
-	 * The <code>ALL</code> has the lowest possible rank and is intended to turn on all logging.
+	 * The {@code ALL} has the lowest possible rank and is intended to turn on all logging.
 	 */
 	public static final Level ALL = new Level(ALL_INT, "ALL", 7);
 
@@ -162,7 +161,7 @@ public class Level extends Priority implements Serializable {
 
 	/**
 	 * Convert the string passed as argument to a level. If the conversion fails, then this method returns the value of
-	 * <code>defaultLevel</code>.
+	 * {@code defaultLevel}.
 	 * 
 	 * @param sArg
 	 *            The name of the Level.

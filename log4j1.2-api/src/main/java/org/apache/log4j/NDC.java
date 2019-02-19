@@ -49,15 +49,15 @@ import org.tinylog.provider.InternalLogger;
  * 
  * <ul>
  * <li>Contexts can be nested.</li>
- * <li>When entering a context, call <code>NDC.push</code>. As a side effect, if there is no nested diagnostic context
- * for the current thread, this method will create it.</li>
- * <li>When leaving a context, call <code>NDC.pop</code>.</li>
+ * <li>When entering a context, call {@code NDC.push}. As a side effect, if there is no nested diagnostic context for
+ * the current thread, this method will create it.</li>
+ * <li>When leaving a context, call {@code NDC.pop}.</li>
  * <li><b>When exiting a thread make sure to call {@link #remove NDC.remove()}</b>.</li>
  * </ul>
  * 
  * <p>
- * There is no penalty for forgetting to match each <code>push</code> operation with a corresponding <code>pop</code>,
- * except the obvious mismatch between the real application context and the context set in the NDC.
+ * There is no penalty for forgetting to match each {@code push} operation with a corresponding {@code pop}, except the
+ * obvious mismatch between the real application context and the context set in the NDC.
  * </p>
  * 
  * <p>
@@ -88,7 +88,7 @@ public final class NDC {
 	 * potentially used over and over in different unrelated contexts.
 	 * 
 	 * <p>
-	 * This method is equivalent to calling the {@link #setMaxDepth} method with a zero <code>maxDepth</code> argument.
+	 * This method is equivalent to calling the {@link #setMaxDepth} method with a zero {@code maxDepth} argument.
 	 * </p>
 	 * 
 	 * @since 0.8.4c
@@ -186,7 +186,7 @@ public final class NDC {
 	 * Push new diagnostic context information for the current thread.
 	 * 
 	 * <p>
-	 * The contents of the <code>message</code> parameter is determined solely by the client.
+	 * The contents of the {@code message} parameter is determined solely by the client.
 	 * </p>
 	 * 
 	 * @param message
@@ -208,8 +208,8 @@ public final class NDC {
 	 * As this is such an important problem in heavy duty systems and because it is difficult to always guarantee that
 	 * the remove method is called before exiting a thread, this method has been augmented to lazily remove references
 	 * to dead threads. In practice, this means that you can be a little sloppy and occasionally forget to call
-	 * {@link #remove} before exiting a thread. However, you must call <code>remove</code> sometime. If you never call
-	 * it, then your application is sure to run out of memory.
+	 * {@link #remove} before exiting a thread. However, you must call {@code remove} sometime. If you never call it,
+	 * then your application is sure to run out of memory.
 	 * </p>
 	 */
 	public static void remove() {
@@ -217,12 +217,12 @@ public final class NDC {
 	}
 
 	/**
-	 * Set maximum depth of this diagnostic context. If the current depth is smaller or equal to <code>maxDepth</code>,
-	 * then no action is taken.
+	 * Set maximum depth of this diagnostic context. If the current depth is smaller or equal to {@code maxDepth}, then
+	 * no action is taken.
 	 * 
 	 * <p>
 	 * This method is a convenient alternative to multiple {@link #pop} calls. Moreover, it is often the case that at
-	 * the end of complex call sequences, the depth of the NDC is unpredictable. The <code>setMaxDepth</code> method
+	 * the end of complex call sequences, the depth of the NDC is unpredictable. The {@code setMaxDepth} method
 	 * circumvents this problem.
 	 * </p>
 	 * 

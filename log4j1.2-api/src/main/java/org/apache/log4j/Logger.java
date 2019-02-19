@@ -46,8 +46,8 @@ public class Logger extends Category {
 	}
 
 	/**
-	 * Retrieve a logger named according to the value of the <code>name</code> parameter. If the named logger already
-	 * exists, then the existing instance will be returned. Otherwise, a new instance is created.
+	 * Retrieve a logger named according to the value of the {@code name} parameter. If the named logger already exists,
+	 * then the existing instance will be returned. Otherwise, a new instance is created.
 	 *
 	 * <p>
 	 * By default, loggers do not have a set level but inherit it from their nearest ancestor with a set level. This is
@@ -63,10 +63,10 @@ public class Logger extends Category {
 	}
 
 	/**
-	 * Shorthand for <code>getLogger(clazz.getName())</code>.
+	 * Shorthand for {@code getLogger(clazz.getName())}.
 	 *
 	 * @param clazz
-	 *            The name of <code>clazz</code> will be used as the name of the logger to retrieve. See
+	 *            The name of {@code clazz} will be used as the name of the logger to retrieve. See
 	 *            {@link #getLogger(String)} for more detailed information.
 	 * @return Logger instance
 	 */
@@ -80,8 +80,8 @@ public class Logger extends Category {
 	 * 
 	 * <p>
 	 * The {@link #getName() Logger.getName()} method for the root logger always returns string value: "root". However,
-	 * calling <code>Logger.getLogger("root")</code> does not retrieve the root logger but a logger just under root
-	 * named "root".
+	 * calling {@code Logger.getLogger("root")} does not retrieve the root logger but a logger just under root named
+	 * "root".
 	 * </p>
 	 * 
 	 * <p>
@@ -96,7 +96,7 @@ public class Logger extends Category {
 
 	/**
 	 * Like {@link #getLogger(String)} except that the type of logger instantiated depends on the type returned by the
-	 * {@link LoggerFactory#makeNewLoggerInstance} method of the <code>factory</code> parameter.
+	 * {@link LoggerFactory#makeNewLoggerInstance} method of the {@code factory} parameter.
 	 * 
 	 * <p>
 	 * This method is intended to be used by sub-classes.
@@ -130,8 +130,8 @@ public class Logger extends Category {
 	}
 
 	/**
-	 * Log a message object with the <code>TRACE</code> level including the stack trace of the
-	 * {@link Throwable}<code>t</code> passed as parameter.
+	 * Log a message object with the {@code TRACE} level including the stack trace of the {@link Throwable}{@code t}
+	 * passed as parameter.
 	 *
 	 * <p>
 	 * See {@link #debug(Object)} form for more detailed information.
@@ -152,7 +152,7 @@ public class Logger extends Category {
 	/**
 	 * Check whether this category is enabled for the TRACE Level.
 	 *
-	 * @return boolean - <code>true</code> if this category is enabled for level TRACE, <code>false</code> otherwise.
+	 * @return boolean - {@code true} if this category is enabled for level TRACE, {@code false} otherwise.
 	 * 
 	 * @since 1.2.12
 	 */

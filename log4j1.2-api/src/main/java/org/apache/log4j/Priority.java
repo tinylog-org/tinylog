@@ -23,35 +23,34 @@ package org.apache.log4j;
 public class Priority {
 
 	/**
-	 * The <code>OFF</code> has the highest possible rank and is intended to turn off logging.
+	 * The {@code OFF} has the highest possible rank and is intended to turn off logging.
 	 */
 	public static final int OFF_INT = Integer.MAX_VALUE;
 	/**
-	 * The <code>FATAL</code> level designates very severe error events that will presumably lead the application to
-	 * abort.
+	 * The {@code FATAL} level designates very severe error events that will presumably lead the application to abort.
 	 */
 	public static final int FATAL_INT = 50000;
 	/**
-	 * The <code>ERROR</code> level designates error events that might still allow the application to continue running.
+	 * The {@code ERROR} level designates error events that might still allow the application to continue running.
 	 */
 	public static final int ERROR_INT = 40000;
 	/**
-	 * The <code>WARN</code> level designates potentially harmful situations.
+	 * The {@code WARN} level designates potentially harmful situations.
 	 */
 	public static final int WARN_INT = 30000;
 	/**
-	 * The <code>INFO</code> level designates informational messages that highlight the progress of the application at
+	 * The {@code INFO} level designates informational messages that highlight the progress of the application at
 	 * coarse-grained level.
 	 */
 	public static final int INFO_INT = 20000;
 	/**
-	 * The <code>DEBUG</code> Level designates fine-grained informational events that are most useful to debug an
+	 * The {@code DEBUG} Level designates fine-grained informational events that are most useful to debug an
 	 * application.
 	 */
 	public static final int DEBUG_INT = 10000;
 	// public final static int FINE_INT = DEBUG_INT;
 	/**
-	 * The <code>ALL</code> has the lowest possible rank and is intended to turn on all logging.
+	 * The {@code ALL} has the lowest possible rank and is intended to turn on all logging.
 	 */
 	public static final int ALL_INT = Integer.MIN_VALUE;
 
@@ -155,7 +154,7 @@ public class Priority {
 	 * Returns {@code true} if this level has a higher or equal level than the level passed as argument, {@code false}
 	 * otherwise.
 	 * <p>
-	 * You should think twice before overriding the default implementation of <code>isGreaterOrEqual</code> method.
+	 * You should think twice before overriding the default implementation of {@code isGreaterOrEqual} method.
 	 * </p>
 	 * 
 	 * @param r

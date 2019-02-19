@@ -56,8 +56,7 @@ public interface AppenderAttachable {
 	Appender getAppender(String name);
 
 	/**
-	 * Returns <code>true</code> if the specified appender is in list of attached attached, <code>false</code>
-	 * otherwise.
+	 * Returns {@code true} if the specified appender is in list of attached attached, {@code false} otherwise.
 	 * 
 	 * @param appender
 	 *            Appender instance

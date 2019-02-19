@@ -62,7 +62,7 @@ public final class ServiceLoader<T> {
 	 * acronym. The acronym is the class name without package and service suffix.
 	 *
 	 * <p>
-	 * The acronym for <tt>org.tinylog.writers.RollingFileWriter</tt> is for example <tt>rolling file</tt>.
+	 * The acronym for {@code org.tinylog.writers.RollingFileWriter} is for example {@code rolling file}.
 	 * </p>
 	 *
 	 * @param name
@@ -162,8 +162,8 @@ public final class ServiceLoader<T> {
 	 * Generates the simple class name from an acronym. A simple class name is the class name without package.
 	 *
 	 * <p>
-	 * The acronym <tt>rolling file</tt>, for example, will be transformed into <tt>RollingFileWriter</tt> for the
-	 * service interface <tt>Writer</tt>.
+	 * The acronym {@code rolling file}, for example, will be transformed into {@code RollingFileWriter} for the service
+	 * interface {@code Writer}.
 	 * </p>
 	 *
 	 * @param name
