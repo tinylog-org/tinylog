@@ -39,27 +39,27 @@
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.17</animal-sniffer-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
-		<spotbugs-maven-plugin.version>3.1.8</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.11</spotbugs-maven-plugin.version>
 		<maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version>
-		<maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-		<flatten-maven-plugin.version>1.0.1</flatten-maven-plugin.version>
+		<flatten-maven-plugin.version>1.1.0</flatten-maven-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
 		<android.version>1.5_r3</android.version>
-		<assertj-core.version>3.11.1</assertj-core.version>
+		<assertj-core.version>3.12.0</assertj-core.version>
 		<assertj-db.version>1.2.0</assertj-db.version>
-		<checkstyle.version>8.14</checkstyle.version>
+		<checkstyle.version>8.17</checkstyle.version>
 		<commons-logging.version>1.2</commons-logging.version>
 		<h2.version>1.4.197</h2.version>
 		<java16.version>1.1</java16.version>
@@ -67,7 +67,7 @@
 		<jmh.version>1.21</jmh.version>
 		<junit.version>4.12</junit.version>
 		<powermock.version>2.0.0</powermock.version>
-		<slf4j.version>1.7.25</slf4j.version>
+		<slf4j.version>1.7.26</slf4j.version>
 	</properties>
 
 	<licenses>
