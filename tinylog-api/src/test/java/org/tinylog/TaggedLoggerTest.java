@@ -133,7 +133,7 @@ public final class TaggedLoggerTest {
 	 * Resets the underlying logging provider.
 	 *
 	 * @throws Exception
-	 *             Failed reseting logging provider
+	 *             Failed resetting logging provider
 	 */
 	@After
 	public void reset() throws Exception {

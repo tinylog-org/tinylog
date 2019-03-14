@@ -45,7 +45,7 @@ public final class RuntimeProviderTest {
 	 * Resets runtime name system property and runtime dialect.
 	 *
 	 * @throws Exception
-	 *             Failed reseting runtime dialect
+	 *             Failed resetting runtime dialect
 	 */
 	@After
 	public void reset() throws Exception {
