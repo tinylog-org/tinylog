@@ -1037,12 +1037,9 @@ public final class LoggerTest {
 		/**
 		 * Verifies that {@link Logger#tag(String)} returns the same unntagged instance of {@link TaggedLogger} for
 		 * {@code null} and empty strings.
-		 *
-		 * @throws Exception
-		 *             Failed getting tag from internal field
 		 */
 		@Test
-		public void untagged() throws Exception {
+		public void untagged() {
 			TaggedLogger logger = Logger.tag(null);
 
 			assertThat(logger).isNotNull().isSameAs(Logger.tag(""));
@@ -1052,12 +1049,9 @@ public final class LoggerTest {
 		/**
 		 * Verifies that {@link Logger#tag(String)} returns the same tagged instance of {@link TaggedLogger} for each
 		 * tag.
-		 *
-		 * @throws Exception
-		 *             Failed getting tag from internal field
 		 */
 		@Test
-		public void tagged() throws Exception {
+		public void tagged() {
 			TaggedLogger logger = Logger.tag("test");
 
 			assertThat(logger).isNotNull().isSameAs(Logger.tag("test")).isNotSameAs(Logger.tag("other"));
