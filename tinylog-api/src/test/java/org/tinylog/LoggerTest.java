@@ -1035,7 +1035,7 @@ public final class LoggerTest {
 		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
 		/**
-		 * Verifies that {@link Logger#tag(String)} returns the same unntagged instance of {@link TaggedLogger} for
+		 * Verifies that {@link Logger#tag(String)} returns the same untagged instance of {@link TaggedLogger} for
 		 * {@code null} and empty strings.
 		 */
 		@Test
