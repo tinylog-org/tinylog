@@ -14,8 +14,8 @@
 	<modules>
 		<module>test-core</module>
 		<module>tinylog-api</module>
-		<module>tinylog-api-kotlin</module>
 		<module>tinylog-impl</module>
+		<module>tinylog-api-kotlin</module>
 		<module>jboss-tinylog</module>
 		<module>jcl-tinylog</module>
 		<module>jul-tinylog</module>
