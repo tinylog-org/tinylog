@@ -5,7 +5,7 @@ Preconditions
 -------------
 
  * Repository https://github.com/pmwmedia/tinylog.git cloned and actual
- * JDK 8 and JDK 9 or 10 installed
+ * JDK 8 and JDK 9 installed
  * Maven 3 installed
  * GPG installed
  * Certificate for oss.sonatype.org imported
@@ -17,7 +17,7 @@ Steps for Each Release
 
  1. Set new version: mvn versions:set -DnewVersion=VERSION -DgenerateBackupPoms=false
  2. Create a tag with new version number as name
- 3. Deploy with JDK 9 or 10: mvn clean install deploy -P release
+ 3. Deploy with JDK 9: mvn clean install deploy -P release
  4. Login to https://oss.sonatype.org/ to close and release the created repository under Staging Repositories
  5. Upload ZIP archives from target to website
  6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc -P release
