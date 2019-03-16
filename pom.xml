@@ -494,6 +494,14 @@
 					<groupId>org.jetbrains.dokka</groupId>
 					<artifactId>dokka-maven-plugin</artifactId>
 					<version>${dokka.version}</version>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
+						</archive>
+					</configuration>
 					<executions>
 						<execution>
 							<phase>package</phase>
