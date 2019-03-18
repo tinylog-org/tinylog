@@ -64,7 +64,7 @@ public final class TaggedLogger {
 	 * Logs a message at {@link Level#TRACE TRACE} level.
 	 *
 	 * @param message
-	 *            String or any other object with meaningful {@link #toString()} method
+	 *            String or any other object with a meaningful {@link #toString()} method
 	 */
 	public void trace(final Object message) {
 		if (minimumLevelCoversTrace) {
@@ -203,7 +203,7 @@ public final class TaggedLogger {
 	 * Logs a message at {@link Level#DEBUG DEBUG} level.
 	 *
 	 * @param message
-	 *            String or any other object with meaningful {@link #toString()} method
+	 *            String or any other object with a meaningful {@link #toString()} method
 	 */
 	public void debug(final Object message) {
 		if (minimumLevelCoversDebug) {
@@ -342,7 +342,7 @@ public final class TaggedLogger {
 	 * Logs a message at {@link Level#INFO INFO} level.
 	 *
 	 * @param message
-	 *            String or any other object with meaningful {@link #toString()} method
+	 *            String or any other object with a meaningful {@link #toString()} method
 	 */
 	public void info(final Object message) {
 		if (minimumLevelCoversInfo) {
@@ -480,7 +480,7 @@ public final class TaggedLogger {
 	 * Logs a message at {@link Level#WARN WARN} level.
 	 *
 	 * @param message
-	 *            String or any other object with meaningful {@link #toString()} method
+	 *            String or any other object with a meaningful {@link #toString()} method
 	 */
 	public void warn(final Object message) {
 		if (minimumLevelCoversWarn) {
@@ -619,7 +619,7 @@ public final class TaggedLogger {
 	 * Logs a message at {@link Level#ERROR ERROR} level.
 	 *
 	 * @param message
-	 *            String or any other object with meaningful {@link #toString()} method
+	 *            String or any other object with a meaningful {@link #toString()} method
 	 */
 	public void error(final Object message) {
 		if (minimumLevelCoversError) {

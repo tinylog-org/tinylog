@@ -72,7 +72,7 @@ object Logger {
 	 * Logs a message at [TRACE][Level.TRACE] level.
 	 *
 	 * @param message
-	 * Any other object with meaningful [Any.toString] method
+	 * Any object with a meaningful [Any.toString] method
 	 */
 	fun trace(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
@@ -223,7 +223,7 @@ object Logger {
 	 * Logs a message at [DEBUG][Level.DEBUG] level.
 	 *
 	 * @param message
-	 * Any other object with meaningful [Any.toString] method
+	 * Any object with a meaningful [Any.toString] method
 	 */
 	fun debug(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
@@ -374,7 +374,7 @@ object Logger {
 	 * Logs a message at [INFO][Level.INFO] level.
 	 *
 	 * @param message
-	 * Any other object with meaningful [Any.toString] method
+	 * Any object with a meaningful [Any.toString] method
 	 */
 	fun info(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
@@ -525,7 +525,7 @@ object Logger {
 	 * Logs a message at [WARN][Level.WARN] level.
 	 *
 	 * @param message
-	 * Any other object with meaningful [Any.toString] method
+	 * Any object with a meaningful [Any.toString] method
 	 */
 	fun warn(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
@@ -676,7 +676,7 @@ object Logger {
 	 * Logs a message at [ERROR][Level.ERROR] level.
 	 *
 	 * @param message
-	 * Any other object with meaningful [Any.toString] method
+	 * Any object with a meaningful [Any.toString] method
 	 */
 	fun error(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
