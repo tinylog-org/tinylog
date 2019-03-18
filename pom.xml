@@ -75,7 +75,7 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.9.2</mockk.version>
 		<powermock.version>2.0.0</powermock.version>
-		<scala-library.version>2.12.8</scala-library.version>
+		<scala.version>2.12.8</scala.version>
 		<slf4j.version>1.7.26</slf4j.version>
 
 	</properties>
@@ -264,7 +264,12 @@
 			<dependency>
 				<groupId>org.scala-lang</groupId>
 				<artifactId>scala-library</artifactId>
-				<version>${scala-library.version}</version>
+				<version>${scala.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-reflect</artifactId>
+				<version>${scala.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>

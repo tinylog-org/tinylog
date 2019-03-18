@@ -30,6 +30,10 @@
 			<artifactId>scala-library</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-reflect</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.tinylog</groupId>
 			<artifactId>tinylog-api</artifactId>
 		</dependency>
