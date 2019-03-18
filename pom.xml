@@ -336,6 +336,11 @@
 					<groupId>net.alchim31.maven</groupId>
 					<artifactId>scala-maven-plugin</artifactId>
 					<version>${scala-maven-plugin.version}</version>
+					<configuration>
+						<args>
+							<arg>-g:line</arg>
+						</args>
+					</configuration>
 					<executions>
 						<execution>
 							<id>compile</id>
