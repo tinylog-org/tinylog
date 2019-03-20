@@ -389,12 +389,14 @@
 					<executions>
 						<execution>
 							<id>default-instrument</id>
+							<phase>process-test-classes</phase>
 							<goals>
 								<goal>instrument</goal>
 							</goals>
 						</execution>
 						<execution>
 							<id>default-restore-instrumented-classes</id>
+							<phase>prepare-package</phase>
 							<goals>
 								<goal>restore-instrumented-classes</goal>
 							</goals>
