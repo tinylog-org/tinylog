@@ -31,7 +31,7 @@ object Logger {
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful [[AnyRef.toString]] method
+		* Any object with a meaningful `toString()` method
 		*/
 	def trace(message: Any): Unit = macro LoggerMacro.tracePlainMessage
 
@@ -144,7 +144,7 @@ object Logger {
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful [[AnyRef.toString]] method
+		* Any object with a meaningful `toString()` method
 		*/
 	def debug(message: Any): Unit = macro LoggerMacro.debugPlainMessage
 
@@ -257,7 +257,7 @@ object Logger {
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful [[AnyRef.toString]] method
+		* Any object with a meaningful `toString()` method
 		*/
 	def info(message: Any): Unit = macro LoggerMacro.infoPlainMessage
 
@@ -370,7 +370,7 @@ object Logger {
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful [[AnyRef.toString]] method
+		* Any object with a meaningful `toString()` method
 		*/
 	def warn(message: Any): Unit = macro LoggerMacro.warnPlainMessage
 
@@ -483,7 +483,7 @@ object Logger {
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful [[AnyRef.toString]] method
+		* Any object with a meaningful `toString()` method
 		*/
 	def error(message: Any): Unit = macro LoggerMacro.errorPlainMessage
 

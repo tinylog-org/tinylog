@@ -21,7 +21,7 @@ import scala.reflect.macros.blackbox
 private object LoggerMacro {
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.isTraceEnabled]] to [[org.tinylog.Logger.isTraceEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isTraceEnabled]] to [[org.tinylog.Logger#isTraceEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -35,8 +35,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(message:Any)]] and [[org.tinylog.scala.Logger.trace(message:String)]]
-		* to [[org.tinylog.Logger.trace(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:Any)]] and [[org.tinylog.scala.Logger#trace(message:String)]]
+		* to [[org.tinylog.Logger#trace(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -56,8 +56,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(message:()=>String)]] to
-		* [[org.tinylog.Logger.trace(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:()=>String)]] to
+		* [[org.tinylog.Logger#trace(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -73,8 +73,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.trace(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#trace(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -92,8 +92,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.trace(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#trace(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -112,8 +112,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(exception:Throwable)]] to
-		* [[org.tinylog.Logger.trace(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -129,8 +129,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(exception:Throwable,message:String)]] to
-		* [[org.tinylog.Logger.trace(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -152,8 +152,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.Logger.trace(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -171,8 +171,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.trace(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -192,8 +192,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.trace(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.trace(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -214,7 +214,7 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.isDebugEnabled]] to [[org.tinylog.Logger.isDebugEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isDebugEnabled]] to [[org.tinylog.Logger#isDebugEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -228,8 +228,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(message:Any)]] and [[org.tinylog.scala.Logger.debug(message:String)]]
-		* to [[org.tinylog.Logger.debug(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:Any)]] and [[org.tinylog.scala.Logger#debug(message:String)]]
+		* to [[org.tinylog.Logger#debug(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -249,8 +249,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(message:()=>String)]] to
-		* [[org.tinylog.Logger.debug(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:()=>String)]] to
+		* [[org.tinylog.Logger#debug(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -266,8 +266,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.debug(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#debug(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -285,8 +285,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.debug(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#debug(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -305,8 +305,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(exception:Throwable)]] to
-		* [[org.tinylog.Logger.debug(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -322,8 +322,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(exception:Throwable,message:String)]] to
-		* [[org.tinylog.Logger.debug(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -345,8 +345,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.Logger.debug(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -364,8 +364,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.debug(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -385,8 +385,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.debug(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.debug(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -407,7 +407,7 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.isInfoEnabled]] to [[org.tinylog.Logger.isInfoEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isInfoEnabled]] to [[org.tinylog.Logger#isInfoEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -421,8 +421,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(message:Any)]] and [[org.tinylog.scala.Logger.info(message:String)]]
-		* to [[org.tinylog.Logger.info(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:Any)]] and [[org.tinylog.scala.Logger#info(message:String)]]
+		* to [[org.tinylog.Logger#info(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -442,8 +442,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(message:()=>String)]] to
-		* [[org.tinylog.Logger.info(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:()=>String)]] to
+		* [[org.tinylog.Logger#info(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -459,8 +459,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.info(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#info(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -478,8 +478,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.info(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#info(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -498,8 +498,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(exception:Throwable)]] to
-		* [[org.tinylog.Logger.info(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -515,8 +515,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(exception:Throwable,message:String)]] to
-		* [[org.tinylog.Logger.info(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -538,8 +538,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.Logger.info(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -557,8 +557,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.info(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -578,8 +578,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.info(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.info(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -600,7 +600,7 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.isWarnEnabled]] to [[org.tinylog.Logger.isWarnEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isWarnEnabled]] to [[org.tinylog.Logger#isWarnEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -614,8 +614,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(message:Any)]] and [[org.tinylog.scala.Logger.warn(message:String)]]
-		* to [[org.tinylog.Logger.warn(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:Any)]] and [[org.tinylog.scala.Logger#warn(message:String)]]
+		* to [[org.tinylog.Logger#warn(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -635,8 +635,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(message:()=>String)]] to
-		* [[org.tinylog.Logger.warn(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:()=>String)]] to
+		* [[org.tinylog.Logger#warn(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -652,8 +652,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.warn(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#warn(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -671,8 +671,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.warn(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#warn(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -691,8 +691,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(exception:Throwable)]] to
-		* [[org.tinylog.Logger.warn(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -708,8 +708,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(exception:Throwable,message:String)]] to
-		* [[org.tinylog.Logger.warn(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -731,8 +731,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.Logger.warn(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -750,8 +750,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.warn(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -771,8 +771,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.warn(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.warn(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -793,7 +793,7 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.isErrorEnabled]] to [[org.tinylog.Logger.isErrorEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isErrorEnabled]] to [[org.tinylog.Logger#isErrorEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -807,8 +807,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(message:Any)]] and [[org.tinylog.scala.Logger.error(message:String)]]
-		* to [[org.tinylog.Logger.error(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:Any)]] and [[org.tinylog.scala.Logger#error(message:String)]]
+		* to [[org.tinylog.Logger#error(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -828,8 +828,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(message:()=>String)]] to
-		* [[org.tinylog.Logger.error(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:()=>String)]] to
+		* [[org.tinylog.Logger#error(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -845,8 +845,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.error(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#error(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -864,8 +864,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.error(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#error(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -884,8 +884,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(exception:Throwable)]] to
-		* [[org.tinylog.Logger.error(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -901,8 +901,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(exception:Throwable,message:String)]] to
-		* [[org.tinylog.Logger.error(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -924,8 +924,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.Logger.error(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -943,8 +943,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.Logger.error(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -964,8 +964,8 @@ private object LoggerMacro {
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.Logger.error(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.Logger.error(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
