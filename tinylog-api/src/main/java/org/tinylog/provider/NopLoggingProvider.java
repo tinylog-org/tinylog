@@ -32,6 +32,11 @@ final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
+	public Level getMinimumLevel() {
+		return Level.OFF;
+	}
+
+	@Override
 	public Level getMinimumLevel(final String tag) {
 		return Level.OFF;
 	}

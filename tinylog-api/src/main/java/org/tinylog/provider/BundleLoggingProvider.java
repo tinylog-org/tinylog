@@ -41,6 +41,18 @@ final class BundleLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
+	public Level getMinimumLevel() {
+		Level minimumLevel = Level.OFF;
+		for (int i = 0; i < loggingProviders.length; ++i) {
+			Level level = loggingProviders[i].getMinimumLevel();
+			if (level.ordinal() < minimumLevel.ordinal()) {
+				minimumLevel = level;
+			}
+		}
+		return minimumLevel;
+	}
+
+	@Override
 	public Level getMinimumLevel(final String tag) {
 		Level minimumLevel = Level.OFF;
 		for (int i = 0; i < loggingProviders.length; ++i) {

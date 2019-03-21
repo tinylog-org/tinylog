@@ -43,10 +43,18 @@ public final class NopLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that the minimum severity level is {@link Level#OFF}.
+	 * Verifies that the minimum global severity level is {@link Level#OFF}.
 	 */
 	@Test
-	public void getMinimumLevel() {
+	public void getGlobalMinimumLevel() {
+		assertThat(provider.getMinimumLevel()).isEqualTo(Level.OFF);
+	}
+
+	/**
+	 * Verifies that the minimum severity level for a tag is {@link Level#OFF}.
+	 */
+	@Test
+	public void getTaggedMinimumLevel() {
 		assertThat(provider.getMinimumLevel(null)).isEqualTo(Level.OFF);
 		assertThat(provider.getMinimumLevel("test")).isEqualTo(Level.OFF);
 	}

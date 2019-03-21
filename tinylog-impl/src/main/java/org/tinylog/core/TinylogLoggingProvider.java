@@ -82,6 +82,19 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
+	public Level getMinimumLevel() {
+		Level level = Level.OFF;
+		for (int tagIndex = 0; tagIndex < writers.length; ++tagIndex) {
+			for (int levelIndex = Level.TRACE.ordinal(); levelIndex < level.ordinal(); ++levelIndex) {
+				if (writers[tagIndex][levelIndex].size() > 0) {
+					level = Level.values()[levelIndex];
+				}
+			}
+		}
+		return level;
+	}
+
+	@Override
 	public Level getMinimumLevel(final String tag) {
 		int tagIndex = getTagIndex(tag);
 		for (int levelIndex = Level.TRACE.ordinal(); levelIndex < Level.OFF.ordinal(); ++levelIndex) {

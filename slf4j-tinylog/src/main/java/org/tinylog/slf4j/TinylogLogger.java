@@ -29,11 +29,19 @@ public final class TinylogLogger implements LocationAwareLogger {
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	// @formatter:off
-	private static final boolean MINIMUM_LEVEL_COVERS_TRACE = isCoveredByMinimumLevel(Level.TRACE);
-	private static final boolean MINIMUM_LEVEL_COVERS_DEBUG = isCoveredByMinimumLevel(Level.DEBUG);
-	private static final boolean MINIMUM_LEVEL_COVERS_INFO  = isCoveredByMinimumLevel(Level.INFO);
-	private static final boolean MINIMUM_LEVEL_COVERS_WARN  = isCoveredByMinimumLevel(Level.WARN);
-	private static final boolean MINIMUM_LEVEL_COVERS_ERROR = isCoveredByMinimumLevel(Level.ERROR);
+	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_TRACE = isCoveredByGlobalMinimumLevel(Level.TRACE);
+	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG = isCoveredByGlobalMinimumLevel(Level.DEBUG);
+	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_INFO  = isCoveredByGlobalMinimumLevel(Level.INFO);
+	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_WARN  = isCoveredByGlobalMinimumLevel(Level.WARN);
+	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_ERROR = isCoveredByGlobalMinimumLevel(Level.ERROR);
+	// @formatter:on
+
+	// @formatter:off
+	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_TRACE = isCoveredByDefaultMinimumLevel(Level.TRACE);
+	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG = isCoveredByDefaultMinimumLevel(Level.DEBUG);
+	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_INFO  = isCoveredByDefaultMinimumLevel(Level.INFO);
+	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_WARN  = isCoveredByDefaultMinimumLevel(Level.WARN);
+	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_ERROR = isCoveredByDefaultMinimumLevel(Level.ERROR);
 	// @formatter:on
 
 	private final String name;
@@ -53,425 +61,400 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isTraceEnabled() {
-		return MINIMUM_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, null, Level.TRACE);
+		return MINIMUM_DEFAULT_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, null, Level.TRACE);
 	}
 
 	@Override
 	public void trace(final String message) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object arg) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object arg1, final Object arg2) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void trace(final String message, final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_TRACE) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isTraceEnabled(final Marker marker) {
-		return provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.TRACE);
+		return MINIMUM_GLOBAL_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.TRACE);
 	}
 
 	@Override
 	public void trace(final Marker marker, final String message) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.TRACE.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object arg) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.TRACE.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object arg1, final Object arg2) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.TRACE.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object... arguments) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.TRACE.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String message, final Throwable exception) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.TRACE.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isDebugEnabled() {
-		return MINIMUM_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, null, Level.DEBUG);
+		return MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, null, Level.DEBUG);
 	}
 
 	@Override
 	public void debug(final String message) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object arg) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object arg1, final Object arg2) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void debug(final String message, final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_DEBUG) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isDebugEnabled(final Marker marker) {
-		return provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG);
+		return MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG);
 	}
 
 	@Override
 	public void debug(final Marker marker, final String message) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.DEBUG.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object arg) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.DEBUG.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object arg1, final Object arg2) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.DEBUG.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object... arguments) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.DEBUG.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String message, final Throwable exception) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.DEBUG.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isInfoEnabled() {
-		return MINIMUM_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, null, Level.INFO);
+		return MINIMUM_DEFAULT_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, null, Level.INFO);
 	}
 
 	@Override
 	public void info(final String message) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object arg) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object arg1, final Object arg2) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void info(final String message, final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_INFO) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isInfoEnabled(final Marker marker) {
-		return provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.INFO);
+		return MINIMUM_GLOBAL_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.INFO);
 	}
 
 	@Override
 	public void info(final Marker marker, final String message) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.INFO.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object arg) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.INFO.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object arg1, final Object arg2) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.INFO.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object... arguments) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.INFO.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String message, final Throwable exception) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.INFO.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isWarnEnabled() {
-		return MINIMUM_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, null, Level.WARN);
+		return MINIMUM_DEFAULT_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, null, Level.WARN);
 	}
 
 	@Override
 	public void warn(final String message) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object arg) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object arg1, final Object arg2) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void warn(final String message, final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_WARN) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isWarnEnabled(final Marker marker) {
-		return provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.WARN);
+		return MINIMUM_GLOBAL_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.WARN);
 	}
 
 	@Override
 	public void warn(final Marker marker, final String message) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.WARN.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object arg) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.WARN.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object arg1, final Object arg2) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.WARN.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object... arguments) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.WARN.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String message, final Throwable exception) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.WARN.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isErrorEnabled() {
-		return MINIMUM_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, null, Level.ERROR);
+		return MINIMUM_DEFAULT_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, null, Level.ERROR);
 	}
 
 	@Override
 	public void error(final String message) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object arg) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object arg1, final Object arg2) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object... arguments) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void error(final String message, final Throwable exception) {
-		if (MINIMUM_LEVEL_COVERS_ERROR) {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public boolean isErrorEnabled(final Marker marker) {
-		return provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.ERROR);
+		return MINIMUM_GLOBAL_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.ERROR);
 	}
 
 	@Override
 	public void error(final Marker marker, final String message) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.ERROR.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object arg) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.ERROR.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object arg1, final Object arg2) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.ERROR.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object... arguments) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.ERROR.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String message, final Throwable exception) {
-		String tag = marker.getName();
-		if (provider.getMinimumLevel(tag).ordinal() <= Level.ERROR.ordinal()) {
+		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, exception, message, (Object[]) null);
 		}
 	}
@@ -487,13 +470,24 @@ public final class TinylogLogger implements LocationAwareLogger {
 	}
 
 	/**
-	 * Checks if a given severity level is covered by the logging provider's minimum level.
+	 * Checks if a given severity level is covered by the global logging provider's minimum level for all tags.
 	 *
 	 * @param level
 	 *            Severity level to check
 	 * @return {@code true} if given severity level is covered, otherwise {@code false}
 	 */
-	private static boolean isCoveredByMinimumLevel(final Level level) {
+	private static boolean isCoveredByGlobalMinimumLevel(final Level level) {
+		return provider.getMinimumLevel().ordinal() <= level.ordinal();
+	}
+
+	/**
+	 * Checks if a given severity level is covered by the untagged logging provider's minimum level.
+	 *
+	 * @param level
+	 *            Severity level to check
+	 * @return {@code true} if given severity level is covered, otherwise {@code false}
+	 */
+	private static boolean isCoveredByDefaultMinimumLevel(final Level level) {
 		return provider.getMinimumLevel(null).ordinal() <= level.ordinal();
 	}
 

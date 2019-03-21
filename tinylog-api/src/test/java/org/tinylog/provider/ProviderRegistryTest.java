@@ -196,6 +196,11 @@ public final class ProviderRegistryTest {
 		}
 
 		@Override
+		public final Level getMinimumLevel() {
+			return Level.OFF;
+		}
+
+		@Override
 		public final Level getMinimumLevel(final String tag) {
 			return Level.OFF;
 		}

@@ -53,20 +53,40 @@ public final class BundleLoggingProviderTest {
 
 	/**
 	 * Verifies that {@code getMinimumLevel()} method returns the minimum severity level of underlying logging
-	 * providers, if all have the same minimum severity level.
+	 * providers, if all have the same global minimum severity level.
 	 */
 	@Test
-	public void getSameMinimumLevel() {
+	public void getSameGlobalMinimumLevel() {
+		init(Level.TRACE, Level.TRACE);
+		assertThat(bundle.getMinimumLevel()).isEqualTo(Level.TRACE);
+	}
+
+	/**
+	 * Verifies that {@code getMinimumLevel()} method returns the lowest minimum severity level of underlying logging
+	 * providers, if there are different global minimum severity levels.
+	 */
+	@Test
+	public void getDifferentGlobalMinimumLevel() {
+		init(Level.DEBUG, Level.WARN);
+		assertThat(bundle.getMinimumLevel()).isEqualTo(Level.DEBUG);
+	}
+
+	/**
+	 * Verifies that {@code getMinimumLevel(String)} method returns the minimum severity level of underlying logging
+	 * providers, if all have the same minimum severity level for an tag.
+	 */
+	@Test
+	public void getSameTaggedMinimumLevel() {
 		init(Level.TRACE, Level.TRACE);
 		assertThat(bundle.getMinimumLevel(null)).isEqualTo(Level.TRACE);
 	}
 
 	/**
-	 * Verifies that {@code getMinimumLevel()} method returns the lowest minimum severity level of underlying logging
-	 * providers, if there are different minimum severity levels.
+	 * Verifies that {@code getMinimumLevel(String)} method returns the lowest minimum severity level of underlying logging
+	 * providers, if there are different minimum severity levels for an tag.
 	 */
 	@Test
-	public void getDifferentMinimumLevel() {
+	public void getDifferentTaggedMinimumLevel() {
 		init(Level.DEBUG, Level.WARN);
 		assertThat(bundle.getMinimumLevel(null)).isEqualTo(Level.DEBUG);
 	}
@@ -162,6 +182,9 @@ public final class BundleLoggingProviderTest {
 
 		when(first.getContextProvider()).thenReturn(mock(ContextProvider.class));
 		when(second.getContextProvider()).thenReturn(mock(ContextProvider.class));
+
+		when(first.getMinimumLevel()).thenReturn(firstLevel);
+		when(second.getMinimumLevel()).thenReturn(secondLevel);
 
 		when(first.getMinimumLevel(null)).thenReturn(firstLevel);
 		when(second.getMinimumLevel(null)).thenReturn(secondLevel);

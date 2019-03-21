@@ -71,10 +71,18 @@ public final class TinylogLoggingProviderTest {
 		}
 
 		/**
-		 * Verifies that the minimum severity level is {@link Level#TRACE}.
+		 * Verifies that the global minimum severity level is {@link Level#TRACE}.
 		 */
 		@Test
-		public void minimumLevel() {
+		public void globalMinimumLevel() {
+			assertThat(provider.getMinimumLevel()).isEqualTo(Level.TRACE);
+		}
+
+		/**
+		 * Verifies that the minimum severity level for a tag is {@link Level#TRACE}.
+		 */
+		@Test
+		public void taggedMinimumLevel() {
 			assertThat(provider.getMinimumLevel(tag)).isEqualTo(Level.TRACE);
 		}
 
@@ -175,10 +183,18 @@ public final class TinylogLoggingProviderTest {
 		}
 
 		/**
-		 * Verifies that the minimum severity level is {@link Level#OFF}.
+		 * Verifies that the global minimum severity level is {@link Level#OFF}.
 		 */
 		@Test
-		public void minimumLevel() {
+		public void globalMinimumLevel() {
+			assertThat(provider.getMinimumLevel()).isEqualTo(Level.OFF);
+		}
+
+		/**
+		 * Verifies that the minimum severity level for a tag is {@link Level#OFF}.
+		 */
+		@Test
+		public void taggedMinimumLevel() {
 			assertThat(provider.getMinimumLevel(tag)).isEqualTo(Level.OFF);
 		}
 
@@ -289,10 +305,18 @@ public final class TinylogLoggingProviderTest {
 		}
 
 		/**
-		 * Verifies that the minimum severity level is {@link Level#DEBUG}.
+		 * Verifies that the global minimum severity level is {@link Level#DEBUG}.
 		 */
 		@Test
-		public void minimumLevel() {
+		public void globalMinimumLevel() {
+			assertThat(provider.getMinimumLevel()).isEqualTo(Level.DEBUG);
+		}
+
+		/**
+		 * Verifies that the minimum severity level for a tag is {@link Level#DEBUG}.
+		 */
+		@Test
+		public void taggedMinimumLevel() {
 			assertThat(provider.getMinimumLevel(tag)).isEqualTo(Level.DEBUG);
 		}
 
@@ -459,6 +483,14 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer2.level", "info");
 			Configuration.set("writer2.tag", "test");
 			Configuration.set("writer2.format", "{level}: {message}");
+		}
+
+		/**
+		 * Verifies that the global minimum severity level for all loggers is {@link Level#TRACE}.
+		 */
+		@Test
+		public void globalMinimumLevel() {
+			assertThat(provider.getMinimumLevel()).isEqualTo(Level.TRACE);
 		}
 
 		/**

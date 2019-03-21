@@ -135,11 +135,19 @@ public final class TinylogLoggerTest {
 			when(provider.isEnabled(anyInt(), eq(null), eq(Level.ERROR))).thenReturn(errorEnabled);
 
 			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
+
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", errorEnabled);
+
 			Whitebox.setInternalState(TinylogLogger.class, provider);
 		}
 
@@ -705,11 +713,18 @@ public final class TinylogLoggerTest {
 
 			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_TRACE", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_DEBUG", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_INFO", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_WARN", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_LEVEL_COVERS_ERROR", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
+
 			Whitebox.setInternalState(TinylogLogger.class, provider);
 		}
 

@@ -28,6 +28,20 @@ public interface LoggingProvider {
 	ContextProvider getContextProvider();
 
 	/**
+	 * Gets the lowest activated severity level for all tags.
+	 *
+	 * <p>
+	 * The result of this method is cacheable and can be used to stop processing log entries at an early stage, before
+	 * doing any expensive operations. All lower severity levels than the returned level will be never output. But it is
+	 * not guaranteed the returned severity level or higher will be really output (for example if output depends on
+	 * package or class name).
+	 * </p>
+	 *
+	 * @return Lowest activated severity level
+	 */
+	Level getMinimumLevel();
+
+	/**
 	 * Gets the lowest activated severity level for a tag.
 	 *
 	 * <p>
