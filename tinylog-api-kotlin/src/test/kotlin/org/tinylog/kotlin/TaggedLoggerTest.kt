@@ -113,28 +113,11 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	}
 
 	/**
-	 * Resets the logging provider and all overridden fields in [TaggedLogger].
+	 * Resets the logging provider in [TaggedLogger].
 	 */
 	@After
 	fun resetLoggingProvider() {
 		Whitebox.setProperty(logger, LoggingProvider::class, ProviderRegistry.getLoggingProvider())
-		Whitebox.setProperty(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE))
-		Whitebox.setProperty(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG))
-		Whitebox.setProperty(logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO))
-		Whitebox.setProperty(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARN))
-		Whitebox.setProperty(logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR))
-	}
-
-	/**
-	 * Verifies evaluating whether a specific severity level is covered by the minimum severity level.
-	 */
-	@Test
-	fun coveredByMinimumLevel() {
-		assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(traceEnabled)
-		assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(debugEnabled)
-		assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(infoEnabled)
-		assertThat(isCoveredByMinimumLevel(Level.WARN)).isEqualTo(warnEnabled)
-		assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(errorEnabled)
 	}
 
 	/**
@@ -947,17 +930,6 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	private inline fun <reified T : Any> provide(value: Any?): (T) -> Boolean {
 		return { it is Supplier<*> && value == it.get() }
-	}
-
-	/**
-	 * Invokes the private method [TaggedLogger.isCoveredByMinimumLevel].
-	 *
-	 * @param level
-	 * Severity level to check
-	 * @return `true` if given severity level is covered, otherwise `false`
-	 */
-	private fun isCoveredByMinimumLevel(level: Level): Boolean {
-		return Whitebox.callMethod(logger, "isCoveredByMinimumLevel", tag, level) as Boolean
 	}
 
 }

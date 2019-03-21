@@ -967,32 +967,13 @@ public final class TaggedLoggerTest {
 	}
 
 	/**
-	 * Resets the logging provider and all overridden fields in {@link TaggedLogger}.
+	 * Resets the logging provider in {@link TaggedLogger}.
 	 *
 	 * @throws Exception
-	 *             Failed updating fields
+	 *             Failed updating logging provider
 	 */
 	private void resetLoggingProvider() throws Exception {
 		Whitebox.setInternalState(TaggedLogger.class, ProviderRegistry.getLoggingProvider());
-
-		Whitebox.setInternalState(logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE));
-		Whitebox.setInternalState(logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG));
-		Whitebox.setInternalState(logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO));
-		Whitebox.setInternalState(logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARN));
-		Whitebox.setInternalState(logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR));
-	}
-
-	/**
-	 * Invokes the private method {@link TaggedLogger#isCoveredByMinimumLevel(String, Level)}.
-	 *
-	 * @param level
-	 *            Severity level to check
-	 * @return {@code true} if given severity level is covered, otherwise {@code false}
-	 * @throws Exception
-	 *             Failed invoking method
-	 */
-	private boolean isCoveredByMinimumLevel(final Level level) throws Exception {
-		return Whitebox.invokeMethod(TaggedLogger.class, "isCoveredByMinimumLevel", TAG, level);
 	}
 
 }
