@@ -161,7 +161,7 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceLazyMessage() {
-		logger.trace{ "Hello World!" }
+		logger.trace { "Hello World!" }
 
 		if (traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, match(provide("Hello World!"))) }
@@ -321,7 +321,7 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugLazyMessage() {
-		logger.debug{ "Hello World!" }
+		logger.debug { "Hello World!" }
 
 		if (debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, match(provide("Hello World!"))) }
@@ -481,7 +481,7 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoLazyMessage() {
-		logger.info{ "Hello World!" }
+		logger.info { "Hello World!" }
 
 		if (infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, match(provide("Hello World!"))) }
@@ -641,7 +641,7 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnLazyMessage() {
-		logger.warn{ "Hello World!" }
+		logger.warn { "Hello World!" }
 
 		if (warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, match(provide("Hello World!"))) }
@@ -801,7 +801,7 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorLazyMessage() {
-		logger.error{ "Hello World!" }
+		logger.error { "Hello World!" }
 
 		if (errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, match(provide("Hello World!"))) }

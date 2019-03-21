@@ -195,7 +195,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun traceLazyMessage() {
-			Logger.trace{ "Hello World!" }
+			Logger.trace { "Hello World!" }
 
 			if (traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, match(provide("Hello World!"))) }
@@ -355,7 +355,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun debugLazyMessage() {
-			Logger.debug{ "Hello World!" }
+			Logger.debug { "Hello World!" }
 
 			if (debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, match(provide("Hello World!"))) }
@@ -515,7 +515,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun infoLazyMessage() {
-			Logger.info{ "Hello World!" }
+			Logger.info { "Hello World!" }
 
 			if (infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, match(provide("Hello World!"))) }
@@ -675,7 +675,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun warnLazyMessage() {
-			Logger.warn{ "Hello World!" }
+			Logger.warn { "Hello World!" }
 
 			if (warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, match(provide("Hello World!"))) }
@@ -835,7 +835,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun errorLazyMessage() {
-			Logger.error{ "Hello World!" }
+			Logger.error { "Hello World!" }
 
 			if (errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, match(provide("Hello World!"))) }
