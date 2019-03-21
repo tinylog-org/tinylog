@@ -83,6 +83,12 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*Macro*</exclude>
+						<exclude>**\*Macro*</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
