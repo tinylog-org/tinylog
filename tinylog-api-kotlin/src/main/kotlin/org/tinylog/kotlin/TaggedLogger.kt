@@ -23,7 +23,7 @@ import org.tinylog.provider.ProviderRegistry
  * Case-sensitive tag for logger instance
  * @see Logger.tag
  */
-class TaggedLogger(private val tag: String?) {
+class TaggedLogger internal constructor(private val tag: String?) {
 
 	private val stackTraceDepth = 2
 	private val provider = ProviderRegistry.getLoggingProvider()
