@@ -13,54 +13,33 @@
 
 package org.tinylog.scala
 
-import java.util.concurrent.ConcurrentHashMap
-
 import scala.language.experimental.macros
 
 /**
-	* Static logger for issuing log entries.
+	* Logger for issuing tagged log entries. Tagged loggers can be received by calling [[org.tinylog.scala.Logger#tag(String)]].
+	*
+	* @param tag
+	* Case-sensitive tag for logger instance
+	* @see org.tinylog.scala.Logger#tag(String)
 	*/
-object Logger {
+final class TaggedLogger private[scala] (private val tag: String) {
 
-	private val instance = new TaggedLogger(null)
-	private val loggers = new ConcurrentHashMap[String, TaggedLogger]()
-
-	/**
-		* Gets a tagged logger instance. Tags are case-sensitive.
-		*
-		* @param tag
-		* Tag for logger or `null` for receiving an untagged logger
-		* @return Logger instance
-		*/
-	def tag(tag: String): TaggedLogger = {
-		if (tag == null || tag.isEmpty()) {
-			return instance
-		} else {
-			var logger = loggers.get(tag)
-			if (logger == null) {
-				logger = new TaggedLogger(tag)
-				val existing = loggers.putIfAbsent(tag, logger)
-				return if (existing == null) logger else existing
-			} else {
-				return logger
-			}
-		}
-	}
+	private[scala] final val logger = org.tinylog.Logger.tag(tag)
 
 	/**
 		* Checks whether log entries at [[org.tinylog.Level#TRACE]] will be output.
 		*
 		* @return `true` if [[org.tinylog.Level#TRACE]] level is enabled, `false` if disabled
 		*/
-	def isTraceEnabled(): Boolean = macro LoggerMacro.isTraceEnabled
+	def isTraceEnabled(): Boolean = macro TaggedLoggerMacro.isTraceEnabled
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful `toString()` method
+		* Any object with a meaningful [[AnyRef.toString]] method
 		*/
-	def trace(message: Any): Unit = macro LoggerMacro.tracePlainMessage
+	def trace(message: Any): Unit = macro TaggedLoggerMacro.tracePlainMessage
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
@@ -70,7 +49,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def trace(message: String): Unit = macro LoggerMacro.tracePlainMessage
+	def trace(message: String): Unit = macro TaggedLoggerMacro.tracePlainMessage
 
 	/**
 		* Logs a lazy message at [[org.tinylog.Level#TRACE]]. The message will be only evaluated if the log entry is
@@ -79,7 +58,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def trace(message: () => String): Unit = macro LoggerMacro.traceLazyMessage
+	def trace(message: () => String): Unit = macro TaggedLoggerMacro.traceLazyMessage
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced by given
@@ -90,7 +69,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def trace(message: String, arguments: Any*): Unit = macro LoggerMacro.traceMessageWithPlainArguments
+	def trace(message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.traceMessageWithPlainArguments
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]] level. "{}" placeholders will be replaced by given lazy
@@ -101,7 +80,7 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def trace(message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.traceMessageWithLazyArguments
+	def trace(message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.traceMessageWithLazyArguments
 
 	/**
 		* Logs an exception at [[org.tinylog.Level#TRACE]].
@@ -109,7 +88,7 @@ object Logger {
 		* @param exception
 		* Caught exception or any other throwable to log
 		*/
-	def trace(exception: Throwable): Unit = macro LoggerMacro.traceException
+	def trace(exception: Throwable): Unit = macro TaggedLoggerMacro.traceException
 
 	/**
 		* Logs an exception with a custom message at [[org.tinylog.Level#TRACE]].
@@ -121,7 +100,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def trace(exception: Throwable, message: String): Unit = macro LoggerMacro.traceExceptionWithPlainMessage
+	def trace(exception: Throwable, message: String): Unit = macro TaggedLoggerMacro.traceExceptionWithPlainMessage
 
 	/**
 		* Logs an exception with a custom lazy message at [[org.tinylog.Level#TRACE]]. The message will be only
@@ -132,7 +111,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def trace(exception: Throwable, message: () => String): Unit = macro LoggerMacro.traceExceptionWithLazyMessage
+	def trace(exception: Throwable, message: () => String): Unit = macro TaggedLoggerMacro.traceExceptionWithLazyMessage
 
 	/**
 		* Logs an exception with a formatted custom message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be
@@ -145,7 +124,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def trace(exception: Throwable, message: String, arguments: Any*): Unit = macro LoggerMacro.traceExceptionWithMessageWithPlainArguments
+	def trace(exception: Throwable, message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.traceExceptionWithMessageWithPlainArguments
 
 	/**
 		* Logs an exception with a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced
@@ -158,22 +137,22 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def trace(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.traceExceptionWithMessageWithLazyArguments
+	def trace(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.traceExceptionWithMessageWithLazyArguments
 
 	/**
 		* Checks whether log entries at [[org.tinylog.Level#TRACE]] will be output.
 		*
 		* @return `true` if [[org.tinylog.Level#TRACE]] level is enabled, `false` if disabled
 		*/
-	def isDebugEnabled(): Boolean = macro LoggerMacro.isDebugEnabled
+	def isDebugEnabled(): Boolean = macro TaggedLoggerMacro.isDebugEnabled
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful `toString()` method
+		* Any object with a meaningful [[AnyRef.toString]] method
 		*/
-	def debug(message: Any): Unit = macro LoggerMacro.debugPlainMessage
+	def debug(message: Any): Unit = macro TaggedLoggerMacro.debugPlainMessage
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
@@ -183,7 +162,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def debug(message: String): Unit = macro LoggerMacro.debugPlainMessage
+	def debug(message: String): Unit = macro TaggedLoggerMacro.debugPlainMessage
 
 	/**
 		* Logs a lazy message at [[org.tinylog.Level#TRACE]]. The message will be only evaluated if the log entry is
@@ -192,7 +171,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def debug(message: () => String): Unit = macro LoggerMacro.debugLazyMessage
+	def debug(message: () => String): Unit = macro TaggedLoggerMacro.debugLazyMessage
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced by given
@@ -203,7 +182,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def debug(message: String, arguments: Any*): Unit = macro LoggerMacro.debugMessageWithPlainArguments
+	def debug(message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.debugMessageWithPlainArguments
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]] level. "{}" placeholders will be replaced by given lazy
@@ -214,7 +193,7 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def debug(message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.debugMessageWithLazyArguments
+	def debug(message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.debugMessageWithLazyArguments
 
 	/**
 		* Logs an exception at [[org.tinylog.Level#TRACE]].
@@ -222,7 +201,7 @@ object Logger {
 		* @param exception
 		* Caught exception or any other throwable to log
 		*/
-	def debug(exception: Throwable): Unit = macro LoggerMacro.debugException
+	def debug(exception: Throwable): Unit = macro TaggedLoggerMacro.debugException
 
 	/**
 		* Logs an exception with a custom message at [[org.tinylog.Level#TRACE]].
@@ -234,7 +213,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def debug(exception: Throwable, message: String): Unit = macro LoggerMacro.debugExceptionWithPlainMessage
+	def debug(exception: Throwable, message: String): Unit = macro TaggedLoggerMacro.debugExceptionWithPlainMessage
 
 	/**
 		* Logs an exception with a custom lazy message at [[org.tinylog.Level#TRACE]]. The message will be only
@@ -245,7 +224,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def debug(exception: Throwable, message: () => String): Unit = macro LoggerMacro.debugExceptionWithLazyMessage
+	def debug(exception: Throwable, message: () => String): Unit = macro TaggedLoggerMacro.debugExceptionWithLazyMessage
 
 	/**
 		* Logs an exception with a formatted custom message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be
@@ -258,7 +237,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def debug(exception: Throwable, message: String, arguments: Any*): Unit = macro LoggerMacro.debugExceptionWithMessageWithPlainArguments
+	def debug(exception: Throwable, message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.debugExceptionWithMessageWithPlainArguments
 
 	/**
 		* Logs an exception with a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced
@@ -271,22 +250,22 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def debug(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.debugExceptionWithMessageWithLazyArguments
+	def debug(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.debugExceptionWithMessageWithLazyArguments
 
 	/**
 		* Checks whether log entries at [[org.tinylog.Level#TRACE]] will be output.
 		*
 		* @return `true` if [[org.tinylog.Level#TRACE]] level is enabled, `false` if disabled
 		*/
-	def isInfoEnabled(): Boolean = macro LoggerMacro.isInfoEnabled
+	def isInfoEnabled(): Boolean = macro TaggedLoggerMacro.isInfoEnabled
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful `toString()` method
+		* Any object with a meaningful [[AnyRef.toString]] method
 		*/
-	def info(message: Any): Unit = macro LoggerMacro.infoPlainMessage
+	def info(message: Any): Unit = macro TaggedLoggerMacro.infoPlainMessage
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
@@ -296,7 +275,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def info(message: String): Unit = macro LoggerMacro.infoPlainMessage
+	def info(message: String): Unit = macro TaggedLoggerMacro.infoPlainMessage
 
 	/**
 		* Logs a lazy message at [[org.tinylog.Level#TRACE]]. The message will be only evaluated if the log entry is
@@ -305,7 +284,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def info(message: () => String): Unit = macro LoggerMacro.infoLazyMessage
+	def info(message: () => String): Unit = macro TaggedLoggerMacro.infoLazyMessage
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced by given
@@ -316,7 +295,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def info(message: String, arguments: Any*): Unit = macro LoggerMacro.infoMessageWithPlainArguments
+	def info(message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.infoMessageWithPlainArguments
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]] level. "{}" placeholders will be replaced by given lazy
@@ -327,7 +306,7 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def info(message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.infoMessageWithLazyArguments
+	def info(message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.infoMessageWithLazyArguments
 
 	/**
 		* Logs an exception at [[org.tinylog.Level#TRACE]].
@@ -335,7 +314,7 @@ object Logger {
 		* @param exception
 		* Caught exception or any other throwable to log
 		*/
-	def info(exception: Throwable): Unit = macro LoggerMacro.infoException
+	def info(exception: Throwable): Unit = macro TaggedLoggerMacro.infoException
 
 	/**
 		* Logs an exception with a custom message at [[org.tinylog.Level#TRACE]].
@@ -347,7 +326,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def info(exception: Throwable, message: String): Unit = macro LoggerMacro.infoExceptionWithPlainMessage
+	def info(exception: Throwable, message: String): Unit = macro TaggedLoggerMacro.infoExceptionWithPlainMessage
 
 	/**
 		* Logs an exception with a custom lazy message at [[org.tinylog.Level#TRACE]]. The message will be only
@@ -358,7 +337,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def info(exception: Throwable, message: () => String): Unit = macro LoggerMacro.infoExceptionWithLazyMessage
+	def info(exception: Throwable, message: () => String): Unit = macro TaggedLoggerMacro.infoExceptionWithLazyMessage
 
 	/**
 		* Logs an exception with a formatted custom message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be
@@ -371,7 +350,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def info(exception: Throwable, message: String, arguments: Any*): Unit = macro LoggerMacro.infoExceptionWithMessageWithPlainArguments
+	def info(exception: Throwable, message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.infoExceptionWithMessageWithPlainArguments
 
 	/**
 		* Logs an exception with a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced
@@ -384,22 +363,22 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def info(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.infoExceptionWithMessageWithLazyArguments
+	def info(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.infoExceptionWithMessageWithLazyArguments
 
 	/**
 		* Checks whether log entries at [[org.tinylog.Level#TRACE]] will be output.
 		*
 		* @return `true` if [[org.tinylog.Level#TRACE]] level is enabled, `false` if disabled
 		*/
-	def isWarnEnabled(): Boolean = macro LoggerMacro.isWarnEnabled
+	def isWarnEnabled(): Boolean = macro TaggedLoggerMacro.isWarnEnabled
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful `toString()` method
+		* Any object with a meaningful [[AnyRef.toString]] method
 		*/
-	def warn(message: Any): Unit = macro LoggerMacro.warnPlainMessage
+	def warn(message: Any): Unit = macro TaggedLoggerMacro.warnPlainMessage
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
@@ -409,7 +388,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def warn(message: String): Unit = macro LoggerMacro.warnPlainMessage
+	def warn(message: String): Unit = macro TaggedLoggerMacro.warnPlainMessage
 
 	/**
 		* Logs a lazy message at [[org.tinylog.Level#TRACE]]. The message will be only evaluated if the log entry is
@@ -418,7 +397,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def warn(message: () => String): Unit = macro LoggerMacro.warnLazyMessage
+	def warn(message: () => String): Unit = macro TaggedLoggerMacro.warnLazyMessage
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced by given
@@ -429,7 +408,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def warn(message: String, arguments: Any*): Unit = macro LoggerMacro.warnMessageWithPlainArguments
+	def warn(message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.warnMessageWithPlainArguments
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]] level. "{}" placeholders will be replaced by given lazy
@@ -440,7 +419,7 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def warn(message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.warnMessageWithLazyArguments
+	def warn(message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.warnMessageWithLazyArguments
 
 	/**
 		* Logs an exception at [[org.tinylog.Level#TRACE]].
@@ -448,7 +427,7 @@ object Logger {
 		* @param exception
 		* Caught exception or any other throwable to log
 		*/
-	def warn(exception: Throwable): Unit = macro LoggerMacro.warnException
+	def warn(exception: Throwable): Unit = macro TaggedLoggerMacro.warnException
 
 	/**
 		* Logs an exception with a custom message at [[org.tinylog.Level#TRACE]].
@@ -460,7 +439,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def warn(exception: Throwable, message: String): Unit = macro LoggerMacro.warnExceptionWithPlainMessage
+	def warn(exception: Throwable, message: String): Unit = macro TaggedLoggerMacro.warnExceptionWithPlainMessage
 
 	/**
 		* Logs an exception with a custom lazy message at [[org.tinylog.Level#TRACE]]. The message will be only
@@ -471,7 +450,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def warn(exception: Throwable, message: () => String): Unit = macro LoggerMacro.warnExceptionWithLazyMessage
+	def warn(exception: Throwable, message: () => String): Unit = macro TaggedLoggerMacro.warnExceptionWithLazyMessage
 
 	/**
 		* Logs an exception with a formatted custom message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be
@@ -484,7 +463,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def warn(exception: Throwable, message: String, arguments: Any*): Unit = macro LoggerMacro.warnExceptionWithMessageWithPlainArguments
+	def warn(exception: Throwable, message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.warnExceptionWithMessageWithPlainArguments
 
 	/**
 		* Logs an exception with a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced
@@ -497,22 +476,22 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def warn(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.warnExceptionWithMessageWithLazyArguments
+	def warn(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.warnExceptionWithMessageWithLazyArguments
 
 	/**
 		* Checks whether log entries at [[org.tinylog.Level#TRACE]] will be output.
 		*
 		* @return `true` if [[org.tinylog.Level#TRACE]] level is enabled, `false` if disabled
 		*/
-	def isErrorEnabled(): Boolean = macro LoggerMacro.isErrorEnabled
+	def isErrorEnabled(): Boolean = macro TaggedLoggerMacro.isErrorEnabled
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
 		*
 		* @param message
-		* Any object with a meaningful `toString()` method
+		* Any object with a meaningful [[AnyRef.toString]] method
 		*/
-	def error(message: Any): Unit = macro LoggerMacro.errorPlainMessage
+	def error(message: Any): Unit = macro TaggedLoggerMacro.errorPlainMessage
 
 	/**
 		* Logs a message at [[org.tinylog.Level#TRACE]].
@@ -522,7 +501,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def error(message: String): Unit = macro LoggerMacro.errorPlainMessage
+	def error(message: String): Unit = macro TaggedLoggerMacro.errorPlainMessage
 
 	/**
 		* Logs a lazy message at [[org.tinylog.Level#TRACE]]. The message will be only evaluated if the log entry is
@@ -531,7 +510,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def error(message: () => String): Unit = macro LoggerMacro.errorLazyMessage
+	def error(message: () => String): Unit = macro TaggedLoggerMacro.errorLazyMessage
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced by given
@@ -542,7 +521,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def error(message: String, arguments: Any*): Unit = macro LoggerMacro.errorMessageWithPlainArguments
+	def error(message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.errorMessageWithPlainArguments
 
 	/**
 		* Logs a formatted message at [[org.tinylog.Level#TRACE]] level. "{}" placeholders will be replaced by given lazy
@@ -553,7 +532,7 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def error(message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.errorMessageWithLazyArguments
+	def error(message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.errorMessageWithLazyArguments
 
 	/**
 		* Logs an exception at [[org.tinylog.Level#TRACE]].
@@ -561,7 +540,7 @@ object Logger {
 		* @param exception
 		* Caught exception or any other throwable to log
 		*/
-	def error(exception: Throwable): Unit = macro LoggerMacro.errorException
+	def error(exception: Throwable): Unit = macro TaggedLoggerMacro.errorException
 
 	/**
 		* Logs an exception with a custom message at [[org.tinylog.Level#TRACE]].
@@ -573,7 +552,7 @@ object Logger {
 		* @param message
 		* Text message to log
 		*/
-	def error(exception: Throwable, message: String): Unit = macro LoggerMacro.errorExceptionWithPlainMessage
+	def error(exception: Throwable, message: String): Unit = macro TaggedLoggerMacro.errorExceptionWithPlainMessage
 
 	/**
 		* Logs an exception with a custom lazy message at [[org.tinylog.Level#TRACE]]. The message will be only
@@ -584,7 +563,7 @@ object Logger {
 		* @param message
 		* Function that produces the message
 		*/
-	def error(exception: Throwable, message: () => String): Unit = macro LoggerMacro.errorExceptionWithLazyMessage
+	def error(exception: Throwable, message: () => String): Unit = macro TaggedLoggerMacro.errorExceptionWithLazyMessage
 
 	/**
 		* Logs an exception with a formatted custom message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be
@@ -597,7 +576,7 @@ object Logger {
 		* @param arguments
 		* Arguments for formatted text message
 		*/
-	def error(exception: Throwable, message: String, arguments: Any*): Unit = macro LoggerMacro.errorExceptionWithMessageWithPlainArguments
+	def error(exception: Throwable, message: String, arguments: Any*): Unit = macro TaggedLoggerMacro.errorExceptionWithMessageWithPlainArguments
 
 	/**
 		* Logs an exception with a formatted message at [[org.tinylog.Level#TRACE]]. "{}" placeholders will be replaced
@@ -610,6 +589,6 @@ object Logger {
 		* @param arguments
 		* Functions that produce the arguments for formatted text message
 		*/
-	def error(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro LoggerMacro.errorExceptionWithMessageWithLazyArguments
+	def error(exception: Throwable, message: String, arguments: (() => Any)*): Unit = macro TaggedLoggerMacro.errorExceptionWithMessageWithLazyArguments
 
 }
