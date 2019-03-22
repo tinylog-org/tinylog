@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.tinylog.Level;
@@ -177,7 +178,7 @@ public final class ServiceLoader<T> {
 		for (String token : SPLIT_PATTERN.split(name)) {
 			if (!token.isEmpty()) {
 				builder.append(Character.toUpperCase(token.charAt(0)));
-				builder.append(token, 1, token.length());
+				builder.append(token.substring(1).toLowerCase(Locale.ROOT));
 			}
 		}
 		builder.append(service.getSimpleName());
