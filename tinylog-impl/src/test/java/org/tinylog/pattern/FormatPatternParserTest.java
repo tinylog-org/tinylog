@@ -263,7 +263,7 @@ public final class FormatPatternParserTest {
 	 * Verifies that {@code {closing-curly-bracket"}} can be parsed and outputs a single closing curly bracket '}'.
 	 */
 	@Test
-	public void cClosingCurlyBracket() {
+	public void closingCurlyBracket() {
 		assertThat(render("closing-curly-bracket", LogEntryBuilder.empty().create())).isEqualTo("}");
 	}
 
@@ -273,6 +273,14 @@ public final class FormatPatternParserTest {
 	@Test
 	public void minimumSize() {
 		assertThat(render("{level | min-size=6}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO  ");
+	}
+
+	/**
+	 * Verifies that {@code {{any}:|min-size=X}} can be parsed and the returned token will apply minimum size.
+	 */
+	@Test
+	public void nestedMinimumSize() {
+		assertThat(render("{{level}:|min-size=6}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO: ");
 	}
 
 	/**

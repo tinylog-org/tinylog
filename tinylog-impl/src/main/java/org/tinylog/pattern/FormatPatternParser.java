@@ -74,36 +74,16 @@ public final class FormatPatternParser {
 			InternalLogger.log(Level.ERROR, "Closing curly bracket is missing: '" + pattern + "'");
 		}
 
-		if (start == 0) {
-			tokens.add(createStyledToken(pattern));
-		} else if (start < pattern.length()) {
-			tokens.add(new PlainTextToken(pattern.substring(start)));
-		}
-
-		if (tokens.size() == 1) {
-			return tokens.get(0);
-		} else {
-			return new BundleToken(tokens);
-		}
-	}
-
-	/**
-	 * Creates a new token for a given placeholder with optional style options.
-	 *
-	 * @param placeholder
-	 *            Placeholder with optional style options but without surrounding curly brackets
-	 * @return Created token
-	 */
-	private static Token createStyledToken(final String placeholder) {
-		int splitIndex = placeholder.indexOf('|');
+		int splitIndex = pattern.indexOf('|', start);
 		if (splitIndex == -1) {
-			return createPlainToken(placeholder);
+			tokens.add(createPlainToken(pattern.substring(start)));
+			return tokens.size() == 1 ? tokens.get(0) : new BundleToken(tokens);
 		} else {
-			String plainPlaceholder = placeholder.substring(0, splitIndex).trim();
-			String[] styleOptions = SPLIT_PATTERN.split(placeholder.substring(splitIndex + 1));
-			return styleToken(createPlainToken(plainPlaceholder), styleOptions);
+			String token = pattern.substring(start, splitIndex).trim();
+			tokens.add(createPlainToken(token));
+			String[] styleOptions = SPLIT_PATTERN.split(pattern.substring(splitIndex + 1));
+			return styleToken(tokens.size() == 1 ? tokens.get(0) : new BundleToken(tokens), styleOptions);
 		}
-
 	}
 
 	/**
