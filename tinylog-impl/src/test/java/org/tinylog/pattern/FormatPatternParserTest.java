@@ -268,6 +268,14 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that {@code {pipe}} can be parsed and outputs a single vertical bar '|'.
+	 */
+	@Test
+	public void pipe() {
+		assertThat(render("pipe", LogEntryBuilder.empty().create())).isEqualTo("|");
+	}
+
+	/**
 	 * Verifies that {@code {any | min-size=X}} can be parsed and the returned token will apply minimum size.
 	 */
 	@Test

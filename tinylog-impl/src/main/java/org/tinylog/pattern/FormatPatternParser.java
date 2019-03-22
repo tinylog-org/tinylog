@@ -154,6 +154,8 @@ public final class FormatPatternParser {
 			return new PlainTextToken("{");
 		} else if ("closing-curly-bracket".equals(name)) {
 			return new PlainTextToken("}");
+		} else if ("pipe".equals(name)) {
+			return new PlainTextToken("|");
 		} else {
 			return null;
 		}
