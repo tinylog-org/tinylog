@@ -54,7 +54,7 @@ public final class ServiceLoader<T> {
 		this.service = service;
 		this.argumentTypes = argumentTypes;
 		this.classLoader = Thread.currentThread().getContextClassLoader();
-		this.classes = loadClasses(service);
+		this.classes = loadClasses(classLoader, service);
 	}
 
 	/**
@@ -114,15 +114,17 @@ public final class ServiceLoader<T> {
 	 *
 	 * @param <T>
 	 *            Service interface
+	 * @param classLoader
+	 *             Class loader to use for finding service files
 	 * @param service
 	 *            Service interface
 	 * @return Class names
 	 */
-	private static <T> Collection<String> loadClasses(final Class<? extends T> service) {
+	private static <T> Collection<String> loadClasses(final ClassLoader classLoader, final Class<? extends T> service) {
 		String name = SERVICE_PREFIX + service.getName();
 		Enumeration<URL> urls;
 		try {
-			urls = ClassLoader.getSystemResources(name);
+			urls = classLoader.getResources(name);
 		} catch (IOException ex) {
 			InternalLogger.log(Level.ERROR, "Failed loading services from '" + name + "'");
 			return Collections.emptyList();
@@ -218,3 +220,4 @@ public final class ServiceLoader<T> {
 	}
 
 }
+
