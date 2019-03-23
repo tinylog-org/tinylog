@@ -60,12 +60,12 @@
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
 		<android.version>1.5_r3</android.version>
-		<assertj-core.version>3.12.1</assertj-core.version>
+		<assertj-core.version>3.12.2</assertj-core.version>
 		<assertj-db.version>1.2.0</assertj-db.version>
 		<checkstyle.version>8.18</checkstyle.version>
 		<commons-lang.version>3.8.1</commons-lang.version>
 		<commons-logging.version>1.2</commons-logging.version>
-		<dokka.version>0.9.17</dokka.version>
+		<dokka.version>0.9.18</dokka.version>
 		<h2.version>1.4.199</h2.version>
 		<java16.version>1.1</java16.version>
 		<jboss-logging.version>3.3.2.Final</jboss-logging.version>
