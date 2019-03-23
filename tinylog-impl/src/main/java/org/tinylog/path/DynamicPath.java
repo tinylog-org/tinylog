@@ -159,6 +159,8 @@ public final class DynamicPath {
 						index = file.getPath().indexOf(text, index);
 						if (index == -1) {
 							break;
+						} else {
+							index += text.length();
 						}
 					}
 
