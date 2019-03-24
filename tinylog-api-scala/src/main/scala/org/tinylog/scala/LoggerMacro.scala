@@ -49,7 +49,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.trace(new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.trace($message.asInstanceOf[Any])"
 		}
@@ -69,7 +69,7 @@ private object LoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.trace(new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -107,7 +107,7 @@ private object LoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.trace($message, ..$suppliers)"
 	}
 
@@ -145,7 +145,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.trace($exception, new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.trace($exception, $message)"
 		}
@@ -167,7 +167,7 @@ private object LoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.trace($exception, new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -209,7 +209,7 @@ private object LoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.trace($exception, $message, ..$suppliers)"
 	}
 
@@ -242,7 +242,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.debug(new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.debug($message.asInstanceOf[Any])"
 		}
@@ -262,7 +262,7 @@ private object LoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.debug(new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -300,7 +300,7 @@ private object LoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.debug($message, ..$suppliers)"
 	}
 
@@ -338,7 +338,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.debug($exception, new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.debug($exception, $message)"
 		}
@@ -360,7 +360,7 @@ private object LoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.debug($exception, new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -402,7 +402,7 @@ private object LoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.debug($exception, $message, ..$suppliers)"
 	}
 
@@ -435,7 +435,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.info(new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.info($message.asInstanceOf[Any])"
 		}
@@ -455,7 +455,7 @@ private object LoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.info(new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -493,7 +493,7 @@ private object LoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.info($message, ..$suppliers)"
 	}
 
@@ -531,7 +531,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.info($exception, new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.info($exception, $message)"
 		}
@@ -553,7 +553,7 @@ private object LoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.info($exception, new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -595,7 +595,7 @@ private object LoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.info($exception, $message, ..$suppliers)"
 	}
 
@@ -628,7 +628,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.warn(new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.warn($message.asInstanceOf[Any])"
 		}
@@ -648,7 +648,7 @@ private object LoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.warn(new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -686,7 +686,7 @@ private object LoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.warn($message, ..$suppliers)"
 	}
 
@@ -724,7 +724,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.warn($exception, new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.warn($exception, $message)"
 		}
@@ -746,7 +746,7 @@ private object LoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.warn($exception, new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -788,7 +788,7 @@ private object LoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.warn($exception, $message, ..$suppliers)"
 	}
 
@@ -821,7 +821,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.error(new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.error($message.asInstanceOf[Any])"
 		}
@@ -841,7 +841,7 @@ private object LoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.error(new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -879,7 +879,7 @@ private object LoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.error($message, ..$suppliers)"
 	}
 
@@ -917,7 +917,7 @@ private object LoggerMacro {
 	: context.universe.Tree = {
 		import context.universe._
 		if (message.tree.toString().contains("scala.StringContext")) {
-			q"org.tinylog.Logger.error($exception, new Supplier[String] { override def get(): String = $message })"
+			q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
 			q"org.tinylog.Logger.error($exception, $message)"
 		}
@@ -939,7 +939,7 @@ private object LoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		q"org.tinylog.Logger.error($exception, new Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
@@ -981,7 +981,7 @@ private object LoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val suppliers = arguments.map(argument => q"new Supplier[Any] { override def get(): Any = $argument.apply() }")
+		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
 		q"org.tinylog.Logger.error($exception, $message, ..$suppliers)"
 	}
 
