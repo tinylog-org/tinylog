@@ -73,7 +73,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void requiredLogEntryValues() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{thread}", "format", "{class}: {message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{thread}", "format", "{class}: {message}"));
 		assertThat(writer.getRequiredLogEntryValues())
 			.containsOnly(LogEntryValue.LEVEL, LogEntryValue.THREAD, LogEntryValue.CLASS, LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 	}
@@ -101,7 +101,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void trace() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{class-name}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.TRACE).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.VERBOSE);
@@ -114,7 +114,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void debug() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{class-name}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.DEBUG).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.DEBUG);
@@ -127,7 +127,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void info() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{class-name}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.INFO).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.INFO);
@@ -140,7 +140,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void warning() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{class-name}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.WARN).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.WARN);
@@ -153,7 +153,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void error() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "{class-name}", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "{class-name}", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.ERROR).className("MyClass").message("Hello World!").create());
 
 		assertThat(levelCaptor.getAllValues()).containsOnly(Log.ERROR);
@@ -166,7 +166,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void trimTag() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.INFO).message("Hello World!").create());
 
 		assertThat(tagCaptor.getAllValues()).containsOnly("ABCDEFGHIJKLMNOPQRST...");
@@ -178,7 +178,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void writingThread() {
-		LogcatWriter writer = new LogcatWriter(tripletonMap("tag", "{class-name}", "format", "{message}", "writingthread", "true"));
+		LogcatWriter writer = new LogcatWriter(tripletonMap("tagname", "{class-name}", "format", "{message}", "writingthread", "true"));
 		writer.write(LogEntryBuilder.empty().level(Level.INFO).className("FirstClass").message("Hello World!").create());
 		writer.write(LogEntryBuilder.empty().level(Level.INFO).className("SecondClass").message("Hello Universe!").create());
 
@@ -191,7 +191,7 @@ public final class LogcatWriterTest {
 	 */
 	@Test
 	public void illegalSeverityLevel() {
-		LogcatWriter writer = new LogcatWriter(doubletonMap("tag", "STATIC", "format", "{message}"));
+		LogcatWriter writer = new LogcatWriter(doubletonMap("tagname", "STATIC", "format", "{message}"));
 		writer.write(LogEntryBuilder.empty().level(Level.OFF).message("Hello World!").create());
 
 		assertThat(tagCaptor.getAllValues()).isEmpty();

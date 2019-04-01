@@ -51,7 +51,7 @@ public final class LogcatWriter implements Writer {
 	public LogcatWriter(final Map<String, String> properties) {
 		boolean hasWritingThread = Boolean.parseBoolean(properties.get("writingthread"));
 
-		String tagPattern = properties.get("tag");
+		String tagPattern = properties.get("tagname");
 		if (tagPattern == null) {
 			tagPattern = DEFAULT_TAG_FORMAT_PATTERN;
 		}
