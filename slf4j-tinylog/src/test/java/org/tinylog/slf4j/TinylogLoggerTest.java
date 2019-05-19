@@ -56,7 +56,7 @@ public final class TinylogLoggerTest {
 	 */
 	@RunWith(Parameterized.class)
 	@PrepareForTest(TinylogLogger.class)
-	public static final class WithoutMarker {
+	public static final class NoneMarker {
 
 		/**
 		 * Activates PowerMock (alternative to {@link PowerMockRunner}).
@@ -89,7 +89,7 @@ public final class TinylogLoggerTest {
 		 * @param errorEnabled
 		 *            Determines if {@link Level#ERROR ERROR} level is enabled
 		 */
-		public WithoutMarker(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
+		public NoneMarker(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
 			final boolean warnEnabled, final boolean errorEnabled) {
 			this.level = level;
 			this.traceEnabled = traceEnabled;
@@ -617,11 +617,11 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Test logging with using a {@link Marker}.
+	 * Test logging with using a real non-null {@link Marker}.
 	 */
 	@RunWith(Parameterized.class)
 	@PrepareForTest(TinylogLogger.class)
-	public static final class WithMarker {
+	public static final class RealMarker {
 
 		private static final String TAG = "test";
 
@@ -657,7 +657,7 @@ public final class TinylogLoggerTest {
 		 * @param errorEnabled
 		 *            Determines if {@link Level#ERROR ERROR} level is enabled
 		 */
-		public WithMarker(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
+		public RealMarker(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
 			final boolean warnEnabled, final boolean errorEnabled) {
 			this.marker = new BasicMarkerFactory().getDetachedMarker(TAG);
 			this.level = level;
@@ -1188,6 +1188,572 @@ public final class TinylogLoggerTest {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 			} else {
 				verify(provider).log(TinylogLogger.class.getName(), TAG, level, exception, "Hello {}!", arguments);
+			}
+		}
+
+	}
+
+	/**
+	 * Test logging with using a null value as {@link Marker}.
+	 */
+	@RunWith(Parameterized.class)
+	@PrepareForTest(TinylogLogger.class)
+	public static final class NullMarker {
+
+		/**
+		 * Activates PowerMock (alternative to {@link PowerMockRunner}).
+		 */
+		@Rule
+		public PowerMockRule rule = new PowerMockRule();
+
+		private Level level;
+
+		private boolean traceEnabled;
+		private boolean debugEnabled;
+		private boolean infoEnabled;
+		private boolean warnEnabled;
+		private boolean errorEnabled;
+
+		private LoggingProvider provider;
+		private TinylogLogger logger;
+
+		/**
+		 * @param level
+		 *            Actual severity level under test
+		 * @param traceEnabled
+		 *            Determines if {@link Level#TRACE TRACE} level is enabled
+		 * @param debugEnabled
+		 *            Determines if {@link Level#DEBUG DEBUG} level is enabled
+		 * @param infoEnabled
+		 *            Determines if {@link Level#INFO INFO} level is enabled
+		 * @param warnEnabled
+		 *            Determines if {@link Level#WARN WARN} level is enabled
+		 * @param errorEnabled
+		 *            Determines if {@link Level#ERROR ERROR} level is enabled
+		 */
+		public NullMarker(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
+			final boolean warnEnabled, final boolean errorEnabled) {
+			this.level = level;
+			this.traceEnabled = traceEnabled;
+			this.debugEnabled = debugEnabled;
+			this.infoEnabled = infoEnabled;
+			this.warnEnabled = warnEnabled;
+			this.errorEnabled = errorEnabled;
+		}
+
+		/**
+		 * Returns for all severity levels which severity levels are enabled.
+		 *
+		 * @return Each object array contains the severity level itself and five booleans for {@link Level#TRACE TRACE}
+		 *         ... {@link Level#ERROR ERROR} to determine whether these severity levels are enabled
+		 */
+		@Parameters(name = "{0}")
+		public static Collection<Object[]> getLevels() {
+			List<Object[]> levels = new ArrayList<>();
+
+			// @formatter:off
+			levels.add(new Object[] { Level.TRACE, true,  true,  true,  true,  true  });
+			levels.add(new Object[] { Level.DEBUG, false, true,  true,  true,  true  });
+			levels.add(new Object[] { Level.INFO,  false, false, true,  true,  true  });
+			levels.add(new Object[] { Level.WARN,  false, false, false, true,  true  });
+			levels.add(new Object[] { Level.ERROR, false, false, false, false, true  });
+			levels.add(new Object[] { Level.OFF,   false, false, false, false, false });
+			// @formatter:on
+
+			return levels;
+		}
+
+		/**
+		 * Mocks the underlying logging provider.
+		 */
+		@Before
+		public void init() {
+			provider = mock(LoggingProvider.class);
+
+			when(provider.getMinimumLevel(null)).thenReturn(level);
+			when(provider.isEnabled(anyInt(), eq(null), eq(Level.TRACE))).thenReturn(traceEnabled);
+			when(provider.isEnabled(anyInt(), eq(null), eq(Level.DEBUG))).thenReturn(debugEnabled);
+			when(provider.isEnabled(anyInt(), eq(null), eq(Level.INFO))).thenReturn(infoEnabled);
+			when(provider.isEnabled(anyInt(), eq(null), eq(Level.WARN))).thenReturn(warnEnabled);
+			when(provider.isEnabled(anyInt(), eq(null), eq(Level.ERROR))).thenReturn(errorEnabled);
+
+			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
+
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
+			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
+
+			Whitebox.setInternalState(TinylogLogger.class, provider);
+		}
+
+		/**
+		 * Resets the underlying logging provider.
+		 */
+		@After
+		public void reset() {
+			Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+		}
+
+		/**
+		 * Verifies that the configured name is returned.
+		 */
+		@Test
+		public void getName() {
+			assertThat(logger.getName()).isEqualTo(TinylogLoggerTest.class.getName());
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#TRACE TRACE} level is enabled.
+		 */
+		@Test
+		public void isTraceEnabled() {
+			assertThat(logger.isTraceEnabled((Marker) null)).isEqualTo(traceEnabled);
+		}
+
+		/**
+		 * Verifies that a plain text message will be logged correctly at {@link Level#TRACE TRACE} level.
+		 */
+		@Test
+		public void tracePlainTextMessage() {
+			logger.trace((Marker) null, "Hello World!");
+
+			if (traceEnabled) {
+				verify(provider).log(2, null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with a single argument will be logged correctly at {@link Level#TRACE
+		 * TRACE} level.
+		 */
+		@Test
+		public void traceFormatedMessageWithSingleArgument() {
+			logger.trace((Marker) null, "Hello {}!", "World");
+
+			if (traceEnabled) {
+				verify(provider).log(2, null, Level.TRACE, null, "Hello {}!", "World");
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with two arguments will be logged correctly at {@link Level#TRACE
+		 * TRACE} level.
+		 */
+		@Test
+		public void traceFormatedMessageWithTwoArguments() {
+			logger.trace((Marker) null, "{} = {}", "magic", 42);
+
+			if (traceEnabled) {
+				verify(provider).log(2, null, Level.TRACE, null, "{} = {}", "magic", 42);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with multiple arguments will be logged correctly at {@link Level#TRACE
+		 * TRACE} level.
+		 */
+		@Test
+		public void traceFormatedMessageWithMultipleArguments() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.trace((Marker) null, "{} = {}", "magic", 42, exception);
+
+			if (traceEnabled) {
+				verify(provider).log(2, null, Level.TRACE, exception, "{} = {}", "magic", 42, exception);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a plain text message with an exception will be logged correctly at {@link Level#TRACE TRACE}
+		 * level.
+		 */
+		@Test
+		public void tracePlainTextMessageWithException() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.trace((Marker) null, "Hello World!", exception);
+
+			if (traceEnabled) {
+				verify(provider).log(2, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#DEBUG DEBUG} level is enabled.
+		 */
+		@Test
+		public void isDebugEnabled() {
+			assertThat(logger.isDebugEnabled((Marker) null)).isEqualTo(debugEnabled);
+		}
+
+		/**
+		 * Verifies that a plain text message will be logged correctly at {@link Level#DEBUG DEBUG} level.
+		 */
+		@Test
+		public void debugPlainTextMessage() {
+			logger.debug((Marker) null, "Hello World!");
+
+			if (debugEnabled) {
+				verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with a single argument will be logged correctly at {@link Level#DEBUG
+		 * DEBUG} level.
+		 */
+		@Test
+		public void debugFormatedMessageWithSingleArgument() {
+			logger.debug((Marker) null, "Hello {}!", "World");
+
+			if (debugEnabled) {
+				verify(provider).log(2, null, Level.DEBUG, null, "Hello {}!", "World");
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with two arguments will be logged correctly at {@link Level#DEBUG
+		 * DEBUG} level.
+		 */
+		@Test
+		public void debugFormatedMessageWithTwoArguments() {
+			logger.debug((Marker) null, "{} = {}", "magic", 42);
+
+			if (debugEnabled) {
+				verify(provider).log(2, null, Level.DEBUG, null, "{} = {}", "magic", 42);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with multiple arguments will be logged correctly at {@link Level#DEBUG
+		 * DEBUG} level.
+		 */
+		@Test
+		public void debugFormatedMessageWithMultipleArguments() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.debug((Marker) null, "{} = {}", "magic", 42, exception);
+
+			if (debugEnabled) {
+				verify(provider).log(2, null, Level.DEBUG, exception, "{} = {}", "magic", 42, exception);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a plain text message with an exception will be logged correctly at {@link Level#DEBUG DEBUG}
+		 * level.
+		 */
+		@Test
+		public void debugPlainTextMessageWithException() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.debug((Marker) null, "Hello World!", exception);
+
+			if (debugEnabled) {
+				verify(provider).log(2, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#INFO INFO} level is enabled.
+		 */
+		@Test
+		public void isInfoEnabled() {
+			assertThat(logger.isInfoEnabled((Marker) null)).isEqualTo(infoEnabled);
+		}
+
+		/**
+		 * Verifies that a plain text message will be logged correctly at {@link Level#INFO INFO} level.
+		 */
+		@Test
+		public void infoPlainTextMessage() {
+			logger.info((Marker) null, "Hello World!");
+
+			if (infoEnabled) {
+				verify(provider).log(2, null, Level.INFO, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with a single argument will be logged correctly at {@link Level#INFO
+		 * INFO} level.
+		 */
+		@Test
+		public void infoFormatedMessageWithSingleArgument() {
+			logger.info((Marker) null, "Hello {}!", "World");
+
+			if (infoEnabled) {
+				verify(provider).log(2, null, Level.INFO, null, "Hello {}!", "World");
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with two arguments will be logged correctly at {@link Level#INFO
+		 * INFO} level.
+		 */
+		@Test
+		public void infoFormatedMessageWithTwoArguments() {
+			logger.info((Marker) null, "{} = {}", "magic", 42);
+
+			if (infoEnabled) {
+				verify(provider).log(2, null, Level.INFO, null, "{} = {}", "magic", 42);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with multiple arguments will be logged correctly at {@link Level#INFO
+		 * INFO} level.
+		 */
+		@Test
+		public void infoFormatedMessageWithMultipleArguments() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.info((Marker) null, "{} = {}", "magic", 42, exception);
+
+			if (infoEnabled) {
+				verify(provider).log(2, null, Level.INFO, exception, "{} = {}", "magic", 42, exception);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a plain text message with an exception will be logged correctly at {@link Level#INFO INFO}
+		 * level.
+		 */
+		@Test
+		public void infoPlainTextMessageWithException() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.info((Marker) null, "Hello World!", exception);
+
+			if (infoEnabled) {
+				verify(provider).log(2, null, Level.INFO, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#WARN WARN} level is enabled.
+		 */
+		@Test
+		public void isWarnEnabled() {
+			assertThat(logger.isWarnEnabled((Marker) null)).isEqualTo(warnEnabled);
+		}
+
+		/**
+		 * Verifies that a plain text message will be logged correctly at {@link Level#WARN WARN} level.
+		 */
+		@Test
+		public void warnPlainTextMessage() {
+			logger.warn((Marker) null, "Hello World!");
+
+			if (warnEnabled) {
+				verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with a single argument will be logged correctly at {@link Level#WARN
+		 * WARN} level.
+		 */
+		@Test
+		public void warnFormatedMessageWithSingleArgument() {
+			logger.warn((Marker) null, "Hello {}!", "World");
+
+			if (warnEnabled) {
+				verify(provider).log(2, null, Level.WARN, null, "Hello {}!", "World");
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with two arguments will be logged correctly at {@link Level#WARN
+		 * WARN} level.
+		 */
+		@Test
+		public void warnFormatedMessageWithTwoArguments() {
+			logger.warn((Marker) null, "{} = {}", "magic", 42);
+
+			if (warnEnabled) {
+				verify(provider).log(2, null, Level.WARN, null, "{} = {}", "magic", 42);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with multiple arguments will be logged correctly at {@link Level#WARN
+		 * WARN} level.
+		 */
+		@Test
+		public void warnFormatedMessageWithMultipleArguments() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.warn((Marker) null, "{} = {}", "magic", 42, exception);
+
+			if (warnEnabled) {
+				verify(provider).log(2, null, Level.WARN, exception, "{} = {}", "magic", 42, exception);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a plain text message with an exception will be logged correctly at {@link Level#WARN WARN}
+		 * level.
+		 */
+		@Test
+		public void warnPlainTextMessageWithException() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.warn((Marker) null, "Hello World!", exception);
+
+			if (warnEnabled) {
+				verify(provider).log(2, null, Level.WARN, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies evaluating whether {@link Level#ERROR ERROR} level is enabled.
+		 */
+		@Test
+		public void isErrorEnabled() {
+			assertThat(logger.isErrorEnabled((Marker) null)).isEqualTo(errorEnabled);
+		}
+
+		/**
+		 * Verifies that a plain text message will be logged correctly at {@link Level#ERROR ERROR} level.
+		 */
+		@Test
+		public void errorPlainTextMessage() {
+			logger.error((Marker) null, "Hello World!");
+
+			if (errorEnabled) {
+				verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with a single argument will be logged correctly at {@link Level#ERROR
+		 * ERROR} level.
+		 */
+		@Test
+		public void errorFormatedMessageWithSingleArgument() {
+			logger.error((Marker) null, "Hello {}!", "World");
+
+			if (errorEnabled) {
+				verify(provider).log(2, null, Level.ERROR, null, "Hello {}!", "World");
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with two arguments will be logged correctly at {@link Level#ERROR
+		 * ERROR} level.
+		 */
+		@Test
+		public void errorFormatedMessageWithTwoArguments() {
+			logger.error((Marker) null, "{} = {}", "magic", 42);
+
+			if (errorEnabled) {
+				verify(provider).log(2, null, Level.ERROR, null, "{} = {}", "magic", 42);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a formatted text message with multiple arguments will be logged correctly at {@link Level#ERROR
+		 * ERROR} level.
+		 */
+		@Test
+		public void errorFormatedMessageWithMultipleArguments() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.error((Marker) null, "{} = {}", "magic", 42, exception);
+
+			if (errorEnabled) {
+				verify(provider).log(2, null, Level.ERROR, exception, "{} = {}", "magic", 42, exception);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that a plain text message with an exception will be logged correctly at {@link Level#ERROR ERROR}
+		 * level.
+		 */
+		@Test
+		public void errorPlainTextMessageWithException() {
+			RuntimeException exception = new RuntimeException();
+
+			logger.error((Marker) null, "Hello World!", exception);
+
+			if (errorEnabled) {
+				verify(provider).log(2, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			} else {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			}
+		}
+
+		/**
+		 * Verifies that location aware logging is fully supported.
+		 */
+		@Test
+		public void logWithLoggerClassName() {
+			Object[] arguments = new Object[] { "World" };
+			RuntimeException exception = new RuntimeException();
+
+			logger.log((Marker) null, TinylogLogger.class.getName(), level.ordinal() * 10, "Hello {}!", arguments, exception);
+
+			if (level == Level.OFF) {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			} else {
+				verify(provider).log(TinylogLogger.class.getName(), null, level, exception, "Hello {}!", arguments);
 			}
 		}
 

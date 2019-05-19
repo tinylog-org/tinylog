@@ -101,41 +101,47 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isTraceEnabled(final Marker marker) {
-		return MINIMUM_GLOBAL_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.TRACE);
+		String tag = marker == null ? null : marker.getName();
+		return MINIMUM_GLOBAL_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.TRACE);
 	}
 
 	@Override
 	public void trace(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, null, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arg), format, arg);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, extractThrowable(arguments), format, arguments);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void trace(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.TRACE, exception, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
 		}
 	}
 
@@ -181,41 +187,47 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isDebugEnabled(final Marker marker) {
-		return MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG);
+		String tag = marker == null ? null : marker.getName();
+		return MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.DEBUG);
 	}
 
 	@Override
 	public void debug(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, null, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arg), format, arg);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, extractThrowable(arguments), format, arguments);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void debug(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.DEBUG, exception, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
 		}
 	}
 
@@ -261,41 +273,47 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isInfoEnabled(final Marker marker) {
-		return MINIMUM_GLOBAL_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.INFO);
+		String tag = marker == null ? null : marker.getName();
+		return MINIMUM_GLOBAL_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.INFO);
 	}
 
 	@Override
 	public void info(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, null, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arg), format, arg);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arg2), format, arg1, arg2);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, extractThrowable(arguments), format, arguments);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void info(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.INFO, exception, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
 		}
 	}
 
@@ -341,41 +359,47 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isWarnEnabled(final Marker marker) {
-		return MINIMUM_GLOBAL_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.WARN);
+		String tag = marker == null ? null : marker.getName();
+		return MINIMUM_GLOBAL_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.WARN);
 	}
 
 	@Override
 	public void warn(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, null, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arg), format, arg);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arg2), format, arg1, arg2);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, extractThrowable(arguments), format, arguments);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void warn(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.WARN, exception, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
 		}
 	}
 
@@ -421,41 +445,47 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isErrorEnabled(final Marker marker) {
-		return MINIMUM_GLOBAL_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, marker.getName(), Level.ERROR);
+		String tag = marker == null ? null : marker.getName();
+		return MINIMUM_GLOBAL_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, tag, Level.ERROR);
 	}
 
 	@Override
 	public void error(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, null, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arg), format, arg);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg), format, arg);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, extractThrowable(arguments), format, arguments);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arguments), format, arguments);
 		}
 	}
 
 	@Override
 	public void error(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, marker.getName(), Level.ERROR, exception, message, (Object[]) null);
+			String tag = marker == null ? null : marker.getName();
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
 		}
 	}
 
