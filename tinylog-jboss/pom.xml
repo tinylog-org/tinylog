@@ -14,7 +14,7 @@
 	</parent>
 
 	<artifactId>tinylog-jboss</artifactId>
-	<name>tinylog API for JBoss Logging</name>
+	<name>tinylog adapter for JBoss Logging</name>
 	<description>tinylog adapter for outputting log entries via JBoss Logging</description>
 	<url>${website.url}</url>
 
