@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core;
+package org.tinylog.provider;
 
 import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
@@ -22,7 +22,6 @@ import java.util.Locale;
 
 import org.tinylog.Level;
 import org.tinylog.Supplier;
-import org.tinylog.provider.InternalLogger;
 
 /**
  * Formatter for text messages. Placeholders '{}' will be replaced with given arguments.
@@ -35,7 +34,7 @@ import org.tinylog.provider.InternalLogger;
  * @see ChoiceFormat
  * @see DecimalFormat
  */
-final class MessageFormatter {
+public final class MessageFormatter {
 
 	private static final int INITIAL_STRING_BUFFER_CAPACITY = 256;
 
@@ -45,7 +44,7 @@ final class MessageFormatter {
 	 * @param locale
 	 *            Locale for formatting numbers
 	 */
-	MessageFormatter(final Locale locale) {
+	public MessageFormatter(final Locale locale) {
 		symbols = new DecimalFormatSymbols(locale);
 	}
 
@@ -58,7 +57,7 @@ final class MessageFormatter {
 	 *            Replacements for placeholders
 	 * @return Formatted text message
 	 */
-	String format(final String message, final Object[] arguments) {
+	public String format(final String message, final Object[] arguments) {
 		StringBuilder builder = new StringBuilder(INITIAL_STRING_BUFFER_CAPACITY);
 
 		int argumentIndex = 0;

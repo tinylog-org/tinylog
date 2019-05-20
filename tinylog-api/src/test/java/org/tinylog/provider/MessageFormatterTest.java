@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core;
+package org.tinylog.provider;
 
 import java.text.ChoiceFormat;
 import java.text.NumberFormat;

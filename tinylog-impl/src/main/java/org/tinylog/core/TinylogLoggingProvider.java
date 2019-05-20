@@ -27,6 +27,7 @@ import org.tinylog.Supplier;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
+import org.tinylog.provider.MessageFormatter;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.runtime.Timestamp;
 import org.tinylog.writers.Writer;
