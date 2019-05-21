@@ -19,10 +19,10 @@ import java.util.Map;
 /**
  * Context provider implementation that does nothing. All put values will be ignored.
  */
-final class NopContextProvider implements ContextProvider {
+public final class NopContextProvider implements ContextProvider {
 
 	/** */
-	NopContextProvider() {
+	public NopContextProvider() {
 	}
 
 	@Override

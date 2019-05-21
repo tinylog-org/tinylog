@@ -18,12 +18,12 @@ import org.tinylog.Level;
 /**
  * Logging provider implementation that does nothing. All log entries will be ignored.
  */
-final class NopLoggingProvider implements LoggingProvider {
+public final class NopLoggingProvider implements LoggingProvider {
 
 	private static final ContextProvider contextProvider = new NopContextProvider();
 
 	/** */
-	NopLoggingProvider() {
+	public NopLoggingProvider() {
 	}
 
 	@Override
