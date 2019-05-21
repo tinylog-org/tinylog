@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.adapter.jboss;
+package org.tinylog.util;
 
 import java.util.ArrayList;
 import java.util.List;

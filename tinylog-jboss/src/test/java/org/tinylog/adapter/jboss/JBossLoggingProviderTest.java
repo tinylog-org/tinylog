@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.provider.ContextProvider;
+import org.tinylog.util.StorageHandler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
