@@ -53,20 +53,20 @@ public final class JBossLoggingProvider implements LoggingProvider {
 
 	@Override
 	public boolean isEnabled(final int depth, final String tag, final Level level) {
-		String callerClassName = RuntimeProvider.getCallerClassName(depth);
+		String callerClassName = RuntimeProvider.getCallerClassName(depth + 1);
 		return Logger.getLogger(callerClassName).isEnabled(translate(level));
 	}
 
 	@Override
 	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
 		final Object... arguments) {
-		String callerClassName = RuntimeProvider.getCallerClassName(depth);
+		String callerClassName = RuntimeProvider.getCallerClassName(depth + 1);
 		Logger jbossLogger = Logger.getLogger(callerClassName);
 		org.jboss.logging.Logger.Level jbossLevel = translate(level);
 
 		if (jbossLogger.isEnabled(jbossLevel)) {
 			Object message = arguments == null || arguments.length == 0 ? obj : formatter.format(String.valueOf(obj), arguments);
-			String loggerClassName = RuntimeProvider.getCallerClassName(depth - 1);
+			String loggerClassName = RuntimeProvider.getCallerClassName(depth);
 			jbossLogger.log(jbossLevel, loggerClassName, message, exception);
 		}
 	}

@@ -128,7 +128,7 @@ public final class JBossLoggingProviderTest {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
 		Exception exception = new RuntimeException();	
-		provider.log(2, null, Level.INFO, exception, "Hello World", new Object[0]);
+		provider.log(1, null, Level.INFO, exception, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);
@@ -145,8 +145,8 @@ public final class JBossLoggingProviderTest {
 	public void logParameterizedMessageAtInfoWithDepthOfCaller() {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
-		Exception exception = new RuntimeException();	
-		provider.log(2, null, Level.INFO, exception, "Hello {}", new Object[] { "User" });
+		Exception exception = new RuntimeException();
+		provider.log(1, null, Level.INFO, exception, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);
@@ -163,8 +163,8 @@ public final class JBossLoggingProviderTest {
 	public void logPlainTextMessageAtDebugWithLoggerClassName() {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
-		Exception exception = new RuntimeException();	
-		provider.log(2, null, Level.DEBUG, exception, "Hello World", new Object[0]);
+		Exception exception = new RuntimeException();
+		provider.log(1, null, Level.DEBUG, exception, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).isEmpty();
 	}
 
@@ -175,7 +175,7 @@ public final class JBossLoggingProviderTest {
 	public void logPlainTextMessageAtInfoWithLoggerClassName() {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
-		Exception exception = new RuntimeException();	
+		Exception exception = new RuntimeException();
 		provider.log(JBossLoggingProvider.class.getName(), null, Level.INFO, exception, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).hasSize(1);
 
@@ -193,7 +193,7 @@ public final class JBossLoggingProviderTest {
 	public void logParameterizedMessageAtInfoWithLoggerClassName() {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
-		Exception exception = new RuntimeException();	
+		Exception exception = new RuntimeException();
 		provider.log(JBossLoggingProvider.class.getName(), null, Level.INFO, exception, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
