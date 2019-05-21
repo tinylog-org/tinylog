@@ -16,6 +16,7 @@
 		<module>tinylog-api</module>
 		<module>tinylog-impl</module>
 		<module>tinylog-jboss</module>
+		<module>tinylog-jul</module>
 		<module>tinylog-api-kotlin</module>
 		<module>tinylog-api-scala</module>
 		<module>jboss-tinylog</module>
