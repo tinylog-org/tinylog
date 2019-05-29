@@ -75,6 +75,34 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that {@code {timestamp}} can be parsed and the returned token will output the timestamp of issue, in seconds.
+	 */
+	@Test
+	public void timestampWithDefaultPattern() {
+		LocalDate date = LocalDate.of(1985, 06, 03);
+		assertThat(render("timestamp", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
+	}
+
+	/**
+	 * Verifies that {@code {timestamp}} can be parsed with a specified milliseconds pattern and the returned token will output the date of
+	 * issue as a timestamp in milliseconds.
+	 */
+	@Test
+	public void timestampWithMillisecondsPattern() {
+		LocalDate date = LocalDate.of(1985, 06, 03);
+		assertThat(render("timestamp: milliseconds", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800000");
+	}
+
+	/**
+	 * Verifies that the default seconds pattern will be used, if the custom pattern for {@code {timestamp}} is invalid.
+	 */
+	@Test
+	public void timestampWithUnknownPattern() {
+		LocalDate date = LocalDate.of(1985, 06, 03);
+		assertThat(render("timestamp: inval'd", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
+	}
+
+	/**
 	 * Verifies that {@code {pid}} can be parsed and the returned token will output the process ID.
 	 */
 	@Test

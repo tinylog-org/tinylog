@@ -120,6 +120,8 @@ public final class FormatPatternParser {
 	private static Token createPlainToken(final String name, final String configuration) {
 		if (name.equals("date")) {
 			return createDateToken(configuration);
+		} else if ("timestamp".equals(name)) {
+			return new TimestampToken(configuration);
 		} else if ("pid".equals(name)) {
 			return new ProcessIdToken();
 		} else if ("thread".equals(name)) {
