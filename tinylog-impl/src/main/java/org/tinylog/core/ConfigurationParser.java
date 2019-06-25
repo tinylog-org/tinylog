@@ -52,13 +52,13 @@ public final class ConfigurationParser {
 		if (tag == null) {
 			return Locale.ROOT;
 		} else {
-			String[] splittedTag = tag.split("_", MAX_LOCALE_ARGUMENTS);
-			if (splittedTag.length == 1) {
-				return new Locale(splittedTag[0]);
-			} else if (splittedTag.length == 2) {
-				return new Locale(splittedTag[0], splittedTag[1]);
+			String[] splitTag = tag.split("_", MAX_LOCALE_ARGUMENTS);
+			if (splitTag.length == 1) {
+				return new Locale(splitTag[0]);
+			} else if (splitTag.length == 2) {
+				return new Locale(splitTag[0], splitTag[1]);
 			} else {
-				return new Locale(splittedTag[0], splittedTag[1], splittedTag[2]);
+				return new Locale(splitTag[0], splitTag[1], splitTag[2]);
 			}
 		}
 	}

@@ -51,7 +51,7 @@ public final class ConsoleWriterTest {
 	}
 
 	/**
-	 * Verifies that the default pattern contains a minimum set of informations.
+	 * Verifies that the default pattern contains a minimum set of information.
 	 */
 	@Test
 	public void defaultFormatPattern() {

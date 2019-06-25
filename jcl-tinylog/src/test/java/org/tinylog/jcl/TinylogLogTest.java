@@ -254,7 +254,7 @@ public final class TinylogLogTest {
 	 * Verifies evaluating whether {@link Level#INFO INFO} level is enabled.
 	 */
 	@Test
-	public void isInfonabled() {
+	public void isInfoEnabled() {
 		assertThat(log.isInfoEnabled()).isEqualTo(infoEnabled);
 	}
 

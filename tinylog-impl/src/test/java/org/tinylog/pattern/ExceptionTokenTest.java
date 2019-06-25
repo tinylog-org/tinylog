@@ -46,7 +46,7 @@ public final class ExceptionTokenTest {
 	 * Verifies that nothing will be output to a {@link StringBuilder}, if there is no caught exception in a log entry.
 	 */
 	@Test
-	public void renderLogEntrywithoutException() {
+	public void renderLogEntryWithoutException() {
 		ExceptionToken token = new ExceptionToken();
 		assertThat(render(token, null)).isEmpty();
 	}
@@ -59,7 +59,7 @@ public final class ExceptionTokenTest {
 	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void applyLogEntrywithoutException() throws SQLException {
+	public void applyLogEntryWithoutException() throws SQLException {
 		ExceptionToken token = new ExceptionToken();
 
 		PreparedStatement statement = mock(PreparedStatement.class);

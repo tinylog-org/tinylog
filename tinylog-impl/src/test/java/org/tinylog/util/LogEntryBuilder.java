@@ -271,10 +271,10 @@ public final class LogEntryBuilder {
 	}
 
 	/**
-	 * Sets the catched exception or throwable associated with this log entry.
+	 * Sets the caught  exception or throwable associated with this log entry.
 	 *
 	 * @param exception
-	 *            Associated catched exception or throwable
+	 *            Associated caught  exception or throwable
 	 * @return Actual log entry builder
 	 */
 	public LogEntryBuilder exception(final Throwable exception) {

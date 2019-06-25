@@ -175,7 +175,7 @@ public final class FileWriterTest {
 	}
 
 	/**
-	 * Verifies that the default pattern contains a minimum set of informations.
+	 * Verifies that the default pattern contains a minimum set of information.
 	 *
 	 * @throws IOException
 	 *             Failed writing to file

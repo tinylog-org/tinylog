@@ -101,7 +101,7 @@ public final class MessageFormatterTest {
 	 * Verifies that {@link NumberFormat} compatible patterns can be used in {@link ChoiceFormat} patterns.
 	 */
 	@Test
-	public void choiceAndnumberFormat() {
+	public void choiceAndNumberFormat() {
 		assertThat(format("{0#zero|1#one|1<{000}}", 0)).isEqualTo("zero");
 		assertThat(format("{0#zero|1#one|1<{000}}", 42)).isEqualTo("042");
 	}

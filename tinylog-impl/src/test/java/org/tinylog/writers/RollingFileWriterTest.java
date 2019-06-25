@@ -153,7 +153,7 @@ public final class RollingFileWriterTest {
 	}
 
 	/**
-	 * Verifies that the default pattern contains a minimum set of informations.
+	 * Verifies that the default pattern contains a minimum set of information.
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file

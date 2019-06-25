@@ -201,7 +201,7 @@ public final class ServiceLoader<T> {
 			if (service.isAssignableFrom(implementation)) {
 				return (T) implementation.getDeclaredConstructor(argumentTypes).newInstance(arguments);
 			} else {
-				InternalLogger.log(Level.ERROR, "Class '" + className + "' does not implement servcie interface '" + service + "'");
+				InternalLogger.log(Level.ERROR, "Class '" + className + "' does not implement service interface '" + service + "'");
 			}
 		} catch (ClassNotFoundException ex) {
 			InternalLogger.log(Level.ERROR, "Service implementation '" + className + "' not found");

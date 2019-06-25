@@ -684,7 +684,7 @@ public final class JdbcWriterTest {
 		 *             Failed to call private append() method
 		 */
 		@Test
-		public void quoteIdentifiereWithSpaces() throws Exception {
+		public void quoteIdentifierWithSpaces() throws Exception {
 			StringBuilder builder = new StringBuilder();
 			Whitebox.invokeMethod(JdbcWriter.class, "append", builder, "TEXT MESSAGE", "'");
 			assertThat(builder.toString()).isEqualTo("'TEXT MESSAGE'");
@@ -697,7 +697,7 @@ public final class JdbcWriterTest {
 		 *             Failed to call {@link JdbcWriter#append(StringBuilder, String, String)}
 		 */
 		@Test
-		public void quoteIdentifiereWithSpecialCharacters() throws Exception {
+		public void quoteIdentifierWithSpecialCharacters() throws Exception {
 			StringBuilder builder = new StringBuilder();
 			Whitebox.invokeMethod(JdbcWriter.class, "append", builder, "M€SS@GE", "'");
 			assertThat(builder.toString()).isEqualTo("'M€SS@GE'");
@@ -721,7 +721,7 @@ public final class JdbcWriterTest {
 		 * supported.
 		 */
 		@Test
-		public void refuseIdentifiereWithSpaces() {
+		public void refuseIdentifierWithSpaces() {
 			assertThatThrownBy(() -> {
 				Whitebox.invokeMethod(JdbcWriter.class, "append", new StringBuilder(), "TEXT MESSAGE", " ");
 			}).hasMessageContaining("TEXT MESSAGE");
@@ -732,7 +732,7 @@ public final class JdbcWriterTest {
 		 * are not supported.
 		 */
 		@Test
-		public void refuseIdentifiereWithSpecialCharacters() {
+		public void refuseIdentifierWithSpecialCharacters() {
 			assertThatThrownBy(() -> {
 				Whitebox.invokeMethod(JdbcWriter.class, "append", new StringBuilder(), "M€SS@GE", " ");
 			}).hasMessageContaining("M€SS@GE");

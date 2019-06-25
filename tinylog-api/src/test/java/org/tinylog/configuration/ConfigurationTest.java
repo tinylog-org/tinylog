@@ -66,7 +66,7 @@ public final class ConfigurationTest {
 	 */
 	@AfterClass
 	public static void reset() throws Exception {
-		loadProperies(null);
+		loadProperties(null);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class ConfigurationTest {
 	public void defaultPropertiesFile() throws Exception {
 		FileSystem.createResource("tinylog.properties", "level = off");
 		try {
-			loadProperies(null);
+			loadProperties(null);
 			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
 		} finally {
 			FileSystem.deleteResource("tinylog.properties");
@@ -111,7 +111,7 @@ public final class ConfigurationTest {
 	public void propertiesFileFromUrl() throws Exception {
 		String path = FileSystem.createTemporaryFile("level = debug");
 		String url = new File(path).getAbsoluteFile().toURI().toURL().toString();
-		loadProperies(url);
+		loadProperties(url);
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("debug");
 	}
 
@@ -123,7 +123,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void propertiesFileFromClassPath() throws Exception {
-		loadProperies(FileSystem.createTemporaryResource("level = info"));
+		loadProperties(FileSystem.createTemporaryResource("level = info"));
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("info");
 	}
 
@@ -135,7 +135,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void propertiesFileFromFileSystem() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = warn"));
+		loadProperties(FileSystem.createTemporaryFile("level = warn"));
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("warn");
 	}
 
@@ -149,7 +149,7 @@ public final class ConfigurationTest {
 	public void nonExistingFile() throws Exception {
 		String path = FileSystem.createTemporaryFile();
 		Files.delete(Paths.get(path));
-		loadProperies(path);
+		loadProperties(path);
 
 		assertThat(Configuration.get("level")).isNull();
 		assertThat(systemStream.consumeErrorOutput()).contains("ERROR").containsOnlyOnce(path);
@@ -164,7 +164,7 @@ public final class ConfigurationTest {
 	@Test
 	public void overridingProperty() throws Exception {
 		System.setProperty(PROPERTIES_PREFIX + "level", "debug");
-		loadProperies(FileSystem.createTemporaryFile("level = info"));
+		loadProperties(FileSystem.createTemporaryFile("level = info"));
 
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("debug");
 	}
@@ -177,7 +177,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void foundSiblings() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info", "writer = console", "writer2 = file", "writer2.file = log.txt"));
+		loadProperties(FileSystem.createTemporaryFile("level = info", "writer = console", "writer2 = file", "writer2.file = log.txt"));
 		assertThat(Configuration.getSiblings("writer")).containsOnly(entry("writer", "console"), entry("writer2", "file"));
 	}
 
@@ -190,7 +190,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void foundSiblingsWithAtSign() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info", "level@org.test = trace", "level@com = info"));
+		loadProperties(FileSystem.createTemporaryFile("level = info", "level@org.test = trace", "level@com = info"));
 		assertThat(Configuration.getSiblings("level@"))
 			.containsOnly(entry("level@org.test", "trace"), entry("level@com", "info"));
 	}
@@ -204,7 +204,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void noSiblings() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info"));
+		loadProperties(FileSystem.createTemporaryFile("level = info"));
 		assertThat(Configuration.getSiblings("writer")).isEmpty();
 	}
 
@@ -216,7 +216,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void foundChildren() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info", "writer = file", "writer.file = log.txt", "writer.buffered = true"));
+		loadProperties(FileSystem.createTemporaryFile("level = info", "writer = file", "writer.file = log.txt", "writer.buffered = true"));
 		assertThat(Configuration.getChildren("writer")).containsOnly(entry("file", "log.txt"), entry("buffered", "true"));
 	}
 
@@ -229,7 +229,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void noChildren() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("level = info"));
+		loadProperties(FileSystem.createTemporaryFile("level = info"));
 		assertThat(Configuration.getChildren("writer")).isEmpty();
 	}
 
@@ -241,7 +241,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveSystemProperty() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = #{os.name}"));
+		loadProperties(FileSystem.createTemporaryFile("test = #{os.name}"));
 		assertThat(Configuration.get("test")).isEqualTo(System.getProperty("os.name"));
 	}
 
@@ -253,7 +253,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveMultipleProperties() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = JRE #{java.version} from #{java.vendor}"));
+		loadProperties(FileSystem.createTemporaryFile("test = JRE #{java.version} from #{java.vendor}"));
 		assertThat(Configuration.get("test"))
 			.isEqualTo("JRE " + System.getProperty("java.version") + " from " + System.getProperty("java.vendor"));
 	}
@@ -266,7 +266,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveEnvironmentVariable() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${PATH}"));
+		loadProperties(FileSystem.createTemporaryFile("test = ${PATH}"));
 		assertThat(Configuration.get("test")).isEqualTo(System.getenv("PATH"));
 	}
 
@@ -278,7 +278,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void resolveMixedVariablesAndProperties() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${PATH} read by JRE #{java.version}"));
+		loadProperties(FileSystem.createTemporaryFile("test = ${PATH} read by JRE #{java.version}"));
 		assertThat(Configuration.get("test")).isEqualTo(System.getenv("PATH") + " read by JRE " + System.getProperty("java.version"));
 	}
 
@@ -290,7 +290,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void emptyVariable() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${}"));
+		loadProperties(FileSystem.createTemporaryFile("test = ${}"));
 		assertThat(Configuration.get("test")).isEqualTo("${}");
 		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("${}");
 	}
@@ -303,7 +303,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void incompleteVariable() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${os.name"));
+		loadProperties(FileSystem.createTemporaryFile("test = ${os.name"));
 		assertThat(Configuration.get("test")).isEqualTo("${os.name");
 		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("${os.name");
 	}
@@ -317,9 +317,9 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void nonExistentVariable() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = ${my.invalid.varaiable}"));
-		assertThat(Configuration.get("test")).isEqualTo("${my.invalid.varaiable}");
-		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("my.invalid.varaiable");
+		loadProperties(FileSystem.createTemporaryFile("test = ${my.invalid.variable}"));
+		assertThat(Configuration.get("test")).isEqualTo("${my.invalid.variable}");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("my.invalid.variable");
 	}
 
 	/**
@@ -330,7 +330,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void addProperty() throws Exception {
-		loadProperies(null);
+		loadProperties(null);
 
 		assertThat(Configuration.get("test")).isNull();
 		Configuration.set("test", "Hello World!");
@@ -345,7 +345,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void overrideProperty() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("test = Hello World!"));
+		loadProperties(FileSystem.createTemporaryFile("test = Hello World!"));
 
 		assertThat(Configuration.get("test")).isEqualTo("Hello World!");
 		Configuration.set("test", "Bye World!");
@@ -360,7 +360,7 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void replaceProperties() throws Exception {
-		loadProperies(FileSystem.createTemporaryFile("a = 1", "b = 2"));
+		loadProperties(FileSystem.createTemporaryFile("a = 1", "b = 2"));
 
 		assertThat(Configuration.get("a")).isEqualTo("1");
 		assertThat(Configuration.get("b")).isEqualTo("2");
@@ -379,7 +379,7 @@ public final class ConfigurationTest {
 	 * @throws Exception
 	 *             Failed invoking private method {@link Configuration#load()}
 	 */
-	private static void loadProperies(final String path) throws Exception {
+	private static void loadProperties(final String path) throws Exception {
 		if (path != null) {
 			System.setProperty(CONFIGURATION_PROPERTY, path);
 		}

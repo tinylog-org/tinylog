@@ -58,7 +58,7 @@ final class ExceptionToken implements Token {
 	}
 
 	/**
-	 * Renders a throwable including stack trace and cause throwables.
+	 * Renders a throwable including stack trace and cause throwable.
 	 *
 	 * @param throwable
 	 *            Throwable to render

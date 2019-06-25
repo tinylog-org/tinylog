@@ -33,7 +33,7 @@ import org.junit.runners.model.Statement;
  */
 public final class SystemStreamCollector implements TestRule {
 
-	private final boolean verifiyEmptyStreams;
+	private final boolean verifyEmptyStreams;
 
 	private final ByteArrayOutputStream standardStream;
 	private final ByteArrayOutputStream errorStream;
@@ -42,12 +42,12 @@ public final class SystemStreamCollector implements TestRule {
 	private final PrintStream originalErrorStream;
 
 	/**
-	 * @param verifiyEmptyStreams
+	 * @param verifyEmptyStreams
 	 *            if {@code true}, output streams while be checked whether they are empty after each test method,
 	 *            otherwise the streams will be cleaned silently
 	 */
-	public SystemStreamCollector(final boolean verifiyEmptyStreams) {
-		this.verifiyEmptyStreams = verifiyEmptyStreams;
+	public SystemStreamCollector(final boolean verifyEmptyStreams) {
+		this.verifyEmptyStreams = verifyEmptyStreams;
 
 		standardStream = new ByteArrayOutputStream();
 		errorStream = new ByteArrayOutputStream();
@@ -93,7 +93,7 @@ public final class SystemStreamCollector implements TestRule {
 		System.setOut(originalStandardStream);
 		System.setErr(originalErrorStream);
 
-		if (verifiyEmptyStreams) {
+		if (verifyEmptyStreams) {
 			Assertions.assertThat(consumeStandardOutput()).isEmpty();
 			Assertions.assertThat(consumeErrorOutput()).isEmpty();
 		}

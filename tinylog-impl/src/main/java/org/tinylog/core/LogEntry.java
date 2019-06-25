@@ -170,9 +170,9 @@ public final class LogEntry {
 	}
 
 	/**
-	 * Gets the catched exception or throwable associated with this log entry.
+	 * Gets the caught exception or throwable associated with this log entry.
 	 *
-	 * @return Associated catched exception or throwable
+	 * @return Associated caught exception or throwable
 	 */
 	public Throwable getException() {
 		return exception;

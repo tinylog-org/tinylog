@@ -194,7 +194,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithSingleArgument() {
+		public void traceFormattedMessageWithSingleArgument() {
 			logger.trace("Hello {}!", "World");
 
 			if (traceEnabled) {
@@ -209,7 +209,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithTwoArguments() {
+		public void traceFormattedMessageWithTwoArguments() {
 			logger.trace("{} = {}", "magic", 42);
 
 			if (traceEnabled) {
@@ -224,7 +224,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithMultipleArguments() {
+		public void traceFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.trace("{} = {}", "magic", 42, exception);
@@ -280,7 +280,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithSingleArgument() {
+		public void debugFormattedMessageWithSingleArgument() {
 			logger.debug("Hello {}!", "World");
 
 			if (debugEnabled) {
@@ -295,7 +295,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithTwoArguments() {
+		public void debugFormattedMessageWithTwoArguments() {
 			logger.debug("{} = {}", "magic", 42);
 
 			if (debugEnabled) {
@@ -310,7 +310,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithMultipleArguments() {
+		public void debugFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.debug("{} = {}", "magic", 42, exception);
@@ -366,7 +366,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithSingleArgument() {
+		public void infoFormattedMessageWithSingleArgument() {
 			logger.info("Hello {}!", "World");
 
 			if (infoEnabled) {
@@ -381,7 +381,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithTwoArguments() {
+		public void infoFormattedMessageWithTwoArguments() {
 			logger.info("{} = {}", "magic", 42);
 
 			if (infoEnabled) {
@@ -396,7 +396,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithMultipleArguments() {
+		public void infoFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.info("{} = {}", "magic", 42, exception);
@@ -452,7 +452,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithSingleArgument() {
+		public void warnFormattedMessageWithSingleArgument() {
 			logger.warn("Hello {}!", "World");
 
 			if (warnEnabled) {
@@ -467,7 +467,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithTwoArguments() {
+		public void warnFormattedMessageWithTwoArguments() {
 			logger.warn("{} = {}", "magic", 42);
 
 			if (warnEnabled) {
@@ -482,7 +482,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithMultipleArguments() {
+		public void warnFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.warn("{} = {}", "magic", 42, exception);
@@ -538,7 +538,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithSingleArgument() {
+		public void errorFormattedMessageWithSingleArgument() {
 			logger.error("Hello {}!", "World");
 
 			if (errorEnabled) {
@@ -553,7 +553,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithTwoArguments() {
+		public void errorFormattedMessageWithTwoArguments() {
 			logger.error("{} = {}", "magic", 42);
 
 			if (errorEnabled) {
@@ -568,7 +568,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithMultipleArguments() {
+		public void errorFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.error("{} = {}", "magic", 42, exception);
@@ -771,7 +771,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithSingleArgument() {
+		public void traceFormattedMessageWithSingleArgument() {
 			logger.trace(marker, "Hello {}!", "World");
 
 			if (traceEnabled) {
@@ -786,7 +786,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithTwoArguments() {
+		public void traceFormattedMessageWithTwoArguments() {
 			logger.trace(marker, "{} = {}", "magic", 42);
 
 			if (traceEnabled) {
@@ -801,7 +801,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithMultipleArguments() {
+		public void traceFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.trace(marker, "{} = {}", "magic", 42, exception);
@@ -857,7 +857,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithSingleArgument() {
+		public void debugFormattedMessageWithSingleArgument() {
 			logger.debug(marker, "Hello {}!", "World");
 
 			if (debugEnabled) {
@@ -872,7 +872,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithTwoArguments() {
+		public void debugFormattedMessageWithTwoArguments() {
 			logger.debug(marker, "{} = {}", "magic", 42);
 
 			if (debugEnabled) {
@@ -887,7 +887,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithMultipleArguments() {
+		public void debugFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.debug(marker, "{} = {}", "magic", 42, exception);
@@ -943,7 +943,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithSingleArgument() {
+		public void infoFormattedMessageWithSingleArgument() {
 			logger.info(marker, "Hello {}!", "World");
 
 			if (infoEnabled) {
@@ -958,7 +958,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithTwoArguments() {
+		public void infoFormattedMessageWithTwoArguments() {
 			logger.info(marker, "{} = {}", "magic", 42);
 
 			if (infoEnabled) {
@@ -973,7 +973,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithMultipleArguments() {
+		public void infoFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.info(marker, "{} = {}", "magic", 42, exception);
@@ -1029,7 +1029,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithSingleArgument() {
+		public void warnFormattedMessageWithSingleArgument() {
 			logger.warn(marker, "Hello {}!", "World");
 
 			if (warnEnabled) {
@@ -1044,7 +1044,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithTwoArguments() {
+		public void warnFormattedMessageWithTwoArguments() {
 			logger.warn(marker, "{} = {}", "magic", 42);
 
 			if (warnEnabled) {
@@ -1059,7 +1059,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithMultipleArguments() {
+		public void warnFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.warn(marker, "{} = {}", "magic", 42, exception);
@@ -1115,7 +1115,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithSingleArgument() {
+		public void errorFormattedMessageWithSingleArgument() {
 			logger.error(marker, "Hello {}!", "World");
 
 			if (errorEnabled) {
@@ -1130,7 +1130,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithTwoArguments() {
+		public void errorFormattedMessageWithTwoArguments() {
 			logger.error(marker, "{} = {}", "magic", 42);
 
 			if (errorEnabled) {
@@ -1145,7 +1145,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithMultipleArguments() {
+		public void errorFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.error(marker, "{} = {}", "magic", 42, exception);
@@ -1337,7 +1337,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithSingleArgument() {
+		public void traceFormattedMessageWithSingleArgument() {
 			logger.trace((Marker) null, "Hello {}!", "World");
 
 			if (traceEnabled) {
@@ -1352,7 +1352,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithTwoArguments() {
+		public void traceFormattedMessageWithTwoArguments() {
 			logger.trace((Marker) null, "{} = {}", "magic", 42);
 
 			if (traceEnabled) {
@@ -1367,7 +1367,7 @@ public final class TinylogLoggerTest {
 		 * TRACE} level.
 		 */
 		@Test
-		public void traceFormatedMessageWithMultipleArguments() {
+		public void traceFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.trace((Marker) null, "{} = {}", "magic", 42, exception);
@@ -1423,7 +1423,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithSingleArgument() {
+		public void debugFormattedMessageWithSingleArgument() {
 			logger.debug((Marker) null, "Hello {}!", "World");
 
 			if (debugEnabled) {
@@ -1438,7 +1438,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithTwoArguments() {
+		public void debugFormattedMessageWithTwoArguments() {
 			logger.debug((Marker) null, "{} = {}", "magic", 42);
 
 			if (debugEnabled) {
@@ -1453,7 +1453,7 @@ public final class TinylogLoggerTest {
 		 * DEBUG} level.
 		 */
 		@Test
-		public void debugFormatedMessageWithMultipleArguments() {
+		public void debugFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.debug((Marker) null, "{} = {}", "magic", 42, exception);
@@ -1509,7 +1509,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithSingleArgument() {
+		public void infoFormattedMessageWithSingleArgument() {
 			logger.info((Marker) null, "Hello {}!", "World");
 
 			if (infoEnabled) {
@@ -1524,7 +1524,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithTwoArguments() {
+		public void infoFormattedMessageWithTwoArguments() {
 			logger.info((Marker) null, "{} = {}", "magic", 42);
 
 			if (infoEnabled) {
@@ -1539,7 +1539,7 @@ public final class TinylogLoggerTest {
 		 * INFO} level.
 		 */
 		@Test
-		public void infoFormatedMessageWithMultipleArguments() {
+		public void infoFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.info((Marker) null, "{} = {}", "magic", 42, exception);
@@ -1595,7 +1595,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithSingleArgument() {
+		public void warnFormattedMessageWithSingleArgument() {
 			logger.warn((Marker) null, "Hello {}!", "World");
 
 			if (warnEnabled) {
@@ -1610,7 +1610,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithTwoArguments() {
+		public void warnFormattedMessageWithTwoArguments() {
 			logger.warn((Marker) null, "{} = {}", "magic", 42);
 
 			if (warnEnabled) {
@@ -1625,7 +1625,7 @@ public final class TinylogLoggerTest {
 		 * WARN} level.
 		 */
 		@Test
-		public void warnFormatedMessageWithMultipleArguments() {
+		public void warnFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.warn((Marker) null, "{} = {}", "magic", 42, exception);
@@ -1681,7 +1681,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithSingleArgument() {
+		public void errorFormattedMessageWithSingleArgument() {
 			logger.error((Marker) null, "Hello {}!", "World");
 
 			if (errorEnabled) {
@@ -1696,7 +1696,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithTwoArguments() {
+		public void errorFormattedMessageWithTwoArguments() {
 			logger.error((Marker) null, "{} = {}", "magic", 42);
 
 			if (errorEnabled) {
@@ -1711,7 +1711,7 @@ public final class TinylogLoggerTest {
 		 * ERROR} level.
 		 */
 		@Test
-		public void errorFormatedMessageWithMultipleArguments() {
+		public void errorFormattedMessageWithMultipleArguments() {
 			RuntimeException exception = new RuntimeException();
 
 			logger.error((Marker) null, "{} = {}", "magic", 42, exception);

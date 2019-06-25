@@ -89,7 +89,7 @@ public enum LogEntryValue {
 	MESSAGE,
 
 	/**
-	 * Catched exception or throwable.
+	 * Caught exception or throwable.
 	 *
 	 * @see LogEntry#getException()
 	 */

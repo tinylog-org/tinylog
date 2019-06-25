@@ -500,7 +500,7 @@ public final class CategoryTest {
 		 * Verifies that no log entry will be issued, if the assertion is {@code true}.
 		 */
 		@Test
-		public void assertLogWithPostiveAssertion() {
+		public void assertLogWithPositiveAssertion() {
 			category.assertLog(true, "Hello World!");
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
 		}

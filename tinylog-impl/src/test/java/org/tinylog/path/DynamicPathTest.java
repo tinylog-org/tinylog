@@ -189,7 +189,7 @@ public final class DynamicPathTest {
 	}
 
 	/**
-	 * Verifies that all files of subfolders will be returned that are compatible with the configured dynamic path.
+	 * Verifies that all files of sub folders will be returned that are compatible with the configured dynamic path.
 	 *
 	 * @throws IOException
 	 *             Failed to create folder or files
