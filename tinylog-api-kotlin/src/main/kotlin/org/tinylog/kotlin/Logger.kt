@@ -14,7 +14,7 @@
 package org.tinylog.kotlin
 
 import org.tinylog.Level
-import org.tinylog.provider.ProviderRegistry;
+import org.tinylog.provider.ProviderRegistry
 import java.util.concurrent.ConcurrentHashMap
 
 /**
