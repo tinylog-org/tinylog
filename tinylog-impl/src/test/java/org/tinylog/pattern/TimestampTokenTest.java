@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.junit.Test;
 import org.tinylog.core.LogEntry;
@@ -76,7 +77,7 @@ public class TimestampTokenTest {
 		LocalDateTime now = LocalDateTime.now();
 
 		PreparedStatement statement = mock(PreparedStatement.class);
-		token.apply(createLogEntry(now), statement, 1);
+		token.apply(LogEntryBuilder.empty().date(now).create(), statement, 1);
 		verify(statement).setTimestamp(1, Timestamp.valueOf(now));
 	}
 
@@ -103,7 +104,7 @@ public class TimestampTokenTest {
 	 * @return Filled log entry
 	 */
 	private static LogEntry createLogEntry(final LocalDateTime date) {
-		return LogEntryBuilder.empty().date(date).create();
+		return LogEntryBuilder.empty().date(date.atZone(ZoneOffset.UTC)).create();
 	}
 
 }

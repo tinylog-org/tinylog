@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -157,6 +158,18 @@ public final class LogEntryBuilder {
 	 */
 	public LogEntryBuilder date(final LocalDateTime date) {
 		this.timestamp = new InstantTimestamp(date.atZone(ZoneId.systemDefault()).toInstant());
+		return this;
+	}
+
+	/**
+	 * Sets the data and time when this log entry was issued.
+	 *
+	 * @param date
+	 *            Date and time of issue
+	 * @return Actual log entry builder
+	 */
+	public LogEntryBuilder date(final ZonedDateTime date) {
+		this.timestamp = new InstantTimestamp(date.toInstant());
 		return this;
 	}
 

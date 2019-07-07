@@ -14,6 +14,8 @@
 package org.tinylog.pattern;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,7 +81,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithDefaultPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
 	}
 
@@ -89,7 +91,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithMillisecondsPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp: milliseconds", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800000");
 	}
 
@@ -98,7 +100,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithUnknownPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp: inval'd", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
 	}
 
