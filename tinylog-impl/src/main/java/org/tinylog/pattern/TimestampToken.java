@@ -51,18 +51,24 @@ final class TimestampToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		long timestamp = logEntry.getTimestamp().toDate().getTime();
-
-		if (useMilliseconds) {
-			builder.append(timestamp);
-		} else {
-			builder.append(timestamp / SECONDS_DIVISOR);
-		}
+		builder.append(getTime(logEntry));
 	}
 
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		statement.setTimestamp(index, logEntry.getTimestamp().toSqlTimestamp());
+		statement.setLong(index, getTime(logEntry));
+	}
+
+	/**
+	 * Gets the time of issue from a long entry.
+	 *
+	 * @param logEntry
+	 *            Log entry to get time of issue from
+	 * @return Time of issue as Unix timestamp
+	 */
+	private long getTime(final LogEntry logEntry) {
+		long timestamp = logEntry.getTimestamp().toDate().getTime();
+		return useMilliseconds ? timestamp : timestamp / SECONDS_DIVISOR;
 	}
 
 }

@@ -15,9 +15,9 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 import org.junit.Test;
 import org.tinylog.core.LogEntry;
@@ -43,15 +43,25 @@ public class TimestampTokenTest {
 	}
 
 	/**
+	 * Verifies that seconds pattern will be rendered correctly for a {@link StringBuilder}.
+	 */
+	@Test
+	public void renderSecondsPattern() {
+		TimestampToken token = new TimestampToken("seconds");
+
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 0, 0, 0))).isEqualTo("1467288000");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 15, 1, 987654321))).isEqualTo("1467288901");
+	}
+
+	/**
 	 * Verifies that milliseconds pattern will be rendered correctly for a {@link StringBuilder}.
 	 */
 	@Test
-	public void renderMillisecondsTimestampPattern() {
+	public void renderMillisecondsPattern() {
 		TimestampToken token = new TimestampToken("milliseconds");
 
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 00, 00))).isEqualTo("1451606400000");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 12, 00))).isEqualTo("1451649600000");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 02, 00, 00))).isEqualTo("1451692800000");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 0, 0, 0))).isEqualTo("1467288000000");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 15, 1, 987654321))).isEqualTo("1467288901987");
 	}
 
 	/**
@@ -61,24 +71,40 @@ public class TimestampTokenTest {
 	public void renderDefaultPattern() {
 		TimestampToken token = new TimestampToken();
 
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 00))).isEqualTo("1467288000");
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 15))).isEqualTo("1467288900");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 0, 0, 0))).isEqualTo("1467288000");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 15, 1, 987654321))).isEqualTo("1467288901");
 	}
 
 	/**
-	 * Verifies that the current time will be added as a {@link Timestamp} to a {@link PreparedStatement}.
+	 * Verifies that seconds pattern will be added correctly to a {@link PreparedStatement}.
 	 *
 	 * @throws SQLException
 	 *             Failed to add value to prepared SQL statement
 	 */
 	@Test
-	public void applyTimestamp() throws SQLException {
-		TimestampToken token = new TimestampToken();
+	public void applySecondsTimestamp() throws SQLException {
+		TimestampToken token = new TimestampToken("seconds");
 		LocalDateTime now = LocalDateTime.now();
 
 		PreparedStatement statement = mock(PreparedStatement.class);
-		token.apply(LogEntryBuilder.empty().date(now).create(), statement, 1);
-		verify(statement).setTimestamp(1, Timestamp.valueOf(now));
+		token.apply(createLogEntry(now), statement, 1);
+		verify(statement).setLong(1, now.atZone(ZoneOffset.UTC).toEpochSecond());
+	}
+
+	/**
+	 * Verifies that milliseconds pattern will be added correctly to a {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyMillisecondsTimestamp() throws SQLException {
+		TimestampToken token = new TimestampToken("milliseconds");
+		LocalDateTime now = LocalDateTime.now();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(now), statement, 1);
+		verify(statement).setLong(1, Date.from(now.atZone(ZoneOffset.UTC).toInstant()).getTime());
 	}
 
 	/**
