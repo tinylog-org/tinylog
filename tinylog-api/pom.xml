@@ -93,6 +93,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
+						<Bundle-SymbolicName>org.tinylog.api</Bundle-SymbolicName>
 						<Import-Package>!sun.reflect,*</Import-Package>
 					</instructions>
 				</configuration>
@@ -100,6 +101,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>org.tinylog.api</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
