@@ -260,7 +260,7 @@ public final class Configuration {
 			}
 
 			String[] colonSplittedName = name.split(":", -1);
-			if(colonSplittedName.length > 2) {
+			if (colonSplittedName.length > 2) {
 				InternalLogger.log(Level.WARN, "Multiple default values found: " + value);
 				return value;
 			}
