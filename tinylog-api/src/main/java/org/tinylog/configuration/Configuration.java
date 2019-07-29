@@ -259,9 +259,17 @@ public final class Configuration {
 				return value;
 			}
 
-			String data = resolver.resolve(name);
+			String[] colonSplittedName = name.split(":", -1);
+			if(colonSplittedName.length > 2) {
+				InternalLogger.log(Level.WARN, "Multiple default values found: " + value);
+				return value;
+			}
+
+			String key = colonSplittedName[0];
+			String defaultValue = colonSplittedName.length == 2 ? colonSplittedName[1] : null;
+			String data = Optional.ofNullable(resolver.resolve(key)).orElse(defaultValue);
 			if (data == null) {
-				InternalLogger.log(Level.WARN, "'" + name + "' could not be found in " + resolver.getName());
+				InternalLogger.log(Level.WARN, "'" + key + "' could not be found in " + resolver.getName());
 				return value;
 			} else {
 				builder.append(data);
