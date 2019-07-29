@@ -267,13 +267,15 @@ public final class Configuration {
 
 			String key = colonSplittedName[0];
 			String defaultValue = colonSplittedName.length == 2 ? colonSplittedName[1] : null;
-			String data = Optional.ofNullable(resolver.resolve(key)).orElse(defaultValue);
+			String data = resolver.resolve(key);
 			if (data == null) {
-				InternalLogger.log(Level.WARN, "'" + key + "' could not be found in " + resolver.getName());
-				return value;
-			} else {
-				builder.append(data);
+				if (defaultValue == null) {
+					InternalLogger.log(Level.WARN, "'" + key + "' could not be found in " + resolver.getName());
+					return value;
+				}
+				data = defaultValue;
 			}
+			builder.append(data);
 
 			position = end + 1;
 		}
