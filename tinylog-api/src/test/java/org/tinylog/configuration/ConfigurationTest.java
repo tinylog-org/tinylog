@@ -323,6 +323,56 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that environment variables will be resolved and the given default value is ignored.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void existingVariableWithUnusedDefaultValue() throws Exception {
+		loadProperties(FileSystem.createTemporaryFile("test = ${PATH:/a/default/path}"));
+		assertThat(Configuration.get("test")).isEqualTo(System.getenv("PATH"));
+	}
+
+	/**
+	 * Verifies that a given empty string is used as default value, if a variable exists neither as system property nor
+	 * as environment variable..
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void nonExistingVariableWithEmptyDefaultValue() throws Exception {
+		loadProperties(FileSystem.createTemporaryFile("test = ${my.invalid.variable:}"));
+		assertThat(Configuration.get("test")).isEqualTo("");
+	}
+
+	/**
+	 * Verifies that a given default value is used, if a variable exists neither as system property nor
+	 * as environment variable..
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void nonExistingVariableWithDefaultValue() throws Exception {
+		loadProperties(FileSystem.createTemporaryFile("test = ${my.invalid.variable:a_default_value}"));
+		assertThat(Configuration.get("test")).isEqualTo("a_default_value");
+	}
+
+	/**
+	 * Verifies that an accurate warning message will be output, if multiple default values were given.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void nonExistingVariableMultipleDefaultValues() throws Exception {
+		loadProperties(FileSystem.createTemporaryFile("test = ${PATH:a_default_value:an_other_default_value}"));
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN").containsOnlyOnce("PATH");
+	}
+
+	/**
 	 * Verifies that a new property can be added.
 	 *
 	 * @throws Exception

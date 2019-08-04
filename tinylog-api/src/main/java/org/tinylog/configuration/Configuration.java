@@ -259,13 +259,23 @@ public final class Configuration {
 				return value;
 			}
 
-			String data = resolver.resolve(name);
-			if (data == null) {
-				InternalLogger.log(Level.WARN, "'" + name + "' could not be found in " + resolver.getName());
+			String[] colonSplittedName = name.split(":", -1);
+			if (colonSplittedName.length > 2) {
+				InternalLogger.log(Level.WARN, "Multiple default values found: " + value);
 				return value;
-			} else {
-				builder.append(data);
 			}
+
+			String key = colonSplittedName[0];
+			String defaultValue = colonSplittedName.length == 2 ? colonSplittedName[1] : null;
+			String data = resolver.resolve(key);
+			if (data == null) {
+				if (defaultValue == null) {
+					InternalLogger.log(Level.WARN, "'" + key + "' could not be found in " + resolver.getName());
+					return value;
+				}
+				data = defaultValue;
+			}
+			builder.append(data);
 
 			position = end + 1;
 		}
