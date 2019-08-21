@@ -7,6 +7,7 @@ jdk:
   - openjdk9
 
 script:
+  - mvn dependency:go-offline -q
   - mvn clean install -P release
 
 after_success:
