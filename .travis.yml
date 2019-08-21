@@ -7,8 +7,7 @@ jdk:
   - openjdk9
 
 script:
-  - mvn dependency:go-offline -q
-  - mvn clean install -P release
+  - mvn clean install -P release -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
