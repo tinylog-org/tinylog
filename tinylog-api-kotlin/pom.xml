@@ -100,6 +100,14 @@
 			<plugin>
 				<groupId>org.jetbrains.dokka</groupId>
 				<artifactId>dokka-maven-plugin</artifactId>
+				<configuration>
+					<externalDocumentationLinks>
+						<links>
+							<url>https://tinylog.org/v2/javadoc/</url>
+							<packageListUrl>file:///${project.parent.basedir}/tinylog-api/target/apidocs/package-list</packageListUrl>
+						</links>
+					</externalDocumentationLinks>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
