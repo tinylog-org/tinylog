@@ -13,7 +13,7 @@
 		<version>2.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>tinylog-api-scala</artifactId>
+	<artifactId>tinylog-api-scala_2.12</artifactId>
 	<name>tinylog Scala API</name>
 	<description>tinylog logging API for Scala</description>
 	<url>${website.url}</url>
