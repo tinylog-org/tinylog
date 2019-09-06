@@ -153,7 +153,8 @@ public final class ExceptionTokenTest {
 			.startsWith(RuntimeException.class.getName())
 			.contains(IOException.class.getName() + ": File not found")
 			.contains(ExceptionTokenTest.class.getName(), "renderExceptionWithCause")
-			.hasLineCount(exception.getStackTrace().length + cause.getStackTrace().length + 2);
+			.contains("... " + (cause.getStackTrace().length - 1) + " more")
+			.hasLineCount(exception.getStackTrace().length + 4);
 	}
 
 	/**
@@ -178,7 +179,8 @@ public final class ExceptionTokenTest {
 			.startsWith(RuntimeException.class.getName())
 			.contains(IOException.class.getName() + ": File not found")
 			.contains(ExceptionTokenTest.class.getName(), "applyExceptionWithCause")
-			.hasLineCount(exception.getStackTrace().length + cause.getStackTrace().length + 2);
+			.contains("... " + (cause.getStackTrace().length - 1) + " more")
+			.hasLineCount(exception.getStackTrace().length + 4);
 	}
 
 	/**

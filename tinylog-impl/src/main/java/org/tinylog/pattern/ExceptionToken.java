@@ -27,6 +27,7 @@ import org.tinylog.core.LogEntryValue;
 final class ExceptionToken implements Token {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final StackTraceElement[] EMPTY_TRACE = new StackTraceElement[0];
 
 	/** */
 	ExceptionToken() {
@@ -41,7 +42,7 @@ final class ExceptionToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		Throwable throwable = logEntry.getException();
 		if (throwable != null) {
-			render(throwable, builder);
+			render(throwable, EMPTY_TRACE, builder);
 		}
 	}
 	
@@ -52,7 +53,7 @@ final class ExceptionToken implements Token {
 			statement.setString(index, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
-			render(throwable, builder);
+			render(throwable, EMPTY_TRACE, builder);
 			statement.setString(index, builder.toString());
 		}
 	}
@@ -62,10 +63,23 @@ final class ExceptionToken implements Token {
 	 *
 	 * @param throwable
 	 *            Throwable to render
+	 * @param parentTrace
+	 *            Stack trace from parent throwable
 	 * @param builder
 	 *            Output will be appended to this string builder
 	 */
-	private static void render(final Throwable throwable, final StringBuilder builder) {
+	private static void render(final Throwable throwable, final StackTraceElement[] parentTrace, final StringBuilder builder) {
+		StackTraceElement[] stackTrace = throwable.getStackTrace();
+
+		int parentIndex = parentTrace.length - 1;
+		int childIndex = stackTrace.length - 1;
+		int commonElements = 0;
+		while (parentIndex >= 0 && childIndex >= 0 && parentTrace[parentIndex].equals(stackTrace[childIndex])) {
+			parentIndex -= 1;
+			childIndex -= 1;
+			commonElements += 1;
+		}
+		
 		builder.append(throwable.getClass().getName());
 		String message = throwable.getMessage();
 		if (message != null) {
@@ -73,18 +87,24 @@ final class ExceptionToken implements Token {
 			builder.append(message);
 		}
 
-		StackTraceElement[] stackTrace = throwable.getStackTrace();
-		for (int i = 0; i < stackTrace.length; ++i) {
+		for (int i = 0; i < stackTrace.length - commonElements; ++i) {
 			builder.append(NEW_LINE);
 			builder.append("\tat ");
 			builder.append(stackTrace[i]);
+		}
+		
+		if (commonElements > 0) {
+			builder.append(NEW_LINE);
+			builder.append("\t... ");
+			builder.append(commonElements);
+			builder.append(" more");
 		}
 
 		Throwable cause = throwable.getCause();
 		if (cause != null) {
 			builder.append(NEW_LINE);
 			builder.append("Caused by: ");
-			render(cause, builder);
+			render(cause, stackTrace, builder);
 		}
 	}
 
