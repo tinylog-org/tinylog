@@ -18,16 +18,23 @@ import java.util.List;
 /**
  * Filter for removing all stack trace elements from stack trace except the defined packages and classes.
  */
-public final class KeepStackTraceFilter extends AbstractStackTraceFilter {
-
+public final class KeepStackTraceFilter extends AbstractStackTraceElementsFilter {
+	
 	/**
+	 * @param origin
+	 *            Origin source stack trace filter
 	 * @param arguments
-	 *            List of packages and classes, separated by '|'
+	 *            Configured packages and classes to keep
 	 */
-	public KeepStackTraceFilter(final String arguments) {
-		super(arguments);
+	public KeepStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
+		super(origin, arguments);
 	}
 	
+	@Override
+	public KeepStackTraceFilter getCause() {
+		return super.getCause() == null ? null : new KeepStackTraceFilter(super.getCause(), getArguments());
+	}
+
 	@Override
 	protected boolean shouldKept(final String className, final List<String> filters) {
 		for (String filter : filters) {

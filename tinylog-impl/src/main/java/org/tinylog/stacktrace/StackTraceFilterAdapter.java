@@ -13,54 +13,50 @@
 
 package org.tinylog.stacktrace;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Abstract stack trace filter that just loops trough all data of the passed origin stack trace filter.
+ * Adapter for using any kind of throwables as a stack trace filter.
+ * 
+ * <p>
+ * All data of the passed throwable will be just looped trough.
+ * </p>
  */
-public abstract class AbstractStackTraceFilter implements StackTraceFilter {
+public final class StackTraceFilterAdapter implements StackTraceFilter {
 
-	private final StackTraceFilter origin;
+	private final Throwable throwable;
 	private final List<String> arguments;
 
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
+	 * @param throwable
+	 *            Origin source throwable
 	 * @param arguments
-	 *            Configured arguments
+	 *            Configured arguments will be ignored
 	 */
-	public AbstractStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
-		this.origin = origin;
+	public StackTraceFilterAdapter(final Throwable throwable, final List<String> arguments) {
+		this.throwable = throwable;
 		this.arguments = arguments;
 	}
 
 	@Override
 	public String getClassName() {
-		return origin.getClassName();
+		return throwable.getClass().getName();
 	}
 
 	@Override
 	public String getMessage() {
-		return origin.getMessage();
+		return throwable.getMessage();
 	}
 
 	@Override
 	public List<StackTraceElement> getStackTrace() {
-		return origin.getStackTrace();
+		return Arrays.asList(throwable.getStackTrace());
 	}
 
 	@Override
-	public StackTraceFilter getCause() {
-		return origin.getCause();
-	}
-
-	/**
-	 * Gets all passed arguments.
-	 * 
-	 * @return Passed arguments
-	 */
-	protected final List<String> getArguments() {
-		return arguments;
+	public StackTraceFilterAdapter getCause() {
+		return throwable.getCause() == null ? null : new StackTraceFilterAdapter(throwable.getCause(), arguments);
 	}
 
 }
