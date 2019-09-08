@@ -13,7 +13,6 @@
 
 package org.tinylog.stacktrace;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Test;
@@ -55,7 +54,7 @@ public final class StackTraceFilterAdapterTest {
 		RuntimeException exception = new RuntimeException();
 
 		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception, Collections.emptyList());
-		assertThat(filter.getStackTrace()).containsExactlyElementsOf(Arrays.asList(exception.getStackTrace()));
+		assertThat(filter.getStackTrace()).containsExactly(exception.getStackTrace());
 	}
 
 	/**
