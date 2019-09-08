@@ -16,27 +16,19 @@ package org.tinylog.stacktrace;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractStackTraceFilter implements StackTraceFilter {
+/**
+ * Abstract stack trace filter that can filter stack trace elements by configurable packages and classes.
+ */
+public abstract class AbstractStackTraceFilter extends AbstractMultiArgumentFilter {
 
 	private static final StackTraceElement[] EMPTY_TRACE = new StackTraceElement[0];
 
-	private final List<String> packagesAndClasses;
-
 	/**
-	 * @param argument
+	 * @param arguments
 	 *            List of packages and classes, separated by '|'
 	 */
-	public AbstractStackTraceFilter(final String argument) {
-		this.packagesAndClasses = new ArrayList<String>();
-
-		if (argument != null) {
-			for (String token : argument.split("\\|")) {
-				token = token.trim();
-				if (!token.isEmpty()) {
-					packagesAndClasses.add(token);
-				}
-			}
-		}
+	public AbstractStackTraceFilter(final String arguments) {
+		super(arguments);
 	}
 
 	@Override
@@ -45,7 +37,7 @@ public abstract class AbstractStackTraceFilter implements StackTraceFilter {
 		List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>(currentTrace.length);
 
 		for (StackTraceElement element : currentTrace) {
-			if (shouldKept(element.getClassName(), packagesAndClasses)) {
+			if (shouldKept(element.getClassName(), getArguments())) {
 				newTrace.add(element);
 			}
 		}

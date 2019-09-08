@@ -13,30 +13,35 @@
 
 package org.tinylog.stacktrace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Filter for removing defined packages and classes from stack trace.
+ * Abstract stack trace filter that can accept multiple arguments, which are separated by '|'.
  */
-public final class StripStackTraceFilter extends AbstractStackTraceFilter {
+public abstract class AbstractMultiArgumentFilter implements StackTraceFilter {
+
+	private final List<String> arguments;
 
 	/**
 	 * @param arguments
-	 *            List of packages and classes, separated by '|'
+	 *            List of arguments, separated by '|'
 	 */
-	public StripStackTraceFilter(final String arguments) {
-		super(arguments);
-	}
+	public AbstractMultiArgumentFilter(final String arguments) {
+		this.arguments = new ArrayList<String>();
 
-	@Override
-	protected boolean shouldKept(final String className, final List<String> filters) {
-		for (String filter : filters) {
-			if (match(className, filter)) {
-				return false;
+		if (arguments != null) {
+			for (String argument : arguments.split("\\|")) {
+				argument = argument.trim();
+				if (!argument.isEmpty()) {
+					this.arguments.add(argument);
+				}
 			}
 		}
-		
-		return true;
+	}
+	
+	public List<String> getArguments() {
+		return arguments;
 	}
 
 }

@@ -21,11 +21,11 @@ import java.util.List;
 public final class KeepStackTraceFilter extends AbstractStackTraceFilter {
 
 	/**
-	 * @param argument
+	 * @param arguments
 	 *            List of packages and classes, separated by '|'
 	 */
-	public KeepStackTraceFilter(final String argument) {
-		super(argument);
+	public KeepStackTraceFilter(final String arguments) {
+		super(arguments);
 	}
 	
 	@Override
