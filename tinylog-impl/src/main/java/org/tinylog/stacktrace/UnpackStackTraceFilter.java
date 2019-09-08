@@ -48,6 +48,10 @@ public final class UnpackStackTraceFilter extends AbstractStackTraceFilter {
 		StackTraceFilter cause = origin.getCause();
 
 		if (cause != null) {
+			if (classNames.isEmpty()) {
+				return unpack(cause, classNames);
+			}
+
 			for (String className : classNames) {
 				if (className.equals(origin.getClassName())) {
 					return unpack(cause, classNames);

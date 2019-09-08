@@ -63,7 +63,7 @@ public final class UnpackStackTraceFilterTest {
 	 * Verifies that multiple class names of throwables can be configured.
 	 */
 	@Test
-	public void multipleClassNames() {
+	public void unpackMultipleExceptions() {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 		
@@ -74,7 +74,23 @@ public final class UnpackStackTraceFilterTest {
 		assertThat(filter.getStackTrace()).containsExactly(childException.getStackTrace());
 		assertThat(filter.getCause()).isNull();
 	}
-	
+
+	/**
+	 * Verifies that the cause throwable will be used, if all throwables should be unpacked.
+	 */
+	@Test
+	public void unpackAll() {
+		NullPointerException childException = new NullPointerException("Hello Hell!");
+		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
+		
+		StackTraceFilter filter = create(parentException);
+		
+		assertThat(filter.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(filter.getMessage()).isEqualTo("Hello Hell!");
+		assertThat(filter.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(filter.getCause()).isNull();
+	}
+
 	/**
 	 * Verifies that the original throwable will be used, if there is no cause throwable.
 	 */
@@ -89,7 +105,6 @@ public final class UnpackStackTraceFilterTest {
 		assertThat(filter.getStackTrace()).containsExactly(exception.getStackTrace());
 		assertThat(filter.getCause()).isNull();
 	}
-	
 	
 	/**
 	 * Verifies that the original throwable will be used, if the parent throwable doesn't have the expected class name.
