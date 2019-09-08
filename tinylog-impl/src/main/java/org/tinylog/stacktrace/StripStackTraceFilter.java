@@ -13,63 +13,30 @@
 
 package org.tinylog.stacktrace;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Filter for removing defined packages and classes from stack trace.
  */
-public final class StripStackTraceFilter implements StackTraceFilter {
-
-	private static final StackTraceElement[] EMPTY_TRACE = new StackTraceElement[0];
-
-	private final List<String> packagesAndClasses;
+public final class StripStackTraceFilter extends AbstractStackTraceFilter {
 
 	/**
 	 * @param argument
 	 *            List of packages and classes, separated by '|'
 	 */
 	public StripStackTraceFilter(final String argument) {
-		this.packagesAndClasses = new ArrayList<String>();
-
-		if (argument != null) {
-			for (String token : argument.split("\\|")) {
-				token = token.trim();
-				if (!token.isEmpty()) {
-					packagesAndClasses.add(token);
-				}
-			}
-		}
+		super(argument);
 	}
-
+	
 	@Override
-	public Throwable apply(final Throwable throwable) {
-		StackTraceElement[] currentTrace = throwable.getStackTrace();
-		List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>(currentTrace.length);
-
-		for (StackTraceElement element : currentTrace) {
-			String className = element.getClassName();
-			boolean skip = false;
-			
-			for (String filter : packagesAndClasses) {
-				if (className.startsWith(filter) && (filter.length() == className.length() || className.charAt(filter.length()) == '.')) {
-					skip = true;
-					break;
-				}
-			}
-			
-			if (!skip) {
-				newTrace.add(element);
+	protected boolean shouldKept(final String className, final List<String> filters) {
+		for (String filter : filters) {
+			if (match(className, filter)) {
+				return false;
 			}
 		}
-
-		throwable.setStackTrace(newTrace.toArray(EMPTY_TRACE));
-
-		if (throwable.getCause() != null) {
-			apply(throwable.getCause());
-		}
-
-		return throwable;
+		
+		return true;
 	}
 
 }
