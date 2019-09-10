@@ -14,7 +14,6 @@
 package org.tinylog.stacktrace;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -144,7 +143,7 @@ public final class StripStackTraceFilterTest {
 	 * @return Created instance
 	 */
 	private StripStackTraceFilter create(final Throwable throwable, final String... packagesAndClasses) {
-		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable, Collections.emptyList());
+		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable);
 		return new StripStackTraceFilter(origin, Arrays.asList(packagesAndClasses));
 	}
 

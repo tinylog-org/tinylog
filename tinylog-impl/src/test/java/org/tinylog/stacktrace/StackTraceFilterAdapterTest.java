@@ -13,8 +13,6 @@
 
 package org.tinylog.stacktrace;
 
-import java.util.Collections;
-
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +29,7 @@ public final class StackTraceFilterAdapterTest {
 	public void keepClassName() {
 		RuntimeException exception = new RuntimeException();
 
-		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception, Collections.emptyList());
+		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception);
 		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
 	}
 
@@ -42,7 +40,7 @@ public final class StackTraceFilterAdapterTest {
 	public void keepMessage() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception, Collections.emptyList());
+		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception);
 		assertThat(filter.getMessage()).isEqualTo("Hello World!");
 	}
 
@@ -53,7 +51,7 @@ public final class StackTraceFilterAdapterTest {
 	public void loopTroughStackTrace() {
 		RuntimeException exception = new RuntimeException();
 
-		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception, Collections.emptyList());
+		StackTraceFilterAdapter filter = new StackTraceFilterAdapter(exception);
 		assertThat(filter.getStackTrace()).containsExactly(exception.getStackTrace());
 	}
 
@@ -64,7 +62,7 @@ public final class StackTraceFilterAdapterTest {
 	public void loopTroughNullCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		StackTraceFilterAdapter parentFilter = new StackTraceFilterAdapter(exception, Collections.emptyList());
+		StackTraceFilterAdapter parentFilter = new StackTraceFilterAdapter(exception);
 		StackTraceFilterAdapter childFilter = parentFilter.getCause();
 
 		assertThat(childFilter).isNull();
@@ -77,7 +75,7 @@ public final class StackTraceFilterAdapterTest {
 	public void keepExistingCause() {
 		RuntimeException exception = new RuntimeException("Hello Heaven!", new NullPointerException("Hello Hell!"));
 
-		StackTraceFilterAdapter parentFilter = new StackTraceFilterAdapter(exception, Collections.emptyList());
+		StackTraceFilterAdapter parentFilter = new StackTraceFilterAdapter(exception);
 		StackTraceFilterAdapter childFilter = parentFilter.getCause();
 
 		assertThat(childFilter).isNotNull();

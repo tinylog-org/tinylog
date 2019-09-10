@@ -26,17 +26,13 @@ import java.util.List;
 public final class StackTraceFilterAdapter implements StackTraceFilter {
 
 	private final Throwable throwable;
-	private final List<String> arguments;
 
 	/**
 	 * @param throwable
 	 *            Origin source throwable
-	 * @param arguments
-	 *            Configured arguments will be ignored
 	 */
-	public StackTraceFilterAdapter(final Throwable throwable, final List<String> arguments) {
+	public StackTraceFilterAdapter(final Throwable throwable) {
 		this.throwable = throwable;
-		this.arguments = arguments;
 	}
 
 	@Override
@@ -56,7 +52,7 @@ public final class StackTraceFilterAdapter implements StackTraceFilter {
 
 	@Override
 	public StackTraceFilterAdapter getCause() {
-		return throwable.getCause() == null ? null : new StackTraceFilterAdapter(throwable.getCause(), arguments);
+		return throwable.getCause() == null ? null : new StackTraceFilterAdapter(throwable.getCause());
 	}
 
 }
