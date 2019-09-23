@@ -45,7 +45,11 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class Configuration {
 
-	private static final String DEFAULT_CONFIGURATION_FILE = "tinylog.properties";
+	private static final String[] CONFIGURATION_FILES = new String[] {
+		"tinylog-dev.properties",
+		"tinylog-test.properties",
+		"tinylog.properties"
+	};
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";
 	private static final String CONFIGURATION_PROPERTY = PROPERTIES_PREFIX + "configuration";
@@ -179,9 +183,13 @@ public final class Configuration {
 				}
 				load(properties, stream);
 			} else {
-				InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
-				if (stream != null) {
-					load(properties, stream);
+				for (String configurationFile : CONFIGURATION_FILES) {
+					file = configurationFile;
+					InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+					if (stream != null) {
+						load(properties, stream);
+						break;
+					}
 				}
 			}
 		} catch (IOException ex) {

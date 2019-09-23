@@ -85,18 +85,97 @@ public final class ConfigurationTest {
 	}
 
 	/**
-	 * Verifies that {@code tinylog.properties} will be loaded by default.
+	 * Verifies that {@code tinylog.properties} will be loaded.
 	 *
 	 * @throws Exception
 	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
 	 */
 	@Test
-	public void defaultPropertiesFile() throws Exception {
+	public void productionPropertiesFile() throws Exception {
 		FileSystem.createResource("tinylog.properties", "level = off");
 		try {
 			loadProperties(null);
 			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
 		} finally {
+			FileSystem.deleteResource("tinylog.properties");
+		}
+	}
+
+	/**
+	 * Verifies that {@code tinylog-test.properties} will be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void testPropertiesFile() throws Exception {
+		FileSystem.createResource("tinylog-test.properties", "level = off");
+
+		try {
+			loadProperties(null);
+			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
+		} finally {
+			FileSystem.deleteResource("tinylog-test.properties");
+		}
+	}
+
+	/**
+	 * Verifies that {@code tinylog-test.properties} will be loaded, if this file and {@code tinylog.properties} are available.
+	 *
+	 * @throws Exception
+	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void testPropertiesFileBeforeRelease() throws Exception {
+		FileSystem.createResource("tinylog-test.properties", "level = off");
+		FileSystem.createResource("tinylog.properties", "level = trace");
+
+		try {
+			loadProperties(null);
+			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
+		} finally {
+			FileSystem.deleteResource("tinylog-dev.properties");
+			FileSystem.deleteResource("tinylog-test.properties");
+			FileSystem.deleteResource("tinylog.properties");
+		}
+	}
+
+	/**
+	 * Verifies that {@code tinylog-dev.properties} will be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void developmentPropertiesFile() throws Exception {
+		FileSystem.createResource("tinylog-dev.properties", "level = off");
+
+		try {
+			loadProperties(null);
+			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
+		} finally {
+			FileSystem.deleteResource("tinylog-dev.properties");
+		}
+	}
+
+	/**
+	 * Verifies that {@code tinylog-dev.properties} will be loaded, if all three properties files are available.
+	 *
+	 * @throws Exception
+	 *             Failed creating {@code tinylog.properties} or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void developmentPropertiesFileBeforeOthers() throws Exception {
+		FileSystem.createResource("tinylog-dev.properties", "level = off");
+		FileSystem.createResource("tinylog-test.properties", "level = trace");
+		FileSystem.createResource("tinylog.properties", "level = trace");
+
+		try {
+			loadProperties(null);
+			assertThat(Configuration.get("level")).isEqualToIgnoringCase("off");
+		} finally {
+			FileSystem.deleteResource("tinylog-dev.properties");
+			FileSystem.deleteResource("tinylog-test.properties");
 			FileSystem.deleteResource("tinylog.properties");
 		}
 	}
