@@ -16,33 +16,42 @@ package org.tinylog.throwable;
 import java.util.List;
 
 /**
- * Stack trace filter that drops the causes of configured throwables.
+ * Filter for unpacking configured throwables.
+ * 
+ * <p>
+ * The cause throwable instead of the original passed throwable will be used for all configured throwable class names,
+ * if there is a cause throwable.
+ * </p>
  */
-public final class DropCauseStackTraceFilter extends AbstractStackTraceFilter {
+public final class UnpackThrowableFilter extends AbstractThrowableFilter {
 
 	/**
 	 * @param arguments
-	 *            Configured class names of throwables to cut causes off
+	 *            Configured class names of throwables to unpack
 	 */
-	public DropCauseStackTraceFilter(final List<String> arguments) {
+	public UnpackThrowableFilter(final List<String> arguments) {
 		super(arguments);
 	}
 	
 	@Override
 	public ThrowableData filter(final ThrowableData origin) {
-		if (getArguments().isEmpty()) {
-			return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
-		} else {
-			String className = origin.getClassName();
+		ThrowableData cause = origin.getCause();
 
-			for (String filter : getArguments()) {
-				if (className.equals(filter)) {
-					return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
+		if (cause != null) {
+			List<String> classNames = getArguments();
+
+			if (classNames.isEmpty()) {
+				return filter(cause);
+			}
+
+			for (String className : classNames) {
+				if (className.equals(origin.getClassName())) {
+					return filter(cause);
 				}
 			}
-			
-			return origin;
 		}
+
+		return origin;
 	}
-	
+
 }

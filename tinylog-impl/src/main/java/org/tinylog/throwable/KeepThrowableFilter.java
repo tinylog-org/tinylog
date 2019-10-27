@@ -13,18 +13,30 @@
 
 package org.tinylog.throwable;
 
-/**
- * Stack trace filters transform exceptions and other throwables for improving and customizing the output.
- */
-public interface StackTraceFilter {
+import java.util.List;
 
+/**
+ * Filter for removing all stack trace elements from stack trace except the defined packages and classes.
+ */
+public final class KeepThrowableFilter extends AbstractStackTraceElementsFilter {
+	
 	/**
-	 * Filters or transforms an exception or other throwables.
-	 * 
-	 * @param origin
-	 *            Original exception or other throwable
-	 * @return Modified or original throwable
+	 * @param arguments
+	 *            Configured packages and classes to keep
 	 */
-	ThrowableData filter(ThrowableData origin);
+	public KeepThrowableFilter(final List<String> arguments) {
+		super(arguments);
+	}
+	
+	@Override
+	protected boolean shouldKept(final String className, final List<String> filters) {
+		for (String filter : filters) {
+			if (match(className, filter)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 }

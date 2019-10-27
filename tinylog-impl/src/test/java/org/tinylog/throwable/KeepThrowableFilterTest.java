@@ -21,9 +21,9 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link KeepStackTraceFilter}.
+ * Tests for {@link KeepThrowableFilter}.
  */
-public final class KeepStackTraceFilterTest {
+public final class KeepThrowableFilterTest {
 
 	/**
 	 * Verifies that the class name of the source throwable will be looped through.
@@ -32,7 +32,7 @@ public final class KeepStackTraceFilterTest {
 	public void keepClassName() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 		
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -45,7 +45,7 @@ public final class KeepStackTraceFilterTest {
 	public void keepMessage() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 		
 		assertThat(data.getMessage()).isEqualTo("Hello World!");
@@ -58,7 +58,7 @@ public final class KeepStackTraceFilterTest {
 	public void loopTroughNullCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getCause()).isNull();
@@ -71,7 +71,7 @@ public final class KeepStackTraceFilterTest {
 	public void keepExistingCause() {
 		RuntimeException exception = new RuntimeException("Hello Heaven!", new NullPointerException("Hello Hell!"));
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getCause()).isNotNull();
@@ -86,7 +86,7 @@ public final class KeepStackTraceFilterTest {
 	public void empty() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).isEmpty();
@@ -99,7 +99,7 @@ public final class KeepStackTraceFilterTest {
 	public void singlePackage() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList("org.tinylog"));
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList("org.tinylog"));
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace())
@@ -114,7 +114,7 @@ public final class KeepStackTraceFilterTest {
 	public void incompletePackage() {
 		RuntimeException exception = new RuntimeException();
 		
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList("o"));
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList("o"));
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).isEmpty();
@@ -128,7 +128,7 @@ public final class KeepStackTraceFilterTest {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Arrays.asList("com", "java", "javax", "jdk", "org", "sun"));
+		KeepThrowableFilter filter = new KeepThrowableFilter(Arrays.asList("com", "java", "javax", "jdk", "org", "sun"));
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).hasSize(elements);
@@ -141,12 +141,12 @@ public final class KeepStackTraceFilterTest {
 	public void singleClass() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList(KeepStackTraceFilterTest.class.getName()));
+		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList(KeepThrowableFilterTest.class.getName()));
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace())
 			.hasSize(1)
-			.allMatch(element -> element.getClassName().startsWith(KeepStackTraceFilterTest.class.getName()));
+			.allMatch(element -> element.getClassName().startsWith(KeepThrowableFilterTest.class.getName()));
 	}
 
 }

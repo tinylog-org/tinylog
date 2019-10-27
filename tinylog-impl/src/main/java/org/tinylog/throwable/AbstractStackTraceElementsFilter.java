@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract stack trace filter for filtering stack trace elements by configurable packages and classes.
+ * Abstract throwable filter for filtering stack trace elements by configurable packages and classes.
  */
-public abstract class AbstractStackTraceElementsFilter extends AbstractStackTraceFilter {
+public abstract class AbstractStackTraceElementsFilter extends AbstractThrowableFilter {
 
 	/**
 	 * @param arguments

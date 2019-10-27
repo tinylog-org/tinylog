@@ -22,42 +22,42 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link UnpackStackTraceFilter}.
+ * Tests for {@link DropCauseThrowableFilter}.
  */
-public final class UnpackStackTraceFilterTest {
+public final class DropCauseThrowableFilterTest {
 
 	/**
-	 * Verifies that the direct cause throwable will be used, if the parent throwable has the expected class name.
+	 * Verifies that a single cause throwable will be dropped, if the parent throwable has the expected class name.
 	 */
 	@Test
-	public void unpackSingleCause() {
-		NullPointerException childException = new NullPointerException("Hello World!");
+	public void dropSingleCause() {
+		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(data.getMessage()).isEqualTo("Hello World!");
-		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
 		assertThat(data.getCause()).isNull();
 	}
-	
+
 	/**
-	 * Verifies that the deepest cause throwable will be used, if the parent and child throwables have the expected class name.
+	 * Verifies that all nested cause throwables will be dropped, if the parent throwable has the expected class name.
 	 */
 	@Test
-	public void unpackNestedCause() {
+	public void dropNestedCause() {
 		NullPointerException grandChildException = new NullPointerException("Hello Hell!");
 		RuntimeException childException = new RuntimeException("Hello World!", grandChildException);
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(data.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(data.getStackTrace()).containsExactly(grandChildException.getStackTrace());
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
 		assertThat(data.getCause()).isNull();
 	}
 
@@ -65,44 +65,44 @@ public final class UnpackStackTraceFilterTest {
 	 * Verifies that multiple class names of throwables can be configured.
 	 */
 	@Test
-	public void unpackMultipleExceptions() {
-		NullPointerException childException = new NullPointerException("Hello World!");
+	public void dropMultipleExceptions() {
+		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(data.getMessage()).isEqualTo("Hello World!");
-		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getClassName()).isEqualTo(IOException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
 		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that the deeptest cause throwable will be used, if all throwables should be unpacked.
+	 * Verifies that all kind of cause throwables will be dropped, if no throwable class names have been defined.
 	 */
 	@Test
-	public void unpackAll() {
-		NullPointerException childException = new NullPointerException("Hello World!");
+	public void dropAll() {
+		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.emptyList());
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.emptyList());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(data.getMessage()).isEqualTo("Hello World!");
-		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
 		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that the original throwable will be used, if there is no cause throwable.
+	 * Verifies that throwables without any cause throwables will be output unmodified.
 	 */
 	@Test
 	public void missingCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -110,17 +110,17 @@ public final class UnpackStackTraceFilterTest {
 		assertThat(data.getStackTrace()).containsExactly(exception.getStackTrace());
 		assertThat(data.getCause()).isNull();
 	}
-	
+
 	/**
-	 * Verifies that the original throwable will be used, if the parent throwable doesn't have the expected class name.
+	 * Verifies that throwables that don't have the expected class name will be output unmodified with their origin cause throwables.
 	 */
 	@Test
 	public void otherException() {
-		NullPointerException childException = new NullPointerException("Hello World!");
+		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
-		
-		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
-		
+
+		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+	
 		ThrowableData parentData = filter.filter(new ThrowableWrapper(parentException));
 		assertThat(parentData.getClassName()).isEqualTo(IOException.class.getName());
 		assertThat(parentData.getMessage()).isEqualTo("Hello Heaven!");
@@ -129,7 +129,7 @@ public final class UnpackStackTraceFilterTest {
 
 		ThrowableData causeData = parentData.getCause();
 		assertThat(causeData.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(causeData.getMessage()).isEqualTo("Hello World!");
+		assertThat(causeData.getMessage()).isEqualTo("Hello Hell!");
 		assertThat(causeData.getStackTrace()).containsExactly(childException.getStackTrace());
 		assertThat(causeData.getCause()).isNull();
 	}

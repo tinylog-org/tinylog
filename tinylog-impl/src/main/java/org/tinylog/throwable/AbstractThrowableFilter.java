@@ -16,27 +16,27 @@ package org.tinylog.throwable;
 import java.util.List;
 
 /**
- * Filter for removing defined packages and classes from stack trace.
+ * Abstract throwable filter that just loops trough all data of the passed origin throwable data.
  */
-public final class StripStackTraceFilter extends AbstractStackTraceElementsFilter {
-	
+public abstract class AbstractThrowableFilter implements ThrowableFilter {
+
+	private final List<String> arguments;
+
 	/**
 	 * @param arguments
-	 *            Configured packages and classes to remove
+	 *            Configured arguments
 	 */
-	public StripStackTraceFilter(final List<String> arguments) {
-		super(arguments);
+	public AbstractThrowableFilter(final List<String> arguments) {
+		this.arguments = arguments;
 	}
-	
-	@Override
-	protected boolean shouldKept(final String className, final List<String> filters) {
-		for (String filter : filters) {
-			if (match(className, filter)) {
-				return false;
-			}
-		}
-		
-		return true;
+
+	/**
+	 * Gets all passed arguments.
+	 * 
+	 * @return Passed arguments
+	 */
+	protected final List<String> getArguments() {
+		return arguments;
 	}
 
 }
