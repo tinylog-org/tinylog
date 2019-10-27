@@ -11,7 +11,20 @@
  * specific language governing permissions and limitations under the License.
  */
 
+package org.tinylog.throwable;
+
 /**
- * Filters for transforming exceptions and other throwables.
+ * Stack trace filters transform exceptions and other throwables for improving and customizing the output.
  */
-package org.tinylog.stacktrace;
+public interface StackTraceFilter {
+
+	/**
+	 * Filters or transforms an exception or other throwables.
+	 * 
+	 * @param origin
+	 *            Original exception or other throwable
+	 * @return Modified or original throwable
+	 */
+	ThrowableData filter(ThrowableData origin);
+
+}
