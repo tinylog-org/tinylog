@@ -16,42 +16,18 @@ package org.tinylog.stacktrace;
 import java.util.List;
 
 /**
- * Abstract stack trace filter that just loops trough all data of the passed origin stack trace filter.
+ * Abstract stack trace filter that just loops trough all data of the passed origin throwable data.
  */
 public abstract class AbstractStackTraceFilter implements StackTraceFilter {
 
-	private final StackTraceFilter origin;
 	private final List<String> arguments;
 
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
 	 * @param arguments
 	 *            Configured arguments
 	 */
-	public AbstractStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
-		this.origin = origin;
+	public AbstractStackTraceFilter(final List<String> arguments) {
 		this.arguments = arguments;
-	}
-
-	@Override
-	public String getClassName() {
-		return origin.getClassName();
-	}
-
-	@Override
-	public String getMessage() {
-		return origin.getMessage();
-	}
-
-	@Override
-	public List<StackTraceElement> getStackTrace() {
-		return origin.getStackTrace();
-	}
-
-	@Override
-	public StackTraceFilter getCause() {
-		return origin.getCause();
 	}
 
 	/**

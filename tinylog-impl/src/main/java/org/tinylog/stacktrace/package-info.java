@@ -12,6 +12,6 @@
  */
 
 /**
- * Filters for transforming the stack trace of exceptions and other throwables.
+ * Filters for transforming exceptions and other throwables.
  */
 package org.tinylog.stacktrace;

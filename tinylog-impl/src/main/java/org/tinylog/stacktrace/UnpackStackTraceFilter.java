@@ -26,35 +26,27 @@ import java.util.List;
 public final class UnpackStackTraceFilter extends AbstractStackTraceFilter {
 
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
 	 * @param arguments
 	 *            Configured class names of throwables to unpack
 	 */
-	public UnpackStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
-		super(unpack(origin, arguments), arguments);
+	public UnpackStackTraceFilter(final List<String> arguments) {
+		super(arguments);
 	}
-
-	/**
-	 * Unpacks all passed throwables.
-	 * 
-	 * @param origin
-	 *            Origin source stack trace filter
-	 * @param classNames
-	 *            Configured class names of throwables to unpack
-	 * @return Stack trace filter to use for output
-	 */
-	private static StackTraceFilter unpack(final StackTraceFilter origin, final List<String> classNames) {
-		StackTraceFilter cause = origin.getCause();
+	
+	@Override
+	public ThrowableData filter(final ThrowableData origin) {
+		ThrowableData cause = origin.getCause();
 
 		if (cause != null) {
+			List<String> classNames = getArguments();
+
 			if (classNames.isEmpty()) {
-				return unpack(cause, classNames);
+				return filter(cause);
 			}
 
 			for (String className : classNames) {
 				if (className.equals(origin.getClassName())) {
-					return unpack(cause, classNames);
+					return filter(cause);
 				}
 			}
 		}

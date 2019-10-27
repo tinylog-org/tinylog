@@ -16,27 +16,36 @@ package org.tinylog.stacktrace;
 import java.util.List;
 
 /**
- * Filter for removing all stack trace elements from stack trace except the defined packages and classes.
+ * Interface for all relevant throwable data.
  */
-public final class KeepStackTraceFilter extends AbstractStackTraceElementsFilter {
+public interface ThrowableData {
+
+	/**
+	 * Gets the class name of the throwable to output.
+	 * 
+	 * @return Class name of the throwable
+	 */
+	String getClassName();
+
+	/**
+	 * Gets the message of the throwable to output.
+	 * 
+	 * @return Message of the throwable
+	 */
+	String getMessage();
+
+	/**
+	 * Gets the stack trace of the throwable to output.
+	 * 
+	 * @return Stack trace of the throwable
+	 */
+	List<StackTraceElement> getStackTrace();
 	
 	/**
-	 * @param arguments
-	 *            Configured packages and classes to keep
+	 * Gets the cause of the throwable to output.
+	 * 
+	 * @return Cause of the throwable or {@code null}
 	 */
-	public KeepStackTraceFilter(final List<String> arguments) {
-		super(arguments);
-	}
-	
-	@Override
-	protected boolean shouldKept(final String className, final List<String> filters) {
-		for (String filter : filters) {
-			if (match(className, filter)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
+	ThrowableData getCause();
 
 }

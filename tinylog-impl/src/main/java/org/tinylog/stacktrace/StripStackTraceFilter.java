@@ -21,20 +21,13 @@ import java.util.List;
 public final class StripStackTraceFilter extends AbstractStackTraceElementsFilter {
 	
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
 	 * @param arguments
 	 *            Configured packages and classes to remove
 	 */
-	public StripStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
-		super(origin, arguments);
+	public StripStackTraceFilter(final List<String> arguments) {
+		super(arguments);
 	}
 	
-	@Override
-	public StripStackTraceFilter getCause() {
-		return super.getCause() == null ? null : new StripStackTraceFilter(super.getCause(), getArguments());
-	}
-
 	@Override
 	protected boolean shouldKept(final String className, final List<String> filters) {
 		for (String filter : filters) {

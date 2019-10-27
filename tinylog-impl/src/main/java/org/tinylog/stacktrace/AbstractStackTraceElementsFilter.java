@@ -22,18 +22,16 @@ import java.util.List;
 public abstract class AbstractStackTraceElementsFilter extends AbstractStackTraceFilter {
 
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
 	 * @param arguments
 	 *            Configured packages and classes
 	 */
-	public AbstractStackTraceElementsFilter(final StackTraceFilter origin, final List<String> arguments) {
-		super(origin, arguments);
+	public AbstractStackTraceElementsFilter(final List<String> arguments) {
+		super(arguments);
 	}
 
 	@Override
-	public List<StackTraceElement> getStackTrace() {
-		List<StackTraceElement> currentTrace = super.getStackTrace();
+	public ThrowableData filter(final ThrowableData origin) {
+		List<StackTraceElement> currentTrace = origin.getStackTrace();
 		List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>(currentTrace.size());
 
 		for (StackTraceElement element : currentTrace) {
@@ -42,7 +40,12 @@ public abstract class AbstractStackTraceElementsFilter extends AbstractStackTrac
 			}
 		}
 
-		return newTrace;
+		ThrowableData cause = origin.getCause();
+		if (cause != null) {
+			cause = filter(cause);
+		}
+
+		return new ThrowableStore(origin.getClassName(), origin.getMessage(), newTrace, cause);
 	}
 
 	/**

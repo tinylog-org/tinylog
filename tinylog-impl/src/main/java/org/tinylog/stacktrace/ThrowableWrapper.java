@@ -17,21 +17,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Adapter for using any kind of throwables as a stack trace filter.
- * 
- * <p>
- * All data of the passed throwable will be just looped trough.
- * </p>
+ * Wrapper for exceptions and other throwables.
  */
-public final class StackTraceFilterAdapter implements StackTraceFilter {
+public final class ThrowableWrapper implements ThrowableData {
 
 	private final Throwable throwable;
 
 	/**
 	 * @param throwable
-	 *            Origin source throwable
+	 *            Throwable to wrap
 	 */
-	public StackTraceFilterAdapter(final Throwable throwable) {
+	public ThrowableWrapper(final Throwable throwable) {
 		this.throwable = throwable;
 	}
 
@@ -51,8 +47,8 @@ public final class StackTraceFilterAdapter implements StackTraceFilter {
 	}
 
 	@Override
-	public StackTraceFilterAdapter getCause() {
-		return throwable.getCause() == null ? null : new StackTraceFilterAdapter(throwable.getCause());
+	public ThrowableWrapper getCause() {
+		return throwable.getCause() == null ? null : new ThrowableWrapper(throwable.getCause());
 	}
 
 }

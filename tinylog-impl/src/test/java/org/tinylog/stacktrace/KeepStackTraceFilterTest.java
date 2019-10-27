@@ -14,6 +14,7 @@
 package org.tinylog.stacktrace;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -31,8 +32,10 @@ public final class KeepStackTraceFilterTest {
 	public void keepClassName() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepStackTraceFilter filter = create(exception, "");
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+		
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
 	}
 
 	/**
@@ -42,21 +45,23 @@ public final class KeepStackTraceFilterTest {
 	public void keepMessage() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepStackTraceFilter filter = create(exception, "");
-		assertThat(filter.getMessage()).isEqualTo("Hello World!");
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+		
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
 	}
 
 	/**
-	 * Verifies that a null cause of the source throwable will be looped through.
+	 * Verifies that a {@code null} cause of the source throwable will be looped through.
 	 */
 	@Test
 	public void loopTroughNullCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepStackTraceFilter parentFilter = create(exception, "");
-		KeepStackTraceFilter childFilter = parentFilter.getCause();
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		assertThat(childFilter).isNull();
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -66,12 +71,12 @@ public final class KeepStackTraceFilterTest {
 	public void keepExistingCause() {
 		RuntimeException exception = new RuntimeException("Hello Heaven!", new NullPointerException("Hello Hell!"));
 
-		KeepStackTraceFilter parentFilter = create(exception, "");
-		KeepStackTraceFilter childFilter = parentFilter.getCause();
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		assertThat(childFilter).isNotNull();
-		assertThat(childFilter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(childFilter.getMessage()).isEqualTo("Hello Hell!");
+		assertThat(data.getCause()).isNotNull();
+		assertThat(data.getCause().getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getCause().getMessage()).isEqualTo("Hello Hell!");
 	}
 	
 	/**
@@ -80,9 +85,11 @@ public final class KeepStackTraceFilterTest {
 	@Test
 	public void empty() {
 		RuntimeException exception = new RuntimeException();
-		
-		KeepStackTraceFilter filter = create(exception);
-		assertThat(filter.getStackTrace()).isEmpty();
+
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace()).isEmpty();
 	}
 
 	/**
@@ -91,9 +98,13 @@ public final class KeepStackTraceFilterTest {
 	@Test
 	public void singlePackage() {
 		RuntimeException exception = new RuntimeException();
-		
-		KeepStackTraceFilter filter = create(exception, "org.tinylog");
-		assertThat(filter.getStackTrace()).hasSize(1);
+
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList("org.tinylog"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace())
+			.hasSize(1)
+			.allMatch(element -> element.getClassName().startsWith("org.tinylog"));
 	}
 
 	/**
@@ -103,20 +114,24 @@ public final class KeepStackTraceFilterTest {
 	public void incompletePackage() {
 		RuntimeException exception = new RuntimeException();
 		
-		KeepStackTraceFilter filter = create(exception, "o");
-		assertThat(filter.getStackTrace()).isEmpty();
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList("o"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace()).isEmpty();
 	}
 
 	/**
-	 * Verifies that a multiple packages can be kept on stack trace.
+	 * Verifies that multiple packages can be kept on stack trace.
 	 */
 	@Test
 	public void multiplePackages() {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
-	
-		KeepStackTraceFilter filter = create(exception, "com", "java", "javax", "jdk", "org", "sun");
-		assertThat(filter.getStackTrace()).hasSize(elements);
+
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Arrays.asList("com", "java", "javax", "jdk", "org", "sun"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace()).hasSize(elements);
 	}
 
 	/**
@@ -125,23 +140,13 @@ public final class KeepStackTraceFilterTest {
 	@Test
 	public void singleClass() {
 		RuntimeException exception = new RuntimeException();
-		
-		KeepStackTraceFilter filter = create(exception, KeepStackTraceFilterTest.class.getName());
-		assertThat(filter.getStackTrace()).hasSize(1);
-	}
 
-	/**
-	 * Creates a new {@link KeepStackTraceFilter} instance.
-	 * 
-	 * @param throwable
-	 *            Source throwable to pass
-	 * @param packagesAndClasses
-	 *            Packages and classes to pass
-	 * @return Created instance
-	 */
-	private KeepStackTraceFilter create(final Throwable throwable, final String... packagesAndClasses) {
-		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable);
-		return new KeepStackTraceFilter(origin, Arrays.asList(packagesAndClasses));
+		KeepStackTraceFilter filter = new KeepStackTraceFilter(Collections.singletonList(KeepStackTraceFilterTest.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace())
+			.hasSize(1)
+			.allMatch(element -> element.getClassName().startsWith(KeepStackTraceFilterTest.class.getName()));
 	}
 
 }

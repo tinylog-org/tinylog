@@ -13,39 +13,18 @@
 
 package org.tinylog.stacktrace;
 
-import java.util.List;
-
 /**
- * Stack trace filters transform exceptions and other throwables to improve the output.
+ * Stack trace filters transform exceptions and other throwables for improving and customizing the output.
  */
 public interface StackTraceFilter {
 
 	/**
-	 * Gets the class name of the throwable to output.
+	 * Filters or transforms an exception or other throwables.
 	 * 
-	 * @return Class name of the throwable
+	 * @param origin
+	 *            Original exception or other throwable
+	 * @return Modified or original throwable
 	 */
-	String getClassName();
-
-	/**
-	 * Gets the message of the throwable to output.
-	 * 
-	 * @return Message of the throwable
-	 */
-	String getMessage();
-
-	/**
-	 * Gets the stack trace of the throwable to output.
-	 * 
-	 * @return Stack trace of the throwable
-	 */
-	List<StackTraceElement> getStackTrace();
-	
-	/**
-	 * Gets the cause of the throwable to output.
-	 * 
-	 * @return Cause of the throwable or {@code null}
-	 */
-	StackTraceFilter getCause();
+	ThrowableData filter(ThrowableData origin);
 
 }

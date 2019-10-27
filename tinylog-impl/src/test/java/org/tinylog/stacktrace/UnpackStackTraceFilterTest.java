@@ -15,6 +15,7 @@ package org.tinylog.stacktrace;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -30,15 +31,16 @@ public final class UnpackStackTraceFilterTest {
 	 */
 	@Test
 	public void unpackSingleCause() {
-		NullPointerException childException = new NullPointerException("Hello Hell!");
+		NullPointerException childException = new NullPointerException("Hello World!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName());
-		
-		assertThat(filter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(filter.getStackTrace()).containsExactly(childException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
+
+		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
+		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 	
 	/**
@@ -50,12 +52,13 @@ public final class UnpackStackTraceFilterTest {
 		RuntimeException childException = new RuntimeException("Hello World!", grandChildException);
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName());
-		
-		assertThat(filter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(filter.getStackTrace()).containsExactly(grandChildException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
+
+		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Hell!");
+		assertThat(data.getStackTrace()).containsExactly(grandChildException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -63,31 +66,33 @@ public final class UnpackStackTraceFilterTest {
 	 */
 	@Test
 	public void unpackMultipleExceptions() {
-		NullPointerException childException = new NullPointerException("Hello Hell!");
+		NullPointerException childException = new NullPointerException("Hello World!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 		
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName(), IOException.class.getName());
-		
-		assertThat(filter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(filter.getStackTrace()).containsExactly(childException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		StackTraceFilter filter = new UnpackStackTraceFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
+
+		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
+		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that the cause throwable will be used, if all throwables should be unpacked.
+	 * Verifies that the deeptest cause throwable will be used, if all throwables should be unpacked.
 	 */
 	@Test
 	public void unpackAll() {
-		NullPointerException childException = new NullPointerException("Hello Hell!");
+		NullPointerException childException = new NullPointerException("Hello World!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		StackTraceFilter filter = create(parentException);
-		
-		assertThat(filter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(filter.getStackTrace()).containsExactly(childException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
+
+		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
+		assertThat(data.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -97,12 +102,13 @@ public final class UnpackStackTraceFilterTest {
 	public void missingCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 		
-		StackTraceFilter filter = create(exception, RuntimeException.class.getName());
-		
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello World!");
-		assertThat(filter.getStackTrace()).containsExactly(exception.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
+		assertThat(data.getStackTrace()).containsExactly(exception.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 	
 	/**
@@ -110,36 +116,22 @@ public final class UnpackStackTraceFilterTest {
 	 */
 	@Test
 	public void otherException() {
-		NullPointerException childException = new NullPointerException("Hello Hell!");
+		NullPointerException childException = new NullPointerException("Hello World!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 		
-		StackTraceFilter parentFilter = create(parentException, RuntimeException.class.getName());
+		StackTraceFilter filter = new UnpackStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
 		
-		assertThat(parentFilter.getClassName()).isEqualTo(IOException.class.getName());
-		assertThat(parentFilter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(parentFilter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(parentFilter.getCause()).isNotNull();
+		ThrowableData parentData = filter.filter(new ThrowableWrapper(parentException));
+		assertThat(parentData.getClassName()).isEqualTo(IOException.class.getName());
+		assertThat(parentData.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(parentData.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(parentData.getCause()).isNotNull();
 
-		StackTraceFilter childFilter = parentFilter.getCause();
-		
-		assertThat(childFilter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(childFilter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(childFilter.getStackTrace()).containsExactly(childException.getStackTrace());
-		assertThat(childFilter.getCause()).isNull();
-	}
-
-	/**
-	 * Creates a new {@link UnpackStackTraceFilter} instance.
-	 * 
-	 * @param throwable
-	 *            Source throwable to pass
-	 * @param classNames
-	 *            Class names of throwables to pass
-	 * @return Created instance
-	 */
-	private UnpackStackTraceFilter create(final Throwable throwable, final String... classNames) {
-		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable);
-		return new UnpackStackTraceFilter(origin, Arrays.asList(classNames));
+		ThrowableData causeData = parentData.getCause();
+		assertThat(causeData.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(causeData.getMessage()).isEqualTo("Hello World!");
+		assertThat(causeData.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(causeData.getCause()).isNull();
 	}
 
 }

@@ -15,6 +15,7 @@ package org.tinylog.stacktrace;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -26,23 +27,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class DropCauseStackTraceFilterTest {
 
 	/**
-	 * Verifies that the direct cause throwable will be dropped, if the parent throwable has the expected class name.
+	 * Verifies that a single cause throwable will be dropped, if the parent throwable has the expected class name.
 	 */
 	@Test
 	public void dropSingleCause() {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName());
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(filter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that all cause throwables will be dropped, if the parent throwable has the expected class name.
+	 * Verifies that all nested cause throwables will be dropped, if the parent throwable has the expected class name.
 	 */
 	@Test
 	public void dropNestedCause() {
@@ -50,12 +52,13 @@ public final class DropCauseStackTraceFilterTest {
 		RuntimeException childException = new RuntimeException("Hello World!", grandChildException);
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName());
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(filter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -66,28 +69,30 @@ public final class DropCauseStackTraceFilterTest {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 
-		StackTraceFilter filter = create(parentException, RuntimeException.class.getName(), IOException.class.getName());
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(filter.getClassName()).isEqualTo(IOException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(filter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		assertThat(data.getClassName()).isEqualTo(IOException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that cause throwables will be always dropped, if no throwable class names have been defined.
+	 * Verifies that all kind of cause throwables will be dropped, if no throwable class names have been defined.
 	 */
 	@Test
 	public void dropAll() {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		StackTraceFilter filter = create(parentException);
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(filter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(data.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -97,49 +102,36 @@ public final class DropCauseStackTraceFilterTest {
 	public void missingCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		StackTraceFilter filter = create(exception, RuntimeException.class.getName());
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
-		assertThat(filter.getMessage()).isEqualTo("Hello World!");
-		assertThat(filter.getStackTrace()).containsExactly(exception.getStackTrace());
-		assertThat(filter.getCause()).isNull();
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
+		assertThat(data.getStackTrace()).containsExactly(exception.getStackTrace());
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
-	 * Verifies that throwables that don't have the expected class name will be output unmodified with their cause throwables.
+	 * Verifies that throwables that don't have the expected class name will be output unmodified with their origin cause throwables.
 	 */
 	@Test
 	public void otherException() {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 
-		StackTraceFilter parentFilter = create(parentException, RuntimeException.class.getName());
+		StackTraceFilter filter = new DropCauseStackTraceFilter(Collections.singletonList(RuntimeException.class.getName()));
+	
+		ThrowableData parentData = filter.filter(new ThrowableWrapper(parentException));
+		assertThat(parentData.getClassName()).isEqualTo(IOException.class.getName());
+		assertThat(parentData.getMessage()).isEqualTo("Hello Heaven!");
+		assertThat(parentData.getStackTrace()).containsExactly(parentException.getStackTrace());
+		assertThat(parentData.getCause()).isNotNull();
 
-		assertThat(parentFilter.getClassName()).isEqualTo(IOException.class.getName());
-		assertThat(parentFilter.getMessage()).isEqualTo("Hello Heaven!");
-		assertThat(parentFilter.getStackTrace()).containsExactly(parentException.getStackTrace());
-		assertThat(parentFilter.getCause()).isNotNull();
-
-		StackTraceFilter childFilter = parentFilter.getCause();
-
-		assertThat(childFilter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(childFilter.getMessage()).isEqualTo("Hello Hell!");
-		assertThat(childFilter.getStackTrace()).containsExactly(childException.getStackTrace());
-		assertThat(childFilter.getCause()).isNull();
-	}
-
-	/**
-	 * Creates a new {@link DropCauseStackTraceFilter} instance.
-	 * 
-	 * @param throwable
-	 *            Source throwable to pass
-	 * @param classNames
-	 *            Class names of throwables to pass
-	 * @return Created instance
-	 */
-	private DropCauseStackTraceFilter create(final Throwable throwable, final String... classNames) {
-		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable);
-		return new DropCauseStackTraceFilter(origin, Arrays.asList(classNames));
+		ThrowableData causeData = parentData.getCause();
+		assertThat(causeData.getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(causeData.getMessage()).isEqualTo("Hello Hell!");
+		assertThat(causeData.getStackTrace()).containsExactly(childException.getStackTrace());
+		assertThat(causeData.getCause()).isNull();
 	}
 
 }

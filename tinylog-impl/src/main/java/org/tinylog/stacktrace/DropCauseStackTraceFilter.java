@@ -16,35 +16,33 @@ package org.tinylog.stacktrace;
 import java.util.List;
 
 /**
- * Stack trace filter that drops the cause throwables of configured throwables.
+ * Stack trace filter that drops the causes of configured throwables.
  */
 public final class DropCauseStackTraceFilter extends AbstractStackTraceFilter {
 
 	/**
-	 * @param origin
-	 *            Origin source stack trace filter
 	 * @param arguments
 	 *            Configured class names of throwables to cut causes off
 	 */
-	public DropCauseStackTraceFilter(final StackTraceFilter origin, final List<String> arguments) {
-		super(origin, arguments);
+	public DropCauseStackTraceFilter(final List<String> arguments) {
+		super(arguments);
 	}
 	
 	@Override
-	public StackTraceFilter getCause() {
+	public ThrowableData filter(final ThrowableData origin) {
 		if (getArguments().isEmpty()) {
-			return null;
+			return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
 		} else {
-			String className = getClassName();
+			String className = origin.getClassName();
 
 			for (String filter : getArguments()) {
 				if (className.equals(filter)) {
-					return null;
+					return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
 				}
 			}
 			
-			return super.getCause();
+			return origin;
 		}
 	}
-
+	
 }

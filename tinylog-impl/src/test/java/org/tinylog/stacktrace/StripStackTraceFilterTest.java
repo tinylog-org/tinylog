@@ -14,6 +14,7 @@
 package org.tinylog.stacktrace;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -31,8 +32,10 @@ public final class StripStackTraceFilterTest {
 	public void keepClassName() {
 		RuntimeException exception = new RuntimeException();
 
-		StripStackTraceFilter filter = create(exception, "");
-		assertThat(filter.getClassName()).isEqualTo(RuntimeException.class.getName());
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+		
+		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
 	}
 
 	/**
@@ -42,21 +45,23 @@ public final class StripStackTraceFilterTest {
 	public void keepMessage() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		StripStackTraceFilter filter = create(exception, "");
-		assertThat(filter.getMessage()).isEqualTo("Hello World!");
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+		
+		assertThat(data.getMessage()).isEqualTo("Hello World!");
 	}
 
 	/**
-	 * Verifies that a null cause of the source throwable will be looped through.
+	 * Verifies that a {@code null} cause of the source throwable will be looped through.
 	 */
 	@Test
 	public void loopTroughNullCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		StripStackTraceFilter parentFilter = create(exception, "");
-		StripStackTraceFilter childFilter = parentFilter.getCause();
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		assertThat(childFilter).isNull();
+		assertThat(data.getCause()).isNull();
 	}
 
 	/**
@@ -66,12 +71,12 @@ public final class StripStackTraceFilterTest {
 	public void keepExistingCause() {
 		RuntimeException exception = new RuntimeException("Hello Heaven!", new NullPointerException("Hello Hell!"));
 
-		StripStackTraceFilter parentFilter = create(exception, "");
-		StripStackTraceFilter childFilter = parentFilter.getCause();
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		assertThat(childFilter).isNotNull();
-		assertThat(childFilter.getClassName()).isEqualTo(NullPointerException.class.getName());
-		assertThat(childFilter.getMessage()).isEqualTo("Hello Hell!");
+		assertThat(data.getCause()).isNotNull();
+		assertThat(data.getCause().getClassName()).isEqualTo(NullPointerException.class.getName());
+		assertThat(data.getCause().getMessage()).isEqualTo("Hello Hell!");
 	}
 
 	/**
@@ -82,8 +87,10 @@ public final class StripStackTraceFilterTest {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
 
-		StripStackTraceFilter filter = create(exception, "");
-		assertThat(filter.getStackTrace()).hasSize(elements);
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.emptyList());
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace()).hasSize(elements);
 	}
 
 	/**
@@ -94,8 +101,12 @@ public final class StripStackTraceFilterTest {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
 
-		StripStackTraceFilter filter = create(exception, "org.tinylog");
-		assertThat(filter.getStackTrace()).hasSize(elements - 1);
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.singletonList("org.tinylog"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace())
+			.hasSize(elements - 1)
+			.noneMatch(element -> element.getClassName().startsWith("org.tinylog"));
 	}
 
 	/**
@@ -105,20 +116,24 @@ public final class StripStackTraceFilterTest {
 	public void incompletePackage() {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
+	
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.singletonList("o"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-		StripStackTraceFilter filter = create(exception, "o");
-		assertThat(filter.getStackTrace()).hasSize(elements);
+		assertThat(data.getStackTrace()).hasSize(elements);
 	}
 
 	/**
-	 * Verifies that a multiple packages can be removed from stack trace.
+	 * Verifies that multiple packages can be removed from stack trace.
 	 */
 	@Test
 	public void multiplePackages() {
 		RuntimeException exception = new RuntimeException();
 
-		StripStackTraceFilter filter = create(exception, "com", "java", "javax", "jdk", "org", "sun");
-		assertThat(filter.getStackTrace()).hasSize(0);
+		StripStackTraceFilter filter = new StripStackTraceFilter(Arrays.asList("com", "java", "javax", "jdk", "org", "sun"));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getStackTrace()).isEmpty();
 	}
 
 	/**
@@ -129,22 +144,10 @@ public final class StripStackTraceFilterTest {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
 
-		StripStackTraceFilter filter = create(exception, StripStackTraceFilterTest.class.getName());
-		assertThat(filter.getStackTrace()).hasSize(elements - 1);
-	}
+		StripStackTraceFilter filter = new StripStackTraceFilter(Collections.singletonList(StripStackTraceFilterTest.class.getName()));
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
-	/**
-	 * Creates a new {@link StripStackTraceFilter} instance.
-	 * 
-	 * @param throwable
-	 *            Source throwable to pass
-	 * @param packagesAndClasses
-	 *            Packages and classes to pass
-	 * @return Created instance
-	 */
-	private StripStackTraceFilter create(final Throwable throwable, final String... packagesAndClasses) {
-		StackTraceFilterAdapter origin = new StackTraceFilterAdapter(throwable);
-		return new StripStackTraceFilter(origin, Arrays.asList(packagesAndClasses));
+		assertThat(data.getStackTrace()).hasSize(elements - 1);
 	}
 
 }
