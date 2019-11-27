@@ -21,6 +21,11 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class StartupPolicy implements Policy {
 
+	/** */
+	public StartupPolicy() {
+		this(null);
+	}
+
 	/**
 	 * @param argument
 	 *            Should be always {@code null} as startup policy does not support arguments
