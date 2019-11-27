@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Registry for receiving the actual logging provider.
@@ -58,6 +59,10 @@ public final class ProviderRegistry {
 	 * @return New logging provider instance
 	 */
 	private static LoggingProvider loadLoggingProvider() {
+		if (RuntimeProvider.getProcessId() == Long.MIN_VALUE) {
+			java.util.ServiceLoader.load(LoggingProvider.class); // Workaround for ProGuard (see issue #126)
+		}
+
 		ServiceLoader<LoggingProvider> loader = new ServiceLoader<LoggingProvider>(LoggingProvider.class);
 		String name = Configuration.get(PROVIDER_PROPERTY);
 
