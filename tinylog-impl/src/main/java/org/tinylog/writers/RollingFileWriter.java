@@ -49,6 +49,16 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private ByteArrayWriter writer;
 
 	/**
+	 * @throws FileNotFoundException
+	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IllegalArgumentException
+	 *             A property has an invalid value or is missing in configuration
+	 */
+	public RollingFileWriter() throws FileNotFoundException {
+		this(Collections.emptyMap());
+	}
+
+	/**
 	 * @param properties
 	 *            Configuration for writer
 	 *

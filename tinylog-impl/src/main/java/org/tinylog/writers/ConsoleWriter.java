@@ -14,6 +14,7 @@
 package org.tinylog.writers;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.tinylog.Level;
@@ -32,6 +33,11 @@ import org.tinylog.provider.InternalLogger;
 public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
 	private final Level errorLevel;
+
+	/** */
+	public ConsoleWriter() {
+		this(Collections.emptyMap());
+	}
 
 	/**
 	 * @param properties

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
 
 import org.tinylog.Level;
@@ -38,6 +39,18 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 
 	private final Charset charset;
 	private final ByteArrayWriter writer;
+
+	/**
+	 * @throws FileNotFoundException
+	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Lock for log file cannot be accessed
+	 * @throws IllegalArgumentException
+	 *             Log file is not defined in configuration
+	 */
+	public SharedFileWriter() throws FileNotFoundException, IOException {
+		this(Collections.emptyMap());
+	}
 
 	/**
 	 * @param properties

@@ -16,6 +16,7 @@ package org.tinylog.writers;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
 
 import org.tinylog.core.LogEntry;
@@ -29,6 +30,16 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 
 	private final Charset charset;
 	private final ByteArrayWriter writer;
+
+	/**
+	 * @throws FileNotFoundException
+	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IllegalArgumentException
+	 *             Log file is not defined in configuration
+	 */
+	public FileWriter() throws FileNotFoundException {
+		this(Collections.emptyMap());
+	}
 
 	/**
 	 * @param properties

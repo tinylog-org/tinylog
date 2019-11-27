@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -60,6 +61,16 @@ public final class JdbcWriter implements Writer {
 	private long batchCount;
 	private long lostCount;
 	private long reconnectTimestamp;
+
+	/**
+	 * @throws NamingException
+	 *             Data source cannot be found
+	 * @throws SQLException
+	 *             Database connection cannot be established
+	 */
+	public JdbcWriter() throws NamingException, SQLException {
+		this(Collections.emptyMap());
+	}
 
 	/**
 	 * @param properties
