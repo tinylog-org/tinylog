@@ -47,7 +47,7 @@ public final class LogcatWriter implements Writer {
 
 	/** */
 	public LogcatWriter() {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**

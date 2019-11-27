@@ -36,7 +36,7 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
 	/** */
 	public ConsoleWriter() {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**

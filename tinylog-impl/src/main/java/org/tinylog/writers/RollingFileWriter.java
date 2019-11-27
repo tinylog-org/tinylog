@@ -55,7 +55,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 *             A property has an invalid value or is missing in configuration
 	 */
 	public RollingFileWriter() throws FileNotFoundException {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**

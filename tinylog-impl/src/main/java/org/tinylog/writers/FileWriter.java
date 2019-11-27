@@ -38,7 +38,7 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	 *             Log file is not defined in configuration
 	 */
 	public FileWriter() throws FileNotFoundException {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**

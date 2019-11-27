@@ -69,7 +69,7 @@ public final class JdbcWriter implements Writer {
 	 *             Database connection cannot be established
 	 */
 	public JdbcWriter() throws NamingException, SQLException {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**

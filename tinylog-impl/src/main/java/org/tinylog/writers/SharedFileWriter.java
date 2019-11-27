@@ -49,7 +49,7 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 	 *             Log file is not defined in configuration
 	 */
 	public SharedFileWriter() throws FileNotFoundException, IOException {
-		this(Collections.emptyMap());
+		this(Collections.<String, String>emptyMap());
 	}
 
 	/**
