@@ -29,6 +29,7 @@ import org.tinylog.path.DynamicPath;
 import org.tinylog.policies.Policy;
 import org.tinylog.policies.StartupPolicy;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.writers.raw.ByteArrayWriter;
 
 /**
@@ -46,6 +47,16 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private final Charset charset;
 
 	private ByteArrayWriter writer;
+
+	/**
+	 * @throws FileNotFoundException
+	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IllegalArgumentException
+	 *             A property has an invalid value or is missing in configuration
+	 */
+	public RollingFileWriter() throws FileNotFoundException {
+		this(Collections.<String, String>emptyMap());
+	}
 
 	/**
 	 * @param properties
@@ -178,6 +189,10 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (property == null || property.isEmpty()) {
 			return Collections.<Policy>singletonList(new StartupPolicy(null));
 		} else {
+			if (RuntimeProvider.getProcessId() == Long.MIN_VALUE) {
+				java.util.ServiceLoader.load(Policy.class); // Workaround for ProGuard (see issue #126)
+			}
+
 			ServiceLoader<Policy> loader = new ServiceLoader<Policy>(Policy.class, String.class);
 			List<Policy> policies = new ArrayList<Policy>();
 			for (String entry : property.split(",")) {

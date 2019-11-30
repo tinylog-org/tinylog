@@ -31,7 +31,7 @@ tinylog requires Maven 3 and JDK 9 for building. The generated JARs are compatib
 
 Build command:
 
-	mvn clean install -P release
+	mvn clean install
 
 A new folder "target" with Javadoc documentation and all JARs will be created in the root directory.
 

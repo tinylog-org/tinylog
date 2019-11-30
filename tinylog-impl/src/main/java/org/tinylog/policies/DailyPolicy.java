@@ -31,6 +31,11 @@ public final class DailyPolicy implements Policy {
 
 	private final Calendar calendar;
 
+	/** */
+	public DailyPolicy() {
+		this(null);
+	}
+
 	/**
 	 * @param argument
 	 *            Time for starting new log file (e.g. "23:30")

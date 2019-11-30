@@ -139,6 +139,10 @@ public final class ConfigurationParser {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Collection<Writer>[][] createWriters(final List<String> tags, final Level minimumLevel, final boolean writingThread) {
+		if (RuntimeProvider.getProcessId() == Long.MIN_VALUE) {
+			java.util.ServiceLoader.load(Writer.class); // Workaround for ProGuard (see issue #126)
+		}
+
 		Collection<Writer>[][] matrix = new Collection[tags.size() + 2][Level.values().length - 1];
 		ServiceLoader<Writer> loader = new ServiceLoader<Writer>(Writer.class, Map.class);
 

@@ -14,6 +14,7 @@
 package org.tinylog.writers;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -43,6 +44,11 @@ public final class LogcatWriter implements Writer {
 
 	private final StringBuilder messageBuilder;
 	private final Token messageToken;
+
+	/** */
+	public LogcatWriter() {
+		this(Collections.<String, String>emptyMap());
+	}
 
 	/**
 	 * @param properties

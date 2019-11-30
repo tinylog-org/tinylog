@@ -28,6 +28,11 @@ public final class SizePolicy implements Policy {
 	private final long maximum;
 	private long count;
 
+	/** */
+	public SizePolicy() {
+		this(null);
+	}
+
 	/**
 	 * @param argument
 	 *            Maximum size for log file (e.g. "16MB")

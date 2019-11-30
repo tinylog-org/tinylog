@@ -17,10 +17,10 @@ Steps for Each Release
 
  1. Set new version: mvn versions:set -DnewVersion=VERSION -DgenerateBackupPoms=false
  2. Create a tag with new version number as name
- 3. Deploy with JDK 9: mvn clean install deploy -P release
+ 3. Deploy with JDK 9: mvn clean install deploy
  4. Login to https://oss.sonatype.org/ to close and release the created repository under Staging Repositories
  5. Upload ZIP archives from target to website
- 6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc -P release
+ 6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc
  7. Upload generated Javadoc for tinylog API to website
  8. Restore snapshot version: mvn versions:set -DnewVersion=2.MINOR-SNAPSHOT -DgenerateBackupPoms=false
  9. Push all commits and tags
