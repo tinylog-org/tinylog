@@ -13,12 +13,18 @@
 
 package org.tinylog.throwable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Filter for dropping the causes of configured throwables.
  */
 public final class DropCauseThrowableFilter extends AbstractThrowableFilter {
+
+	/** */
+	public DropCauseThrowableFilter() {
+		this(Collections.<String>emptyList());
+	}
 
 	/**
 	 * @param arguments

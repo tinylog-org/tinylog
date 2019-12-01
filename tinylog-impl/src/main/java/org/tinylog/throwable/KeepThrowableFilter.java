@@ -13,13 +13,19 @@
 
 package org.tinylog.throwable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Filter for removing all stack trace elements from stack trace except the defined packages and classes.
  */
 public final class KeepThrowableFilter extends AbstractStackTraceElementsFilter {
-	
+
+	/** */
+	public KeepThrowableFilter() {
+		this(Collections.<String>emptyList());
+	}
+
 	/**
 	 * @param arguments
 	 *            Configured packages and classes to keep

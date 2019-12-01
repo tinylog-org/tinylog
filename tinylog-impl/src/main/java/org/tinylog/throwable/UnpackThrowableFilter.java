@@ -13,6 +13,7 @@
 
 package org.tinylog.throwable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,6 +26,11 @@ import java.util.List;
  */
 public final class UnpackThrowableFilter extends AbstractThrowableFilter {
 
+	/** */
+	public UnpackThrowableFilter() {
+		this(Collections.<String>emptyList());
+	}
+	
 	/**
 	 * @param arguments
 	 *            Configured class names of throwables to unpack
