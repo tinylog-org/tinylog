@@ -26,6 +26,8 @@ import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.throwable.ThrowableFilter;
+import org.tinylog.util.ConfigurationStoreWriter;
 import org.tinylog.writers.ConsoleWriter;
 import org.tinylog.writers.FileWriter;
 import org.tinylog.writers.Writer;
@@ -461,6 +463,46 @@ public final class ConfigurationParserTest {
 				.hasSize(1)
 				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
 		});
+	}
+	
+	/**
+	 * Verifies that a {@link ThrowableFilter} can be registered globally.
+	 */
+	@Test
+	public void globalException() {
+		Configuration.set("exception", "drop cause");
+		Configuration.set("writer", "configuration store");
+		
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.INFO, false);
+		ConfigurationStoreWriter writer = (ConfigurationStoreWriter) writers[0][Level.INFO.ordinal()].iterator().next();
+		assertThat(writer.getProperties()).contains(entry("exception", "drop cause"));
+	}
+	
+	/**
+	 * Verifies that a {@link ThrowableFilter} can be registered on a writer.
+	 */
+	@Test
+	public void localException() {
+		Configuration.set("writer", "configuration store");
+		Configuration.set("writer.exception", "unpack");
+		
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.INFO, false);
+		ConfigurationStoreWriter writer = (ConfigurationStoreWriter) writers[0][Level.INFO.ordinal()].iterator().next();
+		assertThat(writer.getProperties()).contains(entry("exception", "unpack"));
+	}
+	
+	/**
+	 * Verifies that a global {@link ThrowableFilter} can be overridden by another one directly registered on a writer.
+	 */
+	@Test
+	public void overridelException() {
+		Configuration.set("exception", "drop cause");
+		Configuration.set("writer", "configuration store");
+		Configuration.set("writer.exception", "unpack");
+		
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.INFO, false);
+		ConfigurationStoreWriter writer = (ConfigurationStoreWriter) writers[0][Level.INFO.ordinal()].iterator().next();
+		assertThat(writer.getProperties()).contains(entry("exception", "unpack"));
 	}
 
 }
