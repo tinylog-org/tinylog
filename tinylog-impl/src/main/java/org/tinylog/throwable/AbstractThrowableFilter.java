@@ -13,6 +13,8 @@
 
 package org.tinylog.throwable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -24,10 +26,21 @@ public abstract class AbstractThrowableFilter implements ThrowableFilter {
 
 	/**
 	 * @param arguments
-	 *            Configured arguments
+	 *            Configured arguments, separated by a vertical bar "|"
 	 */
-	public AbstractThrowableFilter(final List<String> arguments) {
-		this.arguments = arguments;
+	public AbstractThrowableFilter(final String arguments) {
+		if (arguments == null) {
+			this.arguments = Collections.emptyList();
+		} else {
+			this.arguments = new ArrayList<String>();
+
+			for (String argument : arguments.split("\\|")) {
+				argument = argument.trim();
+				if (!argument.isEmpty()) {
+					this.arguments.add(argument);
+				}
+			}
+		}
 	}
 
 	/**

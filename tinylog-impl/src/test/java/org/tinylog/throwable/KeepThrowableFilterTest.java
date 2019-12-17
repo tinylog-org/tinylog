@@ -13,9 +13,6 @@
 
 package org.tinylog.throwable;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +29,7 @@ public final class KeepThrowableFilterTest {
 	public void keepClassName() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 		
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -45,7 +42,7 @@ public final class KeepThrowableFilterTest {
 	public void keepMessage() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 		
 		assertThat(data.getMessage()).isEqualTo("Hello World!");
@@ -58,7 +55,7 @@ public final class KeepThrowableFilterTest {
 	public void loopTroughNullCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getCause()).isNull();
@@ -71,7 +68,7 @@ public final class KeepThrowableFilterTest {
 	public void keepExistingCause() {
 		RuntimeException exception = new RuntimeException("Hello Heaven!", new NullPointerException("Hello Hell!"));
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getCause()).isNotNull();
@@ -86,7 +83,7 @@ public final class KeepThrowableFilterTest {
 	public void empty() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.emptyList());
+		KeepThrowableFilter filter = new KeepThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).isEmpty();
@@ -99,7 +96,7 @@ public final class KeepThrowableFilterTest {
 	public void singlePackage() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList("org.tinylog"));
+		KeepThrowableFilter filter = new KeepThrowableFilter("org.tinylog");
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace())
@@ -114,7 +111,7 @@ public final class KeepThrowableFilterTest {
 	public void incompletePackage() {
 		RuntimeException exception = new RuntimeException();
 		
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList("o"));
+		KeepThrowableFilter filter = new KeepThrowableFilter("o");
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).isEmpty();
@@ -128,7 +125,7 @@ public final class KeepThrowableFilterTest {
 		RuntimeException exception = new RuntimeException();
 		int elements = exception.getStackTrace().length;
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Arrays.asList("com", "java", "javax", "jdk", "org", "sun"));
+		KeepThrowableFilter filter = new KeepThrowableFilter("com|java|javax|jdk|org|sun");
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).hasSize(elements);
@@ -141,7 +138,7 @@ public final class KeepThrowableFilterTest {
 	public void singleClass() {
 		RuntimeException exception = new RuntimeException();
 
-		KeepThrowableFilter filter = new KeepThrowableFilter(Collections.singletonList(KeepThrowableFilterTest.class.getName()));
+		KeepThrowableFilter filter = new KeepThrowableFilter(KeepThrowableFilterTest.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace())

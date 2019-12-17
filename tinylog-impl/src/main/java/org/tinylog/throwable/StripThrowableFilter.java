@@ -13,7 +13,6 @@
 
 package org.tinylog.throwable;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,14 +22,14 @@ public final class StripThrowableFilter extends AbstractStackTraceElementsFilter
 
 	/** */
 	public StripThrowableFilter() {
-		this(Collections.<String>emptyList());
+		this(null);
 	}
 
 	/**
 	 * @param arguments
-	 *            Configured packages and classes to remove
+	 *            Configured packages and classes to remove, separated by a vertical bar "|"
 	 */
-	public StripThrowableFilter(final List<String> arguments) {
+	public StripThrowableFilter(final String arguments) {
 		super(arguments);
 	}
 	

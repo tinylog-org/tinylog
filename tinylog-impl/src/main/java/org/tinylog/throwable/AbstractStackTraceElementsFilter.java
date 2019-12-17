@@ -23,9 +23,9 @@ public abstract class AbstractStackTraceElementsFilter extends AbstractThrowable
 
 	/**
 	 * @param arguments
-	 *            Configured packages and classes
+	 *            Configured packages and classes, separated by a vertical bar "|"
 	 */
-	public AbstractStackTraceElementsFilter(final List<String> arguments) {
+	public AbstractStackTraceElementsFilter(final String arguments) {
 		super(arguments);
 	}
 

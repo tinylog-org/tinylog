@@ -13,7 +13,6 @@
 
 package org.tinylog.throwable;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,14 +22,14 @@ public final class KeepThrowableFilter extends AbstractStackTraceElementsFilter 
 
 	/** */
 	public KeepThrowableFilter() {
-		this(Collections.<String>emptyList());
+		this(null);
 	}
 
 	/**
 	 * @param arguments
-	 *            Configured packages and classes to keep
+	 *            Configured packages and classes to keep, separated by a vertical bar "|"
 	 */
-	public KeepThrowableFilter(final List<String> arguments) {
+	public KeepThrowableFilter(final String arguments) {
 		super(arguments);
 	}
 	

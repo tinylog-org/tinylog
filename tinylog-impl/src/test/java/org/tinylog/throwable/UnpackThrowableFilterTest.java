@@ -14,8 +14,6 @@
 package org.tinylog.throwable;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -34,7 +32,7 @@ public final class UnpackThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello World!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new UnpackThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
@@ -52,7 +50,7 @@ public final class UnpackThrowableFilterTest {
 		RuntimeException childException = new RuntimeException("Hello World!", grandChildException);
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new UnpackThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
@@ -69,7 +67,7 @@ public final class UnpackThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello World!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
+		ThrowableFilter filter = new UnpackThrowableFilter(RuntimeException.class.getName() + " | " + IOException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
@@ -86,7 +84,7 @@ public final class UnpackThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello World!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Collections.emptyList());
+		ThrowableFilter filter = new UnpackThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(NullPointerException.class.getName());
@@ -102,7 +100,7 @@ public final class UnpackThrowableFilterTest {
 	public void missingCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new UnpackThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -119,7 +117,7 @@ public final class UnpackThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello World!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 		
-		ThrowableFilter filter = new UnpackThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new UnpackThrowableFilter(RuntimeException.class.getName());
 		
 		ThrowableData parentData = filter.filter(new ThrowableWrapper(parentException));
 		assertThat(parentData.getClassName()).isEqualTo(IOException.class.getName());

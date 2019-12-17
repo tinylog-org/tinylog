@@ -14,8 +14,6 @@
 package org.tinylog.throwable;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -34,7 +32,7 @@ public final class DropCauseThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new DropCauseThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -52,7 +50,7 @@ public final class DropCauseThrowableFilterTest {
 		RuntimeException childException = new RuntimeException("Hello World!", grandChildException);
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new DropCauseThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -69,7 +67,7 @@ public final class DropCauseThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Arrays.asList(RuntimeException.class.getName(), IOException.class.getName()));
+		ThrowableFilter filter = new DropCauseThrowableFilter(RuntimeException.class.getName() + " | " + IOException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(IOException.class.getName());
@@ -86,7 +84,7 @@ public final class DropCauseThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		RuntimeException parentException = new RuntimeException("Hello Heaven!", childException);
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.emptyList());
+		ThrowableFilter filter = new DropCauseThrowableFilter();
 		ThrowableData data = filter.filter(new ThrowableWrapper(parentException));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -102,7 +100,7 @@ public final class DropCauseThrowableFilterTest {
 	public void missingCause() {
 		RuntimeException exception = new RuntimeException("Hello World!");
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new DropCauseThrowableFilter(RuntimeException.class.getName());
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getClassName()).isEqualTo(RuntimeException.class.getName());
@@ -119,7 +117,7 @@ public final class DropCauseThrowableFilterTest {
 		NullPointerException childException = new NullPointerException("Hello Hell!");
 		IOException parentException = new IOException("Hello Heaven!", childException);
 
-		ThrowableFilter filter = new DropCauseThrowableFilter(Collections.singletonList(RuntimeException.class.getName()));
+		ThrowableFilter filter = new DropCauseThrowableFilter(RuntimeException.class.getName());
 	
 		ThrowableData parentData = filter.filter(new ThrowableWrapper(parentException));
 		assertThat(parentData.getClassName()).isEqualTo(IOException.class.getName());
