@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -88,6 +89,39 @@ public final class ServiceLoader<T> {
 		} else {
 			return createInstance(name, arguments);
 		}
+	}
+
+	/**
+	 * Creates service implementations from a comma separated list of names. Names can be either fully-qualified class names or their
+	 * simplified acronyms. An acronym is the class name without package and service suffix. Optionally, each name can be enriched by a
+	 * string argument. There must be a colon between the name and argument. All service implementations need a constructor that accepts
+	 * a string as argument.
+	 *
+	 * @param list Comma separated list of names with optional arguments
+	 * @return All created service implementations (one for each name)
+	 */
+	public List<T> createList(final String list) {
+		List<T> instances = new ArrayList<T>();
+		for (String entry : list.split(",")) {
+			entry = entry.trim();
+			if (!entry.isEmpty()) {
+				T instance;
+
+				int separator = entry.indexOf(':');
+				if (separator == -1) {
+					instance = create(entry, (Object) null);
+				} else {
+					String name = entry.substring(0, separator).trim();
+					String argument = entry.substring(separator + 1).trim();
+					instance = create(name, argument);
+				}
+
+				if (instance != null) {
+					instances.add(instance);
+				}
+			}
+		}
+		return instances;
 	}
 
 	/**

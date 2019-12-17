@@ -61,6 +61,7 @@ public final class ServiceLoaderTest {
 	@Before
 	public void init() throws Exception {
 		FileSystem.createServiceFile(List.class, ArrayList.class.getName(), LinkedList.class.getName());
+		FileSystem.createServiceFile(Throwable.class, NullPointerException.class.getName(), IllegalStateException.class.getName());
 	}
 
 	/**
@@ -72,6 +73,7 @@ public final class ServiceLoaderTest {
 	@After
 	public void clear() throws Exception {
 		FileSystem.deleteServiceFile(List.class);
+		FileSystem.deleteServiceFile(CharSequence.class);
 	}
 
 	/**
@@ -106,6 +108,73 @@ public final class ServiceLoaderTest {
 		ServiceLoader<?> loader = new ServiceLoader<>(List.class);
 		assertThat(loader.create(ArrayList.class.getName())).isInstanceOf(ArrayList.class);
 		assertThat(loader.create(LinkedList.class.getName())).isInstanceOf(LinkedList.class);
+	}
+
+	/**
+	 * Verifies that an empty list of throwables will be created for an empty string ("").
+	 */
+	@Test
+	public void getServicesFromEmptyList() {
+		ServiceLoader<?> loader = new ServiceLoader<>(Throwable.class, String.class);
+		assertThat(loader.createList("")).isEmpty();
+	}
+
+	/**
+	 * Verifies that a single instance without an argument can be created.
+	 */
+	@Test
+	public void getServicesFromSingletonListWithoutArgument() {
+		ServiceLoader<Throwable> loader = new ServiceLoader<>(Throwable.class, String.class);
+		assertThat(loader.createList(NullPointerException.class.getName()))
+				.hasSize(1)
+				.allSatisfy(element -> assertThat(element).isInstanceOf(NullPointerException.class))
+				.allSatisfy(element -> assertThat(element).hasMessage(null));
+	}
+
+	/**
+	 * Verifies that a single instance with an argument can be created.
+	 */
+	@Test
+	public void getServicesFromSingletonListWithArgument() {
+		ServiceLoader<Throwable> loader = new ServiceLoader<>(Throwable.class, String.class);
+		assertThat(loader.createList(NullPointerException.class.getName() + ": Hello World!"))
+				.hasSize(1)
+				.allSatisfy(element -> assertThat(element).isInstanceOf(NullPointerException.class))
+				.allSatisfy(element -> assertThat(element).hasMessage("Hello World!"));
+	}
+
+	/**
+	 * Verifies that a two instances can be created from a comma separated list.
+	 */
+	@Test
+	public void getServicesFromValidDoubletonList() {
+		ServiceLoader<Throwable> loader = new ServiceLoader<>(Throwable.class, String.class);
+		List<Throwable> exceptions = loader.createList(
+				NullPointerException.class.getName() + ": Hello World!, " + IllegalStateException.class.getName()
+			);
+
+		assertThat(exceptions).hasSize(2);
+		assertThat(exceptions.get(0)).isInstanceOf(NullPointerException.class).hasMessage("Hello World!");
+		assertThat(exceptions.get(1)).isInstanceOf(IllegalStateException.class).hasMessage(null);
+	}
+
+	/**
+	 * Verifies that all successfully created instances will be returned, even if some couldn't be created.
+	 */
+	@Test
+	public void getServicesFromInvalidDoubletonList() {
+		ServiceLoader<Throwable> loader = new ServiceLoader<>(Throwable.class, String.class);
+		List<Throwable> exceptions = loader.createList(NullPointerException.class.getName() + ", " + String.class.getName());
+
+		assertThat(exceptions)
+				.hasSize(1)
+				.allSatisfy(element -> assertThat(element).isInstanceOf(NullPointerException.class))
+				.allSatisfy(element -> assertThat(element).hasMessage(null));
+
+		assertThat(systemStream.consumeErrorOutput())
+				.contains("ERROR")
+				.containsOnlyOnce(Throwable.class.getName())
+				.containsOnlyOnce(String.class.getName());
 	}
 
 	/**

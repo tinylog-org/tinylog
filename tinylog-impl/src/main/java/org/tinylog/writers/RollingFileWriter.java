@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -193,19 +192,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 				java.util.ServiceLoader.load(Policy.class); // Workaround for ProGuard (see issue #126)
 			}
 
-			ServiceLoader<Policy> loader = new ServiceLoader<Policy>(Policy.class, String.class);
-			List<Policy> policies = new ArrayList<Policy>();
-			for (String entry : property.split(",")) {
-				int separator = entry.indexOf(':');
-				if (separator == -1) {
-					policies.add(loader.create(entry, (String) null));
-				} else {
-					String name = entry.substring(0, separator).trim();
-					String argument = entry.substring(separator + 1).trim();
-					policies.add(loader.create(name, argument));
-				}
-			}
-			return policies;
+			return new ServiceLoader<Policy>(Policy.class, String.class).createList(property);
 		}
 	}
 
