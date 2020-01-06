@@ -16,11 +16,16 @@ package org.tinylog.pattern;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.throwable.ThrowableFilter;
+import org.tinylog.throwable.ThrowableStore;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +43,7 @@ public final class ExceptionTokenTest {
 	 */
 	@Test
 	public void requiredLogEntryValues() {
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.EXCEPTION);
 	}
 
@@ -47,7 +52,7 @@ public final class ExceptionTokenTest {
 	 */
 	@Test
 	public void renderLogEntryWithoutException() {
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 		assertThat(render(token, null)).isEmpty();
 	}
 
@@ -60,7 +65,7 @@ public final class ExceptionTokenTest {
 	 */
 	@Test
 	public void applyLogEntryWithoutException() throws SQLException {
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(LogEntryBuilder.empty().create(), statement, 1);
@@ -73,7 +78,7 @@ public final class ExceptionTokenTest {
 	@Test
 	public void renderExceptionWithoutDescription() {
 		Exception exception = new UnsupportedOperationException();
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 
 		assertThat(render(token, exception))
 			.startsWith(UnsupportedOperationException.class.getName())
@@ -94,7 +99,7 @@ public final class ExceptionTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-		new ExceptionToken().apply(createLogEntry(exception), statement, 1);
+		new ExceptionToken(Collections.emptyList()).apply(createLogEntry(exception), statement, 1);
 
 		verify(statement).setString(eq(1), captor.capture());
 		assertThat(captor.getValue())
@@ -109,7 +114,7 @@ public final class ExceptionTokenTest {
 	@Test
 	public void renderExceptionWithDescription() {
 		Exception exception = new NullPointerException("my message");
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 
 		assertThat(render(token, exception))
 			.startsWith(NullPointerException.class.getName() + ": my message")
@@ -130,7 +135,7 @@ public final class ExceptionTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-		new ExceptionToken().apply(createLogEntry(exception), statement, 1);
+		new ExceptionToken(Collections.emptyList()).apply(createLogEntry(exception), statement, 1);
 
 		verify(statement).setString(eq(1), captor.capture());
 		assertThat(captor.getValue())
@@ -147,7 +152,7 @@ public final class ExceptionTokenTest {
 		Exception cause = new IOException("File not found");
 		Exception exception = new RuntimeException(cause);
 
-		ExceptionToken token = new ExceptionToken();
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
 
 		assertThat(render(token, exception))
 			.startsWith(RuntimeException.class.getName())
@@ -172,15 +177,56 @@ public final class ExceptionTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-		new ExceptionToken().apply(createLogEntry(exception), statement, 1);
+		new ExceptionToken(Collections.emptyList()).apply(createLogEntry(exception), statement, 1);
 
 		verify(statement).setString(eq(1), captor.capture());
 		assertThat(captor.getValue())
-			.startsWith(RuntimeException.class.getName())
-			.contains(IOException.class.getName() + ": File not found")
-			.contains(ExceptionTokenTest.class.getName(), "applyExceptionWithCause")
-			.contains("... " + (cause.getStackTrace().length - 1) + " more")
-			.hasLineCount(exception.getStackTrace().length + 4);
+				.startsWith(RuntimeException.class.getName())
+				.contains(IOException.class.getName() + ": File not found")
+				.contains(ExceptionTokenTest.class.getName(), "applyExceptionWithCause")
+				.contains("... " + (cause.getStackTrace().length - 1) + " more")
+				.hasLineCount(exception.getStackTrace().length + 4);
+	}
+
+	/**
+	 * Verifies that {@link ThrowableFilter throwable filters} can be applied to a passed exception when rendering a
+	 * string.
+	 */
+	@Test
+	public void renderyExceptionUsingFilters() {
+		Exception exception = new RuntimeException("Test");
+		List<ThrowableFilter> filters = Arrays.asList(
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+		);
+
+		ExceptionToken token = new ExceptionToken(filters);
+
+		assertThat(render(token, exception)).startsWith(RuntimeException.class.getName() + ": Test12");
+	}
+
+	/**
+	 * Verifies that {@link ThrowableFilter throwable filters} can be applied to a passed exception when rendering for a
+	 * {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyyExceptionUsingFilters() throws SQLException {
+		Exception exception = new RuntimeException("Test");
+		List<ThrowableFilter> filters = Arrays.asList(
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+		);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+		new ExceptionToken(filters).apply(createLogEntry(exception), statement, 1);
+
+		verify(statement).setString(eq(1), captor.capture());
+		assertThat(captor.getValue()).startsWith(RuntimeException.class.getName() + ": Test12");
 	}
 
 	/**

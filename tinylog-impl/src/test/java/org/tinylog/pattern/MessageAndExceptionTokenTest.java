@@ -15,11 +15,15 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.throwable.ThrowableFilter;
+import org.tinylog.throwable.ThrowableStore;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +42,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	@Test
 	public void requiredLogEntryValues() {
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 		assertThat(token.getRequiredLogEntryValues()).containsOnly(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 	}
 
@@ -48,7 +52,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	@Test
 	public void renderNeitherMessageNorException() {
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 		assertThat(render(token, null, null)).isEmpty();
 	}
 
@@ -61,7 +65,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	@Test
 	public void applyNeitherMessageNorException() throws SQLException {
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(null, null), statement, 1);
@@ -73,7 +77,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	@Test
 	public void renderMessageOnly() {
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 		assertThat(render(token, "Hello World!", null)).isEqualTo("Hello World!");
 	}
 
@@ -85,7 +89,7 @@ public final class MessageAndExceptionTokenTest {
 	 */
 	@Test
 	public void applyMessageOnly() throws SQLException {
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry("Hello World!", null), statement, 1);
@@ -98,7 +102,7 @@ public final class MessageAndExceptionTokenTest {
 	@Test
 	public void renderExceptionOnly() {
 		Exception exception = new UnsupportedOperationException();
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 
 		assertThat(render(token, null, exception))
 			.startsWith(UnsupportedOperationException.class.getName())
@@ -119,7 +123,7 @@ public final class MessageAndExceptionTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-		new MessageAndExceptionToken().apply(createLogEntry(null, exception), statement, 1);
+		new MessageAndExceptionToken(Collections.emptyList()).apply(createLogEntry(null, exception), statement, 1);
 
 		verify(statement).setString(eq(1), captor.capture());
 		assertThat(captor.getValue())
@@ -134,7 +138,7 @@ public final class MessageAndExceptionTokenTest {
 	@Test
 	public void renderMessageAndException() {
 		Exception exception = new UnsupportedOperationException();
-		MessageAndExceptionToken token = new MessageAndExceptionToken();
+		MessageAndExceptionToken token = new MessageAndExceptionToken(Collections.emptyList());
 
 		assertThat(render(token, "Hello World!", exception))
 			.startsWith("Hello World!")
@@ -156,7 +160,7 @@ public final class MessageAndExceptionTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-		new MessageAndExceptionToken().apply(createLogEntry("Hello World!", exception), statement, 1);
+		new MessageAndExceptionToken(Collections.emptyList()).apply(createLogEntry("Hello World!", exception), statement, 1);
 
 		verify(statement).setString(eq(1), captor.capture());
 		assertThat(captor.getValue())
@@ -164,6 +168,45 @@ public final class MessageAndExceptionTokenTest {
 			.contains(UnsupportedOperationException.class.getName())
 			.contains(MessageAndExceptionTokenTest.class.getName(), "applyMessageAndException")
 			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that {@link ThrowableFilter throwable filters} can be applied to a passed exception when rendering a
+	 * string.
+	 */
+	@Test
+	public void renderExceptionUsingFilters() {
+		Exception exception = new RuntimeException("Test");
+		List<ThrowableFilter> filters = Collections.singletonList(
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(), origin.getCause())
+		);
+
+		MessageAndExceptionToken token = new MessageAndExceptionToken(filters);
+
+		assertThat(render(token, null, exception)).startsWith(RuntimeException.class.getName() + ": Test42");
+	}
+
+	/**
+	 * Verifies that {@link ThrowableFilter throwable filters} can be applied to a passed exception when rendering for a
+	 * {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyExceptionUsingFilters() throws SQLException {
+		Exception exception = new RuntimeException("Test");
+		List<ThrowableFilter> filters = Collections.singletonList(
+				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(), origin.getCause())
+		);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+		new MessageAndExceptionToken(filters).apply(createLogEntry(null, exception), statement, 1);
+
+		verify(statement).setString(eq(1), captor.capture());
+		assertThat(captor.getValue()).startsWith(RuntimeException.class.getName() + ": Test42");
 	}
 
 	/**

@@ -443,10 +443,12 @@ public final class JdbcWriter implements Writer {
 	 * @return Tokens for filling a {@link PreparedStatement}
 	 */
 	private static List<Token> createTokens(final Map<String, String> properties) {
+		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
+
 		List<Token> tokens = new ArrayList<Token>();
 		for (Entry<String, String> entry : properties.entrySet()) {
 			if (entry.getKey().toLowerCase(Locale.ROOT).startsWith(FIELD_PREFIX)) {
-				tokens.add(FormatPatternParser.parse(entry.getValue()));
+				tokens.add(parser.parse(entry.getValue()));
 			}
 		}
 		return tokens;

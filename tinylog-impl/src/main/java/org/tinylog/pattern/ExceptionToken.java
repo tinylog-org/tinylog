@@ -17,9 +17,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.throwable.ThrowableData;
+import org.tinylog.throwable.ThrowableFilter;
+import org.tinylog.throwable.ThrowableWrapper;
 
 /**
  * Token for outputting the exception or throwable of a log entry.
@@ -27,10 +31,15 @@ import org.tinylog.core.LogEntryValue;
 final class ExceptionToken implements Token {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
-	private static final StackTraceElement[] EMPTY_TRACE = new StackTraceElement[0];
 
-	/** */
-	ExceptionToken() {
+	private final List<ThrowableFilter> filters;
+
+	/**
+	 * @param filters
+	 *            Throwable filters for output of exceptions and other throwables
+	 */
+	ExceptionToken(final List<ThrowableFilter> filters) {
+		this.filters = filters;
 	}
 
 	@Override
@@ -42,10 +51,10 @@ final class ExceptionToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		Throwable throwable = logEntry.getException();
 		if (throwable != null) {
-			render(throwable, EMPTY_TRACE, builder);
+			render(filter(throwable), Collections.emptyList(), builder);
 		}
 	}
-	
+
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		Throwable throwable = logEntry.getException();
@@ -53,9 +62,24 @@ final class ExceptionToken implements Token {
 			statement.setString(index, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
-			render(throwable, EMPTY_TRACE, builder);
+			render(filter(throwable), Collections.emptyList(), builder);
 			statement.setString(index, builder.toString());
 		}
+	}
+
+	/**
+	 * Applies all registered {@link ThrowableFilter throwable filters}.
+	 *
+	 * @param throwable
+	 *            Throwable to filter
+	 * @return Transformed throwable
+	 */
+	private ThrowableData filter(final Throwable throwable) {
+		ThrowableData data = new ThrowableWrapper(throwable);
+		for (ThrowableFilter filter : filters) {
+			data = filter.filter(data);
+		}
+		return data;
 	}
 
 	/**
@@ -68,29 +92,29 @@ final class ExceptionToken implements Token {
 	 * @param builder
 	 *            Output will be appended to this string builder
 	 */
-	private static void render(final Throwable throwable, final StackTraceElement[] parentTrace, final StringBuilder builder) {
-		StackTraceElement[] stackTrace = throwable.getStackTrace();
+	private void render(final ThrowableData throwable, final List<StackTraceElement> parentTrace, final StringBuilder builder) {
+		List<StackTraceElement> stackTrace = throwable.getStackTrace();
 
-		int parentIndex = parentTrace.length - 1;
-		int childIndex = stackTrace.length - 1;
+		int parentIndex = parentTrace.size() - 1;
+		int childIndex = stackTrace.size() - 1;
 		int commonElements = 0;
-		while (parentIndex >= 0 && childIndex >= 0 && parentTrace[parentIndex].equals(stackTrace[childIndex])) {
+		while (parentIndex >= 0 && childIndex >= 0 && parentTrace.get(parentIndex).equals(stackTrace.get(childIndex))) {
 			parentIndex -= 1;
 			childIndex -= 1;
 			commonElements += 1;
 		}
 		
-		builder.append(throwable.getClass().getName());
+		builder.append(throwable.getClassName());
 		String message = throwable.getMessage();
 		if (message != null) {
 			builder.append(": ");
 			builder.append(message);
 		}
 
-		for (int i = 0; i < stackTrace.length - commonElements; ++i) {
+		for (int i = 0; i < stackTrace.size() - commonElements; ++i) {
 			builder.append(NEW_LINE);
 			builder.append("\tat ");
-			builder.append(stackTrace[i]);
+			builder.append(stackTrace.get(i));
 		}
 		
 		if (commonElements > 0) {
@@ -100,7 +124,7 @@ final class ExceptionToken implements Token {
 			builder.append(" more");
 		}
 
-		Throwable cause = throwable.getCause();
+		ThrowableData cause = throwable.getCause();
 		if (cause != null) {
 			builder.append(NEW_LINE);
 			builder.append("Caused by: ");

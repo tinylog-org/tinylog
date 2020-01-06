@@ -14,11 +14,14 @@
 package org.tinylog.pattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.tinylog.Level;
+import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.throwable.ThrowableFilter;
 
 /**
  * Parser for format patterns. It produces tokens combined to a root token that can be used by writers for rendering log
@@ -28,8 +31,18 @@ public final class FormatPatternParser {
 
 	private static final Pattern SPLIT_PATTERN = Pattern.compile(",");
 
-	/** */
-	private FormatPatternParser() {
+	private final List<ThrowableFilter> filters;
+
+	/**
+	 * @param filters
+	 *            Comma separated list of throwable filters
+	 */
+	public FormatPatternParser(final String filters) {
+		if (filters == null) {
+			this.filters = Collections.emptyList();
+		} else {
+			this.filters = new ServiceLoader<ThrowableFilter>(ThrowableFilter.class, String.class).createList(filters);
+		}
 	}
 
 	/**
@@ -40,7 +53,7 @@ public final class FormatPatternParser {
 	 *            Format pattern
 	 * @return Produced root token
 	 */
-	public static Token parse(final String pattern) {
+	public Token parse(final String pattern) {
 		List<Token> tokens = new ArrayList<Token>();
 
 		int start = 0;
@@ -93,7 +106,7 @@ public final class FormatPatternParser {
 	 *            Placeholder without style options and surrounding curly brackets
 	 * @return Created token
 	 */
-	private static Token createPlainToken(final String placeholder) {
+	private Token createPlainToken(final String placeholder) {
 		int splitIndex = placeholder.indexOf(':');
 		Token token;
 
@@ -117,7 +130,7 @@ public final class FormatPatternParser {
 	 *            Configuration for token or {@code null} if not defined
 	 * @return Created token or {@code null} if there is no token for the passed parameters
 	 */
-	private static Token createPlainToken(final String name, final String configuration) {
+	private Token createPlainToken(final String name, final String configuration) {
 		if (name.equals("date")) {
 			return createDateToken(configuration);
 		} else if ("timestamp".equals(name)) {
@@ -147,11 +160,11 @@ public final class FormatPatternParser {
 		} else if ("level".equals(name)) {
 			return new SeverityLevelToken();
 		} else if ("message".equals(name)) {
-			return new MessageAndExceptionToken();
+			return new MessageAndExceptionToken(filters);
 		} else if ("message-only".equals(name)) {
 			return new MessageToken();
 		} else if ("exception".equals(name)) {
-			return new ExceptionToken();
+			return new ExceptionToken(filters);
 		} else if ("opening-curly-bracket".equals(name)) {
 			return new PlainTextToken("{");
 		} else if ("closing-curly-bracket".equals(name)) {

@@ -17,9 +17,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.throwable.ThrowableFilter;
 
 /**
  * Token for outputting the text message and the exception or other throwable of a log entry.
@@ -29,10 +31,13 @@ final class MessageAndExceptionToken implements Token {
 	private final MessageToken messageToken;
 	private final ExceptionToken exceptionToken;
 
-	/** */
-	MessageAndExceptionToken() {
+	/**
+	 * @param filters
+	 *            Throwable filters for output of exceptions and other throwables
+	 */
+	MessageAndExceptionToken(final List<ThrowableFilter> filters) {
 		messageToken = new MessageToken();
-		exceptionToken = new ExceptionToken();
+		exceptionToken = new ExceptionToken(filters);
 	}
 
 	@Override

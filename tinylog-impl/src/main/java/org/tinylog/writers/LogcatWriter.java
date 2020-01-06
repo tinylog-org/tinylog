@@ -55,6 +55,7 @@ public final class LogcatWriter implements Writer {
 	 *            Configuration for writer
 	 */
 	public LogcatWriter(final Map<String, String> properties) {
+		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
 		boolean hasWritingThread = Boolean.parseBoolean(properties.get("writingthread"));
 
 		String tagPattern = properties.get("tagname");
@@ -62,7 +63,7 @@ public final class LogcatWriter implements Writer {
 			tagPattern = DEFAULT_TAG_FORMAT_PATTERN;
 		}
 
-		tagToken = FormatPatternParser.parse(tagPattern);
+		tagToken = parser.parse(tagPattern);
 		tagBuilder = hasWritingThread ? new StringBuilder(TAG_MAX_LENGTH) : null;
 
 		String messagePattern = properties.get("format");
@@ -70,7 +71,7 @@ public final class LogcatWriter implements Writer {
 			messagePattern = DEFAULT_MESSAGE_FORMAT_PATTERN;
 		}
 
-		messageToken = FormatPatternParser.parse(messagePattern);
+		messageToken = parser.parse(messagePattern);
 		messageBuilder = hasWritingThread ? new StringBuilder(MESSAGE_BUILDER_CAPACITY) : null;
 	}
 

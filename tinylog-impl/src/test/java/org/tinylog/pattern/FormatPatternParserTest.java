@@ -52,7 +52,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithDefaultPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		LocalDate date = LocalDate.of(1985, 6, 3);
 		assertThat(render("date", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 	}
 
@@ -62,7 +62,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithDefinedPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		LocalDate date = LocalDate.of(1985, 6, 3);
 		assertThat(render("date: yyyy-MM-dd", LogEntryBuilder.empty().date(date).create())).isEqualTo("1985-06-03");
 	}
 
@@ -71,7 +71,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void dateWithInvalidPattern() {
-		LocalDate date = LocalDate.of(1985, 06, 03);
+		LocalDate date = LocalDate.of(1985, 6, 3);
 		assertThat(render("date: inval'd", LogEntryBuilder.empty().date(date).create())).contains("1985", "06", "03");
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("inval'd");
 	}
@@ -81,7 +81,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithDefaultPattern() {
-		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
+		ZonedDateTime date = LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
 	}
 
@@ -91,7 +91,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithMillisecondsPattern() {
-		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
+		ZonedDateTime date = LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp: milliseconds", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800000");
 	}
 
@@ -100,7 +100,7 @@ public final class FormatPatternParserTest {
 	 */
 	@Test
 	public void timestampWithUnknownPattern() {
-		ZonedDateTime date = LocalDate.of(1985, 06, 03).atStartOfDay(ZoneOffset.UTC);
+		ZonedDateTime date = LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp: inval'd", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
 	}
 
@@ -248,15 +248,29 @@ public final class FormatPatternParserTest {
 
 	/**
 	 * Verifies that {@code {message}} can be parsed and the returned token will output the text message as well as the
-	 * exception.
+	 * exception, if no throwable filters are defined.
 	 */
 	@Test
-	public void message() {
+	public void unfilteredMessage() {
 		Exception exception = new NullPointerException();
 		assertThat(render("message", LogEntryBuilder.empty().message("Hello World!").exception(exception).create()))
 			.startsWith("Hello World!")
 			.contains(NullPointerException.class.getName())
+			.contains("at org.tinylog")
 			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that {@code {message}} can be parsed and the returned token will output a filtered exception,
+	 * if a throwable filter is defined.
+	 */
+	@Test
+	public void filteredMessage() {
+		Exception exception = new NullPointerException();
+		assertThat(render("message", LogEntryBuilder.empty().exception(exception).create(), "strip: org.tinylog"))
+				.startsWith(NullPointerException.class.getName())
+				.contains("at ")
+				.doesNotContain("at org.tinylog");
 	}
 
 	/**
@@ -271,14 +285,28 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that {@code {exception}} can be parsed and the returned token will output the exception.
+	 * Verifies that {@code {exception}} can be parsed and the returned token will output the exception,
+	 * if no throwable filters are defined.
 	 */
 	@Test
-	public void exception() {
+	public void unfilteredException() {
 		Exception exception = new NullPointerException();
 		assertThat(render("exception", LogEntryBuilder.empty().exception(exception).create()))
 			.contains(NullPointerException.class.getName())
 			.hasLineCount(exception.getStackTrace().length + 1);
+	}
+
+	/**
+	 * Verifies that {@code {exception}} can be parsed and the returned token will output a filtered exception,
+	 * if a throwable filter is defined.
+	 */
+	@Test
+	public void filteredException() {
+		Exception exception = new NullPointerException();
+		assertThat(render("exception", LogEntryBuilder.empty().exception(exception).create(), "strip: org.tinylog"))
+				.startsWith(NullPointerException.class.getName())
+				.contains("at ")
+				.doesNotContain("at org.tinylog");
 	}
 
 	/**
@@ -428,7 +456,22 @@ public final class FormatPatternParserTest {
 	 * @return Render result of produced token
 	 */
 	private String render(final String pattern, final LogEntry entry) {
-		Token token = FormatPatternParser.parse(pattern);
+		return render(pattern, entry, null);
+	}
+
+	/**
+	 * Parses a pattern and renders the returned token afterwards.
+	 *
+	 * @param pattern
+	 *            Pattern to parse
+	 * @param entry
+	 *            Log entry for rendering the produced token
+	 * @param filters
+	 *            Throwable filters to apply for exceptions and other throwables
+	 * @return Render result of produced token
+	 */
+	private String render(final String pattern, final LogEntry entry, final String filters) {
+		Token token = new FormatPatternParser(filters).parse(pattern);
 		if (token == null) {
 			return null;
 		} else {
