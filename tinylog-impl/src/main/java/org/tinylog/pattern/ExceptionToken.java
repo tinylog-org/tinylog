@@ -51,7 +51,7 @@ final class ExceptionToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		Throwable throwable = logEntry.getException();
 		if (throwable != null) {
-			render(filter(throwable), Collections.emptyList(), builder);
+			render(filter(throwable), Collections.<StackTraceElement>emptyList(), builder);
 		}
 	}
 
@@ -62,7 +62,7 @@ final class ExceptionToken implements Token {
 			statement.setString(index, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
-			render(filter(throwable), Collections.emptyList(), builder);
+			render(filter(throwable), Collections.<StackTraceElement>emptyList(), builder);
 			statement.setString(index, builder.toString());
 		}
 	}
