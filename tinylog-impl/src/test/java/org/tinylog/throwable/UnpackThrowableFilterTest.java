@@ -16,6 +16,7 @@ package org.tinylog.throwable;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.tinylog.configuration.ServiceLoader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -130,6 +131,15 @@ public final class UnpackThrowableFilterTest {
 		assertThat(causeData.getMessage()).isEqualTo("Hello World!");
 		assertThat(causeData.getStackTrace()).containsExactly(childException.getStackTrace());
 		assertThat(causeData.getCause()).isNull();
+	}
+
+	/**
+	 * Verifies that the throwable filter is registered as service under the name "unpack".
+	 */
+	@Test
+	public void isRegistered() {
+		ThrowableFilter filter = new ServiceLoader<>(ThrowableFilter.class, String.class).create("unpack", "");
+		assertThat(filter).isInstanceOf(UnpackThrowableFilter.class);
 	}
 
 }

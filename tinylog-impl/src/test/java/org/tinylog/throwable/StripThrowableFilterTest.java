@@ -14,6 +14,7 @@
 package org.tinylog.throwable;
 
 import org.junit.Test;
+import org.tinylog.configuration.ServiceLoader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -145,6 +146,15 @@ public final class StripThrowableFilterTest {
 		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
 
 		assertThat(data.getStackTrace()).hasSize(elements - 1);
+	}
+
+	/**
+	 * Verifies that the throwable filter is registered as service under the name "strip".
+	 */
+	@Test
+	public void isRegistered() {
+		ThrowableFilter filter = new ServiceLoader<>(ThrowableFilter.class, String.class).create("strip", "");
+		assertThat(filter).isInstanceOf(StripThrowableFilter.class);
 	}
 
 }

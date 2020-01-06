@@ -16,6 +16,7 @@ package org.tinylog.throwable;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.tinylog.configuration.ServiceLoader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -130,6 +131,15 @@ public final class DropCauseThrowableFilterTest {
 		assertThat(causeData.getMessage()).isEqualTo("Hello Hell!");
 		assertThat(causeData.getStackTrace()).containsExactly(childException.getStackTrace());
 		assertThat(causeData.getCause()).isNull();
+	}
+
+	/**
+	 * Verifies that the throwable filter is registered as service under the name "drop cause".
+	 */
+	@Test
+	public void isRegistered() {
+		ThrowableFilter filter = new ServiceLoader<>(ThrowableFilter.class, String.class).create("drop cause", "");
+		assertThat(filter).isInstanceOf(DropCauseThrowableFilter.class);
 	}
 
 }
