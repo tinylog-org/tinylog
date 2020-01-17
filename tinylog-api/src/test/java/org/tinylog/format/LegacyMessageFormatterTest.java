@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Martin Winandy
+ * Copyright 2020 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -115,7 +115,7 @@ public final class LegacyMessageFormatterTest {
 	}
 
 	/**
-	 * Uses {@link MessageFormatter} for formatting a text message.
+	 * Uses {@link LegacyMessageFormatter} for formatting a text message.
 	 *
 	 * @param message
 	 *            Text message with placeholders
