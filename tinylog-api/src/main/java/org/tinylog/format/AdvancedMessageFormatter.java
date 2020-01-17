@@ -32,8 +32,6 @@ import org.tinylog.provider.InternalLogger;
  */
 public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 
-	private static final int ADDITIONAL_STRING_BUILDER_CAPACITY = 32;
-
 	private final DecimalFormatSymbols symbols;
 
 	/**

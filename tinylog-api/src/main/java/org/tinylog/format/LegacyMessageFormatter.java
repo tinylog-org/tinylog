@@ -24,8 +24,6 @@ import java.text.MessageFormat;
  */
 public class LegacyMessageFormatter extends AbstractMessageFormatter {
 
-	private static final int ADDITIONAL_STRING_BUILDER_CAPACITY = 32;
-
 	/** */
 	public LegacyMessageFormatter() {
 	}

@@ -20,6 +20,8 @@ import org.tinylog.Supplier;
  */
 public abstract class AbstractMessageFormatter implements MessageFormatter {
 
+	protected static final int ADDITIONAL_STRING_BUILDER_CAPACITY = 32;
+
 	/** */
 	protected AbstractMessageFormatter() {
 	}
