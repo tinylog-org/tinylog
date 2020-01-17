@@ -141,11 +141,27 @@ public final class AdvancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies curly brackets can be escaped.
+	 * Verifies that placeholders can be escaped.
 	 */
 	@Test
 	public void ignoreEscapedPlaceholders() {
-		assertThat(format("\\{foo\\} {}", "bar")).isEqualTo("{foo} bar");
+		assertThat(format("'{foo}' {}", "bar")).isEqualTo("{foo} bar");
+	}
+
+	/**
+	 * Verifies that double ticks will be converted into a single tick.
+	 */
+	@Test
+	public void convertDoubleTicks() {
+		assertThat(format("this <''> is a single tick")).isEqualTo("this <'> is a single tick");
+	}
+
+	/**
+	 * Verifies that single ticks will be output.
+	 */
+	@Test
+	public void keepSingleTicks() {
+		assertThat(format("this <'> is a single tick")).isEqualTo("this <'> is a single tick");
 	}
 
 	/**

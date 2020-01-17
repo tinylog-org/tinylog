@@ -53,17 +53,25 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		StringBuilder current = builder;
 
 		int argumentIndex = 0;
+		int openingTickIndex = -1;
 		int openingCurlyBrackets = 0;
 
 		for (int index = 0; index < length; ++index) {
 			char character = message.charAt(index);
-			if (character == '{' && index + 1 < length && argumentIndex < arguments.length) {
+			if (character == '\'' && index + 1 < length && openingCurlyBrackets == 0) {
+				if (message.charAt(index + 1) == '\'') {
+					current.append('\'');
+					index += 1;
+				} else {
+					openingTickIndex = openingTickIndex < 0 ? index : -1;
+				}
+			} else if (character == '{' && index + 1 < length && argumentIndex < arguments.length && openingTickIndex < 0) {
 				if (openingCurlyBrackets++ == 0) {
 					current = buffer;
 				} else {
 					current.append(character);
 				}
-			} else if (character == '}' && openingCurlyBrackets > 0) {
+			} else if (character == '}' && openingCurlyBrackets > 0 && openingTickIndex < 0) {
 				if (--openingCurlyBrackets == 0) {
 					Object argument = resolve(arguments[argumentIndex++]);
 					if (buffer.length() == 0) {
@@ -77,9 +85,6 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 				} else {
 					current.append(character);
 				}
-			} else if (character == '\\' && index + 1 < length && isEscapable(message.charAt(index + 1))) {
-				++index;
-				current.append(message.charAt(index));
 			} else {
 				current.append(character);
 			}
@@ -88,6 +93,10 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		if (buffer.length() > 0) {
 			builder.append('{');
 			builder.append(buffer);
+		}
+
+		if (openingTickIndex >= 0) {
+			builder.insert(openingTickIndex, '\'');
 		}
 
 		return builder.toString();
@@ -132,17 +141,6 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		} else {
 			return new DecimalFormat(pattern, symbols);
 		}
-	}
-
-	/**
-	 * Checks whether a character is escapable.
-	 * 
-	 * @param character
-	 *            Character to check
-	 * @return {@code true} if escapable, {@code false} if not
-	 */
-	private static boolean isEscapable(final char character) {
-		return character == '\\' || character == '{' || character == '}';
 	}
 
 }
