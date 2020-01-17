@@ -36,31 +36,8 @@ import org.tinylog.writers.Writer;
  */
 public final class ConfigurationParser {
 
-	private static final int MAX_LOCALE_ARGUMENTS = 3;
-
 	/** */
 	private ConfigurationParser() {
-	}
-
-	/**
-	 * Loads the locale from configuration.
-	 *
-	 * @return Locale from configuration or {@link Locale#ROOT} if no locale is configured
-	 */
-	public static Locale getLocale() {
-		String tag = Configuration.get("locale");
-		if (tag == null) {
-			return Locale.ROOT;
-		} else {
-			String[] splitTag = tag.split("_", MAX_LOCALE_ARGUMENTS);
-			if (splitTag.length == 1) {
-				return new Locale(splitTag[0]);
-			} else if (splitTag.length == 2) {
-				return new Locale(splitTag[0], splitTag[1]);
-			} else {
-				return new Locale(splitTag[0], splitTag[1], splitTag[2]);
-			}
-		}
 	}
 
 	/**

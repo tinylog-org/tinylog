@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
-import org.tinylog.core.ConfigurationParser;
+import org.tinylog.configuration.Configuration;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.runtime.RuntimeProvider;
@@ -32,7 +32,7 @@ final class DateToken implements Token {
 
 	private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-	private static final Locale locale = ConfigurationParser.getLocale();
+	private static final Locale locale = Configuration.getLocale();
 
 	private final boolean formatted;
 	private final TimestampFormatter formatter;

@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.After;
@@ -246,6 +247,55 @@ public final class ConfigurationTest {
 		loadProperties(FileSystem.createTemporaryFile("level = info"));
 
 		assertThat(Configuration.get("level")).isEqualToIgnoringCase("debug");
+	}
+
+	/**
+	 * Verifies that {@link Locale#ROOT} will be used, if there is no defined locale.
+	 */
+	@Test
+	public void defaultLocale() {
+		Locale locale = Configuration.getLocale();
+		assertThat(locale).isEqualTo(Locale.ROOT);
+	}
+
+	/**
+	 * Verifies that an empty locale will be handled correctly.
+	 */
+	@Test
+	public void emptyLocale() {
+		Configuration.set("locale", "");
+		Locale locale = Configuration.getLocale();
+		assertThat(locale).isEqualTo(Locale.ROOT);
+	}
+
+	/**
+	 * Verifies that a language only locale will be parsed correctly.
+	 */
+	@Test
+	public void languageLocale() {
+		Configuration.set("locale", "en");
+		Locale locale = Configuration.getLocale();
+		assertThat(locale).isEqualTo(new Locale("en"));
+	}
+
+	/**
+	 * Verifies that a locale with language and country will be parsed correctly.
+	 */
+	@Test
+	public void countryLocale() {
+		Configuration.set("locale", "en_US");
+		Locale locale = Configuration.getLocale();
+		assertThat(locale).isEqualTo(new Locale("en", "US"));
+	}
+
+	/**
+	 * Verifies that a full locale with language, country and variant will be parsed correctly.
+	 */
+	@Test
+	public void fullLocale() {
+		Configuration.set("locale", "no_NO_NY");
+		Locale locale = Configuration.getLocale();
+		assertThat(locale).isEqualTo(new Locale("no", "NO", "NY"));
 	}
 
 	/**

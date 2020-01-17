@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.tinylog.Level;
 import org.tinylog.Supplier;
+import org.tinylog.configuration.Configuration;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
@@ -50,7 +51,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	/** */
 	public TinylogLoggingProvider() {
 		context = new TinylogContextProvider();
-		formatter = new MessageFormatter(ConfigurationParser.getLocale());
+		formatter = new MessageFormatter(Configuration.getLocale());
 		globalLevel = ConfigurationParser.getGlobalLevel();
 		customLevels = ConfigurationParser.getCustomLevels();
 		knownTags = ConfigurationParser.getTags();

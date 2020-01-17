@@ -15,7 +15,7 @@ package org.tinylog.path;
 
 import java.util.Locale;
 
-import org.tinylog.core.ConfigurationParser;
+import org.tinylog.configuration.Configuration;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.runtime.Timestamp;
 import org.tinylog.runtime.TimestampFormatter;
@@ -25,7 +25,7 @@ import org.tinylog.runtime.TimestampFormatter;
  */
 final class DateSegment implements Segment {
 
-	private static final Locale locale = ConfigurationParser.getLocale();
+	private static final Locale locale = Configuration.getLocale();
 
 	private final TimestampFormatter formatter;
 

@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -45,6 +46,8 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class Configuration {
 
+	private static final int MAX_LOCALE_ARGUMENTS = 3;
+
 	private static final String[] CONFIGURATION_FILES = new String[] {
 		"tinylog-dev.properties",
 		"tinylog-test.properties",
@@ -60,6 +63,27 @@ public final class Configuration {
 
 	/** */
 	private Configuration() {
+	}
+
+	/**
+	 * Get the global locale.
+	 *
+	 * @return Locale from property {@code locale} or {@link Locale#ROOT} if no locale is configured
+	 */
+	public static Locale getLocale() {
+		String tag = Configuration.get("locale");
+		if (tag == null) {
+			return Locale.ROOT;
+		} else {
+			String[] splitTag = tag.split("_", MAX_LOCALE_ARGUMENTS);
+			if (splitTag.length == 1) {
+				return new Locale(splitTag[0]);
+			} else if (splitTag.length == 2) {
+				return new Locale(splitTag[0], splitTag[1]);
+			} else {
+				return new Locale(splitTag[0], splitTag[1], splitTag[2]);
+			}
+		}
 	}
 
 	/**
