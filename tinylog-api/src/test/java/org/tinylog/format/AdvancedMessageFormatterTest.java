@@ -194,6 +194,7 @@ public final class AdvancedMessageFormatterTest {
 	private static String format(final String message, final Object... arguments) {
 		return format(Locale.ROOT, message, arguments);
 	}
+
 	/**
 	 * Uses {@link AdvancedMessageFormatter} for formatting a text message.
 	 *
