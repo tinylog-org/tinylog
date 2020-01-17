@@ -95,7 +95,8 @@ public final class LegacyMessageFormatterTest {
 	 */
 	@Test
 	public void missingOpeningCurlyBracket() {
-		assertThat(format("Hello }!", "tinylog")).isEqualTo("Hello }!");
+		assertThat(format("} Hello", "tinylog")).isEqualTo("} Hello");
+		assertThat(format("Hello }", "tinylog")).isEqualTo("Hello }");
 	}
 
 	/**
@@ -103,7 +104,8 @@ public final class LegacyMessageFormatterTest {
 	 */
 	@Test
 	public void missingClosingCurlyBracket() {
-		assertThat(format("Hello {!", "tinylog")).isEqualTo("Hello {!");
+		assertThat(format("{ Hello", "tinylog")).isEqualTo("{ Hello");
+		assertThat(format("Hello {", "tinylog")).isEqualTo("Hello {");
 	}
 
 	/**
