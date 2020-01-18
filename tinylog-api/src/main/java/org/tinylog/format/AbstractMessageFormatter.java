@@ -27,6 +27,21 @@ public abstract class AbstractMessageFormatter implements MessageFormatter {
 	}
 
 	/**
+	 * Resolves potential lazy arguments of an array.
+	 *
+	 * @param arguments
+	 *            Array of {@link Supplier Suppliers} and other objects
+	 * @return New array in which all {@link Supplier Suppliers} are resolved to its real object
+	 */
+	protected static Object[] resolve(final Object[] arguments) {
+		Object[] resolvedArguments = new Object[arguments.length];
+		for (int i = 0; i < arguments.length; ++i) {
+			resolvedArguments[i] = resolve(arguments[i]);
+		}
+		return resolvedArguments;
+	}
+
+	/**
 	 * Resolves a potential lazy argument.
 	 * 
 	 * @param argument

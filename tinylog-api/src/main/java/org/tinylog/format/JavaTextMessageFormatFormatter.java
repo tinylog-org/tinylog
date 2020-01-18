@@ -13,36 +13,33 @@
 
 package org.tinylog.format;
 
-import java.util.Formatter;
-import java.util.IllegalFormatException;
+import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 /**
- * Message formatter for printf format syntax.
- * 
- * @see Formatter
+ * Wrapper for formatting messages by {@link MessageFormat}.
  */
-public class PrintfStyleFormatter extends AbstractMessageFormatter {
-	
+public class JavaTextMessageFormatFormatter extends AbstractMessageFormatter {
+
 	private final Locale locale;
-	
+
 	/**
 	 * @param locale
 	 *            Locale for formatting numbers and dates
 	 */
-	public PrintfStyleFormatter(final Locale locale) {
+	public JavaTextMessageFormatFormatter(final Locale locale) {
 		this.locale = locale;
 	}
 
 	@Override
 	public String format(final String message, final Object[] arguments) {
 		try {
-			return String.format(locale, message, resolve(arguments));
-		} catch (IllegalFormatException ex) {
-			InternalLogger.log(Level.WARN, ex, "Illegal printf format message '" + message + "'");
+			return new MessageFormat(message, locale).format(resolve(arguments));
+		} catch (IllegalArgumentException ex) {
+			InternalLogger.log(Level.WARN, ex, "Illegal message format pattern '" + message + "'");
 			return message;
 		}
 	}
