@@ -47,14 +47,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void trace(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, null, message);
 		}
 	}
 
 	@Override
 	public void trace(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message == exception ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, message == exception ? null : message);
 		}
 	}
 
@@ -66,14 +66,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void debug(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, null, message);
 		}
 	}
 
 	@Override
 	public void debug(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message == exception ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, message == exception ? null : message);
 		}
 	}
 
@@ -85,14 +85,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void info(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, null, message);
 		}
 	}
 
 	@Override
 	public void info(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message == exception ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, message == exception ? null : message);
 		}
 	}
 
@@ -104,14 +104,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void warn(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, null, message);
 		}
 	}
 
 	@Override
 	public void warn(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message == exception ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null, message == exception ? null : message);
 		}
 	}
 
@@ -123,14 +123,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void error(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message);
 		}
 	}
 
 	@Override
 	public void error(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, exception == message ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, exception == message ? null : message);
 		}
 	}
 
@@ -142,14 +142,14 @@ public final class TinylogLog implements Log {
 	@Override
 	public void fatal(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message);
 		}
 	}
 
 	@Override
 	public void fatal(final Object message, final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, exception == message ? null : message);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, exception == message ? null : message);
 		}
 	}
 

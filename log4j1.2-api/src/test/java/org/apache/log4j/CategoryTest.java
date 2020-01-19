@@ -268,12 +268,12 @@ public final class CategoryTest {
 		 */
 		@Test
 		public void debugMessage() {
-			category.debug(Integer.valueOf(42));
+			category.debug(42);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -287,9 +287,9 @@ public final class CategoryTest {
 			category.debug("Boom!", exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -304,9 +304,9 @@ public final class CategoryTest {
 			category.debug(exception, exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -315,12 +315,12 @@ public final class CategoryTest {
 		 */
 		@Test
 		public void infoMessage() {
-			category.info(Integer.valueOf(42));
+			category.info(42);
 
 			if (infoEnabled) {
-				verify(provider).log(2, null, Level.INFO, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.INFO, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -334,9 +334,9 @@ public final class CategoryTest {
 			category.info("Boom!", exception);
 
 			if (infoEnabled) {
-				verify(provider).log(2, null, Level.INFO, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.INFO, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -350,9 +350,9 @@ public final class CategoryTest {
 			category.info(exception, exception);
 
 			if (infoEnabled) {
-				verify(provider).log(2, null, Level.INFO, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.INFO, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -361,12 +361,12 @@ public final class CategoryTest {
 		 */
 		@Test
 		public void warnMessage() {
-			category.warn(Integer.valueOf(42));
+			category.warn(42);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -380,9 +380,9 @@ public final class CategoryTest {
 			category.warn("Boom!", exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -396,9 +396,9 @@ public final class CategoryTest {
 			category.warn(exception, exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -407,12 +407,12 @@ public final class CategoryTest {
 		 */
 		@Test
 		public void errorMessage() {
-			category.error(Integer.valueOf(42));
+			category.error(42);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -426,9 +426,9 @@ public final class CategoryTest {
 			category.error("Boom!", exception);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -443,9 +443,9 @@ public final class CategoryTest {
 			category.error(exception, exception);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -454,12 +454,12 @@ public final class CategoryTest {
 		 */
 		@Test
 		public void fatalMessage() {
-			category.fatal(Integer.valueOf(42));
+			category.fatal(42);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -473,9 +473,9 @@ public final class CategoryTest {
 			category.fatal("Boom!", exception);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -490,9 +490,9 @@ public final class CategoryTest {
 			category.fatal(exception, exception);
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -502,7 +502,7 @@ public final class CategoryTest {
 		@Test
 		public void assertLogWithPositiveAssertion() {
 			category.assertLog(true, "Hello World!");
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 
 		/**
@@ -514,9 +514,9 @@ public final class CategoryTest {
 			category.assertLog(false, "Hello World!");
 
 			if (errorEnabled) {
-				verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+				verify(provider).log(2, null, Level.ERROR, null, null, "Hello World!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -531,17 +531,17 @@ public final class CategoryTest {
 			category.forcedLog("MyClass", Priority.DEBUG, "Boom!", exception);
 
 			if (debugEnabled) {
-				verify(provider).log("MyClass", null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.forcedLog("MyClass", Priority.WARN, "Boom!", exception);
 
 			if (warnEnabled) {
-				verify(provider).log("MyClass", null, Level.WARN, exception, "Boom!", (Object[]) null);
+				verify(provider).log("MyClass", null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -557,17 +557,17 @@ public final class CategoryTest {
 			category.forcedLog("MyClass", Priority.DEBUG, exception, exception);
 
 			if (debugEnabled) {
-				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, (Object[]) null);
+				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.forcedLog("MyClass", Priority.WARN, exception, exception);
 
 			if (warnEnabled) {
-				verify(provider).log("MyClass", null, Level.WARN, exception, null, (Object[]) null);
+				verify(provider).log("MyClass", null, Level.WARN, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -584,17 +584,17 @@ public final class CategoryTest {
 			category.l7dlog(Priority.DEBUG, "test", exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, "Hello World!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.l7dlog(Priority.WARN, "test", exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, "Hello World!", (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, "Hello World!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -611,17 +611,17 @@ public final class CategoryTest {
 			category.l7dlog(Priority.DEBUG, "test", new Object[] { "Java" }, exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, "Hello Java!", (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, "Hello Java!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.l7dlog(Priority.WARN, "test", new Object[] { "Java" }, exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, "Hello Java!", (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, "Hello Java!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -635,17 +635,17 @@ public final class CategoryTest {
 			category.log(Priority.DEBUG, "Hello World!");
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, null, null, "Hello World!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.log(Priority.WARN, "Hello World!", null);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, null, null, "Hello World!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -661,17 +661,17 @@ public final class CategoryTest {
 			category.log(Priority.DEBUG, "Boom!", exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.log(Priority.WARN, "Boom!", exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -687,17 +687,17 @@ public final class CategoryTest {
 			category.log(Priority.DEBUG, exception, exception);
 
 			if (debugEnabled) {
-				verify(provider).log(2, null, Level.DEBUG, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.DEBUG, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.log(Priority.WARN, exception, exception);
 
 			if (warnEnabled) {
-				verify(provider).log(2, null, Level.WARN, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.WARN, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -713,17 +713,17 @@ public final class CategoryTest {
 			category.log("MyClass", Priority.DEBUG, "Boom!", exception);
 
 			if (debugEnabled) {
-				verify(provider).log("MyClass", null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.log("MyClass", Priority.WARN, "Boom!", exception);
 
 			if (warnEnabled) {
-				verify(provider).log("MyClass", null, Level.WARN, exception, "Boom!", (Object[]) null);
+				verify(provider).log("MyClass", null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 
@@ -739,17 +739,17 @@ public final class CategoryTest {
 			category.log("MyClass", Priority.DEBUG, exception, exception);
 
 			if (debugEnabled) {
-				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, (Object[]) null);
+				verify(provider).log("MyClass", null, Level.DEBUG, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 
 			category.log("MyClass", Priority.WARN, exception, exception);
 
 			if (warnEnabled) {
-				verify(provider).log("MyClass", null, Level.WARN, exception, null, (Object[]) null);
+				verify(provider).log("MyClass", null, Level.WARN, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 			}
 		}
 

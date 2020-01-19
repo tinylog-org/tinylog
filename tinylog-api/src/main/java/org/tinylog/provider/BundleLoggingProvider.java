@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 
 /**
  * Logging provider that combines multiple logging providers into one.
@@ -76,18 +77,18 @@ final class BundleLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final MessageFormatter formatter,
+		final Object obj, final Object... arguments) {
 		for (int i = 0; i < loggingProviders.length; ++i) {
-			loggingProviders[i].log(depth + 1, tag, level, exception, obj, arguments);
+			loggingProviders[i].log(depth + 1, tag, level, exception, formatter, obj, arguments);
 		}
 	}
 
 	@Override
-	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+		final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		for (int i = 0; i < loggingProviders.length; ++i) {
-			loggingProviders[i].log(loggerClassName, tag, level, exception, obj, arguments);
+			loggingProviders[i].log(loggerClassName, tag, level, exception, formatter, obj, arguments);
 		}
 	}
 

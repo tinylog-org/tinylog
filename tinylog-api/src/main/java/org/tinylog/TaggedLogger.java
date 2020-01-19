@@ -13,6 +13,9 @@
 
 package org.tinylog;
 
+import org.tinylog.configuration.Configuration;
+import org.tinylog.format.AdvancedMessageFormatter;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -24,7 +27,8 @@ import org.tinylog.provider.ProviderRegistry;
 public final class TaggedLogger {
 
 	private static final int STACKTRACE_DEPTH = 2;
-
+	
+	private static final MessageFormatter formatter = new AdvancedMessageFormatter(Configuration.getLocale());
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	private final boolean minimumLevelCoversTrace;
@@ -68,7 +72,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Object message) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -81,7 +85,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Supplier<?> message) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -96,7 +100,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final String message, final Object... arguments) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, formatter, message, arguments);
 		}
 	}
 
@@ -111,7 +115,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -123,7 +127,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -137,7 +141,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final String message) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -152,7 +156,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -169,7 +173,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, formatter, message, arguments);
 		}
 	}
 
@@ -186,7 +190,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversTrace) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -207,7 +211,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Object message) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -220,7 +224,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Supplier<?> message) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -235,7 +239,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final String message, final Object... arguments) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, formatter, message, arguments);
 		}
 	}
 
@@ -250,7 +254,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -262,7 +266,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -276,7 +280,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final String message) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -291,7 +295,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -308,7 +312,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, formatter, message, arguments);
 		}
 	}
 
@@ -325,7 +329,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversDebug) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -346,7 +350,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Object message) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -359,7 +363,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Supplier<?> message) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -373,7 +377,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final String message, final Object... arguments) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, formatter, message, arguments);
 		}
 	}
 
@@ -388,7 +392,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -400,7 +404,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -414,7 +418,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final String message) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -429,7 +433,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -446,7 +450,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, formatter, message, arguments);
 		}
 	}
 
@@ -463,7 +467,7 @@ public final class TaggedLogger {
 	 */
 	public void info(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversInfo) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -484,7 +488,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Object message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -497,7 +501,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Supplier<?> message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -512,7 +516,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, formatter, message, arguments);
 		}
 	}
 
@@ -527,7 +531,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -539,7 +543,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -553,7 +557,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -568,7 +572,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -585,7 +589,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, formatter, message, arguments);
 		}
 	}
 
@@ -602,7 +606,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversWarn) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -623,7 +627,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Object message) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -636,7 +640,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Supplier<?> message) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -651,7 +655,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final String message, final Object... arguments) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, formatter, message, arguments);
 		}
 	}
 
@@ -666,7 +670,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -678,7 +682,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -692,7 +696,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final String message) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -707,7 +711,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final Supplier<String> message) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -724,7 +728,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final String message, final Object... arguments) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, formatter, message, arguments);
 		}
 	}
 
@@ -741,7 +745,7 @@ public final class TaggedLogger {
 	 */
 	public void error(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (minimumLevelCoversError) {
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 

@@ -16,6 +16,8 @@ package org.tinylog.slf4j;
 import org.slf4j.Marker;
 import org.slf4j.spi.LocationAwareLogger;
 import org.tinylog.Level;
+import org.tinylog.format.LegacyMessageFormatter;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -26,6 +28,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 
 	private static final int STACKTRACE_DEPTH = 2;
 
+	private static final MessageFormatter formatter = new LegacyMessageFormatter();
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	// @formatter:off
@@ -67,35 +70,35 @@ public final class TinylogLogger implements LocationAwareLogger {
 	@Override
 	public void trace(final String message) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object arg) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(final String format, final Object... arguments) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
 	@Override
 	public void trace(final String message, final Throwable exception) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -109,7 +112,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void trace(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -117,7 +120,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void trace(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
@@ -125,7 +128,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void trace(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
@@ -133,7 +136,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void trace(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
@@ -141,7 +144,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void trace(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_TRACE) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -153,35 +156,35 @@ public final class TinylogLogger implements LocationAwareLogger {
 	@Override
 	public void debug(final String message) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object arg) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(final String format, final Object... arguments) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
 	@Override
 	public void debug(final String message, final Throwable exception) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -195,7 +198,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void debug(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -203,7 +206,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void debug(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
@@ -211,7 +214,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void debug(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
@@ -219,7 +222,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void debug(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
@@ -227,7 +230,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void debug(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -239,35 +242,35 @@ public final class TinylogLogger implements LocationAwareLogger {
 	@Override
 	public void info(final String message) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object arg) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(final String format, final Object... arguments) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
 	@Override
 	public void info(final String message, final Throwable exception) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -281,7 +284,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void info(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -289,7 +292,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void info(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
@@ -297,7 +300,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void info(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
@@ -305,7 +308,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void info(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
@@ -313,7 +316,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void info(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_INFO) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -325,35 +328,35 @@ public final class TinylogLogger implements LocationAwareLogger {
 	@Override
 	public void warn(final String message) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object arg) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(final String format, final Object... arguments) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
 	@Override
 	public void warn(final String message, final Throwable exception) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -367,7 +370,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void warn(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -375,7 +378,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void warn(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
@@ -383,7 +386,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void warn(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
@@ -391,7 +394,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void warn(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
@@ -399,7 +402,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void warn(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_WARN) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -411,35 +414,35 @@ public final class TinylogLogger implements LocationAwareLogger {
 	@Override
 	public void error(final String message) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object arg) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(final String format, final Object... arguments) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
 	@Override
 	public void error(final String message, final Throwable exception) {
 		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -453,7 +456,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void error(final Marker marker, final String message) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -461,7 +464,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void error(final Marker marker, final String format, final Object arg) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg), format, arg);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg), formatter, format, arg);
 		}
 	}
 
@@ -469,7 +472,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void error(final Marker marker, final String format, final Object arg1, final Object arg2) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg2), format, arg1, arg2);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arg2), formatter, format, arg1, arg2);
 		}
 	}
 
@@ -477,7 +480,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void error(final Marker marker, final String format, final Object... arguments) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arguments), format, arguments);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, extractThrowable(arguments), formatter, format, arguments);
 		}
 	}
 
@@ -485,7 +488,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 	public void error(final Marker marker, final String message, final Throwable exception) {
 		if (MINIMUM_GLOBAL_LEVEL_COVERS_ERROR) {
 			String tag = marker == null ? null : marker.getName();
-			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, tag, Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -495,7 +498,7 @@ public final class TinylogLogger implements LocationAwareLogger {
 		Level severityLevel = translateLevel(level);
 		String tag = marker == null ? null : marker.getName();
 		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
-			provider.log(fqcn, tag, severityLevel, exception, message, arguments);
+			provider.log(fqcn, tag, severityLevel, exception, formatter, message, arguments);
 		}
 	}
 

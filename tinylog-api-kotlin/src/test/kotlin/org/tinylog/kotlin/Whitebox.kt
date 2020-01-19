@@ -13,14 +13,16 @@
 
 package org.tinylog.kotlin
 
-import org.apache.commons.lang3.reflect.FieldUtils
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
+
+import org.apache.commons.lang3.reflect.FieldUtils
 
 /**
  * Reflection utility class for accessing private members.

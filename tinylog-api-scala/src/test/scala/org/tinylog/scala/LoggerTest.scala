@@ -21,11 +21,12 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import org.mockito.ArgumentMatcher
-import org.mockito.ArgumentMatchers.{any, anyInt, anyString, argThat, isNull, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, anyInt, anyString, argThat, isNull, eq => eqTo, same}
 import org.mockito.Mockito.{mock, never, verify, when}
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.rule.PowerMockRule
 import org.powermock.reflect.Whitebox
+import org.tinylog.format.MessageFormatter
 import org.tinylog.provider.{LoggingProvider, ProviderRegistry}
 import org.tinylog.rules.SystemStreamCollector
 import org.tinylog.{Level, Supplier}
@@ -89,8 +90,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def traceNumber(): Unit = {
 		Logger.trace(42.asInstanceOf[Any])
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -99,8 +100,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def traceStaticString(): Unit = {
 		Logger.trace("Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -110,8 +111,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.trace(s"Hello $name!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -120,8 +121,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def traceLazyMessage(): Unit = {
 		Logger.trace(() => "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -130,8 +131,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def traceMessageAndArguments(): Unit = {
 		Logger.trace("Hello {}!", "World")
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, null, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -140,8 +141,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def traceMessageAndLazyArguments(): Unit = {
 		Logger.trace("The number is {}", () => 42)
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -151,8 +152,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.trace(exception)
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, exception, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -162,8 +163,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.trace(exception, "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, exception, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -174,8 +175,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.trace(exception, s"Hello $name!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -185,8 +186,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.trace(exception, () => "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -196,8 +197,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.trace(exception, "Hello {}!", "World")
 
-		if (traceEnabled) verify(loggingProvider).log(2, null, Level.TRACE, exception, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -207,8 +208,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.trace(exception, "The number is {}", () => 42)
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (traceEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.TRACE), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -224,8 +225,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def debugNumber(): Unit = {
 		Logger.debug(42.asInstanceOf[Any])
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -234,8 +235,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def debugStaticString(): Unit = {
 		Logger.debug("Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -245,8 +246,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.debug(s"Hello $name!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -255,8 +256,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def debugLazyMessage(): Unit = {
 		Logger.debug(() => "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -265,8 +266,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def debugMessageAndArguments(): Unit = {
 		Logger.debug("Hello {}!", "World")
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, null, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -275,8 +276,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def debugMessageAndLazyArguments(): Unit = {
 		Logger.debug("The number is {}", () => 42)
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -286,8 +287,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.debug(exception)
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, exception, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -297,8 +298,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.debug(exception, "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, exception, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -309,8 +310,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.debug(exception, s"Hello $name!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -320,8 +321,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.debug(exception, () => "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -331,8 +332,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.debug(exception, "Hello {}!", "World")
 
-		if (debugEnabled) verify(loggingProvider).log(2, null, Level.DEBUG, exception, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -342,8 +343,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.debug(exception, "The number is {}", () => 42)
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (debugEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.DEBUG), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -359,8 +360,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def infoNumber(): Unit = {
 		Logger.info(42.asInstanceOf[Any])
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -369,8 +370,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def infoStaticString(): Unit = {
 		Logger.info("Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -380,8 +381,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.info(s"Hello $name!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -390,8 +391,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def infoLazyMessage(): Unit = {
 		Logger.info(() => "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -400,8 +401,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def infoMessageAndArguments(): Unit = {
 		Logger.info("Hello {}!", "World")
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, null, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -410,8 +411,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def infoMessageAndLazyArguments(): Unit = {
 		Logger.info("The number is {}", () => 42)
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -421,8 +422,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.info(exception)
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, exception, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -432,8 +433,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.info(exception, "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, exception, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -444,8 +445,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.info(exception, s"Hello $name!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -455,8 +456,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.info(exception, () => "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -466,8 +467,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.info(exception, "Hello {}!", "World")
 
-		if (infoEnabled) verify(loggingProvider).log(2, null, Level.INFO, exception, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -477,8 +478,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.info(exception, "The number is {}", () => 42)
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (infoEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.INFO), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -494,8 +495,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def warnNumber(): Unit = {
 		Logger.warn(42.asInstanceOf[Any])
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -504,8 +505,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def warnStaticString(): Unit = {
 		Logger.warn("Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -515,8 +516,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.warn(s"Hello $name!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -525,8 +526,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def warnLazyMessage(): Unit = {
 		Logger.warn(() => "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -535,8 +536,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def warnMessageAndArguments(): Unit = {
 		Logger.warn("Hello {}!", "World")
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, null, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -545,8 +546,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def warnMessageAndLazyArguments(): Unit = {
 		Logger.warn("The number is {}", () => 42)
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -556,8 +557,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.warn(exception)
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, exception, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -567,8 +568,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.warn(exception, "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, exception, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -579,8 +580,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.warn(exception, s"Hello $name!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -590,8 +591,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.warn(exception, () => "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -601,8 +602,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.warn(exception, "Hello {}!", "World")
 
-		if (warnEnabled) verify(loggingProvider).log(2, null, Level.WARN, exception, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -612,8 +613,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.warn(exception, "The number is {}", () => 42)
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (warnEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.WARN), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -629,8 +630,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def errorNumber(): Unit = {
 		Logger.error(42.asInstanceOf[Any])
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -639,8 +640,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def errorStaticString(): Unit = {
 		Logger.error("Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -650,8 +651,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.error(s"Hello $name!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -660,8 +661,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def errorLazyMessage(): Unit = {
 		Logger.error(() => "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -670,8 +671,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def errorMessageAndArguments(): Unit = {
 		Logger.error("Hello {}!", "World")
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, null, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -680,8 +681,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 	@Test def errorMessageAndLazyArguments(): Unit = {
 		Logger.error("The number is {}", () => 42)
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -691,8 +692,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.error(exception)
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, exception, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -702,8 +703,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.error(exception, "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, exception, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -714,8 +715,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val name = "Mister"
 		Logger.error(exception, s"Hello $name!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -725,8 +726,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.error(exception, () => "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -736,8 +737,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.error(exception, "Hello {}!", "World")
 
-		if (errorEnabled) verify(loggingProvider).log(2, null, Level.ERROR, exception, "Hello {}!", "World")
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -747,8 +748,8 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		val exception = new NullPointerException
 		Logger.error(exception, "The number is {}", () => 42)
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any[Array[AnyRef]])
+		if (errorEnabled) verify(loggingProvider).log(eqTo(2), isNull[String], eqTo(Level.ERROR), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -796,7 +797,7 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		* @return `true` if given severity level is covered, otherwise `false`
 		*/
 	private def isCoveredByMinimumLevel(level: Level): Boolean = {
-		return Whitebox.invokeMethod(classOf[org.tinylog.Logger], "isCoveredByMinimumLevel", level)
+		Whitebox.invokeMethod(classOf[org.tinylog.Logger], "isCoveredByMinimumLevel", level)
 	}
 
 	/**
@@ -807,7 +808,7 @@ final class LoggerTest(var level: Level, var traceEnabled: Boolean, var debugEna
 		* @return Argument matcher for testing suppliers
 		*/
 	private def supplies(expected: Any): ArgumentMatcher[Supplier[Any]] = {
-		return supplier => {
+		supplier => {
 			assertThat(supplier.get()).isEqualTo(expected)
 			true
 		}

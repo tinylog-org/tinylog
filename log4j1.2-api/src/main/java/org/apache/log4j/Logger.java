@@ -125,7 +125,7 @@ public class Logger extends Category {
 	 */
 	public void trace(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -145,7 +145,7 @@ public class Logger extends Category {
 	 */
 	public void trace(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 

@@ -13,6 +13,7 @@
 
 package org.tinylog.adapter.jul;
 
+import java.util.Locale;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tinylog.Level;
+import org.tinylog.format.AdvancedMessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.NopContextProvider;
 import org.tinylog.util.StorageHandler;
@@ -118,7 +120,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();	
-		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.DEBUG, exception, "Hello World", new Object[0]);
+		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.DEBUG, exception, null, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).isEmpty();
 	}
 
@@ -130,7 +132,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();	
-		provider.log(1, null, Level.INFO, exception, "Hello World", new Object[0]);
+		provider.log(1, null, Level.INFO, exception, null, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);
@@ -148,7 +150,8 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		provider.log(1, null, Level.INFO, exception, "Hello {}", new Object[] { "User" });
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		provider.log(1, null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);
@@ -166,7 +169,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		provider.log(1, null, Level.DEBUG, exception, "Hello World", new Object[0]);
+		provider.log(1, null, Level.DEBUG, exception, null, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).isEmpty();
 	}
 
@@ -178,7 +181,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.INFO, exception, "Hello World", new Object[0]);
+		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.INFO, exception, null, "Hello World", new Object[0]);
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);
@@ -196,7 +199,8 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.INFO, exception, "Hello {}", new Object[] { "User" });
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
 		LogRecord record = handler.getRecords().get(0);

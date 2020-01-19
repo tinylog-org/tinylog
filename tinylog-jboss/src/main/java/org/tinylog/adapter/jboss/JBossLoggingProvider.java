@@ -13,13 +13,11 @@
 
 package org.tinylog.adapter.jboss;
 
-import java.util.Locale;
-
 import org.jboss.logging.Logger;
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.LoggingProvider;
-import org.tinylog.provider.MessageFormatter;
 import org.tinylog.runtime.RuntimeProvider;
 
 /**
@@ -28,12 +26,10 @@ import org.tinylog.runtime.RuntimeProvider;
 public final class JBossLoggingProvider implements LoggingProvider {
 
 	private ContextProvider contextProvider;
-	private MessageFormatter formatter;
 
 	/** */
 	public JBossLoggingProvider() {
 		contextProvider = new JBossContextProvider();
-		formatter = new MessageFormatter(Locale.getDefault());
 	}
 
 	@Override
@@ -58,8 +54,8 @@ public final class JBossLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final MessageFormatter formatter,
+		final Object obj, final Object... arguments) {
 		String callerClassName = RuntimeProvider.getCallerClassName(depth + 1);
 		Logger jbossLogger = Logger.getLogger(callerClassName);
 		org.jboss.logging.Logger.Level jbossLevel = translate(level);
@@ -72,8 +68,8 @@ public final class JBossLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+		final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		String callerClassName = RuntimeProvider.getCallerClassName(loggerClassName);
 		Logger jbossLogger = Logger.getLogger(callerClassName);
 		org.jboss.logging.Logger.Level jbossLevel = translate(level);

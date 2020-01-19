@@ -15,6 +15,7 @@ package org.tinylog.provider;
 
 import org.junit.Test;
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,10 +131,11 @@ public final class BundleLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		bundle.log(1, "technical", Level.INFO, exception, "Test", 42);
+		MessageFormatter formatter = mock(MessageFormatter.class);
+		bundle.log(1, "technical", Level.INFO, exception, formatter, "Test", 42);
 
-		verify(first).log(2, "technical", Level.INFO, exception, "Test", 42);
-		verify(second).log(2, "technical", Level.INFO, exception, "Test", 42);
+		verify(first).log(2, "technical", Level.INFO, exception, formatter, "Test", 42);
+		verify(second).log(2, "technical", Level.INFO, exception, formatter, "Test", 42);
 	}
 
 	/**
@@ -146,10 +148,11 @@ public final class BundleLoggingProviderTest {
 		init(Level.TRACE, Level.TRACE);
 
 		NullPointerException exception = new NullPointerException();
-		bundle.log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
+		MessageFormatter formatter = mock(MessageFormatter.class);
+		bundle.log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, formatter, "Test", 42);
 
-		verify(first).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
-		verify(second).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, "Test", 42);
+		verify(first).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, formatter, "Test", 42);
+		verify(second).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, formatter, "Test", 42);
 	}
 
 	/**

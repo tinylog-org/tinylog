@@ -13,6 +13,9 @@
 
 package org.pmw.tinylog;
 
+import org.tinylog.configuration.Configuration;
+import org.tinylog.format.AdvancedMessageFormatter;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -23,6 +26,7 @@ public final class Logger {
 
 	private static final int STACKTRACE_DEPTH = 2;
 
+	private static final MessageFormatter formatter = new AdvancedMessageFormatter(Configuration.getLocale());
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	// @formatter:off
@@ -76,7 +80,7 @@ public final class Logger {
 	 */
 	public static void trace(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -88,7 +92,7 @@ public final class Logger {
 	 */
 	public static void trace(final String message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -101,7 +105,7 @@ public final class Logger {
 	 */
 	public static void trace(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -116,7 +120,7 @@ public final class Logger {
 	 */
 	public static void trace(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, formatter, message, arguments);
 		}
 	}
 
@@ -131,7 +135,7 @@ public final class Logger {
 	 */
 	public static void trace(final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -143,7 +147,7 @@ public final class Logger {
 	 */
 	public static void trace(final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -157,7 +161,7 @@ public final class Logger {
 	 */
 	public static void trace(final Throwable exception, final String message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -172,7 +176,7 @@ public final class Logger {
 	 */
 	public static void trace(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -189,7 +193,7 @@ public final class Logger {
 	 */
 	public static void trace(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, formatter, message, arguments);
 		}
 	}
 
@@ -206,7 +210,7 @@ public final class Logger {
 	 */
 	public static void trace(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.TRACE, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -218,7 +222,7 @@ public final class Logger {
 	 */
 	public static void debug(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -230,7 +234,7 @@ public final class Logger {
 	 */
 	public static void debug(final String message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -243,7 +247,7 @@ public final class Logger {
 	 */
 	public static void debug(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -258,7 +262,7 @@ public final class Logger {
 	 */
 	public static void debug(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, formatter, message, arguments);
 		}
 	}
 
@@ -273,7 +277,7 @@ public final class Logger {
 	 */
 	public static void debug(final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -285,7 +289,7 @@ public final class Logger {
 	 */
 	public static void debug(final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -299,7 +303,7 @@ public final class Logger {
 	 */
 	public static void debug(final Throwable exception, final String message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -314,7 +318,7 @@ public final class Logger {
 	 */
 	public static void debug(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -331,7 +335,7 @@ public final class Logger {
 	 */
 	public static void debug(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, formatter, message, arguments);
 		}
 	}
 
@@ -348,7 +352,7 @@ public final class Logger {
 	 */
 	public static void debug(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -360,7 +364,7 @@ public final class Logger {
 	 */
 	public static void info(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -372,7 +376,7 @@ public final class Logger {
 	 */
 	public static void info(final String message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -385,7 +389,7 @@ public final class Logger {
 	 */
 	public static void info(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -399,7 +403,7 @@ public final class Logger {
 	 */
 	public static void info(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, formatter, message, arguments);
 		}
 	}
 
@@ -414,7 +418,7 @@ public final class Logger {
 	 */
 	public static void info(final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -426,7 +430,7 @@ public final class Logger {
 	 */
 	public static void info(final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -440,7 +444,7 @@ public final class Logger {
 	 */
 	public static void info(final Throwable exception, final String message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -455,7 +459,7 @@ public final class Logger {
 	 */
 	public static void info(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -472,7 +476,7 @@ public final class Logger {
 	 */
 	public static void info(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, formatter, message, arguments);
 		}
 	}
 
@@ -489,7 +493,7 @@ public final class Logger {
 	 */
 	public static void info(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -501,7 +505,7 @@ public final class Logger {
 	 */
 	public static void warn(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -513,7 +517,7 @@ public final class Logger {
 	 */
 	public static void warn(final String message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -526,7 +530,7 @@ public final class Logger {
 	 */
 	public static void warn(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -541,7 +545,7 @@ public final class Logger {
 	 */
 	public static void warn(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, formatter, message, arguments);
 		}
 	}
 
@@ -556,7 +560,7 @@ public final class Logger {
 	 */
 	public static void warn(final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -568,7 +572,7 @@ public final class Logger {
 	 */
 	public static void warn(final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -582,7 +586,7 @@ public final class Logger {
 	 */
 	public static void warn(final Throwable exception, final String message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -597,7 +601,7 @@ public final class Logger {
 	 */
 	public static void warn(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -614,7 +618,7 @@ public final class Logger {
 	 */
 	public static void warn(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, formatter, message, arguments);
 		}
 	}
 
@@ -631,7 +635,7 @@ public final class Logger {
 	 */
 	public static void warn(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -643,7 +647,7 @@ public final class Logger {
 	 */
 	public static void error(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -655,7 +659,7 @@ public final class Logger {
 	 */
 	public static void error(final String message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -668,7 +672,7 @@ public final class Logger {
 	 */
 	public static void error(final Supplier<?> message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -683,7 +687,7 @@ public final class Logger {
 	 */
 	public static void error(final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, formatter, message, arguments);
 		}
 	}
 
@@ -698,7 +702,7 @@ public final class Logger {
 	 */
 	public static void error(final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, formatter, message, (Object[]) arguments);
 		}
 	}
 
@@ -710,7 +714,7 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, null, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, null, null, (Object[]) null);
 		}
 	}
 
@@ -724,7 +728,7 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception, final String message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -739,7 +743,7 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception, final Supplier<String> message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, null, message, (Object[]) null);
 		}
 	}
 
@@ -756,7 +760,7 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception, final String message, final Object... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, message, arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, formatter, message, arguments);
 		}
 	}
 
@@ -773,7 +777,7 @@ public final class Logger {
 	 */
 	public static void error(final Throwable exception, final String message, final Supplier<?>... arguments) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, message, (Object[]) arguments);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, exception, formatter, message, (Object[]) arguments);
 		}
 	}
 

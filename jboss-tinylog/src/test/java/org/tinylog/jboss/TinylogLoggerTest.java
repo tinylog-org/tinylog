@@ -29,6 +29,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
+import org.tinylog.format.JavaTextMessageFormatFormatter;
+import org.tinylog.format.PrintfStyleFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -37,6 +39,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -168,12 +172,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceObjectMessage() {
-		logger.trace(Integer.valueOf(42));
+		logger.trace(42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.TRACE, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -187,9 +191,9 @@ public final class TinylogLoggerTest {
 		logger.trace("Boom!", exception);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.TRACE, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -204,9 +208,9 @@ public final class TinylogLoggerTest {
 		logger.trace(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (traceEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.TRACE, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.TRACE, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -221,9 +225,10 @@ public final class TinylogLoggerTest {
 		logger.trace(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (traceEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.TRACE, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.TRACE), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -233,12 +238,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceFormattedMessageWithMultipleArguments() {
-		logger.tracev("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.tracev("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -251,9 +257,10 @@ public final class TinylogLoggerTest {
 		logger.tracev("Hello {0}!", "World");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -265,9 +272,10 @@ public final class TinylogLoggerTest {
 		logger.tracev("{0} = {1}", "magic", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -280,9 +288,10 @@ public final class TinylogLoggerTest {
 		logger.tracev("{0}, {1} or {2}", 1, 2, 3);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -294,12 +303,13 @@ public final class TinylogLoggerTest {
 	public void traceExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.tracev(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.tracev(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -314,9 +324,10 @@ public final class TinylogLoggerTest {
 		logger.tracev(exception, "Hello {0}!", "Error");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -331,9 +342,10 @@ public final class TinylogLoggerTest {
 		logger.tracev(exception, "{0} = {1}", "magic", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -348,9 +360,10 @@ public final class TinylogLoggerTest {
 		logger.tracev(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -360,12 +373,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceFormattedStringWithMultipleObjects() {
-		logger.tracef("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.tracef("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -378,9 +392,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("Hello %s!", "World");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -393,9 +408,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%s = %d", "magic", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -408,9 +424,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%s, %s or %s", "one", "two", "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -422,12 +439,13 @@ public final class TinylogLoggerTest {
 	public void traceExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.tracef(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.tracef(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -442,9 +460,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "Hello %s!", "World");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -459,9 +478,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%s = %d", "magic", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -476,9 +496,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -488,12 +509,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceFormattedStringWithSingleInt() {
-		logger.tracef("Hello %s!", 42);
+		logger.tracef("Hello %d!", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -506,9 +527,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d", 1, 2);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -521,9 +543,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d = %s", 42, "magic");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -536,9 +559,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d = %d", 1, 2, 3);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -551,9 +575,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d = %s", 1, 2, "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -566,9 +591,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d = %s + %s", 3, "one", "two");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -580,12 +606,13 @@ public final class TinylogLoggerTest {
 	public void traceExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.tracef(exception, "Hello %s!", 42);
+		logger.tracef(exception, "Hello %d!", 42);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -600,9 +627,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d", 1, 2);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -617,9 +645,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d = %s", 42, "magic");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -634,9 +663,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -651,9 +681,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -668,9 +699,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -680,12 +712,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceFormattedStringWithSingleLong() {
-		logger.tracef("Hello %s!", 42L);
+		logger.tracef("Hello %d!", 42L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -698,9 +730,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d", 1L, 2L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -713,9 +746,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d = %s", 42L, "magic");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -728,9 +762,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d = %d", 1L, 2L, 3L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -743,9 +778,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d + %d = %s", 1L, 2L, "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -758,9 +794,10 @@ public final class TinylogLoggerTest {
 		logger.tracef("%d = %s + %s", 3L, "one", "two");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -772,12 +809,13 @@ public final class TinylogLoggerTest {
 	public void traceExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.tracef(exception, "Hello %s!", 42L);
+		logger.tracef(exception, "Hello %d!", 42L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -792,9 +830,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d", 1L, 2L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -809,9 +848,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d = %s", 42L, "magic");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -826,9 +866,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -843,9 +884,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -860,9 +902,10 @@ public final class TinylogLoggerTest {
 		logger.tracef(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -879,12 +922,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugObjectMessage() {
-		logger.debug(Integer.valueOf(42));
+		logger.debug(42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -898,9 +941,9 @@ public final class TinylogLoggerTest {
 		logger.debug("Boom!", exception);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -915,9 +958,9 @@ public final class TinylogLoggerTest {
 		logger.debug(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -932,9 +975,10 @@ public final class TinylogLoggerTest {
 		logger.debug(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -944,12 +988,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugFormattedMessageWithMultipleArguments() {
-		logger.debugv("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.debugv("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -962,9 +1007,10 @@ public final class TinylogLoggerTest {
 		logger.debugv("Hello {0}!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -976,9 +1022,10 @@ public final class TinylogLoggerTest {
 		logger.debugv("{0} = {1}", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -991,9 +1038,10 @@ public final class TinylogLoggerTest {
 		logger.debugv("{0}, {1} or {2}", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1005,12 +1053,13 @@ public final class TinylogLoggerTest {
 	public void debugExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.debugv(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.debugv(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1025,9 +1074,10 @@ public final class TinylogLoggerTest {
 		logger.debugv(exception, "Hello {0}!", "Error");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1042,9 +1092,10 @@ public final class TinylogLoggerTest {
 		logger.debugv(exception, "{0} = {1}", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1059,9 +1110,10 @@ public final class TinylogLoggerTest {
 		logger.debugv(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1071,12 +1123,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugFormattedStringWithMultipleObjects() {
-		logger.debugf("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.debugf("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1089,9 +1142,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("Hello %s!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1104,9 +1158,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%s = %d", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1119,9 +1174,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%s, %s or %s", "one", "two", "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1133,12 +1189,13 @@ public final class TinylogLoggerTest {
 	public void debugExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.debugf(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.debugf(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1153,9 +1210,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "Hello %s!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1170,9 +1228,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%s = %d", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1187,9 +1246,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1199,12 +1259,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugFormattedStringWithSingleInt() {
-		logger.debugf("Hello %s!", 42);
+		logger.debugf("Hello %d!", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1217,9 +1277,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d", 1, 2);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1232,9 +1293,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d = %s", 42, "magic");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1247,9 +1309,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d = %d", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1262,9 +1325,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d = %s", 1, 2, "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1277,9 +1341,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d = %s + %s", 3, "one", "two");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1291,12 +1356,13 @@ public final class TinylogLoggerTest {
 	public void debugExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.debugf(exception, "Hello %s!", 42);
+		logger.debugf(exception, "Hello %d!", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1311,9 +1377,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d", 1, 2);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1328,9 +1395,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d = %s", 42, "magic");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1345,9 +1413,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1362,9 +1431,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1379,9 +1449,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1391,12 +1462,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugFormattedStringWithSingleLong() {
-		logger.debugf("Hello %s!", 42L);
+		logger.debugf("Hello %d!", 42L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1409,9 +1480,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d", 1L, 2L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1424,9 +1496,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d = %s", 42L, "magic");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1439,9 +1512,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d = %d", 1L, 2L, 3L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1454,9 +1528,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d + %d = %s", 1L, 2L, "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1469,9 +1544,10 @@ public final class TinylogLoggerTest {
 		logger.debugf("%d = %s + %s", 3L, "one", "two");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1483,12 +1559,13 @@ public final class TinylogLoggerTest {
 	public void debugExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.debugf(exception, "Hello %s!", 42L);
+		logger.debugf(exception, "Hello %d!", 42L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1503,9 +1580,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d", 1L, 2L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1520,9 +1598,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d = %s", 42L, "magic");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1537,9 +1616,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1554,9 +1634,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1571,9 +1652,10 @@ public final class TinylogLoggerTest {
 		logger.debugf(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1590,12 +1672,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoObjectMessage() {
-		logger.info(Integer.valueOf(42));
+		logger.info(42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.INFO, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1609,9 +1691,9 @@ public final class TinylogLoggerTest {
 		logger.info("Boom!", exception);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.INFO, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1626,9 +1708,9 @@ public final class TinylogLoggerTest {
 		logger.info(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (infoEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.INFO, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.INFO, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1643,9 +1725,10 @@ public final class TinylogLoggerTest {
 		logger.info(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (infoEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.INFO, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.INFO), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1655,12 +1738,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoFormattedMessageWithMultipleArguments() {
-		logger.infov("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.infov("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1673,9 +1757,10 @@ public final class TinylogLoggerTest {
 		logger.infov("Hello {0}!", "World");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1687,9 +1772,10 @@ public final class TinylogLoggerTest {
 		logger.infov("{0} = {1}", "magic", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1701,9 +1787,10 @@ public final class TinylogLoggerTest {
 		logger.infov("{0}, {1} or {2}", 1, 2, 3);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1715,12 +1802,13 @@ public final class TinylogLoggerTest {
 	public void infoExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.infov(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.infov(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1735,9 +1823,10 @@ public final class TinylogLoggerTest {
 		logger.infov(exception, "Hello {0}!", "Error");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1752,9 +1841,10 @@ public final class TinylogLoggerTest {
 		logger.infov(exception, "{0} = {1}", "magic", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1769,9 +1859,10 @@ public final class TinylogLoggerTest {
 		logger.infov(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1781,12 +1872,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoFormattedStringWithMultipleObjects() {
-		logger.infof("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.infof("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1799,9 +1891,10 @@ public final class TinylogLoggerTest {
 		logger.infof("Hello %s!", "World");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1814,9 +1907,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%s = %d", "magic", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1829,9 +1923,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%s, %s or %s", "one", "two", "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1843,12 +1938,13 @@ public final class TinylogLoggerTest {
 	public void infoExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.infof(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.infof(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1863,9 +1959,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "Hello %s!", "World");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1880,9 +1977,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%s = %d", "magic", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1897,9 +1995,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1909,12 +2008,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoFormattedStringWithSingleInt() {
-		logger.infof("Hello %s!", 42);
+		logger.infof("Hello %d!", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1927,9 +2026,9 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d", 1, 2);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1), eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1942,9 +2041,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d = %s", 42, "magic");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1957,9 +2057,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d = %d", 1, 2, 3);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1972,9 +2073,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d = %s", 1, 2, "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -1987,9 +2089,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d = %s + %s", 3, "one", "two");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2001,12 +2104,13 @@ public final class TinylogLoggerTest {
 	public void infoExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.infof(exception, "Hello %s!", 42);
+		logger.infof(exception, "Hello %d!", 42);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2021,9 +2125,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d", 1, 2);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2038,9 +2143,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d = %s", 42, "magic");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2055,9 +2161,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2072,9 +2179,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2089,9 +2197,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2101,12 +2210,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoFormattedStringWithSingleLong() {
-		logger.infof("Hello %s!", 42L);
+		logger.infof("Hello %d!", 42L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2119,9 +2228,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d", 1L, 2L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2134,9 +2244,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d = %s", 42L, "magic");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2149,9 +2260,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d = %d", 1L, 2L, 3L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2164,9 +2276,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d + %d = %s", 1L, 2L, "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2179,9 +2292,10 @@ public final class TinylogLoggerTest {
 		logger.infof("%d = %s + %s", 3L, "one", "two");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2193,12 +2307,13 @@ public final class TinylogLoggerTest {
 	public void infoExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.infof(exception, "Hello %s!", 42L);
+		logger.infof(exception, "Hello %d!", 42L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2213,9 +2328,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d", 1L, 2L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2230,9 +2346,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d = %s", 42L, "magic");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2247,9 +2364,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2264,9 +2382,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2281,9 +2400,10 @@ public final class TinylogLoggerTest {
 		logger.infof(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2292,12 +2412,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnObjectMessage() {
-		logger.warn(Integer.valueOf(42));
+		logger.warn(42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2311,9 +2431,9 @@ public final class TinylogLoggerTest {
 		logger.warn("Boom!", exception);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2328,9 +2448,9 @@ public final class TinylogLoggerTest {
 		logger.warn(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2345,9 +2465,10 @@ public final class TinylogLoggerTest {
 		logger.warn(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2357,12 +2478,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnFormattedMessageWithMultipleArguments() {
-		logger.warnv("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.warnv("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2375,9 +2497,10 @@ public final class TinylogLoggerTest {
 		logger.warnv("Hello {0}!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2389,9 +2512,10 @@ public final class TinylogLoggerTest {
 		logger.warnv("{0} = {1}", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2403,9 +2527,10 @@ public final class TinylogLoggerTest {
 		logger.warnv("{0}, {1} or {2}", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2417,12 +2542,13 @@ public final class TinylogLoggerTest {
 	public void warnExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.warnv(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.warnv(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2437,9 +2563,10 @@ public final class TinylogLoggerTest {
 		logger.warnv(exception, "Hello {0}!", "Error");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2454,9 +2581,10 @@ public final class TinylogLoggerTest {
 		logger.warnv(exception, "{0} = {1}", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2471,9 +2599,10 @@ public final class TinylogLoggerTest {
 		logger.warnv(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2483,12 +2612,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnFormattedStringWithMultipleObjects() {
-		logger.warnf("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.warnf("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2501,9 +2631,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("Hello %s!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2516,9 +2647,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%s = %d", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2531,9 +2663,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%s, %s or %s", "one", "two", "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2545,12 +2678,13 @@ public final class TinylogLoggerTest {
 	public void warnExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.warnf(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.warnf(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2565,9 +2699,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "Hello %s!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2582,9 +2717,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%s = %d", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2599,9 +2735,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2611,12 +2748,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnFormattedStringWithSingleInt() {
-		logger.warnf("Hello %s!", 42);
+		logger.warnf("Hello %d!", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2629,9 +2766,9 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d", 1, 2);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1), eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2644,9 +2781,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d = %s", 42, "magic");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2659,9 +2797,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d = %d", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2674,9 +2813,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d = %s", 1, 2, "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2689,9 +2829,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d = %s + %s", 3, "one", "two");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2703,12 +2844,13 @@ public final class TinylogLoggerTest {
 	public void warnExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.warnf(exception, "Hello %s!", 42);
+		logger.warnf(exception, "Hello %d!", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2723,9 +2865,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d", 1, 2);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2740,9 +2883,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d = %s", 42, "magic");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2757,9 +2901,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2774,9 +2919,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2791,9 +2937,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2803,12 +2950,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnFormattedStringWithSingleLong() {
-		logger.warnf("Hello %s!", 42L);
+		logger.warnf("Hello %d!", 42L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2821,9 +2968,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d", 1L, 2L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2836,9 +2984,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d = %s", 42L, "magic");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2851,9 +3000,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d = %d", 1L, 2L, 3L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2866,9 +3016,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d + %d = %s", 1L, 2L, "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2881,9 +3032,10 @@ public final class TinylogLoggerTest {
 		logger.warnf("%d = %s + %s", 3L, "one", "two");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2895,12 +3047,13 @@ public final class TinylogLoggerTest {
 	public void warnExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.warnf(exception, "Hello %s!", 42L);
+		logger.warnf(exception, "Hello %d!", 42L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2915,9 +3068,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d", 1L, 2L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2932,9 +3086,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d = %s", 42L, "magic");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2949,9 +3104,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2966,9 +3122,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2983,9 +3140,10 @@ public final class TinylogLoggerTest {
 		logger.warnf(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -2994,12 +3152,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorObjectMessage() {
-		logger.error(Integer.valueOf(42));
+		logger.error(42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3013,9 +3171,9 @@ public final class TinylogLoggerTest {
 		logger.error("Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3030,9 +3188,9 @@ public final class TinylogLoggerTest {
 		logger.error(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3047,9 +3205,10 @@ public final class TinylogLoggerTest {
 		logger.error(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (errorEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.ERROR), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3059,12 +3218,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorFormattedMessageWithMultipleArguments() {
-		logger.errorv("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.errorv("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3077,9 +3237,10 @@ public final class TinylogLoggerTest {
 		logger.errorv("Hello {0}!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3091,9 +3252,10 @@ public final class TinylogLoggerTest {
 		logger.errorv("{0} = {1}", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3106,9 +3268,10 @@ public final class TinylogLoggerTest {
 		logger.errorv("{0}, {1} or {2}", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3120,12 +3283,13 @@ public final class TinylogLoggerTest {
 	public void errorExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.errorv(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.errorv(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3140,9 +3304,10 @@ public final class TinylogLoggerTest {
 		logger.errorv(exception, "Hello {0}!", "Error");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3157,9 +3322,10 @@ public final class TinylogLoggerTest {
 		logger.errorv(exception, "{0} = {1}", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3174,9 +3340,10 @@ public final class TinylogLoggerTest {
 		logger.errorv(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3186,12 +3353,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorFormattedStringWithMultipleObjects() {
-		logger.errorf("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.errorf("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3204,9 +3372,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("Hello %s!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3219,9 +3388,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%s = %d", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3234,9 +3404,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%s, %s or %s", "one", "two", "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3248,12 +3419,13 @@ public final class TinylogLoggerTest {
 	public void errorExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.errorf(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.errorf(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3268,9 +3440,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "Hello %s!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3285,9 +3458,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%s = %d", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3302,9 +3476,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3314,12 +3489,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorFormattedStringWithSingleInt() {
-		logger.errorf("Hello %s!", 42);
+		logger.errorf("Hello %d!", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3332,9 +3507,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d", 1, 2);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3347,9 +3523,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d = %s", 42, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3362,9 +3539,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d = %d", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3377,9 +3555,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d = %s", 1, 2, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3392,9 +3571,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d = %s + %s", 3, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3406,12 +3586,13 @@ public final class TinylogLoggerTest {
 	public void errorExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.errorf(exception, "Hello %s!", 42);
+		logger.errorf(exception, "Hello %d!", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3426,9 +3607,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d", 1, 2);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3443,9 +3625,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d = %s", 42, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3460,9 +3643,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3477,9 +3661,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3494,9 +3679,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3506,12 +3692,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorFormattedStringWithSingleLong() {
-		logger.errorf("Hello %s!", 42L);
+		logger.errorf("Hello %d!", 42L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3524,9 +3710,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d", 1L, 2L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3539,9 +3726,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d = %s", 42L, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3554,9 +3742,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d = %d", 1L, 2L, 3L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3569,9 +3758,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d + %d = %s", 1L, 2L, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3584,9 +3774,10 @@ public final class TinylogLoggerTest {
 		logger.errorf("%d = %s + %s", 3L, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3598,12 +3789,13 @@ public final class TinylogLoggerTest {
 	public void errorExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.errorf(exception, "Hello %s!", 42L);
+		logger.errorf(exception, "Hello %d!", 42L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3618,9 +3810,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d", 1L, 2L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3635,9 +3828,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d = %s", 42L, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3652,9 +3846,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3669,9 +3864,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3686,9 +3882,10 @@ public final class TinylogLoggerTest {
 		logger.errorf(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3697,12 +3894,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void fatalObjectMessage() {
-		logger.fatal(Integer.valueOf(42));
+		logger.fatal(42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3716,9 +3913,9 @@ public final class TinylogLoggerTest {
 		logger.fatal("Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3733,9 +3930,9 @@ public final class TinylogLoggerTest {
 		logger.fatal(TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, "Boom!", (Object[]) null);
+			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3750,9 +3947,10 @@ public final class TinylogLoggerTest {
 		logger.fatal(TinylogLoggerTest.class.getName(), "Hello {0}!", new Object[] { "Error" }, exception);
 
 		if (errorEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.ERROR, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.ERROR), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3762,12 +3960,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void fatalFormattedMessageWithMultipleArguments() {
-		logger.fatalv("{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.fatalv("{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3780,9 +3979,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv("Hello {0}!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3794,9 +3994,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv("{0} = {1}", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3809,9 +4010,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv("{0}, {1} or {2}", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3823,12 +4025,13 @@ public final class TinylogLoggerTest {
 	public void fatalExceptionAndFormattedMessageWithMultipleArgument() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.fatalv(exception, "{0}, {1}, {2} or {3}", new Object[] { 1, 2, 3, 4 });
+		logger.fatalv(exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3843,9 +4046,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv(exception, "Hello {0}!", "Error");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3860,9 +4064,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv(exception, "{0} = {1}", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3877,9 +4082,10 @@ public final class TinylogLoggerTest {
 		logger.fatalv(exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3889,12 +4095,13 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void fatalFormattedStringWithMultipleObjects() {
-		logger.fatalf("%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.fatalf("%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3907,9 +4114,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("Hello %s!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3922,9 +4130,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%s = %d", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3937,9 +4146,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%s, %s or %s", "one", "two", "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3951,12 +4161,13 @@ public final class TinylogLoggerTest {
 	public void fatalExceptionAndFormattedStringWithMultipleObjects() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.fatalf(exception, "%s, %s, %s or %s", new Object[] { "one", "two", "three", "four" });
+		logger.fatalf(exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3971,9 +4182,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "Hello %s!", "World");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -3988,9 +4200,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%s = %d", "magic", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4005,9 +4218,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%s, %s or %s", "one", "two", "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4017,12 +4231,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void fatalFormattedStringWithSingleInt() {
-		logger.fatalf("Hello %s!", 42);
+		logger.fatalf("Hello %d!", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4035,9 +4249,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d", 1, 2);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4050,9 +4265,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d = %s", 42, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4065,9 +4281,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d = %d", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1),
+					eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4080,9 +4297,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d = %s", 1, 2, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1),
+					eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4095,9 +4313,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d = %s + %s", 3, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4109,12 +4328,13 @@ public final class TinylogLoggerTest {
 	public void fatalExceptionAndFormattedStringWithSingleInt() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.fatalf(exception, "Hello %s!", 42);
+		logger.fatalf(exception, "Hello %d!", 42);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4129,9 +4349,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d", 1, 2);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1),
+					eq(2));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4146,9 +4367,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d = %s", 42, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4163,9 +4385,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d = %d", 1, 2, 3);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4180,9 +4403,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d = %s", 1, 2, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1), eq(2), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4197,9 +4421,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d = %s + %s", 3, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4209,12 +4434,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void fatalFormattedStringWithSingleLong() {
-		logger.fatalf("Hello %s!", 42L);
+		logger.fatalf("Hello %d!", 42L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("Hello %d!"), eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4227,9 +4452,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d", 1L, 2L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4242,9 +4468,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d = %s", 42L, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4257,9 +4484,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d = %d", 1L, 2L, 3L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %d"), eq(1L),
+					eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4272,9 +4500,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d + %d = %s", 1L, 2L, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d + %d = %s"), eq(1L),
+					eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4287,9 +4516,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf("%d = %s + %s", 3L, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(null), any(PrintfStyleFormatter.class), eq("%d = %s + %s"), eq(3L),
+					eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4301,12 +4531,13 @@ public final class TinylogLoggerTest {
 	public void fatalExceptionAndFormattedStringWithSingleLong() {
 		RuntimeException exception = new RuntimeException();
 
-		logger.fatalf(exception, "Hello %s!", 42L);
+		logger.fatalf(exception, "Hello %d!", 42L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Hello 42!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("Hello %d!"),
+					eq(42L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4321,9 +4552,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d", 1L, 2L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d"), eq(1L),
+					eq(2L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4338,9 +4570,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d = %s", 42L, "magic");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "42 = magic", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s"), eq(42L),
+					eq("magic"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4355,9 +4588,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d = %d", 1L, 2L, 3L);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %d"),
+					eq(1L), eq(2L), eq(3L));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4372,9 +4606,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d + %d = %s", 1L, 2L, "three");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "1 + 2 = three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d + %d = %s"),
+					eq(1L), eq(2L), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4389,9 +4624,10 @@ public final class TinylogLoggerTest {
 		logger.fatalf(exception, "%d = %s + %s", 3L, "one", "two");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "3 = one + two", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(PrintfStyleFormatter.class), eq("%d = %s + %s"),
+					eq(3L), eq("one"), eq("two"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4400,20 +4636,20 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void logObjectMessage() {
-		logger.log(org.jboss.logging.Logger.Level.DEBUG, Integer.valueOf(42));
+		logger.log(org.jboss.logging.Logger.Level.DEBUG, 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
-		logger.log(org.jboss.logging.Logger.Level.WARN, Integer.valueOf(42));
+		logger.log(org.jboss.logging.Logger.Level.WARN, 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, 42, (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, null, null, 42, (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4427,17 +4663,17 @@ public final class TinylogLoggerTest {
 		logger.log(org.jboss.logging.Logger.Level.DEBUG, "Boom!", exception);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.log(org.jboss.logging.Logger.Level.WARN, "Boom!", exception);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Boom!", (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, exception, null, "Boom!", (Object[]) null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4451,17 +4687,19 @@ public final class TinylogLoggerTest {
 		logger.log(org.jboss.logging.Logger.Level.DEBUG, TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Boom!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Boom!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.log(org.jboss.logging.Logger.Level.WARN, TinylogLoggerTest.class.getName(), "Boom!", exception);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Boom!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Boom!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4474,21 +4712,23 @@ public final class TinylogLoggerTest {
 		RuntimeException exception = new RuntimeException();
 
 		logger.log(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, "Hello {0}!", new Object[] { "Error" },
-			exception);
+				exception);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.log(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, "Hello {0}!", new Object[] { "Error" },
-			exception);
+				exception);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4500,17 +4740,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4522,17 +4764,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, "Hello {0}!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, "Hello {0}!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4544,17 +4788,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, "{0} = {1}", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, "{0} = {1}", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4566,17 +4812,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4590,17 +4838,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4614,17 +4864,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, exception, "Hello {0}!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, exception, "Hello {0}!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("Hello {0}!"), eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4638,17 +4890,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, exception, "{0} = {1}", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, exception, "{0} = {1}", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4662,17 +4916,19 @@ public final class TinylogLoggerTest {
 		logger.logv(org.jboss.logging.Logger.Level.DEBUG, exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(org.jboss.logging.Logger.Level.WARN, exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(JavaTextMessageFormatFormatter.class),
+					eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4687,17 +4943,19 @@ public final class TinylogLoggerTest {
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "{0}, {1}, {2} or {3}", 1, 2, 3, 4);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "1, 2, 3 or 4", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0}, {1}, {2} or {3}"), eq(1), eq(2), eq(3), eq(4));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4712,17 +4970,19 @@ public final class TinylogLoggerTest {
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "Hello {0}!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "Hello {0}!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello {0}!"), eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4737,17 +4997,19 @@ public final class TinylogLoggerTest {
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "{0} = {1}", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "{0} = {1}", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0} = {1}"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4762,17 +5024,19 @@ public final class TinylogLoggerTest {
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logv(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "{0}, {1} or {2}", 1, 2, 3);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "1, 2 or 3", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("{0}, {1} or {2}"), eq(1), eq(2), eq(3));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4784,17 +5048,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4806,17 +5072,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, "Hello %s!", "World");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, "Hello %s!", "World");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("World"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4828,17 +5096,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, "%s = %d", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, "%s = %d", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"),
+					eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4850,17 +5120,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, "%s, %s or %s", "one", "two", "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, "%s, %s or %s", "one", "two", "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(null), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4875,17 +5147,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, exception, "%s, %s, %s or %s", "one", "two", "three", "four");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "one, two, three or four", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"),
+					eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4900,17 +5174,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, exception, "Hello %s!", "Error");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, exception, "Hello %s!", "Error");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("Hello %s!"),
+					eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4925,17 +5201,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, exception, "%s = %d", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, exception, "%s = %d", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s = %d"),
+					eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4950,17 +5228,19 @@ public final class TinylogLoggerTest {
 		logger.logf(org.jboss.logging.Logger.Level.DEBUG, exception, "%s, %s or %s", "one", "two", "three");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(org.jboss.logging.Logger.Level.WARN, exception, "%s, %s or %s", "one", "two", "three");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(PrintfStyleFormatter.class), eq("%s, %s or %s"),
+					eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -4973,23 +5253,23 @@ public final class TinylogLoggerTest {
 		RuntimeException exception = new RuntimeException();
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "%s, %s, %s or %s", "one", "two",
-			"three", "four");
+				"three", "four");
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "one, two, three or four",
-				(Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"), eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "%s, %s, %s or %s", "one", "two",
-			"three", "four");
+				"three", "four");
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "one, two, three or four",
-				(Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s, %s, %s or %s"), eq("one"), eq("two"), eq("three"), eq("four"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -5004,17 +5284,19 @@ public final class TinylogLoggerTest {
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "Hello %s!", "Error");
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(PrintfStyleFormatter.class), eq("Hello %s!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "Hello %s!", "Error");
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "Hello Error!", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(PrintfStyleFormatter.class), eq("Hello %s!"), eq("Error"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -5029,17 +5311,19 @@ public final class TinylogLoggerTest {
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "%s = %d", "magic", 42);
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "%s = %d", "magic", 42);
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s = %d"), eq("magic"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -5052,21 +5336,23 @@ public final class TinylogLoggerTest {
 		RuntimeException exception = new RuntimeException();
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.DEBUG, exception, "%s, %s or %s", "one", "two",
-			"three");
+				"three");
 
 		if (debugEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.DEBUG, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s, %s or %s"), eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 
 		logger.logf(TinylogLoggerTest.class.getName(), org.jboss.logging.Logger.Level.WARN, exception, "%s, %s or %s", "one", "two",
-			"three");
+				"three");
 
 		if (warnEnabled) {
-			verify(provider).log(TinylogLoggerTest.class.getName(), null, Level.WARN, exception, "one, two or three", (Object[]) null);
+			verify(provider).log(eq(TinylogLoggerTest.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(PrintfStyleFormatter.class), eq("%s, %s or %s"), eq("one"), eq("two"), eq("three"));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 

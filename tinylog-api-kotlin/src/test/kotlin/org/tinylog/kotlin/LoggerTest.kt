@@ -13,23 +13,27 @@
 
 package org.tinylog.kotlin
 
+import java.util.ArrayList
+
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.ArrayList
 
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.AfterClass
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import org.tinylog.Level
+import org.tinylog.Supplier
+import org.tinylog.format.AdvancedMessageFormatter
 import org.tinylog.provider.LoggingProvider
 import org.tinylog.provider.ProviderRegistry
 import org.tinylog.rules.SystemStreamCollector
-
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.*
-import org.tinylog.Supplier
 
 /**
  * Tests for [Logger].
@@ -114,7 +118,7 @@ class LoggerTest {
 		 */
 		@JvmField
 		@Rule
-		public val systemStream = SystemStreamCollector(false)
+		val systemStream = SystemStreamCollector(false)
 
 		private val loggingProvider = mockk<LoggingProvider>()
 
@@ -131,8 +135,8 @@ class LoggerTest {
 			every { loggingProvider.isEnabled(any(), null, Level.WARN) } returns  warnEnabled
 			every { loggingProvider.isEnabled(any(), null, Level.ERROR) } returns  errorEnabled
 
-			every { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) } returns Unit
-			every { loggingProvider.log(any<String>(), any(), any(), any(), any(), *anyVararg()) } returns Unit
+			every { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
+			every { loggingProvider.log(any<String>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
 
 			Whitebox.setProperty(Logger, LoggingProvider::class, loggingProvider)
 			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled)
@@ -170,9 +174,9 @@ class LoggerTest {
 			Logger.trace(42)
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, 42) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, 42) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -184,9 +188,9 @@ class LoggerTest {
 			Logger.trace("Hello World!")
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, "Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -198,9 +202,9 @@ class LoggerTest {
 			Logger.trace { "Hello World!" }
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -212,9 +216,9 @@ class LoggerTest {
 			Logger.trace("Hello {}!", "World")
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -227,9 +231,9 @@ class LoggerTest {
 			Logger.trace("The number is {}", { 42 })
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -243,9 +247,9 @@ class LoggerTest {
 			Logger.trace(exception)
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception,null) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, null) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -259,9 +263,9 @@ class LoggerTest {
 			Logger.trace(exception, "Hello World!")
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception,"Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -275,9 +279,9 @@ class LoggerTest {
 			Logger.trace(exception) { "Hello World!" }
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -291,9 +295,9 @@ class LoggerTest {
 			Logger.trace(exception, "Hello {}!", "World")
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -308,9 +312,9 @@ class LoggerTest {
 			Logger.trace(exception, "The number is {}", { 42 })
 
 			if (traceEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -330,9 +334,9 @@ class LoggerTest {
 			Logger.debug(42)
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, 42) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, 42) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -344,9 +348,9 @@ class LoggerTest {
 			Logger.debug("Hello World!")
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, "Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -358,9 +362,9 @@ class LoggerTest {
 			Logger.debug { "Hello World!" }
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -372,9 +376,9 @@ class LoggerTest {
 			Logger.debug("Hello {}!", "World")
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -387,9 +391,9 @@ class LoggerTest {
 			Logger.debug("The number is {}", { 42 })
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -403,9 +407,9 @@ class LoggerTest {
 			Logger.debug(exception)
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception,null) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, null) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -419,9 +423,9 @@ class LoggerTest {
 			Logger.debug(exception, "Hello World!")
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception,"Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -435,9 +439,9 @@ class LoggerTest {
 			Logger.debug(exception) { "Hello World!" }
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -451,9 +455,9 @@ class LoggerTest {
 			Logger.debug(exception, "Hello {}!", "World")
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -468,9 +472,9 @@ class LoggerTest {
 			Logger.debug(exception, "The number is {}", { 42 })
 
 			if (debugEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -490,9 +494,9 @@ class LoggerTest {
 			Logger.info(42)
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, 42) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, 42) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -504,9 +508,9 @@ class LoggerTest {
 			Logger.info("Hello World!")
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, "Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -518,9 +522,9 @@ class LoggerTest {
 			Logger.info { "Hello World!" }
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -532,9 +536,9 @@ class LoggerTest {
 			Logger.info("Hello {}!", "World")
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -547,9 +551,9 @@ class LoggerTest {
 			Logger.info("The number is {}", { 42 })
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -563,9 +567,9 @@ class LoggerTest {
 			Logger.info(exception)
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception,null) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, null) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -579,9 +583,9 @@ class LoggerTest {
 			Logger.info(exception, "Hello World!")
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception,"Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -595,9 +599,9 @@ class LoggerTest {
 			Logger.info(exception) { "Hello World!" }
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -611,9 +615,9 @@ class LoggerTest {
 			Logger.info(exception, "Hello {}!", "World")
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -628,9 +632,9 @@ class LoggerTest {
 			Logger.info(exception, "The number is {}", { 42 })
 
 			if (infoEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -650,9 +654,9 @@ class LoggerTest {
 			Logger.warn(42)
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, 42) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, 42) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -664,9 +668,9 @@ class LoggerTest {
 			Logger.warn("Hello World!")
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, "Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -678,9 +682,9 @@ class LoggerTest {
 			Logger.warn { "Hello World!" }
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -692,9 +696,9 @@ class LoggerTest {
 			Logger.warn("Hello {}!", "World")
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -707,9 +711,9 @@ class LoggerTest {
 			Logger.warn("The number is {}", { 42 })
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -723,9 +727,9 @@ class LoggerTest {
 			Logger.warn(exception)
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception,null) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, null) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -739,9 +743,9 @@ class LoggerTest {
 			Logger.warn(exception, "Hello World!")
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception,"Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -755,9 +759,9 @@ class LoggerTest {
 			Logger.warn(exception) { "Hello World!" }
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -771,9 +775,9 @@ class LoggerTest {
 			Logger.warn(exception, "Hello {}!", "World")
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -788,9 +792,9 @@ class LoggerTest {
 			Logger.warn(exception, "The number is {}", { 42 })
 
 			if (warnEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -810,9 +814,9 @@ class LoggerTest {
 			Logger.error(42)
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, 42) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, 42) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -824,9 +828,9 @@ class LoggerTest {
 			Logger.error("Hello World!")
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, "Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -838,9 +842,9 @@ class LoggerTest {
 			Logger.error { "Hello World!" }
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -852,9 +856,9 @@ class LoggerTest {
 			Logger.error("Hello {}!", "World")
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -867,9 +871,9 @@ class LoggerTest {
 			Logger.error("The number is {}", { 42 })
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -883,9 +887,9 @@ class LoggerTest {
 			Logger.error(exception)
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception,null) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, null) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -899,9 +903,9 @@ class LoggerTest {
 			Logger.error(exception, "Hello World!")
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception,"Hello World!") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, "Hello World!") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -915,9 +919,9 @@ class LoggerTest {
 			Logger.error(exception) { "Hello World!" }
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, match(provide("Hello World!"))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, match(provide("Hello World!"))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -931,9 +935,9 @@ class LoggerTest {
 			Logger.error(exception, "Hello {}!", "World")
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, "Hello {}!", "World") }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -948,9 +952,9 @@ class LoggerTest {
 			Logger.error(exception, "The number is {}", { 42 })
 
 			if (errorEnabled) {
-				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, "The number is {}", match(provide(42))) }
+				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
-				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), *anyVararg()) }
+				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
 			}
 		}
 
@@ -978,7 +982,7 @@ class LoggerTest {
 		 */
 		@JvmField
 		@Rule
-		public val systemStream = SystemStreamCollector(false)
+		val systemStream = SystemStreamCollector(false)
 
 		/**
 		 * Verifies that [Logger.tag] returns the same untagged instance of [TaggedLogger] for

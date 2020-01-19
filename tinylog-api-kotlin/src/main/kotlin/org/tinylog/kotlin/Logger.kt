@@ -13,9 +13,12 @@
 
 package org.tinylog.kotlin
 
-import org.tinylog.Level
-import org.tinylog.provider.ProviderRegistry
 import java.util.concurrent.ConcurrentHashMap
+
+import org.tinylog.Level
+import org.tinylog.configuration.Configuration
+import org.tinylog.format.AdvancedMessageFormatter
+import org.tinylog.provider.ProviderRegistry
 
 /**
  * Static logger for issuing log entries.
@@ -24,6 +27,7 @@ object Logger {
 
 	private const val STACKTRACE_DEPTH = 2
 
+	private val formatter = AdvancedMessageFormatter(Configuration.getLocale())
 	private val provider = ProviderRegistry.getLoggingProvider()
 
 	// @formatter:off
@@ -76,7 +80,7 @@ object Logger {
 	 */
 	fun trace(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, null, message)
 		}
 	}
 
@@ -88,7 +92,7 @@ object Logger {
 	 */
 	fun trace(message: String) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, null, message)
 		}
 	}
 
@@ -101,7 +105,7 @@ object Logger {
 	 */
 	fun trace(message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, null, message.asSupplier())
 		}
 	}
 
@@ -116,7 +120,7 @@ object Logger {
 	 */
 	fun trace(message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, formatter, message, *arguments)
 		}
 	}
 
@@ -131,7 +135,7 @@ object Logger {
 	 */
 	fun trace(message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -143,7 +147,7 @@ object Logger {
 	 */
 	fun trace(exception: Throwable) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, null)
 		}
 	}
 
@@ -157,7 +161,7 @@ object Logger {
 	 */
 	fun trace(exception: Throwable, message: String) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, message)
 		}
 	}
 
@@ -172,7 +176,7 @@ object Logger {
 	 */
 	fun trace(exception: Throwable, message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, null, message.asSupplier())
 		}
 	}
 
@@ -189,7 +193,7 @@ object Logger {
 	 */
 	fun trace(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -206,7 +210,7 @@ object Logger {
 	 */
 	fun trace(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_TRACE) {
-			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.TRACE, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -227,7 +231,7 @@ object Logger {
 	 */
 	fun debug(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, null, message)
 		}
 	}
 
@@ -239,7 +243,7 @@ object Logger {
 	 */
 	fun debug(message: String) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, null, message)
 		}
 	}
 
@@ -252,7 +256,7 @@ object Logger {
 	 */
 	fun debug(message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, null, message.asSupplier())
 		}
 	}
 
@@ -267,7 +271,7 @@ object Logger {
 	 */
 	fun debug(message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, formatter, message, *arguments)
 		}
 	}
 
@@ -282,7 +286,7 @@ object Logger {
 	 */
 	fun debug(message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -294,7 +298,7 @@ object Logger {
 	 */
 	fun debug(exception: Throwable) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, null)
 		}
 	}
 
@@ -308,7 +312,7 @@ object Logger {
 	 */
 	fun debug(exception: Throwable, message: String) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, message)
 		}
 	}
 
@@ -323,7 +327,7 @@ object Logger {
 	 */
 	fun debug(exception: Throwable, message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, null, message.asSupplier())
 		}
 	}
 
@@ -340,7 +344,7 @@ object Logger {
 	 */
 	fun debug(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -357,7 +361,7 @@ object Logger {
 	 */
 	fun debug(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.DEBUG, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -378,7 +382,7 @@ object Logger {
 	 */
 	fun info(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, null, message)
 		}
 	}
 
@@ -390,7 +394,7 @@ object Logger {
 	 */
 	fun info(message: String) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, null, message)
 		}
 	}
 
@@ -403,7 +407,7 @@ object Logger {
 	 */
 	fun info(message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, null, message.asSupplier())
 		}
 	}
 
@@ -418,7 +422,7 @@ object Logger {
 	 */
 	fun info(message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, formatter, message, *arguments)
 		}
 	}
 
@@ -433,7 +437,7 @@ object Logger {
 	 */
 	fun info(message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -445,7 +449,7 @@ object Logger {
 	 */
 	fun info(exception: Throwable) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, null)
 		}
 	}
 
@@ -459,7 +463,7 @@ object Logger {
 	 */
 	fun info(exception: Throwable, message: String) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, message)
 		}
 	}
 
@@ -474,7 +478,7 @@ object Logger {
 	 */
 	fun info(exception: Throwable, message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, null, message.asSupplier())
 		}
 	}
 
@@ -491,7 +495,7 @@ object Logger {
 	 */
 	fun info(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -508,7 +512,7 @@ object Logger {
 	 */
 	fun info(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.INFO, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -529,7 +533,7 @@ object Logger {
 	 */
 	fun warn(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, null, message)
 		}
 	}
 
@@ -541,7 +545,7 @@ object Logger {
 	 */
 	fun warn(message: String) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, null, message)
 		}
 	}
 
@@ -554,7 +558,7 @@ object Logger {
 	 */
 	fun warn(message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, null, message.asSupplier())
 		}
 	}
 
@@ -569,7 +573,7 @@ object Logger {
 	 */
 	fun warn(message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, formatter, message, *arguments)
 		}
 	}
 
@@ -584,7 +588,7 @@ object Logger {
 	 */
 	fun warn(message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -596,7 +600,7 @@ object Logger {
 	 */
 	fun warn(exception: Throwable) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null, null)
 		}
 	}
 
@@ -610,7 +614,7 @@ object Logger {
 	 */
 	fun warn(exception: Throwable, message: String) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null, message)
 		}
 	}
 
@@ -625,7 +629,7 @@ object Logger {
 	 */
 	fun warn(exception: Throwable, message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, null, message.asSupplier())
 		}
 	}
 
@@ -642,7 +646,7 @@ object Logger {
 	 */
 	fun warn(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -659,7 +663,7 @@ object Logger {
 	 */
 	fun warn(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.WARN, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -680,7 +684,7 @@ object Logger {
 	 */
 	fun error(message: Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message)
 		}
 	}
 
@@ -692,7 +696,7 @@ object Logger {
 	 */
 	fun error(message: String) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message)
 		}
 	}
 
@@ -705,7 +709,7 @@ object Logger {
 	 */
 	fun error(message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, null, message.asSupplier())
 		}
 	}
 
@@ -720,7 +724,7 @@ object Logger {
 	 */
 	fun error(message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, formatter, message, *arguments)
 		}
 	}
 
@@ -735,7 +739,7 @@ object Logger {
 	 */
 	fun error(message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -747,7 +751,7 @@ object Logger {
 	 */
 	fun error(exception: Throwable) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, null)
 		}
 	}
 
@@ -761,7 +765,7 @@ object Logger {
 	 */
 	fun error(exception: Throwable, message: String) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, message)
 		}
 	}
 
@@ -776,7 +780,7 @@ object Logger {
 	 */
 	fun error(exception: Throwable, message: () -> String) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message.asSupplier())
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, null, message.asSupplier())
 		}
 	}
 
@@ -793,7 +797,7 @@ object Logger {
 	 */
 	fun error(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, *arguments)
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -810,7 +814,7 @@ object Logger {
 	 */
 	fun error(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, message, *arguments.asSuppliers())
+			provider.log(STACKTRACE_DEPTH, null, Level.ERROR, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 

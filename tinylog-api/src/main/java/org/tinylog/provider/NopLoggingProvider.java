@@ -14,6 +14,7 @@
 package org.tinylog.provider;
 
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 
 /**
  * Logging provider implementation that does nothing. All log entries will be ignored.
@@ -47,14 +48,14 @@ public final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final MessageFormatter formatter,
+		final Object obj, final Object... arguments) {
 		// Ignore
 	}
 
 	@Override
-	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+		final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		// Ignore
 	}
 

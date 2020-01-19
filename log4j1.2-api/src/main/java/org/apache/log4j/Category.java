@@ -136,7 +136,7 @@ public class Category {
 	 */
 	public void assertLog(final boolean assertion, final String msg) {
 		if (!assertion && MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, msg, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, msg, (Object[]) null);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class Category {
 	 */
 	public void debug(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class Category {
 	 */
 	public void debug(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_DEBUG) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.DEBUG, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 
@@ -218,7 +218,7 @@ public class Category {
 	 */
 	public void error(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -237,7 +237,7 @@ public class Category {
 	 */
 	public void error(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 
@@ -277,7 +277,7 @@ public class Category {
 	 */
 	public void fatal(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -296,7 +296,7 @@ public class Category {
 	 */
 	public void fatal(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_ERROR) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.ERROR, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 
@@ -313,7 +313,7 @@ public class Category {
 	 *            Exception to log
 	 */
 	protected void forcedLog(final String fqcn, final Priority level, final Object message, final Throwable t) {
-		provider.log(fqcn, null, translatePriority(level), t, message == t ? null : message, (Object[]) null);
+		provider.log(fqcn, null, translatePriority(level), t, null, message == t ? null : message, (Object[]) null);
 	}
 
 	/**
@@ -508,7 +508,7 @@ public class Category {
 	 */
 	public void info(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -527,7 +527,7 @@ public class Category {
 	 */
 	public void info(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_INFO) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.INFO, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 
@@ -629,7 +629,7 @@ public class Category {
 		ResourceBundle bundle = this.bundle;
 		String message = bundle == null ? key : bundle.getString(key);
 
-		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, message, (Object[]) null);
+		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, null, message, (Object[]) null);
 	}
 
 	/**
@@ -652,7 +652,7 @@ public class Category {
 		ResourceBundle bundle = this.bundle;
 		String message = bundle == null ? key : MessageFormat.format(bundle.getString(key), params);
 
-		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, message, (Object[]) null);
+		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, null, message, (Object[]) null);
 	}
 
 	/**
@@ -667,7 +667,7 @@ public class Category {
 	 * 
 	 */
 	public void log(final Priority priority, final Object message, final Throwable t) {
-		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, message == t ? null : message, (Object[]) null);
+		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), t, null, message == t ? null : message, (Object[]) null);
 	}
 
 	/**
@@ -679,7 +679,7 @@ public class Category {
 	 *            Message to log
 	 */
 	public void log(final Priority priority, final Object message) {
-		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), null, message, (Object[]) null);
+		provider.log(STACKTRACE_DEPTH, null, translatePriority(priority), null, null, message, (Object[]) null);
 	}
 
 	/**
@@ -695,7 +695,7 @@ public class Category {
 	 *            The throwable of the logging request, may be null.
 	 */
 	public void log(final String callerFQCN, final Priority level, final Object message, final Throwable t) {
-		provider.log(callerFQCN, null, translatePriority(level), t, message == t ? null : message, (Object[]) null);
+		provider.log(callerFQCN, null, translatePriority(level), t, null, message == t ? null : message, (Object[]) null);
 	}
 
 	/**
@@ -836,7 +836,7 @@ public class Category {
 	 */
 	public void warn(final Object message) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, null, null, message, (Object[]) null);
 		}
 	}
 
@@ -855,7 +855,7 @@ public class Category {
 	 */
 	public void warn(final Object message, final Throwable t) {
 		if (MINIMUM_LEVEL_COVERS_WARN) {
-			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, t, message == t ? null : message, (Object[]) null);
+			provider.log(STACKTRACE_DEPTH, null, org.tinylog.Level.WARN, t, null, message == t ? null : message, (Object[]) null);
 		}
 	}
 

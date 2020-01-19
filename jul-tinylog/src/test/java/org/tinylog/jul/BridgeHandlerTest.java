@@ -30,12 +30,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
+import org.tinylog.format.JavaTextMessageFormatFormatter;
 import org.tinylog.provider.LoggingProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -158,9 +162,10 @@ public final class BridgeHandlerTest {
 		logger.finest("Hello World!");
 
 		if (finestEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.TRACE), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -173,9 +178,10 @@ public final class BridgeHandlerTest {
 		logger.finest(() -> "Hello World!");
 
 		if (finestEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.TRACE, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.TRACE), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -188,9 +194,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINEST, "magic = {0}", new Object[] { 42 });
 
 		if (finestEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.TRACE, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.TRACE), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -204,9 +211,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINEST, "Hello World!", exception);
 
 		if (finestEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.TRACE), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -219,17 +227,18 @@ public final class BridgeHandlerTest {
 	}
 
 	/**
-	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#FINER
-	 * FINER} level.
+	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#FINER FINER}
+	 * level.
 	 */
 	@Test
 	public void finerTextMessage() {
 		logger.finer("Hello World!");
 
 		if (finerEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -242,9 +251,10 @@ public final class BridgeHandlerTest {
 		logger.finer(() -> "Hello World!");
 
 		if (finerEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -257,9 +267,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINER, "magic = {0}", new Object[] { 42 });
 
 		if (finerEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -273,9 +284,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINER, "Hello World!", exception);
 
 		if (finerEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -288,17 +300,18 @@ public final class BridgeHandlerTest {
 	}
 
 	/**
-	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#FINE
-	 * FINE} level.
+	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#FINE FINE}
+	 * level.
 	 */
 	@Test
 	public void fineTextMessage() {
 		logger.fine("Hello World!");
 
 		if (fineEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -311,9 +324,10 @@ public final class BridgeHandlerTest {
 		logger.fine(() -> "Hello World!");
 
 		if (fineEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -326,9 +340,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINE, "magic = {0}", new Object[] { 42 });
 
 		if (fineEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -342,9 +357,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.FINE, "Hello World!", exception);
 
 		if (fineEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.DEBUG), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -365,9 +381,10 @@ public final class BridgeHandlerTest {
 		logger.config("Hello World!");
 
 		if (configEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -380,9 +397,10 @@ public final class BridgeHandlerTest {
 		logger.config(() -> "Hello World!");
 
 		if (configEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -395,9 +413,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.CONFIG, "magic = {0}", new Object[] { 42 });
 
 		if (configEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -411,9 +430,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.CONFIG, "Hello World!", exception);
 
 		if (configEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -426,17 +446,18 @@ public final class BridgeHandlerTest {
 	}
 
 	/**
-	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#INFO
-	 * INFO} level.
+	 * Verifies that a plain text message object will be logged correctly at {@link java.util.logging.Level#INFO INFO}
+	 * level.
 	 */
 	@Test
 	public void infoTextMessage() {
 		logger.info("Hello World!");
 
 		if (infoEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -449,9 +470,10 @@ public final class BridgeHandlerTest {
 		logger.info(() -> "Hello World!");
 
 		if (infoEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -464,9 +486,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.INFO, "magic = {0}", new Object[] { 42 });
 
 		if (infoEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -480,9 +503,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.INFO, "Hello World!", exception);
 
 		if (infoEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.INFO, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.INFO), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -503,9 +527,10 @@ public final class BridgeHandlerTest {
 		logger.warning("Hello World!");
 
 		if (warningEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.WARN), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -518,9 +543,10 @@ public final class BridgeHandlerTest {
 		logger.warning(() -> "Hello World!");
 
 		if (warningEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.WARN), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -533,9 +559,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.WARNING, "magic = {0}", new Object[] { 42 });
 
 		if (warningEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.WARN, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.WARN), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -549,9 +576,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.WARNING, "Hello World!", exception);
 
 		if (warningEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.WARN, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.WARN), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -572,9 +600,10 @@ public final class BridgeHandlerTest {
 		logger.severe("Hello World!");
 
 		if (severeEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.ERROR), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -587,9 +616,10 @@ public final class BridgeHandlerTest {
 		logger.severe(() -> "Hello World!");
 
 		if (severeEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.ERROR), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -602,9 +632,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.SEVERE, "magic = {0}", new Object[] { 42 });
 
 		if (severeEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.ERROR, null, "magic = 42", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.ERROR), same(null),
+					any(JavaTextMessageFormatFormatter.class), eq("magic = {0}"), eq(42));
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -618,9 +649,10 @@ public final class BridgeHandlerTest {
 		logger.log(java.util.logging.Level.SEVERE, "Hello World!", exception);
 
 		if (severeEnabled) {
-			verify(provider).log(Logger.class.getName(), null, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			verify(provider).log(eq(Logger.class.getName()), isNull(), eq(Level.ERROR), same(exception),
+					any(JavaTextMessageFormatFormatter.class), eq("Hello World!"), isNull());
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 

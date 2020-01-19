@@ -13,13 +13,15 @@
 
 package org.tinylog.jul;
 
-import java.text.MessageFormat;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.tinylog.configuration.Configuration;
+import org.tinylog.format.JavaTextMessageFormatFormatter;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -30,6 +32,7 @@ final class BridgeHandler extends Handler {
 
 	private static final String LOGGER_CLASS_NAME = Logger.class.getName();
 
+	private static final MessageFormatter formatter = new JavaTextMessageFormatFormatter(Configuration.getLocale());
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	/** */
@@ -38,9 +41,8 @@ final class BridgeHandler extends Handler {
 
 	@Override
 	public void publish(final LogRecord record) {
-		Object[] parameters = record.getParameters();
-		String message = parameters == null ? record.getMessage() : MessageFormat.format(record.getMessage(), parameters);
-		provider.log(LOGGER_CLASS_NAME, null, translateLevel(record.getLevel()), record.getThrown(), message, (Object[]) null);
+		provider.log(LOGGER_CLASS_NAME, null, translateLevel(record.getLevel()), record.getThrown(), formatter, record.getMessage(),
+				record.getParameters());
 	}
 
 	@Override

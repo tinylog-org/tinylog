@@ -28,6 +28,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.format.AdvancedMessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rules.SystemStreamCollector;
@@ -37,6 +38,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -156,9 +159,9 @@ public final class TaggedLoggerTest {
 		logger.trace("Hello World!");
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), isNull(), isNull(), eq("Hello World!"), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -172,9 +175,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), isNull(), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -186,9 +189,10 @@ public final class TaggedLoggerTest {
 		logger.trace("Hello {}!", "World");
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, null, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
+				eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -203,9 +207,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, null, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), isNull(), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -219,9 +224,9 @@ public final class TaggedLoggerTest {
 		logger.trace(exception);
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, exception, null, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), same(exception), isNull(), isNull(), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -235,9 +240,10 @@ public final class TaggedLoggerTest {
 		logger.trace(exception, "Hello World!");
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), same(exception), isNull(), eq("Hello World!"),
+					isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -255,9 +261,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), same(exception), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -272,9 +278,10 @@ public final class TaggedLoggerTest {
 		logger.trace(exception, "Hello {}!", "World");
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), same(exception), any(AdvancedMessageFormatter.class),
+				eq("Hello {}!"), eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -292,9 +299,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (traceEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.TRACE, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.TRACE), same(exception), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -314,9 +322,9 @@ public final class TaggedLoggerTest {
 		logger.debug("Hello World!");
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), isNull(), isNull(), eq("Hello World!"), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -330,9 +338,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), isNull(), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -344,9 +352,10 @@ public final class TaggedLoggerTest {
 		logger.debug("Hello {}!", "World");
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, null, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
+				eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -361,9 +370,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, null, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), isNull(), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -377,9 +387,9 @@ public final class TaggedLoggerTest {
 		logger.debug(exception);
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, null, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), same(exception), isNull(), isNull(), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -393,9 +403,10 @@ public final class TaggedLoggerTest {
 		logger.debug(exception, "Hello World!");
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), same(exception), isNull(), eq("Hello World!"),
+					isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -413,9 +424,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), same(exception), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -430,9 +441,10 @@ public final class TaggedLoggerTest {
 		logger.debug(exception, "Hello {}!", "World");
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), same(exception), any(AdvancedMessageFormatter.class),
+				eq("Hello {}!"), eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -450,9 +462,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (debugEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.DEBUG), same(exception), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -472,9 +485,9 @@ public final class TaggedLoggerTest {
 		logger.info("Hello World!");
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), isNull(), isNull(), eq("Hello World!"), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -488,9 +501,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), isNull(), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -502,9 +515,10 @@ public final class TaggedLoggerTest {
 		logger.info("Hello {}!", "World");
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, null, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
+				eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -519,9 +533,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, null, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), isNull(), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -535,9 +550,9 @@ public final class TaggedLoggerTest {
 		logger.info(exception);
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, exception, null, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), same(exception), isNull(), isNull(), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -551,9 +566,10 @@ public final class TaggedLoggerTest {
 		logger.info(exception, "Hello World!");
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), same(exception), isNull(), eq("Hello World!"),
+					isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -571,9 +587,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), same(exception), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -588,9 +604,10 @@ public final class TaggedLoggerTest {
 		logger.info(exception, "Hello {}!", "World");
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), same(exception), any(AdvancedMessageFormatter.class),
+				eq("Hello {}!"), eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -608,9 +625,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (infoEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.INFO, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.INFO), same(exception), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -630,9 +648,9 @@ public final class TaggedLoggerTest {
 		logger.warn("Hello World!");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), isNull(), isNull(), eq("Hello World!"), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -646,9 +664,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), isNull(), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -660,9 +678,10 @@ public final class TaggedLoggerTest {
 		logger.warn("Hello {}!", "World");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, null, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
+				eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -677,9 +696,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, null, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), isNull(), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -693,9 +713,9 @@ public final class TaggedLoggerTest {
 		logger.warn(exception);
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, exception, null, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), same(exception), isNull(), isNull(), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -709,9 +729,10 @@ public final class TaggedLoggerTest {
 		logger.warn(exception, "Hello World!");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), same(exception), isNull(), eq("Hello World!"),
+					isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -729,9 +750,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), same(exception), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -746,9 +767,10 @@ public final class TaggedLoggerTest {
 		logger.warn(exception, "Hello {}!", "World");
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), same(exception), any(AdvancedMessageFormatter.class),
+				eq("Hello {}!"), eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -766,9 +788,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (warnEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.WARN, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.WARN), same(exception), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -788,9 +811,9 @@ public final class TaggedLoggerTest {
 		logger.error("Hello World!");
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, null, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), isNull(), isNull(), eq("Hello World!"), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -804,9 +827,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, null, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), isNull(), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -818,9 +841,10 @@ public final class TaggedLoggerTest {
 		logger.error("Hello {}!", "World");
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, null, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
+				eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -835,9 +859,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, null, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), isNull(), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -851,9 +876,9 @@ public final class TaggedLoggerTest {
 		logger.error(exception);
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, exception, null, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), same(exception), isNull(), isNull(), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -867,9 +892,10 @@ public final class TaggedLoggerTest {
 		logger.error(exception, "Hello World!");
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, exception, "Hello World!", (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), same(exception), isNull(), eq("Hello World!"),
+					isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -887,9 +913,9 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, exception, supplier, (Object[]) null);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), same(exception), isNull(), same(supplier), isNull());
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -904,9 +930,10 @@ public final class TaggedLoggerTest {
 		logger.error(exception, "Hello {}!", "World");
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, exception, "Hello {}!", "World");
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), same(exception), any(AdvancedMessageFormatter.class),
+				eq("Hello {}!"), eq("World"));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -924,9 +951,10 @@ public final class TaggedLoggerTest {
 		verify(supplier, never()).get();
 
 		if (errorEnabled) {
-			verify(loggingProvider).log(2, TAG, Level.ERROR, exception, "The number is {}", supplier);
+			verify(loggingProvider).log(eq(2), eq(TAG), eq(Level.ERROR), same(exception), any(AdvancedMessageFormatter.class),
+				eq("The number is {}"), same(supplier));
 		} else {
-			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+			verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 		}
 	}
 
@@ -968,11 +996,8 @@ public final class TaggedLoggerTest {
 
 	/**
 	 * Resets the logging provider in {@link TaggedLogger}.
-	 *
-	 * @throws Exception
-	 *             Failed updating logging provider
 	 */
-	private void resetLoggingProvider() throws Exception {
+	private void resetLoggingProvider() {
 		Whitebox.setInternalState(TaggedLogger.class, ProviderRegistry.getLoggingProvider());
 	}
 

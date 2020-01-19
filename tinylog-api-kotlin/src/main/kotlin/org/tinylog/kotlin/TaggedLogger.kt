@@ -14,6 +14,8 @@
 package org.tinylog.kotlin
 
 import org.tinylog.Level
+import org.tinylog.configuration.Configuration
+import org.tinylog.format.AdvancedMessageFormatter
 import org.tinylog.provider.ProviderRegistry
 
 /**
@@ -26,6 +28,8 @@ import org.tinylog.provider.ProviderRegistry
 class TaggedLogger internal constructor(private val tag: String?) {
 
 	private val stackTraceDepth = 2
+
+	private val formatter = AdvancedMessageFormatter(Configuration.getLocale())
 	private val provider = ProviderRegistry.getLoggingProvider()
 
 	// @formatter:off
@@ -53,7 +57,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(message: Any?) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, null, message)
+			provider.log(stackTraceDepth, tag, Level.TRACE, null, null, message)
 		}
 	}
 
@@ -65,7 +69,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(message: String) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, null, message)
+			provider.log(stackTraceDepth, tag, Level.TRACE, null, null, message)
 		}
 	}
 
@@ -78,7 +82,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(message: () -> String) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, null, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.TRACE, null, null, message.asSupplier())
 		}
 	}
 
@@ -93,7 +97,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, null, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.TRACE, null, formatter, message, *arguments)
 		}
 	}
 
@@ -108,7 +112,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, null, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.TRACE, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -120,7 +124,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(exception: Throwable) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, exception, null)
+			provider.log(stackTraceDepth, tag, Level.TRACE, exception, null, null)
 		}
 	}
 
@@ -134,7 +138,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(exception: Throwable, message: String) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, exception, message)
+			provider.log(stackTraceDepth, tag, Level.TRACE, exception, null, message)
 		}
 	}
 
@@ -149,7 +153,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(exception: Throwable, message: () -> String) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, exception, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.TRACE, exception, null, message.asSupplier())
 		}
 	}
 
@@ -166,7 +170,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, exception, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.TRACE, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -183,7 +187,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun trace(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversTrace) {
-			provider.log(stackTraceDepth, tag, Level.TRACE, exception, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.TRACE, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -204,7 +208,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(message: Any?) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, null, message)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, null, null, message)
 		}
 	}
 
@@ -216,7 +220,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(message: String) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, null, message)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, null, null, message)
 		}
 	}
 
@@ -229,7 +233,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(message: () -> String) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, null, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.DEBUG, null, null, message.asSupplier())
 		}
 	}
 
@@ -244,7 +248,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, null, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, null, formatter, message, *arguments)
 		}
 	}
 
@@ -259,7 +263,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, null, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.DEBUG, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -271,7 +275,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(exception: Throwable) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, null)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, null, null)
 		}
 	}
 
@@ -285,7 +289,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(exception: Throwable, message: String) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, message)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, null, message)
 		}
 	}
 
@@ -300,7 +304,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(exception: Throwable, message: () -> String) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, null, message.asSupplier())
 		}
 	}
 
@@ -317,7 +321,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -334,7 +338,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun debug(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversDebug) {
-			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.DEBUG, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -355,7 +359,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(message: Any?) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, null, message)
+			provider.log(stackTraceDepth, tag, Level.INFO, null, null, message)
 		}
 	}
 
@@ -367,7 +371,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(message: String) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, null, message)
+			provider.log(stackTraceDepth, tag, Level.INFO, null, null, message)
 		}
 	}
 
@@ -380,7 +384,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(message: () -> String) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, null, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.INFO, null, null, message.asSupplier())
 		}
 	}
 
@@ -395,7 +399,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, null, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.INFO, null, formatter, message, *arguments)
 		}
 	}
 
@@ -410,7 +414,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, null, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.INFO, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -422,7 +426,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(exception: Throwable) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, exception, null)
+			provider.log(stackTraceDepth, tag, Level.INFO, exception, null, null)
 		}
 	}
 
@@ -436,7 +440,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(exception: Throwable, message: String) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, exception, message)
+			provider.log(stackTraceDepth, tag, Level.INFO, exception, null, message)
 		}
 	}
 
@@ -451,7 +455,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(exception: Throwable, message: () -> String) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, exception, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.INFO, exception, null, message.asSupplier())
 		}
 	}
 
@@ -468,7 +472,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, exception, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.INFO, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -485,7 +489,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun info(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversInfo) {
-			provider.log(stackTraceDepth, tag, Level.INFO, exception, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.INFO, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -506,7 +510,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(message: Any?) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, null, message)
+			provider.log(stackTraceDepth, tag, Level.WARN, null, null, message)
 		}
 	}
 
@@ -518,7 +522,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(message: String) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, null, message)
+			provider.log(stackTraceDepth, tag, Level.WARN, null, null, message)
 		}
 	}
 
@@ -531,7 +535,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(message: () -> String) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, null, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.WARN, null, null, message.asSupplier())
 		}
 	}
 
@@ -546,7 +550,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, null, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.WARN, null, formatter, message, *arguments)
 		}
 	}
 
@@ -561,7 +565,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, null, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.WARN, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -573,7 +577,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(exception: Throwable) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, exception, null)
+			provider.log(stackTraceDepth, tag, Level.WARN, exception, null, null)
 		}
 	}
 
@@ -587,7 +591,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(exception: Throwable, message: String) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, exception, message)
+			provider.log(stackTraceDepth, tag, Level.WARN, exception, null, message)
 		}
 	}
 
@@ -602,7 +606,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(exception: Throwable, message: () -> String) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, exception, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.WARN, exception, null, message.asSupplier())
 		}
 	}
 
@@ -619,7 +623,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, exception, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.WARN, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -636,7 +640,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun warn(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversWarn) {
-			provider.log(stackTraceDepth, tag, Level.WARN, exception, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.WARN, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -657,7 +661,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(message: Any?) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, null, message)
+			provider.log(stackTraceDepth, tag, Level.ERROR, null, null, message)
 		}
 	}
 
@@ -669,7 +673,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(message: String) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, null, message)
+			provider.log(stackTraceDepth, tag, Level.ERROR, null, null, message)
 		}
 	}
 
@@ -682,7 +686,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(message: () -> String) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, null, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.ERROR, null, null, message.asSupplier())
 		}
 	}
 
@@ -697,7 +701,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, null, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.ERROR, null, formatter, message, *arguments)
 		}
 	}
 
@@ -712,7 +716,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, null, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.ERROR, null, formatter, message, *arguments.asSuppliers())
 		}
 	}
 
@@ -724,7 +728,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(exception: Throwable) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, exception, null)
+			provider.log(stackTraceDepth, tag, Level.ERROR, exception, null, null)
 		}
 	}
 
@@ -738,7 +742,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(exception: Throwable, message: String) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, exception, message)
+			provider.log(stackTraceDepth, tag, Level.ERROR, exception, null, message)
 		}
 	}
 
@@ -753,7 +757,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(exception: Throwable, message: () -> String) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, exception, message.asSupplier())
+			provider.log(stackTraceDepth, tag, Level.ERROR, exception, null, message.asSupplier())
 		}
 	}
 
@@ -770,7 +774,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(exception: Throwable, message: String, vararg arguments: Any?) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, exception, message, *arguments)
+			provider.log(stackTraceDepth, tag, Level.ERROR, exception, formatter, message, *arguments)
 		}
 	}
 
@@ -787,7 +791,7 @@ class TaggedLogger internal constructor(private val tag: String?) {
 	 */
 	fun error(exception: Throwable, message: String, vararg arguments: () -> Any?) {
 		if (minimumLevelCoversError) {
-			provider.log(stackTraceDepth, tag, Level.ERROR, exception, message, *arguments.asSuppliers())
+			provider.log(stackTraceDepth, tag, Level.ERROR, exception, formatter, message, *arguments.asSuppliers())
 		}
 	}
 

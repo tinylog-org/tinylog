@@ -203,12 +203,12 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void traceMessage() {
-			logger.trace(Integer.valueOf(42));
+			logger.trace(42);
 
 			if (traceEnabled) {
-				verify(provider).log(2, null, Level.TRACE, null, 42, (Object[]) null);
+				verify(provider).log(2, null, Level.TRACE, null, null, 42, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			}
 		}
 
@@ -222,9 +222,9 @@ public final class LoggerTest {
 			logger.trace("Boom!", exception);
 
 			if (traceEnabled) {
-				verify(provider).log(2, null, Level.TRACE, exception, "Boom!", (Object[]) null);
+				verify(provider).log(2, null, Level.TRACE, exception, null, "Boom!", (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			}
 		}
 
@@ -239,9 +239,9 @@ public final class LoggerTest {
 			logger.trace(exception, exception);
 
 			if (traceEnabled) {
-				verify(provider).log(2, null, Level.TRACE, exception, null, (Object[]) null);
+				verify(provider).log(2, null, Level.TRACE, exception, null, null, (Object[]) null);
 			} else {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), (Object[]) any());
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			}
 		}
 

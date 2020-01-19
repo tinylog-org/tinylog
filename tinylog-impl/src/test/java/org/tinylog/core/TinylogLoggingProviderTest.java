@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.assertj.core.api.Condition;
 import org.junit.After;
@@ -33,6 +34,8 @@ import org.tinylog.Level;
 import org.tinylog.Supplier;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.format.AdvancedMessageFormatter;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.EvilWriter;
@@ -93,10 +96,10 @@ public final class TinylogLoggingProviderTest {
 		public void traceEnabled() {
 			assertThat(provider.isEnabled(1, tag, Level.TRACE)).isTrue();
 
-			provider.log(1, tag, Level.TRACE, null, "Hello World!");
+			provider.log(1, tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("TRACE").containsOnlyOnce("Hello World!");
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("TRACE").containsOnlyOnce("Hello World!");
 		}
 
@@ -107,10 +110,10 @@ public final class TinylogLoggingProviderTest {
 		public void debugEnabled() {
 			assertThat(provider.isEnabled(1, tag, Level.DEBUG)).isTrue();
 
-			provider.log(1, tag, Level.DEBUG, null, "Hello World!");
+			provider.log(1, tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("DEBUG").containsOnlyOnce("Hello World!");
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("DEBUG").containsOnlyOnce("Hello World!");
 		}
 
@@ -121,10 +124,10 @@ public final class TinylogLoggingProviderTest {
 		public void infoEnabled() {
 			assertThat(provider.isEnabled(1, tag, Level.INFO)).isTrue();
 
-			provider.log(1, tag, Level.INFO, null, "Hello World!");
+			provider.log(1, tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("INFO").containsOnlyOnce("Hello World!");
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).containsOnlyOnce("INFO").containsOnlyOnce("Hello World!");
 		}
 
@@ -135,10 +138,10 @@ public final class TinylogLoggingProviderTest {
 		public void warningEnabled() {
 			assertThat(provider.isEnabled(1, tag, Level.WARN)).isTrue();
 
-			provider.log(1, tag, Level.WARN, null, "Hello World!");
+			provider.log(1, tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("Hello World!");
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("Hello World!");
 		}
 
@@ -149,10 +152,10 @@ public final class TinylogLoggingProviderTest {
 		public void errorEnabled() {
 			assertThat(provider.isEnabled(1, tag, Level.ERROR)).isTrue();
 
-			provider.log(1, tag, Level.ERROR, null, "Hello World!");
+			provider.log(1, tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("Hello World!");
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("Hello World!");
 		}
 
@@ -205,10 +208,10 @@ public final class TinylogLoggingProviderTest {
 		public void traceDisabled() {
 			assertThat(provider.isEnabled(1, tag, Level.TRACE)).isFalse();
 
-			provider.log(1, tag, Level.TRACE, null, "Hello World!");
+			provider.log(1, tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -219,10 +222,10 @@ public final class TinylogLoggingProviderTest {
 		public void debugDisabled() {
 			assertThat(provider.isEnabled(1, tag, Level.DEBUG)).isFalse();
 
-			provider.log(1, tag, Level.DEBUG, null, "Hello World!");
+			provider.log(1, tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -233,10 +236,10 @@ public final class TinylogLoggingProviderTest {
 		public void infoDisabled() {
 			assertThat(provider.isEnabled(1, tag, Level.INFO)).isFalse();
 
-			provider.log(1, tag, Level.INFO, null, "Hello World!");
+			provider.log(1, tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -247,10 +250,10 @@ public final class TinylogLoggingProviderTest {
 		public void warningDisabled() {
 			assertThat(provider.isEnabled(1, tag, Level.WARN)).isFalse();
 
-			provider.log(1, tag, Level.WARN, null, "Hello World!");
+			provider.log(1, tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 		}
 
@@ -261,10 +264,10 @@ public final class TinylogLoggingProviderTest {
 		public void errorDisabled() {
 			assertThat(provider.isEnabled(1, tag, Level.ERROR)).isFalse();
 
-			provider.log(1, tag, Level.ERROR, null, "Hello World!");
+			provider.log(1, tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 		}
 
@@ -327,10 +330,10 @@ public final class TinylogLoggingProviderTest {
 		public void traceDisabledForInnerClass() {
 			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.TRACE)).isFalse();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.TRACE, null, "Hello World!");
+			provider.log(DEPTH_INNER_CLASS, tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -341,10 +344,10 @@ public final class TinylogLoggingProviderTest {
 		public void traceDisabledForOuterClass() {
 			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.TRACE)).isFalse();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.TRACE, null, "Hello World!");
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.TRACE, null, "Hello World!");
+			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -355,10 +358,10 @@ public final class TinylogLoggingProviderTest {
 		public void debugEnabledForInnerClass() {
 			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.DEBUG)).isTrue();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.DEBUG, null, "Hello World!");
+			provider.log(DEPTH_INNER_CLASS, tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.DEBUG + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.DEBUG + ": Hello World!" + NEW_LINE);
 		}
 
@@ -369,10 +372,10 @@ public final class TinylogLoggingProviderTest {
 		public void debugDisabledForOuterClass() {
 			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.DEBUG)).isFalse();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.DEBUG, null, "Hello World!");
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.DEBUG, null, "Hello World!");
+			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -383,10 +386,10 @@ public final class TinylogLoggingProviderTest {
 		public void infoEnabledForInnerClass() {
 			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.INFO)).isTrue();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.INFO, null, "Hello World!");
+			provider.log(DEPTH_INNER_CLASS, tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 		}
 
@@ -397,10 +400,10 @@ public final class TinylogLoggingProviderTest {
 		public void infoDisabledForOuterClass() {
 			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.INFO)).isFalse();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.INFO, null, "Hello World!");
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.INFO, null, "Hello World!");
+			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -411,10 +414,10 @@ public final class TinylogLoggingProviderTest {
 		public void warningEnabledForInnerClass() {
 			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.WARN)).isTrue();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.WARN, null, "Hello World!");
+			provider.log(DEPTH_INNER_CLASS, tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
@@ -425,10 +428,10 @@ public final class TinylogLoggingProviderTest {
 		public void warningEnabledForOuterClass() {
 			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.WARN)).isTrue();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.WARN, null, "Hello World!");
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 
-			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.WARN, null, "Hello World!");
+			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
@@ -439,10 +442,10 @@ public final class TinylogLoggingProviderTest {
 		public void errorEnabledForInnerClass() {
 			assertThat(provider.isEnabled(DEPTH_INNER_CLASS, tag, Level.ERROR)).isTrue();
 
-			provider.log(DEPTH_INNER_CLASS, tag, Level.ERROR, null, "Hello World!");
+			provider.log(DEPTH_INNER_CLASS, tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 		}
 
@@ -453,10 +456,10 @@ public final class TinylogLoggingProviderTest {
 		public void errorEnabledForOuterClass() {
 			assertThat(provider.isEnabled(DEPTH_OUTER_CLASS, tag, Level.ERROR)).isTrue();
 
-			provider.log(DEPTH_OUTER_CLASS, tag, Level.ERROR, null, "Hello World!");
+			provider.log(DEPTH_OUTER_CLASS, tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 
-			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.ERROR, null, "Hello World!");
+			provider.log(CustomSeverityLevelForClass.class.getName(), tag, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 		}
 
@@ -516,10 +519,10 @@ public final class TinylogLoggingProviderTest {
 		public void untaggedTraceEnabled() {
 			assertThat(provider.isEnabled(1, null, Level.TRACE)).isTrue();
 
-			provider.log(1, null, Level.TRACE, null, "Hello World!");
+			provider.log(1, null, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.TRACE + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.TRACE, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.TRACE + ": Hello World!" + NEW_LINE);
 		}
 
@@ -530,10 +533,10 @@ public final class TinylogLoggingProviderTest {
 		public void taggedTraceDisabled() {
 			assertThat(provider.isEnabled(1, "test", Level.TRACE)).isFalse();
 
-			provider.log(1, "test", Level.TRACE, null, "Hello World!");
+			provider.log(1, "test", Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.TRACE, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.TRACE, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -544,10 +547,10 @@ public final class TinylogLoggingProviderTest {
 		public void untaggedDebugEnabled() {
 			assertThat(provider.isEnabled(1, null, Level.DEBUG)).isTrue();
 
-			provider.log(1, null, Level.DEBUG, null, "Hello World!");
+			provider.log(1, null, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.DEBUG + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.DEBUG, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.DEBUG + ": Hello World!" + NEW_LINE);
 		}
 
@@ -558,10 +561,10 @@ public final class TinylogLoggingProviderTest {
 		public void taggedDebugDisabled() {
 			assertThat(provider.isEnabled(1, "test", Level.DEBUG)).isFalse();
 
-			provider.log(1, "test", Level.DEBUG, null, "Hello World!");
+			provider.log(1, "test", Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 
-			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.DEBUG, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.DEBUG, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEmpty();
 		}
 
@@ -572,10 +575,10 @@ public final class TinylogLoggingProviderTest {
 		public void untaggedInfoEnabled() {
 			assertThat(provider.isEnabled(1, null, Level.INFO)).isTrue();
 
-			provider.log(1, null, Level.INFO, null, "Hello World!");
+			provider.log(1, null, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 		}
 
@@ -586,10 +589,10 @@ public final class TinylogLoggingProviderTest {
 		public void taggedInfoEnabled() {
 			assertThat(provider.isEnabled(1, "test", Level.INFO)).isTrue();
 
-			provider.log(1, "test", Level.INFO, null, "Hello World!");
+			provider.log(1, "test", Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo(Level.INFO + ": Hello World!" + NEW_LINE);
 		}
 
@@ -600,10 +603,10 @@ public final class TinylogLoggingProviderTest {
 		public void untaggedWarningEnabled() {
 			assertThat(provider.isEnabled(1, null, Level.WARN)).isTrue();
 
-			provider.log(1, null, Level.WARN, null, "Hello World!");
+			provider.log(1, null, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.WARN, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
@@ -614,10 +617,10 @@ public final class TinylogLoggingProviderTest {
 		public void taggedWarningEnabled() {
 			assertThat(provider.isEnabled(1, "test", Level.WARN)).isTrue();
 
-			provider.log(1, "test", Level.WARN, null, "Hello World!");
+			provider.log(1, "test", Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.WARN, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.WARN, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.WARN + ": Hello World!" + NEW_LINE);
 		}
 
@@ -628,10 +631,10 @@ public final class TinylogLoggingProviderTest {
 		public void untaggedErrorEnabled() {
 			assertThat(provider.isEnabled(1, null, Level.ERROR)).isTrue();
 
-			provider.log(1, null, Level.ERROR, null, "Hello World!");
+			provider.log(1, null, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.ERROR, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 		}
 
@@ -642,10 +645,10 @@ public final class TinylogLoggingProviderTest {
 		public void taggedErrorEnabled() {
 			assertThat(provider.isEnabled(1, "test", Level.ERROR)).isTrue();
 
-			provider.log(1, "test", Level.ERROR, null, "Hello World!");
+			provider.log(1, "test", Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.ERROR, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), "test", Level.ERROR, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput()).isEqualTo(Level.ERROR + ": Hello World!" + NEW_LINE);
 		}
 
@@ -706,7 +709,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void logging() {
-			provider.log(1, null, Level.INFO, null, "Hello World!");
+			provider.log(1, null, Level.INFO, null, null, "Hello World!");
 			String output = waitFor(systemStream::consumeStandardOutput, Strings::isNeitherNullNorEmpty, 100);
 			assertThat(output).containsOnlyOnce(Level.INFO.toString()).containsOnlyOnce("Hello World!");
 		}
@@ -731,7 +734,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void logging() {
-			provider.log(1, null, Level.INFO, null, "Hello World!");
+			provider.log(1, null, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeErrorOutput())
 					.containsOnlyOnce("ERROR")
 					.containsOnlyOnce(IOException.class.getName())
@@ -781,7 +784,7 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer.values", "date");
 
 			Instant beforeIndexLog = Instant.now();
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			Instant afterIndexLog = Instant.now();
 
 			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getTimestamp).allSatisfy(timestamp -> {
@@ -789,7 +792,7 @@ public final class TinylogLoggingProviderTest {
 			});
 
 			Instant beforeClassLog = Instant.now();
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			Instant afterClassLog = Instant.now();
 
 			assertThat(StorageWriter.consumeEntries()).hasSize(1).extracting(LogEntry::getTimestamp).allSatisfy(timestamp -> {
@@ -804,10 +807,10 @@ public final class TinylogLoggingProviderTest {
 		public void thread() {
 			Configuration.set("writer.values", "thread");
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getThread).containsOnly(Thread.currentThread());
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getThread).containsOnly(Thread.currentThread());
 		}
 
@@ -822,10 +825,10 @@ public final class TinylogLoggingProviderTest {
 			TinylogLoggingProvider provider = new TinylogLoggingProvider();
 			provider.getContextProvider().put("test", "42");
 
-			provider.log(1, null, Level.INFO, null, null);
+			provider.log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getContext).containsOnly(singletonMap("test", "42"));
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getContext).containsOnly(singletonMap("test", "42"));
 		}
 
@@ -836,10 +839,10 @@ public final class TinylogLoggingProviderTest {
 		public void className() {
 			Configuration.set("writer.values", "class");
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getClassName).containsOnly(LogEntryValues.class.getName());
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getClassName).containsOnly(LogEntryValues.class.getName());
 		}
 
@@ -851,10 +854,10 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer.values", "method");
 			String method = new Throwable().getStackTrace()[0].getMethodName();
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getMethodName).containsOnly(method);
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getMethodName).containsOnly(method);
 		}
 
@@ -865,12 +868,12 @@ public final class TinylogLoggingProviderTest {
 		public void fileName() {
 			Configuration.set("writer.values", "file");
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries())
 					.extracting(LogEntry::getFileName)
 					.containsOnly(TinylogLoggingProviderTest.class.getSimpleName() + ".java");
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries())
 					.extracting(LogEntry::getFileName)
 					.containsOnly(TinylogLoggingProviderTest.class.getSimpleName() + ".java");
@@ -884,11 +887,11 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer.values", "file");
 
 			int line = new Throwable().getStackTrace()[0].getLineNumber() + 1;
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getLineNumber).containsOnly(line);
 
 			line = new Throwable().getStackTrace()[0].getLineNumber() + 1;
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getLineNumber).containsOnly(line);
 		}
 
@@ -899,10 +902,10 @@ public final class TinylogLoggingProviderTest {
 		public void tag() {
 			Configuration.set("writer.values", "tag");
 
-			new TinylogLoggingProvider().log(1, "test", Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, "test", Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getTag).containsOnly("test");
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), "test", Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), "test", Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getTag).containsOnly("test");
 		}
 
@@ -913,10 +916,10 @@ public final class TinylogLoggingProviderTest {
 		public void level() {
 			Configuration.set("writer.values", "level");
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getLevel).containsOnly(Level.INFO);
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getLevel).containsOnly(Level.INFO);
 		}
 
@@ -927,10 +930,10 @@ public final class TinylogLoggingProviderTest {
 		public void message() {
 			Configuration.set("writer.values", "message");
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, null, "Hello World!");
+			new TinylogLoggingProvider().log(1, null, Level.INFO, null, null, "Hello World!");
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getMessage).containsOnly("Hello World!");
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, "Hello World!");
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, "Hello World!");
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getMessage).containsOnly("Hello World!");
 		}
 
@@ -942,10 +945,10 @@ public final class TinylogLoggingProviderTest {
 			Configuration.set("writer.values", "exception");
 			Exception exception = new NullPointerException();
 
-			new TinylogLoggingProvider().log(1, null, Level.INFO, exception, null);
+			new TinylogLoggingProvider().log(1, null, Level.INFO, exception, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getException).containsOnly(exception);
 
-			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, exception, null);
+			new TinylogLoggingProvider().log(TinylogLoggingProvider.class.getName(), null, Level.INFO, exception, null, null);
 			assertThat(StorageWriter.consumeEntries()).extracting(LogEntry::getException).containsOnly(exception);
 		}
 
@@ -969,10 +972,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void object() {
-			provider.log(1, null, Level.INFO, null, 42);
+			provider.log(1, null, Level.INFO, null, null, 42);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("42" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, 42);
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, 42);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("42" + NEW_LINE);
 		}
 
@@ -981,10 +984,10 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void plainText() {
-			provider.log(1, null, Level.INFO, null, "Hello World!");
+			provider.log(1, null, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello World!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, "Hello World!");
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, "Hello World!");
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello World!" + NEW_LINE);
 		}
 
@@ -995,13 +998,13 @@ public final class TinylogLoggingProviderTest {
 		public void exception() {
 			UnsupportedOperationException exception = new UnsupportedOperationException();
 
-			provider.log(1, null, Level.ERROR, exception, null);
+			provider.log(1, null, Level.ERROR, exception, null, null);
 			assertThat(systemStream.consumeErrorOutput())
 				.startsWith(UnsupportedOperationException.class.getName())
 				.contains(TinylogLoggingProviderTest.class.getName(), "exception")
 				.hasLineCount(exception.getStackTrace().length + 1);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.ERROR, exception, null);
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.ERROR, exception, null, null);
 			assertThat(systemStream.consumeErrorOutput())
 				.startsWith(UnsupportedOperationException.class.getName())
 				.contains(TinylogLoggingProviderTest.class.getName(), "exception")
@@ -1014,10 +1017,10 @@ public final class TinylogLoggingProviderTest {
 		@Test
 		public void lazy() {
 			Supplier<String> supplier = () -> "It is " + 42;
-			provider.log(1, null, Level.INFO, null, supplier);
+			provider.log(1, null, Level.INFO, null, null, supplier);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("It is 42" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, supplier);
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, null, supplier);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("It is 42" + NEW_LINE);
 		}
 
@@ -1026,10 +1029,12 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void arguments() {
-			provider.log(1, null, Level.INFO, null, "Hello {}!", 42);
+			MessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+			
+			provider.log(1, null, Level.INFO, null, formatter, "Hello {}!", 42);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello 42!" + NEW_LINE);
 
-			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, "Hello {}!", 42);
+			provider.log(TinylogLoggingProvider.class.getName(), null, Level.INFO, null, formatter, "Hello {}!", 42);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello 42!" + NEW_LINE);
 		}
 

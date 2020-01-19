@@ -23,6 +23,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 
@@ -211,13 +212,13 @@ public final class ProviderRegistryTest {
 		}
 
 		@Override
-		public final void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-			final Object... arguments) {
+		public final void log(final int depth, final String tag, final Level level, final Throwable exception,
+			final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		}
 
 		@Override
-		public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-			final Object... arguments) {
+		public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+			final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		}
 
 		@Override

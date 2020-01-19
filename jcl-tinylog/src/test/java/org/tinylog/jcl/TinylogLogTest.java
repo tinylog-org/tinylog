@@ -158,9 +158,9 @@ public final class TinylogLogTest {
 		log.trace("Hello World!");
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, "Hello World!");
+			verify(provider).log(2, null, Level.TRACE, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -174,9 +174,9 @@ public final class TinylogLogTest {
 		log.trace(exception, exception);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, null);
+			verify(provider).log(2, null, Level.TRACE, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -190,9 +190,9 @@ public final class TinylogLogTest {
 		log.trace("Boom!", exception);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, "Boom!");
+			verify(provider).log(2, null, Level.TRACE, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -212,9 +212,9 @@ public final class TinylogLogTest {
 		log.debug("Hello World!");
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, "Hello World!");
+			verify(provider).log(2, null, Level.DEBUG, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -228,9 +228,9 @@ public final class TinylogLogTest {
 		log.debug(exception, exception);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, null);
+			verify(provider).log(2, null, Level.DEBUG, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -244,9 +244,9 @@ public final class TinylogLogTest {
 		log.debug("Boom!", exception);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, "Boom!");
+			verify(provider).log(2, null, Level.DEBUG, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -266,9 +266,9 @@ public final class TinylogLogTest {
 		log.info("Hello World!");
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, "Hello World!");
+			verify(provider).log(2, null, Level.INFO, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -282,9 +282,9 @@ public final class TinylogLogTest {
 		log.info(exception, exception);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, null);
+			verify(provider).log(2, null, Level.INFO, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -298,9 +298,9 @@ public final class TinylogLogTest {
 		log.info("Boom!", exception);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, "Boom!");
+			verify(provider).log(2, null, Level.INFO, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -320,9 +320,9 @@ public final class TinylogLogTest {
 		log.warn("Hello World!");
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, "Hello World!");
+			verify(provider).log(2, null, Level.WARN, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -336,9 +336,9 @@ public final class TinylogLogTest {
 		log.warn(exception, exception);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, null);
+			verify(provider).log(2, null, Level.WARN, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -352,9 +352,9 @@ public final class TinylogLogTest {
 		log.warn("Boom!", exception);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, "Boom!");
+			verify(provider).log(2, null, Level.WARN, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -374,9 +374,9 @@ public final class TinylogLogTest {
 		log.error("Hello World!");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!");
+			verify(provider).log(2, null, Level.ERROR, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -390,9 +390,9 @@ public final class TinylogLogTest {
 		log.error(exception, exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, null);
+			verify(provider).log(2, null, Level.ERROR, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -406,9 +406,9 @@ public final class TinylogLogTest {
 		log.error("Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Boom!");
+			verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -428,9 +428,9 @@ public final class TinylogLogTest {
 		log.fatal("Hello World!");
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, "Hello World!");
+			verify(provider).log(2, null, Level.ERROR, null, null, "Hello World!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -444,9 +444,9 @@ public final class TinylogLogTest {
 		log.fatal(exception, exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, null);
+			verify(provider).log(2, null, Level.ERROR, exception, null, null);
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 
@@ -460,9 +460,9 @@ public final class TinylogLogTest {
 		log.fatal("Boom!", exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, "Boom!");
+			verify(provider).log(2, null, Level.ERROR, exception, null, "Boom!");
 		} else {
-			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any());
+			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any());
 		}
 	}
 

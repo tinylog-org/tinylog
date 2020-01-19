@@ -14,6 +14,7 @@
 package org.tinylog.provider;
 
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 
 /**
  * API for providing log entries to a concrete logging framework implementation.
@@ -83,12 +84,14 @@ public interface LoggingProvider {
 	 *            Severity level of log entry
 	 * @param exception
 	 *            Exception to log or {@code null}
+	 * @param formatter
+	 *            Formatter for text message, only required if there are any arguments to insert
 	 * @param obj
 	 *            Message to log or {@code null}
 	 * @param arguments
 	 *            Arguments for message or {@code null}
 	 */
-	void log(int depth, String tag, Level level, Throwable exception, Object obj, Object... arguments);
+	void log(int depth, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj, Object... arguments);
 
 	/**
 	 * Provides a regular log entry.
@@ -101,12 +104,15 @@ public interface LoggingProvider {
 	 *            Severity level of log entry
 	 * @param exception
 	 *            Exception to log or {@code null}
+	 * @param formatter
+	 *            Formatter for text message, only required if there are any arguments to insert
 	 * @param obj
 	 *            Message to log or {@code null}
 	 * @param arguments
 	 *            Arguments for message or {@code null}
 	 */
-	void log(String loggerClassName, String tag, Level level, Throwable exception, Object obj, Object... arguments);
+	void log(String loggerClassName, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj,
+		Object... arguments);
 
 	/**
 	 * Shuts down the logging provider and frees all allocated resources. This method should be called only if auto

@@ -13,13 +13,12 @@
 
 package org.tinylog.adapter.jul;
 
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.LoggingProvider;
-import org.tinylog.provider.MessageFormatter;
 import org.tinylog.provider.NopContextProvider;
 import org.tinylog.runtime.RuntimeProvider;
 
@@ -29,12 +28,10 @@ import org.tinylog.runtime.RuntimeProvider;
 public final class JavaUtilLoggingProvider implements LoggingProvider {
 
 	private ContextProvider contextProvider;
-	private MessageFormatter formatter;
 
 	/** */
 	public JavaUtilLoggingProvider() {
 		contextProvider = new NopContextProvider();
-		formatter = new MessageFormatter(Locale.getDefault());
 	}
 
 	@Override
@@ -59,8 +56,8 @@ public final class JavaUtilLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final MessageFormatter formatter,
+		final Object obj, final Object... arguments) {
 		StackTraceElement caller = RuntimeProvider.getCallerStackTraceElement(depth + 1);
 		Logger julLogger = Logger.getLogger(caller.getClassName());
 		java.util.logging.Level julLevel = translate(level);
@@ -75,8 +72,8 @@ public final class JavaUtilLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+		final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		StackTraceElement caller = RuntimeProvider.getCallerStackTraceElement(loggerClassName);
 		Logger julLogger = Logger.getLogger(caller.getClassName());
 		java.util.logging.Level julLevel = translate(level);

@@ -24,11 +24,10 @@ import java.util.Set;
 
 import org.tinylog.Level;
 import org.tinylog.Supplier;
-import org.tinylog.configuration.Configuration;
+import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
-import org.tinylog.provider.MessageFormatter;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.runtime.Timestamp;
 import org.tinylog.writers.Writer;
@@ -39,7 +38,6 @@ import org.tinylog.writers.Writer;
 public class TinylogLoggingProvider implements LoggingProvider {
 
 	private final TinylogContextProvider context;
-	private final MessageFormatter formatter;
 	private final Level globalLevel;
 	private final Map<String, Level> customLevels;
 	private final List<String> knownTags;
@@ -51,7 +49,6 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	/** */
 	public TinylogLoggingProvider() {
 		context = new TinylogContextProvider();
-		formatter = new MessageFormatter(Configuration.getLocale());
 		globalLevel = ConfigurationParser.getGlobalLevel();
 		customLevels = ConfigurationParser.getCustomLevels();
 		knownTags = ConfigurationParser.getTags();
@@ -122,8 +119,8 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(final int depth, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final int depth, final String tag, final Level level, final Throwable exception, final MessageFormatter formatter,
+		final Object obj, final Object... arguments) {
 		int tagIndex = getTagIndex(tag);
 
 		StackTraceElement stackTraceElement;
@@ -147,14 +144,14 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, obj, arguments);
+			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, formatter, obj, arguments);
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
 
 	@Override
-	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception, final Object obj,
-		final Object... arguments) {
+	public void log(final String loggerClassName, final String tag, final Level level, final Throwable exception,
+		final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		int tagIndex = getTagIndex(tag);
 
 		StackTraceElement stackTraceElement;
@@ -178,7 +175,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, obj, arguments);
+			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, formatter, obj, arguments);
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
@@ -345,6 +342,8 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	 *            Severity level
 	 * @param exception
 	 *            Caught exception or throwable to log
+	 * @param formatter
+	 *            Formatter for text message
 	 * @param obj
 	 *            Message to log
 	 * @param arguments
@@ -352,7 +351,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	 * @return Filled log entry
 	 */
 	private LogEntry createLogEntry(final StackTraceElement stackTraceElement, final String tag, final int tagIndex, final Level level,
-		final Throwable exception, final Object obj, final Object[] arguments) {
+		final Throwable exception, final MessageFormatter formatter, final Object obj, final Object[] arguments) {
 		Collection<LogEntryValue> required = requiredLogEntryValues[tagIndex][level.ordinal()];
 
 		Timestamp timestamp = RuntimeProvider.createTimestamp();
