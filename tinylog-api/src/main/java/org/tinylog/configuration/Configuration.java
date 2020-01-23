@@ -57,6 +57,9 @@ public final class Configuration {
 	private static final String PROPERTIES_PREFIX = "tinylog.";
 	private static final String CONFIGURATION_PROPERTY = PROPERTIES_PREFIX + "configuration";
 
+	private static final String LOCALE_KEY = "locale";
+	private static final String ESCAPING_ENABLED_KEY = "escaping.enabled";
+
 	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
 
 	private static final Properties properties = load();
@@ -66,12 +69,12 @@ public final class Configuration {
 	}
 
 	/**
-	 * Get the global locale.
+	 * Gets the global locale.
 	 *
 	 * @return Locale from property {@code locale} or {@link Locale#ROOT} if no locale is configured
 	 */
 	public static Locale getLocale() {
-		String tag = Configuration.get("locale");
+		String tag = get(LOCALE_KEY);
 		if (tag == null) {
 			return Locale.ROOT;
 		} else {
@@ -84,6 +87,15 @@ public final class Configuration {
 				return new Locale(splitTag[0], splitTag[1], splitTag[2]);
 			}
 		}
+	}
+
+	/**
+	 * Checks whether escaping is enabled or disabled.
+	 *
+	 * @return {@code true} if escaping is enabled, otherwise {@code false}
+	 */
+	public static boolean isEscapingEnabled() {
+		return Boolean.parseBoolean(get(ESCAPING_ENABLED_KEY));
 	}
 
 	/**

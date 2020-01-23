@@ -299,6 +299,32 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that escaping is disabled by default.
+	 */
+	@Test
+	public void defaultEscaping() {
+		assertThat(Configuration.isEscapingEnabled()).isFalse();
+	}
+
+	/**
+	 * Verifies that escaping can be enabled.
+	 */
+	@Test
+	public void enabledEscaping() {
+		Configuration.set("escaping.enabled", "true");
+		assertThat(Configuration.isEscapingEnabled()).isTrue();
+	}
+
+	/**
+	 * Verifies that escaping can be disabled.
+	 */
+	@Test
+	public void disabledEscaping() {
+		Configuration.set("escaping.enabled", "false");
+		assertThat(Configuration.isEscapingEnabled()).isFalse();
+	}
+
+	/**
 	 * Verifies that {@link Configuration#getSiblings(String)} finds the expected sibling properties.
 	 *
 	 * @throws Exception
