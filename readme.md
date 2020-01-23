@@ -38,7 +38,7 @@ A new folder "target" with Javadoc documentation and all JARs will be created in
 License
 -------
 
-Copyright 2016 Martin Winandy
+Copyright 2016-2020 Martin Winandy
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
