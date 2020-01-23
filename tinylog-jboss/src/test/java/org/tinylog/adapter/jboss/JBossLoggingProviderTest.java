@@ -149,7 +149,7 @@ public final class JBossLoggingProviderTest {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT, false);
 		provider.log(1, null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
@@ -198,7 +198,7 @@ public final class JBossLoggingProviderTest {
 		JBossLoggingProvider provider = new JBossLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT, false);
 		provider.log(JBossLoggingProvider.class.getName(), null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 

@@ -150,7 +150,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT, false);
 		provider.log(1, null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 
@@ -199,7 +199,7 @@ public final class JavaUtilLoggingProviderTest {
 		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
 
 		Exception exception = new RuntimeException();
-		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+		AdvancedMessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT, false);
 		provider.log(JavaUtilLoggingProvider.class.getName(), null, Level.INFO, exception, formatter, "Hello {}", new Object[] { "User" });
 		assertThat(handler.getRecords()).hasSize(1);
 

@@ -33,13 +33,17 @@ import org.tinylog.provider.InternalLogger;
 public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 
 	private final DecimalFormatSymbols symbols;
+	private final boolean escape;
 
 	/**
 	 * @param locale
 	 *            Locale for formatting numbers
+	 * @param escape
+	 *            {@code true} to enable escaping by ticks, {@code false} to disable
 	 */
-	public AdvancedMessageFormatter(final Locale locale) {
-		symbols = new DecimalFormatSymbols(locale);
+	public AdvancedMessageFormatter(final Locale locale, final boolean escape) {
+		this.symbols = new DecimalFormatSymbols(locale);
+		this.escape = escape;
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 
 		for (int index = 0; index < length; ++index) {
 			char character = message.charAt(index);
-			if (character == '\'' && index + 1 < length && openingCurlyBrackets == 0) {
+			if (escape && character == '\'' && index + 1 < length && openingCurlyBrackets == 0) {
 				if (message.charAt(index + 1) == '\'') {
 					current.append('\'');
 					index += 1;

@@ -1029,7 +1029,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Test
 		public void arguments() {
-			MessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT);
+			MessageFormatter formatter = new AdvancedMessageFormatter(Locale.ROOT, false);
 			
 			provider.log(1, null, Level.INFO, null, formatter, "Hello {}!", 42);
 			assertThat(systemStream.consumeStandardOutput()).isEqualTo("Hello 42!" + NEW_LINE);

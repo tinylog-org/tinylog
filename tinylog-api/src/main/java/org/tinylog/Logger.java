@@ -29,7 +29,11 @@ public final class Logger {
 
 	private static final int STACKTRACE_DEPTH = 2;
 	
-	private static final MessageFormatter formatter = new AdvancedMessageFormatter(Configuration.getLocale());
+	private static final MessageFormatter formatter = new AdvancedMessageFormatter(
+			Configuration.getLocale(),
+			Configuration.isEscapingEnabled()
+		);
+
 	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	// @formatter:off

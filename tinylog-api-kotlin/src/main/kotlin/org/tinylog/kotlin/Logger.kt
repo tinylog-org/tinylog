@@ -27,7 +27,7 @@ object Logger {
 
 	private const val STACKTRACE_DEPTH = 2
 
-	private val formatter = AdvancedMessageFormatter(Configuration.getLocale())
+	private val formatter = AdvancedMessageFormatter(Configuration.getLocale(), Configuration.isEscapingEnabled())
 	private val provider = ProviderRegistry.getLoggingProvider()
 
 	// @formatter:off

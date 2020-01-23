@@ -15,18 +15,25 @@ package org.tinylog.format;
 
 import java.text.ChoiceFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.tinylog.Supplier;
 import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 /**
  * Tests for {@link AdvancedMessageFormatter}.
  */
+@RunWith(Parameterized.class)
 public final class AdvancedMessageFormatterTest {
 
 	/**
@@ -34,6 +41,29 @@ public final class AdvancedMessageFormatterTest {
 	 */
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	private final boolean escape;
+
+	/**
+	 * @param escape
+	 *            {@code true} to enable escaping by ticks, {@code false} to disable
+	 */
+	public AdvancedMessageFormatterTest(final boolean escape) {
+		this.escape = escape;
+	}
+
+	/**
+	 * Gets both escape states ({@code true} and {@code false}.
+	 *
+	 * @return Both escape states
+	 */
+	@Parameterized.Parameters(name = "escape = {0}")
+	public static Collection<Object[]> getEscapeStates() {
+		List<Object[]> states = new ArrayList<>();
+		states.add(new Object[] { true });
+		states.add(new Object[] { false });
+		return states;
+	}
 
 	/**
 	 * Verifies that a text message without any placeholders will be returned unchanged.
@@ -141,19 +171,39 @@ public final class AdvancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that placeholders can be escaped.
+	 * Verifies that placeholders can be escaped, if escaping is enabled.
 	 */
 	@Test
 	public void ignoreEscapedPlaceholders() {
+		assumeThat(escape).isTrue(); // Escaping enabled
 		assertThat(format("'{foo}' {}", "bar")).isEqualTo("{foo} bar");
 	}
 
 	/**
-	 * Verifies that double ticks will be converted into a single tick.
+	 * Verifies that a placeholder within ticks can be resolved, if escaping is disabled.
+	 */
+	@Test
+	public void resolvePlaceholderWithinTicks() {
+		assumeThat(escape).isFalse(); // Escaping enabled
+		assertThat(format("'{}'", "foo")).isEqualTo("'foo'");
+	}
+
+	/**
+	 * Verifies that double ticks will be converted into a single tick, if escaping is enabled.
 	 */
 	@Test
 	public void convertDoubleTicks() {
+		assumeThat(escape).isTrue(); // Escaping enabled
 		assertThat(format("this <''> is a single tick")).isEqualTo("this <'> is a single tick");
+	}
+
+	/**
+	 * Verifies that double ticks will be kept as double ticks, if escaping is disabled.
+	 */
+	@Test
+	public void keepDoubleTicks() {
+		assumeThat(escape).isFalse(); // Escaping disabled
+		assertThat(format("these <''> are double ticks")).isEqualTo("these <''> are double ticks");
 	}
 
 	/**
@@ -191,7 +241,7 @@ public final class AdvancedMessageFormatterTest {
 	 *            Replacements for placeholders
 	 * @return Formatted text message
 	 */
-	private static String format(final String message, final Object... arguments) {
+	private String format(final String message, final Object... arguments) {
 		return format(Locale.ROOT, message, arguments);
 	}
 
@@ -206,8 +256,8 @@ public final class AdvancedMessageFormatterTest {
 	 *            Replacements for placeholders
 	 * @return Formatted text message
 	 */
-	private static String format(final Locale locale, final String message, final Object... arguments) {
-		return new AdvancedMessageFormatter(locale).format(message, arguments);
+	private String format(final Locale locale, final String message, final Object... arguments) {
+		return new AdvancedMessageFormatter(locale, escape).format(message, arguments);
 	}
 
 }
