@@ -3,6 +3,7 @@
 <module name="Checker">
 
 	<property name="fileExtensions" value="java, properties, xml" />
+	<property name="tabWidth" value="4" />
 
 	<!-- Headers -->
 
@@ -25,14 +26,15 @@
 
 	<!-- Miscellaneous -->
 
+	<module name="LineLength">
+		<property name="max" value="140" />
+	</module>
 	<module name="NewlineAtEndOfFile" />
 	<module name="UniqueProperties">
 		<property name="fileExtensions" value="properties" />
 	</module>
 
 	<module name="TreeWalker">
-
-		<property name="tabWidth" value="4" />
 
 		<!-- Annotations -->
 
@@ -86,6 +88,7 @@
 		<module name="MissingCtor" />
 		<module name="MissingSwitchDefault" />
 		<module name="MultipleVariableDeclarations" />
+		<module name="NoArrayTrailingComma" />
 		<module name="NoClone" />
 		<module name="NoFinalizer" />
 		<module name="OneStatementPerLine" />
@@ -96,6 +99,7 @@
 		<module name="StringLiteralEquality" />
 		<module name="SuperClone" />
 		<module name="SuperFinalize" />
+		<module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
 		<module name="UnnecessaryParentheses" />
 
 		<!-- Imports -->
@@ -115,9 +119,9 @@
 		<!-- Javadoc Comments -->
 
 		<module name="AtclauseOrder" />
+		<module name="JavadocBlockTagLocation" />
+		<module name="JavadocContentLocationCheck" />
 		<module name="JavadocMethod">
-			<property name="allowUndeclaredRTE" value="true" />
-			<property name="allowThrowsTagsForSubclasses" value="true" />
 			<property name="validateThrows" value="true" />
 		</module>
 		<module name="JavadocParagraph" />
@@ -164,9 +168,6 @@
 		<!-- Size Violations -->
 
 		<module name=" AnonInnerLength " />
-		<module name="LineLength">
-			<property name="max" value="140" />
-		</module>
 		<module name="MethodLength">
 			<property name="max" value="200" />
 		</module>

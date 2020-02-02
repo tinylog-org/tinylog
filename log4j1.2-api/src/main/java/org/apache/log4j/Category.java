@@ -897,6 +897,9 @@ public class Category {
 	 * @param level
 	 *            Severity level of tinylog 2
 	 * @return Corresponding level of Apache Log4j 1.2
+	 *
+	 * @throws IllegalArgumentException
+	 *            Unknown tinylog 2 severity level
 	 */
 	private static Level translateLevel(final org.tinylog.Level level) {
 		switch (level) {

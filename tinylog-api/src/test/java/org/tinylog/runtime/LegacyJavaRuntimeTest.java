@@ -244,6 +244,9 @@ public final class LegacyJavaRuntimeTest {
 	 * @param index
 	 *            Position of stack trace element
 	 * @return Nothing, will always throw an exception
+	 *
+	 * @throws UnsupportedOperationException
+	 *            Always thrown on each call
 	 */
 	@SuppressWarnings("unused")
 	private static StackTraceElement getStackTraceElement(final int index) {

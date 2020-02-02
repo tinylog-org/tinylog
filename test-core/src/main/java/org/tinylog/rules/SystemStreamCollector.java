@@ -74,6 +74,9 @@ public final class SystemStreamCollector implements TestRule {
 	/**
 	 * Starts collecting outputs form standard output stream {@link System#out} and error output stream
 	 * {@link System#err} instead of writing them to console.
+	 *
+	 * @throws RuntimeException
+	 *            UTF-8 is not supported (wrapped {@link UnsupportedEncodingException})
 	 */
 	public void start() {
 		try {

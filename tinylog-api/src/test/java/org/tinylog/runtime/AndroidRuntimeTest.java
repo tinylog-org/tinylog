@@ -288,6 +288,9 @@ public final class AndroidRuntimeTest {
 	 *            Source thread for stack trace
 	 * @param elements
 	 *            Target array for storing stack trace
+	 *
+	 * @throws UnsupportedOperationException
+	 *            Always thrown on each call
 	 */
 	@SuppressWarnings("unused")
 	private static void throwException(final Thread thread, final StackTraceElement[] elements) {

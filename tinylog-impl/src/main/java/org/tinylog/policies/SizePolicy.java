@@ -36,6 +36,9 @@ public final class SizePolicy implements Policy {
 	/**
 	 * @param argument
 	 *            Maximum size for log file (e.g. "16MB")
+	 *
+	 * @throws IllegalArgumentException
+	 *            Invalid or unsupported maximum size
 	 */
 	public SizePolicy(final String argument) {
 		if (argument == null || argument.isEmpty()) {

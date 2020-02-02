@@ -72,6 +72,9 @@ final class BridgeHandler extends Handler {
 	 * @param level
 	 *            Severity level from tinylog
 	 * @return Logging level for {@code java.util.logging}
+	 *
+	 * @throws IllegalArgumentException
+	 *            Unknown JUL severity level
 	 */
 	private static Level translateLevel(final org.tinylog.Level level) {
 		switch (level) {

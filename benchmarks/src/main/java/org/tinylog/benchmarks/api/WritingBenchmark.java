@@ -295,7 +295,7 @@ public class WritingBenchmark {
 		 * Creates a new empty temporary file.
 		 *
 		 * @throws IOException
-		 *             Failed to create new temporary file.
+		 *             Failed to create new temporary file
 		 */
 		@Setup(Level.Invocation)
 		public void init() throws IOException {
@@ -305,6 +305,9 @@ public class WritingBenchmark {
 
 		/**
 		 * Verifies that all lines were written and deletes the temporary file afterwards.
+		 *
+		 * @throws IllegalStateException
+		 *             Log file is incomplete or corrupt
 		 */
 		@TearDown(Level.Invocation)
 		public void dispose() {

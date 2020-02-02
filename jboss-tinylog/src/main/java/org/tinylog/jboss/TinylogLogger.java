@@ -1485,6 +1485,9 @@ public final class TinylogLogger extends Logger {
 	 * @param level
 	 *            Severity level from JBoss Logging
 	 * @return Responding severity level of tinylog
+	 *
+	 * @throws IllegalArgumentException
+	 *            Unknown JBoss Logging severity level
 	 */
 	private static org.tinylog.Level translateLevel(final Level level) {
 		switch (level) {

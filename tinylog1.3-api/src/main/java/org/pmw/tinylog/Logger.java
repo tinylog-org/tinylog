@@ -798,6 +798,9 @@ public final class Logger {
 	 * @param level
 	 *            Severity level of tinylog 2
 	 * @return Corresponding severity level of tinylog 1.3
+	 *
+	 * @throws IllegalArgumentException
+	 *            Unknown tinylog 2 severity level
 	 */
 	private static Level translateLevel(final org.tinylog.Level level) {
 		switch (level) {
