@@ -30,6 +30,21 @@ public final class RuntimeProvider {
 	}
 
 	/**
+	 * Gets a valid class loader.
+	 *
+	 * @return Valid class loader instance
+	 */
+	public static ClassLoader getClassLoader() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+		if (classLoader == null) {
+			classLoader = RuntimeProvider.class.getClassLoader();
+		}
+
+		return classLoader;
+	}
+
+	/**
 	 * Gets the name of the default writer.
 	 *
 	 * @return Name of default writer

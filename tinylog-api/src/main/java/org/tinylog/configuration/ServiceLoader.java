@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Alternative service loader that supports constructors with arguments in opposite to {@link java.util.ServiceLoader}.
@@ -55,7 +56,7 @@ public final class ServiceLoader<T> {
 	public ServiceLoader(final Class<? extends T> service, final Class<?>... argumentTypes) {
 		this.service = service;
 		this.argumentTypes = argumentTypes;
-		this.classLoader = Thread.currentThread().getContextClassLoader();
+		this.classLoader = RuntimeProvider.getClassLoader();
 		this.classes = loadClasses(classLoader, service);
 	}
 

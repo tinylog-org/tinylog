@@ -23,6 +23,7 @@ import org.powermock.reflect.Whitebox;
 import org.tinylog.util.SimpleTimestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link RuntimeProvider}.
@@ -54,6 +55,35 @@ public final class RuntimeProviderTest {
 
 		RuntimeDialect dialect = Whitebox.invokeMethod(RuntimeProvider.class, "resolveDialect");
 		Whitebox.setInternalState(RuntimeProvider.class, RuntimeDialect.class, dialect);
+	}
+
+	/**
+	 * Verifies that the thread context class loader will be returned, if available.
+	 */
+	@Test
+	public void classLoaderFromThread() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		try {
+			ClassLoader mock = mock(ClassLoader.class);
+			Thread.currentThread().setContextClassLoader(mock);
+			assertThat(RuntimeProvider.getClassLoader()).isSameAs(mock);
+		} finally {
+			Thread.currentThread().setContextClassLoader(classLoader);
+		}
+	}
+
+	/**
+	 * Verifies that a class loader will be returned, even if there is no thread context class loader.
+	 */
+	@Test
+	public void classLoaderNotFromThread() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		try {
+			Thread.currentThread().setContextClassLoader(null);
+			assertThat(RuntimeProvider.getClassLoader()).isNotNull();
+		} finally {
+			Thread.currentThread().setContextClassLoader(classLoader);
+		}
 	}
 
 	/**

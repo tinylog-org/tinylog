@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Global configuration for tinylog.
@@ -212,7 +213,7 @@ public final class Configuration {
 				if (URL_DETECTION_PATTERN.matcher(file).matches()) {
 					stream = new URL(file).openStream();
 				} else {
-					stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+					stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
 					if (stream == null) {
 						stream = new FileInputStream(file);
 					}
@@ -221,7 +222,7 @@ public final class Configuration {
 			} else {
 				for (String configurationFile : CONFIGURATION_FILES) {
 					file = configurationFile;
-					InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+					InputStream stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
 					if (stream != null) {
 						load(properties, stream);
 						break;
