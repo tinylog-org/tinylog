@@ -30,7 +30,7 @@
 
 	<properties>
 
-		<website.url>http://www.tinylog.org/</website.url>
+		<website.url>https://tinylog.org/</website.url>
 		<builder.name>tinylog.org</builder.name>
 
 		<git.url>https://github.com/pmwmedia/tinylog</git.url>
