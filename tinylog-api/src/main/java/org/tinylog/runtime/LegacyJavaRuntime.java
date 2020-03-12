@@ -114,7 +114,7 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	/**
 	 * Checks whether {@link sun.reflect.Reflection#getCallerClass(int)} is available.
 	 *
-	 * @return {@code true} if available, {@code true} if not
+	 * @return {@code true} if available, {@code false} if not
 	 */
 	@SuppressWarnings("removal")
 	@IgnoreJRERequirement
