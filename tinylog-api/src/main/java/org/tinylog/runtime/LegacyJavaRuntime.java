@@ -125,6 +125,8 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 			return false;
 		} catch (NoSuchMethodError error) {
 			return false;
+		} catch (UnsatisfiedLinkError error) {
+			return false;
 		} catch (Exception ex) {
 			return false;
 		}
