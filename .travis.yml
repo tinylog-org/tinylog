@@ -1,4 +1,5 @@
 language: java
+os: linux
 dist: trusty
 install: true
 
