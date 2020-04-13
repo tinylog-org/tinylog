@@ -1,7 +1,7 @@
 tinylog 2
 =========
-[![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.1)](https://travis-ci.org/pmwmedia/tinylog)
-[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.1/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.1)
+[![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.2)](https://travis-ci.org/pmwmedia/tinylog)
+[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.2/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.2)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog-impl/badge.svg)](https://search.maven.org/search?q=g:org.tinylog)
 
 Example
@@ -27,7 +27,7 @@ A detailed user manual and the Javadoc documentation can be found on https://tin
 Build tinylog
 -------------
 
-tinylog requires Maven 3 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
+tinylog requires Maven 3.5 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
 
 Build command:
 
