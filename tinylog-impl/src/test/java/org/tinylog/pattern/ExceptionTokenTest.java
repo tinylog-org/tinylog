@@ -196,8 +196,8 @@ public final class ExceptionTokenTest {
 	public void renderyExceptionUsingFilters() {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Arrays.asList(
-				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
-				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
 		);
 
 		ExceptionToken token = new ExceptionToken(filters);
@@ -216,8 +216,8 @@ public final class ExceptionTokenTest {
 	public void applyyExceptionUsingFilters() throws SQLException {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Arrays.asList(
-				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
-				origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
 		);
 
 		PreparedStatement statement = mock(PreparedStatement.class);
