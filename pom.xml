@@ -28,6 +28,10 @@
 		<module>benchmarks</module>
 	</modules>
 
+	<prerequisites>
+		<maven>3.5.0</maven>
+	</prerequisites>
+
 	<properties>
 
 		<website.url>https://tinylog.org/</website.url>
