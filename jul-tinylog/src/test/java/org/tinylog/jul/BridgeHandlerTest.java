@@ -125,9 +125,14 @@ public final class BridgeHandlerTest {
 
 	/**
 	 * Mocks the underlying logging provider, activates the bridge for {@code java.util.logging}, and creates a logger.
+	 *
+	 * @throws ClassNotFoundException
+	 *             Failed to load {@link BridgeHandler}
 	 */
 	@Before
-	public void init() {
+	public void init() throws ClassNotFoundException {
+		Class.forName("org.tinylog.jul.BridgeHandler");
+
 		provider = mock(LoggingProvider.class);
 		when(provider.getMinimumLevel(null)).thenReturn(level);
 		Whitebox.setInternalState(BridgeHandler.class, provider);

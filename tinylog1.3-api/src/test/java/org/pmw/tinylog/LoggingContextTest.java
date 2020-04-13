@@ -40,6 +40,8 @@ public final class LoggingContextTest {
 	 */
 	@Before
 	public void init() {
+		ThreadContext.clear();
+
 		provider = mock(ContextProvider.class);
 		Whitebox.setInternalState(ThreadContext.class, provider);
 	}
@@ -50,6 +52,7 @@ public final class LoggingContextTest {
 	@After
 	public void reset() {
 		Whitebox.setInternalState(ThreadContext.class, ProviderRegistry.getLoggingProvider().getContextProvider());
+		ThreadContext.clear();
 	}
 
 	/**

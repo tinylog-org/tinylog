@@ -41,6 +41,8 @@ public final class TinylogMdcAdapterTest {
 	 */
 	@Before
 	public void init() {
+		ThreadContext.clear();
+
 		provider = mock(ContextProvider.class);
 		Whitebox.setInternalState(ThreadContext.class, provider);
 	}
@@ -51,6 +53,7 @@ public final class TinylogMdcAdapterTest {
 	@After
 	public void reset() {
 		Whitebox.setInternalState(ThreadContext.class, ProviderRegistry.getLoggingProvider().getContextProvider());
+		ThreadContext.clear();
 	}
 
 	/**

@@ -43,6 +43,8 @@ public final class TinylogLoggerProviderTest {
 	 */
 	@Before
 	public void init() {
+		ThreadContext.clear();
+
 		logging = new TinylogLoggerProvider();
 		context = mock(ContextProvider.class);
 		Whitebox.setInternalState(ThreadContext.class, context);
@@ -54,6 +56,7 @@ public final class TinylogLoggerProviderTest {
 	@After
 	public void reset() {
 		Whitebox.setInternalState(ThreadContext.class, ProviderRegistry.getLoggingProvider().getContextProvider());
+		ThreadContext.clear();
 	}
 
 	/**

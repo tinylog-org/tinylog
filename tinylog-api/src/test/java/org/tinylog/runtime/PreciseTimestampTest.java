@@ -27,8 +27,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link PreciseTimestamp}.
@@ -38,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public final class PreciseTimestampTest {
 
 	/**
-	 * Initializes mocking of {@class Instant}.
+	 * Initializes mocking of {@link Instant}.
 	 */
 	@Before
 	public void init() {
@@ -47,12 +47,9 @@ public final class PreciseTimestampTest {
 
 	/**
 	 * Verifies that a correct {@link Date} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToDate() throws Exception {
+	public void convertingToDate() {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		PreciseTimestamp timestamp = new PreciseTimestamp();
 
@@ -62,12 +59,9 @@ public final class PreciseTimestampTest {
 
 	/**
 	 * Verifies that a correct {@link Instant} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToInstant() throws Exception {
+	public void convertingToInstant() {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		PreciseTimestamp timestamp = new PreciseTimestamp();
 
@@ -77,12 +71,9 @@ public final class PreciseTimestampTest {
 
 	/**
 	 * Verifies that a correct {@link java.sql.Timestamp SQL Timestamp} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToSqlTimestamp() throws Exception {
+	public void convertingToSqlTimestamp() {
 		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		PreciseTimestamp timestamp = new PreciseTimestamp();
 
@@ -97,11 +88,10 @@ public final class PreciseTimestampTest {
 	 *            New current date
 	 * @param time
 	 *            New current time
-	 * @throws Exception
-	 *             Failed mocking {@link Instant}
 	 */
-	private static void setCurrentTime(final LocalDate date, final LocalTime time) throws Exception {
-		when(Instant.now()).thenReturn(asInstant(date, time));
+	private static void setCurrentTime(final LocalDate date, final LocalTime time) {
+		doReturn(asInstant(date, time)).when(Instant.class);
+		Instant.now();
 	}
 
 	/**
