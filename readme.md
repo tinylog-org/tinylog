@@ -22,7 +22,9 @@ public class Application {
 Support
 -------
 
-A detailed user manual and the Javadoc documentation can be found on https://tinylog.org/v2/. Bug reports and feature requests are welcome and can be created via [GitHub issues](https://github.com/pmwmedia/tinylog/issues).
+More information about tinylog including a detailed user manual and the Javadoc documentation can be found on https://tinylog.org/v2/.
+
+On GitHub, issues and pull requests are always welcome :)
 
 Build tinylog
 -------------
