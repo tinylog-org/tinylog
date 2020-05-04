@@ -64,6 +64,11 @@
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+		<p2-maven-plugin.version>1.3.0</p2-maven-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+		<wagon-maven-plugin.version>2.0.0</wagon-maven-plugin.version>
+
+		<wagon-ftp.version>3.2.0</wagon-ftp.version>
 
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.15.0</assertj-core.version>
@@ -303,6 +308,13 @@
 	</dependencyManagement>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>${wagon-ftp.version}</version>
+			</extension>
+		</extensions>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -657,6 +669,77 @@
 					<version>${exec-maven-plugin.version}</version>
 					<configuration>
 						<executable>${java.home}/bin/java</executable>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.reficio</groupId>
+					<artifactId>p2-maven-plugin</artifactId>
+					<version>${p2-maven-plugin.version}</version>
+					<inherited>false</inherited>
+					<configuration>
+						<artifacts>
+							<artifact>
+								<id>org.tinylog:jboss-tinylog:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:jcl-tinylog:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:jul-tinylog:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:log4j1.2-api:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:slf4j-tinylog:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-api:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-api-kotlin:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-api-scala_2.12:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-impl:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-jboss:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-jul:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog1.3-api:${project.version}</id>
+								<source>true</source>
+							</artifact>
+						</artifacts>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>wagon-maven-plugin</artifactId>
+					<version>${wagon-maven-plugin.version}</version>
+					<inherited>false</inherited>
+					<configuration>
+						<fromDir>${project.build.directory}/repository</fromDir>
+						<includes>**/*</includes>
+						<serverId>tinylog</serverId>
+						<url>ftp://tinylog.org</url>
+						<toDir>${project.version}</toDir>
 					</configuration>
 				</plugin>
 			</plugins>
