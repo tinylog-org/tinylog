@@ -68,6 +68,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.tinylog.adapter.jul</Bundle-SymbolicName>
+						<Fragment-Host>org.tinylog.api</Fragment-Host>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -101,6 +101,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.tinylog.impl</Bundle-SymbolicName>
+						<Fragment-Host>org.tinylog.api</Fragment-Host>
 					</instructions>
 				</configuration>
 			</plugin>
