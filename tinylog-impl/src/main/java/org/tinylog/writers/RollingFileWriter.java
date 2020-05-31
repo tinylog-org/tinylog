@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private final int backups;
 	private final boolean buffered;
 	private final boolean writingThread;
+	private final DynamicPath linkToLatest;
 	private final Charset charset;
 
 	private ByteArrayWriter writer;
@@ -72,8 +74,9 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		path = new DynamicPath(getFileName(properties));
 		policies = createPolicies(properties.get("policies"));
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
+		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = path.getAllFiles();
+		List<File> files = removeLinkToLatest(path.getAllFiles());
 
 		String fileName;
 		boolean append;
@@ -96,7 +99,43 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		charset = getCharset(properties);
 		buffered = Boolean.parseBoolean(properties.get("buffered"));
 		writingThread = Boolean.parseBoolean(properties.get("writingthread"));
-		writer = createByteArrayWriter(fileName, append, buffered, false, false);
+		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
+	}
+
+	private List<File> removeLinkToLatest(final List<File> files) {
+		if (linkToLatest != null) {
+			String linkToLatestAbsolutePath = linkToLatest.resolve();
+			List<File> symlink = new ArrayList<File>();
+			for (File file : files) {
+				if (file.getAbsolutePath().equals(linkToLatestAbsolutePath)) {
+					symlink.add(file);
+					break;
+				}
+			}
+			files.removeAll(symlink);
+		}
+		return files;
+	}
+
+	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
+		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
+		ByteArrayWriter writer = AbstractFormatPatternWriter.createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
+		if (linkToLatest != null) {
+			String logFile = new File(fileName).getAbsolutePath();
+			String linkFile = new File(linkToLatest.resolve()).getAbsolutePath();
+			try {
+				Process process = Runtime.getRuntime().exec(new String[]{"ln", "-sf", logFile, linkFile});
+				try {
+					process.waitFor();
+				} catch (InterruptedException intEx) {
+					InternalLogger.log(Level.WARN, intEx, "Interrupted while creating symlink '" + linkFile + "'");
+				}
+				process.destroy();
+			} catch (IOException exception) {
+				InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
+			}
+		}
+		return writer;
 	}
 
 	@Override
@@ -145,9 +184,11 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
 
+			List<File> existingFiles = removeLinkToLatest(path.getAllFiles());
+			deleteBackups(existingFiles, backups);
+
 			String fileName = path.resolve();
-			deleteBackups(path.getAllFiles(), backups);
-			writer = createByteArrayWriter(fileName, false, buffered, false, false);
+			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, false, false);
 
 			for (Policy policy : policies) {
 				policy.reset();
