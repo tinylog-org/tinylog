@@ -29,6 +29,11 @@ public final class RuntimeProvider {
 	private RuntimeProvider() {
 	}
 
+	/**
+	 * Checks if running on Android.
+	 *
+	 * @return {@code true} if running on Android, otherwise {@code false}
+	 */
 	public static boolean isAndroid() {
 		return dialect.isAndroid();
 	}
