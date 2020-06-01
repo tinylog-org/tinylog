@@ -29,6 +29,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public final class ModernJavaRuntimeTest {
 
 	/**
+	 * Verifies that this runtime is not Android.
+	 */
+	@Test
+	public void notAndroid() {
+		assertThat(new ModernJavaRuntime().isAndroid()).isFalse();
+	}
+
+	/**
 	 * Verifies that the console writer will be returned as default writer.
 	 */
 	@Test

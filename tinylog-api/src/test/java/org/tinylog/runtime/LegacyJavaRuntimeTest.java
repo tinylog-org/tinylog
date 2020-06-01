@@ -50,6 +50,14 @@ public final class LegacyJavaRuntimeTest {
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
+	 * Verifies that this runtime is not Android.
+	 */
+	@Test
+	public void notAndroid() {
+		assertThat(new ModernJavaRuntime().isAndroid()).isFalse();
+	}
+
+	/**
 	 * Verifies that the console writer will be returned as default writer.
 	 */
 	@Test

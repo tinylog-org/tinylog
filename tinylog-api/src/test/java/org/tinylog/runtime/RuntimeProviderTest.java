@@ -87,6 +87,14 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
+	 * Verifies that the environment can be detected without throwing any exception.
+	 */
+	@Test
+	public void isAndroid() {
+		RuntimeProvider.isAndroid();
+	}
+
+	/**
 	 * Verifies that the name of a default writer will be returned.
 	 */
 	@Test

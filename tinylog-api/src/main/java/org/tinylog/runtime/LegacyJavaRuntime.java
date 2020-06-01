@@ -37,6 +37,11 @@ final class LegacyJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
+	public boolean isAndroid() {
+		return false;
+	}
+
+	@Override
 	public long getProcessId() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		try {

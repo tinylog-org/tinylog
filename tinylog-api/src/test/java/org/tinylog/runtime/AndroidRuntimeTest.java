@@ -74,6 +74,14 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
+	 * Verifies that this runtime is Android.
+	 */
+	@Test
+	public void isAndroid() {
+		assertThat(new ModernJavaRuntime().isAndroid()).isFalse();
+	}
+
+	/**
 	 * Verifies that Android's logcat writer will be returned as default writer.
 	 */
 	@Test

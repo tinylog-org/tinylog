@@ -29,6 +29,10 @@ public final class RuntimeProvider {
 	private RuntimeProvider() {
 	}
 
+	public static boolean isAndroid() {
+		return dialect.isAndroid();
+	}
+
 	/**
 	 * Gets a valid class loader.
 	 *

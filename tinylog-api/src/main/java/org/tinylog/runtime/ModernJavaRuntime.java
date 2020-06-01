@@ -36,6 +36,11 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
+	public boolean isAndroid() {
+		return false;
+	}
+
+	@Override
 	public long getProcessId() {
 		return currentProcess.pid();
 	}

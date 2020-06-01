@@ -42,6 +42,11 @@ final class AndroidRuntime implements RuntimeDialect {
 	}
 
 	@Override
+	public boolean isAndroid() {
+		return true;
+	}
+
+	@Override
 	public String getDefaultWriter() {
 		return "logcat";
 	}

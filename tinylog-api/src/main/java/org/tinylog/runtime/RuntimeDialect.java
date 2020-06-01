@@ -22,6 +22,13 @@ import java.util.Locale;
 interface RuntimeDialect {
 
 	/**
+	 * Checks if running on Android.
+	 *
+	 * @return {@code true} if running on Android, otherwise {@code false}
+	 */
+	boolean isAndroid();
+
+	/**
 	 * Gets the name of the default writer.
 	 *
 	 * @return Name of default writer
