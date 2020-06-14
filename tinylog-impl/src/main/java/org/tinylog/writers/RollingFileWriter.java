@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = removeLinkToLatest(path.getAllFiles());
+		List<File> files = filterOutSymlinks(path.getAllFiles());
 
 		String fileName;
 		boolean append;
@@ -102,17 +103,15 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
 	}
 
-	private List<File> removeLinkToLatest(final List<File> files) {
-		if (linkToLatest != null) {
-			String linkToLatestAbsolutePath = linkToLatest.resolve();
-			List<File> symlink = new ArrayList<File>();
+	private static List<File> filterOutSymlinks(final List<File> files) {
+		if (!RuntimeProvider.isAndroid()) {
+			List<File> symlinks = new ArrayList<File>();
 			for (File file : files) {
-				if (file.getAbsolutePath().equals(linkToLatestAbsolutePath)) {
-					symlink.add(file);
-					break;
+				if (java.nio.file.Files.isSymbolicLink(file.toPath())) {
+					symlinks.add(file);
 				}
 			}
-			files.removeAll(symlink);
+			files.removeAll(symlinks);
 		}
 		return files;
 	}
@@ -121,18 +120,16 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
 		ByteArrayWriter writer = AbstractFormatPatternWriter.createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
 		if (linkToLatest != null) {
-			String logFile = new File(fileName).getAbsolutePath();
-			String linkFile = new File(linkToLatest.resolve()).getAbsolutePath();
-			try {
-				Process process = Runtime.getRuntime().exec(new String[]{"ln", "-sf", logFile, linkFile});
+			File logFile = new File(fileName);
+			File linkFile = new File(linkToLatest.resolve());
+			if (!RuntimeProvider.isAndroid()) {
 				try {
-					process.waitFor();
-				} catch (InterruptedException intEx) {
-					InternalLogger.log(Level.WARN, intEx, "Interrupted while creating symlink '" + linkFile + "'");
+					Path linkPath = linkFile.toPath();
+					java.nio.file.Files.delete(linkPath);
+					java.nio.file.Files.createSymbolicLink(linkPath, logFile.toPath());
+				} catch (IOException exception) {
+					InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
 				}
-				process.destroy();
-			} catch (IOException exception) {
-				InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
 			}
 		}
 		return writer;
@@ -184,7 +181,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
 
-			List<File> existingFiles = removeLinkToLatest(path.getAllFiles());
+			List<File> existingFiles = filterOutSymlinks(path.getAllFiles());
 			deleteBackups(existingFiles, backups);
 
 			String fileName = path.resolve();
