@@ -17,12 +17,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.core.LogEntry;
@@ -103,11 +105,12 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
 	}
 
+	@IgnoreJRERequirement
 	private static List<File> filterOutSymlinks(final List<File> files) {
 		if (!RuntimeProvider.isAndroid()) {
 			List<File> symlinks = new ArrayList<File>();
 			for (File file : files) {
-				if (java.nio.file.Files.isSymbolicLink(file.toPath())) {
+				if (Files.isSymbolicLink(file.toPath())) {
 					symlinks.add(file);
 				}
 			}
@@ -116,20 +119,23 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		return files;
 	}
 
+	@IgnoreJRERequirement
 	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
 		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
-		ByteArrayWriter writer = AbstractFormatPatternWriter.createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
+		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
 		if (linkToLatest != null) {
 			File logFile = new File(fileName);
 			File linkFile = new File(linkToLatest.resolve());
 			if (!RuntimeProvider.isAndroid()) {
 				try {
 					Path linkPath = linkFile.toPath();
-					java.nio.file.Files.delete(linkPath);
-					java.nio.file.Files.createSymbolicLink(linkPath, logFile.toPath());
+					Files.delete(linkPath);
+					Files.createSymbolicLink(linkPath, logFile.toPath());
 				} catch (IOException exception) {
 					InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
 				}
+			} else {
+				InternalLogger.log(Level.WARN, "Cannot create symlink to latest log segment on Android");
 			}
 		}
 		return writer;
