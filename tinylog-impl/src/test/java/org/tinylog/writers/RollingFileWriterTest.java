@@ -481,45 +481,6 @@ public final class RollingFileWriterTest {
 		assertThat(writer).isInstanceOf(RollingFileWriter.class);
 	}
 
-
-	/**
-	 * Verifies that symlink to new log segment is created at startup.
-	 *
-	 * @throws IOException
-	 *             Failed access to temporary folder or files
-	 */
-	@Test
-	public void createSymlinkToLatestAtStartUp() throws IOException {
-		File file1 = folder.newFile("0");
-		File file2 = folder.newFile("1");
-		File file3 = folder.newFile("2");
-		File file4 = folder.newFile("3");
-		File linkToLatest = folder.newFile("latest");
-
-		file1.setLastModified(0);
-		file2.setLastModified(1000);
-		file3.setLastModified(2000);
-		file4.setLastModified(3000);
-
-		Map<String, String> properties = new HashMap<>();
-		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
-		properties.put("latest", linkToLatest.getAbsolutePath());
-		properties.put("format", "{message}");
-		properties.put("policies", "size: 1MB");
-		properties.put("backups", "2");
-
-		RollingFileWriter writer = new RollingFileWriter(properties);
-		try {
-			assertThat(linkToLatest.getCanonicalPath()).isEqualTo(file4.getCanonicalPath());
-			assertThat(file1).doesNotExist();
-			assertThat(file2).exists();
-			assertThat(file3).exists();
-			assertThat(file4).exists();
-		} finally {
-			writer.close();
-		}
-	}
-
 	/**
 	 * Verifies that obsolete backup files will be deleted when rolling log file.
 	 *
