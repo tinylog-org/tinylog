@@ -408,6 +408,9 @@
 							<goals>
 								<goal>doc-jar</goal>
 							</goals>
+							<configuration>
+								<skip>${maven.javadoc.skip}</skip>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
@@ -570,6 +573,7 @@
 					<artifactId>dokka-maven-plugin</artifactId>
 					<version>${dokka.version}</version>
 					<configuration>
+						<skip>${maven.javadoc.skip}</skip>
 						<archive>
 							<addMavenDescriptor>false</addMavenDescriptor>
 							<manifestEntries>
