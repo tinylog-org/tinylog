@@ -29,7 +29,7 @@ On GitHub, issues and pull requests are always welcome :)
 Build tinylog
 -------------
 
-tinylog requires Maven 3.5 and JDK 10 for building. Newer JDKs cannot compile legacy code for older Java versions, and older JDKs cannot compile new features for the latest Java versions. [OpenJDK 10](https://jdk.java.net/archive/) is still available on [java.net](https://jdk.java.net/archive/) and [Oracle JDK 10](https://www.oracle.com/java/technologies/java-archive-javase10-downloads.html) on [oracle.com](https://www.oracle.com/java/technologies/java-archive-javase10-downloads.html).
+tinylog requires Maven 3.5 and JDK 9 for building. Newer JDKs cannot compile legacy code for older Java versions, and older JDKs cannot compile new features for the latest Java versions. [OpenJDK 9](https://jdk.java.net/archive/) is still available on [java.net](https://jdk.java.net/archive/) and [Oracle JDK 9](https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html) on [oracle.com](https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html).
 
 Build command:
 
