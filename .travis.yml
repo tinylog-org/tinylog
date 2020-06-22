@@ -4,8 +4,7 @@ dist: trusty
 install: true
 
 jdk:
-  - oraclejdk9
-  - openjdk9
+  - openjdk10
 
 script:
   - mvn clean install -P release -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn

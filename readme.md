@@ -29,13 +29,13 @@ On GitHub, issues and pull requests are always welcome :)
 Build tinylog
 -------------
 
-tinylog requires Maven 3.5 and JDK 9 for building. The generated JARs are compatible with Java 6 and higher.
+tinylog requires Maven 3.5 and JDK 10 for building. Newer JDKs cannot compile legacy code for older Java versions, and older JDKs cannot compile new features for the latest Java versions.
 
 Build command:
 
 	mvn clean install
 
-A new folder "target" with Javadoc documentation and all JARs will be created in the root directory.
+A new folder "target" with Javadoc documentation and all JARs will be created in the root directory. The generated JARs contain Java 6 byte code and are compatible with any JRE 7 and higher as well as with Android API level 1 and higher.
 
 License
 -------
