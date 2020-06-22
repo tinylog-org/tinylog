@@ -331,6 +331,36 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>compile</id>
+							<phase>compile</phase>
+							<goals>
+								<goal>compile</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>compile-java-9</id>
+							<phase>compile</phase>
+							<goals>
+								<goal>compile</goal>
+							</goals>
+							<configuration>
+								<release>9</release>
+								<compileSourceRoots>
+									<compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+								</compileSourceRoots>
+								<multiReleaseOutput>true</multiReleaseOutput>
+							</configuration>
+						</execution>
+						<execution>
+							<id>test-compile</id>
+							<phase>test-compile</phase>
+							<goals>
+								<goal>testCompile</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.jetbrains.kotlin</groupId>
@@ -502,6 +532,7 @@
 							<addMavenDescriptor>false</addMavenDescriptor>
 							<manifestEntries>
 								<Built-By>${builder.name}</Built-By>
+								<Multi-Release>true</Multi-Release>
 							</manifestEntries>
 						</archive>
 					</configuration>
