@@ -333,7 +333,7 @@
 					<version>${maven-compiler-plugin.version}</version>
 					<executions>
 						<execution>
-							<id>compile</id>
+							<id>default-compile</id>
 							<phase>compile</phase>
 							<goals>
 								<goal>compile</goal>
@@ -354,7 +354,7 @@
 							</configuration>
 						</execution>
 						<execution>
-							<id>test-compile</id>
+							<id>default-testCompile</id>
 							<phase>test-compile</phase>
 							<goals>
 								<goal>testCompile</goal>
