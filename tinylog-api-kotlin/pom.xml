@@ -82,7 +82,6 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.tinylog.api.kotlin</Bundle-SymbolicName>
-						<Import-Package>!sun.reflect,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

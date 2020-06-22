@@ -94,7 +94,6 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.tinylog.api</Bundle-SymbolicName>
-						<Import-Package>!sun.reflect,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

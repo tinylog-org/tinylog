@@ -96,7 +96,6 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>org.tinylog.api.scala</Bundle-SymbolicName>
-						<Import-Package>!sun.reflect,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

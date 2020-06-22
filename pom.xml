@@ -522,6 +522,13 @@
 					<artifactId>maven-bundle-plugin</artifactId>
 					<version>${maven-bundle-plugin.version}</version>
 					<extensions>true</extensions>
+					<configuration>
+						<instructions>
+							<_exportcontents>!META-INF.versions.9,*</_exportcontents>
+							<Import-Package>!sun.reflect,*</Import-Package>
+							<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+						</instructions>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
