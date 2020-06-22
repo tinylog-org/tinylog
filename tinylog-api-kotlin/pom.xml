@@ -96,7 +96,7 @@
 					<externalDocumentationLinks>
 						<links>
 							<url>https://tinylog.org/v2/javadoc/</url>
-							<packageListUrl>file:///${project.parent.basedir}/tinylog-api/target/apidocs/package-list</packageListUrl>
+							<packageListUrl>file:///${project.parent.basedir}/tinylog-api/target/apidocs/element-list</packageListUrl>
 						</links>
 					</externalDocumentationLinks>
 				</configuration>
