@@ -17,10 +17,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.core.LogEntry;
@@ -43,6 +47,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private final int backups;
 	private final boolean buffered;
 	private final boolean writingThread;
+	private final DynamicPath linkToLatest;
 	private final Charset charset;
 
 	private ByteArrayWriter writer;
@@ -72,8 +77,9 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		path = new DynamicPath(getFileName(properties));
 		policies = createPolicies(properties.get("policies"));
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
+		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = path.getAllFiles();
+		List<File> files = filterOutSymlinks(path.getAllFiles());
 
 		String fileName;
 		boolean append;
@@ -96,7 +102,43 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		charset = getCharset(properties);
 		buffered = Boolean.parseBoolean(properties.get("buffered"));
 		writingThread = Boolean.parseBoolean(properties.get("writingthread"));
-		writer = createByteArrayWriter(fileName, append, buffered, false, false);
+		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
+	}
+
+	@IgnoreJRERequirement
+	private static List<File> filterOutSymlinks(final List<File> files) {
+		if (!RuntimeProvider.isAndroid()) {
+			List<File> symlinks = new ArrayList<File>();
+			for (File file : files) {
+				if (Files.isSymbolicLink(file.toPath())) {
+					symlinks.add(file);
+				}
+			}
+			files.removeAll(symlinks);
+		}
+		return files;
+	}
+
+	@IgnoreJRERequirement
+	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
+		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
+		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
+		if (linkToLatest != null) {
+			File logFile = new File(fileName);
+			File linkFile = new File(linkToLatest.resolve());
+			if (!RuntimeProvider.isAndroid()) {
+				try {
+					Path linkPath = linkFile.toPath();
+					Files.delete(linkPath);
+					Files.createSymbolicLink(linkPath, logFile.toPath());
+				} catch (IOException exception) {
+					InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
+				}
+			} else {
+				InternalLogger.log(Level.WARN, "Cannot create symlink to latest log segment on Android");
+			}
+		}
+		return writer;
 	}
 
 	@Override
@@ -145,9 +187,11 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
 
+			List<File> existingFiles = filterOutSymlinks(path.getAllFiles());
+			deleteBackups(existingFiles, backups);
+
 			String fileName = path.resolve();
-			deleteBackups(path.getAllFiles(), backups);
-			writer = createByteArrayWriter(fileName, false, buffered, false, false);
+			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, false, false);
 
 			for (Policy policy : policies) {
 				policy.reset();
