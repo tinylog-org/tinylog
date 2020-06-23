@@ -30,6 +30,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.Supplier;
 import org.tinylog.configuration.Configuration;
@@ -182,6 +183,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(singletonMap("level", "off"));
 		}
 
@@ -298,6 +300,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(emptyMap());
 
 			Configuration.set("writer", "console");
@@ -681,6 +684,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(doubletonMap("writingthread", "true", "autoshutdown", "false"));
 		}
 
@@ -765,14 +769,17 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@Before
 		public void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(singletonMap("writer", StorageWriter.class.getName()));
 		}
 
 		/**
 		 * Clears global tinylog configuration.
 		 */
+		@Before
 		@After
 		public void clear() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(emptyMap());
 		}
 
@@ -964,6 +971,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(doubletonMap("writer", "console", "writer.format", "{message}"));
 		}
 
@@ -1110,6 +1118,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@AfterClass
 		public static void clear() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(emptyMap());
 		}
 

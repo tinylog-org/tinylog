@@ -24,6 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import org.tinylog.Level;
@@ -63,7 +65,9 @@ public final class Configuration {
 
 	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
 
+	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private static final Properties properties = load();
+	private static boolean frozen;
 
 	/** */
 	private Configuration() {
@@ -107,7 +111,13 @@ public final class Configuration {
 	 * @return Found value or {@code null}
 	 */
 	public static String get(final String key) {
-		return (String) properties.get(key);
+		try {
+			lock.readLock().lock();
+			frozen = true;
+			return (String) properties.get(key);
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	/**
@@ -128,14 +138,21 @@ public final class Configuration {
 	 * @return All found properties (map will be empty if there are no matching properties)
 	 */
 	public static Map<String, String> getSiblings(final String prefix) {
-		Map<String, String> map = new HashMap<String, String>();
-		for (Enumeration<Object> enumeration = properties.keys(); enumeration.hasMoreElements();) {
-			String key = (String) enumeration.nextElement();
-			if (key.startsWith(prefix) && (prefix.endsWith("@") || key.indexOf('.', prefix.length()) == -1)) {
-				map.put(key, (String) properties.get(key));
+		try {
+			lock.readLock().lock();
+			frozen = true;
+
+			Map<String, String> map = new HashMap<String, String>();
+			for (Enumeration<Object> enumeration = properties.keys(); enumeration.hasMoreElements();) {
+				String key = (String) enumeration.nextElement();
+				if (key.startsWith(prefix) && (prefix.endsWith("@") || key.indexOf('.', prefix.length()) == -1)) {
+					map.put(key, (String) properties.get(key));
+				}
 			}
+			return map;
+		} finally {
+			lock.readLock().unlock();
 		}
-		return map;
 	}
 
 	/**
@@ -151,16 +168,23 @@ public final class Configuration {
 	 * @return All found children properties (map will be empty if there are no children properties)
 	 */
 	public static Map<String, String> getChildren(final String key) {
-		String prefix = key + ".";
+		try {
+			lock.readLock().lock();
+			frozen = true;
 
-		Map<String, String> map = new HashMap<String, String>();
-		for (Enumeration<Object> enumeration = properties.keys(); enumeration.hasMoreElements();) {
-			String property = (String) enumeration.nextElement();
-			if (property.startsWith(prefix)) {
-				map.put(property.substring(prefix.length()), (String) properties.get(property));
+			String prefix = key + ".";
+
+			Map<String, String> map = new HashMap<String, String>();
+			for (Enumeration<Object> enumeration = properties.keys(); enumeration.hasMoreElements();) {
+				String property = (String) enumeration.nextElement();
+				if (property.startsWith(prefix)) {
+					map.put(property.substring(prefix.length()), (String) properties.get(property));
+				}
 			}
+			return map;
+		} finally {
+			lock.readLock().unlock();
 		}
-		return map;
 	}
 
 	/**
@@ -168,16 +192,28 @@ public final class Configuration {
 	 *
 	 * <p>
 	 * Configuration properties must be set before calling any logging methods. If the framework has been initialized
-	 * once, the configuration is immutable and further configuration changes will be just ignored.
+	 * once, the configuration is immutable and further configuration changes will throw an {@link UnsupportedOperationException}.
 	 * </p>
 	 *
 	 * @param key
 	 *            Name of the property
 	 * @param value
 	 *            Value of the property
+	 * @throws UnsupportedOperationException
+	 *             Configuration has already been applied and is frozen
 	 */
-	public static void set(final String key, final String value) {
-		properties.put(key, value);
+	public static void set(final String key, final String value) throws UnsupportedOperationException {
+		try {
+			lock.writeLock().lock();
+
+			if (frozen) {
+				throw new UnsupportedOperationException("Configuration cannot be changed after applying to tinylog");
+			} else {
+				properties.put(key, value);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	/**
@@ -185,16 +221,26 @@ public final class Configuration {
 	 *
 	 * <p>
 	 * Configuration properties must be set before calling any logging methods. If the framework has been initialized
-	 * once, the configuration is immutable and further configuration changes will be just ignored.
+	 * once, the configuration is immutable and further configuration changes will throw an {@link UnsupportedOperationException}.
 	 * </p>
 	 *
 	 * @param configuration
 	 *            New configuration
+	 * @throws UnsupportedOperationException
+	 *             Configuration has already been applied and is frozen
 	 */
-	public static void replace(final Map<String, String> configuration) {
-		synchronized (properties) {
-			properties.clear();
-			properties.putAll(configuration);
+	public static void replace(final Map<String, String> configuration) throws UnsupportedOperationException {
+		try {
+			lock.writeLock().lock();
+
+			if (frozen) {
+				throw new UnsupportedOperationException("Configuration cannot be changed after applying to tinylog");
+			} else {
+				properties.clear();
+				properties.putAll(configuration);
+			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 

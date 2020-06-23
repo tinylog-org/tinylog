@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.rules.SystemStreamCollector;
@@ -51,8 +53,10 @@ public final class ConfigurationParserTest {
 	/**
 	 * Resets configuration.
 	 */
+	@Before
 	@After
 	public void reset() {
+		Whitebox.setInternalState(Configuration.class, "frozen", false);
 		Configuration.replace(emptyMap());
 	}
 

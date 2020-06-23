@@ -21,8 +21,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +31,7 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.tinylog.util.Maps.doubletonMap;
 
@@ -67,13 +68,14 @@ public final class ConfigurationTest {
 	 */
 	@AfterClass
 	public static void reset() throws Exception {
+		Whitebox.setInternalState(Configuration.class, "frozen", false);
 		loadProperties(null);
 	}
 
 	/**
 	 * Clears configuration and all tinylog properties.
 	 */
-	@After
+	@Before
 	public void clear() {
 		for (Enumeration<Object> enumeration = System.getProperties().keys(); enumeration.hasMoreElements();) {
 			String property = (String) enumeration.nextElement();
@@ -82,6 +84,7 @@ public final class ConfigurationTest {
 			}
 		}
 
+		Whitebox.setInternalState(Configuration.class, "frozen", false);
 		Configuration.replace(Collections.emptyMap());
 	}
 
@@ -535,9 +538,6 @@ public final class ConfigurationTest {
 	 */
 	@Test
 	public void addProperty() throws Exception {
-		loadProperties(null);
-
-		assertThat(Configuration.get("test")).isNull();
 		Configuration.set("test", "Hello World!");
 		assertThat(Configuration.get("test")).isEqualTo("Hello World!");
 	}
@@ -551,8 +551,6 @@ public final class ConfigurationTest {
 	@Test
 	public void overrideProperty() throws Exception {
 		loadProperties(FileSystem.createTemporaryFile("test = Hello World!"));
-
-		assertThat(Configuration.get("test")).isEqualTo("Hello World!");
 		Configuration.set("test", "Bye World!");
 		assertThat(Configuration.get("test")).isEqualTo("Bye World!");
 	}
@@ -566,14 +564,65 @@ public final class ConfigurationTest {
 	@Test
 	public void replaceProperties() throws Exception {
 		loadProperties(FileSystem.createTemporaryFile("a = 1", "b = 2"));
-
-		assertThat(Configuration.get("a")).isEqualTo("1");
-		assertThat(Configuration.get("b")).isEqualTo("2");
-
 		Configuration.replace(doubletonMap("a", "0", "c", "42"));
 
 		assertThat(Configuration.get("a")).isEqualTo("0");
 		assertThat(Configuration.get("c")).isEqualTo("42");
+	}
+
+	/**
+	 * Verifies that the configuration is frozen after getting the locale.
+	 */
+	@Test
+	public void freezeAfterGettingLocale() {
+		Configuration.getLocale();
+
+		assertThatThrownBy(() -> Configuration.set("test", "42")).isInstanceOf(UnsupportedOperationException.class);
+		assertThatThrownBy(() -> Configuration.replace(Collections.emptyMap())).isInstanceOf(UnsupportedOperationException.class);
+	}
+
+	/**
+	 * Verifies that the configuration is frozen after checking whether escaping is enabled.
+	 */
+	@Test
+	public void freezeAfterCheckingEscaping() {
+		Configuration.isEscapingEnabled();
+
+		assertThatThrownBy(() -> Configuration.set("test", "42")).isInstanceOf(UnsupportedOperationException.class);
+		assertThatThrownBy(() -> Configuration.replace(Collections.emptyMap())).isInstanceOf(UnsupportedOperationException.class);
+	}
+
+	/**
+	 * Verifies that the configuration is frozen after getting a property.
+	 */
+	@Test
+	public void freezeAfterGettingProperty() {
+		Configuration.get("test");
+
+		assertThatThrownBy(() -> Configuration.set("test", "42")).isInstanceOf(UnsupportedOperationException.class);
+		assertThatThrownBy(() -> Configuration.replace(Collections.emptyMap())).isInstanceOf(UnsupportedOperationException.class);
+	}
+
+	/**
+	 * Verifies that the configuration is frozen after getting sibling properties.
+	 */
+	@Test
+	public void freezeAfterGettingSiblings() {
+		Configuration.getSiblings("test");
+
+		assertThatThrownBy(() -> Configuration.set("test", "42")).isInstanceOf(UnsupportedOperationException.class);
+		assertThatThrownBy(() -> Configuration.replace(Collections.emptyMap())).isInstanceOf(UnsupportedOperationException.class);
+	}
+
+	/**
+	 * Verifies that the configuration is frozen after getting child properties.
+	 */
+	@Test
+	public void freezeAfterGettingChildren() {
+		Configuration.getChildren("test");
+
+		assertThatThrownBy(() -> Configuration.set("test", "42")).isInstanceOf(UnsupportedOperationException.class);
+		assertThatThrownBy(() -> Configuration.replace(Collections.emptyMap())).isInstanceOf(UnsupportedOperationException.class);
 	}
 
 	/**
