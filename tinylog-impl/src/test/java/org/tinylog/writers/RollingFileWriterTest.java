@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -237,6 +238,62 @@ public final class RollingFileWriterTest {
 		writer.close();
 
 		assertThat(FileSystem.readFile(path)).isEqualTo("Hello World!" + NEW_LINE);
+	}
+
+	/**
+	 * Verifies that a link to the latest log file can be created when creating a new rolling file writer.
+	 *
+	 * @throws IOException
+	 *             Failed access to temporary folder or files
+	 */
+	@Test
+	public void linkToLatestAtStartup() throws IOException {
+		File latest = new File(folder.getRoot(), "latest");
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
+		properties.put("latest", new File(folder.getRoot(), "latest").getAbsolutePath());
+		properties.put("format", "{message}");
+		properties.put("backups", "3");
+
+		RollingFileWriter writer = new RollingFileWriter(properties);
+		try {
+			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+		} finally {
+			writer.close();
+		}
+
+		assertThat(latest).exists();
+		assertThat(latest).hasContent("Hello World!");
+	}
+
+	/**
+	 * Verifies that a link to the latest log file will be updated when starting a new log file.
+	 *
+	 * @throws IOException
+	 *             Failed access to temporary folder or files
+	 */
+	@Test
+	public void linkToLatestOnRollover() throws IOException {
+		File latest = new File(folder.getRoot(), "latest");
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
+		properties.put("latest", new File(folder.getRoot(), "latest").getAbsolutePath());
+		properties.put("format", "{message}");
+		properties.put("policies", "size: 10");
+		properties.put("backups", "0");
+
+		RollingFileWriter writer = new RollingFileWriter(properties);
+		try {
+			writer.write(LogEntryBuilder.empty().message("First").create());
+			writer.write(LogEntryBuilder.empty().message("Second").create());
+		} finally {
+			writer.close();
+		}
+
+		assertThat(latest).exists();
+		assertThat(latest).hasContent("Second");
 	}
 
 	/**
@@ -479,55 +536,5 @@ public final class RollingFileWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("rolling file", singletonMap("file", file));
 		assertThat(writer).isInstanceOf(RollingFileWriter.class);
-	}
-
-	/**
-	 * Verifies that obsolete backup files will be deleted when rolling log file.
-	 *
-	 * @throws IOException
-	 *             Failed access to temporary folder or files
-	 */
-	@Test
-	public void updateSymlinkToLatestAtRollOver() throws IOException {
-		File file1 = folder.newFile("0");
-		File file2 = folder.newFile("1");
-		File file3 = folder.newFile("2");
-		File file4 = folder.newFile("3");
-		File file5 = folder.newFile("4");
-		File linkToLatest = folder.newFile("latest");
-
-		file1.setLastModified(0);
-		file2.setLastModified(1000);
-		file3.setLastModified(2000);
-		file4.setLastModified(3000);
-		file5.delete();
-
-		Map<String, String> properties = new HashMap<>();
-		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
-		properties.put("latest", linkToLatest.getAbsolutePath());
-		properties.put("format", "{message}");
-		properties.put("policies", "size: 10");
-		properties.put("backups", "3");
-
-		RollingFileWriter writer = new RollingFileWriter(properties);
-
-		assertThat(file1).exists();
-		assertThat(file2).exists();
-		assertThat(file3).exists();
-		assertThat(file4).exists();
-		assertThat(file5).doesNotExist();
-
-		writer.write(LogEntryBuilder.empty().message("First").create());
-		writer.write(LogEntryBuilder.empty().message("Second").create());
-
-		assertThat(file1).doesNotExist();
-		assertThat(file2).exists();
-		assertThat(file3).exists();
-		assertThat(file4).hasContent("First" + NEW_LINE);
-		assertThat(file5).hasContent("Second" + NEW_LINE);
-
-		assertThat(linkToLatest.getCanonicalPath()).isEqualTo(file5.getCanonicalPath());
-
-		writer.close();
 	}
 }

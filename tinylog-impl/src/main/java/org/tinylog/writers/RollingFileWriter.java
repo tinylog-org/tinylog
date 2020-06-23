@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +80,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = filterOutSymlinks(path.getAllFiles());
+		List<File> files = filterOutLatestLink(path.getAllFiles());
 
 		String fileName;
 		boolean append;
@@ -106,15 +107,9 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	}
 
 	@IgnoreJRERequirement
-	private static List<File> filterOutSymlinks(final List<File> files) {
-		if (!RuntimeProvider.isAndroid()) {
-			List<File> symlinks = new ArrayList<File>();
-			for (File file : files) {
-				if (Files.isSymbolicLink(file.toPath())) {
-					symlinks.add(file);
-				}
-			}
-			files.removeAll(symlinks);
+	private List<File> filterOutLatestLink(final List<File> files) {
+		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
+			files.remove(new File(linkToLatest.resolve()));
 		}
 		return files;
 	}
@@ -128,14 +123,15 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			File linkFile = new File(linkToLatest.resolve());
 			if (!RuntimeProvider.isAndroid()) {
 				try {
+					logFile.createNewFile();
 					Path linkPath = linkFile.toPath();
-					Files.delete(linkPath);
-					Files.createSymbolicLink(linkPath, logFile.toPath());
-				} catch (IOException exception) {
-					InternalLogger.log(Level.ERROR, exception, "Failed to create symlink '" + linkFile + "'");
+					Files.deleteIfExists(linkPath);
+					Files.createLink(linkPath, logFile.toPath());
+				} catch (IOException ex) {
+					InternalLogger.log(Level.ERROR, ex, "Failed to create link '" + linkFile + "'");
 				}
 			} else {
-				InternalLogger.log(Level.WARN, "Cannot create symlink to latest log segment on Android");
+				InternalLogger.log(Level.WARN, "Cannot create link to latest log file on Android");
 			}
 		}
 		return writer;
@@ -187,7 +183,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
 
-			List<File> existingFiles = filterOutSymlinks(path.getAllFiles());
+			List<File> existingFiles = filterOutLatestLink(path.getAllFiles());
 			deleteBackups(existingFiles, backups);
 
 			String fileName = path.resolve();
