@@ -121,10 +121,10 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			File linkFile = new File(linkToLatest.resolve());
 			if (!RuntimeProvider.isAndroid()) {
 				try {
-					logFile.createNewFile();
+					Path logPath = logFile.toPath();
 					Path linkPath = linkFile.toPath();
 					Files.deleteIfExists(linkPath);
-					Files.createLink(linkPath, logFile.toPath());
+					Files.createLink(linkPath, logPath);
 				} catch (IOException ex) {
 					InternalLogger.log(Level.ERROR, ex, "Failed to create link '" + linkFile + "'");
 				}
