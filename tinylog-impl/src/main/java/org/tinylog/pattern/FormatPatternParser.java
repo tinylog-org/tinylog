@@ -159,6 +159,8 @@ public final class FormatPatternParser {
 			return configuration == null ? new LoggerTagToken() : new LoggerTagToken(configuration);
 		} else if ("level".equals(name)) {
 			return new SeverityLevelToken();
+		} else if ("level-code".equals(name)) {
+			return new SeverityLevelIntegerToken();
 		} else if ("message".equals(name)) {
 			return new MessageAndExceptionToken(filters);
 		} else if ("message-only".equals(name)) {
