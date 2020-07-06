@@ -26,6 +26,8 @@ import org.tinylog.core.LogEntryValue;
  */
 final class SeverityLevelIntegerToken implements Token {
 
+	private static final int LEVEL_COUNT = 5;
+
 	/** */
 	SeverityLevelIntegerToken() {
 	}
@@ -37,12 +39,16 @@ final class SeverityLevelIntegerToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(logEntry.getLevel().ordinal());
+		builder.append(getReverseOfOrdinalAsLevelValue(logEntry));
 	}
 
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		statement.setInt(index, logEntry.getLevel().ordinal());
+		statement.setInt(index, getReverseOfOrdinalAsLevelValue(logEntry));
+	}
+
+	private int getReverseOfOrdinalAsLevelValue(final LogEntry logEntry) {
+		return LEVEL_COUNT - logEntry.getLevel().ordinal();
 	}
 
 }

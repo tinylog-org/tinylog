@@ -247,6 +247,14 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that {@code {level-code}} can be parsed and the returned token will output the severity level as integer.
+	 */
+	@Test
+	public void levelCode() {
+		assertThat(render("level-code", LogEntryBuilder.empty().level(Level.DEBUG).create())).isEqualTo("4");
+	}
+
+	/**
 	 * Verifies that {@code {message}} can be parsed and the returned token will output the text message as well as the
 	 * exception, if no throwable filters are defined.
 	 */

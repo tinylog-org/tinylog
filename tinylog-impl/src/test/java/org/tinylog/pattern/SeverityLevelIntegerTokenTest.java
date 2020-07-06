@@ -46,7 +46,7 @@ public final class SeverityLevelIntegerTokenTest {
 	@Test
 	public void renderTrace() {
 		SeverityLevelIntegerToken token = new SeverityLevelIntegerToken();
-		assertThat(render(token, Level.TRACE)).isEqualTo(getLevelOrdinalAsString(Level.TRACE));
+		assertThat(render(token, Level.TRACE)).isEqualTo("5");
 	}
 
 	/**
@@ -61,7 +61,7 @@ public final class SeverityLevelIntegerTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(Level.TRACE), statement, 1);
-		verify(statement).setInt(1, Level.TRACE.ordinal());
+		verify(statement).setInt(1, 5);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public final class SeverityLevelIntegerTokenTest {
 	@Test
 	public void renderDebug() {
 		SeverityLevelIntegerToken token = new SeverityLevelIntegerToken();
-		assertThat(render(token, Level.DEBUG)).isEqualTo(getLevelOrdinalAsString(Level.DEBUG));
+		assertThat(render(token, Level.DEBUG)).isEqualTo("4");
 	}
 
 	/**
@@ -85,7 +85,7 @@ public final class SeverityLevelIntegerTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(Level.DEBUG), statement, 1);
-		verify(statement).setInt(1, Level.DEBUG.ordinal());
+		verify(statement).setInt(1, 4);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class SeverityLevelIntegerTokenTest {
 	@Test
 	public void renderInfo() {
 		SeverityLevelIntegerToken token = new SeverityLevelIntegerToken();
-		assertThat(render(token, Level.INFO)).isEqualTo(getLevelOrdinalAsString(Level.INFO));
+		assertThat(render(token, Level.INFO)).isEqualTo("3");
 	}
 
 	/**
@@ -109,7 +109,7 @@ public final class SeverityLevelIntegerTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(Level.INFO), statement, 1);
-		verify(statement).setInt(1, Level.INFO.ordinal());
+		verify(statement).setInt(1, 3);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public final class SeverityLevelIntegerTokenTest {
 	@Test
 	public void renderWarning() {
 		SeverityLevelIntegerToken token = new SeverityLevelIntegerToken();
-		assertThat(render(token, Level.WARN)).isEqualTo(getLevelOrdinalAsString(Level.WARN));
+		assertThat(render(token, Level.WARN)).isEqualTo("2");
 	}
 
 	/**
@@ -133,7 +133,7 @@ public final class SeverityLevelIntegerTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(Level.WARN), statement, 1);
-		verify(statement).setInt(1, Level.WARN.ordinal());
+		verify(statement).setInt(1, 2);
 	}
 
 	/**
@@ -142,7 +142,7 @@ public final class SeverityLevelIntegerTokenTest {
 	@Test
 	public void renderError() {
 		SeverityLevelIntegerToken token = new SeverityLevelIntegerToken();
-		assertThat(render(token, Level.ERROR)).isEqualTo(getLevelOrdinalAsString(Level.ERROR));
+		assertThat(render(token, Level.ERROR)).isEqualTo("1");
 	}
 
 	/**
@@ -157,19 +157,7 @@ public final class SeverityLevelIntegerTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(Level.ERROR), statement, 1);
-		verify(statement).setInt(1, Level.ERROR.ordinal());
-	}
-
-	/**
-	 * Gets String value of log level ordinal.
-	 *
-	 * @param logLevel
-	 * 				Severity level for log entry
-	 * @return String value of level ordinal
-	 */
-
-	private String getLevelOrdinalAsString(final Level logLevel) {
-		return String.valueOf(logLevel.ordinal());
+		verify(statement).setInt(1, 1);
 	}
 
 	/**
