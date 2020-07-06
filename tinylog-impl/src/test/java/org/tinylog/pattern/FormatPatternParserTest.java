@@ -247,7 +247,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that {@code {level-code}} can be parsed and the returned token will output the severity level as integer.
+	 * Verifies that {@code {level-code}} can be parsed and the returned token will output the severity level integer.
 	 */
 	@Test
 	public void levelCode() {
