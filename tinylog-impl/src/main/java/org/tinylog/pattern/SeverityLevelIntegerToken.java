@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 
@@ -26,7 +27,7 @@ import org.tinylog.core.LogEntryValue;
  */
 final class SeverityLevelIntegerToken implements Token {
 
-	private static final int LEVEL_COUNT = 5;
+	private static final int LEVEL_COUNT = Level.OFF.ordinal();
 
 	/** */
 	SeverityLevelIntegerToken() {
