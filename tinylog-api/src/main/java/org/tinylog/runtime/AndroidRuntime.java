@@ -104,7 +104,7 @@ final class AndroidRuntime implements RuntimeDialect {
 	 * Gets {@link VMStack#fillStackTraceElements(Thread, StackTraceElement[])} as accessible method including the
 	 * offset position of direct caller.
 	 *
-	 * @return Method and position if available, {@code null} if not
+	 * @return Method and position if available, {@code null} if unavailable
 	 */
 	private static StackTraceElementsFiller getStackTraceElementsFiller() {
 		try {
