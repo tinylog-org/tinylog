@@ -23,11 +23,21 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
  */
 final class LegacyTimestamp implements Timestamp {
 
+	private static final long MILLISECOND_IN_NANOS = 1000000;
+
 	private final Date date;
 
 	/** */
 	LegacyTimestamp() {
 		date = new Date();
+	}
+
+	/**
+	 * @param milliseconds
+	 *            Milliseconds since January 1, 1970, 00:00:00 GMT
+	 */
+	LegacyTimestamp(final long milliseconds) {
+		date = new Date(milliseconds);
 	}
 
 	@Override

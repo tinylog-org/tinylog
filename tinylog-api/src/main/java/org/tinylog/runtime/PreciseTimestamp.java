@@ -24,11 +24,26 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 @IgnoreJRERequirement
 final class PreciseTimestamp implements Timestamp {
 
+	private static final long SECOND_IN_MILLIS = 1000;
+	private static final long MILLISECOND_IN_NANOS = 1000000;
+
 	private final Instant instant;
 
 	/** */
 	PreciseTimestamp() {
 		instant = Instant.now();
+	}
+
+	/**
+	 * @param milliseconds
+	 *            Milliseconds since January 1, 1970, 00:00:00 GMT
+	 * @param nanoseconds
+	 *            Additional nanoseconds [0 .. 1,000,000]
+	 */
+	PreciseTimestamp(final long milliseconds, final long nanoseconds) {
+		long epochSecond = milliseconds / SECOND_IN_MILLIS;
+		long nanoAdjustment = (milliseconds % SECOND_IN_MILLIS) * MILLISECOND_IN_NANOS + nanoseconds;
+		instant = Instant.ofEpochSecond(epochSecond, nanoAdjustment);
 	}
 
 	@Override

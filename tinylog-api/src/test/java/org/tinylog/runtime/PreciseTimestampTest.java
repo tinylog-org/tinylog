@@ -20,40 +20,21 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Tests for {@link PreciseTimestamp}.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(PreciseTimestamp.class)
 public final class PreciseTimestampTest {
-
-	/**
-	 * Initializes mocking of {@link Instant}.
-	 */
-	@Before
-	public void init() {
-		spy(Instant.class);
-	}
 
 	/**
 	 * Verifies that a correct {@link Date} will be returned.
 	 */
 	@Test
 	public void convertingToDate() {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		PreciseTimestamp timestamp = new PreciseTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		PreciseTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
@@ -62,10 +43,7 @@ public final class PreciseTimestampTest {
 	 */
 	@Test
 	public void convertingToInstant() {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		PreciseTimestamp timestamp = new PreciseTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		PreciseTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789)));
 	}
 
@@ -74,24 +52,22 @@ public final class PreciseTimestampTest {
 	 */
 	@Test
 	public void convertingToSqlTimestamp() {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		PreciseTimestamp timestamp = new PreciseTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		PreciseTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toSqlTimestamp()).isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789)));
 	}
 
 	/**
-	 * Sets the current date and time.
+	 * Creates a new precise timestamp.
 	 *
 	 * @param date
-	 *            New current date
+	 *            Current date
 	 * @param time
-	 *            New current time
+	 *            Current time
+	 * @return Created precise timestamp
 	 */
-	private static void setCurrentTime(final LocalDate date, final LocalTime time) {
-		doReturn(asInstant(date, time)).when(Instant.class);
-		Instant.now();
+	private static PreciseTimestamp create(final LocalDate date, final LocalTime time) {
+		Instant instant = asInstant(date, time);
+		return new PreciseTimestamp(instant.toEpochMilli(), instant.getNano() % 1_000_000);
 	}
 
 	/**

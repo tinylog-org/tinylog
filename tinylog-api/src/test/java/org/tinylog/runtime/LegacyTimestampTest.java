@@ -21,18 +21,12 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
  * Tests for {@link LegacyTimestamp}.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(LegacyTimestamp.class)
 public final class LegacyTimestampTest {
 
 	/**
@@ -43,10 +37,7 @@ public final class LegacyTimestampTest {
 	 */
 	@Test
 	public void convertingToDate() throws Exception {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		LegacyTimestamp timestamp = new LegacyTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
@@ -58,10 +49,7 @@ public final class LegacyTimestampTest {
 	 */
 	@Test
 	public void convertingToInstant() throws Exception {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		LegacyTimestamp timestamp = new LegacyTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
@@ -73,27 +61,22 @@ public final class LegacyTimestampTest {
 	 */
 	@Test
 	public void convertingToSqlTimestamp() throws Exception {
-		setCurrentTime(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
-		LegacyTimestamp timestamp = new LegacyTimestamp();
-
-		setCurrentTime(LocalDate.now(), LocalTime.now());
+		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toSqlTimestamp()).isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
-	 * Sets the current date and time.
+	 * Creates a new legacy timestamp.
 	 *
 	 * @param date
-	 *            New current date
+	 *            Current date
 	 * @param time
-	 *            New current time
-	 * @throws Exception
-	 *             Failed mocking {@link Date}
+	 *            Current time
+	 * @return Created legacy timestamp
 	 */
-	private static void setCurrentTime(final LocalDate date, final LocalTime time) throws Exception {
-		long milliseconds = asInstant(date, time).toEpochMilli();
-		Date newDate = new Date(milliseconds);
-		whenNew(Date.class).withNoArguments().thenReturn(newDate);
+	private static LegacyTimestamp create(final LocalDate date, final LocalTime time) {
+		Instant instant = asInstant(date, time);
+		return new LegacyTimestamp(instant.toEpochMilli());
 	}
 
 	/**
