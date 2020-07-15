@@ -57,6 +57,18 @@ public final class LegacyTimestampTest {
 	}
 
 	/**
+	 * Verifies that the difference between two legacy timestamps can be correctly calculated in nanoseconds.
+	 */
+	@Test
+	public void calcDifferenceInNanoseconds() {
+		LegacyTimestamp first = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 500_000_000));
+		LegacyTimestamp second = create(LocalDate.of(1985, 6, 3), LocalTime.of(14, 33, 54, 505_000_000));
+
+		long nanoseconds = second.calcDifferenceInNanoseconds(first);
+		assertThat(nanoseconds).isEqualTo((((2L * 60L + 3) * 60L + 4L) * 1000L + 5L) * 1_000_000L);
+	}
+
+	/**
 	 * Creates a new legacy timestamp.
 	 *
 	 * @param date

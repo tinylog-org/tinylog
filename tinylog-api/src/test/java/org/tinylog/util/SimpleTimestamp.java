@@ -110,4 +110,9 @@ public final class SimpleTimestamp implements Timestamp {
 		return java.sql.Timestamp.from(instant);
 	}
 
+	@Override
+	public long calcDifferenceInNanoseconds(final Timestamp other) {
+		throw new UnsupportedOperationException();
+	}
+
 }

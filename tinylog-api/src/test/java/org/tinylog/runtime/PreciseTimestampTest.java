@@ -57,6 +57,18 @@ public final class PreciseTimestampTest {
 	}
 
 	/**
+	 * Verifies that the difference between two precise timestamps can be correctly calculated in nanoseconds.
+	 */
+	@Test
+	public void calcDifferenceInNanoseconds() {
+		PreciseTimestamp first = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 500_000_000));
+		PreciseTimestamp second = create(LocalDate.of(1985, 6, 3), LocalTime.of(14, 33, 54, 505_000_001));
+
+		long nanoseconds = second.calcDifferenceInNanoseconds(first);
+		assertThat(nanoseconds).isEqualTo((((2L * 60L + 3) * 60L + 4L) * 1000L + 5L) * 1_000_000L + 1L);
+	}
+
+	/**
 	 * Creates a new precise timestamp.
 	 *
 	 * @param date

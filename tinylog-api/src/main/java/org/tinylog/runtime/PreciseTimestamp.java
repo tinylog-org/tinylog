@@ -61,4 +61,14 @@ final class PreciseTimestamp implements Timestamp {
 		return java.sql.Timestamp.from(instant);
 	}
 
+	@Override
+	public long calcDifferenceInNanoseconds(final Timestamp other) {
+		Instant otherInstant = other.toInstant();
+		long result = this.instant.getEpochSecond() - otherInstant.getEpochSecond();
+		result *= SECOND_IN_MILLIS * MILLISECOND_IN_NANOS;
+		result -= otherInstant.getNano();
+		result += this.instant.getNano();
+		return result;
+	}
+
 }

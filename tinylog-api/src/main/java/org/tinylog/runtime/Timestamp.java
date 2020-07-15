@@ -46,4 +46,13 @@ public interface Timestamp {
 	 */
 	java.sql.Timestamp toSqlTimestamp();
 
+	/**
+	 * Gets the difference to the passed timestamps in nanoseconds.
+	 *
+	 * @param other
+	 *            Timestamp to subtract
+	 * @return Difference in nanoseconds
+	 */
+	long calcDifferenceInNanoseconds(Timestamp other);
+
 }

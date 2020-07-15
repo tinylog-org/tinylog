@@ -334,6 +334,11 @@ public final class LogEntryBuilder {
 			return java.sql.Timestamp.from(instant);
 		}
 
+		@Override
+		public long calcDifferenceInNanoseconds(final Timestamp other) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 }

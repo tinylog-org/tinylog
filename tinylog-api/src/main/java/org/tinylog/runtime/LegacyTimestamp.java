@@ -56,4 +56,9 @@ final class LegacyTimestamp implements Timestamp {
 		return new java.sql.Timestamp(date.getTime());
 	}
 
+	@Override
+	public long calcDifferenceInNanoseconds(final Timestamp other) {
+		return (date.getTime() - other.toDate().getTime()) * MILLISECOND_IN_NANOS;
+	}
+
 }
