@@ -72,6 +72,15 @@ public final class RuntimeProvider {
 	}
 
 	/**
+	 * Gets the uptime of the Java virtual machine in milliseconds.
+	 *
+	 * @return Uptime of the Java virtual machine
+	 */
+	public static long getUptime() {
+		return dialect.getUptime();
+	}
+
+	/**
 	 * Gets the class name of a caller from stack trace. Any anonymous part will be stripped from class name.
 	 *
 	 * @param depth

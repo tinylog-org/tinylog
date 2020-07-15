@@ -43,6 +43,13 @@ interface RuntimeDialect {
 	long getProcessId();
 
 	/**
+	 * Gets the uptime of the Java virtual machine in milliseconds.
+	 *
+	 * @return Uptime of the Java virtual machine
+	 */
+	long getUptime();
+
+	/**
 	 * Gets the class name of a caller from stack trace.
 	 *
 	 * @param depth

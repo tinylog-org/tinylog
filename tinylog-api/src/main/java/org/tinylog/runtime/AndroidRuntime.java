@@ -31,6 +31,8 @@ final class AndroidRuntime implements RuntimeDialect {
 
 	private static final int STACK_TRACE_SIZE = 10;
 
+	private static final long startTime = System.currentTimeMillis();
+
 	private final Method stackTraceElementsFiller;
 	private final int stackTraceOffset;
 
@@ -54,6 +56,11 @@ final class AndroidRuntime implements RuntimeDialect {
 	@Override
 	public long getProcessId() {
 		return Process.myPid();
+	}
+
+	@Override
+	public long getUptime() {
+		return System.currentTimeMillis() - startTime;
 	}
 
 	@Override

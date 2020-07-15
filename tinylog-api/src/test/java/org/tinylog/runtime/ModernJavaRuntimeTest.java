@@ -53,6 +53,23 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
+	 * Verifies that a valid uptime will bew returned.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while sleeping
+	 */
+	@Test
+	public void uptime() throws InterruptedException {
+		long first = new ModernJavaRuntime().getUptime();
+		assertThat(first).isLessThan(System.currentTimeMillis());
+
+		Thread.sleep(1);
+
+		long second = new ModernJavaRuntime().getUptime();
+		assertThat(second).isGreaterThan(first);
+	}
+
+	/**
 	 * Verifies that the fully-qualified class name of a caller will be returned correctly, if depth in stack trace is
 	 * defined as index.
 	 */

@@ -13,6 +13,8 @@
 
 package org.tinylog.runtime;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * Base class for runtime dialect implementations for Java from Oracle and OpenJDK.
  */
@@ -20,6 +22,11 @@ abstract class AbstractJavaRuntime implements RuntimeDialect {
 
 	/** */
 	AbstractJavaRuntime() {
+	}
+
+	@Override
+	public long getUptime() {
+		return ManagementFactory.getRuntimeMXBean().getUptime();
 	}
 
 	@Override
