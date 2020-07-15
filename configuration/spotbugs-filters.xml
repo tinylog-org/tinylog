@@ -13,8 +13,9 @@
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
 	</Match>
 	<Match>
-		<!-- Log Entry Class and Log Entry Builder -->
+		<!-- Legacy Timestamp, Log Entry and Log Entry Builder -->
 		<Or>
+			<Class name="org.tinylog.runtime.LegacyTimestamp" />
 			<Class name="org.tinylog.core.LogEntry" />
 			<Class name="org.tinylog.util.LogEntryBuilder" />
 		</Or>
