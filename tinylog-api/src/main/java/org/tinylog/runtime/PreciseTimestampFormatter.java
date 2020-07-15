@@ -28,7 +28,7 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
  * will be cached, if the formatter does neither output nanoseconds nor microseconds.
  */
 @IgnoreJRERequirement
-final class PreciseTimestampFormatter implements TimestampFormatter {
+public final class PreciseTimestampFormatter implements TimestampFormatter {
 
 	private final DateTimeFormatter formatter;
 	private final TemporalUnit truncationUnit;
@@ -42,7 +42,7 @@ final class PreciseTimestampFormatter implements TimestampFormatter {
 	 * @param locale
 	 *            Locale for formatting
 	 */
-	PreciseTimestampFormatter(final String pattern, final Locale locale) {
+	public PreciseTimestampFormatter(final String pattern, final Locale locale) {
 		formatter = DateTimeFormatter.ofPattern(pattern, locale).withZone(ZoneId.systemDefault());
 
 		if (pattern.contains("n") || pattern.contains("N") || pattern.contains("SSSS")) {

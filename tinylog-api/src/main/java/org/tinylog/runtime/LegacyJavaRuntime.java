@@ -25,13 +25,13 @@ import org.tinylog.provider.InternalLogger;
 /**
  * Runtime dialect implementation for Java 6-8.
  */
-final class LegacyJavaRuntime extends AbstractJavaRuntime {
+public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
 	private final boolean hasSunReflection;
 	private final Method stackTraceElementGetter;
 
 	/** */
-	LegacyJavaRuntime() {
+	public LegacyJavaRuntime() {
 		hasSunReflection = verifySunReflection();
 		stackTraceElementGetter = getStackTraceElementGetter();
 	}

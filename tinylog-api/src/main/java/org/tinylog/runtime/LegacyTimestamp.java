@@ -21,14 +21,14 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 /**
  * Legacy timestamp that based on a {@link Date} with millisecond precision.
  */
-final class LegacyTimestamp implements Timestamp {
+public final class LegacyTimestamp implements Timestamp {
 
 	private static final long MILLISECOND_IN_NANOS = 1000000;
 
 	private final Date date;
 
 	/** */
-	LegacyTimestamp() {
+	public LegacyTimestamp() {
 		date = new Date();
 	}
 
@@ -36,7 +36,7 @@ final class LegacyTimestamp implements Timestamp {
 	 * @param milliseconds
 	 *            Milliseconds since January 1, 1970, 00:00:00 GMT
 	 */
-	LegacyTimestamp(final long milliseconds) {
+	public LegacyTimestamp(final long milliseconds) {
 		date = new Date(milliseconds);
 	}
 

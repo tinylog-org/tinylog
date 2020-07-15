@@ -19,12 +19,12 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
+import org.tinylog.runtime.PreciseTimestamp;
 import org.tinylog.runtime.Timestamp;
 
 /**
@@ -145,7 +145,7 @@ public final class LogEntryBuilder {
 	 * @return Actual log entry builder
 	 */
 	public LogEntryBuilder date(final LocalDate date) {
-		this.timestamp = new InstantTimestamp(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		this.timestamp = createTimestamp(date.atStartOfDay(ZoneId.systemDefault()));
 		return this;
 	}
 
@@ -157,7 +157,7 @@ public final class LogEntryBuilder {
 	 * @return Actual log entry builder
 	 */
 	public LogEntryBuilder date(final LocalDateTime date) {
-		this.timestamp = new InstantTimestamp(date.atZone(ZoneId.systemDefault()).toInstant());
+		this.timestamp = createTimestamp(date.atZone(ZoneId.systemDefault()));
 		return this;
 	}
 
@@ -169,7 +169,7 @@ public final class LogEntryBuilder {
 	 * @return Actual log entry builder
 	 */
 	public LogEntryBuilder date(final ZonedDateTime date) {
-		this.timestamp = new InstantTimestamp(date.toInstant());
+		this.timestamp = createTimestamp(date);
 		return this;
 	}
 
@@ -304,41 +304,9 @@ public final class LogEntryBuilder {
 		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
 	}
 
-	/**
-	 * Wrapper class for using an {@link Instant} as a {@link Timestamp}.
-	 */
-	private static final class InstantTimestamp implements Timestamp {
-
-		private final Instant instant;
-
-		/**
-		 * @param instant
-		 *            Date and time for timestamp
-		 */
-		private InstantTimestamp(final Instant instant) {
-			this.instant = instant;
-		}
-
-		@Override
-		public Date toDate() {
-			return Date.from(instant);
-		}
-
-		@Override
-		public Instant toInstant() {
-			return instant;
-		}
-
-		@Override
-		public java.sql.Timestamp toSqlTimestamp() {
-			return java.sql.Timestamp.from(instant);
-		}
-
-		@Override
-		public long calcDifferenceInNanoseconds(final Timestamp other) {
-			throw new UnsupportedOperationException();
-		}
-
+	private static Timestamp createTimestamp(final ZonedDateTime date) {
+		Instant instant = date.toInstant();
+		return new PreciseTimestamp(instant.toEpochMilli(), instant.getNano() % 1_000_000);
 	}
 
 }

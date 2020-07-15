@@ -20,7 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
-import org.tinylog.util.SimpleTimestamp;
+import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -276,7 +276,7 @@ public final class RuntimeProviderTest {
 	@Test
 	public void createTimestampFormatter() {
 		TimestampFormatter formatter = RuntimeProvider.createTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30);
+		Timestamp timestamp = TimestampFactory.create(1985, 6, 3, 12, 30);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30");
 	}
 

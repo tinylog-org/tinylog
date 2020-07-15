@@ -34,7 +34,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.Logger;
 import org.tinylog.rules.SystemStreamCollector;
-import org.tinylog.util.SimpleTimestamp;
+import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -287,7 +287,7 @@ public final class AndroidRuntimeTest {
 		TimestampFormatter formatter = runtime.createTimestampFormatter("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
 		assertThat(formatter).isInstanceOf(LegacyTimestampFormatter.class);
 
-		Timestamp timestamp = new SimpleTimestamp(1985, 6, 3, 12, 30, 55, 999_001_002);
+		Timestamp timestamp = TimestampFactory.create(1985, 6, 3, 12, 30, 55, 999_001_002);
 		assertThat(formatter.format(timestamp)).isEqualTo("1985-06-03 12:30:55.999");
 	}
 
