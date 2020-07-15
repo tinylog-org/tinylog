@@ -48,9 +48,9 @@ public final class DateTokenTest {
 	public void renderDatePattern() {
 		DateToken token = new DateToken("yyyy-MM-dd");
 
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 00, 00))).isEqualTo("2016-01-01");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 12, 00))).isEqualTo("2016-01-01");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 02, 00, 00))).isEqualTo("2016-01-02");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 1, 0, 0))).isEqualTo("2016-01-01");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 1, 12, 0))).isEqualTo("2016-01-01");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 2, 0, 0))).isEqualTo("2016-01-02");
 	}
 
 	/**
@@ -60,9 +60,9 @@ public final class DateTokenTest {
 	public void renderTimePattern() {
 		DateToken token = new DateToken("HH:mm:ss.SSS");
 
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 00, 00, 00))).isEqualTo("00:00:00.000");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 01, 02, 03, 04))).isEqualTo("02:03:04.000");
-		assertThat(render(token, LocalDateTime.of(2016, 01, 02, 00, 00, 00))).isEqualTo("00:00:00.000");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 1, 0, 0, 0))).isEqualTo("00:00:00.000");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 1, 2, 3, 4))).isEqualTo("02:03:04.000");
+		assertThat(render(token, LocalDateTime.of(2016, 1, 2, 0, 0, 0))).isEqualTo("00:00:00.000");
 	}
 
 	/**
@@ -72,8 +72,8 @@ public final class DateTokenTest {
 	public void renderDefaultPattern() {
 		DateToken token = new DateToken();
 
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 00))).containsSubsequence("2016", "06", "30", "12", "00");
-		assertThat(render(token, LocalDateTime.of(2016, 06, 30, 12, 15))).containsSubsequence("2016", "06", "30", "12", "15");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 0))).containsSubsequence("2016", "06", "30", "12", "00");
+		assertThat(render(token, LocalDateTime.of(2016, 6, 30, 12, 15))).containsSubsequence("2016", "06", "30", "12", "15");
 	}
 
 	/**
@@ -105,7 +105,7 @@ public final class DateTokenTest {
 		DateToken token = new DateToken("yyyy-MM-dd HH:mm");
 
 		PreparedStatement statement = mock(PreparedStatement.class);
-		token.apply(createLogEntry(LocalDateTime.of(2016, 06, 30, 12, 15)), statement, 1);
+		token.apply(createLogEntry(LocalDateTime.of(2016, 6, 30, 12, 15)), statement, 1);
 		verify(statement).setString(1, "2016-06-30 12:15");
 	}
 

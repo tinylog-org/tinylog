@@ -50,9 +50,9 @@ public final class PreciseTimestampFormatterTest {
 	public void minutePrecision() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("2016-02-01 12:30");
 	}
 
 	/**
@@ -62,9 +62,9 @@ public final class PreciseTimestampFormatterTest {
 	public void secondPrecision() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30:55");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30:56");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("2016-02-01 12:30:56");
 	}
 
 	/**
@@ -74,9 +74,9 @@ public final class PreciseTimestampFormatterTest {
 	public void millisecondPrecision() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSS", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56.000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("12:30:56.000");
 	}
 
 	/**
@@ -86,9 +86,9 @@ public final class PreciseTimestampFormatterTest {
 	public void microsecondPrecision() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSSSS", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_000))).isEqualTo("12:30:55.999999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56.000000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_000))).isEqualTo("12:30:55.999999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("12:30:56.000000");
 	}
 
 	/**
@@ -98,9 +98,9 @@ public final class PreciseTimestampFormatterTest {
 	public void nanosecondPrecision() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss.SSSSSSSSS", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_001))).isEqualTo("12:30:55.000000001");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999999999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56.000000000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 1))).isEqualTo("12:30:55.000000001");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55.999999999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("12:30:56.000000000");
 	}
 
 	/**
@@ -110,9 +110,9 @@ public final class PreciseTimestampFormatterTest {
 	public void nanosecondOfSecond() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("HH:mm:ss / n", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_001))).isEqualTo("12:30:55 / 1");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55 / 999999999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56 / 0");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 1))).isEqualTo("12:30:55 / 1");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_999))).isEqualTo("12:30:55 / 999999999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("12:30:56 / 0");
 	}
 
 	/**
@@ -122,9 +122,9 @@ public final class PreciseTimestampFormatterTest {
 	public void nanosecondOfDay() {
 		PreciseTimestampFormatter formatter = new PreciseTimestampFormatter("yyyyMMdd N", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("20160201 45055000000000");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_999_999))).isEqualTo("20160201 45055999999999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("20160201 45056000000000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("20160201 45055000000000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_999_999))).isEqualTo("20160201 45055999999999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("20160201 45056000000000");
 	}
 
 }

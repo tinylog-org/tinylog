@@ -50,9 +50,9 @@ public final class LegacyTimestampFormatterTest {
 	public void minutePrecision() {
 		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("yyyy-MM-dd HH:mm", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("2016-02-01 12:30");
 	}
 
 	/**
@@ -62,9 +62,9 @@ public final class LegacyTimestampFormatterTest {
 	public void secondPrecision() {
 		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("2016-02-01 12:30:55");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("2016-02-01 12:30:56");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("2016-02-01 12:30:55");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("2016-02-01 12:30:56");
 	}
 
 	/**
@@ -74,9 +74,9 @@ public final class LegacyTimestampFormatterTest {
 	public void millisecondPrecision() {
 		LegacyTimestampFormatter formatter = new LegacyTimestampFormatter("HH:mm:ss.SSS", Locale.US);
 
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 000_000_000))).isEqualTo("12:30:55.000");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");
-		assertThat(formatter.format(TimestampFactory.create(2016, 02, 01, 12, 30, 56, 000_000_000))).isEqualTo("12:30:56.000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 0))).isEqualTo("12:30:55.000");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 55, 999_000_000))).isEqualTo("12:30:55.999");
+		assertThat(formatter.format(TimestampFactory.create(2016, 2, 1, 12, 30, 56, 0))).isEqualTo("12:30:56.000");
 	}
 
 }
