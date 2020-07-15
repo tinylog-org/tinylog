@@ -31,36 +31,27 @@ public final class LegacyTimestampTest {
 
 	/**
 	 * Verifies that a correct {@link Date} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToDate() throws Exception {
+	public void convertingToDate() {
 		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toDate()).isEqualTo(asDate(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
 	 * Verifies that a correct {@link Instant} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToInstant() throws Exception {
+	public void convertingToInstant() {
 		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toInstant()).isEqualTo(asInstant(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
 
 	/**
 	 * Verifies that a correct {@link java.sql.Timestamp SQL Timestamp} will be returned.
-	 *
-	 * @throws Exception
-	 *             Test failed
 	 */
 	@Test
-	public void convertingToSqlTimestamp() throws Exception {
+	public void convertingToSqlTimestamp() {
 		LegacyTimestamp timestamp = create(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_456_789));
 		assertThat(timestamp.toSqlTimestamp()).isEqualTo(asSqlTimestamp(LocalDate.of(1985, 6, 3), LocalTime.of(12, 30, 50, 123_000_000)));
 	}
