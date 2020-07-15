@@ -102,20 +102,22 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that a valid uptime will bew returned.
+	 * Verifies that a valid start time will be returned.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while sleeping
 	 */
 	@Test
-	public void uptime() throws InterruptedException {
-		long first = new AndroidRuntime().getUptime();
-		assertThat(first).isLessThan(System.currentTimeMillis());
+	public void startTime() throws InterruptedException {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Timestamp first = runtime.getStartTime();
+		assertThat(first.toInstant()).isBefore(Instant.now());
 
 		Thread.sleep(1);
 
-		long second = new AndroidRuntime().getUptime();
-		assertThat(second).isGreaterThan(first);
+		Timestamp second = runtime.getStartTime();
+		assertThat(second.toInstant()).isEqualTo(first.toInstant());
 	}
 
 	/**

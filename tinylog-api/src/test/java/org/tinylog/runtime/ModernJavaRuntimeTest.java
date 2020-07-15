@@ -53,20 +53,22 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that a valid uptime will bew returned.
+	 * Verifies that a valid start time will be returned.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while sleeping
 	 */
 	@Test
-	public void uptime() throws InterruptedException {
-		long first = new ModernJavaRuntime().getUptime();
-		assertThat(first).isLessThan(System.currentTimeMillis());
+	public void startTime() throws InterruptedException {
+		ModernJavaRuntime runtime = new ModernJavaRuntime();
+
+		Timestamp first = runtime.getStartTime();
+		assertThat(first.toInstant()).isBefore(Instant.now());
 
 		Thread.sleep(1);
 
-		long second = new ModernJavaRuntime().getUptime();
-		assertThat(second).isGreaterThan(first);
+		Timestamp second = runtime.getStartTime();
+		assertThat(second.toInstant()).isEqualTo(first.toInstant());
 	}
 
 	/**

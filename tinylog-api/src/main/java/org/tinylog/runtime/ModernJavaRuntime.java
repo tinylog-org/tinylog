@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.lang.StackWalker.StackFrame;
+import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Function;
@@ -29,6 +30,11 @@ import org.tinylog.provider.InternalLogger;
 @IgnoreJRERequirement
 final class ModernJavaRuntime extends AbstractJavaRuntime {
 
+	private static final Timestamp startTime = new PreciseTimestamp(
+			ManagementFactory.getRuntimeMXBean().getStartTime(),
+			0
+	);
+
 	private final ProcessHandle currentProcess = getCurrentProcess();
 
 	/** */
@@ -43,6 +49,11 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	@Override
 	public long getProcessId() {
 		return currentProcess.pid();
+	}
+
+	@Override
+	public Timestamp getStartTime() {
+		return startTime;
 	}
 
 	@Override

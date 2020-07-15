@@ -27,6 +27,8 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
+	private static final Timestamp startTime = new LegacyTimestamp(ManagementFactory.getRuntimeMXBean().getStartTime());
+
 	private final boolean hasSunReflection;
 	private final Method stackTraceElementGetter;
 
@@ -53,6 +55,11 @@ public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 			InternalLogger.log(Level.ERROR, "Name of virtual machine does not contain a process ID: " + name);
 			return -1;
 		}
+	}
+
+	@Override
+	public Timestamp getStartTime() {
+		return startTime;
 	}
 
 	@Override

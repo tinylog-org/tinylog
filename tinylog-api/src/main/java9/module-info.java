@@ -1,4 +1,6 @@
 module org.tinylog.api {
+	uses org.tinylog.provider.LoggingProvider;
+
 	requires static java.sql;
 	requires java.management;
 

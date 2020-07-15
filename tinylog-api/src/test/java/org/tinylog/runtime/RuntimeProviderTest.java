@@ -111,20 +111,20 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that a valid uptime will bew returned.
+	 * Verifies that a valid start time will be returned.
 	 *
 	 * @throws InterruptedException
 	 *             Interrupted while sleeping
 	 */
 	@Test
-	public void uptime() throws InterruptedException {
-		long first = RuntimeProvider.getUptime();
-		assertThat(first).isLessThan(System.currentTimeMillis());
+	public void startTime() throws InterruptedException {
+		Timestamp first = RuntimeProvider.getStartTime();
+		assertThat(first.toInstant()).isBefore(Instant.now());
 
 		Thread.sleep(1);
 
-		long second = RuntimeProvider.getUptime();
-		assertThat(second).isGreaterThan(first);
+		Timestamp second = RuntimeProvider.getStartTime();
+		assertThat(second.toInstant()).isEqualTo(first.toInstant());
 	}
 
 	/**

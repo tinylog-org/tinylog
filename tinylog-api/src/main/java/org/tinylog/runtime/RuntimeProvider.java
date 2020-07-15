@@ -72,12 +72,12 @@ public final class RuntimeProvider {
 	}
 
 	/**
-	 * Gets the uptime of the Java virtual machine in milliseconds.
+	 * Gets the start time of the Java virtual machine or tinylog.
 	 *
-	 * @return Uptime of the Java virtual machine
+	 * @return Start time
 	 */
-	public static long getUptime() {
-		return dialect.getUptime();
+	public static Timestamp getStartTime() {
+		return dialect.getStartTime();
 	}
 
 	/**

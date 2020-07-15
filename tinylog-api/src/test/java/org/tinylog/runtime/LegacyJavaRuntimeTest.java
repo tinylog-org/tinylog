@@ -74,19 +74,22 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain the expected '@' character.
+	 * Verifies that a valid start time will be returned.
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while sleeping
 	 */
 	@Test
-	@PrepareForTest(LegacyJavaRuntime.class)
-	public void invalidJvmName() {
-		RuntimeMXBean bean = mock(RuntimeMXBean.class);
-		when(bean.getName()).thenReturn("test");
+	public void startTime() throws InterruptedException {
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
 
-		mockStatic(ManagementFactory.class);
-		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
+		Timestamp first = runtime.getStartTime();
+		assertThat(first.toInstant()).isBefore(Instant.now());
 
-		assertThat(new LegacyJavaRuntime().getProcessId()).isEqualTo(-1);
-		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("test");
+		Thread.sleep(1);
+
+		Timestamp second = runtime.getStartTime();
+		assertThat(second.toInstant()).isEqualTo(first.toInstant());
 	}
 
 	/**
@@ -106,20 +109,19 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that a valid uptime will bew returned.
-	 *
-	 * @throws InterruptedException
-	 *             Interrupted while sleeping
+	 * Verifies that there is a fallback, if {@link RuntimeMXBean#getName()} doesn't contain the expected '@' character.
 	 */
 	@Test
-	public void uptime() throws InterruptedException {
-		long first = new LegacyJavaRuntime().getUptime();
-		assertThat(first).isLessThan(System.currentTimeMillis());
+	@PrepareForTest(LegacyJavaRuntime.class)
+	public void invalidJvmName() {
+		RuntimeMXBean bean = mock(RuntimeMXBean.class);
+		when(bean.getName()).thenReturn("test");
 
-		Thread.sleep(1);
+		mockStatic(ManagementFactory.class);
+		when(ManagementFactory.getRuntimeMXBean()).thenReturn(bean);
 
-		long second = new LegacyJavaRuntime().getUptime();
-		assertThat(second).isGreaterThan(first);
+		assertThat(new LegacyJavaRuntime().getProcessId()).isEqualTo(-1);
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("test");
 	}
 
 	/**

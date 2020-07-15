@@ -31,7 +31,7 @@ final class AndroidRuntime implements RuntimeDialect {
 
 	private static final int STACK_TRACE_SIZE = 10;
 
-	private static final long startTime = System.currentTimeMillis();
+	private static final Timestamp startTime = new LegacyTimestamp();
 
 	private final Method stackTraceElementsFiller;
 	private final int stackTraceOffset;
@@ -59,8 +59,8 @@ final class AndroidRuntime implements RuntimeDialect {
 	}
 
 	@Override
-	public long getUptime() {
-		return System.currentTimeMillis() - startTime;
+	public Timestamp getStartTime() {
+		return startTime;
 	}
 
 	@Override
