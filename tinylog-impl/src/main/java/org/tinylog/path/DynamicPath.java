@@ -97,7 +97,7 @@ public final class DynamicPath {
 		}
 
 		int separator = Math.max(prefix.lastIndexOf(File.separatorChar), prefix.lastIndexOf('/'));
-		folder = new File(separator == -1 ? "" : prefix.substring(0, separator));
+		folder = new File(separator == -1 ? "" : prefix.substring(0, separator)).getAbsoluteFile();
 	}
 
 	/**
