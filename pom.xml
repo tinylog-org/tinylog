@@ -25,6 +25,32 @@
         <module>tinylog-core</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Ensure that Eclipse and IntelliJ use Java 9 or later -->
+                <maven.compiler.source>9</maven.compiler.source>
+                <maven.compiler.target>9</maven.compiler.target>
+                <maven.compiler.testSource>9</maven.compiler.testSource>
+                <maven.compiler.testTarget>9</maven.compiler.testTarget>
+            </properties>
+        </profile>
+        <profile>
+            <id>release</id>
+            <properties>
+                <!-- Real Java versions for clean release builds -->
+                <maven.compiler.source>1.6</maven.compiler.source>
+                <maven.compiler.target>1.6</maven.compiler.target>
+                <maven.compiler.testSource>9</maven.compiler.testSource>
+                <maven.compiler.testTarget>9</maven.compiler.testTarget>
+            </properties>
+        </profile>
+    </profiles>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
