@@ -1,0 +1,11 @@
+# Files
+
+.*
+*.iml
+hs_err_pid*
+jacoco.exec
+
+# Folders
+
+*/bin/
+*/target/
