@@ -13,6 +13,11 @@
 
 package org.tinylog.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * Configuration for tinylog.
  *
@@ -23,14 +28,87 @@ package org.tinylog.core;
  */
 public class Configuration {
 
+	private static final String FROZEN_MESSAGE =
+			"Configuration has already been applied and cannot be modified anymore";
+
+	private final Properties properties;
+	private boolean frozen;
+
 	/** */
 	public Configuration() {
+		this.properties = new Properties();
+		this.frozen = false;
+	}
+
+	/**
+	 * Searches the value of a specific key.
+	 *
+	 * @param key Key to search
+	 * @return The found value or {@code null} if the key does not exist
+	 */
+	public String getValue(String key) {
+		synchronized (properties) {
+			return properties.getProperty(key);
+		}
+	}
+
+	/**
+	 * Searches the values of a specific key.
+	 *
+	 * <p>
+	 *     The found string is split by commas.
+	 * </p>
+	 *
+	 * @param key Key to search
+	 * @return The found values or an empty list if the key does not exist
+	 */
+	public List<String> getList(String key) {
+		synchronized (properties) {
+			String value = properties.getProperty(key);
+			if (value == null) {
+				return Collections.emptyList();
+			} else {
+				List<String> elements = new ArrayList<String>();
+				for (String element : value.split(",")) {
+					String normalized = element.trim();
+					if (!normalized.isEmpty()) {
+						elements.add(normalized);
+					}
+				}
+				return elements;
+			}
+		}
+	}
+
+	/**
+	 * Sets a value for a given key. If another value is already stored under the passed key, the old value will be
+	 * overwritten with the new value.
+	 *
+	 * @param key Key under which the value should to be stored
+	 * @param value Value to store
+	 * @throws UnsupportedOperationException The Configuration has already been applied and cannot be modified anymore
+	 */
+	public void set(String key, String value) {
+		synchronized (properties) {
+			if (frozen) {
+				throw new UnsupportedOperationException(FROZEN_MESSAGE);
+			}
+
+			properties.setProperty(key, value);
+		}
 	}
 
 	/**
 	 * Loads the configuration from default properties file if available.
+	 *
+	 * @throws UnsupportedOperationException The Configuration has already been applied and cannot be modified anymore
 	 */
 	void loadPropertiesFile() {
+		synchronized (properties) {
+			if (frozen) {
+				throw new UnsupportedOperationException(FROZEN_MESSAGE);
+			}
+		}
 	}
 
 	/**
@@ -41,6 +119,9 @@ public class Configuration {
 	 * </p>
 	 */
 	void freeze() {
+		synchronized (properties) {
+			frozen = true;
+		}
 	}
 
 }
