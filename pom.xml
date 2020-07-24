@@ -18,6 +18,7 @@
         <git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
         <git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
         <website.url>https://tinylog.org/</website.url>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
