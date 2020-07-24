@@ -13,13 +13,25 @@
 
 package org.tinylog.core.providers;
 
+import org.tinylog.core.Framework;
+
 /**
- * A no operation implementation of {@link LoggingProvider}. All issued log entries are silently ignored.
+ * Builder for {@link NopLoggingProvider}.
  */
-public final class NopLoggingProvider implements LoggingProvider {
+public final class NopLoggingProviderBuilder implements LoggingProviderBuilder {
 
 	/** */
-	public NopLoggingProvider() {
+	public NopLoggingProviderBuilder() {
+	}
+
+	@Override
+	public String getName() {
+		return "nop";
+	}
+
+	@Override
+	public LoggingProvider create(Framework framework) {
+		return new NopLoggingProvider();
 	}
 
 }
