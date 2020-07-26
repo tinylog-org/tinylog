@@ -1,0 +1,20 @@
+language: java
+os: linux
+dist: trusty
+install: true
+
+jdk:
+  - oraclejdk9
+  - openjdk9
+
+script:
+  - mvn clean install -P release -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+cache:
+  directories:
+  - $HOME/.m2
+
+before_cache: rm -rf $HOME/.m2/repository/org/tinylog
