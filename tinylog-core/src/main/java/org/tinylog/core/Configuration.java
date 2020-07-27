@@ -16,6 +16,7 @@ package org.tinylog.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -30,6 +31,7 @@ public final class Configuration {
 
 	private static final String FROZEN_MESSAGE =
 			"Configuration has already been applied and cannot be modified anymore";
+	private static final int MAX_LOCALE_ARGUMENTS = 3;
 
 	private final Properties properties;
 	private boolean frozen;
@@ -38,6 +40,22 @@ public final class Configuration {
 	public Configuration() {
 		this.properties = new Properties();
 		this.frozen = false;
+	}
+
+	/**
+	 * Gets the configured locale from property "locale". If the property is not set, {@link Locale#getDefault()} will
+	 * be returned instead.
+	 *
+	 * @return The configured locale or {@link Locale#getDefault()} if not set
+	 */
+	public Locale getLocale() {
+		String value = getValue("locale");
+		if (value == null) {
+			return Locale.getDefault();
+		} else {
+			String[] tokens = value.split("_", MAX_LOCALE_ARGUMENTS);
+			return new Locale(tokens[0], tokens.length > 1 ? tokens[1] : "", tokens.length > 2 ? tokens[2] : "");
+		}
 	}
 
 	/**

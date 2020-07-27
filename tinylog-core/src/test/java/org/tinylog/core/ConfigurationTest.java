@@ -13,12 +13,63 @@
 
 package org.tinylog.core;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 class ConfigurationTest {
+
+	/**
+	 * Verifies that an empty value for property "locale" is interpreted as {@link Locale#ROOT}.
+	 */
+	@Test
+	void getExistingEmptyLocale() {
+		Configuration configuration = new Configuration();
+		configuration.set("locale", "");
+		assertThat(configuration.getLocale()).isEqualTo(Locale.ROOT);
+	}
+
+	/**
+	 * Verifies that a locale that contains only the language can be created from property "locale".
+	 */
+	@Test
+	void getExistingLocaleWithLanguageOnly() {
+		Configuration configuration = new Configuration();
+		configuration.set("locale", "de");
+		assertThat(configuration.getLocale()).isEqualTo(new Locale("de"));
+	}
+
+	/**
+	 * Verifies that a locale that contains language and country can be created from property "locale".
+	 */
+	@Test
+	void getExistingLocaleWithLanguageAndCountry() {
+		Configuration configuration = new Configuration();
+		configuration.set("locale", "it_CH");
+		assertThat(configuration.getLocale()).isEqualTo(new Locale("it", "CH"));
+	}
+
+	/**
+	 * Verifies that a locale that contains language, country, and variant can be created from property "locale".
+	 */
+	@Test
+	void getExistingFullLocale() {
+		Configuration configuration = new Configuration();
+		configuration.set("locale", "en_US_UNIX");
+		assertThat(configuration.getLocale()).isEqualTo(new Locale("en", "US", "UNIX"));
+	}
+
+	/**
+	 * Verifies that {@link Locale#getDefault()} will be returned if property "locale" is not set.
+	 */
+	@Test
+	void getMissingLocale() {
+		Configuration configuration = new Configuration();
+		assertThat(configuration.getLocale()).isSameAs(Locale.getDefault());
+	}
 
 	/**
 	 * Verifies that an existing value can be received.
