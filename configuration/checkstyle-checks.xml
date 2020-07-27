@@ -172,7 +172,6 @@
             <property name="message" value="Only tabs may be used for indentation" />
         </module>
         <module name="RequireThis"/>
-        <module name="ReturnCount"/>
         <module name="RightCurly"/>
         <module name="SeparatorWrap"/>
         <module name="SimplifyBooleanExpression"/>
