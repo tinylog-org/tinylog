@@ -104,9 +104,10 @@ public final class Configuration {
 	 *
 	 * @param key Key under which the value should to be stored
 	 * @param value Value to store
+	 * @return The same configuration instance (can be used als fluent API)
 	 * @throws UnsupportedOperationException The Configuration has already been applied and cannot be modified anymore
 	 */
-	public void set(String key, String value) {
+	public Configuration set(String key, String value) {
 		synchronized (properties) {
 			if (frozen) {
 				throw new UnsupportedOperationException(FROZEN_MESSAGE);
@@ -114,6 +115,8 @@ public final class Configuration {
 
 			properties.setProperty(key, value);
 		}
+
+		return this;
 	}
 
 	/**

@@ -23,12 +23,35 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class ConfigurationTest {
 
 	/**
+	 * Verifies that a new value can be set.
+	 */
+	@Test
+	void setNewValue() {
+		Configuration configuration = new Configuration();
+		Configuration other = configuration.set("foo", "42");
+
+		assertThat(configuration.getValue("foo")).isEqualTo("42");
+		assertThat(other).isSameAs(configuration);
+	}
+
+	/**
+	 * Verifies that an existing value can be overwritten.
+	 */
+	@Test
+	void overwriteExistingValue() {
+		Configuration configuration = new Configuration();
+		Configuration other = configuration.set("foo", "1").set("foo", "2");
+
+		assertThat(configuration.getValue("foo")).isEqualTo("2");
+		assertThat(other).isSameAs(configuration);
+	}
+
+	/**
 	 * Verifies that an empty value for property "locale" is interpreted as {@link Locale#ROOT}.
 	 */
 	@Test
 	void getExistingEmptyLocale() {
-		Configuration configuration = new Configuration();
-		configuration.set("locale", "");
+		Configuration configuration = new Configuration().set("locale", "");
 		assertThat(configuration.getLocale()).isEqualTo(Locale.ROOT);
 	}
 
@@ -37,8 +60,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getExistingLocaleWithLanguageOnly() {
-		Configuration configuration = new Configuration();
-		configuration.set("locale", "de");
+		Configuration configuration = new Configuration().set("locale", "de");
 		assertThat(configuration.getLocale()).isEqualTo(new Locale("de"));
 	}
 
@@ -47,8 +69,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getExistingLocaleWithLanguageAndCountry() {
-		Configuration configuration = new Configuration();
-		configuration.set("locale", "it_CH");
+		Configuration configuration = new Configuration().set("locale", "it_CH");
 		assertThat(configuration.getLocale()).isEqualTo(new Locale("it", "CH"));
 	}
 
@@ -57,8 +78,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getExistingFullLocale() {
-		Configuration configuration = new Configuration();
-		configuration.set("locale", "en_US_UNIX");
+		Configuration configuration = new Configuration().set("locale", "en_US_UNIX");
 		assertThat(configuration.getLocale()).isEqualTo(new Locale("en", "US", "UNIX"));
 	}
 
@@ -76,8 +96,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getExistingStringValue() {
-		Configuration configuration = new Configuration();
-		configuration.set("foo", "42");
+		Configuration configuration = new Configuration().set("foo", "42");
 		assertThat(configuration.getValue("foo")).isEqualTo("42");
 	}
 
@@ -95,8 +114,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getSingleListValue() {
-		Configuration configuration = new Configuration();
-		configuration.set("foo", "42");
+		Configuration configuration = new Configuration().set("foo", "42");
 		assertThat(configuration.getList("foo")).containsExactly("42");
 	}
 
@@ -105,8 +123,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getMultipleListValues() {
-		Configuration configuration = new Configuration();
-		configuration.set("foo", "1, 2, 3");
+		Configuration configuration = new Configuration().set("foo", "1, 2, 3");
 		assertThat(configuration.getList("foo")).containsExactly("1", "2", "3");
 	}
 
@@ -115,8 +132,7 @@ class ConfigurationTest {
 	 */
 	@Test
 	void getEmptyListValue() {
-		Configuration configuration = new Configuration();
-		configuration.set("foo", "");
+		Configuration configuration = new Configuration().set("foo", "");
 		assertThat(configuration.getList("foo")).isEmpty();
 	}
 
