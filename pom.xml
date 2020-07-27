@@ -133,6 +133,13 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>5.1.1</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
+                            <_exportcontents>!META-INF.versions.9,*</_exportcontents>
+                            <_fixupmessages>"Classes found in the wrong directory: \{(META-INF/versions/\d+/[^, ]+(, )*)*\}"</_fixupmessages>
+                        </instructions>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -171,6 +178,29 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
+                    <executions>
+                        <execution>
+                            <id>compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>compile-java-9</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <release>9</release>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+                                </compileSourceRoots>
+                                <multiReleaseOutput>true</multiReleaseOutput>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -188,6 +218,9 @@
                     <version>3.2.0</version>
                     <configuration>
                         <archive>
+                            <manifestEntries>
+                                <Multi-Release>true</Multi-Release>
+                            </manifestEntries>
                             <addMavenDescriptor>false</addMavenDescriptor>
                         </archive>
                     </configuration>
