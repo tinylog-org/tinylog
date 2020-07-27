@@ -27,7 +27,7 @@ public final class Framework {
 
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
-	private final Object loggingProviderMutex;
+	private final Object loggingProviderMutex = new Object();
 
 	private LoggingProvider loggingProvider;
 	private boolean running;
@@ -36,7 +36,8 @@ public final class Framework {
 	 * Loads the configuration from default properties file and hooks from service files.
 	 */
 	public Framework() {
-		this(loadConfiguration(), loadHooks());
+		this.configuration = loadConfiguration();
+		this.hooks = loadHooks(getClassLoader());
 	}
 
 	/**
@@ -48,7 +49,16 @@ public final class Framework {
 	public Framework(Configuration configuration, Collection<Hook> hooks) {
 		this.configuration = configuration;
 		this.hooks = hooks;
-		this.loggingProviderMutex = new Object();
+	}
+
+	/**
+	 * Gets the class loader for loading resources and services from the classpath.
+	 *
+	 * @return A valid and existing class loader instance
+	 */
+	public ClassLoader getClassLoader() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
 	}
 
 	/**
@@ -137,11 +147,12 @@ public final class Framework {
 	/**
 	 * Loads all hooks that are registered as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
 	 *
+	 * @param classLoader The class loader to use for loading all services
 	 * @return All found hooks
 	 */
-	private static Collection<Hook> loadHooks() {
+	private static Collection<Hook> loadHooks(ClassLoader classLoader) {
 		Collection<Hook> hooks = new ArrayList<Hook>();
-		for (Hook hook : ServiceLoader.load(Hook.class)) {
+		for (Hook hook : ServiceLoader.load(Hook.class, classLoader)) {
 			hooks.add(hook);
 		}
 		return hooks;
