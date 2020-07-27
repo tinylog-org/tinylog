@@ -26,7 +26,7 @@ import java.util.Properties;
  *     entry is issued, the configuration becomes frozen and can no longer be modified.
  * </p>
  */
-public class Configuration {
+public final class Configuration {
 
 	private static final String FROZEN_MESSAGE =
 			"Configuration has already been applied and cannot be modified anymore";

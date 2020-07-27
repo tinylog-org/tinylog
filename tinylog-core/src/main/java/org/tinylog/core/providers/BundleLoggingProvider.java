@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Wrapper for multiple {@link LoggingProvider LoggingProviders}.
  */
-public class BundleLoggingProvider implements LoggingProvider {
+public final class BundleLoggingProvider implements LoggingProvider {
 
 	private final List<LoggingProvider> providers;
 
