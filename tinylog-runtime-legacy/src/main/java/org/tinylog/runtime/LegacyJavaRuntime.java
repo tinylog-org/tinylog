@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Runtime implementation for legacy Java 7 and 8.
@@ -27,6 +28,11 @@ public final class LegacyJavaRuntime implements RuntimeFlavor<Date> {
 	@Override
 	public LegacyTimestamp createTimestamp() {
 		return new LegacyTimestamp(new Date());
+	}
+
+	@Override
+	public LegacyTimestampFormatter createTimestampFormatter(String pattern, Locale locale) {
+		return new LegacyTimestampFormatter(pattern, locale);
 	}
 
 }

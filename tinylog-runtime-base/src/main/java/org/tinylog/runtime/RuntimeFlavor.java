@@ -14,6 +14,7 @@
 package org.tinylog.runtime;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * Abstraction of API that depends on the Java version or flavor.
@@ -28,5 +29,14 @@ public interface RuntimeFlavor<T extends Serializable & Comparable<T>> {
 	 * @return Created timestamp with the current date and time
 	 */
 	Timestamp<T> createTimestamp();
+
+	/**
+	 * Creates a timestamp formatter that can format timestamps created by this runtime flavor.
+	 *
+	 * @param pattern Date and time pattern
+	 * @param locale Locale for language or country depending format outputs
+	 * @return Created timestamp formatter
+	 */
+	TimestampFormatter<T> createTimestampFormatter(String pattern, Locale locale);
 
 }

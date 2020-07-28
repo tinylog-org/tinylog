@@ -13,7 +13,11 @@
 
 package org.tinylog.runtime;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +35,21 @@ class AndroidRuntimeTest {
 		Date after = new Date();
 
 		assertThat(timestamp.resole()).isBetween(before, after, true, true);
+	}
+
+	/**
+	 * Verifies that the provided timestamp formatter can format a {@link LegacyTimestamp LegacyTimestamp}.
+	 */
+	@Test
+	void timestampFormatter() {
+		ZonedDateTime zonedDateTime = LocalDateTime.parse("2020-12-31T11:55").atZone(ZoneId.systemDefault());
+		Date date = Date.from(zonedDateTime.toInstant());
+
+		LegacyTimestamp timestamp = new LegacyTimestamp(date);
+		AndroidRuntime runtime = new AndroidRuntime();
+		LegacyTimestampFormatter formatter = runtime.createTimestampFormatter("dd.MM.yyyy, HH:mm", Locale.GERMANY);
+
+		assertThat(formatter.format(timestamp)).isEqualTo("31.12.2020, 11:55");
 	}
 
 }

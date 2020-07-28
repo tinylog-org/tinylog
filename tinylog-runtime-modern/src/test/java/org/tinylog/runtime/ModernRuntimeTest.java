@@ -14,6 +14,10 @@
 package org.tinylog.runtime;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +35,19 @@ class ModernRuntimeTest {
 		Instant after = Instant.now();
 
 		assertThat(timestamp.resole()).isBetween(before, after);
+	}
+
+	/**
+	 * Verifies that the provided timestamp formatter can format a {@link ModernTimestamp ModernTimestamp}.
+	 */
+	@Test
+	void timestampFormatter() {
+		ZonedDateTime zonedDateTime = LocalDateTime.parse("2020-12-31T11:55").atZone(ZoneId.systemDefault());
+		ModernTimestamp timestamp = new ModernTimestamp(zonedDateTime.toInstant());
+		ModernJavaRuntime runtime = new ModernJavaRuntime();
+		ModernTimestampFormatter formatter = runtime.createTimestampFormatter("dd.MM.yyyy, HH:mm", Locale.GERMANY);
+
+		assertThat(formatter.format(timestamp)).isEqualTo("31.12.2020, 11:55");
 	}
 
 }
