@@ -13,9 +13,20 @@
 
 package org.tinylog.runtime;
 
+import java.io.Serializable;
+
 /**
  * Abstraction of API that depends on the Java version or flavor.
+ *
+ * @param <T> Date type that is used under the hood for {@link Timestamp Timestamps}
  */
-public interface RuntimeFlavor {
+public interface RuntimeFlavor<T extends Serializable & Comparable<T>> {
+
+	/**
+	 * Creates a timestamp with the current date and time.
+	 *
+	 * @return Created timestamp with the current date and time
+	 */
+	Timestamp<T> createTimestamp();
 
 }

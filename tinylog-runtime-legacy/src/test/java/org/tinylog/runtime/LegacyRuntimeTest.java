@@ -13,20 +13,24 @@
 
 package org.tinylog.runtime;
 
-import java.time.Instant;
+import java.util.Date;
 
-/**
- * Runtime implementation for modern Java 9 and later.
- */
-public final class ModernJavaRuntime implements RuntimeFlavor<Instant> {
+import org.junit.jupiter.api.Test;
 
-	/** */
-	public ModernJavaRuntime() {
-	}
+import static org.assertj.core.api.Assertions.assertThat;
 
-	@Override
-	public ModernTimestamp createTimestamp() {
-		return new ModernTimestamp(Instant.now());
+class LegacyRuntimeTest {
+
+	/**
+	 * Verifies that a timestamp with the current date and time is created.
+	 */
+	@Test
+	void timestamp() {
+		Date before = new Date();
+		LegacyTimestamp timestamp = new LegacyJavaRuntime().createTimestamp();
+		Date after = new Date();
+
+		assertThat(timestamp.resole()).isBetween(before, after, true, true);
 	}
 
 }

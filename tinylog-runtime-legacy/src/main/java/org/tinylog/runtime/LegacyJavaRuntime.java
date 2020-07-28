@@ -13,13 +13,20 @@
 
 package org.tinylog.runtime;
 
+import java.util.Date;
+
 /**
  * Runtime implementation for legacy Java 7 and 8.
  */
-public class LegacyJavaRuntime implements RuntimeFlavor {
+public final class LegacyJavaRuntime implements RuntimeFlavor<Date> {
 
 	/** */
 	public LegacyJavaRuntime() {
+	}
+
+	@Override
+	public LegacyTimestamp createTimestamp() {
+		return new LegacyTimestamp(new Date());
 	}
 
 }

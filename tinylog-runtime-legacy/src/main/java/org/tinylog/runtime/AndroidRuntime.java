@@ -13,13 +13,20 @@
 
 package org.tinylog.runtime;
 
+import java.util.Date;
+
 /**
  * Runtime implementation for Android (API level 1 or later).
  */
-public class AndroidRuntime implements RuntimeFlavor {
+public final class AndroidRuntime implements RuntimeFlavor<Date> {
 
 	/** */
 	public AndroidRuntime() {
+	}
+
+	@Override
+	public LegacyTimestamp createTimestamp() {
+		return new LegacyTimestamp(new Date());
 	}
 
 }
