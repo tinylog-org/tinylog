@@ -16,9 +16,10 @@ module org.tinylog.core {
 	uses org.tinylog.core.Hook;
 
 	provides org.tinylog.core.providers.LoggingProviderBuilder
-			with org.tinylog.core.providers.NopLoggingProviderBuilder;
+		with org.tinylog.core.providers.NopLoggingProviderBuilder;
 
 	exports org.tinylog.core;
+	exports org.tinylog.core.formatters;
 	exports org.tinylog.core.providers;
 	exports org.tinylog.runtime;
 }
