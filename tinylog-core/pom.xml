@@ -91,7 +91,7 @@
                         <configuration>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-modern/src/main/java9</compileSourceRoot>
+                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-modern/src/main/java</compileSourceRoot>
                             </compileSourceRoots>
                         </configuration>
                     </execution>
