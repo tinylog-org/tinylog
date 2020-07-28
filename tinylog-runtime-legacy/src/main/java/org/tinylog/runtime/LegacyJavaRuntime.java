@@ -16,7 +16,7 @@ package org.tinylog.runtime;
 /**
  * Runtime implementation for legacy Java 7 and 8.
  */
-public class LegacyJavaRuntime implements Runtime {
+public class LegacyJavaRuntime implements RuntimeFlavor {
 
 	/** */
 	public LegacyJavaRuntime() {

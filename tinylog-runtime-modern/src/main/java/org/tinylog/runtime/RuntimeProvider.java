@@ -14,7 +14,7 @@
 package org.tinylog.runtime;
 
 /**
- * Provider for acquiring the appropriate {@link Runtime} for the actual virtual machine.
+ * Provider for acquiring the appropriate {@link RuntimeFlavor} for the actual virtual machine.
  */
 public final class RuntimeProvider {
 
@@ -23,11 +23,11 @@ public final class RuntimeProvider {
 	}
 
 	/**
-	 * Provides the appropriate {@link Runtime} for the actual virtual machine.
+	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
 	 *
 	 * @return An appropriate runtime instance
 	 */
-	public Runtime getRuntime() {
+	public RuntimeFlavor getRuntime() {
 		return new ModernJavaRuntime();
 	}
 

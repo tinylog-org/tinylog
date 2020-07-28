@@ -16,7 +16,7 @@ package org.tinylog.runtime;
 /**
  * Runtime implementation for Android (API level 1 or later).
  */
-public class AndroidRuntime implements Runtime {
+public class AndroidRuntime implements RuntimeFlavor {
 
 	/** */
 	public AndroidRuntime() {

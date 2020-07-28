@@ -16,6 +16,6 @@ package org.tinylog.runtime;
 /**
  * Abstraction of API that depends on the Java version or flavor.
  */
-public interface Runtime {
+public interface RuntimeFlavor {
 
 }

@@ -16,7 +16,7 @@ package org.tinylog.runtime;
 /**
  * Runtime implementation for modern Java 9 and later.
  */
-public class ModernJavaRuntime implements Runtime {
+public class ModernJavaRuntime implements RuntimeFlavor {
 
 	/** */
 	public ModernJavaRuntime() {
