@@ -11,14 +11,24 @@
  * specific language governing permissions and limitations under the License.
  */
 
-module org.tinylog.core {
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	uses org.tinylog.core.Hook;
+package org.tinylog.runtime;
 
-	provides org.tinylog.core.providers.LoggingProviderBuilder
-			with org.tinylog.core.providers.NopLoggingProviderBuilder;
+/**
+ * Provider for acquiring the appropriate {@link Runtime} for the actual virtual machine.
+ */
+public final class RuntimeProvider {
 
-	exports org.tinylog.core;
-	exports org.tinylog.core.providers;
-	exports org.tinylog.runtime;
+	/** */
+	public RuntimeProvider() {
+	}
+
+	/**
+	 * Provides the appropriate {@link Runtime} for the actual virtual machine.
+	 *
+	 * @return An appropriate runtime instance
+	 */
+	public Runtime getRuntime() {
+		return new ModernJavaRuntime();
+	}
+
 }

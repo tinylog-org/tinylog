@@ -5,10 +5,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <modelVersion>4.0.0</modelVersion>
-    <packaging>bundle</packaging>
-    <artifactId>tinylog-core</artifactId>
+    <packaging>jar</packaging>
+    <artifactId>tinylog-runtime-modern</artifactId>
 
-    <description>Core functionality for all logging APIs and implementations</description>
+    <description>Runtime implementation for modern Java from version 9 and later</description>
     <url>${website.url}</url>
 
     <parent>
@@ -16,6 +16,10 @@
         <artifactId>parent</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
+
+    <properties>
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -36,29 +40,11 @@
         <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>tinylog-runtime-base</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-legacy</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-modern</artifactId>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <excludeDependencies>tinylog-runtime-base,tinylog-runtime-legacy,tinylog-runtime-modern</excludeDependencies>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -70,31 +56,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <configuration>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-base/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-legacy/src/main/java</compileSourceRoot>
-                            </compileSourceRoots>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile-java-9</id>
-                        <configuration>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-modern/src/main/java9</compileSourceRoot>
-                            </compileSourceRoots>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

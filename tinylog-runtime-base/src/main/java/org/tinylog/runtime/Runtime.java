@@ -11,14 +11,11 @@
  * specific language governing permissions and limitations under the License.
  */
 
-module org.tinylog.core {
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	uses org.tinylog.core.Hook;
+package org.tinylog.runtime;
 
-	provides org.tinylog.core.providers.LoggingProviderBuilder
-			with org.tinylog.core.providers.NopLoggingProviderBuilder;
+/**
+ * Abstraction of API that depends on the Java version or flavor.
+ */
+public interface Runtime {
 
-	exports org.tinylog.core;
-	exports org.tinylog.core.providers;
-	exports org.tinylog.runtime;
 }

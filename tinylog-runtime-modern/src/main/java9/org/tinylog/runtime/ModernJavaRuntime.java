@@ -11,14 +11,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
-module org.tinylog.core {
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	uses org.tinylog.core.Hook;
+package org.tinylog.runtime;
 
-	provides org.tinylog.core.providers.LoggingProviderBuilder
-			with org.tinylog.core.providers.NopLoggingProviderBuilder;
+/**
+ * Runtime implementation for modern Java 9 and later.
+ */
+public class ModernJavaRuntime implements Runtime {
 
-	exports org.tinylog.core;
-	exports org.tinylog.core.providers;
-	exports org.tinylog.runtime;
+	/** */
+	public ModernJavaRuntime() {
+	}
+
 }

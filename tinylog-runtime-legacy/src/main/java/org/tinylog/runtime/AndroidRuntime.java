@@ -11,7 +11,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
+package org.tinylog.runtime;
+
 /**
- * Runtime implementations for standard Java and Android.
+ * Runtime implementation for Android (API level 1 or later).
  */
-package org.tinylog.core.runtimes;
+public class AndroidRuntime implements Runtime {
+
+	/** */
+	public AndroidRuntime() {
+	}
+
+}
