@@ -103,6 +103,12 @@
                 <version>0.7.0</version>
             </dependency>
             <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>4.0.6</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
                 <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-core</artifactId>
                 <version>${project.version}</version>

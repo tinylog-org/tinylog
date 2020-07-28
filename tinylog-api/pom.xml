@@ -39,6 +39,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>tinylog-core</artifactId>
         </dependency>
