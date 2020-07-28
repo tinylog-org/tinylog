@@ -140,9 +140,6 @@
         <module name="MutableException"/>
         <module name="NeedBraces"/>
         <module name="NestedForDepth"/>
-        <module name="NestedIfDepth"/>
-        <module name="NestedTryDepth"/>
-        <module name="NoArrayTrailingComma"/>
         <module name="NoClone"/>
         <module name="NoCodeInFile"/>
         <module name="NoFinalizer"/>
@@ -173,7 +170,6 @@
         </module>
         <module name="RequireThis"/>
         <module name="RightCurly"/>
-        <module name="SeparatorWrap"/>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="SingleLineJavadoc"/>
