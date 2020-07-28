@@ -34,6 +34,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>tinylog-core</artifactId>
         </dependency>
