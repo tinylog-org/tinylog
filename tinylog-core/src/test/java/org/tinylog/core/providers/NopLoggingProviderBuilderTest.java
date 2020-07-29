@@ -14,6 +14,7 @@
 package org.tinylog.core.providers;
 
 import java.util.Collections;
+import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
@@ -40,6 +41,15 @@ class NopLoggingProviderBuilderTest {
 		Framework framework = new Framework(new Configuration(), Collections.emptyList());
 		NopLoggingProviderBuilder builder = new NopLoggingProviderBuilder();
 		assertThat(builder.create(framework)).isInstanceOf(NopLoggingProvider.class);
+	}
+
+	/**
+	 * Verifies that the builder is registered as service.
+	 */
+	@Test
+	void service() {
+		assertThat(ServiceLoader.load(LoggingProviderBuilder.class))
+			.anyMatch(builder -> builder instanceof NopLoggingProviderBuilder);
 	}
 
 }
