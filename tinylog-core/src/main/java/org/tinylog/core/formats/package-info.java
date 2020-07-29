@@ -11,17 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-module org.tinylog.core {
-	uses org.tinylog.core.formats.ValueFormat;
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	uses org.tinylog.core.Hook;
-
-	provides org.tinylog.core.providers.LoggingProviderBuilder
-		with org.tinylog.core.providers.NopLoggingProviderBuilder;
-
-	exports org.tinylog.core;
-	exports org.tinylog.core.formats;
-	exports org.tinylog.core.formatters;
-	exports org.tinylog.core.providers;
-	exports org.tinylog.runtime;
-}
+/**
+ * Formats for formatting data values.
+ */
+package org.tinylog.core.formats;
