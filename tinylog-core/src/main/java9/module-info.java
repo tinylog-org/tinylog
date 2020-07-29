@@ -12,12 +12,15 @@
  */
 
 module org.tinylog.core {
-	uses org.tinylog.core.formats.ValueFormat;
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	uses org.tinylog.core.Hook;
+	uses org.tinylog.core.formats.ValueFormatBuilder;
+	provides org.tinylog.core.formats.ValueFormatBuilder
+		with org.tinylog.core.formats.NumberFormatBuilder;
 
+	uses org.tinylog.core.providers.LoggingProviderBuilder;
 	provides org.tinylog.core.providers.LoggingProviderBuilder
 		with org.tinylog.core.providers.NopLoggingProviderBuilder;
+
+	uses org.tinylog.core.Hook;
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.formats;
