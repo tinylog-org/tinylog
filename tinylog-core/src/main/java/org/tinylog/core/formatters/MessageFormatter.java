@@ -27,6 +27,6 @@ public interface MessageFormatter {
 	 *            Replacements for placeholders
 	 * @return Formatted text message
 	 */
-	String format(String message, Object[] arguments);
+	String format(String message, Object... arguments);
 
 }
