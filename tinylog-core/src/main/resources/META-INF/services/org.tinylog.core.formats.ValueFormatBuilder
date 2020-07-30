@@ -1,1 +1,2 @@
+org.tinylog.core.formats.DateFormatBuilder
 org.tinylog.core.formats.NumberFormatBuilder
