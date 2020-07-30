@@ -28,7 +28,7 @@ public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
 	@Override
 	public boolean isCompatible() {
 		try {
-			Class.forName("java.time.temporal.TemporalAccessor");
+			Class.forName("java.time.format.DateTimeFormatter");
 			return true;
 		} catch (ClassNotFoundException ex) {
 			return false;
