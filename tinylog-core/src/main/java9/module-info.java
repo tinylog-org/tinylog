@@ -11,18 +11,22 @@
  * specific language governing permissions and limitations under the License.
  */
 
+import org.tinylog.core.Hook;
+import org.tinylog.core.formats.DateFormatBuilder;
+import org.tinylog.core.formats.JavaTimeFormatBuilder;
+import org.tinylog.core.formats.NumberFormatBuilder;
+import org.tinylog.core.formats.ValueFormatBuilder;
+import org.tinylog.core.providers.LoggingProviderBuilder;
+import org.tinylog.core.providers.NopLoggingProviderBuilder;
+
 module org.tinylog.core {
-	uses org.tinylog.core.formats.ValueFormatBuilder;
-	provides org.tinylog.core.formats.ValueFormatBuilder with
-		org.tinylog.core.formats.DateFormatBuilder,
-		org.tinylog.core.formats.JavaTimeFormatBuilder,
-		org.tinylog.core.formats.NumberFormatBuilder;
+	uses Hook;
 
-	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	provides org.tinylog.core.providers.LoggingProviderBuilder with
-		org.tinylog.core.providers.NopLoggingProviderBuilder;
+	uses ValueFormatBuilder;
+	provides ValueFormatBuilder with DateFormatBuilder, JavaTimeFormatBuilder, NumberFormatBuilder;
 
-	uses org.tinylog.core.Hook;
+	uses LoggingProviderBuilder;
+	provides LoggingProviderBuilder with NopLoggingProviderBuilder;
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.formats;
