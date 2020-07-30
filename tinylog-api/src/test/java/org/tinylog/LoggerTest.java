@@ -42,4 +42,20 @@ class LoggerTest {
 		assertThat(first).isNotSameAs(second);
 	}
 
+	/**
+	 * Verifies that the same untagged root logger is returned for {@code null} and empty tags.
+	 */
+	@Test
+	void sameUntaggedRootLoggerForNullAndEmptyTags() {
+		TaggedLogger nullTag = Logger.tag(null);
+		TaggedLogger emptyTag = Logger.tag("");
+
+		assertThat(nullTag).isNotNull();
+		assertThat(nullTag.getTag()).isNull();
+		assertThat(emptyTag).isNotNull();
+		assertThat(emptyTag.getTag()).isNull();
+
+		assertThat(nullTag).isSameAs(emptyTag);
+	}
+
 }
