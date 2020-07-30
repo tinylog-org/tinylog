@@ -1,2 +1,3 @@
 org.tinylog.core.formats.DateFormatBuilder
+org.tinylog.core.formats.JavaTimeFormatBuilder
 org.tinylog.core.formats.NumberFormatBuilder
