@@ -13,12 +13,14 @@
 
 module org.tinylog.core {
 	uses org.tinylog.core.formats.ValueFormatBuilder;
-	provides org.tinylog.core.formats.ValueFormatBuilder
-		with org.tinylog.core.formats.NumberFormatBuilder;
+	provides org.tinylog.core.formats.ValueFormatBuilder with
+		org.tinylog.core.formats.DateFormatBuilder,
+		org.tinylog.core.formats.JavaTimeFormatBuilder,
+		org.tinylog.core.formats.NumberFormatBuilder;
 
 	uses org.tinylog.core.providers.LoggingProviderBuilder;
-	provides org.tinylog.core.providers.LoggingProviderBuilder
-		with org.tinylog.core.providers.NopLoggingProviderBuilder;
+	provides org.tinylog.core.providers.LoggingProviderBuilder with
+		org.tinylog.core.providers.NopLoggingProviderBuilder;
 
 	uses org.tinylog.core.Hook;
 
