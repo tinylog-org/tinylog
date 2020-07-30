@@ -106,7 +106,6 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-annotations</artifactId>
                 <version>4.0.6</version>
-                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
