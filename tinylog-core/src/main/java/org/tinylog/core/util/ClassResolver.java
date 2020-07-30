@@ -11,30 +11,30 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
-
-import java.time.ZoneId;
-import java.util.Locale;
-
-import org.tinylog.core.util.ClassResolver;
+package org.tinylog.core.util;
 
 /**
- * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
+ * Utility class for resolving classes.
  */
-public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
+public final class ClassResolver {
 
 	/** */
-	public JavaTimeFormatBuilder() {
+	private ClassResolver() {
 	}
 
-	@Override
-	public boolean isCompatible() {
-		return ClassResolver.isAvailable("java.time.format.DateTimeFormatter");
-	}
-
-	@Override
-	public JavaTimeFormat create(Locale locale) {
-		return new JavaTimeFormat(locale, ZoneId.systemDefault());
+	/**
+	 * Checks if a class is available in the classpath.
+	 *
+	 * @param className Fully-qualified class name
+	 * @return {@code true} if the class is available in the classpath, {@code false} if unavailable
+	 */
+	public static boolean isAvailable(String className) {
+		try {
+			Class.forName(className);
+			return true;
+		} catch (ClassNotFoundException ex) {
+			return false;
+		}
 	}
 
 }

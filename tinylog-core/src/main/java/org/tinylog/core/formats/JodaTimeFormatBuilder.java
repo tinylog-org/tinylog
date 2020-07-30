@@ -16,6 +16,7 @@ package org.tinylog.core.formats;
 import java.util.Locale;
 
 import org.joda.time.DateTimeZone;
+import org.tinylog.core.util.ClassResolver;
 
 /**
  * Builder for creating {@link JodaTimeFormat JodaTimeFormats}.
@@ -28,12 +29,7 @@ public final class JodaTimeFormatBuilder implements ValueFormatBuilder {
 
 	@Override
 	public boolean isCompatible() {
-		try {
-			Class.forName("org.joda.time.format.DateTimeFormatter");
-			return true;
-		} catch (ClassNotFoundException ex) {
-			return false;
-		}
+		return ClassResolver.isAvailable("org.joda.time.format.DateTimeFormatter");
 	}
 
 	@Override

@@ -11,30 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
-
-import java.time.ZoneId;
-import java.util.Locale;
-
-import org.tinylog.core.util.ClassResolver;
-
 /**
- * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
+ * Helper and utility classes.
  */
-public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
-
-	/** */
-	public JavaTimeFormatBuilder() {
-	}
-
-	@Override
-	public boolean isCompatible() {
-		return ClassResolver.isAvailable("java.time.format.DateTimeFormatter");
-	}
-
-	@Override
-	public JavaTimeFormat create(Locale locale) {
-		return new JavaTimeFormat(locale, ZoneId.systemDefault());
-	}
-
-}
+package org.tinylog.core.util;

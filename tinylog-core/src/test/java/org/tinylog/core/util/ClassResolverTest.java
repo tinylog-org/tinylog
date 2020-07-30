@@ -11,30 +11,28 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.util;
 
-import java.time.ZoneId;
-import java.util.Locale;
+import org.junit.jupiter.api.Test;
 
-import org.tinylog.core.util.ClassResolver;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
- */
-public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
+class ClassResolverTest {
 
-	/** */
-	public JavaTimeFormatBuilder() {
+	/**
+	 * Verifies that an existing class is detected as available.
+	 */
+	@Test
+	void availableClass() {
+		assertThat(ClassResolver.isAvailable("java.lang.String")).isTrue();
 	}
 
-	@Override
-	public boolean isCompatible() {
-		return ClassResolver.isAvailable("java.time.format.DateTimeFormatter");
-	}
-
-	@Override
-	public JavaTimeFormat create(Locale locale) {
-		return new JavaTimeFormat(locale, ZoneId.systemDefault());
+	/**
+	 * Verifies that an non-existing class is detected as unavailable.
+	 */
+	@Test
+	void unavailableClass() {
+		assertThat(ClassResolver.isAvailable("invalid.NonExistingClass")).isFalse();
 	}
 
 }

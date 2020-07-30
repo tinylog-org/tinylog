@@ -80,6 +80,9 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
+                    <instructions>
+                        <Export-Package>!org.tinylog.core.util</Export-Package>
+                    </instructions>
                     <excludeDependencies>tinylog-runtime-base,tinylog-runtime-legacy,tinylog-runtime-modern</excludeDependencies>
                 </configuration>
             </plugin>
