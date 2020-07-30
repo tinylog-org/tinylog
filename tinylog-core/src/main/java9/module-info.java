@@ -14,6 +14,7 @@
 import org.tinylog.core.Hook;
 import org.tinylog.core.formats.DateFormatBuilder;
 import org.tinylog.core.formats.JavaTimeFormatBuilder;
+import org.tinylog.core.formats.JodaTimeFormatBuilder;
 import org.tinylog.core.formats.NumberFormatBuilder;
 import org.tinylog.core.formats.ValueFormatBuilder;
 import org.tinylog.core.providers.LoggingProviderBuilder;
@@ -23,10 +24,15 @@ module org.tinylog.core {
 	uses Hook;
 
 	uses ValueFormatBuilder;
-	provides ValueFormatBuilder with DateFormatBuilder, JavaTimeFormatBuilder, NumberFormatBuilder;
+	provides ValueFormatBuilder with
+		DateFormatBuilder,
+		JavaTimeFormatBuilder,
+		JodaTimeFormatBuilder,
+		NumberFormatBuilder;
 
 	uses LoggingProviderBuilder;
-	provides LoggingProviderBuilder with NopLoggingProviderBuilder;
+	provides LoggingProviderBuilder with
+		NopLoggingProviderBuilder;
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.formats;
