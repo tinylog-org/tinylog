@@ -86,6 +86,12 @@
                 <groupId>com.google.android</groupId>
                 <artifactId>android</artifactId>
                 <version>2.1.2</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.khronos</groupId>
+                        <artifactId>opengl-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
