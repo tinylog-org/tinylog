@@ -1,0 +1,151 @@
+/*
+ * Copyright 2020 Martin Winandy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
+package org.tinylog.core.formatters;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ServiceLoader;
+
+import org.tinylog.core.Framework;
+import org.tinylog.core.formats.ValueFormat;
+import org.tinylog.core.formats.ValueFormatBuilder;
+
+/**
+ * Enhanced message formatter that replaces '{}' placeholders with passed arguments and optionally accepts format
+ * patterns in placeholders.
+ *
+ * <p>
+ *     All registered {@link ValueFormat ValueFormats} can be used to format arguments via patterns. Curly brackets and
+ *     other characters can be escaped by wrapping them in singe quotes ('). Two directly consecutive singe quotes ('')
+ *     are output as one singe quote.
+ * </p>
+ */
+public final class EnhancedMessageFormatter implements MessageFormatter {
+
+	private static final int EXTRA_CAPACITY = 32;
+
+	private final List<ValueFormat> formats;
+
+	/**
+	 * @param framework The provided class loader from the passed framework is used for loading
+	 *                  {@link ValueFormatBuilder ValueFormatBuilders} as service
+	 * @param locale The locale for language or country depending format outputs
+	 */
+	public EnhancedMessageFormatter(Framework framework, Locale locale) {
+		formats = new ArrayList<ValueFormat>();
+		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
+			if (builder.isCompatible()) {
+				formats.add(builder.create(locale));
+			}
+		}
+	}
+
+	@Override
+	public String format(String message, Object... arguments) {
+		int length = message.length();
+		int argument = 0;
+
+		StringBuilder builder = new StringBuilder(length + EXTRA_CAPACITY);
+
+		for (int index = 0; index < length; ++index) {
+			char character = message.charAt(index);
+			if (character == '\'') {
+				int closingQuotePosition = findClosingQuote(message, index + 1);
+				if (closingQuotePosition == index + 1) {
+					index += 1; // Skip one of both quotes
+				} else if (closingQuotePosition > 0) {
+					builder.append(message, index + 1, closingQuotePosition);
+					index = closingQuotePosition;
+					continue;
+				}
+			} else if (character == '{' && argument < arguments.length) {
+				int closingCurlyBracketPosition = findClosingCurlyBracket(message, index + 1, length);
+				if (closingCurlyBracketPosition > 0) {
+					String pattern = message.substring(index + 1, closingCurlyBracketPosition);
+					builder.append(render(pattern, arguments[argument]));
+					index = closingCurlyBracketPosition;
+					argument += 1;
+					continue;
+				}
+			}
+
+			builder.append(character);
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Renders a value as string.
+	 *
+	 * @param pattern The format pattern for rendering the passed value
+	 * @param value Object to render
+	 * @return The formatted representation of the passed value
+	 */
+	private String render(String pattern, Object value) {
+		if (!pattern.isEmpty()) {
+			for (ValueFormat format : formats) {
+				if (format.isSupported(value)) {
+					return format.format(pattern, value);
+				}
+			}
+		}
+
+		return String.valueOf(value);
+	}
+
+	/**
+	 * Finds the next single quote (').
+	 *
+	 * @param message The text in which to search for a single quote
+	 * @param start The position from which the search is to be started
+	 * @return Position of the found single quote or -1 if none could be found
+	 */
+	private int findClosingQuote(String message, int start) {
+		return message.indexOf('\'', start);
+	}
+
+	/**
+	 * Finds the next closing curly bracket '{'.
+	 *
+	 * @param message The text in which to search for a closing curly bracket
+	 * @param start The included position from which the search is to be started
+	 * @param end The excluded position at which the search is to be stopped
+	 * @return Position of the found closing curly bracket or -1 if none could be found
+	 */
+	private int findClosingCurlyBracket(String message, int start, int end) {
+		int openCount = 1;
+
+		for (int index = start; index < end; ++index) {
+			char character = message.charAt(index);
+			if (character == '\'') {
+				int closingQuotePosition = findClosingQuote(message, index + 1);
+				if (closingQuotePosition > 0) {
+					index = closingQuotePosition;
+				}
+			} else if (character == '{') {
+				openCount += 1;
+			} else if (character == '}') {
+				openCount -= 1;
+				if (openCount == 0) {
+					return index;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+}
