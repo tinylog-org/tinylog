@@ -13,6 +13,7 @@
 
 package org.tinylog.core.formatters;
 
+import java.text.ChoiceFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,9 +28,13 @@ import org.tinylog.core.formats.ValueFormatBuilder;
  * patterns in placeholders.
  *
  * <p>
- *     All registered {@link ValueFormat ValueFormats} can be used to format arguments via patterns. Curly brackets and
- *     other characters can be escaped by wrapping them in singe quotes ('). Two directly consecutive singe quotes ('')
- *     are output as one singe quote.
+ *     All registered {@link ValueFormat ValueFormats} can be used to format arguments via patterns. Additionally the
+ *     {@link ChoiceFormat} syntax is supported for conditional formatting.
+ * </p>
+ *
+ * <p>
+ *     Curly brackets and other characters can be escaped by wrapping them in singe quotes ('). Two directly consecutive
+ *     singe quotes ('') are output as one singe quote.
  * </p>
  */
 public final class EnhancedMessageFormatter implements MessageFormatter {
@@ -64,7 +69,7 @@ public final class EnhancedMessageFormatter implements MessageFormatter {
 			if (character == '\'') {
 				int closingQuotePosition = findClosingQuote(message, index + 1);
 				if (closingQuotePosition == index + 1) {
-					index += 1; // Skip one of both quotes
+					continue;
 				} else if (closingQuotePosition > 0) {
 					builder.append(message, index + 1, closingQuotePosition);
 					index = closingQuotePosition;
@@ -96,14 +101,41 @@ public final class EnhancedMessageFormatter implements MessageFormatter {
 	 */
 	private String render(String pattern, Object value) {
 		if (!pattern.isEmpty()) {
-			for (ValueFormat format : formats) {
-				if (format.isSupported(value)) {
-					return format.format(pattern, value);
+			if (isConditional(pattern)) {
+				return new ChoiceFormat(format(pattern, value)).format(value);
+			} else {
+				for (ValueFormat format : formats) {
+					if (format.isSupported(value)) {
+						return format.format(pattern, value);
+					}
 				}
 			}
 		}
 
 		return String.valueOf(value);
+	}
+
+	/**
+	 * Checks if a pattern is conditional according to the syntax of {@link ChoiceFormat}.
+	 *
+	 * @param pattern The pattern to check
+	 * @return {@code true} if the passed pattern is conditional, {@code false} if not
+	 */
+	private boolean isConditional(final String pattern) {
+		int length = pattern.length();
+		for (int index = 0; index < length; ++index) {
+			char character = pattern.charAt(index);
+			if (character == '|') {
+				return true;
+			} else if (character == '\'') {
+				int closingQuotePosition = findClosingQuote(pattern, index + 1);
+				if (closingQuotePosition > 0) {
+					index = closingQuotePosition;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

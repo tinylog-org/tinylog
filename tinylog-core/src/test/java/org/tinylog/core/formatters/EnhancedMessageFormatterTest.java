@@ -13,6 +13,7 @@
 
 package org.tinylog.core.formatters;
 
+import java.text.ChoiceFormat;
 import java.time.LocalTime;
 import java.util.Locale;
 
@@ -49,8 +50,8 @@ class EnhancedMessageFormatterTest {
 	@Test
 	void formatNumberWithoutPattern() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
-		String output = formatter.format("The maximum port number is {}", 65535);
-		assertThat(output).isEqualTo("The maximum port number is 65535");
+		String output = formatter.format("The maximum port number is {}.", 65535);
+		assertThat(output).isEqualTo("The maximum port number is 65535.");
 	}
 
 	/**
@@ -69,8 +70,8 @@ class EnhancedMessageFormatterTest {
 	@Test
 	void formatTimeWithPattern() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
-		String output = formatter.format("It is {hh:mm a}", LocalTime.of(12, 30));
-		assertThat(output).isEqualTo("It is 12:30 PM");
+		String output = formatter.format("It is {hh:mm a}.", LocalTime.of(12, 30));
+		assertThat(output).isEqualTo("It is 12:30 PM.");
 	}
 
 	/**
@@ -109,8 +110,8 @@ class EnhancedMessageFormatterTest {
 	@Test
 	void keepSingleQuote() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
-		String output = formatter.format("It is {} o'clock", "twelve");
-		assertThat(output).isEqualTo("It is twelve o'clock");
+		String output = formatter.format("It is {} o'clock.", "twelve");
+		assertThat(output).isEqualTo("It is twelve o'clock.");
 	}
 
 	/**
@@ -119,8 +120,8 @@ class EnhancedMessageFormatterTest {
 	@Test
 	void convertSingleQuote() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
-		String output = formatter.format("It is {} o''clock", "twelve");
-		assertThat(output).isEqualTo("It is twelve o'clock");
+		String output = formatter.format("It is {} o''clock.", "twelve");
+		assertThat(output).isEqualTo("It is twelve o'clock.");
 	}
 
 	/**
@@ -139,8 +140,8 @@ class EnhancedMessageFormatterTest {
 	@Test
 	void escapePhraseInPatterns() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
-		String output = formatter.format("It is {hh 'o''clock'}", LocalTime.of(12, 0));
-		assertThat(output).isEqualTo("It is 12 o'clock");
+		String output = formatter.format("It is {hh 'o''clock'}.", LocalTime.of(12, 0));
+		assertThat(output).isEqualTo("It is 12 o'clock.");
 	}
 
 	/**
@@ -161,6 +162,30 @@ class EnhancedMessageFormatterTest {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
 		String output = formatter.format("We give {{0}%}!", 1.00);
 		assertThat(output).isEqualTo("We give {100}%!");
+	}
+
+	/**
+	 * Verifies that the {@link ChoiceFormat} syntax is supported for conditional formatting.
+	 */
+	@Test
+	void formatConditional() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		String message = "There {0#are no files|1#is one file|1<are {#,###} files}.";
+		assertThat(formatter.format(message, -1)).isEqualTo("There are no files.");
+		assertThat(formatter.format(message, 0)).isEqualTo("There are no files.");
+		assertThat(formatter.format(message, 1)).isEqualTo("There is one file.");
+		assertThat(formatter.format(message, 2)).isEqualTo("There are 2 files.");
+		assertThat(formatter.format(message, 1000)).isEqualTo("There are 1,000 files.");
+	}
+
+	/**
+	 * Verifies that pipes can be escaped to avoid conditional formatting.
+	 */
+	@Test
+	void escapePipes() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		String output = formatter.format("There are {'|'#,###'|'} files.", 42);
+		assertThat(output).isEqualTo("There are |42| files.");
 	}
 
 }
