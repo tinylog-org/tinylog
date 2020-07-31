@@ -79,7 +79,6 @@
         <module name="FinalClass"/>
         <module name="GenericWhitespace"/>
         <module name="HideUtilityClassConstructor"/>
-        <module name="IllegalCatch"/>
         <module name="IllegalImport"/>
         <module name="IllegalInstantiation"/>
         <module name="IllegalThrows"/>
