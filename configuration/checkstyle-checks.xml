@@ -133,7 +133,6 @@
         <module name="MissingJavadocType"/>
         <module name="MissingOverride"/>
         <module name="MissingSwitchDefault"/>
-        <module name="ModifiedControlVariable"/>
         <module name="ModifierOrder"/>
         <module name="MultipleStringLiterals"/>
         <module name="MultipleVariableDeclarations"/>
@@ -183,7 +182,6 @@
         <module name="TodoComment">
             <property name="format" value="(TODO)|(FIXME)" />
         </module>
-        <module name="TrailingComment"/>
         <module name="TypecastParenPad"/>
         <module name="TypeName"/>
         <module name="UncommentedMain"/>
