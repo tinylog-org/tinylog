@@ -38,5 +38,5 @@ module org.tinylog.core {
 	exports org.tinylog.core.formats;
 	exports org.tinylog.core.formatters;
 	exports org.tinylog.core.providers;
-	exports org.tinylog.runtime;
+	exports org.tinylog.core.runtime;
 }

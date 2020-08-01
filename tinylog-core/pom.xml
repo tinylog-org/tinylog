@@ -77,7 +77,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>org/tinylog/runtime/**/*</exclude>
+                        <exclude>org/tinylog/core/runtime/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
