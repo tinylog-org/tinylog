@@ -6,9 +6,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>tinylog-runtime-modern</artifactId>
+    <artifactId>tinylog-core-modern</artifactId>
 
-    <description>Runtime implementation for modern Java from version 9 and later</description>
+    <description>Core functionality extension for modern Java from version 9 and later</description>
     <url>${website.url}</url>
 
     <parent>
@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-base</artifactId>
+            <artifactId>tinylog-core-base</artifactId>
         </dependency>
     </dependencies>
 

@@ -59,32 +59,18 @@
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-base</artifactId>
-            <scope>runtime</scope>
+            <artifactId>tinylog-core-base</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-legacy</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-runtime-modern</artifactId>
-            <scope>runtime</scope>
+            <artifactId>tinylog-core-modern</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>org/tinylog/core/runtime/**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -92,12 +78,8 @@
                     <instructions>
                         <Export-Package>!org.tinylog.core.util</Export-Package>
                     </instructions>
-                    <excludeDependencies>tinylog-runtime-base,tinylog-runtime-legacy,tinylog-runtime-modern</excludeDependencies>
+                    <excludeDependencies>tinylog-core-base,tinylog-core-modern</excludeDependencies>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -111,9 +93,7 @@
                         <id>default-compile</id>
                         <configuration>
                             <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-base/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-legacy/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>${project.parent.basedir}/tinylog-core-base/src/main/java</compileSourceRoot>
                             </compileSourceRoots>
                         </configuration>
                     </execution>
@@ -121,8 +101,8 @@
                         <id>compile-java-9</id>
                         <configuration>
                             <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                                <compileSourceRoot>${project.parent.basedir}/tinylog-runtime-modern/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>${project.parent.basedir}/tinylog-core-base/src/main/java9</compileSourceRoot>
+                                <compileSourceRoot>${project.parent.basedir}/tinylog-core-modern/src/main/java</compileSourceRoot>
                             </compileSourceRoots>
                         </configuration>
                     </execution>
@@ -151,10 +131,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

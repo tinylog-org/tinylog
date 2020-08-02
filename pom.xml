@@ -25,9 +25,8 @@
     <modules>
         <module>tinylog-api</module>
         <module>tinylog-core</module>
-        <module>tinylog-runtime-base</module>
-        <module>tinylog-runtime-legacy</module>
-        <module>tinylog-runtime-modern</module>
+        <module>tinylog-core-base</module>
+        <module>tinylog-core-modern</module>
     </modules>
 
     <profiles>
@@ -131,17 +130,12 @@
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-runtime-base</artifactId>
+                <artifactId>tinylog-core-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-runtime-legacy</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-runtime-modern</artifactId>
+                <artifactId>tinylog-core-modern</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
