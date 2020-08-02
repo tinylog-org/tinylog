@@ -19,6 +19,7 @@
         <git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
         <website.url>https://tinylog.org/</website.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <root.basedir>${project.basedir}</root.basedir>
     </properties>
 
     <modules>
@@ -213,8 +214,8 @@
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <configLocation>${maven.multiModuleProjectDirectory}/configuration/checkstyle-checks.xml</configLocation>
-                        <propertyExpansion>workspace_loc=${maven.multiModuleProjectDirectory}</propertyExpansion>
+                        <configLocation>${root.basedir}/configuration/checkstyle-checks.xml</configLocation>
+                        <propertyExpansion>workspace_loc=${root.basedir}</propertyExpansion>
                     </configuration>
                     <dependencies>
                         <dependency>

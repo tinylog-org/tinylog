@@ -17,6 +17,10 @@
         <version>3.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <root.basedir>${project.parent.basedir}</root.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.assertj</groupId>
