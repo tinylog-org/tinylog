@@ -17,7 +17,7 @@ Steps for Each Release
 
  1. Set new version: mvn versions:set -DnewVersion=VERSION -DgenerateBackupPoms=false
  2. Create a tag with new version number as name
- 3. Deploy with JDK 9: mvn clean install deploy -P release
+ 3. Deploy with JDK 9: mvn clean deploy -P release
  4. Upload P2 repository: mvn p2:site wagon:upload -P release --non-recursive
  5. Upload ZIP archives from target to website
  6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc
