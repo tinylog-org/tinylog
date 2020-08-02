@@ -71,6 +71,7 @@
 		<wagon-ftp.version>3.2.0</wagon-ftp.version>
 
 		<android.version>1.5_r3</android.version>
+		<asm.version>7.3.1</asm.version>
 		<assertj-core.version>3.15.0</assertj-core.version>
 		<assertj-db.version>1.3.0</assertj-db.version>
 		<checkstyle.version>8.31</checkstyle.version>
@@ -433,6 +434,13 @@
 							</goals>
 						</execution>
 					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.ow2.asm</groupId>
+							<artifactId>asm</artifactId>
+							<version>${asm.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
@@ -559,6 +567,7 @@
 							</manifestEntries>
 						</archive>
 						<doctitle>${project.name} ${project.version}</doctitle>
+						<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 						<source>8</source>
 					</configuration>
 					<executions>
