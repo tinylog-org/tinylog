@@ -14,12 +14,13 @@
     <url>${website.url}</url>
 
     <properties>
+        <builder.name>tinylog.org</builder.name>
         <git.url>https://github.com/pmwmedia/tinylog</git.url>
         <git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
         <git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
-        <website.url>https://tinylog.org/</website.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
+        <website.url>https://tinylog.org/</website.url>
     </properties>
 
     <modules>
@@ -193,7 +194,7 @@
                     <version>4.2.1</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <instructions>
+                         <instructions>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
                             <_exportcontents>!META-INF.versions.9,*</_exportcontents>
                             <_fixupmessages>"*META-INF/versions/9*"</_fixupmessages>
@@ -278,6 +279,7 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
+                                <Built-By>${builder.name}</Built-By>
                                 <Multi-Release>true</Multi-Release>
                             </manifestEntries>
                             <addMavenDescriptor>false</addMavenDescriptor>
