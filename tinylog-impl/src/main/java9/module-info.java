@@ -11,6 +11,10 @@ module org.tinylog.impl {
 	exports org.tinylog.writers;
 	exports org.tinylog.writers.raw;
 
+	uses org.tinylog.policies.Policy;
+	uses org.tinylog.throwable.ThrowableFilter;
+	uses org.tinylog.writers.Writer;
+
 	provides org.tinylog.policies.Policy with
 			org.tinylog.policies.DailyPolicy,
 			org.tinylog.policies.StartupPolicy,
