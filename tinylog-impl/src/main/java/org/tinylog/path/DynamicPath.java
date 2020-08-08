@@ -15,7 +15,6 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.tinylog.runtime.RuntimeProvider;
@@ -84,10 +83,10 @@ public final class DynamicPath {
 			throw new IllegalArgumentException("Closing curly bracket is missing: '" + path + "'");
 		} else if (start < normalizedPath.length() - 1) {
 			if (prefix.isEmpty() && segments.isEmpty()) {
-				prefix = normalizedPath.substring(0, normalizedPath.length());
+				prefix = normalizedPath;
 			}
 
-			String text = normalizedPath.substring(start, normalizedPath.length());
+			String text = normalizedPath.substring(start);
 			int separator = Math.max(text.lastIndexOf(File.separatorChar), text.lastIndexOf('/'));
 			segments.add(new PlainTextSegment(text));
 			plainTexts.add(text);
@@ -123,7 +122,7 @@ public final class DynamicPath {
 	public List<File> getAllFiles() {
 		List<File> files = new ArrayList<File>();
 		collectFiles(folder, files);
-		Collections.sort(files, LastModifiedFileComparator.INSTANCE);
+		files.sort(LastModifiedFileComparator.INSTANCE);
 		return files;
 	}
 
