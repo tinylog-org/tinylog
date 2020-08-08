@@ -13,6 +13,8 @@
 
 package org.tinylog.pattern;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -25,6 +27,8 @@ import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link UptimeToken}.
@@ -156,12 +160,63 @@ public class UptimeTokenTest {
 		assertThat(render(token, duration)).isEqualTo("12'00");
 	}
 
+	/**
+	 * Verifies that nanoseconds will be added as long to {@link PreparedStatement}, if no format pattern has been
+	 * defined.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyNanoseconds() throws SQLException {
+		UptimeToken token = new UptimeToken();
+		Duration duration = Duration.ofNanos(42);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(duration), statement, 1);
+		verify(statement).setLong(1, 42);
+	}
+
+	/**
+	 * Verifies that a formatted uptime will be added as string to {@link PreparedStatement}, if a format pattern has
+	 * been defined.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyFormattedUptime() throws SQLException {
+		UptimeToken token = new UptimeToken("H:mm");
+		Duration duration = Duration.ofHours(12).plusMinutes(30);
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(duration), statement, 1);
+		verify(statement).setString(1, "12:30");
+	}
+
+	/**
+	 * Renders a {@link Token} with a given uptime as duration.
+	 *
+	 * @param token
+	 *            Token to render
+	 * @param duration
+	 *            Uptime
+	 * @return Rendered token
+	 */
 	private static String render(final Token token, final Duration duration) {
 		StringBuilder builder = new StringBuilder();
 		token.render(createLogEntry(duration), builder);
 		return builder.toString();
 	}
 
+	/**
+	 * Creates a {@link LogEntry} with a given uptime as duration.
+	 *
+	 * @param duration
+	 *            Uptime
+	 * @return Pre-filled log entry
+
+	 */
 	private static LogEntry createLogEntry(final Duration duration) {
 		Instant instant = RuntimeProvider.getStartTime().toInstant().plus(duration);
 		ZonedDateTime date = instant.atZone(ZoneId.systemDefault());
