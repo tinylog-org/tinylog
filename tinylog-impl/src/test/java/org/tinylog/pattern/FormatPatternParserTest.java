@@ -13,15 +13,20 @@
 
 package org.tinylog.pattern;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.runtime.RuntimeProvider;
+import org.tinylog.runtime.Timestamp;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +82,7 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
-	 * Verifies that {@code {timestamp}} can be parsed and the returned token will output the timestamp of issue, in seconds.
+	 * Verifies that {@code {timestamp}} can be parsed and the returned token will output the timestamp of issue in seconds.
 	 */
 	@Test
 	public void timestampWithDefaultPattern() {
@@ -102,6 +107,29 @@ public final class FormatPatternParserTest {
 	public void timestampWithUnknownPattern() {
 		ZonedDateTime date = LocalDate.of(1985, 6, 3).atStartOfDay(ZoneOffset.UTC);
 		assertThat(render("timestamp: inval'd", LogEntryBuilder.empty().date(date).create())).isEqualTo("486604800");
+	}
+
+	/**
+	 * Verifies that {@code {uptime}} can be parsed and the returned token will output the issue relative to the uptime.
+	 */
+	@Test
+	public void uptimeWithDefaultPattern() {
+		Timestamp timestamp = RuntimeProvider.getStartTime();
+		Instant instant = timestamp.toInstant().plus(2, ChronoUnit.HOURS).plus(30, ChronoUnit.MINUTES);
+		ZonedDateTime date = instant.atZone(ZoneId.systemDefault());
+		assertThat(render("uptime", LogEntryBuilder.empty().date(date).create())).isEqualTo("02:30:00");
+	}
+
+	/**
+	 * Verifies that {@code {uptime}} can be parsed with a defined pattern and the returned token will output the issue
+	 * relative to the uptime as defined in that pattern.
+	 */
+	@Test
+	public void uptimeWithCustomPattern() {
+		Timestamp timestamp = RuntimeProvider.getStartTime();
+		Instant instant = timestamp.toInstant().plus(2, ChronoUnit.HOURS).plus(30, ChronoUnit.MINUTES);
+		ZonedDateTime date = instant.atZone(ZoneId.systemDefault());
+		assertThat(render("uptime: H:mm", LogEntryBuilder.empty().date(date).create())).isEqualTo("2:30");
 	}
 
 	/**
