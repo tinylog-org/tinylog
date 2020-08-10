@@ -39,8 +39,8 @@ public final class InternalLoggerTest {
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
-	private Level severityLevel;
-	private String outputLevel;
+	private final Level severityLevel;
+	private final String outputLevel;
 
 	/**
 	 * @param severityLevel
@@ -72,6 +72,7 @@ public final class InternalLoggerTest {
 		InternalLogger.log(severityLevel, "Hello World!");
 
 		assertThat(systemStream.consumeErrorOutput())
+			.startsWith("LOGGER ")
 			.containsOnlyOnce(outputLevel)
 			.containsOnlyOnce("Hello World!")
 			.endsWith(System.lineSeparator())
@@ -86,6 +87,7 @@ public final class InternalLoggerTest {
 		InternalLogger.log(severityLevel, new NullPointerException());
 
 		assertThat(systemStream.consumeErrorOutput())
+			.startsWith("LOGGER ")
 			.containsOnlyOnce(outputLevel)
 			.containsOnlyOnce(NullPointerException.class.getName())
 			.endsWith(System.lineSeparator())
@@ -100,6 +102,7 @@ public final class InternalLoggerTest {
 		InternalLogger.log(severityLevel, new IOException("File not found"));
 
 		assertThat(systemStream.consumeErrorOutput())
+			.startsWith("LOGGER ")
 			.containsOnlyOnce(outputLevel)
 			.containsOnlyOnce(IOException.class.getName())
 			.containsOnlyOnce("File not found")
@@ -116,6 +119,7 @@ public final class InternalLoggerTest {
 		InternalLogger.log(severityLevel, new NullPointerException(), "Hello World!");
 
 		assertThat(systemStream.consumeErrorOutput())
+			.startsWith("LOGGER ")
 			.containsOnlyOnce(outputLevel)
 			.containsOnlyOnce(NullPointerException.class.getName())
 			.containsOnlyOnce("Hello World!")
@@ -132,6 +136,7 @@ public final class InternalLoggerTest {
 		InternalLogger.log(severityLevel, new IOException("File not found"), "Hello World!");
 
 		assertThat(systemStream.consumeErrorOutput())
+			.startsWith("LOGGER ")
 			.containsOnlyOnce(outputLevel)
 			.containsOnlyOnce(IOException.class.getName())
 			.containsOnlyOnce("File not found")

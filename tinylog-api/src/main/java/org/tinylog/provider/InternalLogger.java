@@ -72,6 +72,7 @@ public final class InternalLogger {
 		String messageOfException = exception.getMessage();
 
 		StringBuilder builder = new StringBuilder(BUFFER_SIZE);
+		builder.append("LOGGER ");
 		builder.append(level);
 		builder.append(": ");
 		builder.append(message);
