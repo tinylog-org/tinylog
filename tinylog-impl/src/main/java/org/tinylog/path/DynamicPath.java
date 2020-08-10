@@ -15,6 +15,7 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.tinylog.runtime.RuntimeProvider;
@@ -122,7 +123,7 @@ public final class DynamicPath {
 	public List<File> getAllFiles() {
 		List<File> files = new ArrayList<File>();
 		collectFiles(folder, files);
-		files.sort(LastModifiedFileComparator.INSTANCE);
+		Collections.sort(files, LastModifiedFileComparator.INSTANCE);
 		return files;
 	}
 
