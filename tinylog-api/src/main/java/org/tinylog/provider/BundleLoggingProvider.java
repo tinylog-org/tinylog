@@ -121,8 +121,7 @@ final class BundleLoggingProvider implements LoggingProvider {
 	 * Get all logging providers stored inside this bundle.
 	 * @return All logging providers.
 	 */
-	List<LoggingProvider> getLoggingProviders()
-	{
-		return  Arrays.asList(loggingProviders);		
+	List<LoggingProvider> getLoggingProviders() {
+		return Arrays.asList(loggingProviders);		
 	}
 }

@@ -13,12 +13,6 @@
 
 package org.tinylog.provider;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
-
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +26,10 @@ import org.tinylog.configuration.Configuration;
 import org.tinylog.format.MessageFormatter;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Tests for {@link ProviderRegistry}.
@@ -136,16 +134,16 @@ public final class ProviderRegistryTest {
 		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
 		Whitebox.setInternalState(ProviderRegistry.class, "loggingProvider", createdProvider);
 		
-		assertThat( ProviderRegistry.getLoggingProviders())
-		.hasSize(2)
-		.hasAtLeastOneElementOfType(LoggingProviderOne.class)
-		.hasAtLeastOneElementOfType(LoggingProviderTwo.class);	
+		assertThat(ProviderRegistry.getLoggingProviders())
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);	
 		
 		Whitebox.setInternalState(ProviderRegistry.class, "loggingProvider", saveProvider);
 		
-		assertThat( ProviderRegistry.getLoggingProviders())
-		.hasSize(1)
-		.hasAtLeastOneElementOfType(NopLoggingProvider.class);	
+		assertThat(ProviderRegistry.getLoggingProviders())
+			.hasSize(1)
+			.hasAtLeastOneElementOfType(NopLoggingProvider.class);	
 		
 		assertThat(ProviderRegistry.getLoggingProvider()).isInstanceOf(NopLoggingProvider.class);
 	}

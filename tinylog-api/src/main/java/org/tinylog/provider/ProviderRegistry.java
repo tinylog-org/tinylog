@@ -13,7 +13,6 @@
 
 package org.tinylog.provider;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -66,12 +65,9 @@ public final class ProviderRegistry {
 	 * @return The list of all logging providers.
 	 */
 	public static List<LoggingProvider> getLoggingProviders() {
-		if (loggingProvider instanceof BundleLoggingProvider)
-		{
-			return ((BundleLoggingProvider)loggingProvider).getLoggingProviders();
-		}
-		else
-		{
+		if (loggingProvider instanceof BundleLoggingProvider) {
+			return ((BundleLoggingProvider) loggingProvider).getLoggingProviders();
+		} else {
 			return Collections.singletonList(loggingProvider);
 		}
 	}

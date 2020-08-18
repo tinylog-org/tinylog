@@ -14,11 +14,8 @@
 package org.tinylog.provider;
 
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.format.MessageFormatter;
-import org.tinylog.provider.ProviderRegistryTest.LoggingProviderOne;
-import org.tinylog.provider.ProviderRegistryTest.LoggingProviderTwo;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,12 +163,12 @@ public final class BundleLoggingProviderTest {
 	@Test
 	public void resolveBundleLoggingProviders() {
 		init(Level.TRACE, Level.TRACE);
-		assertThat( ((BundleLoggingProvider)bundle).getLoggingProviders())
-		.hasSize(2)
-		.hasOnlyElementsOfType(LoggingProvider.class);
+		assertThat(((BundleLoggingProvider) bundle).getLoggingProviders())
+			.hasSize(2)
+			.hasOnlyElementsOfType(LoggingProvider.class);
 	}
 
-	
+
 	/**
 	 * Verifies that {@code shutdown()} method invokes {@code shutdown()} methods from underlying logging providers.
 	 * 

@@ -13,13 +13,7 @@
 
 package org.tinylog.core;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.tinylog.util.Maps.doubletonMap;
-import static org.tinylog.util.ResultObserver.waitFor;
-
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +44,12 @@ import org.tinylog.util.StorageWriter;
 import org.tinylog.util.Strings;
 import org.tinylog.writers.ConsoleWriter;
 import org.tinylog.writers.Writer;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.tinylog.util.Maps.doubletonMap;
+import static org.tinylog.util.ResultObserver.waitFor;
 
 /**
  * Tests for {@link TinylogLoggingProvider}.
@@ -658,7 +658,6 @@ public final class TinylogLoggingProviderTest {
 
 	}
 	
-	
 	/**
 	 * Tests to obtain the writers from the provider.
 	 */
@@ -702,23 +701,16 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.getWriters("TAG3")).hasSize(2);
 			
 			Condition<Writer> condition = new Condition<Writer>() {
-			    @Override
-			    public boolean matches(Writer o) {
-			        return o.getClass() == ConsoleWriter.class;
-			    }};
-				assertThat(provider.getWriters("TAG1")).areExactly(1, condition);
-				assertThat(provider.getWriters("TAG2")).areExactly(1, condition);
-				assertThat(provider.getWriters("TAG3")).areExactly(2, condition);
-				assertThat(provider.getWriters()).areExactly(4, condition);
-			
+				@Override
+				public boolean matches(final Writer o) {
+					return o.getClass() == ConsoleWriter.class;
+				} };
+			assertThat(provider.getWriters("TAG1")).areExactly(1, condition);
+			assertThat(provider.getWriters("TAG2")).areExactly(1, condition);
+			assertThat(provider.getWriters("TAG3")).areExactly(2, condition);
+			assertThat(provider.getWriters()).areExactly(4, condition);
 		}
-
-
-
-
 	}
-
-	
 
 	/**
 	 * Tests for receiving context provider.
@@ -793,15 +785,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
-			try
-			{
-				Configuration.replace(doubletonMap("writer", EvilWriter.class.getName(), "autoshutdown", "false"));
-				fail("Excepted UnsupportedOperationException on reconfgure");
-			}
-			catch(UnsupportedOperationException e)
-			{
-				// Latest version of Tinylog throws an exception in this case
-			}
+			Configuration.replace(doubletonMap("writer", EvilWriter.class.getName(), "autoshutdown", "false"));
 		}
 
 		/**
@@ -810,13 +794,10 @@ public final class TinylogLoggingProviderTest {
 		@Test
 		public void logging() {
 			provider.log(1, null, Level.INFO, null, null, "Hello World!");
-			assertThat(systemStream.consumeStandardOutput())
-			.containsOnlyOnce("INFO")
-			.containsOnlyOnce("Hello World!");
-//			assertThat(systemStream.consumeErrorOutput())
-//					.containsOnlyOnce("ERROR")
-//					.containsOnlyOnce(IOException.class.getName())
-//					.containsOnlyOnce("Hello World!");
+			assertThat(systemStream.consumeErrorOutput())
+					.containsOnlyOnce("ERROR")
+					.containsOnlyOnce(IOException.class.getName())
+					.containsOnlyOnce("Hello World!");
 		}
 
 		/**
@@ -828,7 +809,7 @@ public final class TinylogLoggingProviderTest {
 		@Test
 		public void shutdown() throws InterruptedException {
 			provider.shutdown();
-//			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce(IOException.class.getName());
+			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce(IOException.class.getName());
 		}
 
 	}

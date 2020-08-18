@@ -415,12 +415,10 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	 * @param tag The tag to find
 	 * @return The writer objects.
 	 */
-	public Collection<Writer> getWriters(final String tag)
-	{
+	public Collection<Writer> getWriters(final String tag) {
 		Set<Writer> collectedWriters = new HashSet<Writer>(); 
 		int tagIndex = getTagIndex(tag);
-		if (tagIndex > knownTags.size()) 
-		{
+		if (tagIndex > knownTags.size()) {
 			return collectedWriters;
 		}
 		
@@ -434,12 +432,11 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	 * Get all writers of the provider.
 	 * @return The writes.
 	 */
-	public Collection<Writer> getWriters()
-	{
+	public Collection<Writer> getWriters() {
 		Set<Writer> collectedWriters = new HashSet<Writer>(); 
 		
 		for (int tagIndex = 0; tagIndex < writers.length; ++tagIndex) {
-			for (int levelIndex = 0; levelIndex <writers[tagIndex].length; ++levelIndex) {
+			for (int levelIndex = 0; levelIndex < writers[tagIndex].length; ++levelIndex) {
 				collectedWriters.addAll(writers[tagIndex][levelIndex]);
 			}
 		}
