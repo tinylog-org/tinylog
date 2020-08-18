@@ -14,8 +14,11 @@
 package org.tinylog.provider;
 
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 import org.tinylog.Level;
 import org.tinylog.format.MessageFormatter;
+import org.tinylog.provider.ProviderRegistryTest.LoggingProviderOne;
+import org.tinylog.provider.ProviderRegistryTest.LoggingProviderTwo;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -154,7 +157,21 @@ public final class BundleLoggingProviderTest {
 		verify(first).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, formatter, "Test", 42);
 		verify(second).log(BundleContextProvider.class.getName(), "technical", Level.INFO, exception, formatter, "Test", 42);
 	}
+	
+	
+	/**
+	 * Verifies that {@code getMinimumLevel(String)} method returns the minimum severity level of underlying logging
+	 * providers, if all have the same minimum severity level for an tag.
+	 */
+	@Test
+	public void resolveBundleLoggingProviders() {
+		init(Level.TRACE, Level.TRACE);
+		assertThat( ((BundleLoggingProvider)bundle).getLoggingProviders())
+		.hasSize(2)
+		.hasOnlyElementsOfType(LoggingProvider.class);
+	}
 
+	
 	/**
 	 * Verifies that {@code shutdown()} method invokes {@code shutdown()} methods from underlying logging providers.
 	 * 

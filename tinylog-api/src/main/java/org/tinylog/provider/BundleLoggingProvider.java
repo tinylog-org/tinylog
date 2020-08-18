@@ -14,7 +14,9 @@
 package org.tinylog.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.tinylog.Level;
 import org.tinylog.format.MessageFormatter;
@@ -114,4 +116,13 @@ final class BundleLoggingProvider implements LoggingProvider {
 		return new BundleContextProvider(contextProviders);
 	}
 
+	
+	/**
+	 * Get all logging providers stored inside this bundle.
+	 * @return All logging providers.
+	 */
+	List<LoggingProvider> getLoggingProviders()
+	{
+		return  Arrays.asList(loggingProviders);		
+	}
 }
