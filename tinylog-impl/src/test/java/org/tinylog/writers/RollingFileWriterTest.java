@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.converters.FileConverter;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
@@ -36,6 +37,12 @@ import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.tinylog.util.Maps.doubletonMap;
 import static org.tinylog.util.Maps.tripletonMap;
 
@@ -296,6 +303,44 @@ public final class RollingFileWriterTest {
 	}
 
 	/**
+	 * Verifies that a file converter can be used to transform data.
+	 *
+	 * @throws IOException
+	 *             Failed access to temporary folder or files
+	 */
+	@Test
+	public void useFileConverter() throws IOException {
+		String originalMessage = "Hello World!";
+		String convertedMessage = "Hallo Welt!";
+
+		byte[] originalData = (originalMessage + NEW_LINE).getBytes(StandardCharsets.UTF_8);
+		byte[] convertedData = (convertedMessage + NEW_LINE).getBytes(StandardCharsets.UTF_8);
+
+		FileConverter converter = mock(FileConverter.class);
+		when(converter.write(any(), anyInt())).thenReturn(convertedData);
+		WrapperFileConverter.converter = converter;
+
+		File file = folder.newFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file.getAbsolutePath());
+		properties.put("format", "{message}");
+		properties.put("convert", WrapperFileConverter.class.getName());
+
+		RollingFileWriter writer = new RollingFileWriter(properties);
+		try {
+			writer.write(LogEntryBuilder.empty().message(originalMessage).create());
+		} finally {
+			writer.close();
+		}
+
+		assertThat(FileSystem.readFile(file.getAbsolutePath())).isEqualTo(convertedMessage + NEW_LINE);
+
+		verify(converter).open(file.getAbsolutePath());
+		verify(converter).write(eq(originalData), eq(originalData.length));
+		verify(converter).close();
+	}
+
+	/**
 	 * Verifies that all backup files will be kept if deletion of backups is disabled.
 	 *
 	 * @throws IOException
@@ -536,4 +581,33 @@ public final class RollingFileWriterTest {
 		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("rolling file", singletonMap("file", file));
 		assertThat(writer).isInstanceOf(RollingFileWriter.class);
 	}
+
+	/**
+	 * Wrapper file converter for wrapping a concrete file converter instance.
+	 */
+	public static class WrapperFileConverter implements FileConverter {
+
+		private static FileConverter converter;
+
+		@Override
+		public String getBackupSuffix() {
+			return converter.getBackupSuffix();
+		}
+
+		@Override
+		public void open(final String fileName) {
+			converter.open(fileName);
+		}
+
+		@Override
+		public byte[] write(final byte[] data, final int length) {
+			return converter.write(data, length);
+		}
+
+		@Override
+		public void close() {
+			converter.close();
+		}
+	}
+
 }

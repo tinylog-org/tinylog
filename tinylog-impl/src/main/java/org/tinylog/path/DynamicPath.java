@@ -118,11 +118,13 @@ public final class DynamicPath {
 	 * Gets all files that are compatible with the dynamic path. The returned files are sorted by the last modification
 	 * date. The most recently modified files are at the top, the oldest at the bottom of the list.
 	 *
+	 * @param backupSuffix
+	 *            Optional file extension for backup files (can be {@code null})
 	 * @return Found files
 	 */
-	public List<File> getAllFiles() {
+	public List<File> getAllFiles(final String backupSuffix) {
 		List<File> files = new ArrayList<File>();
-		collectFiles(folder, files);
+		collectFiles(folder, backupSuffix == null ? suffix : suffix + backupSuffix, files);
 		Collections.sort(files, LastModifiedFileComparator.INSTANCE);
 		return files;
 	}
@@ -143,15 +145,17 @@ public final class DynamicPath {
 	 *
 	 * @param folder
 	 *            Base folder for starting search
+	 * @param suffix
+	 *            Expected suffix for file paths
 	 * @param found
 	 *            All found files will be added to this list
 	 */
-	private void collectFiles(final File folder, final List<File> found) {
+	private void collectFiles(final File folder, final String suffix, final List<File> found) {
 		File[] files = folder.listFiles();
 		if (files != null) {
 			for (File file : files) {
 				if (file.isDirectory()) {
-					collectFiles(file, found);
+					collectFiles(file, suffix, found);
 				} else if (file.isFile() && file.getPath().endsWith(suffix)) {
 					int index = 0;
 

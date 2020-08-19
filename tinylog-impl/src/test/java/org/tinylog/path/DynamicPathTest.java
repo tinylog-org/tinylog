@@ -168,7 +168,7 @@ public final class DynamicPathTest {
 	public void getFilesForEmptyFolder() {
 		String pattern = new File(folder.getRoot(), "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles()).isEmpty();
+		assertThat(path.getAllFiles(null)).isEmpty();
 	}
 
 	/**
@@ -185,7 +185,7 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(first, second);
+		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
@@ -203,7 +203,7 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{date:YYYY}" + File.separator + "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(file);
+		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(file);
 	}
 
 	/**
@@ -221,7 +221,7 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{date:YYYY}_{count}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles()).containsExactlyInAnyOrder(first, second);
+		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
@@ -246,7 +246,24 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{count}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles()).containsExactly(third, first, second);
+		assertThat(path.getAllFiles(null)).containsExactly(third, first, second);
+	}
+
+	/**
+	 * Verifies that all backup files can be found when providing a separate file extension for backup files.
+	 *
+	 * @throws IOException
+	 *             Failed to create files
+	 */
+	@Test
+	public void getBackupFiles() throws IOException {
+		folder.newFile("1.log");
+		File firstBackup = folder.newFile("2.log.backup");
+		File secondBackup = folder.newFile("3.log.backup");
+
+		String pattern = new File(folder.getRoot(), "{count}.log").getAbsolutePath();
+		DynamicPath path = new DynamicPath(pattern);
+		assertThat(path.getAllFiles(".backup")).containsExactlyInAnyOrder(firstBackup, secondBackup);
 	}
 
 	/**

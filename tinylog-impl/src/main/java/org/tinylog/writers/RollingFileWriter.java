@@ -26,6 +26,8 @@ import java.util.Map;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
 import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.converters.FileConverter;
+import org.tinylog.converters.NopFileConverter;
 import org.tinylog.core.LogEntry;
 import org.tinylog.path.DynamicPath;
 import org.tinylog.policies.Policy;
@@ -43,6 +45,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 
 	private final DynamicPath path;
 	private final List<Policy> policies;
+	private final FileConverter converter;
 	private final int backups;
 	private final boolean buffered;
 	private final boolean writingThread;
@@ -75,10 +78,11 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 
 		path = new DynamicPath(getFileName(properties));
 		policies = createPolicies(properties.get("policies"));
+		converter = createConverter(properties.get("convert"));
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = filterOutLatestLink(path.getAllFiles());
+		List<File> files = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
 
 		String fileName;
 		boolean append;
@@ -150,7 +154,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
 
-			List<File> existingFiles = filterOutLatestLink(path.getAllFiles());
+			List<File> existingFiles = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
 			deleteBackups(existingFiles, backups);
 
 			String fileName = path.resolve();
@@ -161,7 +165,8 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			}
 		}
 
-		writer.write(data, data.length);
+		byte[] convertedData = converter.write(data, data.length);
+		writer.write(convertedData, convertedData == data ? data.length : convertedData.length);
 	}
 
 	/**
@@ -182,6 +187,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 */
 	private void internalClose() throws IOException {
 		writer.close();
+		converter.close();
 	}
 
 	/**
@@ -219,6 +225,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	@IgnoreJRERequirement
 	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
 		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
+		converter.open(fileName);
 		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
 		if (linkToLatest != null) {
 			File logFile = new File(fileName);
@@ -255,6 +262,26 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			}
 
 			return new ServiceLoader<Policy>(Policy.class, String.class).createList(property);
+		}
+	}
+
+	/**
+	 * Creates the file converter from a nullable string.
+	 *
+	 * @param property
+	 *            Nullable string with converter to create
+	 * @return Created file converter
+	 */
+	private static FileConverter createConverter(final String property) {
+		if (property == null || property.isEmpty()) {
+			return new NopFileConverter();
+		} else {
+			if (RuntimeProvider.getProcessId() == Long.MIN_VALUE) {
+				java.util.ServiceLoader.load(FileConverter.class); // Workaround for ProGuard (see issue #126)
+			}
+
+			FileConverter converter = new ServiceLoader<FileConverter>(FileConverter.class).create(property);
+			return converter == null ? new NopFileConverter() : converter;
 		}
 	}
 
