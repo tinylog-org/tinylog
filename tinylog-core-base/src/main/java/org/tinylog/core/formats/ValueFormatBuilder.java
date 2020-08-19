@@ -26,13 +26,6 @@ import java.util.Locale;
 public interface ValueFormatBuilder {
 
 	/**
-	 * Checks if this value format is available on the current environment.
-	 *
-	 * @return {@code true} if available, {@code false} if not
-	 */
-	boolean isCompatible();
-
-	/**
 	 * Creates a new instance of the value format.
 	 *
 	 * @param locale Locale for language or country depending format outputs

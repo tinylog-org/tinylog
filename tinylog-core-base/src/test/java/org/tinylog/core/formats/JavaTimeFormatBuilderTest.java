@@ -23,15 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JavaTimeFormatBuilderTest {
 
 	/**
-	 * Verifies that the builder is compatible with the current environment.
-	 */
-	@Test
-	void compatibility() {
-		JavaTimeFormatBuilder builder = new JavaTimeFormatBuilder();
-		assertThat(builder.isCompatible()).isTrue();
-	}
-
-	/**
 	 * Verifies that the builder can create an instance of {@link JavaTimeFormat}.
 	 */
 	@Test

@@ -51,9 +51,7 @@ public final class EnhancedMessageFormatter implements MessageFormatter {
 	public EnhancedMessageFormatter(Framework framework, Locale locale) {
 		formats = new ArrayList<ValueFormat>();
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
-			if (builder.isCompatible()) {
-				formats.add(builder.create(locale));
-			}
+			formats.add(builder.create(locale));
 		}
 	}
 

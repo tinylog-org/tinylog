@@ -25,11 +25,6 @@ public final class NumberFormatBuilder implements ValueFormatBuilder {
 	}
 
 	@Override
-	public boolean isCompatible() {
-		return true;
-	}
-
-	@Override
 	public NumberFormat create(Locale locale) {
 		return new NumberFormat(locale);
 	}

@@ -23,15 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class NumberFormatBuilderTest {
 
 	/**
-	 * Verifies that the builder is compatible with the current environment.
-	 */
-	@Test
-	void compatibility() {
-		NumberFormatBuilder builder = new NumberFormatBuilder();
-		assertThat(builder.isCompatible()).isTrue();
-	}
-
-	/**
 	 * Verifies that the builder can create an instance of {@link NumberFormat}.
 	 */
 	@Test

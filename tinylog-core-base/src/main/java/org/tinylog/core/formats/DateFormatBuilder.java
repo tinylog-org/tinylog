@@ -25,11 +25,6 @@ public final class DateFormatBuilder implements ValueFormatBuilder {
 	}
 
 	@Override
-	public boolean isCompatible() {
-		return true;
-	}
-
-	@Override
 	public DateFormat create(Locale locale) {
 		return new DateFormat(locale);
 	}

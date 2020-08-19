@@ -16,8 +16,6 @@ package org.tinylog.core.formats;
 import java.time.ZoneId;
 import java.util.Locale;
 
-import org.tinylog.core.util.ClassResolver;
-
 /**
  * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
  */
@@ -25,11 +23,6 @@ public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
 
 	/** */
 	public JavaTimeFormatBuilder() {
-	}
-
-	@Override
-	public boolean isCompatible() {
-		return ClassResolver.isAvailable("java.time.format.DateTimeFormatter");
 	}
 
 	@Override

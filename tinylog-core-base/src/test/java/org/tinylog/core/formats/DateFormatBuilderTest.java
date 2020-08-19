@@ -23,15 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DateFormatBuilderTest {
 
 	/**
-	 * Verifies that the builder is compatible with the current environment.
-	 */
-	@Test
-	void compatibility() {
-		DateFormatBuilder builder = new DateFormatBuilder();
-		assertThat(builder.isCompatible()).isTrue();
-	}
-
-	/**
 	 * Verifies that the builder can create an instance of {@link DateFormat}.
 	 */
 	@Test
