@@ -115,6 +115,36 @@ public final class ProviderRegistryTest {
 			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
 			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
 	}
+	
+	/**
+	 * Verifies that one or more (combined) providers can be obtained again.
+	 *
+	 * @throws Exception
+	 *             Failed invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	public void multipleProvidersGetter() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+		
+		Object saveProvider = Whitebox.getInternalState(ProviderRegistry.class, "loggingProvider");
+		assertThat(ProviderRegistry.getLoggingProvider()).isInstanceOf(NopLoggingProvider.class);
+		
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		Whitebox.setInternalState(ProviderRegistry.class, "loggingProvider", createdProvider);
+		
+		assertThat(ProviderRegistry.getLoggingProviders())
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);	
+		
+		Whitebox.setInternalState(ProviderRegistry.class, "loggingProvider", saveProvider);
+		
+		assertThat(ProviderRegistry.getLoggingProviders())
+			.hasSize(1)
+			.hasAtLeastOneElementOfType(NopLoggingProvider.class);	
+		
+		assertThat(ProviderRegistry.getLoggingProvider()).isInstanceOf(NopLoggingProvider.class);
+	}
 
 	/**
 	 * Verifies that a defined logging provider can be loaded if multiple are available.

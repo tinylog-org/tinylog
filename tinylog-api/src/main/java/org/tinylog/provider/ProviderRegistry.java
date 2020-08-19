@@ -14,6 +14,8 @@
 package org.tinylog.provider;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
@@ -51,6 +53,23 @@ public final class ProviderRegistry {
 	 */
 	public static LoggingProvider getLoggingProvider() {
 		return loggingProvider;
+	}
+	
+	/**
+	 * Gets all loaded logging providers.  
+	 * 
+	 * <p>
+	 * If the logging provider is a {@link BundleLoggingProvider} resolve its contents and return them.
+	 * </p>
+	 * 
+	 * @return The list of all logging providers.
+	 */
+	public static List<LoggingProvider> getLoggingProviders() {
+		if (loggingProvider instanceof BundleLoggingProvider) {
+			return ((BundleLoggingProvider) loggingProvider).getLoggingProviders();
+		} else {
+			return Collections.singletonList(loggingProvider);
+		}
 	}
 
 	/**

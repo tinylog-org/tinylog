@@ -17,6 +17,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -408,5 +409,42 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			}
 		}
 	}
+	
+	/**
+	 * Gets all writers of the provider which respond to the given tag. A null tag is possible for the generic writer.
+	 *
+	 * @param tag
+	 *            The tag to find
+	 * @return All writers
+	 */
+	public Collection<Writer> getWriters(final String tag) {
+		Set<Writer> collectedWriters = new HashSet<Writer>(); 
+		int tagIndex = getTagIndex(tag);
+		if (tagIndex > knownTags.size()) {
+			return collectedWriters;
+		}
+		
+		for (int j = 0; j < writers[tagIndex].length; ++j) {
+			collectedWriters.addAll(writers[tagIndex][j]);
+		}
+		return collectedWriters;
+	}
+	
+	/**
+	 * Gets all writers of the provider.
+	 * 
+	 * @return All writers
+	 */
+	public Collection<Writer> getWriters() {
+		Set<Writer> collectedWriters = new HashSet<Writer>(); 
+		
+		for (int tagIndex = 0; tagIndex < writers.length; ++tagIndex) {
+			for (int levelIndex = 0; levelIndex < writers[tagIndex].length; ++levelIndex) {
+				collectedWriters.addAll(writers[tagIndex][levelIndex]);
+			}
+		}
+
+		return collectedWriters;
+	}	
 
 }
