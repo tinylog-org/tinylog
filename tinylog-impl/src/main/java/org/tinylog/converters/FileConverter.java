@@ -42,10 +42,10 @@ public interface FileConverter {
 	/**
 	 * This method is called when tinylog opens a log file for writing log entries.
 	 *
-	 * @param file
+	 * @param fileName
 	 *            Log file
 	 */
-	void open(File file);
+	void open(String fileName);
 
 	/**
 	 * This method can convert data before writing to the currently opened log file.
@@ -65,19 +65,8 @@ public interface FileConverter {
 	byte[] write(byte[] data, int length);
 
 	/**
-	 * This method is called when tinylog closes a log file.
-	 *
-	 * @param file
-	 *            Log file
+	 * This method is called when tinylog closes the current log file.
 	 */
-	void close(File file);
-
-	/**
-	 * This method is called when the {@link RollingFileWriter} completed a log file and is ready to back it up.
-	 *
-	 * @param file
-	 *            Log file
-	 */
-	void backUp(File file);
+	void close();
 
 }

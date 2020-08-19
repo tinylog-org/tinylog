@@ -25,6 +25,8 @@ public final class GzipFileConverter implements FileConverter {
 
 	private static final AtomicInteger count = new AtomicInteger();
 
+	private volatile File file;
+
 	/** */
 	public GzipFileConverter() {
 	}
@@ -35,8 +37,8 @@ public final class GzipFileConverter implements FileConverter {
 	}
 
 	@Override
-	public void open(final File file) {
-		// Ignore
+	public void open(final String fileName) {
+		file = new File(fileName);
 	}
 
 	@Override
@@ -45,12 +47,7 @@ public final class GzipFileConverter implements FileConverter {
 	}
 
 	@Override
-	public void close(final File file) {
-		// Ignore
-	}
-
-	@Override
-	public void backUp(final File file) {
+	public void close() {
 		Thread thread = new Thread(new GzipEncoder(file));
 		thread.setName(THREAD_NAME_PREFIX + count.getAndIncrement());
 		thread.setPriority(Thread.MIN_PRIORITY);

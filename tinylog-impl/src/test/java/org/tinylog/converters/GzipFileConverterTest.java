@@ -49,41 +49,30 @@ public class GzipFileConverterTest {
 	}
 
 	/**
-	 * Verifies that data won't be converted on-the-fly.
+	 * Verifies that files will be compressed and the original file will be deleted after closing.
 	 *
 	 * @throws IOException
 	 *             Failed to create new file
 	 */
 	@Test
-	public void conversion() throws IOException {
-		File file = folder.newFile();
-		byte[] data = new byte[] { 1, 2, 3, 0, 0 };
-		GzipFileConverter converter = new GzipFileConverter();
-
-		converter.open(file);
-		assertThat(converter.write(data, 3)).isSameAs(data);
-		converter.close(file);
-	}
-
-	/**
-	 * Verifies that backup files will be compressed and the original file will be deleted.
-	 *
-	 * @throws IOException
-	 *             Failed to access file
-	 */
-	@Test
-	public void backup() throws IOException {
+	public void compression() throws IOException {
 		File originalFile = folder.newFile();
 		File compressedFile = new File(originalFile.getAbsolutePath() + ".gz");
-		Files.write(originalFile.toPath(), "Test 42".getBytes(StandardCharsets.UTF_8));
 
-		new GzipFileConverter().backUp(originalFile);
+		byte[] data = "My little GZIP test".getBytes(StandardCharsets.UTF_8);
+		GzipFileConverter converter = new GzipFileConverter();
+
+		converter.open(originalFile.getAbsolutePath());
+		assertThat(converter.write(data, data.length)).isSameAs(data);
+		Files.write(originalFile.toPath(), data);
+		converter.close();
+
 		waitFor(originalFile::exists, value -> !value, 1000);
 
 		try (InputStream fileStream = new FileInputStream(compressedFile)) {
 			try (GZIPInputStream gzipStream = new GZIPInputStream(fileStream)) {
 				String uncompressedText = new String(gzipStream.readAllBytes(), StandardCharsets.UTF_8);
-				assertThat(uncompressedText).isEqualTo("Test 42");
+				assertThat(uncompressedText).isEqualTo("My little GZIP test");
 			}
 		}
 
