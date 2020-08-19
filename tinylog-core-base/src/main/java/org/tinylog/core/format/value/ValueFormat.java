@@ -11,23 +11,28 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
-
-import java.time.ZoneId;
-import java.util.Locale;
+package org.tinylog.core.format.value;
 
 /**
- * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
+ * Format interface for different value types.
  */
-public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
+public interface ValueFormat {
 
-	/** */
-	public JavaTimeFormatBuilder() {
-	}
+	/**
+	 * Checks if the passed value is supported.
+	 *
+	 * @param value Value to test
+	 * @return {@code true} if the passed value is supported, {@code false} if not
+	 */
+	boolean isSupported(Object value);
 
-	@Override
-	public JavaTimeFormat create(Locale locale) {
-		return new JavaTimeFormat(locale, ZoneId.systemDefault());
-	}
+	/**
+	 * Formats the passed value.
+	 *
+	 * @param pattern Format pattern for the value
+	 * @param value Value to format
+	 * @return Formatted value
+	 */
+	String format(String pattern, Object value);
 
 }

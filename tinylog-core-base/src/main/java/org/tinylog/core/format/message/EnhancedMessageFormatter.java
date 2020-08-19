@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formatters;
+package org.tinylog.core.format.message;
 
 import java.text.ChoiceFormat;
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 
 import org.tinylog.core.Framework;
-import org.tinylog.core.formats.ValueFormat;
-import org.tinylog.core.formats.ValueFormatBuilder;
+import org.tinylog.core.format.value.ValueFormat;
+import org.tinylog.core.format.value.ValueFormatBuilder;
 
 /**
  * Enhanced message formatter that replaces '{}' placeholders with passed arguments and optionally accepts format

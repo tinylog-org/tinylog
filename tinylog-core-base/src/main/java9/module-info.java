@@ -12,10 +12,10 @@
  */
 
 import org.tinylog.core.Hook;
-import org.tinylog.core.formats.DateFormatBuilder;
-import org.tinylog.core.formats.JavaTimeFormatBuilder;
-import org.tinylog.core.formats.NumberFormatBuilder;
-import org.tinylog.core.formats.ValueFormatBuilder;
+import org.tinylog.core.format.value.DateFormatBuilder;
+import org.tinylog.core.format.value.JavaTimeFormatBuilder;
+import org.tinylog.core.format.value.NumberFormatBuilder;
+import org.tinylog.core.format.value.ValueFormatBuilder;
 import org.tinylog.core.providers.LoggingProviderBuilder;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 
@@ -33,8 +33,8 @@ module org.tinylog.core {
 		NopLoggingProviderBuilder;
 
 	exports org.tinylog.core;
-	exports org.tinylog.core.formats;
-	exports org.tinylog.core.formatters;
+	exports org.tinylog.core.format.message;
+	exports org.tinylog.core.format.value;
 	exports org.tinylog.core.providers;
 	exports org.tinylog.core.runtime;
 }

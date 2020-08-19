@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.format.value;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

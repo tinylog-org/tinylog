@@ -11,34 +11,22 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.format.value;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 /**
- * Format for numbers.
+ * Builder for creating {@link NumberFormat NumberFormats}.
  */
-public final class NumberFormat implements ValueFormat {
+public final class NumberFormatBuilder implements ValueFormatBuilder {
 
-	private final DecimalFormatSymbols symbols;
-
-	/**
-	 * @param locale Locale for language or country depending decimal format symbols
-	 */
-	public NumberFormat(Locale locale) {
-		this.symbols = new DecimalFormatSymbols(locale);
+	/** */
+	public NumberFormatBuilder() {
 	}
 
 	@Override
-	public boolean isSupported(final Object value) {
-		return value instanceof Number;
-	}
-
-	@Override
-	public String format(final String pattern, final Object value) {
-		return new DecimalFormat(pattern, symbols).format(value);
+	public NumberFormat create(Locale locale) {
+		return new NumberFormat(locale);
 	}
 
 }

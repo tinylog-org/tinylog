@@ -11,34 +11,34 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.format.value;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 /**
- * Format for {@link Date}.
+ * Format for numbers.
  */
-public final class DateFormat implements ValueFormat {
+public final class NumberFormat implements ValueFormat {
 
-	private final Locale locale;
+	private final DecimalFormatSymbols symbols;
 
 	/**
-	 * @param locale Locale for language or country depending format outputs
+	 * @param locale Locale for language or country depending decimal format symbols
 	 */
-	public DateFormat(Locale locale) {
-		this.locale = locale;
+	public NumberFormat(Locale locale) {
+		this.symbols = new DecimalFormatSymbols(locale);
 	}
 
 	@Override
 	public boolean isSupported(final Object value) {
-		return value instanceof Date;
+		return value instanceof Number;
 	}
 
 	@Override
 	public String format(final String pattern, final Object value) {
-		return new SimpleDateFormat(pattern, locale).format(value);
+		return new DecimalFormat(pattern, symbols).format(value);
 	}
 
 }

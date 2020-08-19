@@ -11,22 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.format.value;
 
+import java.time.ZoneId;
 import java.util.Locale;
 
 /**
- * Builder for creating {@link NumberFormat NumberFormats}.
+ * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
  */
-public final class NumberFormatBuilder implements ValueFormatBuilder {
+public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
 
 	/** */
-	public NumberFormatBuilder() {
+	public JavaTimeFormatBuilder() {
 	}
 
 	@Override
-	public NumberFormat create(Locale locale) {
-		return new NumberFormat(locale);
+	public JavaTimeFormat create(Locale locale) {
+		return new JavaTimeFormat(locale, ZoneId.systemDefault());
 	}
 
 }

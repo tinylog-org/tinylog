@@ -11,7 +11,26 @@
  * specific language governing permissions and limitations under the License.
  */
 
+package org.tinylog.core.format.value;
+
+import java.util.Locale;
+
 /**
- * Formatters for replacing placeholders with real values in text messages.
+ * Builder for creating {@link ValueFormat ValueFormats}.
+ *
+ * <p>
+ *     New value format builders can be provided as {@link java.util.ServiceLoader service} in
+ *     {@code META-INF/services}.
+ * </p>
  */
-package org.tinylog.core.formatters;
+public interface ValueFormatBuilder {
+
+	/**
+	 * Creates a new instance of the value format.
+	 *
+	 * @param locale Locale for language or country depending format outputs
+	 * @return New instance of the value format
+	 */
+	ValueFormat create(Locale locale);
+
+}

@@ -11,22 +11,22 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formatters;
+package org.tinylog.core.format.value;
+
+import java.util.Locale;
 
 /**
- * Message formatter can replace placeholders with real values in strings.
+ * Builder for creating {@link DateFormat DateFormats}.
  */
-public interface MessageFormatter {
+public final class DateFormatBuilder implements ValueFormatBuilder {
 
-	/**
-	 * Replaces all placeholders with real values.
-	 *
-	 * @param message
-	 *            Text message with placeholders
-	 * @param arguments
-	 *            Replacements for placeholders
-	 * @return Formatted text message
-	 */
-	String format(String message, Object... arguments);
+	/** */
+	public DateFormatBuilder() {
+	}
+
+	@Override
+	public DateFormat create(Locale locale) {
+		return new DateFormat(locale);
+	}
 
 }

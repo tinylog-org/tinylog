@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formatters;
+package org.tinylog.core.format.message;
 
 import java.text.ChoiceFormat;
 import java.time.LocalTime;

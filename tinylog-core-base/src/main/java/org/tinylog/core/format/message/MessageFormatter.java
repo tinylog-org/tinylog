@@ -11,7 +11,22 @@
  * specific language governing permissions and limitations under the License.
  */
 
+package org.tinylog.core.format.message;
+
 /**
- * Formats for formatting data values.
+ * Message formatter can replace placeholders with real values in strings.
  */
-package org.tinylog.core.formats;
+public interface MessageFormatter {
+
+	/**
+	 * Replaces all placeholders with real values.
+	 *
+	 * @param message
+	 *            Text message with placeholders
+	 * @param arguments
+	 *            Replacements for placeholders
+	 * @return Formatted text message
+	 */
+	String format(String message, Object... arguments);
+
+}

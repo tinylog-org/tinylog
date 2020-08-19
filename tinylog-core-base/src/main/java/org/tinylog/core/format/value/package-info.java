@@ -11,28 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
-
 /**
- * Format interface for different value types.
+ * Formats for formatting data values.
  */
-public interface ValueFormat {
-
-	/**
-	 * Checks if the passed value is supported.
-	 *
-	 * @param value Value to test
-	 * @return {@code true} if the passed value is supported, {@code false} if not
-	 */
-	boolean isSupported(Object value);
-
-	/**
-	 * Formats the passed value.
-	 *
-	 * @param pattern Format pattern for the value
-	 * @param value Value to format
-	 * @return Formatted value
-	 */
-	String format(String pattern, Object value);
-
-}
+package org.tinylog.core.format.value;

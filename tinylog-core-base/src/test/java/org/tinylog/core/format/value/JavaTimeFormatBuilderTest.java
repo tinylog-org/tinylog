@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.formats;
+package org.tinylog.core.format.value;
 
 import java.util.Locale;
 import java.util.ServiceLoader;
@@ -20,15 +20,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DateFormatBuilderTest {
+class JavaTimeFormatBuilderTest {
 
 	/**
-	 * Verifies that the builder can create an instance of {@link DateFormat}.
+	 * Verifies that the builder can create an instance of {@link JavaTimeFormat}.
 	 */
 	@Test
 	void creation() {
-		DateFormatBuilder builder = new DateFormatBuilder();
-		assertThat(builder.create(Locale.GERMANY)).isInstanceOf(DateFormat.class);
+		JavaTimeFormatBuilder builder = new JavaTimeFormatBuilder();
+		assertThat(builder.create(Locale.GERMANY)).isInstanceOf(JavaTimeFormat.class);
 	}
 
 	/**
@@ -37,7 +37,7 @@ class DateFormatBuilderTest {
 	@Test
 	void service() {
 		assertThat(ServiceLoader.load(ValueFormatBuilder.class))
-			.anyMatch(builder -> builder instanceof DateFormatBuilder);
+			.anyMatch(builder -> builder instanceof JavaTimeFormatBuilder);
 	}
 
 }
