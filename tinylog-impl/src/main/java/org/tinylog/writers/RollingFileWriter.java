@@ -104,37 +104,6 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
 	}
 
-	@IgnoreJRERequirement
-	private List<File> filterOutLatestLink(final List<File> files) {
-		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
-			files.remove(new File(linkToLatest.resolve()));
-		}
-		return files;
-	}
-
-	@IgnoreJRERequirement
-	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
-		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
-		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
-		if (linkToLatest != null) {
-			File logFile = new File(fileName);
-			File linkFile = new File(linkToLatest.resolve());
-			if (!RuntimeProvider.isAndroid()) {
-				try {
-					Path logPath = logFile.toPath();
-					Path linkPath = linkFile.toPath();
-					Files.deleteIfExists(linkPath);
-					Files.createLink(linkPath, logPath);
-				} catch (IOException ex) {
-					InternalLogger.log(Level.ERROR, ex, "Failed to create link '" + linkFile + "'");
-				}
-			} else {
-				InternalLogger.log(Level.WARN, "Cannot create link to latest log file on Android");
-			}
-		}
-		return writer;
-	}
-
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		byte[] data = render(logEntry).getBytes(charset);
@@ -213,6 +182,61 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 */
 	private void internalClose() throws IOException {
 		writer.close();
+	}
+
+	/**
+	 * Removes the link to the latest log file from a list of files.
+	 *
+	 * @param files
+	 *            Modifiable list of files
+	 * @return The passed list
+	 */
+	@IgnoreJRERequirement
+	private List<File> filterOutLatestLink(final List<File> files) {
+		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
+			files.remove(new File(linkToLatest.resolve()));
+		}
+		return files;
+	}
+
+	/**
+	 * Creates a {@link ByteArrayWriter} for a file and creates a link to it if linking is enabled.
+	 *
+	 * @param fileName
+	 *            Name of file to open for writing
+	 * @param append
+	 *            An already existing file should be continued
+	 * @param buffered
+	 *            Output should be buffered
+	 * @param threadSafe
+	 *            Created writer must be thread-safe
+	 * @param shared
+	 *            Output file is shared with other processes
+	 * @return Writer for writing to passed file
+	 * @throws FileNotFoundException
+	 *             File does not exist or cannot be opened for any other reason
+	 */
+	@IgnoreJRERequirement
+	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
+		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
+		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
+		if (linkToLatest != null) {
+			File logFile = new File(fileName);
+			File linkFile = new File(linkToLatest.resolve());
+			if (!RuntimeProvider.isAndroid()) {
+				try {
+					Path logPath = logFile.toPath();
+					Path linkPath = linkFile.toPath();
+					Files.deleteIfExists(linkPath);
+					Files.createLink(linkPath, logPath);
+				} catch (IOException ex) {
+					InternalLogger.log(Level.ERROR, ex, "Failed to create link '" + linkFile + "'");
+				}
+			} else {
+				InternalLogger.log(Level.WARN, "Cannot create link to latest log file on Android");
+			}
+		}
+		return writer;
 	}
 
 	/**
