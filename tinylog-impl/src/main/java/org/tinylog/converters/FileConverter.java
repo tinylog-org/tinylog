@@ -13,8 +13,6 @@
 
 package org.tinylog.converters;
 
-import java.io.File;
-
 import org.tinylog.writers.RollingFileWriter;
 
 /**
