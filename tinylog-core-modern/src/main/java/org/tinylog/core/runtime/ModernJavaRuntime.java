@@ -13,26 +13,13 @@
 
 package org.tinylog.core.runtime;
 
-import java.time.Instant;
-import java.util.Locale;
-
 /**
  * Runtime implementation for modern Java 9 and later.
  */
-public final class ModernJavaRuntime implements RuntimeFlavor<Instant> {
+public final class ModernJavaRuntime implements RuntimeFlavor {
 
 	/** */
 	public ModernJavaRuntime() {
-	}
-
-	@Override
-	public ModernTimestamp createTimestamp() {
-		return new ModernTimestamp(Instant.now());
-	}
-
-	@Override
-	public ModernTimestampFormatter createTimestampFormatter(String pattern, Locale locale) {
-		return new ModernTimestampFormatter(pattern, locale);
 	}
 
 }

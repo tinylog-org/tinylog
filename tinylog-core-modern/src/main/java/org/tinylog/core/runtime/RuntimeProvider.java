@@ -13,8 +13,6 @@
 
 package org.tinylog.core.runtime;
 
-import java.time.Instant;
-
 /**
  * Provider for acquiring the appropriate {@link RuntimeFlavor} for the actual virtual machine.
  */
@@ -29,7 +27,7 @@ public final class RuntimeProvider {
 	 *
 	 * @return An appropriate runtime instance
 	 */
-	public RuntimeFlavor<Instant> getRuntime() {
+	public RuntimeFlavor getRuntime() {
 		return new ModernJavaRuntime();
 	}
 

@@ -13,8 +13,6 @@
 
 package org.tinylog.core.runtime;
 
-import java.util.Date;
-
 /**
  * Provider for acquiring the appropriate {@link RuntimeFlavor} for the actual virtual machine.
  */
@@ -29,7 +27,7 @@ public final class RuntimeProvider {
 	 *
 	 * @return An appropriate runtime instance
 	 */
-	public RuntimeFlavor<Date> getRuntime() {
+	public RuntimeFlavor getRuntime() {
 		if (System.getProperty("java.runtime.name").equals("Android Runtime")) {
 			return new AndroidRuntime();
 		} else {
