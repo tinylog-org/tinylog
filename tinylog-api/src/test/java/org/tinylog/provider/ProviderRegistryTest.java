@@ -116,7 +116,6 @@ public final class ProviderRegistryTest {
 			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
 	}
 	
-	
 	/**
 	 * Verifies that one or more (combined) providers can be obtained again.
 	 *
@@ -125,7 +124,6 @@ public final class ProviderRegistryTest {
 	 */
 	@Test
 	public void multipleProvidersGetter() throws Exception {
-		
 		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
 		
 		Object saveProvider = Whitebox.getInternalState(ProviderRegistry.class, "loggingProvider");
@@ -147,7 +145,6 @@ public final class ProviderRegistryTest {
 		
 		assertThat(ProviderRegistry.getLoggingProvider()).isInstanceOf(NopLoggingProvider.class);
 	}
-	
 
 	/**
 	 * Verifies that a defined logging provider can be loaded if multiple are available.

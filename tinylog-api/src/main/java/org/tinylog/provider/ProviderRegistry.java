@@ -56,7 +56,7 @@ public final class ProviderRegistry {
 	}
 	
 	/**
-	 * Get all loaded logging providers.  
+	 * Gets all loaded logging providers.  
 	 * 
 	 * <p>
 	 * If the logging provider is a {@link BundleLoggingProvider} resolve its contents and return them.

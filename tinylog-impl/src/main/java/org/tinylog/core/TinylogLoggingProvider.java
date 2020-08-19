@@ -411,9 +411,11 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 	
 	/**
-	 * Get all writers of the provider which respond to the given tag. A null tag is possible for the generic writer.
-	 * @param tag The tag to find
-	 * @return The writer objects.
+	 * Gets all writers of the provider which respond to the given tag. A null tag is possible for the generic writer.
+	 *
+	 * @param tag
+	 *            The tag to find
+	 * @return All writers
 	 */
 	public Collection<Writer> getWriters(final String tag) {
 		Set<Writer> collectedWriters = new HashSet<Writer>(); 
@@ -429,8 +431,9 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 	
 	/**
-	 * Get all writers of the provider.
-	 * @return The writes.
+	 * Gets all writers of the provider.
+	 * 
+	 * @return All writers
 	 */
 	public Collection<Writer> getWriters() {
 		Set<Writer> collectedWriters = new HashSet<Writer>(); 
