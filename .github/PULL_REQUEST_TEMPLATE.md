@@ -17,5 +17,5 @@ Additions or amendments for the [public documentation](https://github.com/pmwmed
 
 ### Agreements
 
-- [ ] I agree that my changes will be published under the terms of the [Apache License 2.0](../license.txt)
+- [ ] I agree that my changes will be published under the terms of the [Apache License 2.0](https://github.com/pmwmedia/tinylog/blob/v2.0/license.txt)
 - [ ] I agree that my GitHub user name will be published in the release notes
