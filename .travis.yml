@@ -1,20 +1,30 @@
 language: java
-os: linux
 dist: trusty
-install: true
 
-jdk:
-  - oraclejdk9
-  - openjdk9
+jobs:
+  include:
 
-script:
-  - mvn clean install -P release -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - name: Development build with JDK 9
+      jdk: openjdk9
+      install: true
+      script:
+        - mvn clean install -P dev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+    - name: Release build with JDK 8 + 11
+      jdk: openjdk8
+      install:
+        - ln -s ${JAVA_HOME} /home/travis/jdk8
+        - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+        - source ./install-jdk.sh --feature 11 --target /home/travis/jdk11
+        - export JAVA_HOME=/home/travis/jdk8
+      script:
+        - mvn clean install -P release -t .travis-toolchains.xml -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
+before_cache: rm -rf $HOME/.m2/repository/org/tinylog
+
 cache:
   directories:
   - $HOME/.m2
-
-before_cache: rm -rf $HOME/.m2/repository/org/tinylog
