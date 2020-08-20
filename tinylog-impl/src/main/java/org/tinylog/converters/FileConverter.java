@@ -29,11 +29,11 @@ public interface FileConverter {
 	 * Gets the additional file extension for backup files.
 	 *
 	 * <p>
-	 *     The method can return {@code null} or an empty string, if this converter does not create backup files with
-	 *     different file extension.
+	 *     The method can return {@code null}, if this converter does not create backup files with different file
+	 *     extensions.
 	 * </p>
 	 *
-	 * @return Additional file extension, {@code null}, or empty string
+	 * @return Additional file extension or {@code null}
 	 */
 	String getBackupSuffix();
 
