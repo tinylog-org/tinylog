@@ -418,7 +418,22 @@ public final class ConfigurationParserTest {
 				.allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
 		});
 	}
-	
+
+	/**
+	 * Verifies that writers with the severity level {@link Level#OFF OFF} will not be created.
+	 */
+	@Test
+	public void levelOfWriterIsOff() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.level", "off");
+
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.INFO, false);
+
+		assertThat(writers).hasSize(2).allSatisfy(element ->
+			assertThat(element).hasSize(5).allSatisfy(collection -> assertThat(collection).isEmpty())
+		);
+	}
+
 	/**
 	 * Verifies that a {@link ThrowableFilter} can be registered globally.
 	 */

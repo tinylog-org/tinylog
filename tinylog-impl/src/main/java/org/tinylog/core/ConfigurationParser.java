@@ -137,7 +137,11 @@ public final class ConfigurationParser {
 			if (level.ordinal() < minimumLevel.ordinal()) {
 				level = minimumLevel;
 			}
-			
+
+			if (level == Level.OFF) {
+				continue;
+			}
+
 			String exception = Configuration.get("exception");
 			if (exception != null && !configuration.containsKey("exception")) {
 				configuration.put("exception", exception);
