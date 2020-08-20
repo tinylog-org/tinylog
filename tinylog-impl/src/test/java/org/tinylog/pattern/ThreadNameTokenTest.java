@@ -55,7 +55,7 @@ public final class ThreadNameTokenTest {
 	@Test
 	public void renderThreadNameIfThreadIsNull() {
 		ThreadNameToken token = new ThreadNameToken();
-		assertThat(render(token, null)).isEqualTo("<Thread is not set>");
+		assertThat(render(token, null)).isEqualTo("null");
 	}
 
 	/**
@@ -86,7 +86,7 @@ public final class ThreadNameTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(null), statement, 1);
-		verify(statement).setString(1, "<Thread is not set>");
+		verify(statement).setString(1, null);
 	}
 	
 	/**

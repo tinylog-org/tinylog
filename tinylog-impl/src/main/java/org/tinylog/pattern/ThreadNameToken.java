@@ -38,13 +38,13 @@ final class ThreadNameToken implements Token {
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		Thread thread = logEntry.getThread();
-		builder.append(thread == null ? "<Thread is not set>" : thread.getName());
+		builder.append(thread == null ? null : thread.getName());
 	}
 	
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		Thread thread = logEntry.getThread();
-		statement.setString(index, thread == null ? "<Thread is not set>" : thread.getName());
+		statement.setString(index, thread == null ? null : thread.getName());
 	}
 
 }

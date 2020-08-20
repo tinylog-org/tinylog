@@ -15,6 +15,7 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -38,13 +39,17 @@ final class ThreadIdToken implements Token {
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		Thread thread = logEntry.getThread();
-		builder.append(thread == null ? "<ID of thread is not set>" : thread.getId());
+		builder.append(thread == null ? "?" : thread.getId());
 	}
 	
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		Thread thread = logEntry.getThread();
-		statement.setLong(index, thread == null ? -1 : thread.getId());
+		if (thread == null) {
+			statement.setNull(index, Types.BIGINT);
+		} else {
+			statement.setLong(index, thread.getId());
+		}
 	}
 
 }

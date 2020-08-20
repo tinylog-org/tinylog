@@ -15,6 +15,7 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.Test;
 import org.tinylog.core.LogEntry;
@@ -55,7 +56,7 @@ public final class ThreadIdTokenTest {
 	@Test
 	public void renderThreadIdIfThreadIsNull() {
 		ThreadIdToken token = new ThreadIdToken();
-		assertThat(render(token, null)).isEqualTo("<ID of thread is not set>");
+		assertThat(render(token, null)).isEqualTo("?");
 	}
 
 	/**
@@ -86,7 +87,7 @@ public final class ThreadIdTokenTest {
 
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(null), statement, 1);
-		verify(statement).setLong(1, -1);
+		verify(statement).setNull(1, Types.BIGINT);
 	}
 	
 	/**
