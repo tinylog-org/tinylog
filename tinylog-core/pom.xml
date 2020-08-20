@@ -87,6 +87,9 @@
                     <execution>
                         <id>default-compile</id>
                         <configuration>
+                            <compilerArgs>
+                                <arg>-XDignore.symbol.file</arg>
+                            </compilerArgs>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.parent.basedir}/tinylog-core-base/src/main/java</compileSourceRoot>
                             </compileSourceRoots>
