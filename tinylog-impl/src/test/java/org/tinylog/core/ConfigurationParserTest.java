@@ -278,9 +278,9 @@ public final class ConfigurationParserTest {
 		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
 
 		assertThat(writers).hasSize(2).allSatisfy(element ->
-			assertThat(element).hasSize(5).allSatisfy(collection -> {
-				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isNotNull());
-			})
+			assertThat(element).hasSize(5).allSatisfy(collection ->
+				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isNotNull())
+			)
 		);
 	}
 
@@ -294,7 +294,7 @@ public final class ConfigurationParserTest {
 		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.OFF, false);
 
 		assertThat(writers).hasSize(2).allSatisfy(element ->
-			assertThat(element).hasSize(5).allSatisfy(Collection::isEmpty)
+			assertThat(element).hasSize(5).allSatisfy(collection -> assertThat(collection).isEmpty())
 		);
 	}
 
@@ -313,9 +313,9 @@ public final class ConfigurationParserTest {
 			.allSatisfy(element -> assertThat(element).hasSize(5));
 
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
-		assertThat(writers[1]).allSatisfy(collection -> {
-			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
-		});
+		assertThat(writers[1]).allSatisfy(collection ->
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class))
+		);
 		assertThat(writers[2]).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
@@ -330,9 +330,9 @@ public final class ConfigurationParserTest {
 		Collection<Writer>[][] writers = ConfigurationParser.createWriters(emptyList(), Level.TRACE, false);
 
 		assertThat(writers).hasSize(2);
-		assertThat(writers[0]).allSatisfy(collection -> {
-			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
-		});
+		assertThat(writers[0]).allSatisfy(collection ->
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class))
+		);
 		assertThat(writers[1]).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
@@ -358,12 +358,12 @@ public final class ConfigurationParserTest {
 			.allSatisfy(element -> assertThat(element).hasSize(5));
 
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
-		assertThat(writers[1]).allSatisfy(collection -> {
+		assertThat(writers[1]).allSatisfy(collection ->
 			assertThat(collection)
 				.hasSize(2)
 				.hasAtLeastOneElementOfType(ConsoleWriter.class)
-				.hasAtLeastOneElementOfType(FileWriter.class);
-		});
+				.hasAtLeastOneElementOfType(FileWriter.class)
+		);
 		assertThat(writers[2]).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
@@ -449,7 +449,7 @@ public final class ConfigurationParserTest {
 	 * Verifies that a global {@link ThrowableFilter} can be overridden by another one directly registered on a writer.
 	 */
 	@Test
-	public void overridelException() {
+	public void overrideException() {
 		Configuration.set("exception", "drop cause");
 		Configuration.set("writer", "configuration store");
 		Configuration.set("writer.exception", "unpack");
