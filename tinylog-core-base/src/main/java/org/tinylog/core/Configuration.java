@@ -86,7 +86,7 @@ public final class Configuration {
 			if (value == null) {
 				return Collections.emptyList();
 			} else {
-				List<String> elements = new ArrayList<String>();
+				List<String> elements = new ArrayList<>();
 				for (String element : value.split(",")) {
 					String normalized = element.trim();
 					if (!normalized.isEmpty()) {

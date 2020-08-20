@@ -155,7 +155,7 @@ public final class Framework {
 	 * @return All found hooks
 	 */
 	private static Collection<Hook> loadHooks(ClassLoader classLoader) {
-		Collection<Hook> hooks = new ArrayList<Hook>();
+		Collection<Hook> hooks = new ArrayList<>();
 		for (Hook hook : ServiceLoader.load(Hook.class, classLoader)) {
 			hooks.add(hook);
 		}
@@ -169,7 +169,7 @@ public final class Framework {
 		configuration.freeze();
 
 		List<String> names = configuration.getList("backend");
-		List<LoggingProvider> providers = new ArrayList<LoggingProvider>();
+		List<LoggingProvider> providers = new ArrayList<>();
 
 		for (LoggingProviderBuilder builder : ServiceLoader.load(LoggingProviderBuilder.class, getClassLoader())) {
 			if ((names.isEmpty() && !(builder instanceof NopLoggingProviderBuilder))

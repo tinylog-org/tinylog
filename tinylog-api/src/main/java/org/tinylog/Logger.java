@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class Logger {
 
-	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<String, TaggedLogger>();
+	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<>();
 	private static final TaggedLogger logger = new TaggedLogger(null);
 
 	/** */

@@ -49,7 +49,7 @@ public final class EnhancedMessageFormatter implements MessageFormatter {
 	 * @param locale The locale for language or country depending format outputs
 	 */
 	public EnhancedMessageFormatter(Framework framework, Locale locale) {
-		formats = new ArrayList<ValueFormat>();
+		formats = new ArrayList<>();
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
 			formats.add(builder.create(locale));
 		}
