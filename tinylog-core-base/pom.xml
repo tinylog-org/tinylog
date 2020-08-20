@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <artifactId>tinylog-core-base</artifactId>
 
-    <description>Core functionality for all logging APIs and implementations based on legacy Java before version 9 and Android</description>
+    <description>Core functionality for all logging APIs and implementations based on legacy Java 8 and Android</description>
     <url>${website.url}</url>
 
     <parent>
