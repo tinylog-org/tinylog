@@ -73,6 +73,15 @@ public final class PackageNameTokenTest {
 	}
 
 	/**
+	 * Verifies that nothing will be appended to a {@link StringBuilder} for a null class name.
+	 */
+	@Test
+	public void renderClassWithoutPackageIfClassnameIsNull() {
+		PackageNameToken token = new PackageNameToken();
+		assertThat(render(token, null)).isEmpty();
+	}
+	
+	/**
 	 * Verifies that {@code null} will be added to a {@link PreparedStatement} for classes in the default package.
 	 *
 	 * @throws SQLException

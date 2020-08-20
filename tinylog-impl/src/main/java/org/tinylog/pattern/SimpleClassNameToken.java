@@ -57,6 +57,9 @@ final class SimpleClassNameToken implements Token {
 	 * @return Class name without package prefix
 	 */
 	private static String getSimpleClassName(final String fullyQualifiedClassName) {
+		if (fullyQualifiedClassName == null) {
+			return null;
+		}		
 		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
 		if (dotIndex < 0) {
 			return fullyQualifiedClassName;

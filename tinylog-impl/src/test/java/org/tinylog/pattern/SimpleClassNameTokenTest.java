@@ -74,6 +74,15 @@ public final class SimpleClassNameTokenTest {
 	}
 
 	/**
+	 * Verifies that nothing will be appended to a {@link StringBuilder} for null class names.
+	 */
+	@Test
+	public void renderClassWithoutPackageIfClassnameIsNull() {
+		SimpleClassNameToken token = new SimpleClassNameToken();
+		assertThat(render(token, null)).isEqualTo("null");
+	}
+	
+	/**
 	 * Verifies that the simple name of a class will be added to a {@link PreparedStatement} for classes in the default
 	 * package.
 	 *

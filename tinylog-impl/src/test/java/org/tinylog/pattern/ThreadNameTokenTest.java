@@ -48,6 +48,15 @@ public final class ThreadNameTokenTest {
 		Thread thread = new Thread("MyThread");
 		assertThat(render(token, thread)).isEqualTo("MyThread");
 	}
+	
+	/**
+	 * Verifies that the name of the thread will be rendered correctly even if the thread is null.
+	 */
+	@Test
+	public void renderThreadNameIfThreadIsNull() {
+		ThreadNameToken token = new ThreadNameToken();
+		assertThat(render(token, null)).isEqualTo("<Thread is not set>");
+	}
 
 	/**
 	 * Verifies that the name of the thread will be added to a {@link PreparedStatement}.
@@ -65,6 +74,21 @@ public final class ThreadNameTokenTest {
 		verify(statement).setString(1, "MyThread");
 	}
 
+	/**
+	 * Verifies that the name of the thread will be added to a {@link PreparedStatement} if the thread is null.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyThreadNameIfThreadIsNull() throws SQLException {
+		ThreadNameToken token = new ThreadNameToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(null), statement, 1);
+		verify(statement).setString(1, "<Thread is not set>");
+	}
+	
 	/**
 	 * Renders a token.
 	 *

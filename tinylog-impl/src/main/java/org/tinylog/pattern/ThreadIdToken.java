@@ -37,12 +37,14 @@ final class ThreadIdToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(logEntry.getThread().getId());
+		Thread thread = logEntry.getThread();
+		builder.append(thread == null ? "<ID of thread is not set>" : thread.getId());
 	}
 	
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		statement.setLong(index, logEntry.getThread().getId());
+		Thread thread = logEntry.getThread();
+		statement.setLong(index, thread == null ? -1 : thread.getId());
 	}
 
 }
