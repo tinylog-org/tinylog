@@ -48,6 +48,15 @@ public final class ThreadIdTokenTest {
 		Thread thread = new Thread();
 		assertThat(render(token, thread)).isEqualTo(String.valueOf(thread.getId()));
 	}
+	
+	/**
+	 * Verifies that the ID of the thread will be rendered correctly even of the thread is null.
+	 */
+	@Test
+	public void renderThreadIdIfThreadIsNull() {
+		ThreadIdToken token = new ThreadIdToken();
+		assertThat(render(token, null)).isEqualTo("<ID of thread is not set>");
+	}
 
 	/**
 	 * Verifies that the ID of the thread will be added to a {@link PreparedStatement}.
@@ -65,6 +74,21 @@ public final class ThreadIdTokenTest {
 		verify(statement).setLong(1, thread.getId());
 	}
 
+	/**
+	 * Verifies that the ID of the thread will be added to a {@link PreparedStatement} if thread is null.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyThreadIdIfThreadIsNull() throws SQLException {
+		ThreadIdToken token = new ThreadIdToken();
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(null), statement, 1);
+		verify(statement).setLong(1, -1);
+	}
+	
 	/**
 	 * Renders a token.
 	 *

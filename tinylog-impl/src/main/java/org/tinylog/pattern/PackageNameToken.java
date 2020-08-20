@@ -56,6 +56,9 @@ final class PackageNameToken implements Token {
 	 * @return Package name or {@code null} for default package
 	 */
 	private static String getPackage(final String fullyQualifiedClassName) {
+		if (fullyQualifiedClassName == null) {
+			return null;
+		}
 		int dotIndex = fullyQualifiedClassName.lastIndexOf('.');
 		if (dotIndex == -1) {
 			return null;
