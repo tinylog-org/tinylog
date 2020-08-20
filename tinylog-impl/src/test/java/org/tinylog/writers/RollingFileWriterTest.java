@@ -310,14 +310,8 @@ public final class RollingFileWriterTest {
 	 */
 	@Test
 	public void useFileConverter() throws IOException {
-		String originalMessage = "Hello World!";
-		String convertedMessage = "Hallo Welt!";
-
-		byte[] originalData = (originalMessage + NEW_LINE).getBytes(StandardCharsets.UTF_8);
-		byte[] convertedData = (convertedMessage + NEW_LINE).getBytes(StandardCharsets.UTF_8);
-
 		FileConverter converter = mock(FileConverter.class);
-		when(converter.write(any(), anyInt())).thenReturn(convertedData);
+		when(converter.write(any())).thenReturn(("Hallo Welt!" + NEW_LINE).getBytes(StandardCharsets.UTF_8));
 		WrapperFileConverter.converter = converter;
 
 		File file = folder.newFile();
@@ -328,15 +322,15 @@ public final class RollingFileWriterTest {
 
 		RollingFileWriter writer = new RollingFileWriter(properties);
 		try {
-			writer.write(LogEntryBuilder.empty().message(originalMessage).create());
+			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
 		} finally {
 			writer.close();
 		}
 
-		assertThat(FileSystem.readFile(file.getAbsolutePath())).isEqualTo(convertedMessage + NEW_LINE);
+		assertThat(FileSystem.readFile(file.getAbsolutePath())).isEqualTo("Hallo Welt!" + NEW_LINE);
 
 		verify(converter).open(file.getAbsolutePath());
-		verify(converter).write(eq(originalData), eq(originalData.length));
+		verify(converter).write(("Hello World!" + NEW_LINE).getBytes(StandardCharsets.UTF_8));
 		verify(converter).close();
 	}
 
@@ -600,8 +594,8 @@ public final class RollingFileWriterTest {
 		}
 
 		@Override
-		public byte[] write(final byte[] data, final int length) {
-			return converter.write(data, length);
+		public byte[] write(final byte[] data) {
+			return converter.write(data);
 		}
 
 		@Override

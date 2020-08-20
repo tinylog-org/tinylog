@@ -33,7 +33,7 @@ public final class NopFileConverter implements FileConverter {
 	}
 
 	@Override
-	public byte[] write(final byte[] data, final int length) {
+	public byte[] write(final byte[] data) {
 		return data;
 	}
 

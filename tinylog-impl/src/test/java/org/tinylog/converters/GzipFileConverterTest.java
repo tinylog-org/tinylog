@@ -63,7 +63,7 @@ public class GzipFileConverterTest {
 		GzipFileConverter converter = new GzipFileConverter();
 
 		converter.open(originalFile.getAbsolutePath());
-		assertThat(converter.write(data, data.length)).isSameAs(data);
+		assertThat(converter.write(data)).isSameAs(data);
 		Files.write(originalFile.toPath(), data);
 		converter.close();
 

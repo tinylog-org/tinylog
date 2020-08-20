@@ -165,8 +165,8 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			}
 		}
 
-		byte[] convertedData = converter.write(data, data.length);
-		writer.write(convertedData, convertedData == data ? data.length : convertedData.length);
+		byte[] convertedData = converter.write(data);
+		writer.write(convertedData, convertedData.length);
 	}
 
 	/**

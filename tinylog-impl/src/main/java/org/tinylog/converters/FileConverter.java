@@ -48,19 +48,11 @@ public interface FileConverter {
 	/**
 	 * This method can convert data before writing to the currently opened log file.
 	 *
-	 * <p>
-	 *     If no converting is required, the original data can be passed as return value. If this method converts the
-	 *     passed byte array, it has to return a new byte array. In this case, all bytes from the created byte array
-	 *     will be written to the currently opened log file.
-	 * </p>
-	 *
 	 * @param data
 	 *            Data to write to the currently opened log file
-	 * @param length
-	 *            Number of bytes that are used to in the passed byte array (all remaining bytes have to be ignored)
 	 * @return The passed byte array or a new byte array that should be written instead
 	 */
-	byte[] write(byte[] data, int length);
+	byte[] write(byte[] data);
 
 	/**
 	 * This method is called when tinylog closes the current log file.

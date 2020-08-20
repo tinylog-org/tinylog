@@ -42,7 +42,7 @@ public final class GzipFileConverter implements FileConverter {
 	}
 
 	@Override
-	public byte[] write(final byte[] data, final int length) {
+	public byte[] write(final byte[] data) {
 		return data;
 	}
 

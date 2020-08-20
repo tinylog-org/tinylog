@@ -49,11 +49,11 @@ public class NopFileConverterTest {
 	@Test
 	public void conversion() throws IOException {
 		String fileName = folder.newFile().getAbsolutePath();
-		byte[] data = new byte[] { 1, 2, 3, 0, 0 };
+		byte[] data = new byte[] { 0, 1, 2, 3 };
 		NopFileConverter converter = new NopFileConverter();
 
 		converter.open(fileName);
-		assertThat(converter.write(data, 3)).isSameAs(data);
+		assertThat(converter.write(data)).isSameAs(data);
 		converter.close();
 	}
 
