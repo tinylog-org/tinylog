@@ -169,13 +169,13 @@
                     <version>0.8.5</version>
                     <executions>
                         <execution>
+                            <id>prepare-agent</id>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
                         </execution>
                         <execution>
-                            <id>report</id>
-                            <phase>verify</phase>
+                            <id>create-report</id>
                             <goals>
                                 <goal>report</goal>
                             </goals>
