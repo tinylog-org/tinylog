@@ -31,12 +31,12 @@ class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that a {@link LegacyJavaRuntime} is provided on standard Java.
+	 * Verifies that a {@link JavaRuntime} is provided on standard Java.
 	 */
 	@Test
 	void legacyJavaRuntime() {
 		RuntimeProvider provider = new RuntimeProvider();
-		assertThat(provider.getRuntime()).isInstanceOf(LegacyJavaRuntime.class);
+		assertThat(provider.getRuntime()).isInstanceOf(JavaRuntime.class);
 	}
 
 }

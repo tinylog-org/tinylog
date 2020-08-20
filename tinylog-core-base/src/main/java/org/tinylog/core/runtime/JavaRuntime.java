@@ -14,21 +14,12 @@
 package org.tinylog.core.runtime;
 
 /**
- * Provider for acquiring the appropriate {@link RuntimeFlavor} for the actual virtual machine.
+ * Runtime implementation for standard Java.
  */
-public final class RuntimeProvider {
+public final class JavaRuntime implements RuntimeFlavor {
 
 	/** */
-	public RuntimeProvider() {
-	}
-
-	/**
-	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
-	 *
-	 * @return An appropriate runtime instance
-	 */
-	public RuntimeFlavor getRuntime() {
-		return new ModernJavaRuntime();
+	public JavaRuntime() {
 	}
 
 }

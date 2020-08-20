@@ -31,7 +31,7 @@ public final class RuntimeProvider {
 		if (System.getProperty("java.runtime.name").equals("Android Runtime")) {
 			return new AndroidRuntime();
 		} else {
-			return new LegacyJavaRuntime();
+			return new JavaRuntime();
 		}
 	}
 
