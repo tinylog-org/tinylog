@@ -62,7 +62,7 @@ final class LoggerTagToken implements Token {
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		String tag = logEntry.getTag();
 		if (tag == null) {
-			statement.setString(index, empty == DEFAULT_EMPTY_TAG ? null : empty);
+			statement.setString(index, DEFAULT_EMPTY_TAG.equals(empty) ? null : empty);
 		} else {
 			statement.setString(index, tag);
 		}
