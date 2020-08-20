@@ -16,7 +16,6 @@ jobs:
         - ln -s ${JAVA_HOME} /home/travis/jdk8
         - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
         - source ./install-jdk.sh --feature 11 --target /home/travis/jdk11
-        - export JAVA_HOME=/home/travis/jdk8
       script:
         - mvn clean install -P release -t .travis-toolchains.xml -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
