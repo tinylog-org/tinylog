@@ -29,8 +29,8 @@ dependencies {
 }
 
 android {
-    buildToolsVersion "30.0.2"
-    compileSdkVersion 30
+    buildToolsVersion "28.0.3"
+    compileSdkVersion 28
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -40,7 +40,7 @@ android {
     defaultConfig {
         applicationId "org.tinylog.core.android"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 28
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
     }
