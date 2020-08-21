@@ -99,7 +99,12 @@
         <module name="JavadocBlockTagLocation"/>
         <module name="JavadocContentLocation"/>
         <module name="JavadocMethod">
+            <property name="id" value="javadocMethodDefault" />
             <property name="validateThrows" value="true" />
+        </module>
+        <module name="JavadocMethod">
+            <property name="id" value="javadocMethodTests" />
+            <property name="validateThrows" value="false" />
         </module>
         <module name="JavadocMissingWhitespaceAfterAsterisk"/>
         <module name="JavadocParagraph"/>
