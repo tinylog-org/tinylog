@@ -22,8 +22,9 @@ jobs:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-before_cache: rm -rf $HOME/.m2/repository/org/tinylog
+before_cache:
+  - rm -rf $HOME/.m2/repository/org/tinylog
 
 cache:
   directories:
-  - $HOME/.m2
+    - $HOME/.m2
