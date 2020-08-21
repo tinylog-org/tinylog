@@ -32,12 +32,13 @@ class AndroidStackTraceAccessTest {
 		StackTraceElementsFiller filler = AndroidStackTraceAccess.getStackTraceElementsFiller();
 		assertThat(filler).isNotNull();
 
-		Object result = filler.getMethod().invoke(Thread.currentThread(), filler.getOffset());
-		assertThat(result).isEqualTo(new StackTraceElement(
+		StackTraceElement[] trace = new StackTraceElement[filler.getOffset() + 1];
+		filler.getMethod().invoke(null, Thread.currentThread(), trace);
+		assertThat(trace[trace.length - 1]).isEqualTo(new StackTraceElement(
 			AndroidStackTraceAccessTest.class.getCanonicalName(),
 			"fillStackTraceElementsAvailable",
 			AndroidStackTraceAccessTest.class.getSimpleName() + ".java",
-			35
+			36
 		));
 	}
 

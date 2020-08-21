@@ -70,10 +70,10 @@ class JavaTimeFormatTest {
 
 		LocalDate date = LocalDate.of(2020, 12, 31);
 		LocalTime time = LocalTime.of(12, 30);
-		ZonedDateTime dateTime = ZonedDateTime.of(date, time, ZoneId.of("Europe/Paris"));
+		ZonedDateTime dateTime = ZonedDateTime.of(date, time, ZoneOffset.ofHours(2));
 
 		assertThat(format.isSupported(dateTime)).isTrue();
-		assertThat(format.format("yyyy-MM-dd HH:mm zzz", dateTime)).isEqualTo("2020-12-31 12:30 CET");
+		assertThat(format.format("yyyy-MM-dd HH:mm Z", dateTime)).isEqualTo("2020-12-31 12:30 +0200");
 	}
 
 	/**

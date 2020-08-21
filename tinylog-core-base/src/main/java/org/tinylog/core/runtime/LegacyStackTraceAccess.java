@@ -34,7 +34,10 @@ final class LegacyStackTraceAccess {
 	@SuppressWarnings("removal")
 	static boolean checkIfSunReflectionIsAvailable() {
 		try {
-			return LegacyStackTraceAccess.class.equals(sun.reflect.Reflection.getCallerClass(1));
+			Class<?> clazz = Class.forName("sun.reflect.Reflection");
+			Method method = clazz.getDeclaredMethod("getCallerClass", int.class);
+			method.setAccessible(true);
+			return LegacyStackTraceAccess.class.equals(method.invoke(null, 1));
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 			return false;

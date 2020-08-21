@@ -15,8 +15,6 @@ package org.tinylog.core.runtime;
 
 import java.lang.reflect.Method;
 
-import dalvik.system.VMStack;
-
 /**
  * Utility class for resolving legacy Android methods for receiving specific elements from the stack trace.
  */
@@ -35,8 +33,8 @@ final class AndroidStackTraceAccess {
 	 */
 	static StackTraceElementsFiller getStackTraceElementsFiller() {
 		try {
-			String name = "fillStackTraceElements";
-			Method method = VMStack.class.getDeclaredMethod(name, Thread.class, StackTraceElement[].class);
+			Class<?> clazz = Class.forName("dalvik.system.VMStack");
+			Method method = clazz.getDeclaredMethod("fillStackTraceElements", Thread.class, StackTraceElement[].class);
 			method.setAccessible(true);
 			StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_SIZE];
 			method.invoke(null, Thread.currentThread(), trace);

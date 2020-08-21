@@ -14,7 +14,8 @@
 package org.tinylog.core.runtime;
 
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,7 +25,7 @@ class RuntimeProviderTest {
 	 * Verifies that an {@link AndroidRuntime} is provided on Android.
 	 */
 	@Test
-	@SetSystemProperty(key = "java.runtime.name", value = "Android Runtime")
+	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	void androidRuntime() {
 		RuntimeProvider provider = new RuntimeProvider();
 		assertThat(provider.getRuntime()).isInstanceOf(AndroidRuntime.class);
@@ -34,6 +35,7 @@ class RuntimeProviderTest {
 	 * Verifies that a {@link JavaRuntime} is provided on standard Java.
 	 */
 	@Test
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	void legacyJavaRuntime() {
 		RuntimeProvider provider = new RuntimeProvider();
 		assertThat(provider.getRuntime()).isInstanceOf(JavaRuntime.class);
