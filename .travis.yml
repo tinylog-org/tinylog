@@ -1,5 +1,6 @@
 language: java
-dist: trusty
+os: linux
+dist: xenial
 
 jobs:
   include:
