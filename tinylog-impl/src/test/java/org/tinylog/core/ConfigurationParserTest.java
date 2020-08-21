@@ -192,6 +192,18 @@ public final class ConfigurationParserTest {
 	}
 
 	/**
+	 * Verifies that multiple tags from a writer will be found.
+	 */
+	@Test
+	public void writerWithMultipleTags() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", " system , , backup  , test, , "); // Test also odd tag entries
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).containsExactlyInAnyOrder("system", "backup", "test");
+	}
+
+	/**
 	 * Verifies that tags can be read from multiple writers and each tag will be returned only once.
 	 */
 	@Test
@@ -336,6 +348,33 @@ public final class ConfigurationParserTest {
 		assertThat(writers[1]).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
+	/**
+	 * Verifies that a single tagged writer with multiple tags will be created and assigned correctly.
+	 */
+	@Test
+	public void singleMultipleTaggedWriter() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", " system , , backup  , test, , "); // Test also unusual tag entries
+		List<String> tags = ConfigurationParser.getTags();
+		Collection<Writer>[][] writers = ConfigurationParser.createWriters(tags, Level.TRACE, false);
+
+		assertThat(writers)
+			.hasSize(5)
+			.allSatisfy(element -> assertThat(element).hasSize(5));
+
+		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
+		assertThat(writers[1]).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+		assertThat(writers[2]).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+		assertThat(writers[3]).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
+		});
+		assertThat(writers[4]).allSatisfy(collection -> assertThat(collection).isEmpty());
+	}
+	
 	/**
 	 * Verifies that two tagged writers will be created and assigned correctly.
 	 *
