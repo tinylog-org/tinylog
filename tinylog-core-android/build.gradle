@@ -6,7 +6,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url = uri("https://plugins.gradle.org/m2/") }
     }
 
     dependencies {
@@ -22,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation "androidx.constraintlayout:constraintlayout:2.0.0"
     androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.2.0"
     androidTestImplementation "org.assertj:assertj-core:3.16.1"
@@ -54,19 +54,7 @@ android {
     }
 
     packagingOptions {
-        exclude("META-INF/LICENSE.md")
-        exclude("META-INF/LICENSE-notice.md")
-    }
-
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-            jacoco {
-                destinationFile = file("$buildDir/jacoco/moduleTestsCoverage.exec")
-                includeNoLocationClasses = true
-                excludes = ["jdk.internal.*"]
-            }
-        }
+        exclude("META-INF/LICENSE*")
     }
 
     sourceSets {
@@ -78,8 +66,4 @@ android {
             resources.srcDirs += "../tinylog-core-base/src/test/resources"
         }
     }
-}
-
-jacoco {
-    toolVersion "0.8.5"
 }
