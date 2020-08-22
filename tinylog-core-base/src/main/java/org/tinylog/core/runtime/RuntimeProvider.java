@@ -28,7 +28,7 @@ public final class RuntimeProvider {
 	 * @return An appropriate runtime instance
 	 */
 	public RuntimeFlavor getRuntime() {
-		if (System.getProperty("java.runtime.name").equals("Android Runtime")) {
+		if ("Android Runtime".equals(System.getProperty("java.runtime.name"))) {
 			return new AndroidRuntime();
 		} else {
 			return new JavaRuntime();
