@@ -1,15 +1,17 @@
 apply plugin: "com.android.application"
-apply plugin: "jacoco"
+apply plugin: "com.hiya.jacoco-android"
 apply plugin: "de.mannodermaus.android-junit5"
 
 buildscript {
     repositories {
         google()
         jcenter()
+        maven { url = uri("https://plugins.gradle.org/m2/") }
     }
 
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.1"
+        classpath "com.hiya:jacoco-android:0.2"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.6.2.0"
     }
 }
@@ -51,8 +53,13 @@ android {
     }
 
     testOptions {
-        junitPlatform {
-            instrumentationTests.integrityCheckEnabled = false
+        unitTests.all {
+            useJUnitPlatform()
+            jacoco {
+                destinationFile = file("$buildDir/jacoco/moduleTestsCoverage.exec")
+                includeNoLocationClasses = true
+                excludes = ["jdk.internal.*"]
+            }
         }
     }
 
