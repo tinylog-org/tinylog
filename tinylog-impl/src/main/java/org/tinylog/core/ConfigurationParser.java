@@ -77,7 +77,7 @@ public final class ConfigurationParser {
 			String tag = Configuration.get(writerProperty + ".tag");
 			if (tag != null && !tag.isEmpty() && !tag.equals("-")) {
 				String[] tagArray = tag.split(",");
-				for (String tagArrayItem:tagArray) {
+				for (String tagArrayItem : tagArray) {
 					tagArrayItem = tagArrayItem.trim();
 					if (!tags.contains(tagArrayItem) && !tagArrayItem.isEmpty()) {
 						tags.add(tagArrayItem);
