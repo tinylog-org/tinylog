@@ -13,21 +13,21 @@
 
 package org.tinylog.core.runtime;
 
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
 
 /**
  * Data class for storing a method and an index.
  */
 final class StackTraceElementsFiller {
 
-	private final Method method;
+	private final MethodHandle method;
 	private final int offset;
 
 	/**
 	 * @param method The package private method {@code VMStack.fillStackTraceElements(Thread, StackTraceElement[])}
 	 * @param offset The system depending offset to the real caller
 	 */
-	StackTraceElementsFiller(final Method method, final int offset) {
+	StackTraceElementsFiller(final MethodHandle method, final int offset) {
 		this.method = method;
 		this.offset = offset;
 	}
@@ -35,9 +35,9 @@ final class StackTraceElementsFiller {
 	/**
 	 * Gets the package private method {@code VMStack.fillStackTraceElements(Thread, StackTraceElement[])} if available.
 	 *
-	 * @return Accessible method object
+	 * @return Accessible method handle
 	 */
-	public Method getMethod() {
+	public MethodHandle getMethod() {
 		return method;
 	}
 

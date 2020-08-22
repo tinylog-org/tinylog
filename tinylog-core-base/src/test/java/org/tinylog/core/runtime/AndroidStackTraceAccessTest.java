@@ -13,8 +13,6 @@
 
 package org.tinylog.core.runtime;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -28,17 +26,17 @@ class AndroidStackTraceAccessTest {
 	 */
 	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
-	void fillStackTraceElementsAvailable() throws InvocationTargetException, IllegalAccessException {
+	void fillStackTraceElementsAvailable() throws Throwable {
 		StackTraceElementsFiller filler = new AndroidStackTraceAccess().getStackTraceElementsFiller();
 		assertThat(filler).isNotNull();
 
 		StackTraceElement[] trace = new StackTraceElement[filler.getOffset() + 1];
-		filler.getMethod().invoke(null, Thread.currentThread(), trace);
+		filler.getMethod().invoke(Thread.currentThread(), trace);
 		assertThat(trace[trace.length - 1]).isEqualTo(new StackTraceElement(
 			AndroidStackTraceAccessTest.class.getCanonicalName(),
 			"fillStackTraceElementsAvailable",
 			AndroidStackTraceAccessTest.class.getSimpleName() + ".java",
-			36
+			34
 		));
 	}
 

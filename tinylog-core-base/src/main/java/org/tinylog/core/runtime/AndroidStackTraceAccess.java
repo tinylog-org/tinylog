@@ -13,6 +13,8 @@
 
 package org.tinylog.core.runtime;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
 /**
@@ -36,13 +38,15 @@ final class AndroidStackTraceAccess {
 			Class<?> clazz = Class.forName("dalvik.system.VMStack");
 			Method method = clazz.getDeclaredMethod("fillStackTraceElements", Thread.class, StackTraceElement[].class);
 			method.setAccessible(true);
+			MethodHandle handle = MethodHandles.lookup().unreflect(method);
+
 			StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_SIZE];
-			method.invoke(null, Thread.currentThread(), trace);
+			handle.invoke(Thread.currentThread(), trace);
 			for (int i = 0; i < STACK_TRACE_SIZE; ++i) {
 				StackTraceElement element = trace[i];
 				if (element != null && AndroidStackTraceAccess.class.getName().equals(element.getClassName())
 					&& "getStackTraceElementsFiller".equals(element.getMethodName())) {
-					return new StackTraceElementsFiller(method, i);
+					return new StackTraceElementsFiller(handle, i);
 				}
 			}
 		} catch (Throwable ex) {
