@@ -25,30 +25,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LegacyStackTraceAccessTest {
 
 	/**
-	 * Verifies that {@code sun.reflect.Reflection} is available on Java 10 and earlier.
+	 * Verifies that {@code sun.reflect.Reflection.getCallerClass(int)} is available on Java 10 and earlier.
 	 */
 	@EnabledForJreRange(max = JRE.JAVA_10)
 	@Test
-	void sunReflectionAvailable() {
-		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isTrue();
+	void sunReflectionAvailable() throws Throwable {
+		MethodHandle handle = new LegacyStackTraceAccess().getCallerClassGetter();
+		assertThat(handle).isNotNull();
+
+		Object result = handle.invoke(1);
+		assertThat(result).isEqualTo(LegacyStackTraceAccessTest.class);
 	}
 
 	/**
-	 * Verifies that {@code sun.reflect.Reflection} is not available on Java 11 and later.
+	 * Verifies that {@code sun.reflect.Reflection.getCallerClass(int)} is not available on Java 11 and later.
 	 */
 	@EnabledForJreRange(min = JRE.JAVA_11)
 	@Test
 	void sunReflectionUnavailableSinceJava11() {
-		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isFalse();
+		assertThat(new LegacyStackTraceAccess().getCallerClassGetter()).isNull();
 	}
 
 	/**
-	 * Verifies that {@code sun.reflect.Reflection} is not available on Android.
+	 * Verifies that {@code sun.reflect.Reflection.getCallerClass(int)} is not available on Android.
 	 */
 	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void sunReflectionUnavailableOnAndroid() {
-		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isFalse();
+		assertThat(new LegacyStackTraceAccess().getCallerClassGetter()).isNull();
 	}
 
 	/**
@@ -65,7 +69,7 @@ class LegacyStackTraceAccessTest {
 			LegacyStackTraceAccessTest.class.getCanonicalName(),
 			"stackTraceElementGetterAvailable",
 			LegacyStackTraceAccessTest.class.getSimpleName() + ".java",
-			63
+			67
 		));
 	}
 

@@ -27,21 +27,24 @@ final class LegacyStackTraceAccess {
 	}
 
 	/**
-	 * Check if {@code sun.reflect.Reflection} is available.
+	 * Creates a method handle for {@code sun.reflect.Reflection.getCallerClass(int)}.
 	 *
-	 * @return {@code true} if available, otherwise {@code false}
+	 * @return Valid method handle if the method is available, otherwise {@code null}
 	 */
-	@SuppressWarnings("removal")
-	boolean checkIfSunReflectionIsAvailable() {
+	MethodHandle getCallerClassGetter() {
 		try {
 			Class<?> clazz = Class.forName("sun.reflect.Reflection");
 			Method method = clazz.getDeclaredMethod("getCallerClass", int.class);
 			method.setAccessible(true);
-			return LegacyStackTraceAccess.class.equals(method.invoke(null, 1));
+			MethodHandle handle = MethodHandles.lookup().unreflect(method);
+			if (LegacyStackTraceAccess.class.equals(handle.invoke(1))) {
+				return handle;
+			}
 		} catch (Throwable ex) {
 			ex.printStackTrace();
-			return false;
 		}
+
+		return null;
 	}
 
 	/**
