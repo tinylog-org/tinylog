@@ -75,8 +75,14 @@ public final class ConfigurationParser {
 		List<String> tags = new ArrayList<String>();
 		for (String writerProperty : Configuration.getSiblings("writer").keySet()) {
 			String tag = Configuration.get(writerProperty + ".tag");
-			if (tag != null && !tag.isEmpty() && !tag.equals("-") && !tags.contains(tag)) {
-				tags.add(tag);
+			if (tag != null && !tag.isEmpty() && !tag.equals("-")) {
+				String[] tagArray = tag.split(",");
+				for (String tagArrayItem : tagArray) {
+					tagArrayItem = tagArrayItem.trim();
+					if (!tags.contains(tagArrayItem) && !tagArrayItem.isEmpty()) {
+						tags.add(tagArrayItem);
+					}
+				}
 			}
 		}
 		return tags;
@@ -161,7 +167,14 @@ public final class ConfigurationParser {
 				} else if (tag.equals("-")) {
 					addWriter(writer, matrix, 0, level);
 				} else {
-					addWriter(writer, matrix, tags.indexOf(tag) + 1, level);
+					String[] tagArray = tag.split(",");
+					for (String tagArrayItem : tagArray) {
+						tagArrayItem = tagArrayItem.trim(); 
+						if (!tagArrayItem.isEmpty()) {
+							addWriter(writer, matrix, tags.indexOf(tagArrayItem) + 1, level);
+						}
+					}
+					
 				}
 			}
 		}
