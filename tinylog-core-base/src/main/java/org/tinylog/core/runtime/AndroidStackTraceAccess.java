@@ -23,7 +23,7 @@ final class AndroidStackTraceAccess {
 	private static final int STACK_TRACE_SIZE = 32;
 
 	/** */
-	private AndroidStackTraceAccess() {
+	AndroidStackTraceAccess() {
 	}
 
 	/**
@@ -31,7 +31,7 @@ final class AndroidStackTraceAccess {
 	 *
 	 * @return Valid filler instance if the method is available, otherwise {@code null}
 	 */
-	static StackTraceElementsFiller getStackTraceElementsFiller() {
+	StackTraceElementsFiller getStackTraceElementsFiller() {
 		try {
 			Class<?> clazz = Class.forName("dalvik.system.VMStack");
 			Method method = clazz.getDeclaredMethod("fillStackTraceElements", Thread.class, StackTraceElement[].class);

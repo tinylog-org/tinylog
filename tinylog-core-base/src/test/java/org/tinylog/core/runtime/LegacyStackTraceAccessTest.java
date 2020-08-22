@@ -30,7 +30,7 @@ class LegacyStackTraceAccessTest {
 	@EnabledForJreRange(max = JRE.JAVA_10)
 	@Test
 	void sunReflectionAvailable() {
-		assertThat(LegacyStackTraceAccess.checkIfSunReflectionIsAvailable()).isTrue();
+		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isTrue();
 	}
 
 	/**
@@ -39,7 +39,7 @@ class LegacyStackTraceAccessTest {
 	@EnabledForJreRange(min = JRE.JAVA_11)
 	@Test
 	void sunReflectionUnavailableSinceJava11() {
-		assertThat(LegacyStackTraceAccess.checkIfSunReflectionIsAvailable()).isFalse();
+		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isFalse();
 	}
 
 	/**
@@ -48,7 +48,7 @@ class LegacyStackTraceAccessTest {
 	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void sunReflectionUnavailableOnAndroid() {
-		assertThat(LegacyStackTraceAccess.checkIfSunReflectionIsAvailable()).isFalse();
+		assertThat(new LegacyStackTraceAccess().checkIfSunReflectionIsAvailable()).isFalse();
 	}
 
 	/**
@@ -57,7 +57,7 @@ class LegacyStackTraceAccessTest {
 	@EnabledForJreRange(max = JRE.JAVA_8)
 	@Test
 	void stackTraceElementGetterAvailable() throws Throwable {
-		MethodHandle handle = LegacyStackTraceAccess.getStackTraceElementGetter();
+		MethodHandle handle = new LegacyStackTraceAccess().getStackTraceElementGetter();
 		assertThat(handle).isNotNull();
 
 		Object result = handle.invoke(new Throwable(), 0);
@@ -75,7 +75,7 @@ class LegacyStackTraceAccessTest {
 	@EnabledForJreRange(min = JRE.JAVA_9)
 	@Test
 	void stackTraceElementGetterUnavailable() {
-		assertThat(LegacyStackTraceAccess.getStackTraceElementGetter()).isNull();
+		assertThat(new LegacyStackTraceAccess().getStackTraceElementGetter()).isNull();
 	}
 
 }

@@ -29,7 +29,7 @@ class AndroidStackTraceAccessTest {
 	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void fillStackTraceElementsAvailable() throws InvocationTargetException, IllegalAccessException {
-		StackTraceElementsFiller filler = AndroidStackTraceAccess.getStackTraceElementsFiller();
+		StackTraceElementsFiller filler = new AndroidStackTraceAccess().getStackTraceElementsFiller();
 		assertThat(filler).isNotNull();
 
 		StackTraceElement[] trace = new StackTraceElement[filler.getOffset() + 1];
@@ -49,7 +49,7 @@ class AndroidStackTraceAccessTest {
 	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void fillStackTraceElementsUnavailable() {
-		assertThat(AndroidStackTraceAccess.getStackTraceElementsFiller()).isNull();
+		assertThat(new AndroidStackTraceAccess().getStackTraceElementsFiller()).isNull();
 	}
 
 }

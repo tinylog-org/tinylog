@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 final class LegacyStackTraceAccess {
 
 	/** */
-	private LegacyStackTraceAccess() {
+	LegacyStackTraceAccess() {
 	}
 
 	/**
@@ -32,7 +32,7 @@ final class LegacyStackTraceAccess {
 	 * @return {@code true} if available, otherwise {@code false}
 	 */
 	@SuppressWarnings("removal")
-	static boolean checkIfSunReflectionIsAvailable() {
+	boolean checkIfSunReflectionIsAvailable() {
 		try {
 			Class<?> clazz = Class.forName("sun.reflect.Reflection");
 			Method method = clazz.getDeclaredMethod("getCallerClass", int.class);
@@ -49,7 +49,7 @@ final class LegacyStackTraceAccess {
 	 *
 	 * @return Valid method handle if the method is available, otherwise {@code null}
 	 */
-	static MethodHandle getStackTraceElementGetter() {
+	MethodHandle getStackTraceElementGetter() {
 		try {
 			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
 			method.setAccessible(true);
