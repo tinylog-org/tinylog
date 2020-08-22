@@ -17,6 +17,7 @@ import java.lang.invoke.MethodHandle;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.condition.JRE;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +38,16 @@ class LegacyStackTraceAccessTest {
 	 */
 	@EnabledForJreRange(min = JRE.JAVA_11)
 	@Test
-	void sunReflectionUnavailable() {
+	void sunReflectionUnavailableSinceJava11() {
+		assertThat(LegacyStackTraceAccess.checkIfSunReflectionIsAvailable()).isFalse();
+	}
+
+	/**
+	 * Verifies that {@code sun.reflect.Reflection} is not available on Android.
+	 */
+	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	@Test
+	void sunReflectionUnavailableOnAndroid() {
 		assertThat(LegacyStackTraceAccess.checkIfSunReflectionIsAvailable()).isFalse();
 	}
 
@@ -55,7 +65,7 @@ class LegacyStackTraceAccessTest {
 			LegacyStackTraceAccessTest.class.getCanonicalName(),
 			"stackTraceElementGetterAvailable",
 			LegacyStackTraceAccessTest.class.getSimpleName() + ".java",
-			53
+			63
 		));
 	}
 
