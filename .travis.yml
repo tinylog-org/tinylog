@@ -55,7 +55,6 @@ jobs:
       script:
         - cd tinylog-core-android
         - TERM=dumb ./gradlew connectedDebugAndroidTest
-      after_script:
         - TERM=dumb ./gradlew createDebugCoverageReport
 
 after_success:
