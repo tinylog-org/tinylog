@@ -54,7 +54,9 @@ jobs:
         - ./android-wait-for-emulator
       script:
         - cd tinylog-core-android
-        - TERM=dumb ./gradlew build connectedCheck -Dorg.gradle.daemon=false
+        - TERM=dumb ./gradlew connectedDebugAndroidTest
+      after_script:
+        - TERM=dumb ./gradlew createDebugCoverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
