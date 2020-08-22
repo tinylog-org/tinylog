@@ -14,13 +14,11 @@
 package org.tinylog.core.runtime;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 
 /**
  * Utility class for resolving legacy Java methods for receiving specific elements from the stack trace.
  */
-final class LegacyStackTraceAccess {
+final class LegacyStackTraceAccess extends BaseStackTraceAccess {
 
 	/** */
 	LegacyStackTraceAccess() {
@@ -32,19 +30,8 @@ final class LegacyStackTraceAccess {
 	 * @return Valid method handle if the method is available, otherwise {@code null}
 	 */
 	MethodHandle getCallerClassGetter() {
-		try {
-			Class<?> clazz = Class.forName("sun.reflect.Reflection");
-			Method method = clazz.getDeclaredMethod("getCallerClass", int.class);
-			method.setAccessible(true);
-			MethodHandle handle = MethodHandles.lookup().unreflect(method);
-			if (LegacyStackTraceAccess.class.equals(handle.invoke(1))) {
-				return handle;
-			}
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-		}
-
-		return null;
+		FailableCheck<MethodHandle> check = handle -> LegacyStackTraceAccess.class.equals(handle.invoke(1));
+		return getMethod(check, "sun.reflect.Reflection", "getCallerClass", int.class);
 	}
 
 	/**
@@ -53,19 +40,12 @@ final class LegacyStackTraceAccess {
 	 * @return Valid method handle if the method is available, otherwise {@code null}
 	 */
 	MethodHandle getStackTraceElementGetter() {
-		try {
-			Method method = Throwable.class.getDeclaredMethod("getStackTraceElement", int.class);
-			method.setAccessible(true);
-			MethodHandle handle = MethodHandles.lookup().unreflect(method);
+		FailableCheck<MethodHandle> check = handle -> {
 			StackTraceElement stackTraceElement = (StackTraceElement) handle.invoke(new Throwable(), 0);
-			if (LegacyStackTraceAccess.class.getName().equals(stackTraceElement.getClassName())) {
-				return handle;
-			}
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-		}
+			return LegacyStackTraceAccess.class.getName().equals(stackTraceElement.getClassName());
+		};
 
-		return null;
+		return getMethod(check, Throwable.class.getCanonicalName(), "getStackTraceElement", int.class);
 	}
 
 }

@@ -30,7 +30,9 @@
             <property name="ignoreFinal" value="false" />
             <property name="allowedAbbreviationLength" value="1" />
         </module>
-        <module name="AbstractClassName"/>
+        <module name="AbstractClassName">
+            <property name="format" value="^(Abstract|Base).+$"/>
+        </module>
         <module name="AnnotationLocation"/>
         <module name="AnnotationUseStyle"/>
         <module name="AnonInnerLength"/>
@@ -81,7 +83,6 @@
         <module name="HideUtilityClassConstructor"/>
         <module name="IllegalImport"/>
         <module name="IllegalInstantiation"/>
-        <module name="IllegalThrows"/>
         <module name="IllegalToken"/>
         <module name="IllegalTokenText"/>
         <module name="IllegalType"/>

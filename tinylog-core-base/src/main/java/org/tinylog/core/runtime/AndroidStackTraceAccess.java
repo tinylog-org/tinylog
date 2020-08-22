@@ -14,46 +14,51 @@
 package org.tinylog.core.runtime;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 
 /**
  * Utility class for resolving legacy Android methods for receiving specific elements from the stack trace.
  */
-final class AndroidStackTraceAccess {
+final class AndroidStackTraceAccess extends BaseStackTraceAccess {
 
 	private static final int STACK_TRACE_SIZE = 32;
+
+	private int offset = -1;
 
 	/** */
 	AndroidStackTraceAccess() {
 	}
 
 	/**
-	 * Generates a stack trace filler instance for {@code VMStack.fillStackTraceElements(Thread, StackTraceElement[])}.
+	 * Gets the offset in filled stack traces to the caller.
+	 *
+	 * @return The offset to the caller
+	 */
+	int getOffset() {
+		return offset;
+	}
+
+	/**
+	 * Creates a method handle for {@code dalvik.system.VMStack.fillStackTraceElements(Thread, StackTraceElement[])}.
 	 *
 	 * @return Valid filler instance if the method is available, otherwise {@code null}
 	 */
-	StackTraceElementsFiller getStackTraceElementsFiller() {
-		try {
-			Class<?> clazz = Class.forName("dalvik.system.VMStack");
-			Method method = clazz.getDeclaredMethod("fillStackTraceElements", Thread.class, StackTraceElement[].class);
-			method.setAccessible(true);
-			MethodHandle handle = MethodHandles.lookup().unreflect(method);
-
+	MethodHandle getStackTraceElementsFiller() {
+		FailableCheck<MethodHandle> check = handle -> {
 			StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_SIZE];
 			handle.invoke(Thread.currentThread(), trace);
 			for (int i = 0; i < STACK_TRACE_SIZE; ++i) {
 				StackTraceElement element = trace[i];
 				if (element != null && AndroidStackTraceAccess.class.getName().equals(element.getClassName())
 					&& "getStackTraceElementsFiller".equals(element.getMethodName())) {
-					return new StackTraceElementsFiller(handle, i);
+					offset = i;
+					return true;
 				}
 			}
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-		}
+			return false;
+		};
 
-		return null;
+		return getMethod(check, "dalvik.system.VMStack", "fillStackTraceElements", Thread.class,
+			StackTraceElement[].class);
 	}
 
 }
