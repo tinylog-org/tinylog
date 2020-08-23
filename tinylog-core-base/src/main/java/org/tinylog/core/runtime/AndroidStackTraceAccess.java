@@ -48,8 +48,8 @@ final class AndroidStackTraceAccess extends BaseStackTraceAccess {
 			handle.invoke(Thread.currentThread(), trace);
 			for (int i = 0; i < STACK_TRACE_SIZE; ++i) {
 				StackTraceElement element = trace[i];
-				if (element != null && AndroidStackTraceAccess.class.getName().equals(element.getClassName())
-					&& "getStackTraceElementsFiller".equals(element.getMethodName())) {
+				if (element != null && element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
+					&& element.getMethodName().contains("getStackTraceElementsFiller")) {
 					offset = i;
 					return true;
 				}

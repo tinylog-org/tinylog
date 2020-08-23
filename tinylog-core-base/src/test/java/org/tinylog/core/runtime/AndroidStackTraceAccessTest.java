@@ -40,7 +40,7 @@ class AndroidStackTraceAccessTest {
 			AndroidStackTraceAccessTest.class.getCanonicalName(),
 			"fillStackTraceElementsAvailable",
 			AndroidStackTraceAccessTest.class.getSimpleName() + ".java",
-			34
+			38
 		));
 	}
 
