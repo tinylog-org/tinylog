@@ -36,7 +36,7 @@ public final class TaggedLogger {
 	/**
 	 * @param tag Case-sensitive tag for the logger
 	 * @param configuration Custom configuration for the logger
-	 * @param provider Logging back end for the logger
+	 * @param provider Logging backend for the logger
 	 */
 	TaggedLogger(String tag, Configuration configuration, LoggingProvider provider) {
 		this.tag = tag;

@@ -21,7 +21,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
  * Provider for issuing log entries.
  *
  * <p>
- *     This interface must be implemented by all logging back-ends.
+ *     This interface must be implemented by all logging backends.
  * </p>
  */
 public interface LoggingProvider {

@@ -207,8 +207,8 @@ public final class Framework {
 		}
 
 		if (providers.isEmpty()) {
-			System.err.println("No logging back end could be found in the classpath. Therefore, no log entries will be "
-				+ "output. Please add tinylog-impl or any other logging back end for outputting log entries.");
+			System.err.println("No logging backend could be found in the classpath. Therefore, no log entries will be "
+				+ "output. Please add tinylog-impl or any other logging backend for outputting log entries.");
 			loggingProvider = new InternalLoggingProvider();
 		} else if (providers.size() == 1) {
 			loggingProvider = providers.get(0);

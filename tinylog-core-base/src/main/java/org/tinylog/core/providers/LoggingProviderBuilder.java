@@ -19,14 +19,14 @@ import org.tinylog.core.Framework;
  * Builder for creating {@link LoggingProvider LoggingProviders}.
  *
  * <p>
- *     This interface must be implemented by all logging backs end and provided as
+ *     This interface must be implemented by all logging backends and provided as
  *     {@link java.util.ServiceLoader service} in {@code META-INF/services}.
  * </p>
  */
 public interface LoggingProviderBuilder {
 
 	/**
-	 * Gets the name of the logging back end, which can be used to address the logging back end in a configuration.
+	 * Gets the name of the logging backend, which can be used to address the logging backend in a configuration.
 	 *
 	 * <p>
 	 *     The name must start with a lower case ASCII letter [a-z] and end with a lower case ASCII letter [a-z] or
@@ -34,7 +34,7 @@ public interface LoggingProviderBuilder {
 	 *     allowed.
 	 * </p>
 	 *
-	 * @return The name of the logging back end
+	 * @return The name of the logging backend
 	 */
 	String getName();
 
