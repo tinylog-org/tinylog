@@ -43,7 +43,7 @@ public final class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTra
 			}
 		}
 
-		StackTraceElement element = this.push().getCallerStackTraceElement();
+		StackTraceElement element = push().getCallerStackTraceElement();
 		return element == null ? null : element.getClassName();
 	}
 
