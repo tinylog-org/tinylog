@@ -22,4 +22,14 @@ public final class AndroidRuntime implements RuntimeFlavor {
 	public AndroidRuntime() {
 	}
 
+	@Override
+	public AndroidIndexBasedStackTraceLocation getStackTraceLocationAtIndex(int index) {
+		return new AndroidIndexBasedStackTraceLocation(index + 1);
+	}
+
+	@Override
+	public AndroidClassNameBasedStackTraceLocation getStackTraceLocationAfterClass(String className) {
+		return new AndroidClassNameBasedStackTraceLocation(className);
+	}
+
 }
