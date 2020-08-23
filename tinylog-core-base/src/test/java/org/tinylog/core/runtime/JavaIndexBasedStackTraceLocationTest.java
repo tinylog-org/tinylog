@@ -49,6 +49,7 @@ class JavaIndexBasedStackTraceLocationTest {
 		JavaIndexBasedStackTraceLocation location = new JavaIndexBasedStackTraceLocation(1);
 		StackTraceElement caller = location.getCallerStackTraceElement();
 
+		assertThat(caller).isNotNull();
 		assertThat(caller.getFileName())
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
@@ -80,7 +81,7 @@ class JavaIndexBasedStackTraceLocationTest {
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("passedStackTraceLocation");
-		assertThat(caller.getLineNumber()).isEqualTo(76);
+		assertThat(caller.getLineNumber()).isEqualTo(77);
 	}
 
 	/**
