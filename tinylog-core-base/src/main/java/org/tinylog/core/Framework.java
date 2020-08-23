@@ -94,7 +94,9 @@ public final class Framework {
 	public LoggingProvider getLoggingProvider() {
 		if (loggingProvider == null) {
 			synchronized (loggingProviderMutex) {
-				loadLoggingProvider();
+				if (loggingProvider == null) {
+					loadLoggingProvider();
+				}
 			}
 		}
 
@@ -130,7 +132,6 @@ public final class Framework {
 				hook.startUp();
 			}
 		}
-
 	}
 
 	/**
