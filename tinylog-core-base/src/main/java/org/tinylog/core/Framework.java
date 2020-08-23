@@ -40,8 +40,7 @@ public final class Framework {
 	 * Loads the configuration from default properties file and hooks from service files.
 	 */
 	public Framework() {
-		this.configuration = loadConfiguration();
-		this.hooks = loadHooks(getClassLoader());
+		this(loadConfiguration(), loadHooks());
 	}
 
 	/**
@@ -61,8 +60,7 @@ public final class Framework {
 	 * @return A valid and existing class loader instance
 	 */
 	public ClassLoader getClassLoader() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
+		return loadClassLoader();
 	}
 
 	/**
@@ -138,6 +136,16 @@ public final class Framework {
 	}
 
 	/**
+	 * Gets the class loader for loading resources and services from the classpath.
+	 *
+	 * @return A valid and existing class loader instance
+	 */
+	private static ClassLoader loadClassLoader() {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
+	}
+
+	/**
 	 * Creates a new {@link Configuration} and loads the settings from default properties file if available.
 	 *
 	 * @return The created and pre-filled configuration
@@ -151,12 +159,11 @@ public final class Framework {
 	/**
 	 * Loads all hooks that are registered as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
 	 *
-	 * @param classLoader The class loader to use for loading all services
 	 * @return All found hooks
 	 */
-	private static Collection<Hook> loadHooks(ClassLoader classLoader) {
+	private static Collection<Hook> loadHooks() {
 		Collection<Hook> hooks = new ArrayList<>();
-		for (Hook hook : ServiceLoader.load(Hook.class, classLoader)) {
+		for (Hook hook : ServiceLoader.load(Hook.class, loadClassLoader())) {
 			hooks.add(hook);
 		}
 		return hooks;
