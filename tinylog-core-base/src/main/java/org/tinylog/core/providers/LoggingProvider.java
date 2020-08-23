@@ -34,8 +34,8 @@ public interface LoggingProvider {
 	 * @param level Severity level (required)
 	 * @param throwable Exception or any other kind of throwable (optional)
 	 * @param message Text message or any kind of other printable object (optional)
-	 * @param arguments Arguments for all placeholders in the text message (only required if the text message contains
-	 *                  any placeholders)
+	 * @param arguments Argument values for all placeholders in the text message (only required if the text message
+	 *                  contains any placeholders)
 	 * @param formatter Message formatter for replacing placeholder with the provided arguments (only required if the
 	 *                  text message contains any placeholders)
 	 */
