@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.tinylog.core.providers.BundleLoggingProvider;
+import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
-import org.tinylog.core.providers.NopLoggingProvider;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 
 /**
@@ -187,8 +187,8 @@ public final class Framework {
 
 		if (providers.isEmpty()) {
 			System.err.println("No logging back end could be found in the classpath. Therefore, no log entries will be "
-					+ "output. Please add tinylog-impl or any other logging back end for outputting log entries.");
-			loggingProvider = new NopLoggingProvider();
+				+ "output. Please add tinylog-impl or any other logging back end for outputting log entries.");
+			loggingProvider = new InternalLoggingProvider();
 		} else if (providers.size() == 1) {
 			loggingProvider = providers.get(0);
 		} else {
