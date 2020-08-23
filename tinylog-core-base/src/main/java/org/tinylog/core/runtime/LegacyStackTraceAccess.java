@@ -45,7 +45,7 @@ final class LegacyStackTraceAccess extends BaseStackTraceAccess {
 			return LegacyStackTraceAccess.class.getName().equals(stackTraceElement.getClassName());
 		};
 
-		return getMethod(check, Throwable.class.getCanonicalName(), "getStackTraceElement", int.class);
+		return getMethod(check, Throwable.class.getName(), "getStackTraceElement", int.class);
 	}
 
 }

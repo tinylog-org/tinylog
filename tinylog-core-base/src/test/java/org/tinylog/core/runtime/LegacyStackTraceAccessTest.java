@@ -66,7 +66,7 @@ class LegacyStackTraceAccessTest {
 
 		Object result = handle.invoke(new Throwable(), 0);
 		assertThat(result).isEqualTo(new StackTraceElement(
-			LegacyStackTraceAccessTest.class.getCanonicalName(),
+			LegacyStackTraceAccessTest.class.getName(),
 			"stackTraceElementGetterAvailable",
 			LegacyStackTraceAccessTest.class.getSimpleName() + ".java",
 			67

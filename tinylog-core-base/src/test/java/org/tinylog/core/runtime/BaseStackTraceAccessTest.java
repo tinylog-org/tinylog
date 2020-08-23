@@ -29,7 +29,7 @@ class BaseStackTraceAccessTest {
 	@Test
 	public void validMethod() throws Throwable {
 		MethodHandle handle = access.getMethod(
-			ignore -> true, String.class.getCanonicalName(), "substring", int.class, int.class
+			ignore -> true, String.class.getName(), "substring", int.class, int.class
 		);
 
 		assertThat(handle).isNotNull();
@@ -42,7 +42,7 @@ class BaseStackTraceAccessTest {
 	@Test
 	public void invalidMethod() {
 		MethodHandle handle = access.getMethod(
-			ignore -> false, String.class.getCanonicalName(), "substring", int.class, int.class
+			ignore -> false, String.class.getName(), "substring", int.class, int.class
 		);
 
 		assertThat(handle).isNull();
@@ -66,7 +66,7 @@ class BaseStackTraceAccessTest {
 	@Test
 	public void nonExistentMethod() {
 		MethodHandle handle = access.getMethod(
-			ignore -> true, String.class.getCanonicalName(), "substring", double.class, double.class
+			ignore -> true, String.class.getName(), "substring", double.class, double.class
 		);
 
 		assertThat(handle).isNull();

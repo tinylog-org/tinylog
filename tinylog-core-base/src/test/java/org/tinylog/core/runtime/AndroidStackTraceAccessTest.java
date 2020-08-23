@@ -37,7 +37,7 @@ class AndroidStackTraceAccessTest {
 		StackTraceElement[] trace = new StackTraceElement[access.getOffset() + 1];
 		fillStackTraceElements.invoke(Thread.currentThread(), trace);
 		assertThat(trace[trace.length - 1]).isEqualTo(new StackTraceElement(
-			AndroidStackTraceAccessTest.class.getCanonicalName(),
+			AndroidStackTraceAccessTest.class.getName(),
 			"fillStackTraceElementsAvailable",
 			AndroidStackTraceAccessTest.class.getSimpleName() + ".java",
 			38
