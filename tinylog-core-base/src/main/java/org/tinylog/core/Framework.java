@@ -23,12 +23,15 @@ import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
+import org.tinylog.core.runtime.RuntimeFlavor;
+import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
  * Storage for {@link Configuration}, {@link Hook Hooks}, and {@link LoggingProvider}.
  */
 public final class Framework {
 
+	private final RuntimeFlavor runtime;
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
 	private final Object loggingProviderMutex = new Object();
@@ -40,16 +43,18 @@ public final class Framework {
 	 * Loads the configuration from default properties file and hooks from service files.
 	 */
 	public Framework() {
-		this(loadConfiguration(), loadHooks());
+		this(new RuntimeProvider().getRuntime(), loadConfiguration(), loadHooks());
 	}
 
 	/**
 	 * Initializes the framework with a custom configuration and custom hooks.
 	 *
+	 * @param runtime Runtime for the actual virtual machine
 	 * @param configuration Configuration to store
 	 * @param hooks Hooks to store
 	 */
-	public Framework(Configuration configuration, Collection<Hook> hooks) {
+	public Framework(RuntimeFlavor runtime, Configuration configuration, Collection<Hook> hooks) {
+		this.runtime = runtime;
 		this.configuration = configuration;
 		this.hooks = hooks;
 	}
@@ -61,6 +66,15 @@ public final class Framework {
 	 */
 	public ClassLoader getClassLoader() {
 		return loadClassLoader();
+	}
+
+	/**
+	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
+	 *
+	 * @return The appropriate runtime instance
+	 */
+	public RuntimeFlavor getRuntime() {
+		return runtime;
 	}
 
 	/**
