@@ -23,6 +23,7 @@ repositories {
 dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.0.0"
     androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "com.github.stefanbirkner:system-lambda:1.1.0"
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.2.0"
     androidTestImplementation "org.assertj:assertj-core:3.16.1"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0-RC1"
