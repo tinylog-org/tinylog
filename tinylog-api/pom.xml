@@ -38,11 +38,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>tinylog-core</artifactId>
         </dependency>

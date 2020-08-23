@@ -155,11 +155,6 @@
                 <version>5.7.0-RC1</version>
             </dependency>
             <dependency>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-annotations</artifactId>
-                <version>4.1.2</version>
-            </dependency>
-            <dependency>
                 <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-core</artifactId>
                 <version>${project.version}</version>
