@@ -60,10 +60,13 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 before_cache:
-  - rm -rf $HOME/.m2/repository/org/tinylog
+  - rm -rf $HOME/.m2/repository/org/tinylog/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 
 cache:
   directories:
     - $HOME/.android/build-cache
+    - $HOME/.gradle/caches
     - $HOME/.gradle/wrapper
     - $HOME/.m2
