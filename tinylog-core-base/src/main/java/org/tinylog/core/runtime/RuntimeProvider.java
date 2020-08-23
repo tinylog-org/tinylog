@@ -25,7 +25,7 @@ public final class RuntimeProvider {
 	/**
 	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
 	 *
-	 * @return An appropriate runtime instance
+	 * @return The appropriate runtime instance
 	 */
 	public RuntimeFlavor getRuntime() {
 		if ("Android Runtime".equals(System.getProperty("java.runtime.name"))) {

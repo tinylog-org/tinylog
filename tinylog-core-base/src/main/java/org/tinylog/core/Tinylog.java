@@ -14,16 +14,28 @@
 package org.tinylog.core;
 
 import org.tinylog.core.providers.LoggingProvider;
+import org.tinylog.core.runtime.RuntimeFlavor;
+import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
  * Global access to the tinylog framework.
  */
 public final class Tinylog {
 
+	private static final RuntimeFlavor runtime = new RuntimeProvider().getRuntime();
 	private static final Framework framework = new Framework();
 
 	/** */
 	private Tinylog() {
+	}
+
+	/**
+	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
+	 *
+	 * @return The appropriate runtime instance
+	 */
+	public static RuntimeFlavor getRuntime() {
+		return runtime;
 	}
 
 	/**
