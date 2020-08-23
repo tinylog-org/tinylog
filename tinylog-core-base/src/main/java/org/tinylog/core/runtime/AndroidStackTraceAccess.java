@@ -49,10 +49,10 @@ final class AndroidStackTraceAccess extends BaseStackTraceAccess {
 	MethodHandle getStackTraceElementsFiller() {
 		FailableCheck<MethodHandle> check = handle -> {
 			StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_SIZE];
-			handle.invoke(Thread.currentThread(), trace);
-			for (int i = 0; i < STACK_TRACE_SIZE; ++i) {
+			int count = (Integer) handle.invoke(Thread.currentThread(), trace);
+			for (int i = 0; i < count; ++i) {
 				StackTraceElement element = trace[i];
-				if (element != null && element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
+				if (element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
 					&& element.getMethodName().contains("getStackTraceElementsFiller")) {
 					offset = i;
 					return true;
