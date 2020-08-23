@@ -83,6 +83,9 @@
         <module name="HideUtilityClassConstructor"/>
         <module name="IllegalImport"/>
         <module name="IllegalInstantiation"/>
+        <module name="IllegalThrows">
+            <property name="illegalClassNames" value="Error, java.lang.Error"/>
+        </module>
         <module name="IllegalToken"/>
         <module name="IllegalTokenText"/>
         <module name="IllegalType"/>
