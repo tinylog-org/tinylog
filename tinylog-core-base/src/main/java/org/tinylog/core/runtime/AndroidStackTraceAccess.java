@@ -31,6 +31,10 @@ final class AndroidStackTraceAccess extends BaseStackTraceAccess {
 	/**
 	 * Gets the offset in filled stack traces to the caller.
 	 *
+	 * <p>
+	 *     The method {@link #AndroidStackTraceAccess()} must be called at least once before getting a valid offset.
+	 * </p>
+	 *
 	 * @return The offset to the caller
 	 */
 	int getOffset() {
