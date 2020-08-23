@@ -31,10 +31,11 @@ import org.tinylog.core.runtime.RuntimeProvider;
  */
 public final class Framework {
 
+	private final Object mutex = new Object();
+
 	private final RuntimeFlavor runtime;
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
-	private final Object loggingProviderMutex = new Object();
 
 	private LoggingProvider loggingProvider;
 	private boolean running;
@@ -93,7 +94,7 @@ public final class Framework {
 	 */
 	public LoggingProvider getLoggingProvider() {
 		if (loggingProvider == null) {
-			synchronized (loggingProviderMutex) {
+			synchronized (mutex) {
 				if (loggingProvider == null) {
 					loadLoggingProvider();
 				}
@@ -125,11 +126,15 @@ public final class Framework {
 	 * Starts the framework and calls the start up method on all registered hooks, if the framework is not yet started.
 	 */
 	public void startUp() {
-		synchronized (hooks) {
-			running = true;
+		synchronized (mutex) {
+			if (!running) {
+				running = true;
 
-			for (Hook hook : hooks) {
-				hook.startUp();
+				for (Hook hook : hooks) {
+					hook.startUp();
+				}
+
+				getLoggingProvider();
 			}
 		}
 	}
@@ -139,7 +144,7 @@ public final class Framework {
 	 * down.
 	 */
 	public void shutDown() {
-		synchronized (hooks) {
+		synchronized (mutex) {
 			if (running) {
 				running = false;
 
@@ -189,6 +194,7 @@ public final class Framework {
 	 */
 	private void loadLoggingProvider() {
 		configuration.freeze();
+		startUp();
 
 		List<String> names = configuration.getList("backend");
 		List<LoggingProvider> providers = new ArrayList<>();
