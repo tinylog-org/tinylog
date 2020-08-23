@@ -27,7 +27,7 @@ class NopLoggingProviderTest {
 	@Test
 	public void acceptLogEntries() {
 		new NopLoggingProvider().log(
-			mock(StackTraceLocation.class), Level.TRACE, null, "Hello world!", null, null
+			mock(StackTraceLocation.class), null, Level.TRACE, null, "Hello world!", null, null
 		);
 	}
 

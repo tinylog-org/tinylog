@@ -41,14 +41,26 @@ class BundleLoggingProviderTest {
 		Throwable throwable = new Throwable();
 		Object[] arguments = {"world"};
 		MessageFormatter formatter = mock(MessageFormatter.class);
-		provider.log(location, Level.INFO, throwable, "Hello {}!", arguments, formatter);
+		provider.log(location, "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
 
 		verify(first).log(
-			not(same(location)), eq(Level.INFO), same(throwable), eq("Hello {}!"), same(arguments), same(formatter)
+			not(same(location)),
+			eq("TEST"),
+			eq(Level.INFO),
+			same(throwable),
+			eq("Hello {}!"),
+			same(arguments),
+			same(formatter)
 		);
 
 		verify(second).log(
-			not(same(location)), eq(Level.INFO), same(throwable), eq("Hello {}!"), same(arguments), same(formatter)
+			not(same(location)),
+			eq("TEST"),
+			eq(Level.INFO),
+			same(throwable),
+			eq("Hello {}!"),
+			same(arguments),
+			same(formatter)
 		);
 
 		verify(location).push();

@@ -34,11 +34,11 @@ public final class BundleLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(StackTraceLocation location, Level level, Throwable throwable, Object message, Object[] arguments,
-			MessageFormatter formatter) {
+	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
+			Object[] arguments, MessageFormatter formatter) {
 		StackTraceLocation childLocation = location.push();
 		for (LoggingProvider provider : providers) {
-			provider.log(childLocation, level, throwable, message, arguments, formatter);
+			provider.log(childLocation, tag, level, throwable, message, arguments, formatter);
 		}
 	}
 

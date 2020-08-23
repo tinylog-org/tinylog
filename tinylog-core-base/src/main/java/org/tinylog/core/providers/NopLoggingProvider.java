@@ -27,8 +27,8 @@ public final class NopLoggingProvider implements LoggingProvider {
 	}
 
 	@Override
-	public void log(StackTraceLocation location, Level level, Throwable throwable, Object message, Object[] arguments,
-			MessageFormatter formatter) {
+	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
+			Object[] arguments, MessageFormatter formatter) {
 		// Ignore
 	}
 
