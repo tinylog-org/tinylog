@@ -13,23 +13,22 @@
 
 package org.tinylog.core.providers;
 
+import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
-import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
-/**
- * A no operation implementation of {@link LoggingProvider}. All issued log entries are silently ignored.
- */
-public final class NopLoggingProvider implements LoggingProvider {
+import static org.mockito.Mockito.mock;
 
-	/** */
-	public NopLoggingProvider() {
-	}
+class NopLoggingProviderTest {
 
-	@Override
-	public void log(StackTraceLocation location, Level level, Throwable throwable, Object message, Object[] arguments,
-			MessageFormatter formatter) {
-		// Ignore
+	/**
+	 * Verifies that log entries are accepted.
+	 */
+	@Test
+	public void acceptLogEntries() {
+		new NopLoggingProvider().log(
+			mock(StackTraceLocation.class), Level.TRACE, null, "Hello world!", null, null
+		);
 	}
 
 }

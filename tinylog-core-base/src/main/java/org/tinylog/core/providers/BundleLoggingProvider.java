@@ -15,6 +15,10 @@ package org.tinylog.core.providers;
 
 import java.util.List;
 
+import org.tinylog.core.Level;
+import org.tinylog.core.format.message.MessageFormatter;
+import org.tinylog.core.runtime.StackTraceLocation;
+
 /**
  * Wrapper for multiple {@link LoggingProvider LoggingProviders}.
  */
@@ -27,6 +31,15 @@ public final class BundleLoggingProvider implements LoggingProvider {
 	 */
 	public BundleLoggingProvider(List<LoggingProvider> providers) {
 		this.providers = providers;
+	}
+
+	@Override
+	public void log(StackTraceLocation location, Level level, Throwable throwable, Object message, Object[] arguments,
+			MessageFormatter formatter) {
+		StackTraceLocation childLocation = location.push();
+		for (LoggingProvider provider : providers) {
+			provider.log(childLocation, level, throwable, message, arguments, formatter);
+		}
 	}
 
 }
