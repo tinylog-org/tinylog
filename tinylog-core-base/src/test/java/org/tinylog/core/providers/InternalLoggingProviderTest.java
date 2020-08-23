@@ -110,7 +110,7 @@ class InternalLoggingProviderTest {
 	public void exceptionWithCustomMessage(Level level) throws Exception {
 		Exception exception = new UnsupportedOperationException();
 		exception.setStackTrace(new StackTraceElement[] {
-			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42)
+			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
 		});
 
 		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
