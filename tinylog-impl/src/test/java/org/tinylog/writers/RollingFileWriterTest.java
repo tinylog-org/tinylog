@@ -313,6 +313,8 @@ public final class RollingFileWriterTest {
 		WrapperFileConverter.converter = converter;
 
 		File file = folder.newFile();
+		file.delete();
+
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file.getAbsolutePath());
 		properties.put("format", "{message}");

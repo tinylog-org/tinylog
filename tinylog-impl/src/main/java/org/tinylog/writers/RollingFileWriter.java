@@ -82,7 +82,8 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
+		String suffix = converter.getBackupSuffix();
+		List<File> files = getAllFilesWithoutLinks(null);
 
 		String fileName;
 		boolean append;
@@ -90,12 +91,15 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		if (files.size() > 0 && path.isValid(files.get(0))) {
 			fileName = files.get(0).getPath();
 			if (canBeContinued(fileName, policies)) {
+				deleteBackups(suffix == null ? files.subList(1, files.size()) : getAllFilesWithoutLinks(suffix), backups);
 				append = true;
-				deleteBackups(files.subList(1, files.size()), backups);
 			} else {
+				converter.open(fileName);
+				deleteBackups(suffix == null ? files : getAllFilesWithoutLinks(suffix), backups);
+				converter.close();
+
 				fileName = path.resolve();
 				append = false;
-				deleteBackups(files, backups);
 			}
 		} else {
 			fileName = path.resolve();
@@ -153,9 +157,8 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private void internalWrite(final byte[] data) throws IOException {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
-
-			List<File> existingFiles = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
-			deleteBackups(existingFiles, backups);
+			deleteBackups(getAllFilesWithoutLinks(converter.getBackupSuffix()), backups);
+			converter.close();
 
 			String fileName = path.resolve();
 			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, false, false);
@@ -187,18 +190,25 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 */
 	private void internalClose() throws IOException {
 		writer.close();
+
+		String suffix = converter.getBackupSuffix();
+		if (suffix != null) {
+			deleteBackups(getAllFilesWithoutLinks(suffix), backups);
+		}
+
 		converter.close();
 	}
 
 	/**
-	 * Removes the link to the latest log file from a list of files.
+	 * Gets all files from {@link DynamicPath} but without links.
 	 *
-	 * @param files
-	 *            Modifiable list of files
-	 * @return The passed list
+	 * @param backupSuffix
+	 *            Optional file extension for backup files (can be {@code null})
+	 * @return Found files without links
 	 */
 	@IgnoreJRERequirement
-	private List<File> filterOutLatestLink(final List<File> files) {
+	private List<File> getAllFilesWithoutLinks(final String backupSuffix) {
+		List<File> files = path.getAllFiles(backupSuffix);
 		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
 			files.remove(new File(linkToLatest.resolve()));
 		}
