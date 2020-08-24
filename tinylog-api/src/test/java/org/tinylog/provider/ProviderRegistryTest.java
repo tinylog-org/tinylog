@@ -165,6 +165,76 @@ public final class ProviderRegistryTest {
 	}
 
 	/**
+	 * Verifies that a defined logging provider list can be loaded. Also includes testing correct whitespace trim.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void specificProviderList() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+
+		spy(Configuration.class);
+		when(Configuration.get("provider"))
+			.thenReturn(" " + LoggingProviderOne.class.getName() + " , " + LoggingProviderTwo.class.getName() + " ");
+
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(BundleLoggingProvider.class);
+		assertThat(Whitebox.getInternalState(createdProvider, LoggingProvider[].class))
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(LoggingProviderOne.class)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
+	}
+
+	/**
+	 * Verifies that a defined logging provider list of several identical items can be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void specificProviderListRepeated() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+
+		spy(Configuration.class);
+		when(Configuration.get("provider"))
+			.thenReturn(LoggingProviderTwo.class.getName() + " , " + LoggingProviderTwo.class.getName());
+
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(BundleLoggingProvider.class);
+		assertThat(Whitebox.getInternalState(createdProvider, LoggingProvider[].class))
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class)
+			.hasAtLeastOneElementOfType(LoggingProviderTwo.class);
+	}
+	
+	/**
+	 * Verifies that an empty provider list generates the correct warnings and errors.
+	 *
+	 * @throws Exception
+	 *             Failed creating service or invoking private method {@link ProviderRegistry#loadLoggingProvider()}
+	 */
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void specificProviderEmptyList() throws Exception {
+		FileSystem.createServiceFile(LoggingProvider.class, LoggingProviderOne.class.getName(), LoggingProviderTwo.class.getName());
+
+		spy(Configuration.class);
+		when(Configuration.get("provider")).thenReturn(" ");
+
+		LoggingProvider createdProvider = Whitebox.invokeMethod(ProviderRegistry.class, "loadLoggingProvider");
+		assertThat(createdProvider).isInstanceOf(NopLoggingProvider.class);
+		
+		assertThat(systemStream.consumeErrorOutput())
+			.contains("WARN")
+			.contains("'empty string' will be ignored.")
+			.contains("ERROR")
+			.contains("Logging will be disabled.");
+	}
+	
+	/**
 	 * Verifies that an accurate error message will be output, if a requested logging provider is not available.
 	 *
 	 * @throws Exception

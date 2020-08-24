@@ -13,6 +13,7 @@
 
 package org.tinylog.provider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,12 +101,29 @@ public final class ProviderRegistry {
 		} else if (NOP_PROVIDER_NAME.equalsIgnoreCase(name)) {
 			return new NopLoggingProvider();
 		} else {
-			LoggingProvider provider = loader.create(name);
-			if (provider == null) {
-				InternalLogger.log(Level.ERROR, "Requested logging provider is not available. Logging will be disabled.");
+			String[] nameItems = name.split(",");
+			Collection<LoggingProvider> providers = new ArrayList<LoggingProvider>(nameItems.length);
+			for (String nameItem : nameItems) {
+				nameItem = nameItem.trim();
+				if (nameItem.isEmpty()) {
+					InternalLogger.log(Level.WARN, "Requested logging provider 'empty string' will be ignored.");
+					continue;
+				}
+				LoggingProvider provider = loader.create(nameItem);
+				if (provider == null) {
+					InternalLogger.log(Level.ERROR, "Requested logging provider '" + nameItem + "' is not available.");
+				} else {
+					providers.add(provider);	
+				}
+			}
+
+			if (providers.size() == 0) {
+				InternalLogger.log(Level.ERROR, "Requested logging provider '" + name + "' is not available. Logging will be disabled.");
 				return new NopLoggingProvider();
+			} else if (providers.size() == 1) {
+				return providers.iterator().next();
 			} else {
-				return provider;
+				return new BundleLoggingProvider(providers);
 			}
 		}
 	}
