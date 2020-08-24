@@ -190,12 +190,6 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 */
 	private void internalClose() throws IOException {
 		writer.close();
-
-		String suffix = converter.getBackupSuffix();
-		if (suffix != null) {
-			deleteBackups(getAllFilesWithoutLinks(suffix), backups);
-		}
-
 		converter.close();
 	}
 
