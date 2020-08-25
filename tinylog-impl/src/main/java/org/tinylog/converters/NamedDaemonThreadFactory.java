@@ -25,12 +25,12 @@ final class NamedDaemonThreadFactory implements ThreadFactory {
 	/**
 	 * @param name Name for created threads
 	 */
-	NamedDaemonThreadFactory(String name) {
+	NamedDaemonThreadFactory(final String name) {
 		this.name = name;
 	}
 
 	@Override
-	public Thread newThread(Runnable runnable) {
+	public Thread newThread(final Runnable runnable) {
 		Thread thread = new Thread(runnable);
 		thread.setName(name);
 		thread.setPriority(Thread.MIN_PRIORITY);
