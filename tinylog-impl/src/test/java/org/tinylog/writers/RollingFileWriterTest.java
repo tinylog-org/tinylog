@@ -68,9 +68,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void unbufferedWriting() throws IOException {
+	public void unbufferedWriting() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap("file", file, "format", "{message}", "buffered", "false"));
 
@@ -86,9 +88,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void bufferedWriting() throws IOException {
+	public void bufferedWriting() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap("file", file, "format", "{message}", "buffered", "true"));
 
@@ -107,9 +111,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void writingThreadDisabled() throws IOException {
+	public void writingThreadDisabled() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap("file", file, "format", "{message}", "writingthread", "false"));
 
@@ -126,9 +132,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void writingThreadEnabled() throws IOException {
+	public void writingThreadEnabled() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap("file", file, "format", "{message}", "writingthread", "true"));
 
@@ -145,9 +153,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed opening file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void definedCharset() throws IOException {
+	public void definedCharset() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap("file", file, "format", "{message}", "charset", "UTF-16"));
@@ -162,9 +172,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void defaultFormatPattern() throws IOException {
+	public void defaultFormatPattern() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		RollingFileWriter writer = new RollingFileWriter(singletonMap("file", file));
 
@@ -186,9 +198,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void continueExistingFile() throws IOException {
+	public void continueExistingFile() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = tripletonMap("file", file, "format", "{message}", "policies", "size: 1MB");
 
@@ -208,9 +222,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void discontinueExistingFile() throws IOException {
+	public void discontinueExistingFile() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = tripletonMap("file", file, "format", "{message}", "policies", "startup");
 
@@ -230,9 +246,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void createNewFile() throws IOException {
+	public void createNewFile() throws IOException, InterruptedException {
 		File file = folder.newFile();
 		file.delete();
 		String path = file.getAbsolutePath();
@@ -249,9 +267,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void linkToLatestAtStartup() throws IOException {
+	public void linkToLatestAtStartup() throws IOException, InterruptedException {
 		File latest = new File(folder.getRoot(), "latest");
 
 		Map<String, String> properties = new HashMap<>();
@@ -276,9 +296,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void linkToLatestOnRollover() throws IOException {
+	public void linkToLatestOnRollover() throws IOException, InterruptedException {
 		File latest = new File(folder.getRoot(), "latest");
 
 		Map<String, String> properties = new HashMap<>();
@@ -305,9 +327,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void useFileConverter() throws IOException {
+	public void useFileConverter() throws IOException, InterruptedException {
 		FileConverter converter = mock(FileConverter.class);
 		when(converter.write(any())).thenReturn(("Hallo Welt!" + NEW_LINE).getBytes(StandardCharsets.UTF_8));
 		WrapperFileConverter.converter = converter;
@@ -339,9 +363,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void keepAllBackups() throws IOException {
+	public void keepAllBackups() throws IOException, InterruptedException {
 		File file1 = folder.newFile("0");
 		File file2 = folder.newFile("1");
 		File file3 = folder.newFile("2");
@@ -374,9 +400,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void deleteBackupsAtStartUp() throws IOException {
+	public void deleteBackupsAtStartUp() throws IOException, InterruptedException {
 		File file1 = folder.newFile("0");
 		File file2 = folder.newFile("1");
 		File file3 = folder.newFile("2");
@@ -409,9 +437,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void deleteBackupsAtRollOver() throws IOException {
+	public void deleteBackupsAtRollOver() throws IOException, InterruptedException {
 		File file1 = folder.newFile("0");
 		File file2 = folder.newFile("1");
 		File file3 = folder.newFile("2");
@@ -455,9 +485,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void warnIfDeletionFailedOnWindows() throws IOException {
+	public void warnIfDeletionFailedOnWindows() throws IOException, InterruptedException {
 		assumeTrue(System.getProperty("os.name").startsWith("Windows"));
 
 		File file1 = folder.newFile("0");
@@ -495,9 +527,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed access to temporary folder or files
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void warnIfDeletionFailedOnPosix() throws IOException {
+	public void warnIfDeletionFailedOnPosix() throws IOException, InterruptedException {
 		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
 
 		File file1 = new File(folder.getRoot(), "0/log");
@@ -545,9 +579,11 @@ public final class RollingFileWriterTest {
 	 *
 	 * @throws IOException
 	 *             Failed opening file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void invalidCharset() throws IOException {
+	public void invalidCharset() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		new RollingFileWriter(doubletonMap("file", file, "charset", "UTF-42")).close();
 
@@ -602,6 +638,12 @@ public final class RollingFileWriterTest {
 		public void close() {
 			converter.close();
 		}
+
+		@Override
+		public void shutdown() throws InterruptedException {
+			converter.shutdown();
+		}
+
 	}
 
 }

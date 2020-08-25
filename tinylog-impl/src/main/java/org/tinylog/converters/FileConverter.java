@@ -59,4 +59,16 @@ public interface FileConverter {
 	 */
 	void close();
 
+	/**
+	 * Shuts this file converter down.
+	 *
+	 * <p>
+	 *     If the converter has started any further threads, this method must await their termination.
+	 * </p>
+	 *
+	 * @throws InterruptedException
+	 *             Interrupted while waiting
+	 */
+	void shutdown() throws InterruptedException;
+
 }

@@ -53,9 +53,11 @@ public class GzipFileConverterTest {
 	 *
 	 * @throws IOException
 	 *             Failed to create new file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void compression() throws IOException {
+	public void compression() throws IOException, InterruptedException {
 		File originalFile = folder.newFile();
 		File compressedFile = new File(originalFile.getAbsolutePath() + ".gz");
 
@@ -66,6 +68,7 @@ public class GzipFileConverterTest {
 		assertThat(converter.write(data)).isSameAs(data);
 		Files.write(originalFile.toPath(), data);
 		converter.close();
+		converter.shutdown();
 
 		waitFor(originalFile::exists, value -> !value, 1000);
 

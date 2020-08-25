@@ -136,7 +136,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() throws IOException, InterruptedException {
 		if (writingThread) {
 			internalClose();
 		} else {
@@ -157,7 +157,10 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private void internalWrite(final byte[] data) throws IOException {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
-			deleteBackups(getAllFilesWithoutLinks(converter.getBackupSuffix()), backups);
+
+			String suffix = converter.getBackupSuffix();
+			deleteBackups(getAllFilesWithoutLinks(suffix), suffix == null ? backups : backups - 1);
+
 			converter.close();
 
 			String fileName = path.resolve();
@@ -187,10 +190,19 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 *
 	 * @throws IOException
 	 *             Closing failed
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
-	private void internalClose() throws IOException {
+	private void internalClose() throws IOException, InterruptedException {
 		writer.close();
+
+		String suffix = converter.getBackupSuffix();
+		if (suffix != null) {
+			deleteBackups(getAllFilesWithoutLinks(suffix), backups - 1);
+		}
+
 		converter.close();
+		converter.shutdown();
 	}
 
 	/**

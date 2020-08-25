@@ -42,4 +42,9 @@ public final class NopFileConverter implements FileConverter {
 		// Ignore
 	}
 
+	@Override
+	public void shutdown() {
+		// Ignore
+	}
+
 }
