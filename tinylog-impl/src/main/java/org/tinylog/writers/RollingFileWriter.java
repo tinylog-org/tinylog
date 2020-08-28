@@ -216,7 +216,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private List<File> getAllFilesWithoutLinks(final String backupSuffix) {
 		List<File> files = path.getAllFiles(backupSuffix);
 		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
-			files.remove(new File(linkToLatest.resolve()));
+			files.remove(new File(linkToLatest.resolve()).getAbsoluteFile());
 		}
 		return files;
 	}
