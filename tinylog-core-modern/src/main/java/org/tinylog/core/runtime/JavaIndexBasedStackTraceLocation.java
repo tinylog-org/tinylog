@@ -17,7 +17,7 @@ package org.tinylog.core.runtime;
  * Stack trace location implementation for modern Java 9 and later that stores the location of a callee as numeric
  * index.
  */
-public final class JavaIndexBasedStackTraceLocation implements StackTraceLocation {
+public class JavaIndexBasedStackTraceLocation implements StackTraceLocation {
 
 	private final int index;
 

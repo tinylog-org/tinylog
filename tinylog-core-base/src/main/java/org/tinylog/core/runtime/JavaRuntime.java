@@ -16,7 +16,7 @@ package org.tinylog.core.runtime;
 /**
  * Runtime implementation for standard Java.
  */
-public final class JavaRuntime implements RuntimeFlavor {
+public class JavaRuntime implements RuntimeFlavor {
 
 	/** */
 	public JavaRuntime() {

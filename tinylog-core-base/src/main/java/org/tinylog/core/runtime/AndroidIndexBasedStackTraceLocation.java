@@ -18,7 +18,7 @@ import java.lang.invoke.MethodHandle;
 /**
  * Stack trace location implementation for Android that stores the location of a callee as numeric index.
  */
-public final class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
+public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 
 	private static final MethodHandle fillStackTraceElements;
 	private static final int offset;

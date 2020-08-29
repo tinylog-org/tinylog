@@ -29,7 +29,7 @@ import org.tinylog.core.runtime.RuntimeProvider;
 /**
  * Storage for {@link Configuration}, {@link Hook Hooks}, and {@link LoggingProvider}.
  */
-public final class Framework {
+public class Framework {
 
 	private final Object mutex = new Object();
 

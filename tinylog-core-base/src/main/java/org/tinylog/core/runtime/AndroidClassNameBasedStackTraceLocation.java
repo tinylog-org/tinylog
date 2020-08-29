@@ -16,7 +16,7 @@ package org.tinylog.core.runtime;
 /**
  * Stack trace location implementation for Android that stores the fully qualified class name of a callee.
  */
-public final class AndroidClassNameBasedStackTraceLocation implements StackTraceLocation {
+public class AndroidClassNameBasedStackTraceLocation implements StackTraceLocation {
 
 	private final String className;
 

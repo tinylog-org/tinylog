@@ -16,7 +16,7 @@ package org.tinylog.core.runtime;
 /**
  * Provider for acquiring the appropriate {@link RuntimeFlavor} for the actual virtual machine.
  */
-public final class RuntimeProvider {
+public class RuntimeProvider {
 
 	/** */
 	public RuntimeProvider() {

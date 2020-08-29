@@ -37,7 +37,7 @@ import org.tinylog.core.format.value.ValueFormatBuilder;
  *     singe quotes ('') are output as one singe quote.
  * </p>
  */
-public final class EnhancedMessageFormatter implements MessageFormatter {
+public class EnhancedMessageFormatter implements MessageFormatter {
 
 	private static final int EXTRA_CAPACITY = 32;
 

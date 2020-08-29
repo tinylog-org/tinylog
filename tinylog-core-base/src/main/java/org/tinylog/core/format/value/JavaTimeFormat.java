@@ -23,7 +23,7 @@ import java.util.Locale;
 /**
  * Format for date and time classes from {@link java.time}.
  */
-public final class JavaTimeFormat implements ValueFormat {
+public class JavaTimeFormat implements ValueFormat {
 
 	private final Locale locale;
 	private final ZoneId defaultZone;

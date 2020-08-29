@@ -18,7 +18,7 @@ import org.tinylog.core.Framework;
 /**
  * Builder for {@link NopLoggingProvider}.
  */
-public final class NopLoggingProviderBuilder implements LoggingProviderBuilder {
+public class NopLoggingProviderBuilder implements LoggingProviderBuilder {
 
 	/** */
 	public NopLoggingProviderBuilder() {

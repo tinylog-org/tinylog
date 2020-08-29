@@ -16,7 +16,7 @@ package org.tinylog.core.runtime;
 /**
  * Runtime implementation for Android (API level 26 or later).
  */
-public final class AndroidRuntime implements RuntimeFlavor {
+public class AndroidRuntime implements RuntimeFlavor {
 
 	/** */
 	public AndroidRuntime() {

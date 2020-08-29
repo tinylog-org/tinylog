@@ -23,7 +23,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
 /**
  * Wrapper for multiple {@link LoggingProvider LoggingProviders}.
  */
-public final class BundleLoggingProvider implements LoggingProvider {
+public class BundleLoggingProvider implements LoggingProvider {
 
 	private final List<LoggingProvider> providers;
 

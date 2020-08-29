@@ -18,7 +18,7 @@ import java.lang.invoke.MethodHandle;
 /**
  * Utility class for resolving legacy Android methods for receiving specific elements from the stack trace.
  */
-final class AndroidStackTraceAccess extends BaseStackTraceAccess {
+class AndroidStackTraceAccess extends BaseStackTraceAccess {
 
 	private static final int STACK_TRACE_SIZE = 32;
 

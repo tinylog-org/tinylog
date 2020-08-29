@@ -20,7 +20,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
 /**
  * A no operation implementation of {@link LoggingProvider}. All issued log entries are silently ignored.
  */
-public final class NopLoggingProvider implements LoggingProvider {
+public class NopLoggingProvider implements LoggingProvider {
 
 	/** */
 	public NopLoggingProvider() {

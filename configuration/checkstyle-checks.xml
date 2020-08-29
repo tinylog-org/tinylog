@@ -63,7 +63,6 @@
         <module name="DeclarationOrder"/>
         <module name="DefaultComesLast"/>
         <module name="DescendantToken"/>
-        <module name="DesignForExtension"/>
         <module name="EmptyBlock"/>
         <module name="EmptyCatchBlock"/>
         <module name="EmptyForInitializerPad"/>

@@ -19,7 +19,7 @@ import java.util.Locale;
 /**
  * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
  */
-public final class JavaTimeFormatBuilder implements ValueFormatBuilder {
+public class JavaTimeFormatBuilder implements ValueFormatBuilder {
 
 	/** */
 	public JavaTimeFormatBuilder() {

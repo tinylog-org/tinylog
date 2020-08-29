@@ -104,7 +104,7 @@ class JavaClassNameBasedStackTraceLocationTest {
 	/**
 	 * Helper class to simulate a callee.
 	 */
-	private static final class Callee {
+	private static class Callee {
 
 		/**
 		 * Executes the passed {@link Supplier}.

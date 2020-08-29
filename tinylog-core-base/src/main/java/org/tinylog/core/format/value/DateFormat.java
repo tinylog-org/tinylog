@@ -20,7 +20,7 @@ import java.util.Locale;
 /**
  * Format for {@link Date}.
  */
-public final class DateFormat implements ValueFormat {
+public class DateFormat implements ValueFormat {
 
 	private final Locale locale;
 

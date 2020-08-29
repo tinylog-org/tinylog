@@ -16,7 +16,7 @@ package org.tinylog.core.runtime;
 /**
  * Stack trace location implementation for legacy Java 8 that stores the fully qualified class name of a callee.
  */
-public final class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTraceLocation {
+public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTraceLocation {
 
 	private final String className;
 	private final int offset;

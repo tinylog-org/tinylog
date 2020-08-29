@@ -23,7 +23,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
 /**
  * Internal logging provider that prints internal tinylog errors and warnings to {@link System#err}.
  */
-public final class InternalLoggingProvider implements LoggingProvider {
+public class InternalLoggingProvider implements LoggingProvider {
 
 	private static final String TAG = "tinylog";
 

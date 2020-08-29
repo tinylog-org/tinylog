@@ -18,7 +18,7 @@ import java.lang.invoke.MethodHandle;
 /**
  * Utility class for resolving legacy Java methods for receiving specific elements from the stack trace.
  */
-final class LegacyStackTraceAccess extends BaseStackTraceAccess {
+class LegacyStackTraceAccess extends BaseStackTraceAccess {
 
 	/** */
 	LegacyStackTraceAccess() {

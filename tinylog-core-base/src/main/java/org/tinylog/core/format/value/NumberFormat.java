@@ -20,7 +20,7 @@ import java.util.Locale;
 /**
  * Format for numbers.
  */
-public final class NumberFormat implements ValueFormat {
+public class NumberFormat implements ValueFormat {
 
 	private final DecimalFormatSymbols symbols;
 

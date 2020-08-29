@@ -17,7 +17,7 @@ package org.tinylog.core.runtime;
  * Stack trace location implementation for modern Java 9 and later that stores the fully qualified class name of a
  * callee.
  */
-public final class JavaClassNameBasedStackTraceLocation implements StackTraceLocation {
+public class JavaClassNameBasedStackTraceLocation implements StackTraceLocation {
 
 	private final String className;
 	private final int offset;

@@ -18,7 +18,7 @@ import java.util.Locale;
 /**
  * Builder for creating {@link NumberFormat NumberFormats}.
  */
-public final class NumberFormatBuilder implements ValueFormatBuilder {
+public class NumberFormatBuilder implements ValueFormatBuilder {
 
 	/** */
 	public NumberFormatBuilder() {

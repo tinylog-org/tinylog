@@ -18,7 +18,7 @@ import java.util.Locale;
 /**
  * Builder for creating {@link DateFormat DateFormats}.
  */
-public final class DateFormatBuilder implements ValueFormatBuilder {
+public class DateFormatBuilder implements ValueFormatBuilder {
 
 	/** */
 	public DateFormatBuilder() {
