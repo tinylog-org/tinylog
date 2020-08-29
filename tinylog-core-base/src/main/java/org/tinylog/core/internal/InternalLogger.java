@@ -30,10 +30,10 @@ public final class InternalLogger {
 	private static final int INTERNAL_STACK_TRACE_DEPTH = 1;
 	private static final int CALLER_STACK_TRACE_DEPTH = 3;
 
-	private static final Object lock = new Object();
+	private static volatile State state = new State(null, null);
+
+	private static final Object mutex = new Object();
 	private static List<LogEntry> entries = new ArrayList<>();
-	private static RuntimeFlavor runtime;
-	private static LoggingProvider provider;
 
 	/** */
 	private InternalLogger() {
@@ -46,10 +46,7 @@ public final class InternalLogger {
 	 * @param provider Logging provider for output log entries
 	 */
 	public static void init(RuntimeFlavor runtime, LoggingProvider provider) {
-		synchronized (lock) {
-			InternalLogger.runtime = runtime;
-			InternalLogger.provider = provider;
-
+		synchronized (mutex) {
 			if (provider != null) {
 				StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
 				for (LogEntry entry : entries) {
@@ -58,6 +55,7 @@ public final class InternalLogger {
 				}
 			}
 
+			state = new State(runtime, provider);
 			entries = new ArrayList<>();
 		}
 	}
@@ -165,21 +163,37 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	private static void log(Level level, Throwable throwable, String message) {
-		RuntimeFlavor runtime;
-		LoggingProvider provider;
+		State state = InternalLogger.state;
 
-		synchronized (lock) {
-			runtime = InternalLogger.runtime;
-			provider = InternalLogger.provider;
-
-			if (provider == null) {
-				entries.add(new LogEntry(level, throwable, message, null));
+		if (state.provider == null) {
+			synchronized (mutex) {
+				state = InternalLogger.state;
+				if (state.provider == null) {
+					entries.add(new LogEntry(level, throwable, message, null));
+				}
 			}
 		}
 
-		if (provider != null) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			provider.log(location, TAG, level, throwable, message, null, null);
+		if (state.provider != null) {
+			StackTraceLocation location = state.runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			state.provider.log(location, TAG, level, throwable, message, null, null);
+		}
+	}
+
+	/**
+	 * Internal logger state with {@link RuntimeFlavor} and {@link LoggingProvider}.
+	 */
+	private static final class State {
+		private final RuntimeFlavor runtime;
+		private final LoggingProvider provider;
+
+		/**
+		 * @param runtime Runtime flavor for extraction of stack trace location
+		 * @param provider Logging provider for output log entries
+		 */
+		private State(RuntimeFlavor runtime, LoggingProvider provider) {
+			this.runtime = runtime;
+			this.provider = provider;
 		}
 	}
 
