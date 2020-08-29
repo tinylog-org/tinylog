@@ -626,6 +626,17 @@ public final class ConfigurationTest {
 	}
 
 	/**
+	 * Verifies that the frozen status of the configuration can be read and changes after freezing.
+	 */
+	@Test
+	public void checkFrozen() {
+		Configuration.set("freeze", "test");
+		assertThat(Configuration.isFrozen()).isFalse();
+		assertThat(Configuration.get("freeze")).isEqualTo("test");
+		assertThat(Configuration.isFrozen()).isTrue();
+	}
+	
+	/**
 	 * Triggers (re-)loading properties.
 	 *
 	 * @param path
