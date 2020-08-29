@@ -375,4 +375,13 @@ public final class Configuration {
 		return builder.toString();
 	}
 
+	/**
+	 * Checks whether the configuration is already frozen.
+	 *
+	 * @return {@code true} if the configuration is frozen, otherwise {@code false}
+	 */
+	public static boolean isFrozen() {
+		return frozen;
+	}
+
 }
