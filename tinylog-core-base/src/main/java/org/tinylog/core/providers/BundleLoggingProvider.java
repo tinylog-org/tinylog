@@ -13,6 +13,7 @@
 
 package org.tinylog.core.providers;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.tinylog.core.Level;
@@ -31,6 +32,15 @@ public final class BundleLoggingProvider implements LoggingProvider {
 	 */
 	public BundleLoggingProvider(List<LoggingProvider> providers) {
 		this.providers = providers;
+	}
+
+	/**
+	 * Gets all wrapped child logging providers.
+	 *
+	 * @return The wrapped child logging providers
+	 */
+	public List<LoggingProvider> getProviders() {
+		return Collections.unmodifiableList(providers);
 	}
 
 	@Override
