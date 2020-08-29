@@ -15,7 +15,10 @@ package org.tinylog.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.tinylog.core.providers.BundleLoggingProvider;
@@ -110,7 +113,9 @@ public class Framework {
 	 * @param hook Hook to register
 	 */
 	public void registerHook(Hook hook) {
-		hooks.add(hook);
+		synchronized (mutex) {
+			hooks.add(hook);
+		}
 	}
 
 	/**
@@ -119,7 +124,9 @@ public class Framework {
 	 * @param hook Hook to unregister
 	 */
 	public void removeHook(Hook hook) {
-		hooks.remove(hook);
+		synchronized (mutex) {
+			hooks.remove(hook);
+		}
 	}
 
 	/**
@@ -134,7 +141,7 @@ public class Framework {
 					hook.startUp();
 				}
 
-				getLoggingProvider();
+				loadLoggingProvider();
 			}
 		}
 	}
@@ -151,6 +158,8 @@ public class Framework {
 				for (Hook hook : hooks) {
 					hook.shutDown();
 				}
+
+				loggingProvider = null;
 			}
 		}
 	}
@@ -177,7 +186,7 @@ public class Framework {
 	}
 
 	/**
-	 * Loads all hooks that are registered as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+	 * Loads all hooks that are registered as a {@link java.util.ServiceLoader service} in {@code META-INF/services}.
 	 *
 	 * @return All found hooks
 	 */
@@ -196,24 +205,45 @@ public class Framework {
 		configuration.freeze();
 		startUp();
 
-		List<String> names = configuration.getList("backend");
-		List<LoggingProvider> providers = new ArrayList<>();
+		if (loggingProvider == null) {
+			List<String> names = configuration.getList("backend");
+			Map<String, LoggingProviderBuilder> builders = new HashMap<>();
+			List<LoggingProvider> providers = new ArrayList<>();
 
-		for (LoggingProviderBuilder builder : ServiceLoader.load(LoggingProviderBuilder.class, getClassLoader())) {
-			if ((names.isEmpty() && !(builder instanceof NopLoggingProviderBuilder))
-					|| names.contains(builder.getName())) {
-				providers.add(builder.create(this));
+			for (LoggingProviderBuilder builder : ServiceLoader.load(LoggingProviderBuilder.class, getClassLoader())) {
+				builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder);
 			}
-		}
 
-		if (providers.isEmpty()) {
-			System.err.println("No logging backend could be found in the classpath. Therefore, no log entries will be "
-				+ "output. Please add tinylog-impl or any other logging backend for outputting log entries.");
-			loggingProvider = new InternalLoggingProvider();
-		} else if (providers.size() == 1) {
-			loggingProvider = providers.get(0);
-		} else {
-			loggingProvider = new BundleLoggingProvider(providers);
+			for (String name : names) {
+				LoggingProviderBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
+				if (builder == null) {
+					System.err.println(
+						"Could not find any logging backend with the name \"" + name + "\" in the classpath"
+					);
+				} else {
+					providers.add(builder.create(this));
+				}
+			}
+
+			if (providers.isEmpty()) {
+				for (Map.Entry<String, LoggingProviderBuilder> entry : builders.entrySet()) {
+					if (!(entry.getValue() instanceof NopLoggingProviderBuilder)) {
+						providers.add(entry.getValue().create(this));
+					}
+				}
+			}
+
+			if (providers.isEmpty()) {
+				loggingProvider = new InternalLoggingProvider();
+				System.err.println(
+					"No logging backend could be found in the classpath. Therefore, no log entries will be output. "
+					+ "Please add tinylog-impl.jar or any other logging backend for outputting log entries."
+				);
+			} else if (providers.size() == 1) {
+				loggingProvider = providers.get(0);
+			} else {
+				loggingProvider = new BundleLoggingProvider(providers);
+			}
 		}
 	}
 

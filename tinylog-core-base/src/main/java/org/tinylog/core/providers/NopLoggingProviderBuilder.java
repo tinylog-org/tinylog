@@ -20,6 +20,8 @@ import org.tinylog.core.Framework;
  */
 public class NopLoggingProviderBuilder implements LoggingProviderBuilder {
 
+	private static final NopLoggingProvider PROVIDER = new NopLoggingProvider();
+
 	/** */
 	public NopLoggingProviderBuilder() {
 	}
@@ -31,7 +33,7 @@ public class NopLoggingProviderBuilder implements LoggingProviderBuilder {
 
 	@Override
 	public LoggingProvider create(Framework framework) {
-		return new NopLoggingProvider();
+		return PROVIDER;
 	}
 
 }
