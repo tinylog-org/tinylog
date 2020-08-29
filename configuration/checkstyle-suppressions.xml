@@ -4,7 +4,7 @@
 		"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
 
-	<!-- Default Code -->
+	<!-- All Java Files but Tests -->
 	<suppress
 		files="([/\\]src[/\\]java.*[/\\].*\.java)|(.*(?&lt;!Test)\.java)"
 		id="javadocMethodTests"
