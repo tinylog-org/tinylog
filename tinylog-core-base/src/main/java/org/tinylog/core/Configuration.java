@@ -30,7 +30,8 @@ import java.util.Properties;
 public class Configuration {
 
 	private static final String FROZEN_MESSAGE =
-			"Configuration has already been applied and cannot be modified anymore";
+		"The configuration has already been applied and cannot be modified anymore";
+
 	private static final int MAX_LOCALE_ARGUMENTS = 3;
 
 	private final Properties properties;
@@ -40,6 +41,17 @@ public class Configuration {
 	public Configuration() {
 		this.properties = new Properties();
 		this.frozen = false;
+	}
+
+	/**
+	 * Checks if the configuration is already frozen.
+	 *
+	 * @return {@code true} if the configuration is frozen, {@code false} if still modifiable
+	 */
+	public boolean isFrozen() {
+		synchronized (properties) {
+			return frozen;
+		}
 	}
 
 	/**

@@ -201,6 +201,21 @@ class FrameworkTest {
 			}
 		}
 
+		/**
+		 * Verifies that the configuration becomes frozen after startup.
+		 */
+		@Test
+		void freezeConfigurationAfterStartup() {
+			Framework framework = new Framework();
+			try {
+				assertThat(framework.getConfiguration().isFrozen()).isFalse();
+				framework.startUp();
+				assertThat(framework.getConfiguration().isFrozen()).isTrue();
+			} finally {
+				framework.shutDown();
+			}
+		}
+
 	}
 
 	/**
@@ -357,6 +372,17 @@ class FrameworkTest {
 					return new URLClassLoader(new URL[] {url}, super.getClassLoader());
 				}
 			};
+		}
+
+		/**
+		 * Verifies that the configuration becomes frozen after providing a logging provider.
+		 */
+		@Test
+		void freezeConfigurationAfterProvidingLoggingProvider() {
+			Framework framework = new Framework();
+			assertThat(framework.getConfiguration().isFrozen()).isFalse();
+			assertThat(framework.getLoggingProvider()).isNotNull();
+			assertThat(framework.getConfiguration().isFrozen()).isTrue();
 		}
 
 	}

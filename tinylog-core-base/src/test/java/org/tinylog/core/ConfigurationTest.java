@@ -151,7 +151,10 @@ class ConfigurationTest {
 	@Test
 	void freeze() {
 		Configuration configuration = new Configuration();
+
+		assertThat(configuration.isFrozen()).isFalse();
 		configuration.freeze();
+		assertThat(configuration.isFrozen()).isTrue();
 
 		assertThatCode(() -> configuration.set("foo", "42")).isInstanceOf(UnsupportedOperationException.class);
 		assertThatCode(configuration::loadPropertiesFile).isInstanceOf(UnsupportedOperationException.class);
