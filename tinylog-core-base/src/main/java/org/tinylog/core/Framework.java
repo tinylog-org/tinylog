@@ -47,7 +47,9 @@ public class Framework {
 	 * Loads the configuration from default properties file and hooks from service files.
 	 */
 	public Framework() {
-		this(new RuntimeProvider().getRuntime(), loadConfiguration(), loadHooks());
+		this.runtime = new RuntimeProvider().getRuntime();
+		this.configuration = loadConfiguration();
+		this.hooks = loadHooks();
 	}
 
 	/**
@@ -69,7 +71,8 @@ public class Framework {
 	 * @return A valid and existing class loader instance
 	 */
 	public ClassLoader getClassLoader() {
-		return loadClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
 	}
 
 	/**
@@ -165,34 +168,24 @@ public class Framework {
 	}
 
 	/**
-	 * Gets the class loader for loading resources and services from the classpath.
-	 *
-	 * @return A valid and existing class loader instance
-	 */
-	private static ClassLoader loadClassLoader() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
-	}
-
-	/**
 	 * Creates a new {@link Configuration} and loads the settings from default properties file if available.
 	 *
 	 * @return The created and pre-filled configuration
 	 */
-	private static Configuration loadConfiguration() {
+	private Configuration loadConfiguration() {
 		Configuration configuration = new Configuration();
 		configuration.loadPropertiesFile();
 		return configuration;
 	}
 
 	/**
-	 * Loads all hooks that are registered as a {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+	 * Loads all hooks that are registered as a {@link ServiceLoader service} in {@code META-INF/services}.
 	 *
 	 * @return All found hooks
 	 */
-	private static Collection<Hook> loadHooks() {
+	private Collection<Hook> loadHooks() {
 		Collection<Hook> hooks = new ArrayList<>();
-		for (Hook hook : ServiceLoader.load(Hook.class, loadClassLoader())) {
+		for (Hook hook : ServiceLoader.load(Hook.class, getClassLoader())) {
 			hooks.add(hook);
 		}
 		return hooks;
