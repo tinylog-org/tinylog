@@ -54,16 +54,14 @@ public class Framework {
 	}
 
 	/**
-	 * Initializes the framework with a custom configuration and custom hooks.
+	 * Initializes the framework with a custom configuration and no hooks.
 	 *
-	 * @param runtime Runtime for the actual virtual machine
 	 * @param configuration Configuration to store
-	 * @param hooks Hooks to store
 	 */
-	public Framework(RuntimeFlavor runtime, Configuration configuration, Collection<Hook> hooks) {
-		this.runtime = runtime;
+	public Framework(Configuration configuration) {
+		this.runtime = new RuntimeProvider().getRuntime();
 		this.configuration = configuration;
-		this.hooks = hooks;
+		this.hooks = new ArrayList<>();
 	}
 
 	/**

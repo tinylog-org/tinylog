@@ -21,12 +21,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
-import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
  * Framework that can extend the classpath by additional resource folders and service files.
@@ -47,7 +45,7 @@ public class ExtendableFramework extends Framework {
 	 * @param urls Additional resource folders to add to the classpath
 	 */
 	protected ExtendableFramework(Configuration configuration, URL... urls) {
-		super(new RuntimeProvider().getRuntime(), configuration, Collections.emptyList());
+		super(configuration);
 		this.urls = urls;
 	}
 

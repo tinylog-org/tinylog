@@ -13,16 +13,13 @@
 
 package org.tinylog.core.providers;
 
-import java.util.Collections;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
-import org.tinylog.core.runtime.RuntimeFlavor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 class NopLoggingProviderBuilderTest {
 
@@ -40,7 +37,7 @@ class NopLoggingProviderBuilderTest {
 	 */
 	@Test
 	void creation() {
-		Framework framework = new Framework(mock(RuntimeFlavor.class), new Configuration(), Collections.emptyList());
+		Framework framework = new Framework(new Configuration());
 		NopLoggingProviderBuilder builder = new NopLoggingProviderBuilder();
 		assertThat(builder.create(framework)).isInstanceOf(NopLoggingProvider.class);
 	}

@@ -13,8 +13,6 @@
 
 package org.tinylog.core.internal;
 
-import java.util.Collections;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +21,6 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.providers.LoggingProvider;
-import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.runtime.RuntimeProvider;
 import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +35,7 @@ import static org.mockito.Mockito.verify;
 
 class InternalLoggerTest {
 
-	private final RuntimeFlavor runtime = new RuntimeProvider().getRuntime();
-	private final Framework framework = new Framework(runtime, new Configuration(), Collections.emptyList()) {
+	private final Framework framework = new Framework(new Configuration()) {
 		@Override
 		public LoggingProvider getLoggingProvider() {
 			return provider;
@@ -272,7 +267,7 @@ class InternalLoggerTest {
 				StackTraceElement element = location.getCallerStackTraceElement();
 				assertThat(element.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("stackTraceLocation");
-				assertThat(element.getLineNumber()).isEqualTo(280);
+				assertThat(element.getLineNumber()).isEqualTo(275);
 			}
 		};
 
