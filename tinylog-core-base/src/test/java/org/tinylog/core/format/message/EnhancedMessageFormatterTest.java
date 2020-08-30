@@ -24,12 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EnhancedMessageFormatterTest {
 
+	private final Framework framework = new Framework(false, false);
+
 	/**
 	 * Verifies that a string can be formatted without defining a format pattern.
 	 */
 	@Test
 	void formatDefaultStringWithoutPattern() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("Hello {}!", "Alice");
 		assertThat(output).isEqualTo("Hello Alice!");
 	}
@@ -39,7 +41,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void ignorePatternForStrings() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("Hello {###}!", "Alice");
 		assertThat(output).isEqualTo("Hello Alice!");
 	}
@@ -49,7 +51,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void formatNumberWithoutPattern() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("The maximum port number is {}.", 65535);
 		assertThat(output).isEqualTo("The maximum port number is 65535.");
 	}
@@ -59,7 +61,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void formatNumberWithPattern() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("Pi is {0.00}", Math.PI);
 		assertThat(output).isEqualTo("Pi is 3.14");
 	}
@@ -69,7 +71,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void formatTimeWithPattern() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("It is {hh:mm a}.", LocalTime.of(12, 30));
 		assertThat(output).isEqualTo("It is 12:30 PM.");
 	}
@@ -79,7 +81,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void formatMultipleArguments() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("{} + {} = {}", 1, 2, 3);
 		assertThat(output).isEqualTo("1 + 2 = 3");
 	}
@@ -89,7 +91,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void ignoreSuperfluousPlaceholders() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("{}, {}, and {}", 1, 2);
 		assertThat(output).isEqualTo("1, 2, and {}");
 	}
@@ -99,7 +101,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void ignoreSuperfluousArguments() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("{}, {}, and {}", 1, 2, 3, 4);
 		assertThat(output).isEqualTo("1, 2, and 3");
 	}
@@ -109,7 +111,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void keepSingleQuote() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("It is {} o'clock.", "twelve");
 		assertThat(output).isEqualTo("It is twelve o'clock.");
 	}
@@ -119,7 +121,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void convertSingleQuote() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("It is {} o''clock.", "twelve");
 		assertThat(output).isEqualTo("It is twelve o'clock.");
 	}
@@ -129,7 +131,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void escapeCurlyBrackets() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("Brackets can be escaped ('{}') or replaced ({})", 42);
 		assertThat(output).isEqualTo("Brackets can be escaped ({}) or replaced (42)");
 	}
@@ -139,7 +141,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void escapePhraseInPatterns() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("It is {hh 'o''clock'}.", LocalTime.of(12, 0));
 		assertThat(output).isEqualTo("It is 12 o'clock.");
 	}
@@ -149,7 +151,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void ignoreOpeningCurlyBracketWithoutClosingBracket() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("Here is a mistake: <{>", 42);
 		assertThat(output).isEqualTo("Here is a mistake: <{>");
 	}
@@ -159,7 +161,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void supportCurlyBracketsInPatterns() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("We give {{0}%}!", 1.00);
 		assertThat(output).isEqualTo("We give {100}%!");
 	}
@@ -169,7 +171,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void formatConditional() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String message = "There {0#are no files|1#is one file|1<are {#,###} files}.";
 		assertThat(formatter.format(message, -1)).isEqualTo("There are no files.");
 		assertThat(formatter.format(message, 0)).isEqualTo("There are no files.");
@@ -183,7 +185,7 @@ class EnhancedMessageFormatterTest {
 	 */
 	@Test
 	void escapePipes() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(new Framework(), Locale.US);
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
 		String output = formatter.format("There are {'|'#,###'|'} files.", 42);
 		assertThat(output).isEqualTo("There are |42| files.");
 	}

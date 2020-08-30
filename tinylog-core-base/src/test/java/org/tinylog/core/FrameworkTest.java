@@ -13,20 +13,17 @@
 
 package org.tinylog.core;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.tinylog.core.providers.BundleLoggingProvider;
 import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.util.ExtendableFramework;
+import org.tinylog.core.test.RegisterService;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +39,7 @@ class FrameworkTest {
 	 */
 	@Test
 	void runtime() {
-		assertThat(new Framework().getRuntime()).isNotNull();
+		assertThat(new Framework(false, false).getRuntime()).isNotNull();
 	}
 
 	/**
@@ -50,7 +47,7 @@ class FrameworkTest {
 	 */
 	@Test
 	void configuration() {
-		assertThat(new Framework().getConfiguration()).isNotNull();
+		assertThat(new Framework(false, false).getConfiguration()).isNotNull();
 	}
 
 	/**
@@ -64,7 +61,7 @@ class FrameworkTest {
 		 */
 		@Test
 		void provideFromCurrentThread() {
-			ClassLoader classLoader = new Framework().getClassLoader();
+			ClassLoader classLoader = new Framework(false, false).getClassLoader();
 			assertThat(classLoader).isNotNull().isEqualTo(Thread.currentThread().getContextClassLoader());
 		}
 
@@ -78,7 +75,7 @@ class FrameworkTest {
 			ClassLoader threadClassLoader = thread.getContextClassLoader();
 			try {
 				thread.setContextClassLoader(null);
-				ClassLoader providedClassLoader = new Framework().getClassLoader();
+				ClassLoader providedClassLoader = new Framework(false, false).getClassLoader();
 				assertThat(providedClassLoader).isNotNull().isEqualTo(Framework.class.getClassLoader());
 			} finally {
 				thread.setContextClassLoader(threadClassLoader);
@@ -96,12 +93,11 @@ class FrameworkTest {
 
 		/**
 		 * Verifies that as service registered hooks are loaded.
-		 *
-		 * @param folder Custom temporary folder for creating service file
 		 */
+		@RegisterService(service = Hook.class, implementations = TestHook.class)
 		@Test
-		void loadServiceHooks(@TempDir Path folder) throws IOException {
-			Framework framework = ExtendableFramework.create(folder, Hook.class, TestHook.class);
+		void loadServiceHooks() {
+			Framework framework = new Framework(false, true);
 			assertThat(TestHook.running).isFalse();
 
 			try {
@@ -119,7 +115,7 @@ class FrameworkTest {
 		@Test
 		void registerHookForStartupOnly() {
 			Hook hook = mock(Hook.class);
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			framework.registerHook(hook);
 
 			try {
@@ -139,7 +135,7 @@ class FrameworkTest {
 		@Test
 		void registerHookForShutdownOnly() {
 			Hook hook = mock(Hook.class);
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 
 			try {
 				framework.startUp();
@@ -158,7 +154,7 @@ class FrameworkTest {
 		@Test
 		void registerHookForStartupAndShutdown() {
 			Hook hook = mock(Hook.class);
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			framework.registerHook(hook);
 
 			try {
@@ -177,7 +173,7 @@ class FrameworkTest {
 		@Test
 		void ignoreSecondStartup() {
 			Hook hook = mock(Hook.class);
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			framework.registerHook(hook);
 
 			try {
@@ -198,7 +194,7 @@ class FrameworkTest {
 		@Test
 		void ignoreSecondShutdown() {
 			Hook hook = mock(Hook.class);
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			framework.registerHook(hook);
 
 			try {
@@ -218,7 +214,7 @@ class FrameworkTest {
 		 */
 		@Test
 		void freezeConfigurationAfterStartup() {
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			try {
 				assertThat(framework.getConfiguration().isFrozen()).isFalse();
 				framework.startUp();
@@ -237,17 +233,11 @@ class FrameworkTest {
 	class LoggingProviderGetter {
 
 		/**
-		 * Custom temporary folder for creating files.
-		 */
-		@TempDir
-		Path folder;
-
-		/**
 		 * Verifies that the internal logging provider is loaded if none other is available.
 		 */
 		@Test
 		void loadInternalLoggingProvider() throws Exception {
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 
 			String output = tapSystemErr(
 				() -> assertThat(framework.getLoggingProvider()).isInstanceOf(InternalLoggingProvider.class)
@@ -259,26 +249,23 @@ class FrameworkTest {
 		/**
 		 * Verifies that a logging provider is loaded if it is the only available.
 		 */
+		@RegisterService(service = LoggingProviderBuilder.class, implementations = TestOneLoggingProviderBuilder.class)
 		@Test
-		void loadSingleAvailableProvider() throws IOException {
-			Framework framework = createCustomFramework(
-				new Configuration(),
-				TestOneLoggingProviderBuilder.class
-			);
-
+		void loadSingleAvailableProvider() {
+			Framework framework = new Framework(false, false);
 			assertThat(framework.getLoggingProvider()).isSameAs(TestOneLoggingProviderBuilder.provider);
 		}
 
 		/**
 		 * Verifies that all available logging providers are loaded and bundled in a {@link BundleLoggingProvider}.
 		 */
+		@RegisterService(
+			service = LoggingProviderBuilder.class,
+			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+		)
 		@Test
-		void loadAllAvailableProviders() throws IOException {
-			Framework framework = createCustomFramework(
-				new Configuration(),
-				TestOneLoggingProviderBuilder.class,
-				TestTwoLoggingProviderBuilder.class
-			);
+		void loadAllAvailableProviders() {
+			Framework framework = new Framework(false, false);
 
 			LoggingProvider provider = framework.getLoggingProvider();
 			assertThat(provider).isInstanceOf(BundleLoggingProvider.class);
@@ -292,27 +279,28 @@ class FrameworkTest {
 		/**
 		 * Verifies that one logging provider can be defined by name if multiple are available.
 		 */
+		@RegisterService(
+			service = LoggingProviderBuilder.class,
+			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+		)
 		@Test
-		void loadSingleProviderByName() throws IOException {
-			Framework framework = createCustomFramework(
-				new Configuration().set("backend", "test2"),
-				TestOneLoggingProviderBuilder.class,
-				TestTwoLoggingProviderBuilder.class
-			);
-
+		void loadSingleProviderByName() {
+			Framework framework = new Framework(false, false);
+			framework.getConfiguration().set("backend", "test2");
 			assertThat(framework.getLoggingProvider()).isSameAs(TestTwoLoggingProviderBuilder.provider);
 		}
 
 		/**
 		 * Verifies that several logging providers can be defined by name if multiple are available.
 		 */
+		@RegisterService(
+			service = LoggingProviderBuilder.class,
+			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+		)
 		@Test
-		void loadMultipleProvidersByName() throws IOException {
-			Framework framework = createCustomFramework(
-				new Configuration().set("backend", "test1, nop"),
-				TestOneLoggingProviderBuilder.class,
-				TestTwoLoggingProviderBuilder.class
-			);
+		void loadMultipleProvidersByName() {
+			Framework framework = new Framework(true, false);
+			framework.getConfiguration().set("backend", "test1, nop");
 
 			LoggingProvider provider = framework.getLoggingProvider();
 			assertThat(provider).isInstanceOf(BundleLoggingProvider.class);
@@ -327,14 +315,12 @@ class FrameworkTest {
 		 * Verifies that the available logging provider will be created, if the configured logging provider does not
 		 * exist.
 		 */
+		@RegisterService(service = LoggingProviderBuilder.class, implementations = TestOneLoggingProviderBuilder.class)
 		@Test
 		void fallbackForEntireInvalidName() throws Exception {
-			Framework framework = createCustomFramework(
-				new Configuration().set("backend", "test3"),
-				TestOneLoggingProviderBuilder.class
-			);
-
 			String output = tapSystemErr(() -> {
+				Framework framework = new Framework(true, false);
+				framework.getConfiguration().set("backend", "test3");
 				LoggingProvider provider = framework.getLoggingProvider();
 				assertThat(provider).isSameAs(TestOneLoggingProviderBuilder.provider);
 			});
@@ -345,15 +331,15 @@ class FrameworkTest {
 		/**
 		 * Verifies that all other configured logging providers will be created, if one of them does not exist.
 		 */
+		@RegisterService(
+			service = LoggingProviderBuilder.class,
+			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+		)
 		@Test
 		void fallbackForPartialInvalidName() throws Exception {
-			Framework framework = createCustomFramework(
-				new Configuration().set("backend", "test0, test1"),
-				TestOneLoggingProviderBuilder.class,
-				TestTwoLoggingProviderBuilder.class
-			);
-
 			String output = tapSystemErr(() -> {
+				Framework framework = new Framework(true, false);
+				framework.getConfiguration().set("backend", "test0, test1");
 				LoggingProvider provider = framework.getLoggingProvider();
 				assertThat(provider).isSameAs(TestOneLoggingProviderBuilder.provider);
 			});
@@ -362,25 +348,11 @@ class FrameworkTest {
 		}
 
 		/**
-		 * Creates a {@link Framework} with a custom configuration and additional registered
-		 * {@link LoggingProviderBuilder LoggingProviderBuilders}.
-		 *
-		 * @param configuration	Custom configuration to apply
-		 * @param implementations Additional logging provider builders to register a service
-		 * @return The created framework
-		 */
-		@SafeVarargs
-		private final Framework createCustomFramework(Configuration configuration,
-				Class<? extends LoggingProviderBuilder>... implementations) throws IOException {
-			return ExtendableFramework.create(configuration, folder, LoggingProviderBuilder.class, implementations);
-		}
-
-		/**
 		 * Verifies that the configuration becomes frozen after providing a logging provider.
 		 */
 		@Test
 		void freezeConfigurationAfterProvidingLoggingProvider() {
-			Framework framework = new Framework();
+			Framework framework = new Framework(false, false);
 			assertThat(framework.getConfiguration().isFrozen()).isFalse();
 			assertThat(framework.getLoggingProvider()).isNotNull();
 			assertThat(framework.getConfiguration().isFrozen()).isTrue();

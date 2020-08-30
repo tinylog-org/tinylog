@@ -63,7 +63,7 @@ class InternalLoggingProviderTest {
 			null,
 			"Hello {}!",
 			new Object[] {"world"},
-			new EnhancedMessageFormatter(new Framework(), Locale.ENGLISH)
+			new EnhancedMessageFormatter(new Framework(false, false), Locale.ENGLISH)
 		));
 
 		assertThat(output).isEqualTo("TINYLOG " + level + ": Hello world!" + System.lineSeparator());

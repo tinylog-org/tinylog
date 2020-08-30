@@ -12,6 +12,6 @@
  */
 
 /**
- * Test utilities and helpers.
+ * Extensions for JUnit tests.
  */
-package org.tinylog.core.util;
+package org.tinylog.core.test;

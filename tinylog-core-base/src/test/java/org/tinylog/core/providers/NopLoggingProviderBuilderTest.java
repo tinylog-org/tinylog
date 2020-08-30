@@ -16,7 +16,6 @@ package org.tinylog.core.providers;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +36,7 @@ class NopLoggingProviderBuilderTest {
 	 */
 	@Test
 	void creation() {
-		Framework framework = new Framework(new Configuration());
+		Framework framework = new Framework(false, false);
 		NopLoggingProviderBuilder builder = new NopLoggingProviderBuilder();
 		assertThat(builder.create(framework)).isInstanceOf(NopLoggingProvider.class);
 	}

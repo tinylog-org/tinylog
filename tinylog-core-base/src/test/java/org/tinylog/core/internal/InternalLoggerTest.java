@@ -16,7 +16,6 @@ package org.tinylog.core.internal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -35,7 +34,7 @@ import static org.mockito.Mockito.verify;
 
 class InternalLoggerTest {
 
-	private final Framework framework = new Framework(new Configuration()) {
+	private final Framework framework = new Framework(false, false) {
 		@Override
 		public LoggingProvider getLoggingProvider() {
 			return provider;
@@ -267,7 +266,7 @@ class InternalLoggerTest {
 				StackTraceElement element = location.getCallerStackTraceElement();
 				assertThat(element.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("stackTraceLocation");
-				assertThat(element.getLineNumber()).isEqualTo(275);
+				assertThat(element.getLineNumber()).isEqualTo(274);
 			}
 		};
 

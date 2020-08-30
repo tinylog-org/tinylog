@@ -21,7 +21,7 @@ import org.tinylog.core.runtime.RuntimeFlavor;
  */
 public final class Tinylog {
 
-	private static final Framework framework = new Framework();
+	private static final Framework framework = new Framework(true, true);
 
 	/** */
 	private Tinylog() {

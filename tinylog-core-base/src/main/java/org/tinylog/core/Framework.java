@@ -46,22 +46,16 @@ public class Framework {
 
 	/**
 	 * Loads the configuration from default properties file and hooks from service files.
-	 */
-	public Framework() {
-		this.runtime = new RuntimeProvider().getRuntime();
-		this.configuration = loadConfiguration();
-		this.hooks = loadHooks();
-	}
-
-	/**
-	 * Initializes the framework with a custom configuration and no hooks.
 	 *
-	 * @param configuration Configuration to store
+	 * @param loadConfiguration {@code true} to load the configuration from found properties file, {@code false} to
+	 *                          keep the configuration empty
+	 * @param loadHooks {@code true} to load all hooks that are registered as services, {@code false} to do not load
+	 *                  any hooks
 	 */
-	public Framework(Configuration configuration) {
+	public Framework(boolean loadConfiguration, boolean loadHooks) {
 		this.runtime = new RuntimeProvider().getRuntime();
-		this.configuration = configuration;
-		this.hooks = new ArrayList<>();
+		this.configuration = loadConfiguration ? loadConfiguration() : new Configuration();
+		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
 	}
 
 	/**
