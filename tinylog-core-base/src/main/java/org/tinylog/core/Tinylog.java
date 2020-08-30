@@ -64,7 +64,7 @@ public final class Tinylog {
 	 *
 	 * @param hook Hook to register
 	 */
-	public void registerHook(Hook hook) {
+	public static void registerHook(Hook hook) {
 		framework.registerHook(hook);
 	}
 
@@ -73,7 +73,7 @@ public final class Tinylog {
 	 *
 	 * @param hook Hook to unregister
 	 */
-	public void removeHook(Hook hook) {
+	public static void removeHook(Hook hook) {
 		framework.removeHook(hook);
 	}
 
