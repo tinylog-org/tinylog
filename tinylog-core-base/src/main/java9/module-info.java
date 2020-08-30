@@ -17,6 +17,7 @@ import org.tinylog.core.format.value.JavaTimeFormatBuilder;
 import org.tinylog.core.format.value.NumberFormatBuilder;
 import org.tinylog.core.format.value.ValueFormatBuilder;
 import org.tinylog.core.providers.LoggingProviderBuilder;
+import org.tinylog.core.providers.InternalLoggingProviderBuilder;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 
 module org.tinylog.core {
@@ -30,6 +31,7 @@ module org.tinylog.core {
 
 	uses LoggingProviderBuilder;
 	provides LoggingProviderBuilder with
+		InternalLoggingProviderBuilder,
 		NopLoggingProviderBuilder;
 
 	exports org.tinylog.core;

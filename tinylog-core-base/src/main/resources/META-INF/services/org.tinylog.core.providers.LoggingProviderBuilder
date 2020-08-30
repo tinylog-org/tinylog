@@ -1,1 +1,2 @@
+org.tinylog.core.providers.InternalLoggingProviderBuilder
 org.tinylog.core.providers.NopLoggingProviderBuilder
