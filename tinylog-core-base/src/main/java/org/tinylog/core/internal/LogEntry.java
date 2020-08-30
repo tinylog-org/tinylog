@@ -18,7 +18,7 @@ import org.tinylog.core.Level;
 /**
  * Immutable log entry record.
  */
-class LogEntry {
+final class LogEntry {
 
 	private final Level level;
 	private final Throwable throwable;
