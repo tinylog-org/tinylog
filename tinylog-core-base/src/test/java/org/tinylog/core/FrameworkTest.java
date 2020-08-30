@@ -95,6 +95,25 @@ class FrameworkTest {
 	class LifeCycle {
 
 		/**
+		 * Verifies that as service registered hooks are loaded.
+		 *
+		 * @param folder Custom temporary folder for creating service file
+		 */
+		@Test
+		void loadServiceHooks(@TempDir Path folder) throws IOException {
+			Framework framework = ExtendableFramework.create(folder, Hook.class, TestHook.class);
+			assertThat(TestHook.running).isFalse();
+
+			try {
+				framework.startUp();
+				assertThat(TestHook.running).isTrue();
+			} finally {
+				framework.shutDown();
+				assertThat(TestHook.running).isFalse();
+			}
+		}
+
+		/**
 		 * Verifies that a registered hook is called at startup.
 		 */
 		@Test
@@ -370,7 +389,26 @@ class FrameworkTest {
 	}
 
 	/**
-	 * Additional logging provider builder for JUnit test.
+	 * Additional hook for JUnit tests.
+	 */
+	public static final class TestHook implements Hook {
+
+		private static boolean running;
+
+		@Override
+		public void startUp() {
+			running = true;
+		}
+
+		@Override
+		public void shutDown() {
+			running = false;
+		}
+
+	}
+
+	/**
+	 * Additional logging provider builder for JUnit tests.
 	 */
 	public static final class TestOneLoggingProviderBuilder implements LoggingProviderBuilder {
 
@@ -389,7 +427,7 @@ class FrameworkTest {
 	}
 
 	/**
-	 * Additional logging provider builder for JUnit test.
+	 * Additional logging provider builder for JUnit tests.
 	 */
 	public static final class TestTwoLoggingProviderBuilder implements LoggingProviderBuilder {
 
