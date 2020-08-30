@@ -13,11 +13,16 @@
 
 package org.tinylog.core;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Configuration for tinylog.
@@ -33,6 +38,16 @@ public class Configuration {
 		"The configuration has already been applied and cannot be modified anymore";
 
 	private static final int MAX_LOCALE_ARGUMENTS = 3;
+
+	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
+
+	private static final String CONFIGURATION_PROPERTY = "tinylog.configuration";
+
+	private static final String[] CONFIGURATION_FILES = new String[] {
+		"tinylog-dev.properties",
+		"tinylog-test.properties",
+		"tinylog.properties",
+	};
 
 	private final Properties properties;
 	private boolean frozen;
@@ -134,13 +149,57 @@ public class Configuration {
 	/**
 	 * Loads the configuration from default properties file if available.
 	 *
-	 * @throws UnsupportedOperationException The Configuration has already been applied and cannot be modified anymore
+	 * @param classLoader The class loader to use for loading resources from classpath
+	 * @throws UnsupportedOperationException The configuration has already been applied and cannot be modified anymore
 	 */
-	void loadPropertiesFile() {
+	void loadPropertiesFile(ClassLoader classLoader) {
 		synchronized (properties) {
 			if (frozen) {
 				throw new UnsupportedOperationException(FROZEN_MESSAGE);
+			} else {
+				String file = System.getProperty(CONFIGURATION_PROPERTY);
+
+				if (file != null) {
+					try (InputStream stream = getInputStream(classLoader, file)) {
+						properties.load(stream);
+					} catch (IOException ex) {
+						System.err.println("Failed to load tinylog configuration from \"" + file + "\" ("
+							+ ex.getMessage() + ")");
+						file = null;
+					}
+				}
+
+				if (file == null) {
+					for (String configurationFile : CONFIGURATION_FILES) {
+						try (InputStream stream = classLoader.getResourceAsStream(configurationFile)) {
+							if (stream != null) {
+								properties.load(stream);
+								break;
+							}
+						} catch (IOException ex) {
+							System.err.println("Failed to load tinylog configuration from \"" + configurationFile
+								+ "\" (" + ex.getMessage() + ")");
+						}
+					}
+				}
 			}
+		}
+	}
+
+	/**
+	 * Opens an URL, classpath resource, or local file as input stream.
+	 *
+	 * @param classLoader Class loader to use to open classpath resources
+	 * @param file URL, classpath resource, or local file
+	 * @return The input stream of the passed file
+	 * @throws IOException Failed to open the passed file
+	 */
+	private InputStream getInputStream(ClassLoader classLoader, String file) throws IOException {
+		if (URL_DETECTION_PATTERN.matcher(file).matches()) {
+			return new URL(file).openStream();
+		} else {
+			InputStream stream = classLoader.getResourceAsStream(file);
+			return stream == null ? new FileInputStream(file) : stream;
 		}
 	}
 

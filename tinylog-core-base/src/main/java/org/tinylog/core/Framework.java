@@ -174,7 +174,7 @@ public class Framework {
 	 */
 	private Configuration loadConfiguration() {
 		Configuration configuration = new Configuration();
-		configuration.loadPropertiesFile();
+		configuration.loadPropertiesFile(getClassLoader());
 		return configuration;
 	}
 
