@@ -48,27 +48,31 @@ public final class InternalLogger {
 	 * @param framework Fully initialized framework for setting this logger up
 	 */
 	public static void init(Framework framework) {
-		if (framework == null) {
-			synchronized (mutex) {
-				state = null;
-				entries = new ArrayList<>();
-			}
-		} else {
-			RuntimeFlavor runtime = framework.getRuntime();
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
-			LoggingProvider provider = framework.getLoggingProvider();
-			Locale locale = framework.getConfiguration().getLocale();
-			MessageFormatter formatter = new EnhancedMessageFormatter(framework, locale);
+		RuntimeFlavor runtime = framework.getRuntime();
+		StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
+		LoggingProvider provider = framework.getLoggingProvider();
+		Locale locale = framework.getConfiguration().getLocale();
+		MessageFormatter formatter = new EnhancedMessageFormatter(framework, locale);
 
-			synchronized (mutex) {
-				for (LogEntry entry : entries) {
-					provider.log(location, TAG, entry.getLevel(), entry.getThrowable(), entry.getMessage(),
-						entry.getArguments(), formatter);
-				}
+		synchronized (mutex) {
+			state = new State(runtime, provider, formatter);
 
-				state = new State(runtime, provider, formatter);
-				entries = new ArrayList<>();
+			for (LogEntry entry : entries) {
+				provider.log(location, TAG, entry.getLevel(), entry.getThrowable(), entry.getMessage(),
+					entry.getArguments(), formatter);
 			}
+
+			entries = new ArrayList<>();
+		}
+	}
+
+	/**
+	 * Resets the internal logger to an uninitialized state.
+	 */
+	public static void reset() {
+		synchronized (mutex) {
+			state = null;
+			entries = new ArrayList<>();
 		}
 	}
 

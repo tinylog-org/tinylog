@@ -55,7 +55,7 @@ class InternalLoggerTest {
 	@BeforeEach
 	@AfterEach
 	void cleanUp() {
-		InternalLogger.init(null);
+		InternalLogger.reset();
 	}
 
 	/**
