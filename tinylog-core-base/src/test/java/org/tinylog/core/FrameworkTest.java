@@ -351,7 +351,7 @@ class FrameworkTest {
 		 * @return The created framework
 		 */
 		@SafeVarargs
-		private Framework createCustomFramework(Configuration configuration,
+		private final Framework createCustomFramework(Configuration configuration,
 				Class<? extends LoggingProviderBuilder>... implementations) throws IOException {
 			return ExtendableFramework.create(configuration, folder, LoggingProviderBuilder.class, implementations);
 		}
