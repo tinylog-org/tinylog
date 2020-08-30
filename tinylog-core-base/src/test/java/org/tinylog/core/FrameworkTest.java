@@ -14,14 +14,8 @@
 package org.tinylog.core;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,10 +26,9 @@ import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.runtime.RuntimeProvider;
+import org.tinylog.core.util.ExtendableFramework;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
-import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
@@ -360,18 +353,7 @@ class FrameworkTest {
 		@SafeVarargs
 		private Framework createCustomFramework(Configuration configuration,
 				Class<? extends LoggingProviderBuilder>... implementations) throws IOException {
-			String services = Arrays.stream(implementations).map(Class::getName).collect(joining("\n"));
-			Path file = folder.resolve("META-INF").resolve("services").resolve(LoggingProviderBuilder.class.getName());
-			Files.createDirectories(file.getParent());
-			Files.write(file, services.getBytes(StandardCharsets.UTF_8));
-			URL url = folder.toUri().toURL();
-
-			return new Framework(new RuntimeProvider().getRuntime(), configuration, Collections.emptyList()) {
-				@Override
-				public ClassLoader getClassLoader() {
-					return new URLClassLoader(new URL[] {url}, super.getClassLoader());
-				}
-			};
+			return ExtendableFramework.create(configuration, folder, LoggingProviderBuilder.class, implementations);
 		}
 
 		/**
