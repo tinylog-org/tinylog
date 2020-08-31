@@ -21,6 +21,7 @@ import org.tinylog.core.providers.BundleLoggingProvider;
 import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
+import org.tinylog.core.providers.NopLoggingProvider;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.RegisterService;
@@ -384,7 +385,7 @@ class FrameworkTest {
 	 */
 	public static final class TestOneLoggingProviderBuilder implements LoggingProviderBuilder {
 
-		private static final LoggingProvider provider = mock(LoggingProvider.class);
+		private static final LoggingProvider provider = new NopLoggingProvider();
 
 		@Override
 		public String getName() {
@@ -403,7 +404,7 @@ class FrameworkTest {
 	 */
 	public static final class TestTwoLoggingProviderBuilder implements LoggingProviderBuilder {
 
-		private static final LoggingProvider provider = mock(LoggingProvider.class);
+		private static final LoggingProvider provider = new NopLoggingProvider();
 
 		@Override
 		public String getName() {
