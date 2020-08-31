@@ -107,6 +107,16 @@ class EnhancedMessageFormatterTest {
 	}
 
 	/**
+	 * Verifies that invalid format patterns are silently ignored.
+	 */
+	@Test
+	void ignoreInvalidPatterns() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework, Locale.US);
+		String output = formatter.format("<{0 # 0}>", 42);
+		assertThat(output).isEqualTo("<42>");
+	}
+
+	/**
 	 * Verifies that one single quote can be output.
 	 */
 	@Test

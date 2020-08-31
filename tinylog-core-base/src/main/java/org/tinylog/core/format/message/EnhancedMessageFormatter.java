@@ -104,7 +104,11 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 			} else {
 				for (ValueFormat format : formats) {
 					if (format.isSupported(value)) {
-						return format.format(pattern, value);
+						try {
+							return format.format(pattern, value);
+						} catch (RuntimeException ex) {
+							ex.printStackTrace();
+						}
 					}
 				}
 			}
