@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.tinylog.Level;
@@ -274,7 +273,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 */
 	private static File findLatestLogFile(final List<FileTuple> files) {
 		for (FileTuple file : files) {
-			if (file.getOriginal().isFile() && (Objects.equals(file.getOriginal(), file.getBackup()) || !file.getBackup().isFile())) {
+			if (file.getOriginal().isFile() && (file.getOriginal().equals(file.getBackup()) || !file.getBackup().isFile())) {
 				return file.getOriginal();
 			}
 		}
@@ -370,7 +369,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			if (tuple.getOriginal().isFile() && !tuple.getOriginal().delete()) {
 				InternalLogger.log(Level.WARN, "Failed to delete log file '" + tuple.getOriginal() + "'");
 			}
-			if (!Objects.equals(tuple.getOriginal(), tuple.getBackup()) && tuple.getBackup().isFile() && !tuple.getBackup().delete()) {
+			if (!tuple.getOriginal().equals(tuple.getBackup()) && tuple.getBackup().isFile() && !tuple.getBackup().delete()) {
 				InternalLogger.log(Level.WARN, "Failed to delete backup file '" + tuple.getBackup() + "'");
 			}
 		}
