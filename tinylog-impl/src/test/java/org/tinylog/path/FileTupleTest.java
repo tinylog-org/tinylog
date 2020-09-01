@@ -226,9 +226,9 @@ public final class FileTupleTest {
 
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("WARN")
-			.containsOnlyOnce(backupFile.getPath());
-		assertThat(originalFile).doesNotExist();
-		assertThat(backupFile).exists();
+			.containsOnlyOnce(originalFile.getPath());
+		assertThat(originalFile).exists();
+		assertThat(backupFile).doesNotExist();
 
 	}
 
