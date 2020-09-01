@@ -25,7 +25,7 @@ import org.tinylog.provider.InternalLogger;
 /**
  * GZIP encoder for compressing a file.
  */
-class GzipEncoder implements Runnable {
+final class GzipEncoder implements Runnable {
 
 	/**
 	 * File extension for compressed GZIP files.
@@ -34,21 +34,20 @@ class GzipEncoder implements Runnable {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
-	private final File file;
+	private final File sourceFile;
+	private final File targetFile;
 
 	/**
 	 * @param file
 	 *            File that should be compressed
 	 */
 	GzipEncoder(final File file) {
-		this.file = file;
+		sourceFile = file;
+		targetFile = new File(file.getAbsolutePath() + FILE_EXTENSION);
 	}
 
 	@Override
 	public void run() {
-		String sourceFile = file.getAbsolutePath();
-		String targetFile = sourceFile + FILE_EXTENSION;
-
 		try {
 			FileInputStream fileInputStream = new FileInputStream(sourceFile);
 			try {
@@ -71,7 +70,7 @@ class GzipEncoder implements Runnable {
 				fileInputStream.close();
 			}
 
-			if (!file.delete()) {
+			if (!sourceFile.delete()) {
 				InternalLogger.log(Level.WARN, "Failed to delete original log file '" + sourceFile + "'");
 			}
 		} catch (IOException ex) {

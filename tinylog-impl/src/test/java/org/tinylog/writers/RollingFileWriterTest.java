@@ -308,7 +308,6 @@ public final class RollingFileWriterTest {
 		properties.put("latest", new File(folder.getRoot(), "latest").getAbsolutePath());
 		properties.put("format", "{message}");
 		properties.put("policies", "size: 10");
-		properties.put("backups", "0");
 
 		RollingFileWriter writer = new RollingFileWriter(properties);
 		try {
@@ -408,12 +407,10 @@ public final class RollingFileWriterTest {
 		File file1 = folder.newFile("0");
 		File file2 = folder.newFile("1");
 		File file3 = folder.newFile("2");
-		File file4 = folder.newFile("3");
 
 		file1.setLastModified(0);
 		file2.setLastModified(1000);
 		file3.setLastModified(2000);
-		file4.setLastModified(3000);
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
@@ -426,7 +423,6 @@ public final class RollingFileWriterTest {
 			assertThat(file1).doesNotExist();
 			assertThat(file2).exists();
 			assertThat(file3).exists();
-			assertThat(file4).exists();
 		} finally {
 			writer.close();
 		}
@@ -446,13 +442,11 @@ public final class RollingFileWriterTest {
 		File file2 = folder.newFile("1");
 		File file3 = folder.newFile("2");
 		File file4 = folder.newFile("3");
-		File file5 = folder.newFile("4");
 
 		file1.setLastModified(0);
 		file2.setLastModified(1000);
 		file3.setLastModified(2000);
-		file4.setLastModified(3000);
-		file5.delete();
+		file4.delete();
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
@@ -465,17 +459,15 @@ public final class RollingFileWriterTest {
 		assertThat(file1).exists();
 		assertThat(file2).exists();
 		assertThat(file3).exists();
-		assertThat(file4).exists();
-		assertThat(file5).doesNotExist();
+		assertThat(file4).doesNotExist();
 
 		writer.write(LogEntryBuilder.empty().message("First").create());
 		writer.write(LogEntryBuilder.empty().message("Second").create());
 
 		assertThat(file1).doesNotExist();
 		assertThat(file2).exists();
-		assertThat(file3).exists();
-		assertThat(file4).hasContent("First" + NEW_LINE);
-		assertThat(file5).hasContent("Second" + NEW_LINE);
+		assertThat(file3).hasContent("First" + NEW_LINE);
+		assertThat(file4).hasContent("Second" + NEW_LINE);
 
 		writer.close();
 	}

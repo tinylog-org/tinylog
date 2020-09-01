@@ -13,27 +13,27 @@
 
 package org.tinylog.path;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Comparator for sorting files by last modification date. The most recently modified files come first, the oldest last.
+ * Comparator for sorting files by last modification date. The most recently modified file tuples come first, the oldest
+ * last.
  */
-final class LastModifiedFileComparator implements Comparator<File>, Serializable {
+final class LastModifiedFileTupleComparator implements Comparator<FileTuple>, Serializable {
 
-	static final LastModifiedFileComparator INSTANCE = new LastModifiedFileComparator();
+	static final LastModifiedFileTupleComparator INSTANCE = new LastModifiedFileTupleComparator();
 
 	private static final long serialVersionUID = 1L;
 
 	/** */
-	private LastModifiedFileComparator() {
+	private LastModifiedFileTupleComparator() {
 	}
 
 	@Override
-	public int compare(final File first, final File second) {
-		long firstModificationDate = first.lastModified();
-		long secondModificationDate = second.lastModified();
+	public int compare(final FileTuple first, final FileTuple second) {
+		long firstModificationDate = first.getLastModified();
+		long secondModificationDate = second.getLastModified();
 		return (firstModificationDate < secondModificationDate) ? +1 : ((firstModificationDate == secondModificationDate) ? 0 : -1);
 	}
 
