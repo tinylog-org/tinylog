@@ -14,10 +14,8 @@
 package org.tinylog.writers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +34,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -470,100 +467,6 @@ public final class RollingFileWriterTest {
 		assertThat(file4).hasContent("Second" + NEW_LINE);
 
 		writer.close();
-	}
-
-	/**
-	 * Verifies that a warning will be output on Windows, if a file cannot be deleted.
-	 *
-	 * @throws IOException
-	 *             Failed access to temporary folder or files
-	 * @throws InterruptedException
-	 *             Interrupted while waiting for the converter
-	 */
-	@Test
-	public void warnIfDeletionFailedOnWindows() throws IOException, InterruptedException {
-		assumeTrue(System.getProperty("os.name").startsWith("Windows"));
-
-		File file1 = folder.newFile("0");
-		File file2 = folder.newFile("1");
-		File file3 = folder.newFile("2");
-		File file4 = folder.newFile("3");
-
-		file1.setLastModified(0);
-		file2.setLastModified(1000);
-		file3.setLastModified(2000);
-		file4.setLastModified(3000);
-
-		Map<String, String> properties = new HashMap<>();
-		properties.put("file", new File(folder.getRoot(), "{count}").getAbsolutePath());
-		properties.put("format", "{message}");
-		properties.put("policies", "size: 1MB");
-		properties.put("backups", "0");
-
-		try (FileInputStream stream = new FileInputStream(file2)) {
-			RollingFileWriter writer = new RollingFileWriter(properties);
-			try {
-				assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce(file2.getPath());
-				assertThat(file1).doesNotExist();
-				assertThat(file2).exists();
-				assertThat(file3).doesNotExist();
-				assertThat(file4).exists();
-			} finally {
-				writer.close();
-			}
-		}
-	}
-
-	/**
-	 * Verifies that a warning will be output on POSIX compatible operating systems, if a file cannot be deleted.
-	 *
-	 * @throws IOException
-	 *             Failed access to temporary folder or files
-	 * @throws InterruptedException
-	 *             Interrupted while waiting for the converter
-	 */
-	@Test
-	public void warnIfDeletionFailedOnPosix() throws IOException, InterruptedException {
-		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
-
-		File file1 = new File(folder.getRoot(), "0/log");
-		file1.getParentFile().mkdirs();
-		file1.createNewFile();
-		file1.setLastModified(0);
-
-		File file2 = new File(folder.getRoot(), "1/log");
-		file2.getParentFile().mkdirs();
-		file2.createNewFile();
-		file2.setLastModified(1000);
-
-		File file3 = new File(folder.getRoot(), "2/log");
-		file3.getParentFile().mkdirs();
-		file3.createNewFile();
-		file3.setLastModified(2000);
-
-		File file4 = new File(folder.getRoot(), "3/log");
-		file4.getParentFile().mkdirs();
-		file4.createNewFile();
-		file4.setLastModified(3000);
-
-		file2.getParentFile().setWritable(false);
-
-		Map<String, String> properties = new HashMap<>();
-		properties.put("file", new File(folder.getRoot(), "{count}/log").getAbsolutePath());
-		properties.put("format", "{message}");
-		properties.put("policies", "size: 1MB");
-		properties.put("backups", "0");
-
-		RollingFileWriter writer = new RollingFileWriter(properties);
-		try {
-			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce(file2.getPath());
-			assertThat(file1).doesNotExist();
-			assertThat(file2).exists();
-			assertThat(file3).doesNotExist();
-			assertThat(file4).exists();
-		} finally {
-			writer.close();
-		}
 	}
 
 	/**

@@ -363,15 +363,8 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 *            Number of log files to keep
 	 */
 	private static void deleteBackups(final List<FileTuple> files, final int count) {
-		for (int i = files.size() - Math.max(0, files.size() - count); i < files.size(); ++i) {
-			FileTuple tuple = files.get(i);
-
-			if (tuple.getOriginal().isFile() && !tuple.getOriginal().delete()) {
-				InternalLogger.log(Level.WARN, "Failed to delete log file '" + tuple.getOriginal() + "'");
-			}
-			if (!tuple.getOriginal().equals(tuple.getBackup()) && tuple.getBackup().isFile() && !tuple.getBackup().delete()) {
-				InternalLogger.log(Level.WARN, "Failed to delete backup file '" + tuple.getBackup() + "'");
-			}
+		for (int i = count; i < files.size(); ++i) {
+			files.get(i).delete();
 		}
 	}
 

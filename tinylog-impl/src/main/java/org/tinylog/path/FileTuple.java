@@ -15,6 +15,9 @@ package org.tinylog.path;
 
 import java.io.File;
 
+import org.tinylog.Level;
+import org.tinylog.provider.InternalLogger;
+
 /**
  * Immutable tuple of original file and its backup.
  */
@@ -59,6 +62,18 @@ public final class FileTuple {
 	 */
 	public long getLastModified() {
 		return Math.max(original.lastModified(), backup.lastModified());
+	}
+
+	/**
+	 * Deletes the original and backup file.
+	 */
+	public void delete() {
+		if (original.isFile() && !original.delete()) {
+			InternalLogger.log(Level.WARN, "Failed to delete log file '" + original + "'");
+		}
+		if (!backup.equals(original) && backup.isFile() && !backup.delete()) {
+			InternalLogger.log(Level.WARN, "Failed to delete backup file '" + backup + "'");
+		}
 	}
 
 }
