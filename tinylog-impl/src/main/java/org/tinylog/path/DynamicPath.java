@@ -161,7 +161,7 @@ public final class DynamicPath {
 	 * @return {@code true} if passed file is compatible, {@code false} if not
 	 */
 	public boolean isValid(final File file) {
-		return isValid(file.getPath(), 0, 0);
+		return isValid(file.getAbsolutePath(), 0, 0);
 	}
 
 	/**
@@ -180,11 +180,11 @@ public final class DynamicPath {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					collectFiles(file, suffix, found);
-				} else if (file.isFile() && file.getPath().endsWith(suffix)) {
+				} else if (file.isFile() && file.getAbsolutePath().endsWith(suffix)) {
 					int index = 0;
 
 					for (String text : plainTexts) {
-						index = file.getPath().indexOf(text, index);
+						index = file.getAbsolutePath().indexOf(text, index);
 						if (index == -1) {
 							break;
 						} else {
@@ -214,6 +214,16 @@ public final class DynamicPath {
 	private boolean isValid(final String path, final int pathPosition, final int segmentIndex) {
 		Segment segment = segments.get(segmentIndex);
 		String expectedValue = segment.getStaticText();
+
+		if (pathPosition == 0) {
+			File file = new File(expectedValue == null ? "" : expectedValue).getAbsoluteFile();
+			if (file.isDirectory()) {
+				expectedValue = file.getAbsolutePath() + File.separator;
+			} else {
+				expectedValue = file.getAbsolutePath();
+			}
+		}
+
 		if (expectedValue == null) {
 			if (segmentIndex == segments.size() - 1) {
 				return segment.validateToken(path.substring(pathPosition));
