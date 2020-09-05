@@ -172,20 +172,70 @@ public final class DynamicPathTest {
 	}
 
 	/**
-	 * Verifies that all files of a folder will be returned that are compatible with the configured dynamic path.
+	 * Verifies that all original files of a folder will be returned that are compatible with the configured dynamic path.
 	 *
 	 * @throws IOException
 	 *             Failed to create files
 	 */
 	@Test
-	public void getExistingFiles() throws IOException {
+	public void getExistingOriginalFiles() throws IOException {
 		File first = folder.newFile("1.log");
 		File second = folder.newFile("42.log");
 		folder.newFile("42.old");
 
 		String pattern = new File(folder.getRoot(), "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(first, second);
+
+		assertThat(path.getAllFiles(null))
+			.extracting(FileTuple::getOriginal)
+			.containsExactlyInAnyOrder(first, second);
+	}
+
+	/**
+	 * Verifies that all backup files of a folder will be returned that are compatible with the configured dynamic path.
+	 *
+	 * @throws IOException
+	 *             Failed to create files
+	 */
+	@Test
+	public void getExistingBackupFiles() throws IOException {
+		File first = folder.newFile("1.log");
+		File second = folder.newFile("42.log");
+
+		folder.newFile("1.log.backup");
+		folder.newFile("42.log.backup");
+		folder.newFile("42.old.backup");
+
+		String pattern = new File(folder.getRoot(), "{pid}.log").getAbsolutePath();
+		DynamicPath path = new DynamicPath(pattern);
+
+		assertThat(path.getAllFiles(".backup"))
+			.extracting(FileTuple::getOriginal)
+			.containsExactlyInAnyOrder(first, second);
+	}
+
+	/**
+	 * Verifies that all original and backup files of a folder will be returned that are compatible with the configured dynamic path.
+	 *
+	 * @throws IOException
+	 *             Failed to create files
+	 */
+	@Test
+	public void getAllExistingFiles() throws IOException {
+		File first = folder.newFile("1.log");
+		File second = folder.newFile("2.log");
+		File third = folder.newFile("3.log");
+
+		first.delete();
+		folder.newFile("1.log.backup");
+		folder.newFile("2.log.backup");
+
+		String pattern = new File(folder.getRoot(), "{pid}.log").getAbsolutePath();
+		DynamicPath path = new DynamicPath(pattern);
+
+		assertThat(path.getAllFiles(".backup"))
+			.extracting(FileTuple::getOriginal)
+			.containsExactlyInAnyOrder(first, second, third);
 	}
 
 	/**
@@ -203,7 +253,10 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{date:YYYY}" + File.separator + "{pid}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(file);
+
+		assertThat(path.getAllFiles(null))
+			.extracting(FileTuple::getOriginal)
+			.containsExactly(file);
 	}
 
 	/**
@@ -221,7 +274,10 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{date:YYYY}_{count}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles(null)).containsExactlyInAnyOrder(first, second);
+
+		assertThat(path.getAllFiles(null))
+			.extracting(FileTuple::getOriginal)
+			.containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
@@ -246,24 +302,10 @@ public final class DynamicPathTest {
 
 		String pattern = new File(folder.getRoot(), "{count}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles(null)).containsExactly(third, first, second);
-	}
 
-	/**
-	 * Verifies that all backup files can be found when providing a separate file extension for backup files.
-	 *
-	 * @throws IOException
-	 *             Failed to create files
-	 */
-	@Test
-	public void getBackupFiles() throws IOException {
-		folder.newFile("1.log");
-		File firstBackup = folder.newFile("2.log.backup");
-		File secondBackup = folder.newFile("3.log.backup");
-
-		String pattern = new File(folder.getRoot(), "{count}.log").getAbsolutePath();
-		DynamicPath path = new DynamicPath(pattern);
-		assertThat(path.getAllFiles(".backup")).containsExactlyInAnyOrder(firstBackup, secondBackup);
+		assertThat(path.getAllFiles(null))
+			.extracting(FileTuple::getOriginal)
+			.containsExactlyInAnyOrder(third, first, second);
 	}
 
 	/**

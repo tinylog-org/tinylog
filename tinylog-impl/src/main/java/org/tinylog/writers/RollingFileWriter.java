@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.tinylog.converters.FileConverter;
 import org.tinylog.converters.NopFileConverter;
 import org.tinylog.core.LogEntry;
 import org.tinylog.path.DynamicPath;
+import org.tinylog.path.FileTuple;
 import org.tinylog.policies.Policy;
 import org.tinylog.policies.StartupPolicy;
 import org.tinylog.provider.InternalLogger;
@@ -82,20 +84,23 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
 
-		List<File> files = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
+		List<FileTuple> files = getAllFileTuplesWithoutLinks(converter.getBackupSuffix());
+		File latestFile = findLatestLogFile(files);
+
+		if (backups >= 0) {
+			deleteBackups(files, backups);
+		}
 
 		String fileName;
 		boolean append;
 
-		if (files.size() > 0 && path.isValid(files.get(0))) {
-			fileName = files.get(0).getPath();
+		if (latestFile != null && path.isValid(latestFile)) {
+			fileName = latestFile.getAbsolutePath();
 			if (canBeContinued(fileName, policies)) {
 				append = true;
-				deleteBackups(files.subList(1, files.size()), backups);
 			} else {
 				fileName = path.resolve();
 				append = false;
-				deleteBackups(files, backups);
 			}
 		} else {
 			fileName = path.resolve();
@@ -132,7 +137,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() throws IOException, InterruptedException {
 		if (writingThread) {
 			internalClose();
 		} else {
@@ -153,15 +158,17 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private void internalWrite(final byte[] data) throws IOException {
 		if (!canBeContinued(data, policies)) {
 			writer.close();
-
-			List<File> existingFiles = filterOutLatestLink(path.getAllFiles(converter.getBackupSuffix()));
-			deleteBackups(existingFiles, backups);
+			converter.close();
 
 			String fileName = path.resolve();
 			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, false, false);
 
 			for (Policy policy : policies) {
 				policy.reset();
+			}
+
+			if (backups >= 0) {
+				deleteBackups(getAllFileTuplesWithoutLinks(converter.getBackupSuffix()), backups);
 			}
 		}
 
@@ -184,23 +191,34 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 *
 	 * @throws IOException
 	 *             Closing failed
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
 	 */
-	private void internalClose() throws IOException {
+	private void internalClose() throws IOException, InterruptedException {
 		writer.close();
 		converter.close();
+		converter.shutdown();
 	}
 
 	/**
-	 * Removes the link to the latest log file from a list of files.
+	 * Gets all log files including backups from {@link DynamicPath} but without links.
 	 *
-	 * @param files
-	 *            Modifiable list of files
-	 * @return The passed list
+	 * @param backupSuffix
+	 *            File extension for backup files
+	 * @return Found file tuples without links
 	 */
 	@IgnoreJRERequirement
-	private List<File> filterOutLatestLink(final List<File> files) {
+	private List<FileTuple> getAllFileTuplesWithoutLinks(final String backupSuffix) {
+		List<FileTuple> files = path.getAllFiles(backupSuffix);
 		if (linkToLatest != null && !RuntimeProvider.isAndroid()) {
-			files.remove(new File(linkToLatest.resolve()));
+			File fileLink = new File(linkToLatest.resolve()).getAbsoluteFile();
+			Iterator<FileTuple> iterator = files.iterator();
+			while (iterator.hasNext()) {
+				if (fileLink.equals(iterator.next().getOriginal())) {
+					iterator.remove();
+					break;
+				}
+			}
 		}
 		return files;
 	}
@@ -244,6 +262,23 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			}
 		}
 		return writer;
+	}
+
+	/**
+	 * Finds the latest existing original log file.
+	 *
+	 * @param files
+	 *            All original and backup files
+	 * @return Found original log file or {@code null} if there are no original log files
+	 */
+	private static File findLatestLogFile(final List<FileTuple> files) {
+		for (FileTuple file : files) {
+			if (file.getOriginal().isFile() && (file.getOriginal().equals(file.getBackup()) || !file.getBackup().isFile())) {
+				return file.getOriginal();
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -323,17 +358,13 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 * Deletes old log files.
 	 *
 	 * @param files
-	 *            All existing log files
+	 *            All original and backup files
 	 * @param count
 	 *            Number of log files to keep
 	 */
-	private static void deleteBackups(final List<File> files, final int count) {
-		if (count >= 0) {
-			for (int i = files.size() - Math.max(0, files.size() - count); i < files.size(); ++i) {
-				if (!files.get(i).delete()) {
-					InternalLogger.log(Level.WARN, "Failed to delete log file '" + files.get(i).getAbsolutePath() + "'");
-				}
-			}
+	private static void deleteBackups(final List<FileTuple> files, final int count) {
+		for (int i = count; i < files.size(); ++i) {
+			files.get(i).delete();
 		}
 	}
 

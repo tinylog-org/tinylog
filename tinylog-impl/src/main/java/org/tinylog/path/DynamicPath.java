@@ -15,7 +15,9 @@ package org.tinylog.path;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.tinylog.runtime.RuntimeProvider;
@@ -115,18 +117,40 @@ public final class DynamicPath {
 	}
 
 	/**
-	 * Gets all files that are compatible with the dynamic path. The returned files are sorted by the last modification
-	 * date. The most recently modified files are at the top, the oldest at the bottom of the list.
+	 * Gets all original files and backup files that are compatible with the dynamic path. The returned file tuples are
+	 * sorted by the last modification date. The most recently modified file tuples are at the top, the oldest at the
+	 * bottom of the list.
 	 *
 	 * @param backupSuffix
-	 *            Optional file extension for backup files (can be {@code null})
-	 * @return Found files
+	 *            Optional file extension for backup files (can be {@code null} if there are no separate backup files)
+	 * @return Found file tuples
 	 */
-	public List<File> getAllFiles(final String backupSuffix) {
-		List<File> files = new ArrayList<File>();
-		collectFiles(folder, backupSuffix == null ? suffix : suffix + backupSuffix, files);
-		Collections.sort(files, LastModifiedFileComparator.INSTANCE);
-		return files;
+	public List<FileTuple> getAllFiles(final String backupSuffix) {
+		List<FileTuple> tuples = new ArrayList<FileTuple>();
+
+		Collection<File> originals = backupSuffix == null ? new ArrayList<File>() : new HashSet<File>();
+		collectFiles(folder, suffix, originals);
+
+		if (backupSuffix != null) {
+			Collection<File> backups = new ArrayList<File>();
+			collectFiles(folder, suffix + backupSuffix, backups);
+
+			for (File backup : backups) {
+				String path = backup.getAbsolutePath();
+				File original = new File(path.substring(0, path.length() - backupSuffix.length()));
+				tuples.add(new FileTuple(original, backup));
+				originals.remove(original);
+			}
+		}
+
+		for (File original : originals) {
+			String path = original.getAbsolutePath();
+			File backup = new File(backupSuffix == null ? path : path + backupSuffix);
+			tuples.add(new FileTuple(original, backup));
+		}
+
+		Collections.sort(tuples, LastModifiedFileTupleComparator.INSTANCE);
+		return tuples;
 	}
 
 	/**
@@ -137,7 +161,7 @@ public final class DynamicPath {
 	 * @return {@code true} if passed file is compatible, {@code false} if not
 	 */
 	public boolean isValid(final File file) {
-		return isValid(file.getPath(), 0, 0);
+		return isValid(file.getAbsolutePath(), 0, 0);
 	}
 
 	/**
@@ -150,17 +174,17 @@ public final class DynamicPath {
 	 * @param found
 	 *            All found files will be added to this list
 	 */
-	private void collectFiles(final File folder, final String suffix, final List<File> found) {
+	private void collectFiles(final File folder, final String suffix, final Collection<File> found) {
 		File[] files = folder.listFiles();
 		if (files != null) {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					collectFiles(file, suffix, found);
-				} else if (file.isFile() && file.getPath().endsWith(suffix)) {
+				} else if (file.isFile() && file.getAbsolutePath().endsWith(suffix)) {
 					int index = 0;
 
 					for (String text : plainTexts) {
-						index = file.getPath().indexOf(text, index);
+						index = file.getAbsolutePath().indexOf(text, index);
 						if (index == -1) {
 							break;
 						} else {
@@ -169,7 +193,7 @@ public final class DynamicPath {
 					}
 
 					if (index >= 0) {
-						found.add(file);
+						found.add(file.getAbsoluteFile());
 					}
 				}
 			}
@@ -190,6 +214,16 @@ public final class DynamicPath {
 	private boolean isValid(final String path, final int pathPosition, final int segmentIndex) {
 		Segment segment = segments.get(segmentIndex);
 		String expectedValue = segment.getStaticText();
+
+		if (pathPosition == 0) {
+			File file = new File(expectedValue == null ? "" : expectedValue).getAbsoluteFile();
+			if (file.isDirectory()) {
+				expectedValue = file.getAbsolutePath() + File.separator;
+			} else {
+				expectedValue = file.getAbsolutePath();
+			}
+		}
+
 		if (expectedValue == null) {
 			if (segmentIndex == segments.size() - 1) {
 				return segment.validateToken(path.substring(pathPosition));

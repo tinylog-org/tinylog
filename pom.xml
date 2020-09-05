@@ -569,7 +569,6 @@
 							</manifestEntries>
 						</archive>
 						<doctitle>${project.name} ${project.version}</doctitle>
-						<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 						<source>8</source>
 					</configuration>
 					<executions>

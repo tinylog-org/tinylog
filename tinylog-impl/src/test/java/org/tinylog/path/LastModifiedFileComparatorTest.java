@@ -23,28 +23,33 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link LastModifiedFileComparator}.
+ * Tests for {@link LastModifiedFileTupleComparator}.
  */
 
 public final class LastModifiedFileComparatorTest {
 
+	private static final LastModifiedFileTupleComparator COMPARATOR = LastModifiedFileTupleComparator.INSTANCE;
+
 	/**
-	 * Verifies that zero will be returned, if both files have the same last modification date.
+	 * Verifies that zero will be returned, if both file tuples have the same last modification date.
 	 *
 	 * @throws IOException
 	 *             Failed to create files
 	 */
 	@Test
 	public void sameModificationDate() throws IOException {
-		File first = File.createTempFile("junt", null);
-		File second = File.createTempFile("junt", null);
-		second.setLastModified(first.lastModified());
+		File firstFile = File.createTempFile("junit", null);
+		File secondFile = File.createTempFile("junit", null);
+		secondFile.setLastModified(firstFile.lastModified());
 
-		assertThat(LastModifiedFileComparator.INSTANCE.compare(first, second)).isZero();
+		FileTuple firstTuple = new FileTuple(firstFile, firstFile);
+		FileTuple secondTuple = new FileTuple(secondFile, secondFile);
+
+		assertThat(COMPARATOR.compare(firstTuple, secondTuple)).isZero();
 	}
 
 	/**
-	 * Verifies that a negative number will be returned, if the first file is younger than the second.
+	 * Verifies that a negative number will be returned, if the first file tuple is younger than the second.
 	 *
 	 * @throws IOException
 	 *             Failed to create files
@@ -53,17 +58,20 @@ public final class LastModifiedFileComparatorTest {
 	public void keepYoungestFirst() throws IOException {
 		ZonedDateTime now = ZonedDateTime.now();
 
-		File first = File.createTempFile("junt", null);
-		first.setLastModified(now.toEpochSecond());
+		File firstFile = File.createTempFile("junit", null);
+		File secondFile = File.createTempFile("junit", null);
+		firstFile.setLastModified(now.toEpochSecond());
+		secondFile.setLastModified(now.minus(1, ChronoUnit.DAYS).toEpochSecond());
 
-		File second = File.createTempFile("junt", null);
-		second.setLastModified(now.minus(1, ChronoUnit.DAYS).toEpochSecond());
+		FileTuple firstTuple = new FileTuple(firstFile, firstFile);
+		FileTuple secondTuple = new FileTuple(secondFile, secondFile);
 
-		assertThat(LastModifiedFileComparator.INSTANCE.compare(first, second)).isNegative();
+		assertThat(COMPARATOR.compare(firstTuple, secondTuple)).isNegative();
+
 	}
 
 	/**
-	 * Verifies that a positive number will be returned, if the first file is older than the second.
+	 * Verifies that a positive number will be returned, if the second file tuple is older than the second.
 	 *
 	 * @throws IOException
 	 *             Failed to create files
@@ -72,13 +80,15 @@ public final class LastModifiedFileComparatorTest {
 	public void reorderIfOldestIsFirst() throws IOException {
 		ZonedDateTime now = ZonedDateTime.now();
 
-		File first = File.createTempFile("junt", null);
-		first.setLastModified(now.minus(1, ChronoUnit.DAYS).toEpochSecond());
+		File firstFile = File.createTempFile("junit", null);
+		File secondFile = File.createTempFile("junit", null);
+		firstFile.setLastModified(now.minus(1, ChronoUnit.DAYS).toEpochSecond());
+		secondFile.setLastModified(now.toEpochSecond());
 
-		File second = File.createTempFile("junt", null);
-		second.setLastModified(now.toEpochSecond());
+		FileTuple firstTuple = new FileTuple(firstFile, firstFile);
+		FileTuple secondTuple = new FileTuple(secondFile, secondFile);
 
-		assertThat(LastModifiedFileComparator.INSTANCE.compare(first, second)).isPositive();
+		assertThat(COMPARATOR.compare(firstTuple, secondTuple)).isPositive();
 	}
 
 }

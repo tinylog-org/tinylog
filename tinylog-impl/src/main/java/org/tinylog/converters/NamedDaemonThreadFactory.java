@@ -13,38 +13,29 @@
 
 package org.tinylog.converters;
 
+import java.util.concurrent.ThreadFactory;
+
 /**
- * Converter that will do nothing but keeping the original data and files.
+ * Thread factory that creates new daemon threads with a given name and lowest priority.
  */
-public final class NopFileConverter implements FileConverter {
+final class NamedDaemonThreadFactory implements ThreadFactory {
 
-	/** */
-	public NopFileConverter() {
+	private final String name;
+
+	/**
+	 * @param name Name for created threads
+	 */
+	NamedDaemonThreadFactory(final String name) {
+		this.name = name;
 	}
 
 	@Override
-	public String getBackupSuffix() {
-		return null;
-	}
-
-	@Override
-	public void open(final String fileName) {
-		// Ignore
-	}
-
-	@Override
-	public byte[] write(final byte[] data) {
-		return data;
-	}
-
-	@Override
-	public void close() {
-		// Ignore
-	}
-
-	@Override
-	public void shutdown() {
-		// Ignore
+	public Thread newThread(final Runnable runnable) {
+		Thread thread = new Thread(runnable);
+		thread.setName(name);
+		thread.setPriority(Thread.MIN_PRIORITY);
+		thread.setDaemon(true);
+		return thread;
 	}
 
 }

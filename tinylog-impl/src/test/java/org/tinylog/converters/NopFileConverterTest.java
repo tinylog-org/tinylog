@@ -55,6 +55,8 @@ public class NopFileConverterTest {
 		converter.open(fileName);
 		assertThat(converter.write(data)).isSameAs(data);
 		converter.close();
+
+		converter.shutdown();
 	}
 
 }

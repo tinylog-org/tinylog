@@ -14,6 +14,9 @@
 package org.tinylog.converters;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,9 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class GzipFileConverter implements FileConverter {
 
-	private static final String THREAD_NAME_PREFIX = "tinylog-GZipThread-";
-
 	private static final AtomicInteger count = new AtomicInteger();
+
+	private final ExecutorService executor = Executors.newSingleThreadExecutor(
+		new NamedDaemonThreadFactory("tinylog-GZipThread-" + count.getAndIncrement())
+	);
 
 	private volatile File file;
 
@@ -48,10 +53,13 @@ public final class GzipFileConverter implements FileConverter {
 
 	@Override
 	public void close() {
-		Thread thread = new Thread(new GzipEncoder(file));
-		thread.setName(THREAD_NAME_PREFIX + count.getAndIncrement());
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
+		executor.execute(new GzipEncoder(file));
+	}
+
+	@Override
+	public void shutdown() throws InterruptedException {
+		executor.shutdown();
+		executor.awaitTermination(1, TimeUnit.MINUTES);
 	}
 
 }
