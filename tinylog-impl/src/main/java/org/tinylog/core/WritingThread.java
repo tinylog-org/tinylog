@@ -25,7 +25,7 @@ import org.tinylog.writers.Writer;
 /**
  * Thread for writing log entries asynchronously.
  */
-final class WritingThread extends Thread {
+public final class WritingThread extends Thread {
 
 	private static final String THREAD_NAME = "tinylog-WritingThread";
 	private static final long MILLISECONDS_TO_SLEEP = 10L;
