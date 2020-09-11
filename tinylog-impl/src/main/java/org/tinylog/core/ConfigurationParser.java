@@ -73,7 +73,7 @@ public final class ConfigurationParser {
 			if (tag != null && !tag.isEmpty() && !tag.equals("-")) {
 				String[] tagArray = tag.split(",");
 				for (String tagArrayItem : tagArray) {
-					tagArrayItem = tagArrayItem.trim();
+					tagArrayItem = tagArrayItem.replaceAll("@.*", "").trim();
 					if (!tags.contains(tagArrayItem) && !tagArrayItem.isEmpty()) {
 						tags.add(tagArrayItem);
 					}

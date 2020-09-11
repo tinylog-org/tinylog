@@ -85,7 +85,6 @@ public class TinylogLoggingConfiguration {
 			}
 
 			configuration.put("ID", entry.getKey());
-
 			configuration.put("writingthread", Boolean.toString(writingThread));
 
 			Writer writer = loader.create(entry.getValue(), configuration);
@@ -100,8 +99,18 @@ public class TinylogLoggingConfiguration {
 					String[] tagArray = tag.split(",");
 					for (String tagArrayItem : tagArray) {
 						tagArrayItem = tagArrayItem.trim(); 
+						String[] tagLevelItem = tagArrayItem.split("@", 2);
+						Level currentLevel;
+						String currentTag;
+						if (tagLevelItem.length == 1) {
+							currentTag = tagArrayItem;
+							currentLevel = level;
+						} else {
+							currentTag = tagLevelItem[0].trim();
+							currentLevel = ConfigurationParser.parse(tagLevelItem[1].trim(), level);	
+						}
 						if (!tagArrayItem.isEmpty()) {
-							addWriter(writer, matrix, tags.indexOf(tagArrayItem) + 1, level);
+							addWriter(writer, matrix, tags.indexOf(currentTag) + 1, currentLevel);
 						}
 					}
 				}

@@ -163,6 +163,46 @@ public final class TinylogLoggingConfigurationTest {
 	}
 	
 	/**
+	 * Verifies that a single tagged writer with multiple tags and levels will be created and assigned correctly.
+	 */
+	@Test
+	public void singleMultipleTaggedWriterWithLevels() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.level", "ERROR"); // Default level
+		Configuration.set("writer.tag", " system@WARN , , backup  , test@INFO, , "); // Test also unusual tag entries
+		
+		List<String> tags = ConfigurationParser.getTags();
+		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
+		Collection<Writer>[][] writers = config.createWriters(tags, Level.TRACE, false);
+
+		assertThat(writers)
+			.hasSize(5)
+			.allSatisfy(element -> assertThat(element).hasSize(5));
+		
+		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
+		
+		assertThat(writers[1][Level.TRACE.ordinal()]).isEmpty();
+		assertThat(writers[1][Level.DEBUG.ordinal()]).isEmpty();
+		assertThat(writers[1][Level.INFO.ordinal()]).isEmpty();
+		assertThat(writers[1][Level.WARN.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+		assertThat(writers[1][Level.ERROR.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+
+		assertThat(writers[2][Level.TRACE.ordinal()]).isEmpty();
+		assertThat(writers[2][Level.DEBUG.ordinal()]).isEmpty();
+		assertThat(writers[2][Level.INFO.ordinal()]).isEmpty();
+		assertThat(writers[2][Level.WARN.ordinal()]).isEmpty();
+		assertThat(writers[2][Level.ERROR.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+
+		assertThat(writers[3][Level.TRACE.ordinal()]).isEmpty();
+		assertThat(writers[3][Level.DEBUG.ordinal()]).isEmpty();
+		assertThat(writers[3][Level.INFO.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+		assertThat(writers[3][Level.WARN.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+		assertThat(writers[3][Level.ERROR.ordinal()]).hasSize(1).allSatisfy(w -> assertThat(w).isInstanceOf(ConsoleWriter.class));
+		
+		assertThat(writers[4]).allSatisfy(collection -> assertThat(collection).isEmpty());
+	}
+	
+	/**
 	 * Verifies that two tagged writers will be created and assigned correctly.
 	 *
 	 * @throws IOException
