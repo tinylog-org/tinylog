@@ -194,6 +194,18 @@ public final class ConfigurationParserTest {
 	}
 
 	/**
+	 * Verifies that multiple tags with levels will be found (i.e. the levels are ignored).
+	 */
+	@Test
+	public void writerWithMultipleTagsWithLevels() {
+		Configuration.set("writer", "console");
+		Configuration.set("writer.tag", " system@INFO , backup , test@TRACE "); 
+
+		List<String> tags = ConfigurationParser.getTags();
+		assertThat(tags).containsExactlyInAnyOrder("system", "backup", "test");
+	}
+	
+	/**
 	 * Verifies that tags can be read from multiple writers and each tag will be returned only once.
 	 */
 	@Test
