@@ -15,22 +15,17 @@ package org.tinylog.core;
 
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.tinylog.Level;
-import org.tinylog.Supplier;
 import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.InternalLogger;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.runtime.RuntimeProvider;
-import org.tinylog.runtime.Timestamp;
 import org.tinylog.writers.Writer;
 
 /**
@@ -49,18 +44,19 @@ public class TinylogLoggingProvider implements LoggingProvider {
 
 	/** */
 	public TinylogLoggingProvider() {
+		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		context = new TinylogContextProvider();
 		globalLevel = ConfigurationParser.getGlobalLevel();
 		customLevels = ConfigurationParser.getCustomLevels();
 		knownTags = ConfigurationParser.getTags();
 
-		Level minimumLevel = calculateMinimumLevel(globalLevel, customLevels);
+		Level minimumLevel = config.calculateMinimumLevel(globalLevel, customLevels);
 		boolean hasWritingThread = ConfigurationParser.isWritingThreadEnabled();
 
-		writers = ConfigurationParser.createWriters(knownTags, minimumLevel, hasWritingThread);
-		requiredLogEntryValues = calculateRequiredLogEntryValues(writers);
-		fullStackTraceRequired = calculateFullStackTraceRequirements(requiredLogEntryValues);
-		writingThread = hasWritingThread ? createWritingThread(writers) : null;
+		writers = config.createWriters(knownTags, minimumLevel, hasWritingThread);
+		requiredLogEntryValues = config.calculateRequiredLogEntryValues(writers);
+		fullStackTraceRequired = config.calculateFullStackTraceRequirements(requiredLogEntryValues);
+		writingThread = hasWritingThread ? config.createWritingThread(writers) : null;
 
 		if (ConfigurationParser.isAutoShutdownEnabled()) {
 			Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -145,7 +141,8 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, formatter, obj, arguments);
+			LogEntry logEntry = TinylogLoggingConfiguration.createLogEntry(stackTraceElement, tag, level, exception, formatter, 
+					obj, arguments, requiredLogEntryValues[tagIndex], context);
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
@@ -176,7 +173,8 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		}
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
-			LogEntry logEntry = createLogEntry(stackTraceElement, tag, tagIndex, level, exception, formatter, obj, arguments);
+			LogEntry logEntry = TinylogLoggingConfiguration.createLogEntry(stackTraceElement, tag, level, exception, formatter,  
+					obj, arguments, requiredLogEntryValues[tagIndex], context);
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
@@ -184,7 +182,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	@Override
 	public void shutdown() throws InterruptedException {
 		if (writingThread == null) {
-			for (Writer writer : getAllWriters(writers)) {
+			for (Writer writer : TinylogLoggingConfiguration.getAllWriters(writers)) {
 				try {
 					writer.close();
 				} catch (Exception ex) {
@@ -195,98 +193,6 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			writingThread.shutdown();
 			writingThread.join();
 		}
-	}
-
-	/**
-	 * Calculates the minimum severity level that can output any log entries.
-	 *
-	 * @param globalLevel
-	 *            Global severity level
-	 * @param customLevels
-	 *            Custom severity levels for packages and classes
-	 * @return Minimum severity level
-	 */
-	private static Level calculateMinimumLevel(final Level globalLevel, final Map<String, Level> customLevels) {
-		Level minimumLevel = globalLevel;
-		for (Level level : customLevels.values()) {
-			if (level.ordinal() < minimumLevel.ordinal()) {
-				minimumLevel = level;
-			}
-		}
-		return minimumLevel;
-	}
-
-	/**
-	 * Creates a matrix with all required log entry values for each tag and severity level.
-	 *
-	 * @param writers
-	 *            Matrix with registered writers
-	 * @return Matrix with all required log entry values
-	 */
-	@SuppressWarnings("unchecked")
-	private static Collection<LogEntryValue>[][] calculateRequiredLogEntryValues(final Collection<Writer>[][] writers) {
-		Collection<LogEntryValue>[][] logEntryValues = new Collection[writers.length][Level.values().length - 1];
-
-		for (int tagIndex = 0; tagIndex < writers.length; ++tagIndex) {
-			for (int levelIndex = 0; levelIndex < Level.OFF.ordinal(); ++levelIndex) {
-				Set<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
-				for (Writer writer : writers[tagIndex][levelIndex]) {
-					values.addAll(writer.getRequiredLogEntryValues());
-				}
-				logEntryValues[tagIndex][levelIndex] = values;
-			}
-		}
-
-		return logEntryValues;
-	}
-
-	/**
-	 * Calculates for which tag a full stack trace element with method name, file name and line number is required.
-	 *
-	 * @param logEntryValues
-	 *            Matrix with required log entry values
-	 * @return Each set bit represents a tag that requires a full stack trace element
-	 */
-	private static BitSet calculateFullStackTraceRequirements(final Collection<LogEntryValue>[][] logEntryValues) {
-		BitSet result = new BitSet(logEntryValues.length);
-		for (int i = 0; i < logEntryValues.length; ++i) {
-			Collection<LogEntryValue> values = logEntryValues[i][Level.ERROR.ordinal()];
-			if (values.contains(LogEntryValue.METHOD) || values.contains(LogEntryValue.FILE) || values.contains(LogEntryValue.LINE)) {
-				result.set(i);
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Creates a writing thread for a matrix of writers.
-	 *
-	 * @param matrix
-	 *            All writers
-	 * @return Initialized and running writhing thread
-	 */
-	private static WritingThread createWritingThread(final Collection<Writer>[][] matrix) {
-		Collection<Writer> writers = getAllWriters(matrix);
-		WritingThread thread = new WritingThread(writers);
-		thread.start();
-		return thread;
-	}
-
-	/**
-	 * Collects all writer instances from a matrix of writers.
-	 *
-	 * @param matrix
-	 *            All writers
-	 * @return Collection that contains each writer only once
-	 */
-	private static Collection<Writer> getAllWriters(final Collection<Writer>[][] matrix) {
-		Collection<Writer> writers = Collections.newSetFromMap(new IdentityHashMap<Writer, Boolean>());
-		for (int i = 0; i < matrix.length; ++i) {
-			for (int j = 0; j < matrix[i].length; ++j) {
-				writers.addAll(matrix[i][j]);
-			}
-		}
-		return writers;
 	}
 
 	/**
@@ -329,63 +235,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 			}
 		}
 	}
-
-	/**
-	 * Creates a new log entry.
-	 *
-	 * @param stackTraceElement
-	 *            Optional stack trace element of caller
-	 * @param tag
-	 *            Tag name if issued from a tagged logger
-	 * @param tagIndex
-	 *            Index of tag
-	 * @param level
-	 *            Severity level
-	 * @param exception
-	 *            Caught exception or throwable to log
-	 * @param formatter
-	 *            Formatter for text message
-	 * @param obj
-	 *            Message to log
-	 * @param arguments
-	 *            Arguments for message
-	 * @return Filled log entry
-	 */
-	private LogEntry createLogEntry(final StackTraceElement stackTraceElement, final String tag, final int tagIndex, final Level level,
-		final Throwable exception, final MessageFormatter formatter, final Object obj, final Object[] arguments) {
-		Collection<LogEntryValue> required = requiredLogEntryValues[tagIndex][level.ordinal()];
-
-		Timestamp timestamp = RuntimeProvider.createTimestamp();
-		Thread thread = required.contains(LogEntryValue.THREAD) ? Thread.currentThread() : null;
-		Map<String, String> context = required.contains(LogEntryValue.CONTEXT) ? this.context.getMapping() : null;
-
-		String className;
-		String methodName;
-		String fileName;
-		int lineNumber;
-		if (stackTraceElement == null) {
-			className = null;
-			methodName = null;
-			fileName = null;
-			lineNumber = -1;
-		} else {
-			className = stackTraceElement.getClassName();
-			methodName = stackTraceElement.getMethodName();
-			fileName = stackTraceElement.getFileName();
-			lineNumber = stackTraceElement.getLineNumber();
-		}
-
-		String message;
-		if (arguments == null || arguments.length == 0) {
-			Object evaluatedObject = obj instanceof Supplier<?> ? ((Supplier<?>) obj).get() : obj;
-			message = evaluatedObject == null ? null : evaluatedObject.toString();
-		} else {
-			message = formatter.format((String) obj, arguments);
-		}
-
-		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, level, message, exception);
-	}
-
+	
 	/**
 	 * Outputs a log entry to all passed writers.
 	 * 

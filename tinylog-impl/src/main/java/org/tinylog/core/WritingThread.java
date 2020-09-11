@@ -25,7 +25,7 @@ import org.tinylog.writers.Writer;
 /**
  * Thread for writing log entries asynchronously.
  */
-final class WritingThread extends Thread {
+public final class WritingThread extends Thread {
 
 	private static final String THREAD_NAME = "tinylog-WritingThread";
 	private static final long MILLISECONDS_TO_SLEEP = 10L;
@@ -84,7 +84,7 @@ final class WritingThread extends Thread {
 	 * @param logEntry
 	 *            Log entry to write
 	 */
-	void add(final Writer writer, final LogEntry logEntry) {
+	public void add(final Writer writer, final LogEntry logEntry) {
 		Task task = new Task(writer, logEntry);
 		synchronized (mutex) {
 			tasks.add(task);
@@ -99,7 +99,7 @@ final class WritingThread extends Thread {
 	 * for termination.
 	 * </p>
 	 */
-	void shutdown() {
+	public void shutdown() {
 		synchronized (mutex) {
 			tasks.add(Task.POISON);
 		}
