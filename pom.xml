@@ -570,6 +570,8 @@
 						</archive>
 						<doctitle>${project.name} ${project.version}</doctitle>
 						<source>8</source>
+						<!-- Set the Javadoc executable explicitly, if Maven cannot find it automatically -->
+						<!-- <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable> -->
 					</configuration>
 					<executions>
 						<execution>
