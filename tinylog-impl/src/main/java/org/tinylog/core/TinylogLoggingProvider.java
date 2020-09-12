@@ -261,7 +261,27 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	}
 	
 	/**
-	 * Gets all writers of the provider which respond to the given tag. A null tag is possible for the generic writer.
+	 * Gets all writers which belong to the given tag and a given level. A null tag is possible for the generic writer.
+	 * 
+	 * @param tag
+	 *            The tag to find
+	 * @param level
+	 *            The level to find
+	 * @return All writers
+	 */
+	public Collection<Writer> getWriters(final String tag, final Level level) {
+		Set<Writer> collectedWriters = new HashSet<Writer>(); 
+		int tagIndex = getTagIndex(tag);
+		if (tagIndex > knownTags.size() || level == Level.OFF) {
+			return collectedWriters;
+		}
+
+		collectedWriters.addAll(writers[tagIndex][level.ordinal()]);
+		return collectedWriters;
+	}
+	
+	/**
+	 * Gets all writers of the provider which belong to the given tag. A null tag is possible for the generic writer.
 	 *
 	 * @param tag
 	 *            The tag to find

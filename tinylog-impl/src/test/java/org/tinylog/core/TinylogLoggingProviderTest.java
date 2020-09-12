@@ -668,30 +668,32 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(emptyMap());
 
 			Configuration.set("writer1", "console");
 			Configuration.set("writer1.tag", "TAG1");
+			Configuration.set("writer1.level", Level.DEBUG.name());
 			Configuration.set("writer1.format", "{level}: {message}");
 
 			Configuration.set("writer2", "console");
-			Configuration.set("writer2.level", "info");
+			Configuration.set("writer2.level", Level.WARN.name());
 			Configuration.set("writer2.tag", "TAG2");
 			Configuration.set("writer2.format", "{level}: {message}");
 			
 			Configuration.set("writer3", "console");
-			Configuration.set("writer3.level", "info");
+			Configuration.set("writer3.level", Level.INFO.name());
 			Configuration.set("writer3.tag", "TAG3");
 			Configuration.set("writer3.format", "{level}: {message}");
 			
 			Configuration.set("writer4", "console");
-			Configuration.set("writer4.level", "info");
+			Configuration.set("writer4.level", Level.INFO.name());
 			Configuration.set("writer4.tag", "TAG3");
 			Configuration.set("writer4.format", "{level}: {message}");
 		}
 
 		/**
-		 * Verifies that the global minimum severity level for all loggers is {@link Level#TRACE}.
+		 * Verifies that the writers can be obtained from the provider correctly.
 		 */
 		@Test
 		public void checkWriterRetrieval() {
@@ -700,6 +702,20 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.getWriters("TAG2")).hasSize(1);
 			assertThat(provider.getWriters("TAG3")).hasSize(2);
 			
+			assertThat(provider.getWriters("TAG1", Level.TRACE)).hasSize(0);
+			assertThat(provider.getWriters("TAG1", Level.DEBUG)).hasSize(1);
+			assertThat(provider.getWriters("TAG1", Level.ERROR)).hasSize(1);
+
+			assertThat(provider.getWriters("TAG2", Level.INFO)).hasSize(0);
+			assertThat(provider.getWriters("TAG2", Level.WARN)).hasSize(1);
+			assertThat(provider.getWriters("TAG2", Level.ERROR)).hasSize(1);
+			
+			assertThat(provider.getWriters("TAG3", Level.DEBUG)).hasSize(0);
+			assertThat(provider.getWriters("TAG3", Level.INFO)).hasSize(2);
+			assertThat(provider.getWriters("TAG3", Level.ERROR)).hasSize(2);
+			
+			assertThat(provider.getWriters("TAG3", Level.OFF)).hasSize(0);			
+
 			Condition<Writer> condition = new Condition<Writer>() {
 				@Override
 				public boolean matches(final Writer o) {
