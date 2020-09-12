@@ -701,6 +701,8 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.getWriters("TAG1")).hasSize(1);
 			assertThat(provider.getWriters("TAG2")).hasSize(1);
 			assertThat(provider.getWriters("TAG3")).hasSize(2);
+			assertThat(provider.getWriters("XXX")).hasSize(0);
+			assertThat(provider.getWriters(null)).hasSize(0);
 			
 			assertThat(provider.getWriters("TAG1", Level.TRACE)).hasSize(0);
 			assertThat(provider.getWriters("TAG1", Level.DEBUG)).hasSize(1);
@@ -715,6 +717,7 @@ public final class TinylogLoggingProviderTest {
 			assertThat(provider.getWriters("TAG3", Level.ERROR)).hasSize(2);
 			
 			assertThat(provider.getWriters("TAG3", Level.OFF)).hasSize(0);			
+			assertThat(provider.getWriters("XXX", Level.ERROR)).hasSize(0);			
 
 			Condition<Writer> condition = new Condition<Writer>() {
 				@Override
