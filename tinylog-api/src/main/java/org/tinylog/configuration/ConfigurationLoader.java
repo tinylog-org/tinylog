@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Martin Winandy
+ * Copyright 2016 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,33 +13,22 @@
 
 package org.tinylog.configuration;
 
+import java.util.Properties;
+
 /**
- * Resolver for system properties.
+ * Service interface for a property loader. The loader provides a property
+ * map for the configuration of the logging framework.
  */
-public final class SystemPropertyResolver implements Resolver {
-
-	/**
-	 * Instance of the system property resolver.
-	 */
-	public static final SystemPropertyResolver INSTANCE = new SystemPropertyResolver();
+public interface ConfigurationLoader {
 	
-	/** */
-	private SystemPropertyResolver() {
-	}
-
-	@Override
-	public String getName() {
-		return "system properties";
-	}
-
-	@Override
-	public char getPrefix() {
-		return '#';
-	}
-
-	@Override
-	public String resolve(final String name) {
-		return System.getProperty(name);
-	}
-
+	/**
+	 * Load a property object from a resource.
+	 * 
+	 * @return The loaded properties
+	 * 
+	 * @throws Exception
+	 *             Any exception can be thrown if writing has been failed
+	 */
+	Properties load() throws Exception;
+	
 }

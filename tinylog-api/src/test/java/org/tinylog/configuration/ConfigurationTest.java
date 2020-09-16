@@ -14,6 +14,7 @@
 package org.tinylog.configuration;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -637,6 +638,109 @@ public final class ConfigurationTest {
 	}
 	
 	/**
+	 * Verifies that a user defined configuration loader can be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkUsingOtherConfigurationLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
+	 * Verifies that a configuration loader can be selected by a system property.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkSelectingConfigurationLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName());
+		
+		System.setProperty("tinylog.configurationloader", PropertyConfigurationLoader.class.getName());
+		System.setProperty("tinylog.StandardConfigurationLoader", "456");
+		loadProperties(null);
+		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
+		
+		System.setProperty("tinylog.configurationloader", FirstDummyConfigurationLoader.class.getName());
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		System.setProperty("tinylog.configurationloader", "property");
+		System.setProperty("tinylog.StandardConfigurationLoader", "456");
+		loadProperties(null);
+		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
+
+		System.setProperty("tinylog.configurationloader", "first dummy");
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}		
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorTwoLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName(), 
+				SecondDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		assertThat(systemStream.consumeErrorOutput()).contains("ERROR")
+			.containsOnlyOnce("More than one active configuration loader found.");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}		
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorNullLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, ErrorDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		Properties props = Whitebox.getInternalState(Configuration.class, Properties.class);
+		assertThat(props).isEmpty();
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorExceptionLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, ExceptionDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(systemStream.consumeErrorOutput()).contains("ERROR").containsOnlyOnce("Dummy error");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
 	 * Triggers (re-)loading properties.
 	 *
 	 * @param path
@@ -651,6 +755,41 @@ public final class ConfigurationTest {
 
 		Properties properties = Whitebox.invokeMethod(Configuration.class, "load");
 		Whitebox.setInternalState(Configuration.class, Properties.class, properties);
+	}	
+	
+	/**
+	 * Error configuration loader class for testing.
+	 */
+	public static final class ExceptionDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			throw new IOException("Dummy error");
+		}
+	}
+	
+	/**
+	 * Error configuration loader class for testing.
+	 */
+	public static final class ErrorDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			return null;
+		}
+	}
+	
+	/**
+	 * Dummy configuration loader class for testing.
+	 */
+	public static final class SecondDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			Properties props = new Properties();
+			props.put("DummyConfigurationLoader", "456");
+			return props;
+		}
 	}
 
 }

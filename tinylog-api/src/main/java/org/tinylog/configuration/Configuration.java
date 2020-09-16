@@ -13,24 +13,17 @@
 
 package org.tinylog.configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Pattern;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
-import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Global configuration for tinylog.
@@ -46,31 +39,97 @@ import org.tinylog.runtime.RuntimeProvider;
  * "{@code tinylog.}". For example: "{@code level = debug}" becomes "{@code tinylog.level=debug}". If a configuration
  * property exists as system property and in configuration file, the system property will win.
  * </p>
+ * 
+ * <p>
+ * The default property loading behavior can be changed by supplying a property service loader which reads the properties
+ * in any other way. The properties can have a priority. The service loader which loads the properties with the highes
+ * priority is chosen. Alternatively, the loader can be directly chosen by setting a system property
+ * "{@code tinylog.configurationLoader}" to the simple class name of the desired loader.  
+ * </p>
  */
 public final class Configuration {
 
 	private static final int MAX_LOCALE_ARGUMENTS = 3;
 
-	private static final String[] CONFIGURATION_FILES = new String[] {
-		"tinylog-dev.properties",
-		"tinylog-test.properties",
-		"tinylog.properties"
-	};
-
-	private static final String PROPERTIES_PREFIX = "tinylog.";
-	private static final String CONFIGURATION_PROPERTY = PROPERTIES_PREFIX + "configuration";
-
 	private static final String LOCALE_KEY = "locale";
 	private static final String ESCAPING_ENABLED_KEY = "escaping.enabled";
-
-	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
+	
+	private static final String CONFIGURATION_LOADER_CLASS_PROPERTY = "tinylog.configurationloader";
 
 	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private static final Properties properties = load();
 	private static boolean frozen;
-
+	
 	/** */
 	private Configuration() {
+	}
+	
+	/**
+	 * Loads the configuration properties. Per default the properties are loaded from the internal
+	 * Java property loader. If a custom service loader is found it is preferred over the internal one.
+	 * If a system property {@code tinylog.configurationloader} is given matching the simple class name
+	 * of a configuration service loader this used. It is possible to set this system property
+	 * to the internal configuration service loader's class name to override all custom loader.
+	 *
+	 * @return Loaded properties
+	 */
+	private static Properties load() {
+		String loaderName = System.getProperty(CONFIGURATION_LOADER_CLASS_PROPERTY);
+		ServiceLoader<ConfigurationLoader> serviceLoader = new ServiceLoader<ConfigurationLoader>(ConfigurationLoader.class);
+		ConfigurationLoader loader = null;
+		// Loader is given via system property 
+		if (loaderName != null) {
+			// Check if explicit loading of the internal loader is necessary
+			if (loaderName.indexOf('.') == -1) {
+				String simpleClassName = serviceLoader.toSimpleClassName(loaderName);
+				if (PropertyConfigurationLoader.class.getSimpleName().equals(simpleClassName)) {
+					loader = new PropertyConfigurationLoader();
+				}
+			} else if (PropertyConfigurationLoader.class.getName().equals(loaderName)) {
+				loader = new PropertyConfigurationLoader();
+			}
+			// Load a service with the given name
+			if (loader == null) {
+				loader = serviceLoader.create(loaderName);
+			}
+		} else {
+			// Load all services and take the first. Log an error if there is more than one.
+			Collection<ConfigurationLoader> loaders = serviceLoader.createAll();
+			if (loaders.size() >= 1) {
+				loader = loaders.iterator().next();
+				if (loaders.size() > 1) {
+					InternalLogger.log(Level.ERROR, "More than one active configuration loader found.");
+				}
+			}
+		}
+		
+		// Default to the internal loader if none was found above
+		if (loader == null) {
+			loader = new PropertyConfigurationLoader();
+		}
+		return load(loader);
+	}
+	
+	/**
+	 * Loads the configuration properties from the given loader.
+	 * 
+	 * @param loader
+	 *            The configuration loader to use
+	 *            
+	 * @return Loaded properties
+	 */
+	private static Properties load(final ConfigurationLoader loader) {
+		try {
+			Properties currentProps = loader.load();
+			if (currentProps != null) {
+				return currentProps;
+			} else {
+				return new Properties();
+			}
+		} catch (Exception ex) {
+			InternalLogger.log(Level.ERROR, "Configuration loader error: '" + ex + "'");
+			return new Properties();
+		}
 	}
 
 	/**
@@ -245,79 +304,6 @@ public final class Configuration {
 	}
 
 	/**
-	 * Loads all configuration properties.
-	 *
-	 * @return Found properties
-	 */
-	private static Properties load() {
-		Properties properties = new Properties();
-
-		String file = System.getProperty(CONFIGURATION_PROPERTY);
-		try {
-			if (file != null) {
-				InputStream stream;
-				if (URL_DETECTION_PATTERN.matcher(file).matches()) {
-					stream = new URL(file).openStream();
-				} else {
-					stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
-					if (stream == null) {
-						stream = new FileInputStream(file);
-					}
-				}
-				load(properties, stream);
-			} else {
-				for (String configurationFile : CONFIGURATION_FILES) {
-					file = configurationFile;
-					InputStream stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
-					if (stream != null) {
-						load(properties, stream);
-						break;
-					}
-				}
-			}
-		} catch (IOException ex) {
-			InternalLogger.log(Level.ERROR, "Failed loading configuration from '" + file + "'");
-		}
-
-		for (Object key : new ArrayList<Object>(System.getProperties().keySet())) {
-			String name = (String) key;
-			if (name.startsWith(PROPERTIES_PREFIX)) {
-				properties.put(name.substring(PROPERTIES_PREFIX.length()), System.getProperty(name));
-			}
-		}
-
-		for (Entry<Object, Object> entry : properties.entrySet()) {
-			String value = (String) entry.getValue();
-			if (value.indexOf('{') != -1) {
-				value = resolve(value, EnvironmentVariableResolver.INSTANCE);
-				value = resolve(value, SystemPropertyResolver.INSTANCE);
-				properties.put(entry.getKey(), value);
-			}
-		}
-
-		return properties;
-	}
-
-	/**
-	 * Puts all properties from a stream to an existing properties object. Already existing properties will be
-	 * overridden.
-	 *
-	 * @param properties
-	 *            Read properties will be put to this properties object
-	 * @param stream
-	 *            Input stream with a properties file
-	 * @throws IOException
-	 *             Failed reading properties from input stream
-	 */
-	private static void load(final Properties properties, final InputStream stream) throws IOException {
-		try {
-			properties.load(stream);
-		} finally {
-			stream.close();
-		}
-	}
-
-	/**
 	 * Resolves placeholders with passed resolver.
 	 *
 	 * @param value
@@ -326,7 +312,7 @@ public final class Configuration {
 	 *            Resolver for replacing placeholders
 	 * @return Input value with resolved placeholders
 	 */
-	private static String resolve(final String value, final Resolver resolver) {
+	public static String resolve(final String value, final Resolver resolver) {
 		StringBuilder builder = new StringBuilder();
 		int position = 0;
 

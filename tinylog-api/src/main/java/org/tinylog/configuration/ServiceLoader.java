@@ -208,7 +208,7 @@ public final class ServiceLoader<T> {
 	 *            Simplified acronym
 	 * @return Simple class without package
 	 */
-	private String toSimpleClassName(final String name) {
+	public String toSimpleClassName(final String name) {
 		StringBuilder builder = new StringBuilder(name.length());
 		for (String token : SPLIT_PATTERN.split(name)) {
 			if (!token.isEmpty()) {
