@@ -13,17 +13,20 @@
 
 package org.tinylog.configuration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
+import org.tinylog.runtime.RuntimeProvider;
 
 /**
  * Global configuration for tinylog.
@@ -49,12 +52,14 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class Configuration {
 
+	static final String PROPERTIES_PREFIX = "tinylog.";
+
 	private static final int MAX_LOCALE_ARGUMENTS = 3;
 
 	private static final String LOCALE_KEY = "locale";
 	private static final String ESCAPING_ENABLED_KEY = "escaping.enabled";
 	
-	private static final String CONFIGURATION_LOADER_CLASS_PROPERTY = "tinylog.configurationloader";
+	private static final String CONFIGURATION_LOADER_CLASS_PROPERTY = PROPERTIES_PREFIX + "configurationloader";
 
 	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private static final Properties properties = load();
@@ -74,6 +79,10 @@ public final class Configuration {
 	 * @return Loaded properties
 	 */
 	private static Properties load() {
+		if (RuntimeProvider.getProcessId() == Long.MIN_VALUE) {
+			java.util.ServiceLoader.load(ConfigurationLoader.class); // Workaround for ProGuard (see issue #126)
+		}
+		
 		String loaderName = System.getProperty(CONFIGURATION_LOADER_CLASS_PROPERTY);
 		ServiceLoader<ConfigurationLoader> serviceLoader = new ServiceLoader<ConfigurationLoader>(ConfigurationLoader.class);
 		ConfigurationLoader loader = null;
@@ -82,11 +91,11 @@ public final class Configuration {
 			// Check if explicit loading of the internal loader is necessary
 			if (loaderName.indexOf('.') == -1) {
 				String simpleClassName = serviceLoader.toSimpleClassName(loaderName);
-				if (PropertyConfigurationLoader.class.getSimpleName().equals(simpleClassName)) {
-					loader = new PropertyConfigurationLoader();
+				if (PropertiesConfigurationLoader.class.getSimpleName().equals(simpleClassName)) {
+					loader = new PropertiesConfigurationLoader();
 				}
-			} else if (PropertyConfigurationLoader.class.getName().equals(loaderName)) {
-				loader = new PropertyConfigurationLoader();
+			} else if (PropertiesConfigurationLoader.class.getName().equals(loaderName)) {
+				loader = new PropertiesConfigurationLoader();
 			}
 			// Load a service with the given name
 			if (loader == null) {
@@ -105,7 +114,7 @@ public final class Configuration {
 		
 		// Default to the internal loader if none was found above
 		if (loader == null) {
-			loader = new PropertyConfigurationLoader();
+			loader = new PropertiesConfigurationLoader();
 		}
 		return load(loader);
 	}
@@ -359,6 +368,44 @@ public final class Configuration {
 
 		builder.append(value, position, value.length());
 		return builder.toString();
+	}
+
+	/**
+	 * Merges system properties starting with the Tinylog property prefix into the given properties.
+	 * 
+	 * @param properties
+	 *            The properties which the system values shall be merged into
+	 */
+	public static void mergeSystemProperties(final Properties properties) {
+		for (Object key : new ArrayList<Object>(System.getProperties().keySet())) {
+			String name = (String) key;
+			if (name.startsWith(PROPERTIES_PREFIX)) {
+				properties.put(name.substring(PROPERTIES_PREFIX.length()), System.getProperty(name));
+			}
+		}
+	}
+	
+	/**
+	 * Resolves the given property entries with the provided resolvers.
+	 * 
+	 * @param properties
+	 *            The properties which shall be resolved
+	 * @param resolvers
+	 *            One or more resolvers to apply to each property entry
+	 */
+	public static void resolveProperties(final Properties properties, final Resolver... resolvers) {
+		if (resolvers == null) {
+			return;
+		}
+		for (Entry<Object, Object> entry : properties.entrySet()) {
+			String value = (String) entry.getValue();
+			if (value.indexOf('{') != -1) {
+				for (Resolver resolver : resolvers) {
+					value = Configuration.resolve(value, resolver);
+				}
+				properties.put(entry.getKey(), value);
+			}
+		}
 	}
 
 	/**

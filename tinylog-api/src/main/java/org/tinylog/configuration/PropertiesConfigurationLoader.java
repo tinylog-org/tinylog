@@ -17,8 +17,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -41,19 +39,19 @@ import org.tinylog.runtime.RuntimeProvider;
  * property exists as system property and in configuration file, the system property will win.
  * </p>
  */
-public class PropertyConfigurationLoader implements ConfigurationLoader {
+public class PropertiesConfigurationLoader implements ConfigurationLoader {
 	private static final String[] CONFIGURATION_FILES = new String[] {
 		"tinylog-dev.properties",
 		"tinylog-test.properties",
 		"tinylog.properties"
 	};
 	
-	private static final String PROPERTIES_PREFIX = "tinylog.";
-	private static final String CONFIGURATION_PROPERTY = PROPERTIES_PREFIX + "configuration";
+
+	private static final String CONFIGURATION_PROPERTY = Configuration.PROPERTIES_PREFIX + "configuration";
 	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
 	
 	/** */
-	public PropertyConfigurationLoader() {
+	public PropertiesConfigurationLoader() {
 		
 	}
 	
@@ -101,21 +99,8 @@ public class PropertyConfigurationLoader implements ConfigurationLoader {
 			}
 		}
 
-		for (Object key : new ArrayList<Object>(System.getProperties().keySet())) {
-			String name = (String) key;
-			if (name.startsWith(PROPERTIES_PREFIX)) {
-				properties.put(name.substring(PROPERTIES_PREFIX.length()), System.getProperty(name));
-			}
-		}
-
-		for (Entry<Object, Object> entry : properties.entrySet()) {
-			String value = (String) entry.getValue();
-			if (value.indexOf('{') != -1) {
-				value = Configuration.resolve(value, EnvironmentVariableResolver.INSTANCE);
-				value = Configuration.resolve(value, SystemPropertyResolver.INSTANCE);
-				properties.put(entry.getKey(), value);
-			}
-		}
+		Configuration.mergeSystemProperties(properties);
+		Configuration.resolveProperties(properties, EnvironmentVariableResolver.INSTANCE, SystemPropertyResolver.INSTANCE);
 
 		return properties;
 	}

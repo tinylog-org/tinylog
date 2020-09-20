@@ -663,7 +663,7 @@ public final class ConfigurationTest {
 	public void checkSelectingConfigurationLoader() throws Exception {
 		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName());
 		
-		System.setProperty("tinylog.configurationloader", PropertyConfigurationLoader.class.getName());
+		System.setProperty("tinylog.configurationloader", PropertiesConfigurationLoader.class.getName());
 		System.setProperty("tinylog.StandardConfigurationLoader", "456");
 		loadProperties(null);
 		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
@@ -672,7 +672,7 @@ public final class ConfigurationTest {
 		loadProperties(null);
 		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
 		
-		System.setProperty("tinylog.configurationloader", "property");
+		System.setProperty("tinylog.configurationloader", "properties");
 		System.setProperty("tinylog.StandardConfigurationLoader", "456");
 		loadProperties(null);
 		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
@@ -740,6 +740,36 @@ public final class ConfigurationTest {
 		FileSystem.deleteServiceFile(ConfigurationLoader.class);
 	}	
 	
+	/**
+	 * Verifies that the property resolve methods work as expected.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationProperties() throws Exception {
+		Properties properties = new Properties();
+		
+		System.setProperty("tinylog.test1", "value1");
+		Configuration.mergeSystemProperties(properties);
+		assertThat(properties.get("test1")).isEqualTo("value1");
+		assertThat(properties.get("tinylog.test1")).isNull();
+		assertThat(properties.size()).isEqualTo(1);
+		
+		properties.clear();
+		properties.put("test2", "${PATH}");
+		Configuration.resolveProperties(properties, EnvironmentVariableResolver.INSTANCE);
+		assertThat(properties.get("test2")).isEqualTo(System.getenv("PATH"));
+		
+		properties.clear();
+		Configuration.resolveProperties(properties, (Resolver[]) null);
+		assertThat(properties.size()).isEqualTo(0);
+
+		properties.clear();
+		Configuration.resolveProperties(properties);
+		assertThat(properties.size()).isEqualTo(0);
+	}	
+		
 	/**
 	 * Triggers (re-)loading properties.
 	 *
