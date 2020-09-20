@@ -27,9 +27,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.rules.SystemStreamCollector;
-import org.tinylog.runtime.DummyRuntime;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.util.FileSystem;
 
@@ -41,6 +45,7 @@ import static org.tinylog.util.Maps.doubletonMap;
 /**
  * Tests for {@link Configuration}.
  */
+@RunWith(PowerMockRunner.class)
 public final class ConfigurationTest {
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";
@@ -779,18 +784,13 @@ public final class ConfigurationTest {
 	 *             Failed creating the loader
 	 */
 	@Test
+	@PrepareForTest({Configuration.class, RuntimeProvider.class})	
 	public void checkProguardHack() throws Exception {
-		Object oldRuntime = Whitebox.getInternalState(RuntimeProvider.class, "dialect");
-
-		DummyRuntime runtime = new DummyRuntime();
-		Whitebox.setInternalState(RuntimeProvider.class, "dialect", runtime);
-		assertThat(RuntimeProvider.getProcessId()).isEqualTo(-1);
-
-		Whitebox.setInternalState(runtime, "processId", Long.MIN_VALUE);
-		loadProperties(null);
+		PowerMockito.mockStatic(RuntimeProvider.class);
+		PowerMockito.mockStatic(Configuration.class);
+		Mockito.when(RuntimeProvider.getProcessId()).thenReturn(Long.MIN_VALUE);
+		Whitebox.invokeMethod(Configuration.class, "load");
 		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);
-		
-		Whitebox.setInternalState(RuntimeProvider.class, "dialect", oldRuntime);
 	}
 		
 	/**
