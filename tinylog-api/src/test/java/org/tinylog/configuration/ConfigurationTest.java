@@ -28,7 +28,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -787,8 +786,9 @@ public final class ConfigurationTest {
 	@PrepareForTest({Configuration.class, RuntimeProvider.class})	
 	public void checkProguardHack() throws Exception {
 		PowerMockito.mockStatic(RuntimeProvider.class);
-		PowerMockito.mockStatic(Configuration.class);
-		Mockito.when(RuntimeProvider.getProcessId()).thenReturn(Long.MIN_VALUE);
+		PowerMockito.spy(Configuration.class);
+		PowerMockito.when(RuntimeProvider.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+		PowerMockito.when(RuntimeProvider.getProcessId()).thenReturn(Long.MIN_VALUE);
 		Whitebox.invokeMethod(Configuration.class, "load");
 		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);
 	}
