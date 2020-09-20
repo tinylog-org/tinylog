@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.runtime.DummyRuntime;
+import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -769,6 +771,27 @@ public final class ConfigurationTest {
 		Configuration.resolveProperties(properties);
 		assertThat(properties.size()).isEqualTo(0);
 	}	
+
+	/**
+	 * Verifies that the Proguard hack works for the configuration loading.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkProguardHack() throws Exception {
+		Object oldRuntime = Whitebox.getInternalState(RuntimeProvider.class, "dialect");
+
+		DummyRuntime runtime = new DummyRuntime();
+		Whitebox.setInternalState(RuntimeProvider.class, "dialect", runtime);
+		assertThat(RuntimeProvider.getProcessId()).isEqualTo(-1);
+
+		Whitebox.setInternalState(runtime, "processId", Long.MIN_VALUE);
+		loadProperties(null);
+		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);
+		
+		Whitebox.setInternalState(RuntimeProvider.class, "dialect", oldRuntime);
+	}
 		
 	/**
 	 * Triggers (re-)loading properties.
