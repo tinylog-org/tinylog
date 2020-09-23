@@ -705,7 +705,7 @@ public final class ConfigurationTest {
 		loadProperties(null);
 		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
 		assertThat(systemStream.consumeErrorOutput()).contains("ERROR")
-			.containsOnlyOnce("More than one active configuration loader found.");
+			.containsOnlyOnce("Ignoring more than one configuration loader");
 		
 		System.clearProperty("tinylog.configurationloader");
 		FileSystem.deleteServiceFile(ConfigurationLoader.class);
@@ -792,7 +792,19 @@ public final class ConfigurationTest {
 		Whitebox.invokeMethod(Configuration.class, "load");
 		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);
 	}
-		
+	
+	/**
+	 * Verifies that property loading with a null loader works as expected.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkNullLoader() throws Exception {
+		Properties props = Whitebox.invokeMethod(Configuration.class, "load", (ConfigurationLoader) null);
+		assertThat(props).isEmpty();
+	}
+	
 	/**
 	 * Triggers (re-)loading properties.
 	 *

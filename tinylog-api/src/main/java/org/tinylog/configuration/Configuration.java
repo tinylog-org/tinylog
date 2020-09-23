@@ -83,38 +83,30 @@ public final class Configuration {
 			java.util.ServiceLoader.load(ConfigurationLoader.class); // Workaround for ProGuard (see issue #126)
 		}
 		
-		String loaderName = System.getProperty(CONFIGURATION_LOADER_CLASS_PROPERTY);
-		ServiceLoader<ConfigurationLoader> serviceLoader = new ServiceLoader<ConfigurationLoader>(ConfigurationLoader.class);
 		ConfigurationLoader loader = null;
-		// Loader is given via system property 
-		if (loaderName != null) {
-			// Check if explicit loading of the internal loader is necessary
-			if (loaderName.indexOf('.') == -1) {
-				String simpleClassName = serviceLoader.toSimpleClassName(loaderName);
-				if (PropertiesConfigurationLoader.class.getSimpleName().equals(simpleClassName)) {
-					loader = new PropertiesConfigurationLoader();
-				}
-			} else if (PropertiesConfigurationLoader.class.getName().equals(loaderName)) {
-				loader = new PropertiesConfigurationLoader();
-			}
-			// Load a service with the given name
-			if (loader == null) {
-				loader = serviceLoader.create(loaderName);
-			}
-		} else {
-			// Load all services and take the first. Log an error if there is more than one.
-			Collection<ConfigurationLoader> loaders = serviceLoader.createAll();
-			if (loaders.size() >= 1) {
-				loader = loaders.iterator().next();
-				if (loaders.size() > 1) {
-					InternalLogger.log(Level.ERROR, "More than one active configuration loader found.");
-				}
-			}
-		}
+		ServiceLoader<ConfigurationLoader> serviceLoader = new ServiceLoader<ConfigurationLoader>(ConfigurationLoader.class);
 		
-		// Default to the internal loader if none was found above
-		if (loader == null) {
-			loader = new PropertiesConfigurationLoader();
+		// Loader is given via system property? 
+		String loaderName = System.getProperty(CONFIGURATION_LOADER_CLASS_PROPERTY);
+		if (loaderName != null) {
+			loader = serviceLoader.create(loaderName);
+		} else {
+			// Load all services and take the first. Log an error if there is more than one (not counting the standard loader).
+			Collection<ConfigurationLoader> loaders = serviceLoader.createAll();
+			ConfigurationLoader internalLoader = null;
+			for (ConfigurationLoader currentLoader : loaders) {
+				if (currentLoader.getClass().equals(PropertiesConfigurationLoader.class)) {
+					internalLoader = currentLoader;
+				} else if (loader == null) {
+					loader = currentLoader;
+				} else {
+					InternalLogger.log(Level.ERROR, "Ignoring more than one configuration loader (" + currentLoader.getClass() + ").");
+				}
+				// No user loader found. Use the internal loader.
+				if (loader == null) {
+					loader = internalLoader;
+				}
+			}
 		}
 		return load(loader);
 	}
@@ -128,6 +120,9 @@ public final class Configuration {
 	 * @return Loaded properties
 	 */
 	private static Properties load(final ConfigurationLoader loader) {
+		if (loader == null) {
+			return new Properties();
+		}
 		try {
 			Properties currentProps = loader.load();
 			if (currentProps != null) {
