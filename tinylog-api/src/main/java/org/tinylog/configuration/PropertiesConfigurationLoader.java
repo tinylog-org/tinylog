@@ -45,7 +45,6 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 		"tinylog-test.properties",
 		"tinylog.properties"
 	};
-	
 
 	private static final String CONFIGURATION_PROPERTY = Configuration.PROPERTIES_PREFIX + "configuration";
 	private static final Pattern URL_DETECTION_PATTERN = Pattern.compile("^[a-zA-Z]{2,}:/.*");
@@ -98,9 +97,6 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 				}
 			}
 		}
-
-		Configuration.mergeSystemProperties(properties);
-		Configuration.resolveProperties(properties, EnvironmentVariableResolver.INSTANCE, SystemPropertyResolver.INSTANCE);
 
 		return properties;
 	}

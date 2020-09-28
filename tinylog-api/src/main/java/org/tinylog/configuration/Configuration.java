@@ -108,7 +108,11 @@ public final class Configuration {
 				}
 			}
 		}
-		return load(loader);
+		
+		Properties currentProps = load(loader);
+		mergeSystemProperties(currentProps);
+		resolveProperties(currentProps, EnvironmentVariableResolver.INSTANCE, SystemPropertyResolver.INSTANCE);
+		return currentProps;
 	}
 	
 	/**
