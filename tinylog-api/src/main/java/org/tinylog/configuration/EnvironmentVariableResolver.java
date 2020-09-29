@@ -16,9 +16,12 @@ package org.tinylog.configuration;
 /**
  * Resolver for environment variables.
  */
-final class EnvironmentVariableResolver implements Resolver {
+public final class EnvironmentVariableResolver implements Resolver {
 
-	static final EnvironmentVariableResolver INSTANCE = new EnvironmentVariableResolver();
+	/**
+	 * Instance of the environment variable resolver.
+	 */
+	public static final EnvironmentVariableResolver INSTANCE = new EnvironmentVariableResolver();
 	
 	/** */
 	private EnvironmentVariableResolver() {

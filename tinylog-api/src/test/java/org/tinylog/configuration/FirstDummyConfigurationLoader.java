@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Martin Winandy
+ * Copyright 2016 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,33 +13,23 @@
 
 package org.tinylog.configuration;
 
-/**
- * Resolver for system properties.
- */
-public final class SystemPropertyResolver implements Resolver {
+import java.util.Properties;
 
-	/**
-	 * Instance of the system property resolver.
-	 */
-	public static final SystemPropertyResolver INSTANCE = new SystemPropertyResolver();
+/**
+ * Dummy configuration loader class for testing. We need this as separate class for the service loader to load
+ * it by its acronym name.
+ */
+public final class FirstDummyConfigurationLoader implements ConfigurationLoader {
 	
 	/** */
-	private SystemPropertyResolver() {
+	public FirstDummyConfigurationLoader() {
+		
 	}
-
+	
 	@Override
-	public String getName() {
-		return "system properties";
+	public Properties load() throws Exception {
+		Properties props = new Properties();
+		props.put("DummyConfigurationLoader", "123");
+		return props;
 	}
-
-	@Override
-	public char getPrefix() {
-		return '#';
-	}
-
-	@Override
-	public String resolve(final String name) {
-		return System.getProperty(name);
-	}
-
 }

@@ -804,6 +804,7 @@ public final class TinylogLoggingProviderTest {
 		 */
 		@BeforeClass
 		public static void configure() {
+			Whitebox.setInternalState(Configuration.class, "frozen", false);
 			Configuration.replace(doubletonMap("writer", EvilWriter.class.getName(), "autoshutdown", "false"));
 		}
 

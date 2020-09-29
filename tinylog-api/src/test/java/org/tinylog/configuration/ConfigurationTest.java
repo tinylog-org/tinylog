@@ -14,6 +14,7 @@
 package org.tinylog.configuration;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -26,8 +27,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +44,7 @@ import static org.tinylog.util.Maps.doubletonMap;
 /**
  * Tests for {@link Configuration}.
  */
+@RunWith(PowerMockRunner.class)
 public final class ConfigurationTest {
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";
@@ -637,6 +644,168 @@ public final class ConfigurationTest {
 	}
 	
 	/**
+	 * Verifies that a user defined configuration loader can be loaded.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkUsingOtherConfigurationLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
+	 * Verifies that a configuration loader can be selected by a system property.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkSelectingConfigurationLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName());
+		
+		System.setProperty("tinylog.configurationloader", PropertiesConfigurationLoader.class.getName());
+		System.setProperty("tinylog.StandardConfigurationLoader", "456");
+		loadProperties(null);
+		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
+		
+		System.setProperty("tinylog.configurationloader", FirstDummyConfigurationLoader.class.getName());
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		System.setProperty("tinylog.configurationloader", "properties");
+		System.setProperty("tinylog.StandardConfigurationLoader", "456");
+		loadProperties(null);
+		assertThat(Configuration.get("StandardConfigurationLoader")).isEqualTo("456");
+
+		System.setProperty("tinylog.configurationloader", "first dummy");
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}		
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorTwoLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, FirstDummyConfigurationLoader.class.getName(), 
+				SecondDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
+		assertThat(systemStream.consumeErrorOutput()).contains("ERROR")
+			.containsOnlyOnce("Ignoring more than one configuration loader");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}		
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorNullLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, ErrorDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		Properties props = Whitebox.getInternalState(Configuration.class, Properties.class);
+		assertThat(props).isEmpty();
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
+	 * Verifies that a configuration loader handles error cases.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationLoaderErrorExceptionLoader() throws Exception {
+		FileSystem.createServiceFile(ConfigurationLoader.class, ExceptionDummyConfigurationLoader.class.getName());
+		
+		loadProperties(null);
+		assertThat(systemStream.consumeErrorOutput()).contains("ERROR").containsOnlyOnce("Dummy error");
+		
+		System.clearProperty("tinylog.configurationloader");
+		FileSystem.deleteServiceFile(ConfigurationLoader.class);
+	}	
+	
+	/**
+	 * Verifies that the property resolve methods work as expected.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkConfigurationProperties() throws Exception {
+		Properties properties = new Properties();
+		
+		System.setProperty("tinylog.test1", "value1");
+		Configuration.mergeSystemProperties(properties);
+		assertThat(properties.get("test1")).isEqualTo("value1");
+		assertThat(properties.get("tinylog.test1")).isNull();
+		assertThat(properties.size()).isEqualTo(1);
+		
+		properties.clear();
+		properties.put("test2", "${PATH}");
+		Configuration.resolveProperties(properties, EnvironmentVariableResolver.INSTANCE);
+		assertThat(properties.get("test2")).isEqualTo(System.getenv("PATH"));
+		
+		properties.clear();
+		Configuration.resolveProperties(properties, (Resolver[]) null);
+		assertThat(properties.size()).isEqualTo(0);
+
+		properties.clear();
+		Configuration.resolveProperties(properties);
+		assertThat(properties.size()).isEqualTo(0);
+	}	
+
+	/**
+	 * Verifies that the Proguard hack works for the configuration loading.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	@PrepareForTest({Configuration.class, RuntimeProvider.class})	
+	public void checkProguardHack() throws Exception {
+		PowerMockito.mockStatic(RuntimeProvider.class);
+		PowerMockito.spy(Configuration.class);
+		PowerMockito.when(RuntimeProvider.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+		PowerMockito.when(RuntimeProvider.getProcessId()).thenReturn(Long.MIN_VALUE);
+		Whitebox.invokeMethod(Configuration.class, "load");
+		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);
+	}
+	
+	/**
+	 * Verifies that property loading with a null loader works as expected.
+	 *
+	 * @throws Exception
+	 *             Failed creating the loader
+	 */
+	@Test
+	public void checkNullLoader() throws Exception {
+		Properties props = Whitebox.invokeMethod(Configuration.class, "load", (ConfigurationLoader) null);
+		assertThat(props).isEmpty();
+	}
+	
+	/**
 	 * Triggers (re-)loading properties.
 	 *
 	 * @param path
@@ -651,6 +820,41 @@ public final class ConfigurationTest {
 
 		Properties properties = Whitebox.invokeMethod(Configuration.class, "load");
 		Whitebox.setInternalState(Configuration.class, Properties.class, properties);
+	}	
+	
+	/**
+	 * Error configuration loader class for testing.
+	 */
+	public static final class ExceptionDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			throw new IOException("Dummy error");
+		}
+	}
+	
+	/**
+	 * Error configuration loader class for testing.
+	 */
+	public static final class ErrorDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			return null;
+		}
+	}
+	
+	/**
+	 * Dummy configuration loader class for testing.
+	 */
+	public static final class SecondDummyConfigurationLoader implements ConfigurationLoader {
+		
+		@Override
+		public Properties load() throws Exception {
+			Properties props = new Properties();
+			props.put("DummyConfigurationLoader", "456");
+			return props;
+		}
 	}
 
 }
