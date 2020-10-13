@@ -81,7 +81,7 @@
 		<java16.version>1.1</java16.version>
 		<jboss-logging.version>3.4.1.Final</jboss-logging.version>
 		<jmh.version>1.23</jmh.version>
-		<junit.version>4.13</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<kotlin.version>1.3.71</kotlin.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.9.3</mockk.version>
