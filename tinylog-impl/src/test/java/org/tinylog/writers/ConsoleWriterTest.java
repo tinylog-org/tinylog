@@ -13,6 +13,7 @@
 
 package org.tinylog.writers;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -177,5 +178,65 @@ public final class ConsoleWriterTest {
 		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("console", emptyMap());
 		assertThat(writer).isInstanceOf(ConsoleWriter.class);
 	}
+	
+	/**
+	 * Verifies that log entries will be written to the correct output stream, if property "stream" is set with level.
+	 */
+	@Test
+	public void errorOutputStreamWithLevelInfo() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "err@INFO", "format", "{message}"));
 
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.INFO).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
+	
+	/**
+	 * Verifies that log entries will be written to the correct output stream, if property "stream" is set with level.
+	 */
+	@Test
+	public void errorOutputStreamWithLevelError() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "err@ERROR", "format", "{message}"));
+
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.WARN).message("Hello World!").create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}	
+	
+	/**
+	 * Verifies the property "stream" with level raises an error log if wrongly configured.
+	 */
+	@Test
+	public void errorOutputStreamWithLevelMisconfiguration() {
+		ConsoleWriter writer = new ConsoleWriter(doubletonMap("stream", "dummy@INFO", "format", "{message}"));
+		assertThat(systemStream.consumeErrorOutput()).contains("Stream with level must be \"err\", \"");
+		
+		writer.write(LogEntryBuilder.empty().level(Level.INFO).message("Hello World!").create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
+	
+	/**
+	 * Verifies that an empty logger works correctly.
+	 */
+	@Test
+	public void errorOutputStreamForEmptyLogger() {
+		ConsoleWriter writer = new ConsoleWriter();
+		writer.flush(); // Does nothing but gets coverage for flush
+
+		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").date(LocalDate.now()).create());
+		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
+		
+		writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("Hello World!").date(LocalDate.now()).create());
+		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
+	}
 }

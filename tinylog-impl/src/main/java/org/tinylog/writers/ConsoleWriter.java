@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.tinylog.Level;
+import org.tinylog.core.ConfigurationParser;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.provider.InternalLogger;
@@ -46,16 +47,32 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 	public ConsoleWriter(final Map<String, String> properties) {
 		super(properties);
 		
+		// Set the default level for stderr logging
+		Level levelStream = Level.WARN;
+		
+		// Check stream property
 		String stream = properties.get("stream");
+		if (stream != null) {
+			// Check whether we have the err@LEVEL syntax
+			String[] streams = stream.split("@", 2);
+			if (streams.length == 2) {
+				levelStream = ConfigurationParser.parse(streams[1], levelStream);
+				if (!streams[0].equals("err")) {
+					InternalLogger.log(Level.ERROR, "Stream with level must be \"err\", \"" + streams[0] + "\" is an invalid name");
+				}
+				stream = null;
+			}
+		}
+		
 		if (stream == null) {
-			errorLevel = Level.WARN;
+			errorLevel = levelStream;
 		} else if ("err".equalsIgnoreCase(stream)) {
 			errorLevel = Level.TRACE;
 		} else if ("out".equalsIgnoreCase(stream)) {
 			errorLevel = Level.OFF;
 		} else {
 			InternalLogger.log(Level.ERROR, "Stream must be \"out\" or \"err\", \"" + stream + "\" is an invalid stream name");
-			errorLevel = Level.WARN;
+			errorLevel = levelStream;
 		}
 	}
 
