@@ -142,32 +142,32 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.16.1</version>
+                <version>3.18.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.7.0-RC1</version>
+                <version>5.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.7.0-RC1</version>
+                <version>5.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.7.0-RC1</version>
+                <version>5.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>3.5.5</version>
+                <version>3.6.0</version>
             </dependency>
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
@@ -216,7 +216,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.5</version>
+                    <version>0.8.6</version>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>
@@ -261,7 +261,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.35</version>
+                            <version>8.36.2</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -341,7 +341,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -361,14 +361,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.0.4</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.github.spotbugs</groupId>
-                            <artifactId>spotbugs</artifactId>
-                            <version>4.1.2</version>
-                        </dependency>
-                    </dependencies>
+                    <version>4.1.4</version>
                     <executions>
                         <execution>
                             <id>verify</id>
