@@ -1,7 +1,7 @@
 <FindBugsFilter>
 	<Match>
 		<!-- Generated Sources -->
-		<Package name="~.*\.generated.*" />
+		<Package name="~.*\.(jmh_)?generated" />
 	</Match>
 	<Match>
 		<!-- Loggers and Thread Context -->

@@ -20,6 +20,8 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,11 +73,10 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.TRACE, false);
 
-		assertThat(writers).hasSize(2).allSatisfy(element ->
-			assertThat(element).hasSize(5).allSatisfy(collection ->
-				assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isNotNull())
-			)
-		);
+		assertThat(writers).hasDimensions(2, 5);
+		assertThat(unpack(writers)).allSatisfy(collection -> {
+			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isNotNull());
+		});
 	}
 
 	/**
@@ -88,9 +89,8 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.OFF, false);
 
-		assertThat(writers).hasSize(2).allSatisfy(element ->
-			assertThat(element).hasSize(5).allSatisfy(collection -> assertThat(collection).isEmpty())
-		);
+		assertThat(writers).hasDimensions(2, 5);
+		assertThat(unpack(writers)).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
 	/**
@@ -104,10 +104,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(singletonList("SYSTEM"), Level.TRACE, false);
 
-		assertThat(writers)
-			.hasSize(3)
-			.allSatisfy(element -> assertThat(element).hasSize(5));
-
+		assertThat(writers).hasDimensions(3, 5);
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
 		assertThat(writers[1]).allSatisfy(collection ->
 			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class))
@@ -126,7 +123,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.TRACE, false);
 
-		assertThat(writers).hasSize(2);
+		assertThat(writers).hasDimensions(2, 5);
 		assertThat(writers[0]).allSatisfy(collection ->
 			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class))
 		);
@@ -145,10 +142,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(tags, Level.TRACE, false);
 
-		assertThat(writers)
-			.hasSize(5)
-			.allSatisfy(element -> assertThat(element).hasSize(5));
-
+		assertThat(writers).hasDimensions(5, 5);
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
 		assertThat(writers[1]).allSatisfy(collection -> {
 			assertThat(collection).hasSize(1).allSatisfy(writer -> assertThat(writer).isInstanceOf(ConsoleWriter.class));
@@ -175,10 +169,8 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(tags, Level.TRACE, false);
 
-		assertThat(writers)
-			.hasSize(5)
-			.allSatisfy(element -> assertThat(element).hasSize(5));
-		
+		assertThat(writers).hasDimensions(5, 5);
+
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
 		
 		assertThat(writers[1][Level.TRACE.ordinal()]).isEmpty();
@@ -220,10 +212,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(singletonList("SYSTEM"), Level.TRACE, false);
 
-		assertThat(writers)
-			.hasSize(3)
-			.allSatisfy(element -> assertThat(element).hasSize(5));
-
+		assertThat(writers).hasDimensions(3, 5);
 		assertThat(writers[0]).allSatisfy(collection -> assertThat(collection).isEmpty());
 		assertThat(writers[1]).allSatisfy(collection ->
 			assertThat(collection)
@@ -246,7 +235,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.TRACE, false);
 
-		assertThat(writers).hasSize(2).allSatisfy(element -> {
+		assertThat(Arrays.asList(writers)).hasSize(2).allSatisfy(element -> {
 			assertThat(element).hasSize(5);
 			assertThat(element[Level.TRACE.ordinal()]).isEmpty();
 			assertThat(element[Level.DEBUG.ordinal()]).isEmpty();
@@ -272,7 +261,7 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.INFO, false);
 
-		assertThat(writers).hasSize(2).allSatisfy(element -> {
+		assertThat(Arrays.asList(writers)).hasSize(2).allSatisfy(element -> {
 			assertThat(element).hasSize(5);
 			assertThat(element[Level.TRACE.ordinal()]).isEmpty();
 			assertThat(element[Level.DEBUG.ordinal()]).isEmpty();
@@ -299,9 +288,8 @@ public final class TinylogLoggingConfigurationTest {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
 		Collection<Writer>[][] writers = config.createWriters(emptyList(), Level.INFO, false);
 
-		assertThat(writers).hasSize(2).allSatisfy(element ->
-			assertThat(element).hasSize(5).allSatisfy(collection -> assertThat(collection).isEmpty())
-		);
+		assertThat(writers).hasDimensions(2, 5);
+		assertThat(unpack(writers)).allSatisfy(collection -> assertThat(collection).isEmpty());
 	}
 
 	/**
@@ -403,7 +391,7 @@ public final class TinylogLoggingConfigurationTest {
 		logEntries[1][Level.ERROR.ordinal()] = Collections.singleton(LogEntryValue.METHOD);
 		logEntries[2][Level.ERROR.ordinal()] = Collections.singleton(LogEntryValue.FILE);
 		logEntries[3][Level.ERROR.ordinal()] = Collections.singleton(LogEntryValue.LINE);
-		logEntries[4][Level.ERROR.ordinal()] = Arrays.asList(new LogEntryValue[] {LogEntryValue.FILE, LogEntryValue.LINE});
+		logEntries[4][Level.ERROR.ordinal()] = Arrays.asList(LogEntryValue.FILE, LogEntryValue.LINE);
 		
 		BitSet requirements = config.calculateFullStackTraceRequirements(logEntries);
 		assertThat(requirements.get(0)).isFalse();
@@ -444,23 +432,36 @@ public final class TinylogLoggingConfigurationTest {
 		contextProvider.put("id", "100");
 		Collection<LogEntryValue>[] requiredLogEntryValues = new Collection[Level.values().length - 1];
 
-		requiredLogEntryValues[Level.INFO.ordinal()] = Arrays.asList(new LogEntryValue[] {LogEntryValue.TAG, LogEntryValue.LEVEL});
+		requiredLogEntryValues[Level.INFO.ordinal()] = Arrays.asList(LogEntryValue.TAG, LogEntryValue.LEVEL);
 		LogEntry entry1 = TinylogLoggingConfiguration.createLogEntry(null, "testtag", Level.INFO, null, null, null,
 				null, requiredLogEntryValues, null);
 		assertThat(entry1.getTag()).isEqualTo("testtag");
 		assertThat(entry1.getLevel()).isEqualTo(Level.INFO);
 		
-		requiredLogEntryValues[Level.INFO.ordinal()] = Arrays.asList(new LogEntryValue[] {LogEntryValue.CONTEXT});
+		requiredLogEntryValues[Level.INFO.ordinal()] = singletonList(LogEntryValue.CONTEXT);
 		LogEntry entry2 = TinylogLoggingConfiguration.createLogEntry(null, null, Level.INFO, null, null, null,
 				null, requiredLogEntryValues, contextProvider);
 		assertThat(entry2.getContext()).containsAllEntriesOf(Collections.singletonMap("id", "100"));
 		
-		requiredLogEntryValues[Level.INFO.ordinal()] = Arrays.asList(new LogEntryValue[] {LogEntryValue.EXCEPTION});
+		requiredLogEntryValues[Level.INFO.ordinal()] = singletonList(LogEntryValue.EXCEPTION);
 		LogEntry entry3 = TinylogLoggingConfiguration.createLogEntry(null, null, Level.INFO, new Exception("test"), null, null,
 				null, requiredLogEntryValues, null);
 		assertThat(entry3.getException().getMessage()).isEqualTo("test");
-	}	
-	
+	}
+
+	/**
+	 * Converts a 2D array in a collection.
+	 *
+	 * @param array
+	 *            Array with two dimensions
+	 * @param <T>
+	 *            Type of array elements
+	 * @return Content of the passed array
+	 */
+	private static <T> Collection<T> unpack(final T[][] array) {
+		return Stream.of(array).flatMap(Stream::of).collect(Collectors.toList());
+	}
+
 	/**
 	 * Dummy writer class for log entry testing.
 	 */
