@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import java.util.Arrays;
 
@@ -27,33 +27,33 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class BundleLoggingProviderTest {
+class BundleLoggingBackendTest {
 
 	/**
-	 * Verifies that all passed child logging providers are stored.
+	 * Verifies that all passed child logging backends are stored.
 	 */
 	@Test
 	public void getChildProviders() {
-		LoggingProvider first = mock(LoggingProvider.class);
-		LoggingProvider second = mock(LoggingProvider.class);
-		BundleLoggingProvider parent = new BundleLoggingProvider(Arrays.asList(first, second));
+		LoggingBackend first = mock(LoggingBackend.class);
+		LoggingBackend second = mock(LoggingBackend.class);
+		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
 		assertThat(parent.getProviders()).containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
-	 * Verifies that log entries are passed to all assigned child providers.
+	 * Verifies that log entries are passed to all assigned child backends.
 	 */
 	@Test
 	public void provideLogsToChildren() {
-		LoggingProvider first = mock(LoggingProvider.class);
-		LoggingProvider second = mock(LoggingProvider.class);
-		BundleLoggingProvider provider = new BundleLoggingProvider(Arrays.asList(first, second));
+		LoggingBackend first = mock(LoggingBackend.class);
+		LoggingBackend second = mock(LoggingBackend.class);
+		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
 
 		StackTraceLocation location = mock(StackTraceLocation.class);
 		Throwable throwable = new Throwable();
 		Object[] arguments = {"world"};
 		MessageFormatter formatter = mock(MessageFormatter.class);
-		provider.log(location, "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
+		backend.log(location, "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
 
 		verify(first).log(
 			not(same(location)),

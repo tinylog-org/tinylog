@@ -17,12 +17,12 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.backend.BundleLoggingBackend;
+import org.tinylog.core.backend.InternalLoggingBackend;
+import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.LoggingBackendBuilder;
+import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.providers.BundleLoggingProvider;
-import org.tinylog.core.providers.InternalLoggingProvider;
-import org.tinylog.core.providers.LoggingProvider;
-import org.tinylog.core.providers.LoggingProviderBuilder;
-import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.RegisterService;
 
@@ -253,134 +253,134 @@ class FrameworkTest {
 	}
 
 	/**
-	 * Tests for {@link Framework#getLoggingProvider()}.
+	 * Tests for {@link Framework#getLoggingBackend()}.
 	 */
 	@Nested
-	class LoggingProviderGetter {
+	class LoggingBackendGetter {
 
 		/**
-		 * Verifies that the internal logging provider is loaded if none other is available.
+		 * Verifies that the internal logging backend is loaded if none other is available.
 		 */
 		@Test
-		void loadInternalLoggingProvider() throws Exception {
+		void loadInternalLoggingBackend() throws Exception {
 			Framework framework = new Framework(false, false);
 
 			String output = tapSystemErr(
-				() -> assertThat(framework.getLoggingProvider()).isInstanceOf(InternalLoggingProvider.class)
+				() -> assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class)
 			);
 
 			assertThat(output).contains("TINYLOG WARN", "tinylog-impl");
 		}
 
 		/**
-		 * Verifies that a logging provider is loaded if it is the only available.
+		 * Verifies that a logging backend is loaded if it is the only available.
 		 */
-		@RegisterService(service = LoggingProviderBuilder.class, implementations = TestOneLoggingProviderBuilder.class)
+		@RegisterService(service = LoggingBackendBuilder.class, implementations = TestOneLoggingBackendBuilder.class)
 		@Test
 		void loadSingleAvailableProvider() {
 			Framework framework = new Framework(false, false);
-			assertThat(framework.getLoggingProvider()).isSameAs(TestOneLoggingProviderBuilder.provider);
+			assertThat(framework.getLoggingBackend()).isSameAs(TestOneLoggingBackendBuilder.backend);
 		}
 
 		/**
-		 * Verifies that all available logging providers are loaded and bundled in a {@link BundleLoggingProvider}.
+		 * Verifies that all available logging backends are loaded and bundled in a {@link BundleLoggingBackend}.
 		 */
 		@RegisterService(
-			service = LoggingProviderBuilder.class,
-			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+			service = LoggingBackendBuilder.class,
+			implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
 		)
 		@Test
 		void loadAllAvailableProviders() {
 			Framework framework = new Framework(false, false);
 
-			LoggingProvider provider = framework.getLoggingProvider();
-			assertThat(provider).isInstanceOf(BundleLoggingProvider.class);
+			LoggingBackend backend = framework.getLoggingBackend();
+			assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-			Collection<LoggingProvider> children = ((BundleLoggingProvider) provider).getProviders();
+			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getProviders();
 			assertThat(children).containsExactlyInAnyOrder(
-				TestOneLoggingProviderBuilder.provider, TestTwoLoggingProviderBuilder.provider
+				TestOneLoggingBackendBuilder.backend, TestTwoLoggingBackendBuilder.backend
 			);
 		}
 
 		/**
-		 * Verifies that one logging provider can be defined by name if multiple are available.
+		 * Verifies that one logging backend can be defined by name if multiple are available.
 		 */
 		@RegisterService(
-			service = LoggingProviderBuilder.class,
-			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+			service = LoggingBackendBuilder.class,
+			implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
 		)
 		@Test
 		void loadSingleProviderByName() {
 			Framework framework = new Framework(false, false);
 			framework.getConfiguration().set("backend", "test2");
-			assertThat(framework.getLoggingProvider()).isSameAs(TestTwoLoggingProviderBuilder.provider);
+			assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
 		}
 
 		/**
-		 * Verifies that several logging providers can be defined by name if multiple are available.
+		 * Verifies that several logging backends can be defined by name if multiple are available.
 		 */
 		@RegisterService(
-			service = LoggingProviderBuilder.class,
-			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+			service = LoggingBackendBuilder.class,
+			implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
 		)
 		@Test
 		void loadMultipleProvidersByName() {
 			Framework framework = new Framework(true, false);
 			framework.getConfiguration().set("backend", "test1, nop");
 
-			LoggingProvider provider = framework.getLoggingProvider();
-			assertThat(provider).isInstanceOf(BundleLoggingProvider.class);
+			LoggingBackend backend = framework.getLoggingBackend();
+			assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-			Collection<LoggingProvider> children = ((BundleLoggingProvider) provider).getProviders();
+			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getProviders();
 			assertThat(children).containsExactlyInAnyOrder(
-				TestOneLoggingProviderBuilder.provider, new NopLoggingProviderBuilder().create(null)
+				TestOneLoggingBackendBuilder.backend, new NopLoggingBackendBuilder().create(null)
 			);
 		}
 
 		/**
-		 * Verifies that the available logging provider will be created, if the configured logging provider does not
+		 * Verifies that the available logging backend will be created, if the configured logging backend does not
 		 * exist.
 		 */
-		@RegisterService(service = LoggingProviderBuilder.class, implementations = TestOneLoggingProviderBuilder.class)
+		@RegisterService(service = LoggingBackendBuilder.class, implementations = TestOneLoggingBackendBuilder.class)
 		@Test
 		void fallbackForEntireInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
 				framework.getConfiguration().set("backend", "test0");
-				LoggingProvider provider = framework.getLoggingProvider();
-				assertThat(provider).isSameAs(TestOneLoggingProviderBuilder.provider);
+				LoggingBackend backend = framework.getLoggingBackend();
+				assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
 			});
 
 			assertThat(output).contains("TINYLOG ERROR", "test0");
 		}
 
 		/**
-		 * Verifies that all other configured logging providers will be created, if one of them does not exist.
+		 * Verifies that all other configured logging backends will be created, if one of them does not exist.
 		 */
 		@RegisterService(
-			service = LoggingProviderBuilder.class,
-			implementations = {TestOneLoggingProviderBuilder.class, TestTwoLoggingProviderBuilder.class}
+			service = LoggingBackendBuilder.class,
+			implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
 		)
 		@Test
 		void fallbackForPartialInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
 				framework.getConfiguration().set("backend", "test2, test3");
-				LoggingProvider provider = framework.getLoggingProvider();
-				assertThat(provider).isSameAs(TestTwoLoggingProviderBuilder.provider);
+				LoggingBackend backend = framework.getLoggingBackend();
+				assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
 			});
 
 			assertThat(output).contains("TINYLOG ERROR", "test3");
 		}
 
 		/**
-		 * Verifies that the configuration becomes frozen after providing a logging provider.
+		 * Verifies that the configuration becomes frozen after providing a logging backend.
 		 */
 		@Test
-		void freezeConfigurationAfterProvidingLoggingProvider() {
+		void freezeConfigurationAfterProvidingLoggingBackend() {
 			Framework framework = new Framework(false, false);
 			assertThat(framework.getConfiguration().isFrozen()).isFalse();
-			assertThat(framework.getLoggingProvider()).isNotNull();
+			assertThat(framework.getLoggingBackend()).isNotNull();
 			assertThat(framework.getConfiguration().isFrozen()).isTrue();
 		}
 
@@ -406,11 +406,11 @@ class FrameworkTest {
 	}
 
 	/**
-	 * Additional logging provider builder for JUnit tests.
+	 * Additional logging backend builder for JUnit tests.
 	 */
-	public static final class TestOneLoggingProviderBuilder implements LoggingProviderBuilder {
+	public static final class TestOneLoggingBackendBuilder implements LoggingBackendBuilder {
 
-		private static final LoggingProvider provider = new InternalLoggingProvider();
+		private static final LoggingBackend backend = new InternalLoggingBackend();
 
 		@Override
 		public String getName() {
@@ -418,18 +418,18 @@ class FrameworkTest {
 		}
 
 		@Override
-		public LoggingProvider create(Framework framework) {
-			return provider;
+		public LoggingBackend create(Framework framework) {
+			return backend;
 		}
 
 	}
 
 	/**
-	 * Additional logging provider builder for JUnit tests.
+	 * Additional logging backend builder for JUnit tests.
 	 */
-	public static final class TestTwoLoggingProviderBuilder implements LoggingProviderBuilder {
+	public static final class TestTwoLoggingBackendBuilder implements LoggingBackendBuilder {
 
-		private static final LoggingProvider provider = new InternalLoggingProvider();
+		private static final LoggingBackend backend = new InternalLoggingBackend();
 
 		@Override
 		public String getName() {
@@ -437,8 +437,8 @@ class FrameworkTest {
 		}
 
 		@Override
-		public LoggingProvider create(Framework framework) {
-			return provider;
+		public LoggingBackend create(Framework framework) {
+			return backend;
 		}
 
 	}

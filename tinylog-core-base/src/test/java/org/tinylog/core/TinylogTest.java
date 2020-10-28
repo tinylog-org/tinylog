@@ -14,7 +14,7 @@
 package org.tinylog.core;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.providers.LoggingProvider;
+import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.runtime.RuntimeFlavor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,11 +41,11 @@ class TinylogTest {
 	}
 
 	/**
-	 * Verifies that a {@link LoggingProvider} is provided.
+	 * Verifies that a {@link LoggingBackend} is provided.
 	 */
 	@Test
-	void loggingProvider() {
-		assertThat(Tinylog.getLoggingProvider()).isNotNull();
+	void loggingBackend() {
+		assertThat(Tinylog.getLoggingBackend()).isNotNull();
 	}
 
 	/**

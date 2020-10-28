@@ -27,8 +27,8 @@ class RuntimeProviderTest {
 	@Test
 	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	void androidRuntime() {
-		RuntimeProvider provider = new RuntimeProvider();
-		assertThat(provider.getRuntime()).isInstanceOf(AndroidRuntime.class);
+		RuntimeProvider backend = new RuntimeProvider();
+		assertThat(backend.getRuntime()).isInstanceOf(AndroidRuntime.class);
 	}
 
 	/**
@@ -37,8 +37,8 @@ class RuntimeProviderTest {
 	@Test
 	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	void legacyJavaRuntime() {
-		RuntimeProvider provider = new RuntimeProvider();
-		assertThat(provider.getRuntime()).isInstanceOf(JavaRuntime.class);
+		RuntimeProvider backend = new RuntimeProvider();
+		assertThat(backend.getRuntime()).isInstanceOf(JavaRuntime.class);
 	}
 
 }

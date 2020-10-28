@@ -11,19 +11,19 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link LoggingProvider LoggingProviders}.
+ * Builder for creating {@link LoggingBackend LoggingBackends}.
  *
  * <p>
  *     This interface must be implemented by all logging backends and provided as
  *     {@link java.util.ServiceLoader service} in {@code META-INF/services}.
  * </p>
  */
-public interface LoggingProviderBuilder {
+public interface LoggingBackendBuilder {
 
 	/**
 	 * Gets the name of the logging backend, which can be used to address the logging backend in a configuration.
@@ -44,6 +44,6 @@ public interface LoggingProviderBuilder {
 	 * @param framework Configuration and hooks
 	 * @return New instance of the logging backend
 	 */
-	LoggingProvider create(Framework framework);
+	LoggingBackend create(Framework framework);
 
 }

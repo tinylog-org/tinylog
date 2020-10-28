@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,14 +21,14 @@ import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
- * Internal logging provider that prints internal tinylog errors and warnings to {@link System#err}.
+ * Internal logging backend that prints internal tinylog errors and warnings to {@link System#err}.
  */
-public class InternalLoggingProvider implements LoggingProvider {
+public class InternalLoggingBackend implements LoggingBackend {
 
 	private static final String TAG = "tinylog";
 
 	/** */
-	public InternalLoggingProvider() {
+	public InternalLoggingBackend() {
 	}
 
 	@Override

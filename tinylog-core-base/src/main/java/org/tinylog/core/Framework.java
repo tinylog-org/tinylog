@@ -21,18 +21,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.tinylog.core.backend.BundleLoggingBackend;
+import org.tinylog.core.backend.InternalLoggingBackend;
+import org.tinylog.core.backend.InternalLoggingBackendBuilder;
+import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.LoggingBackendBuilder;
+import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.providers.BundleLoggingProvider;
-import org.tinylog.core.providers.InternalLoggingProvider;
-import org.tinylog.core.providers.InternalLoggingProviderBuilder;
-import org.tinylog.core.providers.LoggingProvider;
-import org.tinylog.core.providers.LoggingProviderBuilder;
-import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
- * Storage for {@link Configuration}, {@link Hook Hooks}, and {@link LoggingProvider}.
+ * Storage for {@link Configuration}, {@link Hook Hooks}, and {@link LoggingBackend}.
  */
 public class Framework {
 
@@ -43,7 +43,7 @@ public class Framework {
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
 
-	private LoggingProvider loggingProvider;
+	private LoggingBackend loggingBackend;
 	private boolean running;
 
 	/**
@@ -99,20 +99,20 @@ public class Framework {
 	}
 
 	/**
-	 * Gets the logging provider from the stored configuration.
+	 * Gets the logging backend from the stored configuration.
 	 *
-	 * @return The logging provider implementation
+	 * @return The logging backend implementation
 	 */
-	public LoggingProvider getLoggingProvider() {
-		if (loggingProvider == null) {
+	public LoggingBackend getLoggingBackend() {
+		if (loggingBackend == null) {
 			synchronized (mutex) {
-				if (loggingProvider == null) {
-					loadLoggingProvider();
+				if (loggingBackend == null) {
+					loadLoggingBackend();
 				}
 			}
 		}
 
-		return loggingProvider;
+		return loggingBackend;
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class Framework {
 					hook.startUp();
 				}
 
-				loadLoggingProvider();
+				loadLoggingBackend();
 			}
 		}
 	}
@@ -167,7 +167,7 @@ public class Framework {
 					hook.shutDown();
 				}
 
-				loggingProvider = null;
+				loggingBackend = null;
 			}
 		}
 	}
@@ -197,31 +197,31 @@ public class Framework {
 	}
 
 	/**
-	 * Freezes the stored configuration and creates a new logging provider, if none is assigned yet.
+	 * Freezes the stored configuration and creates a new logging backend, if none is assigned yet.
 	 */
-	private void loadLoggingProvider() {
+	private void loadLoggingBackend() {
 		configuration.freeze();
 		startUp();
 
-		if (loggingProvider == null) {
-			createLoggingProvider();
+		if (loggingBackend == null) {
+			createLoggingBackend();
 		}
 	}
 
 	/**
-	 * Creates a new {@link LoggingProvider}.
+	 * Creates a new {@link LoggingBackend}.
 	 */
-	private void createLoggingProvider() {
+	private void createLoggingBackend() {
 		List<String> names = configuration.getList("backend");
-		Map<String, LoggingProviderBuilder> builders = new HashMap<>();
-		List<LoggingProvider> providers = new ArrayList<>();
+		Map<String, LoggingBackendBuilder> builders = new HashMap<>();
+		List<LoggingBackend> backends = new ArrayList<>();
 
-		for (LoggingProviderBuilder builder : ServiceLoader.load(LoggingProviderBuilder.class, getClassLoader())) {
+		for (LoggingBackendBuilder builder : ServiceLoader.load(LoggingBackendBuilder.class, getClassLoader())) {
 			builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder);
 		}
 
 		for (String name : names) {
-			LoggingProviderBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
+			LoggingBackendBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
 			if (builder == null) {
 				logger.error(
 					null,
@@ -229,28 +229,28 @@ public class Framework {
 					name
 				);
 			} else {
-				providers.add(builder.create(this));
+				backends.add(builder.create(this));
 			}
 		}
 
-		if (providers.isEmpty()) {
-			for (Map.Entry<String, LoggingProviderBuilder> entry : builders.entrySet()) {
-				if (!(entry.getValue() instanceof NopLoggingProviderBuilder)
-						&& !(entry.getValue() instanceof InternalLoggingProviderBuilder)) {
-					providers.add(entry.getValue().create(this));
+		if (backends.isEmpty()) {
+			for (Map.Entry<String, LoggingBackendBuilder> entry : builders.entrySet()) {
+				if (!(entry.getValue() instanceof NopLoggingBackendBuilder)
+						&& !(entry.getValue() instanceof InternalLoggingBackendBuilder)) {
+					backends.add(entry.getValue().create(this));
 				}
 			}
 		}
 
-		if (providers.isEmpty()) {
-			loggingProvider = new InternalLoggingProvider();
+		if (backends.isEmpty()) {
+			loggingBackend = new InternalLoggingBackend();
 			logger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
 				+ "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
 				+ "entries, or disable logging explicitly by setting \"backend = nop\" in the configuration.");
-		} else if (providers.size() == 1) {
-			loggingProvider = providers.get(0);
+		} else if (backends.size() == 1) {
+			loggingBackend = backends.get(0);
 		} else {
-			loggingProvider = new BundleLoggingProvider(providers);
+			loggingBackend = new BundleLoggingBackend(backends);
 		}
 
 		logger.init(this);

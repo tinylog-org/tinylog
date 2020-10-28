@@ -18,9 +18,9 @@ import java.util.List;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -49,14 +49,14 @@ public final class InternalLogger {
 	public void init(Framework framework) {
 		RuntimeFlavor runtime = framework.getRuntime();
 		StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
-		LoggingProvider provider = framework.getLoggingProvider();
+		LoggingBackend backend = framework.getLoggingBackend();
 		MessageFormatter formatter = new EnhancedMessageFormatter(framework);
 
 		synchronized (mutex) {
-			state = new State(runtime, provider, formatter);
+			state = new State(runtime, backend, formatter);
 
 			for (LogEntry entry : entries) {
-				provider.log(location, TAG, entry.getLevel(), entry.getThrowable(), entry.getMessage(),
+				backend.log(location, TAG, entry.getLevel(), entry.getThrowable(), entry.getMessage(),
 					entry.getArguments(), formatter);
 			}
 
@@ -191,26 +191,26 @@ public final class InternalLogger {
 
 		if (state != null) {
 			StackTraceLocation location = state.runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			state.provider.log(location, TAG, level, throwable, message, arguments, state.formatter);
+			state.backend.log(location, TAG, level, throwable, message, arguments, state.formatter);
 		}
 	}
 
 	/**
-	 * Internal logger state with {@link RuntimeFlavor}, {@link LoggingProvider}, and {@link MessageFormatter}.
+	 * Internal logger state with {@link RuntimeFlavor}, {@link LoggingBackend}, and {@link MessageFormatter}.
 	 */
 	private static final class State {
 		private final RuntimeFlavor runtime;
-		private final LoggingProvider provider;
+		private final LoggingBackend backend;
 		private final MessageFormatter formatter;
 
 		/**
 		 * @param runtime Runtime flavor for extraction of stack trace location
-		 * @param provider Logging provider for output log entries
+		 * @param backend Logging backend for output log entries
 		 * @param formatter Message formatter for replacing placeholders by real values
 		 */
-		private State(RuntimeFlavor runtime, LoggingProvider provider, MessageFormatter formatter) {
+		private State(RuntimeFlavor runtime, LoggingBackend backend, MessageFormatter formatter) {
 			this.runtime = runtime;
-			this.provider = provider;
+			this.backend = backend;
 			this.formatter = formatter;
 		}
 	}

@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import java.util.ServiceLoader;
 
@@ -20,25 +20,25 @@ import org.tinylog.core.Framework;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InternalLoggingProviderBuilderTest {
+class InternalLoggingBackendBuilderTest {
 
 	/**
 	 * Verifies that the name is "internal".
 	 */
 	@Test
 	void name() {
-		InternalLoggingProviderBuilder builder = new InternalLoggingProviderBuilder();
+		InternalLoggingBackendBuilder builder = new InternalLoggingBackendBuilder();
 		assertThat(builder.getName()).isEqualTo("internal");
 	}
 
 	/**
-	 * Verifies that an instance of {@link InternalLoggingProvider} can be created.
+	 * Verifies that an instance of {@link InternalLoggingBackend} can be created.
 	 */
 	@Test
 	void creation() {
 		Framework framework = new Framework(false, false);
-		InternalLoggingProviderBuilder builder = new InternalLoggingProviderBuilder();
-		assertThat(builder.create(framework)).isInstanceOf(InternalLoggingProvider.class);
+		InternalLoggingBackendBuilder builder = new InternalLoggingBackendBuilder();
+		assertThat(builder.create(framework)).isInstanceOf(InternalLoggingBackend.class);
 	}
 
 	/**
@@ -46,8 +46,8 @@ class InternalLoggingProviderBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(LoggingProviderBuilder.class))
-			.anyMatch(builder -> builder instanceof InternalLoggingProviderBuilder);
+		assertThat(ServiceLoader.load(LoggingBackendBuilder.class))
+			.anyMatch(builder -> builder instanceof InternalLoggingBackendBuilder);
 	}
 
 }

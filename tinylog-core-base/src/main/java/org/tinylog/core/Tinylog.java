@@ -13,7 +13,7 @@
 
 package org.tinylog.core;
 
-import org.tinylog.core.providers.LoggingProvider;
+import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.runtime.RuntimeFlavor;
 
 /**
@@ -46,17 +46,17 @@ public final class Tinylog {
 	}
 
 	/**
-	 * Gets the logging provider implementation of the actual logging backend.
+	 * Gets the actual logging backend implementation.
 	 *
 	 * <p>
-	 *     This method should only be called by (third-party) logging APIs. Logging providers are not to be used for
+	 *     This method should only be called by (third-party) logging APIs. Logging backends are not to be used for
 	 *     logging in an application or library.
 	 * </p>
 	 *
-	 * @return The logging provider implementation of the actual logging backend
+	 * @return The actual logging backend implementation
 	 */
-	public static LoggingProvider getLoggingProvider() {
-		return framework.getLoggingProvider();
+	public static LoggingBackend getLoggingBackend() {
+		return framework.getLoggingBackend();
 	}
 
 	/**

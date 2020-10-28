@@ -11,29 +11,25 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
+import org.tinylog.core.format.message.MessageFormatter;
+import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
- * Builder for {@link NopLoggingProvider}.
+ * A no operation implementation of {@link LoggingBackend}. All issued log entries are silently ignored.
  */
-public class NopLoggingProviderBuilder implements LoggingProviderBuilder {
-
-	private static final NopLoggingProvider PROVIDER = new NopLoggingProvider();
+public class NopLoggingBackend implements LoggingBackend {
 
 	/** */
-	public NopLoggingProviderBuilder() {
+	public NopLoggingBackend() {
 	}
 
 	@Override
-	public String getName() {
-		return "nop";
-	}
-
-	@Override
-	public LoggingProvider create(Framework framework) {
-		return PROVIDER;
+	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
+			Object[] arguments, MessageFormatter formatter) {
+		// Ignore
 	}
 
 }

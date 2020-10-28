@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -23,7 +23,7 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InternalLoggingProviderTest {
+class InternalLoggingBackendTest {
 
 	/**
 	 * Verifies that a plain text message can be output at the severity levels warn and error.
@@ -33,7 +33,7 @@ class InternalLoggingProviderTest {
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
 	public void plainTextMessage(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -54,7 +54,7 @@ class InternalLoggingProviderTest {
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
 	public void formattedTextMessage(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -81,7 +81,7 @@ class InternalLoggingProviderTest {
 			new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
 		});
 
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -111,7 +111,7 @@ class InternalLoggingProviderTest {
 			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
 		});
 
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -135,7 +135,7 @@ class InternalLoggingProviderTest {
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
 	public void discardNonServeLogEntries(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -157,7 +157,7 @@ class InternalLoggingProviderTest {
 	@ParameterizedTest
 	@CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
 	public void discardNonTinylogLogEntries(String tag, Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingProvider().log(
+		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
 			null,
 			tag,
 			level,

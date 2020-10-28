@@ -17,8 +17,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,18 +34,18 @@ import static org.mockito.Mockito.verify;
 class InternalLoggerTest {
 
 	private Framework framework;
-	private LoggingProvider provider;
+	private LoggingBackend backend;
 
 	/**
 	 * Initialize the internal logger.
 	 */
 	@BeforeEach
 	void init() {
-		provider = mock(LoggingProvider.class);
+		backend = mock(LoggingBackend.class);
 		framework = new Framework(false, false) {
 			@Override
-			public LoggingProvider getLoggingProvider() {
-				return provider;
+			public LoggingBackend getLoggingBackend() {
+				return backend;
 			}
 		};
 	}
@@ -59,7 +59,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.trace(null, "Hello World!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(),
 			eq("Hello World!"), isNull(), any());
 	}
 
@@ -72,7 +72,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.trace(null, "Hello {}!", "Alice");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(), eq("Hello {}!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
 	}
 
@@ -87,7 +87,7 @@ class InternalLoggerTest {
 		Exception exception = new Exception();
 		logger.trace(exception, "Oops!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), same(exception),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), same(exception),
 			eq("Oops!"), isNull(), any());
 	}
 
@@ -100,7 +100,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.debug(null, "Hello World!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(),
 			eq("Hello World!"), isNull(), any());
 	}
 
@@ -113,7 +113,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.debug(null, "Hello {}!", "Alice");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(), eq("Hello {}!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
 	}
 
@@ -128,7 +128,7 @@ class InternalLoggerTest {
 		Exception exception = new Exception();
 		logger.debug(exception, "Oops!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), same(exception),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), same(exception),
 			eq("Oops!"), isNull(), any());
 	}
 
@@ -141,7 +141,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.info(null, "Hello World!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(),
 			eq("Hello World!"), isNull(), any());
 	}
 
@@ -154,7 +154,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.info(null, "Hello {}!", "Alice");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello {}!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
 	}
 
@@ -169,7 +169,7 @@ class InternalLoggerTest {
 		Exception exception = new Exception();
 		logger.info(exception, "Oops!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), same(exception),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), same(exception),
 			eq("Oops!"), isNull(), any());
 	}
 
@@ -182,7 +182,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.warn(null, "Hello World!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(),
 			eq("Hello World!"), isNull(), any());
 	}
 
@@ -195,7 +195,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.warn(null, "Hello {}!", "Alice");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(), eq("Hello {}!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
 	}
 
@@ -210,7 +210,7 @@ class InternalLoggerTest {
 		Exception exception = new Exception();
 		logger.warn(exception, "Oops!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), same(exception),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), same(exception),
 			eq("Oops!"), isNull(), any());
 	}
 
@@ -223,7 +223,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.error(null, "Hello World!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(),
 			eq("Hello World!"), isNull(), any());
 	}
 
@@ -236,7 +236,7 @@ class InternalLoggerTest {
 		logger.init(framework);
 		logger.error(null, "Hello {}!", "Alice");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(), eq("Hello {}!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
 	}
 
@@ -251,7 +251,7 @@ class InternalLoggerTest {
 		Exception exception = new Exception();
 		logger.error(exception, "Oops!");
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), same(exception),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), same(exception),
 			eq("Oops!"), isNull(), any());
 	}
 
@@ -264,7 +264,7 @@ class InternalLoggerTest {
 		logger.info(null, "Hello World!");
 		logger.init(framework);
 
-		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello World!"),
+		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello World!"),
 			isNull(), any());
 	}
 
@@ -273,7 +273,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void stackTraceLocation() {
-		provider = new LoggingProvider() {
+		backend = new LoggingBackend() {
 			@Override
 			public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 					Object[] arguments, MessageFormatter formatter) {

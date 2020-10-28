@@ -11,29 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
-
-import org.tinylog.core.Framework;
-
 /**
- * Builder for {@link InternalLoggingProvider}.
+ * Logging backend interfaces and basic implementations.
  */
-public class InternalLoggingProviderBuilder implements LoggingProviderBuilder {
-
-	private static final InternalLoggingProvider PROVIDER = new InternalLoggingProvider();
-
-	/** */
-	public InternalLoggingProviderBuilder() {
-	}
-
-	@Override
-	public String getName() {
-		return "internal";
-	}
-
-	@Override
-	public LoggingProvider create(Framework framework) {
-		return PROVIDER;
-	}
-
-}
+package org.tinylog.core.backend;

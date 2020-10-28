@@ -11,24 +11,29 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
-import org.junit.jupiter.api.Test;
-import org.tinylog.core.Level;
-import org.tinylog.core.runtime.StackTraceLocation;
+import org.tinylog.core.Framework;
 
-import static org.mockito.Mockito.mock;
+/**
+ * Builder for {@link InternalLoggingBackend}.
+ */
+public class InternalLoggingBackendBuilder implements LoggingBackendBuilder {
 
-class NopLoggingProviderTest {
+	private static final InternalLoggingBackend PROVIDER = new InternalLoggingBackend();
 
-	/**
-	 * Verifies that log entries are accepted.
-	 */
-	@Test
-	public void acceptLogEntries() {
-		new NopLoggingProvider().log(
-			mock(StackTraceLocation.class), null, Level.TRACE, null, "Hello world!", null, null
-		);
+	/** */
+	public InternalLoggingBackendBuilder() {
+	}
+
+	@Override
+	public String getName() {
+		return "internal";
+	}
+
+	@Override
+	public LoggingBackend create(Framework framework) {
+		return PROVIDER;
 	}
 
 }

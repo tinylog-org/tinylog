@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -24,7 +24,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
  *     This interface must be implemented by all logging backends.
  * </p>
  */
-public interface LoggingProvider {
+public interface LoggingBackend {
 
 	/**
 	 * Issues a new log entry.

@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.core.providers;
+package org.tinylog.core.backend;
 
 import java.util.ServiceLoader;
 
@@ -20,25 +20,25 @@ import org.tinylog.core.Framework;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class NopLoggingProviderBuilderTest {
+class NopLoggingBackendBuilderTest {
 
 	/**
 	 * Verifies that the name is "nop".
 	 */
 	@Test
 	void name() {
-		NopLoggingProviderBuilder builder = new NopLoggingProviderBuilder();
+		NopLoggingBackendBuilder builder = new NopLoggingBackendBuilder();
 		assertThat(builder.getName()).isEqualTo("nop");
 	}
 
 	/**
-	 * Verifies that an instance of {@link NopLoggingProvider} can be created.
+	 * Verifies that an instance of {@link NopLoggingBackend} can be created.
 	 */
 	@Test
 	void creation() {
 		Framework framework = new Framework(false, false);
-		NopLoggingProviderBuilder builder = new NopLoggingProviderBuilder();
-		assertThat(builder.create(framework)).isInstanceOf(NopLoggingProvider.class);
+		NopLoggingBackendBuilder builder = new NopLoggingBackendBuilder();
+		assertThat(builder.create(framework)).isInstanceOf(NopLoggingBackend.class);
 	}
 
 	/**
@@ -46,8 +46,8 @@ class NopLoggingProviderBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(LoggingProviderBuilder.class))
-			.anyMatch(builder -> builder instanceof NopLoggingProviderBuilder);
+		assertThat(ServiceLoader.load(LoggingBackendBuilder.class))
+			.anyMatch(builder -> builder instanceof NopLoggingBackendBuilder);
 	}
 
 }
