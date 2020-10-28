@@ -13,8 +13,6 @@
 
 package org.tinylog.core.providers;
 
-import java.util.Locale;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -63,7 +61,7 @@ class InternalLoggingProviderTest {
 			null,
 			"Hello {}!",
 			new Object[] {"world"},
-			new EnhancedMessageFormatter(new Framework(false, false), Locale.ENGLISH)
+			new EnhancedMessageFormatter(new Framework(false, false))
 		));
 
 		assertThat(output).isEqualTo("TINYLOG " + level + ": Hello world!" + System.lineSeparator());

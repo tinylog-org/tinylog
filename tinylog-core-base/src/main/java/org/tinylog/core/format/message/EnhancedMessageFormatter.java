@@ -46,9 +46,10 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	/**
 	 * @param framework The provided class loader from the passed framework is used for loading
 	 *                  {@link ValueFormatBuilder ValueFormatBuilders} as service
-	 * @param locale The locale for language or country depending format outputs
 	 */
-	public EnhancedMessageFormatter(Framework framework, Locale locale) {
+	public EnhancedMessageFormatter(Framework framework) {
+		Locale locale = framework.getConfiguration().getLocale();
+
 		formats = new ArrayList<>();
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
 			formats.add(builder.create(locale));

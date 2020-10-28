@@ -15,7 +15,6 @@ package org.tinylog.core.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -51,8 +50,7 @@ public final class InternalLogger {
 		RuntimeFlavor runtime = framework.getRuntime();
 		StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
 		LoggingProvider provider = framework.getLoggingProvider();
-		Locale locale = framework.getConfiguration().getLocale();
-		MessageFormatter formatter = new EnhancedMessageFormatter(framework, locale);
+		MessageFormatter formatter = new EnhancedMessageFormatter(framework);
 
 		synchronized (mutex) {
 			state = new State(runtime, provider, formatter);
