@@ -13,6 +13,8 @@
 
 package org.tinylog.core;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.runtime.RuntimeFlavor;
@@ -23,6 +25,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class TinylogTest {
+
+	/**
+	 * Ensures that {@link Tinylog} is down before and after each test.
+	 */
+	@BeforeEach
+	@AfterEach
+	void shutDownTinylog() {
+		Tinylog.shutDown();
+	}
 
 	/**
 	 * Verifies that a {@link RuntimeFlavor} is provided.
