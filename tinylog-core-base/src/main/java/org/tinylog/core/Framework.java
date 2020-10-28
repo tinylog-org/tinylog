@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.providers.BundleLoggingProvider;
 import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.InternalLoggingProviderBuilder;
@@ -37,6 +38,7 @@ public class Framework {
 
 	private final Object mutex = new Object();
 
+	private final InternalLogger logger;
 	private final RuntimeFlavor runtime;
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
@@ -53,6 +55,7 @@ public class Framework {
 	 *                  any hooks
 	 */
 	public Framework(boolean loadConfiguration, boolean loadHooks) {
+		this.logger = new InternalLogger();
 		this.runtime = new RuntimeProvider().getRuntime();
 		this.configuration = loadConfiguration ? loadConfiguration() : new Configuration();
 		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
@@ -66,6 +69,15 @@ public class Framework {
 	public ClassLoader getClassLoader() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
+	}
+
+	/**
+	 * Gets the internal logger.
+	 *
+	 * @return Internal logger instance
+	 */
+	public InternalLogger getLogger() {
+		return logger;
 	}
 
 	/**
@@ -211,8 +223,10 @@ public class Framework {
 		for (String name : names) {
 			LoggingProviderBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
 			if (builder == null) {
-				System.err.println(
-					"Could not find any logging backend with the name \"" + name + "\" in the classpath"
+				logger.error(
+					null,
+					"Could not find any logging backend with the name \"{}\" in the classpath",
+					name
 				);
 			} else {
 				providers.add(builder.create(this));
@@ -230,15 +244,16 @@ public class Framework {
 
 		if (providers.isEmpty()) {
 			loggingProvider = new InternalLoggingProvider();
-			System.err.println(
-				"No logging backend could be found in the classpath. Therefore, no log entries will be output. "
-				+ "Please add tinylog-impl.jar or any other logging backend for outputting log entries."
-			);
+			logger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
+				+ "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
+				+ "entries, or disable logging explicitly by setting \"backend = nop\" in the configuration.");
 		} else if (providers.size() == 1) {
 			loggingProvider = providers.get(0);
 		} else {
 			loggingProvider = new BundleLoggingProvider(providers);
 		}
+
+		logger.init(this);
 	}
 
 }

@@ -17,11 +17,11 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.providers.BundleLoggingProvider;
 import org.tinylog.core.providers.InternalLoggingProvider;
 import org.tinylog.core.providers.LoggingProvider;
 import org.tinylog.core.providers.LoggingProviderBuilder;
-import org.tinylog.core.providers.NopLoggingProvider;
 import org.tinylog.core.providers.NopLoggingProviderBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.RegisterService;
@@ -34,6 +34,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class FrameworkTest {
+
+	/**
+	 * Verifies that an {@link InternalLogger} is provided.
+	 */
+	@Test
+	void logger() {
+		assertThat(new Framework(false, false).getLogger()).isNotNull();
+	}
 
 	/**
 	 * Verifies that a {@link RuntimeFlavor} is provided.
@@ -225,6 +233,23 @@ class FrameworkTest {
 			}
 		}
 
+		/**
+		 * Verifies that the internal logger is initialized after startup.
+		 */
+		@Test
+		void initializeInternalLoggerAfterStartup() throws Exception {
+			Framework framework = new Framework(false, false);
+			try {
+				String output = tapSystemErr(() -> {
+					framework.startUp();
+					framework.getLogger().warn(null, "Hello World!");
+				});
+				assertThat(output).contains("TINYLOG WARN", "Hello World!");
+			} finally {
+				framework.shutDown();
+			}
+		}
+
 	}
 
 	/**
@@ -244,7 +269,7 @@ class FrameworkTest {
 				() -> assertThat(framework.getLoggingProvider()).isInstanceOf(InternalLoggingProvider.class)
 			);
 
-			assertThat(output).contains("tinylog-impl");
+			assertThat(output).contains("TINYLOG WARN", "tinylog-impl");
 		}
 
 		/**
@@ -321,12 +346,12 @@ class FrameworkTest {
 		void fallbackForEntireInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backend", "test3");
+				framework.getConfiguration().set("backend", "test0");
 				LoggingProvider provider = framework.getLoggingProvider();
 				assertThat(provider).isSameAs(TestOneLoggingProviderBuilder.provider);
 			});
 
-			assertThat(output).contains("test3");
+			assertThat(output).contains("TINYLOG ERROR", "test0");
 		}
 
 		/**
@@ -340,12 +365,12 @@ class FrameworkTest {
 		void fallbackForPartialInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backend", "test0, test1");
+				framework.getConfiguration().set("backend", "test2, test3");
 				LoggingProvider provider = framework.getLoggingProvider();
-				assertThat(provider).isSameAs(TestOneLoggingProviderBuilder.provider);
+				assertThat(provider).isSameAs(TestTwoLoggingProviderBuilder.provider);
 			});
 
-			assertThat(output).contains("test0");
+			assertThat(output).contains("TINYLOG ERROR", "test3");
 		}
 
 		/**
@@ -385,7 +410,7 @@ class FrameworkTest {
 	 */
 	public static final class TestOneLoggingProviderBuilder implements LoggingProviderBuilder {
 
-		private static final LoggingProvider provider = new NopLoggingProvider();
+		private static final LoggingProvider provider = new InternalLoggingProvider();
 
 		@Override
 		public String getName() {
@@ -404,7 +429,7 @@ class FrameworkTest {
 	 */
 	public static final class TestTwoLoggingProviderBuilder implements LoggingProviderBuilder {
 
-		private static final LoggingProvider provider = new NopLoggingProvider();
+		private static final LoggingProvider provider = new InternalLoggingProvider();
 
 		@Override
 		public String getName() {
