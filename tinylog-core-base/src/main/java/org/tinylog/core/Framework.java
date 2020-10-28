@@ -173,45 +173,11 @@ public class Framework {
 	}
 
 	/**
-	 * Creates a new {@link Configuration} and loads the settings from default properties file if available.
-	 *
-	 * @return The created and pre-filled configuration
-	 */
-	private Configuration loadConfiguration() {
-		Configuration configuration = new Configuration();
-		configuration.loadPropertiesFile(getClassLoader());
-		return configuration;
-	}
-
-	/**
-	 * Loads all hooks that are registered as a {@link ServiceLoader service} in {@code META-INF/services}.
-	 *
-	 * @return All found hooks
-	 */
-	private Collection<Hook> loadHooks() {
-		Collection<Hook> hooks = new ArrayList<>();
-		for (Hook hook : ServiceLoader.load(Hook.class, getClassLoader())) {
-			hooks.add(hook);
-		}
-		return hooks;
-	}
-
-	/**
-	 * Freezes the stored configuration and creates a new logging backend, if none is assigned yet.
-	 */
-	private void loadLoggingBackend() {
-		configuration.freeze();
-		startUp();
-
-		if (loggingBackend == null) {
-			createLoggingBackend();
-		}
-	}
-
-	/**
 	 * Creates a new {@link LoggingBackend}.
+	 *
+	 * @return The newly created logging backend instance
 	 */
-	private void createLoggingBackend() {
+	protected LoggingBackend createLoggingBackend() {
 		List<String> names = configuration.getList("backend");
 		Map<String, LoggingBackendBuilder> builders = new HashMap<>();
 		List<LoggingBackend> backends = new ArrayList<>();
@@ -243,17 +209,52 @@ public class Framework {
 		}
 
 		if (backends.isEmpty()) {
-			loggingBackend = new InternalLoggingBackend();
 			logger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
 				+ "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
 				+ "entries, or disable logging explicitly by setting \"backend = nop\" in the configuration.");
+			return new InternalLoggingBackend();
 		} else if (backends.size() == 1) {
-			loggingBackend = backends.get(0);
+			return backends.get(0);
 		} else {
-			loggingBackend = new BundleLoggingBackend(backends);
+			return new BundleLoggingBackend(backends);
 		}
+	}
 
-		logger.init(this);
+	/**
+	 * Creates a new {@link Configuration} and loads the settings from default properties file if available.
+	 *
+	 * @return The created and pre-filled configuration
+	 */
+	private Configuration loadConfiguration() {
+		Configuration configuration = new Configuration();
+		configuration.loadPropertiesFile(getClassLoader());
+		return configuration;
+	}
+
+	/**
+	 * Loads all hooks that are registered as a {@link ServiceLoader service} in {@code META-INF/services}.
+	 *
+	 * @return All found hooks
+	 */
+	private Collection<Hook> loadHooks() {
+		Collection<Hook> hooks = new ArrayList<>();
+		for (Hook hook : ServiceLoader.load(Hook.class, getClassLoader())) {
+			hooks.add(hook);
+		}
+		return hooks;
+	}
+
+	/**
+	 * Freezes the stored configuration and creates a new logging backend, if none is assigned yet.
+	 */
+	private void loadLoggingBackend() {
+		configuration.freeze();
+		startUp();
+
+		if (loggingBackend == null) {
+			loggingBackend = createLoggingBackend();
+			logger.init(this);
+		}
 	}
 
 }

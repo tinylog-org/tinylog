@@ -13,41 +13,30 @@
 
 package org.tinylog.core.internal;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
-import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.runtime.StackTraceLocation;
+import org.tinylog.core.test.CaptureLogEntries;
+import org.tinylog.core.test.Log;
+import org.tinylog.core.test.LogEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalMatchers.aryEq;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNotNull;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
+@CaptureLogEntries
 class InternalLoggerTest {
 
-	private Framework framework;
-	private LoggingBackend backend;
+	private final Framework framework;
+	private final InternalLogger logger;
+	private final Log log;
 
 	/**
-	 * Initialize the internal logger.
+	 * @param framework Independent and prepared framework instance
+	 * @param log Live updated list of output log entries
 	 */
-	@BeforeEach
-	void init() {
-		backend = mock(LoggingBackend.class);
-		framework = new Framework(false, false) {
-			@Override
-			public LoggingBackend getLoggingBackend() {
-				return backend;
-			}
-		};
+	InternalLoggerTest(Framework framework, Log log) {
+		this.framework = framework;
+		this.logger = framework.getLogger();
+		this.log = log;
 	}
 
 	/**
@@ -55,25 +44,17 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.trace(null, "Hello World!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(),
-			eq("Hello World!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"));
 	}
-
+	
 	/**
 	 * Verifies that a trace log entry with a placeholder message and arguments can be issued.
 	 */
 	@Test
 	void traceMessageWithArguments() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.trace(null, "Hello {}!", "Alice");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(), eq("Hello {}!"),
-			aryEq(new Object[] {"Alice"}), isNotNull());
+		assertThat(log).containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"));
 	}
 
 	/**
@@ -81,14 +62,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceExceptionAndMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-
 		Exception exception = new Exception();
 		logger.trace(exception, "Oops!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), same(exception),
-			eq("Oops!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"));
 	}
 
 	/**
@@ -96,12 +72,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.debug(null, "Hello World!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(),
-			eq("Hello World!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"));
 	}
 
 	/**
@@ -109,12 +81,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessageWithArguments() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.debug(null, "Hello {}!", "Alice");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(), eq("Hello {}!"),
-			aryEq(new Object[] {"Alice"}), isNotNull());
+		assertThat(log).containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"));
 	}
 
 	/**
@@ -122,14 +90,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugExceptionAndMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-
 		Exception exception = new Exception();
 		logger.debug(exception, "Oops!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), same(exception),
-			eq("Oops!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"));
 	}
 
 	/**
@@ -137,12 +100,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.info(null, "Hello World!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(),
-			eq("Hello World!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.INFO, null, "Hello World!"));
 	}
 
 	/**
@@ -150,12 +109,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessageWithArguments() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.info(null, "Hello {}!", "Alice");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello {}!"),
-			aryEq(new Object[] {"Alice"}), isNotNull());
+		assertThat(log).containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"));
 	}
 
 	/**
@@ -163,14 +118,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoExceptionAndMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-
 		Exception exception = new Exception();
 		logger.info(exception, "Oops!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), same(exception),
-			eq("Oops!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.INFO, exception, "Oops!"));
 	}
 
 	/**
@@ -178,12 +128,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.warn(null, "Hello World!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(),
-			eq("Hello World!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.WARN, null, "Hello World!"));
 	}
 
 	/**
@@ -191,12 +137,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessageWithArguments() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.warn(null, "Hello {}!", "Alice");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(), eq("Hello {}!"),
-			aryEq(new Object[] {"Alice"}), isNotNull());
+		assertThat(log).containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"));
 	}
 
 	/**
@@ -204,14 +146,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnExceptionAndMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-
 		Exception exception = new Exception();
 		logger.warn(exception, "Oops!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.WARN), same(exception),
-			eq("Oops!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.WARN, exception, "Oops!"));
 	}
 
 	/**
@@ -219,12 +156,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.error(null, "Hello World!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(),
-			eq("Hello World!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"));
 	}
 
 	/**
@@ -232,12 +165,8 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessageWithArguments() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
 		logger.error(null, "Hello {}!", "Alice");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(), eq("Hello {}!"),
-			aryEq(new Object[] {"Alice"}), isNotNull());
+		assertThat(log).containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"));
 	}
 
 	/**
@@ -245,14 +174,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorExceptionAndMessage() {
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-
 		Exception exception = new Exception();
 		logger.error(exception, "Oops!");
-
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), same(exception),
-			eq("Oops!"), isNull(), any());
+		assertThat(log).containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
 	}
 
 	/**
@@ -261,32 +185,26 @@ class InternalLoggerTest {
 	@Test
 	void delayedIssuing() {
 		InternalLogger logger = new InternalLogger();
-		logger.info(null, "Hello World!");
-		logger.init(framework);
 
-		verify(backend).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello World!"),
-			isNull(), any());
+		logger.info(null, "Hello World!");
+		assertThat(log).isEmpty();
+
+		logger.init(framework);
+		assertThat(log).containsExactly(
+			new LogEntry(InternalLogger.class.getName(), "tinylog", Level.INFO, null, "Hello World!")
+		);
 	}
 
 	/**
-	 * Verifies that the correct stack trace location is provided.
+	 * Creates a new log entry.
+	 *
+	 * @param level Severity level
+	 * @param exception Exception or any other kind of throwable
+	 * @param message Text message
+	 * @return Created log entry
 	 */
-	@Test
-	void stackTraceLocation() {
-		backend = new LoggingBackend() {
-			@Override
-			public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
-					Object[] arguments, MessageFormatter formatter) {
-				StackTraceElement element = location.getCallerStackTraceElement();
-				assertThat(element.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
-				assertThat(element.getMethodName()).isEqualTo("stackTraceLocation");
-				assertThat(element.getLineNumber()).isEqualTo(289);
-			}
-		};
-
-		InternalLogger logger = new InternalLogger();
-		logger.init(framework);
-		logger.info(null, "Hello World!");
+	private static LogEntry createLogEntry(Level level, Throwable exception, String message) {
+		return new LogEntry(InternalLoggerTest.class.getName(), "tinylog", level, exception, message);
 	}
 
 }
