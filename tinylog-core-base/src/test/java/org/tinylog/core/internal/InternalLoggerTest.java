@@ -13,7 +13,6 @@
 
 package org.tinylog.core.internal;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
@@ -34,22 +33,21 @@ import static org.mockito.Mockito.verify;
 
 class InternalLoggerTest {
 
-	private final Framework framework = new Framework(false, false) {
-		@Override
-		public LoggingProvider getLoggingProvider() {
-			return provider;
-		}
-	};
-
-	private LoggingProvider provider = mock(LoggingProvider.class);
+	private Framework framework;
+	private LoggingProvider provider;
 
 	/**
-	 * Resets the internal logger.
+	 * Initialize the internal logger.
 	 */
 	@BeforeEach
-	@AfterEach
-	void cleanUp() {
-		InternalLogger.reset();
+	void init() {
+		provider = mock(LoggingProvider.class);
+		framework = new Framework(false, false) {
+			@Override
+			public LoggingProvider getLoggingProvider() {
+				return provider;
+			}
+		};
 	}
 
 	/**
@@ -57,8 +55,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceMessage() {
-		InternalLogger.init(framework);
-		InternalLogger.trace(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.trace(null, "Hello World!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(),
 			eq("Hello World!"), isNull(), any());
@@ -69,8 +68,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceMessageWithArguments() {
-		InternalLogger.init(framework);
-		InternalLogger.trace(null, "Hello {}!", "Alice");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.trace(null, "Hello {}!", "Alice");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
@@ -81,10 +81,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceExceptionAndMessage() {
-		InternalLogger.init(framework);
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
 
 		Exception exception = new Exception();
-		InternalLogger.trace(exception, "Oops!");
+		logger.trace(exception, "Oops!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.TRACE), same(exception),
 			eq("Oops!"), isNull(), any());
@@ -95,8 +96,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessage() {
-		InternalLogger.init(framework);
-		InternalLogger.debug(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.debug(null, "Hello World!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(),
 			eq("Hello World!"), isNull(), any());
@@ -107,8 +109,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessageWithArguments() {
-		InternalLogger.init(framework);
-		InternalLogger.debug(null, "Hello {}!", "Alice");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.debug(null, "Hello {}!", "Alice");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
@@ -119,10 +122,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugExceptionAndMessage() {
-		InternalLogger.init(framework);
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
 
 		Exception exception = new Exception();
-		InternalLogger.debug(exception, "Oops!");
+		logger.debug(exception, "Oops!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.DEBUG), same(exception),
 			eq("Oops!"), isNull(), any());
@@ -133,8 +137,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessage() {
-		InternalLogger.init(framework);
-		InternalLogger.info(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.info(null, "Hello World!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(),
 			eq("Hello World!"), isNull(), any());
@@ -145,8 +150,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessageWithArguments() {
-		InternalLogger.init(framework);
-		InternalLogger.info(null, "Hello {}!", "Alice");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.info(null, "Hello {}!", "Alice");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
@@ -157,10 +163,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoExceptionAndMessage() {
-		InternalLogger.init(framework);
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
 
 		Exception exception = new Exception();
-		InternalLogger.info(exception, "Oops!");
+		logger.info(exception, "Oops!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), same(exception),
 			eq("Oops!"), isNull(), any());
@@ -171,8 +178,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessage() {
-		InternalLogger.init(framework);
-		InternalLogger.warn(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.warn(null, "Hello World!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(),
 			eq("Hello World!"), isNull(), any());
@@ -183,8 +191,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessageWithArguments() {
-		InternalLogger.init(framework);
-		InternalLogger.warn(null, "Hello {}!", "Alice");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.warn(null, "Hello {}!", "Alice");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
@@ -195,10 +204,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnExceptionAndMessage() {
-		InternalLogger.init(framework);
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
 
 		Exception exception = new Exception();
-		InternalLogger.warn(exception, "Oops!");
+		logger.warn(exception, "Oops!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.WARN), same(exception),
 			eq("Oops!"), isNull(), any());
@@ -209,8 +219,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessage() {
-		InternalLogger.init(framework);
-		InternalLogger.error(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.error(null, "Hello World!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(),
 			eq("Hello World!"), isNull(), any());
@@ -221,8 +232,9 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessageWithArguments() {
-		InternalLogger.init(framework);
-		InternalLogger.error(null, "Hello {}!", "Alice");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.error(null, "Hello {}!", "Alice");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), isNull(), eq("Hello {}!"),
 			aryEq(new Object[] {"Alice"}), isNotNull());
@@ -233,10 +245,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorExceptionAndMessage() {
-		InternalLogger.init(framework);
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
 
 		Exception exception = new Exception();
-		InternalLogger.error(exception, "Oops!");
+		logger.error(exception, "Oops!");
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.ERROR), same(exception),
 			eq("Oops!"), isNull(), any());
@@ -246,9 +259,10 @@ class InternalLoggerTest {
 	 * Verifies that log entries can be issued belated when the internal logger will be initialized.
 	 */
 	@Test
-	void belatedIssuing() {
-		InternalLogger.info(null, "Hello World!");
-		InternalLogger.init(framework);
+	void delayedIssuing() {
+		InternalLogger logger = new InternalLogger();
+		logger.info(null, "Hello World!");
+		logger.init(framework);
 
 		verify(provider).log(isNotNull(), eq("tinylog"), eq(Level.INFO), isNull(), eq("Hello World!"),
 			isNull(), any());
@@ -266,12 +280,13 @@ class InternalLoggerTest {
 				StackTraceElement element = location.getCallerStackTraceElement();
 				assertThat(element.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("stackTraceLocation");
-				assertThat(element.getLineNumber()).isEqualTo(274);
+				assertThat(element.getLineNumber()).isEqualTo(289);
 			}
 		};
 
-		InternalLogger.init(framework);
-		InternalLogger.info(null, "Hello World!");
+		InternalLogger logger = new InternalLogger();
+		logger.init(framework);
+		logger.info(null, "Hello World!");
 	}
 
 }
