@@ -46,8 +46,7 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	private final List<ValueFormat> formats;
 
 	/**
-	 * @param framework The provided class loader from the passed framework is used for loading
-	 *                  {@link ValueFormatBuilder ValueFormatBuilders} as service
+	 * @param framework The actual logging framework instance
 	 */
 	public EnhancedMessageFormatter(Framework framework) {
 		Locale locale = framework.getConfiguration().getLocale();

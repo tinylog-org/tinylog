@@ -57,8 +57,12 @@ public class Framework {
 	public Framework(boolean loadConfiguration, boolean loadHooks) {
 		this.logger = new InternalLogger();
 		this.runtime = new RuntimeProvider().getRuntime();
-		this.configuration = loadConfiguration ? loadConfiguration() : new Configuration();
+		this.configuration = new Configuration(this);
 		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
+
+		if (loadConfiguration) {
+			configuration.loadPropertiesFile(getClassLoader());
+		}
 	}
 
 	/**
@@ -218,17 +222,6 @@ public class Framework {
 		} else {
 			return new BundleLoggingBackend(backends);
 		}
-	}
-
-	/**
-	 * Creates a new {@link Configuration} and loads the settings from default properties file if available.
-	 *
-	 * @return The created and pre-filled configuration
-	 */
-	private Configuration loadConfiguration() {
-		Configuration configuration = new Configuration();
-		configuration.loadPropertiesFile(getClassLoader());
-		return configuration;
 	}
 
 	/**

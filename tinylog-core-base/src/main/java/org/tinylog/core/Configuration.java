@@ -24,6 +24,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Configuration for tinylog.
  *
@@ -49,11 +51,15 @@ public class Configuration {
 		"tinylog.properties",
 	};
 
+	private final InternalLogger logger;
 	private final Properties properties;
 	private boolean frozen;
 
-	/** */
-	public Configuration() {
+	/**
+	 * @param framework The actual logging framework instance
+	 */
+	public Configuration(Framework framework) {
+		this.logger = framework.getLogger();
 		this.properties = new Properties();
 		this.frozen = false;
 	}
@@ -163,22 +169,20 @@ public class Configuration {
 					try (InputStream stream = getInputStream(classLoader, file)) {
 						properties.load(stream);
 					} catch (IOException ex) {
-						System.err.println("Failed to load tinylog configuration from \"" + file + "\" ("
-							+ ex.getMessage() + ")");
+						logger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
 						file = null;
 					}
 				}
 
 				if (file == null) {
-					for (String configurationFile : CONFIGURATION_FILES) {
-						try (InputStream stream = classLoader.getResourceAsStream(configurationFile)) {
+					for (String name : CONFIGURATION_FILES) {
+						try (InputStream stream = classLoader.getResourceAsStream(name)) {
 							if (stream != null) {
 								properties.load(stream);
 								break;
 							}
 						} catch (IOException ex) {
-							System.err.println("Failed to load tinylog configuration from \"" + configurationFile
-								+ "\" (" + ex.getMessage() + ")");
+							logger.error(ex, "Failed to load tinylog configuration from \"{}\"", name);
 						}
 					}
 				}
