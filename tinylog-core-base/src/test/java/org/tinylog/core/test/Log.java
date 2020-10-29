@@ -14,14 +14,40 @@
 package org.tinylog.core.test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Storage for {@link LogEntry LogEntries}.
  */
-public class Log extends ArrayList<LogEntry> {
+public class Log {
+
+	private List<LogEntry> entries;
 
 	/** */
 	public Log() {
+		entries = new ArrayList<>();
+	}
+
+	/**
+	 * Appends a new log entry to the end of this log.
+	 *
+	 * @param entry Log entry to append to this log
+	 */
+	public void add(LogEntry entry) {
+		entries.add(entry);
+	}
+
+	/**
+	 * Retrieves all stored log entries and clears the entire log afterwards.
+	 *
+	 * @return All store log entries
+	 */
+	public Iterable<LogEntry> consume() {
+		try {
+			return entries;
+		} finally {
+			entries = new ArrayList<>();
+		}
 	}
 
 }

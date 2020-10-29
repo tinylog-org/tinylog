@@ -13,6 +13,7 @@
 
 package org.tinylog.core.test;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -62,11 +63,17 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 
 	@Override
 	public void afterEach(ExtensionContext context) {
-		getOrCreateFramework(context).shutDown();
-
-		remove(context, Framework.class);
-		remove(context, CaptureLoggingBackend.class);
-		remove(context, Log.class);
+		try {
+			getOrCreateFramework(context).shutDown();
+			Assertions
+				.assertThat(getOrCreateLog(context).consume())
+				.as("Log should be empty after JUnit test")
+				.isEmpty();
+		} finally {
+			remove(context, Framework.class);
+			remove(context, CaptureLoggingBackend.class);
+			remove(context, Log.class);
+		}
 	}
 
 	/**
