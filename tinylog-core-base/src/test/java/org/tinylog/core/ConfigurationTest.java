@@ -62,7 +62,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void setNewValue() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			Configuration other = configuration.set("foo", "42");
 
 			assertThat(configuration.getValue("foo")).isEqualTo("42");
@@ -74,7 +74,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void overwriteExistingValue() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			Configuration other = configuration.set("foo", "1").set("foo", "2");
 
 			assertThat(configuration.getValue("foo")).isEqualTo("2");
@@ -86,7 +86,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getExistingEmptyLocale() {
-			Configuration configuration = new Configuration(framework).set("locale", "");
+			Configuration configuration = new Configuration().set("locale", "");
 			assertThat(configuration.getLocale()).isEqualTo(Locale.ROOT);
 		}
 
@@ -95,7 +95,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getExistingLocaleWithLanguageOnly() {
-			Configuration configuration = new Configuration(framework).set("locale", "de");
+			Configuration configuration = new Configuration().set("locale", "de");
 			assertThat(configuration.getLocale()).isEqualTo(new Locale("de"));
 		}
 
@@ -104,7 +104,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getExistingLocaleWithLanguageAndCountry() {
-			Configuration configuration = new Configuration(framework).set("locale", "it_CH");
+			Configuration configuration = new Configuration().set("locale", "it_CH");
 			assertThat(configuration.getLocale()).isEqualTo(new Locale("it", "CH"));
 		}
 
@@ -113,7 +113,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getExistingFullLocale() {
-			Configuration configuration = new Configuration(framework).set("locale", "en_US_UNIX");
+			Configuration configuration = new Configuration().set("locale", "en_US_UNIX");
 			assertThat(configuration.getLocale()).isEqualTo(new Locale("en", "US", "UNIX"));
 		}
 
@@ -122,7 +122,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getMissingLocale() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			assertThat(configuration.getLocale()).isSameAs(Locale.getDefault());
 		}
 
@@ -131,7 +131,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getExistingStringValue() {
-			Configuration configuration = new Configuration(framework).set("foo", "42");
+			Configuration configuration = new Configuration().set("foo", "42");
 			assertThat(configuration.getValue("foo")).isEqualTo("42");
 		}
 
@@ -140,7 +140,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getMissingStringValue() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			assertThat(configuration.getValue("foo")).isNull();
 		}
 
@@ -149,7 +149,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getSingleListValue() {
-			Configuration configuration = new Configuration(framework).set("foo", "42");
+			Configuration configuration = new Configuration().set("foo", "42");
 			assertThat(configuration.getList("foo")).containsExactly("42");
 		}
 
@@ -158,7 +158,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getMultipleListValues() {
-			Configuration configuration = new Configuration(framework).set("foo", "1, 2, 3");
+			Configuration configuration = new Configuration().set("foo", "1, 2, 3");
 			assertThat(configuration.getList("foo")).containsExactly("1", "2", "3");
 		}
 
@@ -167,7 +167,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getEmptyListValue() {
-			Configuration configuration = new Configuration(framework).set("foo", "");
+			Configuration configuration = new Configuration().set("foo", "");
 			assertThat(configuration.getList("foo")).isEmpty();
 		}
 
@@ -176,7 +176,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void getMissingListValue() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			assertThat(configuration.getList("foo")).isEmpty();
 		}
 
@@ -185,7 +185,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void freeze() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			assertThat(configuration.isFrozen()).isFalse();
 
 			configuration.freeze();
@@ -214,7 +214,7 @@ class ConfigurationTest {
 		void loadDefaultProductionPropertiesFile() throws IOException {
 			createTextFile("tinylog.properties", "environment = production");
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(generateClassLoader());
 			assertThat(configuration.getValue("environment")).isEqualTo("production");
 		}
@@ -226,7 +226,7 @@ class ConfigurationTest {
 		void loadDefaultTestPropertiesFile() throws IOException {
 			createTextFile("tinylog-test.properties", "environment = test");
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(generateClassLoader());
 			assertThat(configuration.getValue("environment")).isEqualTo("test");
 		}
@@ -238,7 +238,7 @@ class ConfigurationTest {
 		void loadDefaultDevelopmentPropertiesFile() throws IOException {
 			createTextFile("tinylog-dev.properties", "environment = development");
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(generateClassLoader());
 			assertThat(configuration.getValue("environment")).isEqualTo("development");
 		}
@@ -252,7 +252,7 @@ class ConfigurationTest {
 			createTextFile("tinylog.properties", "production = yes");
 			createTextFile("tinylog-test.properties", "test = yes");
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(generateClassLoader());
 			assertThat(configuration.getValue("production")).isNull();
 			assertThat(configuration.getValue("test")).isEqualTo("yes");
@@ -267,7 +267,7 @@ class ConfigurationTest {
 			createTextFile("tinylog-test.properties", "test = yes");
 			createTextFile("tinylog-dev.properties", "development = yes");
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(generateClassLoader());
 			assertThat(configuration.getValue("test")).isNull();
 			assertThat(configuration.getValue("development")).isEqualTo("yes");
@@ -282,7 +282,7 @@ class ConfigurationTest {
 				createTextFile("my-configuration.properties", "foo = bar");
 				System.setProperty("tinylog.configuration", "my-configuration.properties");
 
-				Configuration configuration = new Configuration(framework);
+				Configuration configuration = new Configuration();
 				configuration.loadPropertiesFile(generateClassLoader());
 				assertThat(configuration.getValue("foo")).isEqualTo("bar");
 			});
@@ -297,7 +297,7 @@ class ConfigurationTest {
 				Path file = createTextFile("my-configuration.properties", "foo = bar");
 				System.setProperty("tinylog.configuration", file.toString());
 
-				Configuration configuration = new Configuration(framework);
+				Configuration configuration = new Configuration();
 				configuration.loadPropertiesFile(getClass().getClassLoader());
 				assertThat(configuration.getValue("foo")).isEqualTo("bar");
 			});
@@ -312,7 +312,7 @@ class ConfigurationTest {
 				Path file = createTextFile("my-configuration.properties", "foo = bar");
 				System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
 
-				Configuration configuration = new Configuration(framework);
+				Configuration configuration = new Configuration();
 				configuration.loadPropertiesFile(getClass().getClassLoader());
 				assertThat(configuration.getValue("foo")).isEqualTo("bar");
 			});
@@ -331,7 +331,7 @@ class ConfigurationTest {
 
 				System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-				Configuration configuration = new Configuration(framework);
+				Configuration configuration = new Configuration();
 				configuration.loadPropertiesFile(generateClassLoader());
 				assertThat(configuration.getValue("custom")).isEqualTo("yes");
 				assertThat(configuration.getValue("production")).isNull();
@@ -350,7 +350,7 @@ class ConfigurationTest {
 				createTextFile("tinylog.properties", "production = yes");
 
 				System.setProperty("tinylog.configuration", folder.resolve("tinylog-custom.properties").toString());
-				Configuration configuration = new Configuration(framework);
+				Configuration configuration = new Configuration();
 				configuration.loadPropertiesFile(generateClassLoader());
 
 				assertThat(configuration.getValue("production")).isEqualTo("yes");
@@ -379,7 +379,7 @@ class ConfigurationTest {
 				}
 			};
 
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			configuration.loadPropertiesFile(classLoader);
 
 			assertThat(log.consume()).hasSize(3).allSatisfy(entry -> {
@@ -393,7 +393,7 @@ class ConfigurationTest {
 		 */
 		@Test
 		void freeze() {
-			Configuration configuration = new Configuration(framework);
+			Configuration configuration = new Configuration();
 			assertThat(configuration.isFrozen()).isFalse();
 
 			configuration.freeze();

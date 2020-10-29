@@ -51,15 +51,11 @@ public class Configuration {
 		"tinylog.properties",
 	};
 
-	private final InternalLogger logger;
 	private final Properties properties;
 	private boolean frozen;
 
-	/**
-	 * @param framework The actual logging framework instance
-	 */
-	public Configuration(Framework framework) {
-		this.logger = framework.getLogger();
+	/** */
+	public Configuration() {
 		this.properties = new Properties();
 		this.frozen = false;
 	}
@@ -169,7 +165,7 @@ public class Configuration {
 					try (InputStream stream = getInputStream(classLoader, file)) {
 						properties.load(stream);
 					} catch (IOException ex) {
-						logger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
+						InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
 						file = null;
 					}
 				}
@@ -182,7 +178,7 @@ public class Configuration {
 								break;
 							}
 						} catch (IOException ex) {
-							logger.error(ex, "Failed to load tinylog configuration from \"{}\"", name);
+							InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", name);
 						}
 					}
 				}

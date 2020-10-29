@@ -38,7 +38,6 @@ public class Framework {
 
 	private final Object mutex = new Object();
 
-	private final InternalLogger logger;
 	private final RuntimeFlavor runtime;
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
@@ -55,9 +54,8 @@ public class Framework {
 	 *                  any hooks
 	 */
 	public Framework(boolean loadConfiguration, boolean loadHooks) {
-		this.logger = new InternalLogger();
 		this.runtime = new RuntimeProvider().getRuntime();
-		this.configuration = new Configuration(this);
+		this.configuration = new Configuration();
 		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
 
 		if (loadConfiguration) {
@@ -73,15 +71,6 @@ public class Framework {
 	public ClassLoader getClassLoader() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
-	}
-
-	/**
-	 * Gets the internal logger.
-	 *
-	 * @return Internal logger instance
-	 */
-	public InternalLogger getLogger() {
-		return logger;
 	}
 
 	/**
@@ -172,6 +161,7 @@ public class Framework {
 				}
 
 				loggingBackend = null;
+				InternalLogger.reset();
 			}
 		}
 	}
@@ -193,7 +183,7 @@ public class Framework {
 		for (String name : names) {
 			LoggingBackendBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
 			if (builder == null) {
-				logger.error(
+				InternalLogger.error(
 					null,
 					"Could not find any logging backend with the name \"{}\" in the classpath",
 					name
@@ -213,7 +203,7 @@ public class Framework {
 		}
 
 		if (backends.isEmpty()) {
-			logger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
+			InternalLogger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
 				+ "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
 				+ "entries, or disable logging explicitly by setting \"backend = nop\" in the configuration.");
 			return new InternalLoggingBackend();
@@ -246,7 +236,7 @@ public class Framework {
 
 		if (loggingBackend == null) {
 			loggingBackend = createLoggingBackend();
-			logger.init(this);
+			InternalLogger.init(this);
 		}
 	}
 

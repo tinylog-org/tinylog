@@ -33,12 +33,12 @@ public final class InternalLogger {
 	private static final int INTERNAL_STACK_TRACE_DEPTH = 1;
 	private static final int CALLER_STACK_TRACE_DEPTH = 3;
 
-	private final Object mutex = new Object();
-	private volatile State state;
-	private List<LogEntry> entries = new ArrayList<>();
+	private static final Object mutex = new Object();
+	private static volatile State state;
+	private static List<LogEntry> entries = new ArrayList<>();
 
 	/** */
-	public InternalLogger() {
+	private InternalLogger() {
 	}
 
 	/**
@@ -46,7 +46,7 @@ public final class InternalLogger {
 	 *
 	 * @param framework Fully initialized framework for setting this logger up
 	 */
-	public void init(Framework framework) {
+	public static void init(Framework framework) {
 		RuntimeFlavor runtime = framework.getRuntime();
 		StackTraceLocation location = runtime.getStackTraceLocationAtIndex(INTERNAL_STACK_TRACE_DEPTH);
 		LoggingBackend backend = framework.getLoggingBackend();
@@ -65,12 +65,22 @@ public final class InternalLogger {
 	}
 
 	/**
+	 * Resets the internal logger to an uninitialized state.
+	 */
+	public static void reset() {
+		synchronized (mutex) {
+			state = null;
+			entries = new ArrayList<>();
+		}
+	}
+
+	/**
 	 * Issues a trace log entry.
 	 *
 	 * @param ex Exception or any other kind of throwable
 	 * @param message Human-readable text message
 	 */
-	public void trace(Throwable ex, String message) {
+	public static void trace(Throwable ex, String message) {
 		log(Level.TRACE, ex, message, null);
 	}
 
@@ -81,7 +91,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message with placeholders
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	public void trace(Throwable ex, String message, Object... arguments) {
+	public static void trace(Throwable ex, String message, Object... arguments) {
 		log(Level.TRACE, ex, message, arguments);
 	}
 
@@ -91,7 +101,7 @@ public final class InternalLogger {
 	 * @param ex Exception or any other kind of throwable
 	 * @param message Human-readable text message
 	 */
-	public void debug(Throwable ex, String message) {
+	public static void debug(Throwable ex, String message) {
 		log(Level.DEBUG, ex, message, null);
 	}
 
@@ -102,7 +112,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message with placeholders
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	public void debug(Throwable ex, String message, Object... arguments) {
+	public static void debug(Throwable ex, String message, Object... arguments) {
 		log(Level.DEBUG, ex, message, arguments);
 	}
 
@@ -112,7 +122,7 @@ public final class InternalLogger {
 	 * @param ex Exception or any other kind of throwable
 	 * @param message Human-readable text message
 	 */
-	public void info(Throwable ex, String message) {
+	public static void info(Throwable ex, String message) {
 		log(Level.INFO, ex, message, null);
 	}
 
@@ -123,7 +133,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message with placeholders
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	public void info(Throwable ex, String message, Object... arguments) {
+	public static void info(Throwable ex, String message, Object... arguments) {
 		log(Level.INFO, ex, message, arguments);
 	}
 
@@ -133,7 +143,7 @@ public final class InternalLogger {
 	 * @param ex Exception or any other kind of throwable
 	 * @param message Human-readable text message
 	 */
-	public void warn(Throwable ex, String message) {
+	public static void warn(Throwable ex, String message) {
 		log(Level.WARN, ex, message, null);
 	}
 
@@ -144,7 +154,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message with placeholders
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	public void warn(Throwable ex, String message, Object... arguments) {
+	public static void warn(Throwable ex, String message, Object... arguments) {
 		log(Level.WARN, ex, message, arguments);
 	}
 
@@ -154,7 +164,7 @@ public final class InternalLogger {
 	 * @param ex Exception or any other kind of throwable
 	 * @param message Human-readable text message
 	 */
-	public void error(Throwable ex, String message) {
+	public static void error(Throwable ex, String message) {
 		log(Level.ERROR, ex, message, null);
 	}
 
@@ -165,7 +175,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message with placeholders
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	public void error(Throwable ex, String message, Object... arguments) {
+	public static void error(Throwable ex, String message, Object... arguments) {
 		log(Level.ERROR, ex, message, arguments);
 	}
 
@@ -177,12 +187,12 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 * @param arguments Argument values for placeholders in the text message
 	 */
-	private void log(Level level, Throwable throwable, String message, Object[] arguments) {
-		State state = this.state;
+	private static void log(Level level, Throwable throwable, String message, Object[] arguments) {
+		State state = InternalLogger.state;
 
 		if (state == null) {
 			synchronized (mutex) {
-				state = this.state;
+				state = InternalLogger.state;
 				if (state == null) {
 					entries.add(new LogEntry(level, throwable, message, arguments));
 				}
@@ -199,6 +209,7 @@ public final class InternalLogger {
 	 * Internal logger state with {@link RuntimeFlavor}, {@link LoggingBackend}, and {@link MessageFormatter}.
 	 */
 	private static final class State {
+
 		private final RuntimeFlavor runtime;
 		private final LoggingBackend backend;
 		private final MessageFormatter formatter;
@@ -213,6 +224,7 @@ public final class InternalLogger {
 			this.backend = backend;
 			this.formatter = formatter;
 		}
+
 	}
 
 }

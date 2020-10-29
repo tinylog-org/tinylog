@@ -42,7 +42,6 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 
 	private static final int EXTRA_CAPACITY = 32;
 
-	private final InternalLogger logger;
 	private final List<ValueFormat> formats;
 
 	/**
@@ -51,9 +50,7 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	public EnhancedMessageFormatter(Framework framework) {
 		Locale locale = framework.getConfiguration().getLocale();
 
-		logger = framework.getLogger();
 		formats = new ArrayList<>();
-
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
 			formats.add(builder.create(locale));
 		}
@@ -111,7 +108,7 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 						try {
 							return format.format(pattern, value);
 						} catch (RuntimeException ex) {
-							logger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
+							InternalLogger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
 						}
 					}
 				}

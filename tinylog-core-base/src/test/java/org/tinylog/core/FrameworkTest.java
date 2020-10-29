@@ -36,14 +36,6 @@ import static org.mockito.Mockito.verify;
 class FrameworkTest {
 
 	/**
-	 * Verifies that an {@link InternalLogger} is provided.
-	 */
-	@Test
-	void logger() {
-		assertThat(new Framework(false, false).getLogger()).isNotNull();
-	}
-
-	/**
 	 * Verifies that a {@link RuntimeFlavor} is provided.
 	 */
 	@Test
@@ -242,7 +234,7 @@ class FrameworkTest {
 			try {
 				String output = tapSystemErr(() -> {
 					framework.startUp();
-					framework.getLogger().warn(null, "Hello World!");
+					InternalLogger.warn(null, "Hello World!");
 				});
 				assertThat(output).contains("TINYLOG WARN", "Hello World!");
 			} finally {

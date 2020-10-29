@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InternalLoggerTest {
 
 	private final Framework framework;
-	private final InternalLogger logger;
 	private final Log log;
 
 	/**
@@ -35,7 +34,6 @@ class InternalLoggerTest {
 	 */
 	InternalLoggerTest(Framework framework, Log log) {
 		this.framework = framework;
-		this.logger = framework.getLogger();
 		this.log = log;
 	}
 
@@ -44,7 +42,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceMessage() {
-		logger.trace(null, "Hello World!");
+		InternalLogger.trace(null, "Hello World!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"));
 	}
 	
@@ -53,7 +51,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void traceMessageWithArguments() {
-		logger.trace(null, "Hello {}!", "Alice");
+		InternalLogger.trace(null, "Hello {}!", "Alice");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"));
 	}
 
@@ -63,7 +61,7 @@ class InternalLoggerTest {
 	@Test
 	void traceExceptionAndMessage() {
 		Exception exception = new Exception();
-		logger.trace(exception, "Oops!");
+		InternalLogger.trace(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"));
 	}
 
@@ -72,7 +70,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessage() {
-		logger.debug(null, "Hello World!");
+		InternalLogger.debug(null, "Hello World!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"));
 	}
 
@@ -81,7 +79,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void debugMessageWithArguments() {
-		logger.debug(null, "Hello {}!", "Alice");
+		InternalLogger.debug(null, "Hello {}!", "Alice");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"));
 	}
 
@@ -91,7 +89,7 @@ class InternalLoggerTest {
 	@Test
 	void debugExceptionAndMessage() {
 		Exception exception = new Exception();
-		logger.debug(exception, "Oops!");
+		InternalLogger.debug(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"));
 	}
 
@@ -100,7 +98,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessage() {
-		logger.info(null, "Hello World!");
+		InternalLogger.info(null, "Hello World!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, null, "Hello World!"));
 	}
 
@@ -109,7 +107,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void infoMessageWithArguments() {
-		logger.info(null, "Hello {}!", "Alice");
+		InternalLogger.info(null, "Hello {}!", "Alice");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"));
 	}
 
@@ -119,7 +117,7 @@ class InternalLoggerTest {
 	@Test
 	void infoExceptionAndMessage() {
 		Exception exception = new Exception();
-		logger.info(exception, "Oops!");
+		InternalLogger.info(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, exception, "Oops!"));
 	}
 
@@ -128,7 +126,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessage() {
-		logger.warn(null, "Hello World!");
+		InternalLogger.warn(null, "Hello World!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, null, "Hello World!"));
 	}
 
@@ -137,7 +135,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void warnMessageWithArguments() {
-		logger.warn(null, "Hello {}!", "Alice");
+		InternalLogger.warn(null, "Hello {}!", "Alice");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"));
 	}
 
@@ -147,7 +145,7 @@ class InternalLoggerTest {
 	@Test
 	void warnExceptionAndMessage() {
 		Exception exception = new Exception();
-		logger.warn(exception, "Oops!");
+		InternalLogger.warn(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, exception, "Oops!"));
 	}
 
@@ -156,7 +154,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessage() {
-		logger.error(null, "Hello World!");
+		InternalLogger.error(null, "Hello World!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"));
 	}
 
@@ -165,7 +163,7 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void errorMessageWithArguments() {
-		logger.error(null, "Hello {}!", "Alice");
+		InternalLogger.error(null, "Hello {}!", "Alice");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"));
 	}
 
@@ -175,7 +173,7 @@ class InternalLoggerTest {
 	@Test
 	void errorExceptionAndMessage() {
 		Exception exception = new Exception();
-		logger.error(exception, "Oops!");
+		InternalLogger.error(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
 	}
 
@@ -184,12 +182,11 @@ class InternalLoggerTest {
 	 */
 	@Test
 	void delayedIssuing() {
-		InternalLogger logger = new InternalLogger();
-
-		logger.info(null, "Hello World!");
+		InternalLogger.reset();
+		InternalLogger.info(null, "Hello World!");
 		assertThat(log.consume()).isEmpty();
 
-		logger.init(framework);
+		InternalLogger.init(framework);
 		assertThat(log.consume()).containsExactly(
 			new LogEntry(InternalLogger.class.getName(), "tinylog", Level.INFO, null, "Hello World!")
 		);
