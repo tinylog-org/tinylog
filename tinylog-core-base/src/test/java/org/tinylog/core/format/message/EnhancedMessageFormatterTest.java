@@ -18,15 +18,26 @@ import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
+import org.tinylog.core.test.CaptureLogEntries;
+import org.tinylog.core.test.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureLogEntries
 class EnhancedMessageFormatterTest {
 
-	private final Framework framework = new Framework(false, false);
+	private final Framework framework;
+	private final Log log;
 
-	/** */
-	EnhancedMessageFormatterTest() {
+	/**
+	 * @param framework Independent and prepared framework instance
+	 * @param log Live updated list of output log entries
+	 */
+	EnhancedMessageFormatterTest(Framework framework, Log log) {
+		this.framework = framework;
+		this.log = log;
+
 		framework.getConfiguration().set("locale", "en_US");
 	}
 
@@ -111,13 +122,18 @@ class EnhancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that invalid format patterns are silently ignored.
+	 * Verifies that invalid format patterns are reported.
 	 */
 	@Test
-	void ignoreInvalidPatterns() {
+	void reportInvalidPatterns() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
 		String output = formatter.format("<{0 # 0}>", 42);
 		assertThat(output).isEqualTo("<42>");
+
+		assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("0 # 0", "42");
+		});
 	}
 
 	/**

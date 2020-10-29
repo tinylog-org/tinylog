@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.format.value.ValueFormatBuilder;
+import org.tinylog.core.internal.InternalLogger;
 
 /**
  * Enhanced message formatter that replaces '{}' placeholders with passed arguments and optionally accepts format
@@ -41,6 +42,7 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 
 	private static final int EXTRA_CAPACITY = 32;
 
+	private final InternalLogger logger;
 	private final List<ValueFormat> formats;
 
 	/**
@@ -50,7 +52,9 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	public EnhancedMessageFormatter(Framework framework) {
 		Locale locale = framework.getConfiguration().getLocale();
 
+		logger = framework.getLogger();
 		formats = new ArrayList<>();
+
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
 			formats.add(builder.create(locale));
 		}
@@ -108,7 +112,7 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 						try {
 							return format.format(pattern, value);
 						} catch (RuntimeException ex) {
-							ex.printStackTrace();
+							logger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
 						}
 					}
 				}
