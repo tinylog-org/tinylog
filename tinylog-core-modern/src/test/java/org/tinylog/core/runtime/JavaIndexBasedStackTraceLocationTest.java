@@ -13,11 +13,22 @@
 
 package org.tinylog.core.runtime;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.tinylog.core.Level;
+import org.tinylog.core.test.CaptureLogEntries;
+import org.tinylog.core.test.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureLogEntries
 class JavaIndexBasedStackTraceLocationTest {
+
+	@Inject
+	private Log log;
 
 	/**
 	 * Verifies that the fully-qualified caller class name can be resolved.
@@ -32,13 +43,21 @@ class JavaIndexBasedStackTraceLocationTest {
 
 	/**
 	 * Verifies that {@code null} is returned for an invalid depth index.
+	 * @param depth The invalid depth index to test
 	 */
-	@Test
-	void invalidCallerClassName() {
-		JavaIndexBasedStackTraceLocation location = new JavaIndexBasedStackTraceLocation(Integer.MAX_VALUE);
+	@ParameterizedTest
+	@ValueSource(ints = {Integer.MIN_VALUE, Integer.MAX_VALUE})
+	void invalidCallerClassName(int depth) {
+		JavaIndexBasedStackTraceLocation location = new JavaIndexBasedStackTraceLocation(depth);
 		String caller = location.getCallerClassName();
 
 		assertThat(caller).isNull();
+		assertThat(log.consume())
+			.hasSizeGreaterThanOrEqualTo(1)
+			.anySatisfy(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+				assertThat(entry.getMessage()).contains(Integer.toString(depth));
+			});
 	}
 
 	/**
@@ -54,18 +73,28 @@ class JavaIndexBasedStackTraceLocationTest {
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("validCallerStackTraceElement");
-		assertThat(caller.getLineNumber()).isEqualTo(50);
+		assertThat(caller.getLineNumber()).isEqualTo(69);
 	}
 
 	/**
 	 * Verifies that {@code null} is returned for an invalid depth index.
+	 *
+	 * @param depth The invalid depth index to test
 	 */
-	@Test
-	void invalidStackTraceElement() {
-		JavaIndexBasedStackTraceLocation location = new JavaIndexBasedStackTraceLocation(Integer.MAX_VALUE);
+	@ParameterizedTest
+	@ValueSource(ints = {Integer.MIN_VALUE, Integer.MAX_VALUE})
+	void invalidStackTraceElement(int depth) {
+		JavaIndexBasedStackTraceLocation location = new JavaIndexBasedStackTraceLocation(depth);
 		StackTraceElement caller = location.getCallerStackTraceElement();
 
 		assertThat(caller).isNull();
+
+		assertThat(log.consume())
+			.hasSizeGreaterThanOrEqualTo(1)
+			.anySatisfy(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+				assertThat(entry.getMessage()).contains(Integer.toString(depth));
+			});
 	}
 
 	/**
@@ -81,7 +110,7 @@ class JavaIndexBasedStackTraceLocationTest {
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("passedStackTraceLocation");
-		assertThat(caller.getLineNumber()).isEqualTo(77);
+		assertThat(caller.getLineNumber()).isEqualTo(106);
 	}
 
 	/**
