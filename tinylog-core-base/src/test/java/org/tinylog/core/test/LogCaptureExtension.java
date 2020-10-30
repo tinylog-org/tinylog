@@ -92,7 +92,9 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 			}
 		});
 
-		framework.startUp();
+		if (annotations.isEmpty() || annotations.get(annotations.size() - 1).autostart()) {
+			framework.startUp();
+		}
 	}
 
 	@Override

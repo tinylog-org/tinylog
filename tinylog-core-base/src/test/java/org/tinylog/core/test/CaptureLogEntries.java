@@ -43,4 +43,13 @@ public @interface CaptureLogEntries {
 	 */
 	String[] configuration() default "";
 
+	/**
+	 * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,
+	 * autostart can be disabled by setting {@code autostart = false}.
+	 *
+	 * @return {@code true} if the framework should be automatically started, {@code false} if the framework should not
+	 *         be started in advance
+	 */
+	boolean autostart() default true;
+
 }

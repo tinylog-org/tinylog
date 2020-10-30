@@ -180,9 +180,9 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that log entries can be issued belated when the internal logger will be initialized.
 	 */
+	@CaptureLogEntries(autostart = false)
 	@Test
 	void delayedIssuing() {
-		InternalLogger.reset();
 		InternalLogger.info(null, "Hello World!");
 		assertThat(log.consume()).isEmpty();
 
