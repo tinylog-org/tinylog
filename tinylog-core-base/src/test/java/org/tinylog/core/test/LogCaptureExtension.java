@@ -13,6 +13,10 @@
 
 package org.tinylog.core.test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -61,18 +65,30 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	public void beforeEach(ExtensionContext context) {
 		Framework framework = getOrCreateFramework(context);
 		Configuration configuration = framework.getConfiguration();
+		List<CaptureLogEntries> annotations = new ArrayList<>();
 
-		context.getTestInstance().ifPresent(object -> {
-			CaptureLogEntries annotation = object.getClass().getAnnotation(CaptureLogEntries.class);
-			if (annotation != null) {
-				for (String entry : annotation.configuration()) {
-					int index = entry.indexOf('=');
-					if (index >= 0) {
-						String key = entry.substring(0, index);
-						String value = entry.substring(index + 1);
-						configuration.set(key, value);
-					}
+		context.getTestInstances().ifPresent(instances -> {
+			for (Object object : instances.getAllInstances()) {
+				CaptureLogEntries annotation = object.getClass().getAnnotation(CaptureLogEntries.class);
+				if (annotation != null) {
+					annotations.add(annotation);
 				}
+			}
+		});
+
+		context.getTestMethod().ifPresent(method -> {
+			CaptureLogEntries annotation = method.getAnnotation(CaptureLogEntries.class);
+			if (annotation != null) {
+				annotations.add(annotation);
+			}
+		});
+
+		annotations.stream().flatMap(annotation -> Arrays.stream(annotation.configuration())).forEach(entry -> {
+			int index = entry.indexOf('=');
+			if (index >= 0) {
+				String key = entry.substring(0, index);
+				String value = entry.substring(index + 1);
+				configuration.set(key, value);
 			}
 		});
 
