@@ -24,7 +24,7 @@ import org.tinylog.core.test.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@CaptureLogEntries(configuration = "locale=en_US")
 class EnhancedMessageFormatterTest {
 
 	private final Framework framework;
@@ -37,8 +37,6 @@ class EnhancedMessageFormatterTest {
 	EnhancedMessageFormatterTest(Framework framework, Log log) {
 		this.framework = framework;
 		this.log = log;
-
-		framework.getConfiguration().set("locale", "en_US");
 	}
 
 	/**

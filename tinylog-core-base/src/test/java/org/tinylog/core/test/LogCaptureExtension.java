@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.backend.LoggingBackend;
 
@@ -58,7 +59,24 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 
 	@Override
 	public void beforeEach(ExtensionContext context) {
-		getOrCreateFramework(context).startUp();
+		Framework framework = getOrCreateFramework(context);
+		Configuration configuration = framework.getConfiguration();
+
+		context.getTestInstance().ifPresent(object -> {
+			CaptureLogEntries annotation = object.getClass().getAnnotation(CaptureLogEntries.class);
+			if (annotation != null) {
+				for (String entry : annotation.configuration()) {
+					int index = entry.indexOf('=');
+					if (index >= 0) {
+						String key = entry.substring(0, index);
+						String value = entry.substring(index + 1);
+						configuration.set(key, value);
+					}
+				}
+			}
+		});
+
+		framework.startUp();
 	}
 
 	@Override

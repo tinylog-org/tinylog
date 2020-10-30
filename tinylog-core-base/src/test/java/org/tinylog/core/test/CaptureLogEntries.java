@@ -28,4 +28,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(LogCaptureExtension.class)
 public @interface CaptureLogEntries {
 
+	/**
+	 * Key value pairs to apply to the framework's configuration.
+	 *
+	 * <p>
+	 * Examples:
+	 * <blockquote><pre>
+	 * {@literal @}CaptureLogEntries(configuration = "locale=en_US")
+	 * {@literal @}CaptureLogEntries(configuration = {"backend=nop", "locale=en_US"})
+	 * </pre></blockquote>
+	 * </p>
+	 *
+	 * @return The initial configuration to apply to the framework
+	 */
+	String[] configuration() default "";
+
 }
