@@ -186,6 +186,13 @@
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
+                <artifactId>tinylog-core-base</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-core-modern</artifactId>
                 <version>${project.version}</version>
             </dependency>
