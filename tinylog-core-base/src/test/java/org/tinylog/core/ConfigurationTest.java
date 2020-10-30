@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,17 +41,8 @@ import static org.mockito.Mockito.when;
 @CaptureLogEntries
 class ConfigurationTest {
 
-	private final Framework framework;
-	private final Log log;
-
-	/**
-	 * @param framework Independent and prepared framework instance
-	 * @param log Live updated list of output log entries
-	 */
-	ConfigurationTest(Framework framework, Log log) {
-		this.framework = framework;
-		this.log = log;
-	}
+	@Inject
+	private Log log;
 
 	/**
 	 * Tests for getting and setting values.

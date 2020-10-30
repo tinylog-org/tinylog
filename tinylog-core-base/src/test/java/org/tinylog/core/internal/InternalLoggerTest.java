@@ -13,6 +13,8 @@
 
 package org.tinylog.core.internal;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -25,17 +27,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @CaptureLogEntries
 class InternalLoggerTest {
 
-	private final Framework framework;
-	private final Log log;
+	@Inject
+	private Framework framework;
 
-	/**
-	 * @param framework Independent and prepared framework instance
-	 * @param log Live updated list of output log entries
-	 */
-	InternalLoggerTest(Framework framework, Log log) {
-		this.framework = framework;
-		this.log = log;
-	}
+	@Inject
+	private Log log;
 
 	/**
 	 * Verifies that a trace log entry with a plain text message can be issued.

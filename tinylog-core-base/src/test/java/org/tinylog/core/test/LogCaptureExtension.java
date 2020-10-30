@@ -13,9 +13,13 @@
 
 package org.tinylog.core.test;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -24,6 +28,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.platform.commons.support.AnnotationSupport;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.backend.LoggingBackend;
@@ -62,8 +69,13 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	}
 
 	@Override
-	public void beforeEach(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) throws IllegalAccessException {
 		Framework framework = getOrCreateFramework(context);
+		injectFields(context, framework);
+
+		Log log = getOrCreateLog(context);
+		injectFields(context, log);
+
 		Configuration configuration = framework.getConfiguration();
 		List<CaptureLogEntries> annotations = new ArrayList<>();
 
@@ -157,6 +169,33 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	 */
 	private Log getOrCreateLog(ExtensionContext context) {
 		return context.getStore(NAMESPACE).getOrComputeIfAbsent(Log.class);
+	}
+
+	/**
+	 * Sets the passed value to all fields with {@link Inject} annotation and matching value type.
+	 *
+	 * @param context The current extension context
+	 * @param value The value to inject (must be not {@code null})
+	 * @param <T> Value type
+	 * @throws IllegalAccessException Failed to set the value
+	 */
+	private <T> void injectFields(ExtensionContext context, T value) throws IllegalAccessException {
+		Optional<TestInstances> instances = context.getTestInstances();
+		if (instances.isPresent()) {
+			for (Object object : instances.get().getAllInstances()) {
+				List<Field> fields = AnnotationSupport.findAnnotatedFields(
+					object.getClass(),
+					Inject.class,
+					field -> field.getType().isAssignableFrom(value.getClass()),
+					HierarchyTraversalMode.TOP_DOWN
+				);
+
+				for (Field field : fields) {
+					field.setAccessible(true);
+					field.set(object, value);
+				}
+			}
+		}
 	}
 
 	/**

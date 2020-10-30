@@ -16,6 +16,8 @@ package org.tinylog.core.format.message;
 import java.text.ChoiceFormat;
 import java.time.LocalTime;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -27,17 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @CaptureLogEntries(configuration = "locale=en_US")
 class EnhancedMessageFormatterTest {
 
-	private final Framework framework;
-	private final Log log;
+	@Inject
+	private Framework framework;
 
-	/**
-	 * @param framework Independent and prepared framework instance
-	 * @param log Live updated list of output log entries
-	 */
-	EnhancedMessageFormatterTest(Framework framework, Log log) {
-		this.framework = framework;
-		this.log = log;
-	}
+	@Inject
+	private Log log;
 
 	/**
 	 * Verifies that a string can be formatted without defining a format pattern.
