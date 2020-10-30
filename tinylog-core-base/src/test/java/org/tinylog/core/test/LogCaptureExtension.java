@@ -33,6 +33,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
 
 /**
@@ -104,15 +105,37 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 			}
 		});
 
+		if (annotations.isEmpty()) {
+			log.setMinLevel(Level.DEBUG);
+		} else {
+			log.setMinLevel(annotations.get(annotations.size() - 1).minLevel());
+		}
+
 		if (annotations.isEmpty() || annotations.get(annotations.size() - 1).autostart()) {
-			framework.startUp();
+			Level minLevel = log.getMinLevel();
+			try {
+				log.setMinLevel(Level.WARN);
+				framework.startUp();
+			} finally {
+				log.setMinLevel(minLevel);
+			}
 		}
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) {
 		try {
-			getOrCreateFramework(context).shutDown();
+			Framework framework = getOrCreateFramework(context);
+			Log log = getOrCreateLog(context);
+
+			Level minLevel = log.getMinLevel();
+			try {
+				log.setMinLevel(Level.WARN);
+				framework.shutDown();
+			} finally {
+				log.setMinLevel(minLevel);
+			}
+
 			Assertions
 				.assertThat(getOrCreateLog(context).consume())
 				.as("Log should be empty after JUnit test")
@@ -168,7 +191,11 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	 * @return The {@link Log} instance from the store
 	 */
 	private Log getOrCreateLog(ExtensionContext context) {
-		return context.getStore(NAMESPACE).getOrComputeIfAbsent(Log.class);
+		return context.getStore(NAMESPACE).getOrComputeIfAbsent(
+			Log.class,
+			type -> new Log(),
+			Log.class
+		);
 	}
 
 	/**

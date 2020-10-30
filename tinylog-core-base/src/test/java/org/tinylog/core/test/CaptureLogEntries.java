@@ -19,6 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.tinylog.core.Level;
 
 /**
  * JUnit extension annotation for capturing output log entries.
@@ -42,6 +43,13 @@ public @interface CaptureLogEntries {
 	 * @return The initial configuration to apply to the framework
 	 */
 	String[] configuration() default "";
+
+	/**
+	 * All log entries with a severity level less severe than the configured minimum level are ignored.
+	 *
+	 * @return The configured minimum severity level
+	 */
+	Level minLevel() default Level.INFO;
 
 	/**
 	 * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,

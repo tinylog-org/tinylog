@@ -24,7 +24,7 @@ import org.tinylog.core.test.LogEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@CaptureLogEntries(minLevel = Level.TRACE)
 class InternalLoggerTest {
 
 	@Inject
@@ -176,7 +176,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that log entries can be issued belated when the internal logger will be initialized.
 	 */
-	@CaptureLogEntries(autostart = false)
+	@CaptureLogEntries(minLevel = Level.TRACE, autostart = false)
 	@Test
 	void delayedIssuing() {
 		InternalLogger.info(null, "Hello World!");
