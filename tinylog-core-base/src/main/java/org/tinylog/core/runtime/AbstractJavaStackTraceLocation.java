@@ -15,6 +15,8 @@ package org.tinylog.core.runtime;
 
 import java.lang.invoke.MethodHandle;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Base class for stack trace location implementations for Java 8.
  */
@@ -34,8 +36,16 @@ abstract class AbstractJavaStackTraceLocation implements StackTraceLocation {
 
 	static {
 		LegacyStackTraceAccess access = new LegacyStackTraceAccess();
+
 		callerClassGetter = access.getCallerClassGetter();
+		if (callerClassGetter == null) {
+			InternalLogger.debug(null, "Legacy sun.reflect.Reflection.getCallerClass(int) is not available");
+		}
+
 		stackTraceElementGetter = access.getStackTraceElementGetter();
+		if (stackTraceElementGetter == null) {
+			InternalLogger.debug(null, "Legacy Throwable.getStackTraceElement(int) is not available");
+		}
 	}
 
 }

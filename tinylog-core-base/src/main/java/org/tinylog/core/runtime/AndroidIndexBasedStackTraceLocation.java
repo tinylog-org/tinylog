@@ -15,6 +15,8 @@ package org.tinylog.core.runtime;
 
 import java.lang.invoke.MethodHandle;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Stack trace location implementation for Android that stores the location of a callee as numeric index.
  */
@@ -29,6 +31,13 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 		AndroidStackTraceAccess access = new AndroidStackTraceAccess();
 		fillStackTraceElements = access.getStackTraceElementsFiller();
 		offset = access.getOffset();
+
+		if (fillStackTraceElements == null) {
+			InternalLogger.debug(
+				null,
+				"Legacy dalvik.system.VMStack.fillStackTraceElements(Thread, StackTraceElement[]) is not available"
+			);
+		}
 	}
 
 	/**
