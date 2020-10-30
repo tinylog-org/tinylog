@@ -54,8 +54,25 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 
 	@Override
 	public String getCallerClassName() {
-		StackTraceElement element = push().getCallerStackTraceElement();
-		return element == null ? null : element.getClassName();
+		if (fillStackTraceElements != null) {
+			try {
+				StackTraceElement[] trace = new StackTraceElement[index + offset + 1];
+				fillStackTraceElements.invoke(Thread.currentThread(), trace);
+				if (trace[trace.length - 1] != null) {
+					return trace[trace.length - 1].getClassName();
+				}
+			} catch (Throwable ex) {
+				InternalLogger.error(ex, "Failed to extract class name at the stack trace depth of {}", index);
+			}
+		}
+
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		if (index >= 0 && index < trace.length) {
+			return trace[index].getClassName();
+		} else {
+			InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
+			return null;
+		}
 	}
 
 	@Override
@@ -64,14 +81,21 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 			try {
 				StackTraceElement[] trace = new StackTraceElement[index + offset + 1];
 				fillStackTraceElements.invoke(Thread.currentThread(), trace);
-				return trace[trace.length - 1];
+				if (trace[trace.length - 1] != null) {
+					return trace[trace.length - 1];
+				}
 			} catch (Throwable ex) {
-				ex.printStackTrace();
+				InternalLogger.error(ex, "Failed to extract stack trace element at the depth of {}", index);
 			}
 		}
 
 		StackTraceElement[] trace = new Throwable().getStackTrace();
-		return index < 0 || index >= trace.length ? null : trace[index];
+		if (index >= 0 && index < trace.length) {
+			return trace[index];
+		} else {
+			InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
+			return null;
+		}
 	}
 
 }
