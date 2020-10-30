@@ -35,7 +35,7 @@ public @interface CaptureLogEntries {
 	 * Examples:
 	 * <blockquote><pre>
 	 * {@literal @}CaptureLogEntries(configuration = "locale=en_US")
-	 * {@literal @}CaptureLogEntries(configuration = {"backend=nop", "locale=en_US"})
+	 * {@literal @}CaptureLogEntries(configuration = {"backends=nop", "locale=en_US"})
 	 * </pre></blockquote>
 	 * </p>
 	 *

@@ -172,7 +172,7 @@ public class Framework {
 	 * @return The newly created logging backend instance
 	 */
 	protected LoggingBackend createLoggingBackend() {
-		List<String> names = configuration.getList("backend");
+		List<String> names = configuration.getList("backends");
 		Map<String, LoggingBackendBuilder> builders = new HashMap<>();
 		List<LoggingBackend> backends = new ArrayList<>();
 
@@ -205,7 +205,7 @@ public class Framework {
 		if (backends.isEmpty()) {
 			InternalLogger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
 				+ "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
-				+ "entries, or disable logging explicitly by setting \"backend = nop\" in the configuration.");
+				+ "entries, or disable logging explicitly by setting \"backends = nop\" in the configuration.");
 			return new InternalLoggingBackend();
 		} else if (backends.size() == 1) {
 			return backends.get(0);

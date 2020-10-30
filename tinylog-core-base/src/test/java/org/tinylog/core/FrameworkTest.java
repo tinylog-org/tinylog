@@ -304,7 +304,7 @@ class FrameworkTest {
 		@Test
 		void loadSingleProviderByName() {
 			Framework framework = new Framework(false, false);
-			framework.getConfiguration().set("backend", "test2");
+			framework.getConfiguration().set("backends", "test2");
 			assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
 		}
 
@@ -318,7 +318,7 @@ class FrameworkTest {
 		@Test
 		void loadMultipleProvidersByName() {
 			Framework framework = new Framework(true, false);
-			framework.getConfiguration().set("backend", "test1, nop");
+			framework.getConfiguration().set("backends", "test1, nop");
 
 			LoggingBackend backend = framework.getLoggingBackend();
 			assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
@@ -338,7 +338,7 @@ class FrameworkTest {
 		void fallbackForEntireInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backend", "test0");
+				framework.getConfiguration().set("backends", "test0");
 				LoggingBackend backend = framework.getLoggingBackend();
 				assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
 			});
@@ -357,7 +357,7 @@ class FrameworkTest {
 		void fallbackForPartialInvalidName() throws Exception {
 			String output = tapSystemErr(() -> {
 				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backend", "test2, test3");
+				framework.getConfiguration().set("backends", "test2, test3");
 				LoggingBackend backend = framework.getLoggingBackend();
 				assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
 			});
