@@ -17,6 +17,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Base utility class for resolving legacy methods for receiving specific elements from the stack trace.
  */
@@ -44,7 +46,7 @@ abstract class BaseStackTraceAccess {
 			MethodHandle handle = MethodHandles.lookup().unreflect(method);
 			return check.test(handle) ? handle : null;
 		} catch (Throwable ex) {
-			ex.printStackTrace();
+			InternalLogger.debug(ex, "Failed to load {}.{}()", className, methodName);
 			return null;
 		}
 	}
