@@ -16,9 +16,11 @@ package org.tinylog.core.runtime;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.test.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureLogEntries
 class JavaClassNameBasedStackTraceLocationTest {
 
 	/**
@@ -59,7 +61,7 @@ class JavaClassNameBasedStackTraceLocationTest {
 			.isEqualTo(JavaClassNameBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaClassNameBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("validCallerStackTraceElement");
-		assertThat(caller.getLineNumber()).isEqualTo(55);
+		assertThat(caller.getLineNumber()).isEqualTo(57);
 	}
 
 	/**
@@ -88,7 +90,7 @@ class JavaClassNameBasedStackTraceLocationTest {
 			.isEqualTo(JavaClassNameBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaClassNameBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("passedStackTraceLocation");
-		assertThat(caller.getLineNumber()).isEqualTo(84);
+		assertThat(caller.getLineNumber()).isEqualTo(86);
 	}
 
 	/**

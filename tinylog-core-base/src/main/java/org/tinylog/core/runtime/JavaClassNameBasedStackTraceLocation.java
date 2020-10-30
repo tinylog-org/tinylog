@@ -13,6 +13,8 @@
 
 package org.tinylog.core.runtime;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Stack trace location implementation for legacy Java 8 that stores the fully qualified class name of a callee.
  */
@@ -45,7 +47,7 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				try {
 					clazz = (Class<?>) callerClassGetter.invoke(i + 1);
 				} catch (Throwable ex) {
-					ex.printStackTrace();
+					InternalLogger.error(ex, "Failed to extract caller class name from stack trace");
 					break;
 				}
 
@@ -75,7 +77,7 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				try {
 					element = (StackTraceElement) stackTraceElementGetter.invoke(throwable, i);
 				} catch (Throwable ex) {
-					ex.printStackTrace();
+					InternalLogger.error(ex, "Failed to extract caller stack trace element from stack trace");
 					break;
 				}
 
