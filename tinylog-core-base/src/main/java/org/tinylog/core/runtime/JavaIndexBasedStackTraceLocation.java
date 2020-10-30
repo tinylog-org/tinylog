@@ -45,8 +45,13 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 			}
 		}
 
-		StackTraceElement element = push().getCallerStackTraceElement();
-		return element == null ? null : element.getClassName();
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		if (index >= 0 && index < trace.length) {
+			return trace[index].getClassName();
+		} else {
+			InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
+			return null;
+		}
 	}
 
 	@Override
