@@ -13,6 +13,8 @@
 
 package org.tinylog.core.runtime;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Stack trace location implementation for legacy Java 8 that stores the location of a callee as numeric index.
  */
@@ -39,7 +41,7 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 				Class<?> clazz = (Class<?>) callerClassGetter.invoke(index + 1);
 				return clazz.getName();
 			} catch (Throwable ex) {
-				ex.printStackTrace();
+				InternalLogger.error(ex, "Failed to extract class name at the stack trace depth of {}", index);
 			}
 		}
 
@@ -50,7 +52,12 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 	@Override
 	public StackTraceElement getCallerStackTraceElement() {
 		StackTraceElement[] trace = new Throwable().getStackTrace();
-		return index >= 0 && index < trace.length ? trace[index] : null;
+		if (index >= 0 && index < trace.length) {
+			return trace[index];
+		} else {
+			InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
+			return null;
+		}
 	}
 
 }
