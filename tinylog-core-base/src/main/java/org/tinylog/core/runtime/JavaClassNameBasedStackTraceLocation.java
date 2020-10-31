@@ -61,7 +61,7 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 			}
 		}
 
-		StackTraceElement element = push().getCallerStackTraceElement();
+		StackTraceElement element = findCallerInStackTrace(new Throwable().getStackTrace());
 		return element == null ? null : element.getClassName();
 	}
 
@@ -76,12 +76,14 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				StackTraceElement element;
 				try {
 					element = (StackTraceElement) stackTraceElementGetter.invoke(throwable, i);
+				} catch (IndexOutOfBoundsException ex) {
+					return null;
 				} catch (Throwable ex) {
 					InternalLogger.error(ex, "Failed to extract caller stack trace element from stack trace");
 					break;
 				}
 
-				if (element == null || (foundClassName && !className.equals(element.getClassName()))) {
+				if (foundClassName && !className.equals(element.getClassName())) {
 					return element;
 				} else if (!foundClassName && className.equals(element.getClassName())) {
 					foundClassName = true;
@@ -89,7 +91,7 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 			}
 		}
 
-		return findCallerInStackTrace(new Throwable().getStackTrace());
+		return findCallerInStackTrace(throwable.getStackTrace());
 	}
 
 	/**
