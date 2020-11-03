@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
@@ -54,6 +55,12 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
 			formats.add(builder.create(locale));
 		}
+
+		InternalLogger.debug(
+			null,
+			"Available value formats: {}",
+			formats.stream().map(instance -> instance.getClass().getName()).collect(Collectors.toList())
+		);
 	}
 
 	@Override

@@ -176,7 +176,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that log entries can be issued belated when the internal logger will be initialized.
 	 */
-	@CaptureLogEntries(minLevel = Level.TRACE, autostart = false)
+	@CaptureLogEntries(minLevel = Level.INFO, autostart = false)
 	@Test
 	void delayedIssuing() {
 		InternalLogger.info(null, "Hello World!");

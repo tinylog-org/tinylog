@@ -163,6 +163,7 @@ public class Configuration {
 
 				if (file != null) {
 					try (InputStream stream = getInputStream(classLoader, file)) {
+						InternalLogger.info(null, "Load configuration from \"{}\"", file);
 						properties.load(stream);
 					} catch (IOException ex) {
 						InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
@@ -173,7 +174,10 @@ public class Configuration {
 				if (file == null) {
 					for (String name : CONFIGURATION_FILES) {
 						try (InputStream stream = classLoader.getResourceAsStream(name)) {
-							if (stream != null) {
+							if (stream == null) {
+								InternalLogger.debug(null, "Configuration file \"{}\" does not exist", name);
+							} else {
+								InternalLogger.info(null, "Load configuration from \"{}\"", name);
 								properties.load(stream);
 								break;
 							}
@@ -212,7 +216,10 @@ public class Configuration {
 	 */
 	void freeze() {
 		synchronized (properties) {
-			frozen = true;
+			if (!frozen) {
+				frozen = true;
+				InternalLogger.debug(null, "Configuration for tinylog: {}", properties);
+			}
 		}
 	}
 

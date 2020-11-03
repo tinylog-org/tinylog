@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import org.tinylog.core.backend.BundleLoggingBackend;
 import org.tinylog.core.backend.InternalLoggingBackend;
@@ -139,10 +140,12 @@ public class Framework {
 				running = true;
 
 				for (Hook hook : hooks) {
+					InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
 					hook.startUp();
 				}
 
 				loadLoggingBackend();
+				InternalLogger.debug(null, "Logging framework is up");
 			}
 		}
 	}
@@ -156,7 +159,10 @@ public class Framework {
 			if (running) {
 				running = false;
 
+				InternalLogger.debug(null, "Logging framework is shutting down");
+
 				for (Hook hook : hooks) {
+					InternalLogger.debug(null, "Shut down hook {}", hook.getClass().getName());
 					hook.shutDown();
 				}
 
@@ -179,6 +185,12 @@ public class Framework {
 		for (LoggingBackendBuilder builder : ServiceLoader.load(LoggingBackendBuilder.class, getClassLoader())) {
 			builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder);
 		}
+
+		InternalLogger.debug(
+			null,
+			"Available logging backend builders: {}",
+			builders.values().stream().map(instance -> instance.getClass().getName()).collect(Collectors.toList())
+		);
 
 		for (String name : names) {
 			LoggingBackendBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
@@ -237,6 +249,7 @@ public class Framework {
 		if (loggingBackend == null) {
 			loggingBackend = createLoggingBackend();
 			InternalLogger.init(this);
+			InternalLogger.debug(null, "Active logging backend: {}", loggingBackend.getClass().getName());
 		}
 	}
 

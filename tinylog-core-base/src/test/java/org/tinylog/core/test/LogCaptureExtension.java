@@ -106,7 +106,7 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 		});
 
 		if (annotations.isEmpty()) {
-			log.setMinLevel(Level.DEBUG);
+			log.setMinLevel(Level.WARN);
 		} else {
 			log.setMinLevel(annotations.get(annotations.size() - 1).minLevel());
 		}

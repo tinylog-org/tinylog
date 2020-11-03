@@ -49,7 +49,7 @@ public @interface CaptureLogEntries {
 	 *
 	 * @return The configured minimum severity level
 	 */
-	Level minLevel() default Level.INFO;
+	Level minLevel() default Level.WARN;
 
 	/**
 	 * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,
