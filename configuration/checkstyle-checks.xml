@@ -8,11 +8,6 @@
     <property name="tabWidth" value="4" />
 
     <module name="FileLength"/>
-    <module name="Header">
-        <property name="headerFile" value="${workspace_loc}/configuration/checkstyle-header.txt" />
-        <property name="fileExtensions" value="java" />
-        <property name="ignoreLines" value="2" />
-    </module>
     <module name="JavadocPackage"/>
     <module name="LineLength">
         <property name="max" value="120"/>
