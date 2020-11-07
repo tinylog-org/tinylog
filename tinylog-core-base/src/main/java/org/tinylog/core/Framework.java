@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import org.tinylog.core.backend.BundleLoggingBackend;
 import org.tinylog.core.backend.InternalLoggingBackend;
@@ -16,6 +15,7 @@ import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.runtime.RuntimeProvider;
 
@@ -128,7 +128,7 @@ public class Framework {
 
 				for (Hook hook : hooks) {
 					InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
-					hook.startUp();
+					SafeServiceLoader.execute(hook, "start", Hook::startUp);
 				}
 
 				loadLoggingBackend();
@@ -150,7 +150,7 @@ public class Framework {
 
 				for (Hook hook : hooks) {
 					InternalLogger.debug(null, "Shut down hook {}", hook.getClass().getName());
-					hook.shutDown();
+					SafeServiceLoader.execute(hook, "shut down", Hook::shutDown);
 				}
 
 				loggingBackend = null;
@@ -169,14 +169,11 @@ public class Framework {
 		Map<String, LoggingBackendBuilder> builders = new HashMap<>();
 		List<LoggingBackend> backends = new ArrayList<>();
 
-		for (LoggingBackendBuilder builder : ServiceLoader.load(LoggingBackendBuilder.class, getClassLoader())) {
-			builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder);
-		}
-
-		InternalLogger.debug(
-			null,
-			"Available logging backend builders: {}",
-			builders.values().stream().map(instance -> instance.getClass().getName()).collect(Collectors.toList())
+		SafeServiceLoader.load(
+			this,
+			LoggingBackendBuilder.class,
+			"logging backend builder",
+			builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder)
 		);
 
 		for (String name : names) {
@@ -188,15 +185,16 @@ public class Framework {
 					name
 				);
 			} else {
-				backends.add(builder.create(this));
+				SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(this));
 			}
 		}
 
 		if (backends.isEmpty()) {
 			for (Map.Entry<String, LoggingBackendBuilder> entry : builders.entrySet()) {
-				if (!(entry.getValue() instanceof NopLoggingBackendBuilder)
-						&& !(entry.getValue() instanceof InternalLoggingBackendBuilder)) {
-					backends.add(entry.getValue().create(this));
+				LoggingBackendBuilder builder = entry.getValue();
+				if (!(builder instanceof NopLoggingBackendBuilder)
+						&& !(builder instanceof InternalLoggingBackendBuilder)) {
+					SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(this));
 				}
 			}
 		}
@@ -219,11 +217,7 @@ public class Framework {
 	 * @return All found hooks
 	 */
 	private Collection<Hook> loadHooks() {
-		Collection<Hook> hooks = new ArrayList<>();
-		for (Hook hook : ServiceLoader.load(Hook.class, getClassLoader())) {
-			hooks.add(hook);
-		}
-		return hooks;
+		return SafeServiceLoader.asList(this, Hook.class, "hook");
 	}
 
 	/**

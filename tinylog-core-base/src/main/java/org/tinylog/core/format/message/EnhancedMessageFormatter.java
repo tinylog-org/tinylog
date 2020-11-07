@@ -1,16 +1,14 @@
 package org.tinylog.core.format.message;
 
 import java.text.ChoiceFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.format.value.ValueFormatBuilder;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.SafeServiceLoader;
 
 /**
  * Enhanced message formatter that replaces '{}' placeholders with passed arguments and optionally accepts format
@@ -37,16 +35,8 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	 */
 	public EnhancedMessageFormatter(Framework framework) {
 		Locale locale = framework.getConfiguration().getLocale();
-
-		formats = new ArrayList<>();
-		for (ValueFormatBuilder builder : ServiceLoader.load(ValueFormatBuilder.class, framework.getClassLoader())) {
-			formats.add(builder.create(locale));
-		}
-
-		InternalLogger.debug(
-			null,
-			"Available value formats: {}",
-			formats.stream().map(instance -> instance.getClass().getName()).collect(Collectors.toList())
+		formats = SafeServiceLoader.asList(
+			framework, ValueFormatBuilder.class, "value format builder", builder -> builder.create(locale)
 		);
 	}
 
