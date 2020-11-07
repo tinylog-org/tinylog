@@ -47,7 +47,6 @@
         </module>
         <module name="ClassDataAbstractionCoupling"/>
         <module name="ClassFanOutComplexity"/>
-        <module name="ClassMemberImpliedModifier"/>
         <module name="ClassTypeParameterName"/>
         <module name="CommentsIndentation"/>
         <module name="ConstantName">
