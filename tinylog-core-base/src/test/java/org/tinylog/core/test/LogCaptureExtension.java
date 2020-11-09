@@ -1,20 +1,10 @@
 package org.tinylog.core.test;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestInstances;
-import org.junit.platform.commons.support.AnnotationSupport;
-import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -27,28 +17,12 @@ import org.tinylog.core.backend.LoggingBackend;
  *     Use the annotation {@link CaptureLogEntries} to apply this extension.
  * </p>
  */
-public class LogCaptureExtension extends AbstractExtension implements ParameterResolver {
+public class LogCaptureExtension extends AbstractParameterizedExtension {
 
 	/** */
 	public LogCaptureExtension() {
-	}
-
-	@Override
-	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-		Class<?> type = parameterContext.getParameter().getType();
-		return type == Framework.class || type == Log.class;
-	}
-
-	@Override
-	public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-		Class<?> type = parameterContext.getParameter().getType();
-		if (type == Framework.class) {
-			return getOrCreateFramework(extensionContext);
-		} else if (type == Log.class) {
-			return getOrCreateLog(extensionContext);
-		} else {
-			throw new IllegalStateException("Unexpected parameter type: " + type.getName());
-		}
+		registerParameter(Framework.class, this::getOrCreateFramework);
+		registerParameter(Log.class, this::getOrCreateLog);
 	}
 
 	@Override
@@ -60,23 +34,7 @@ public class LogCaptureExtension extends AbstractExtension implements ParameterR
 		injectFields(context, log);
 
 		Configuration configuration = framework.getConfiguration();
-		List<CaptureLogEntries> annotations = new ArrayList<>();
-
-		context.getTestInstances().ifPresent(instances -> {
-			for (Object object : instances.getAllInstances()) {
-				CaptureLogEntries annotation = object.getClass().getAnnotation(CaptureLogEntries.class);
-				if (annotation != null) {
-					annotations.add(annotation);
-				}
-			}
-		});
-
-		context.getTestMethod().ifPresent(method -> {
-			CaptureLogEntries annotation = method.getAnnotation(CaptureLogEntries.class);
-			if (annotation != null) {
-				annotations.add(annotation);
-			}
-		});
+		List<CaptureLogEntries> annotations = findAnnotations(context, CaptureLogEntries.class);
 
 		annotations.stream().flatMap(annotation -> Arrays.stream(annotation.configuration())).forEach(entry -> {
 			int index = entry.indexOf('=');
@@ -174,33 +132,6 @@ public class LogCaptureExtension extends AbstractExtension implements ParameterR
 	 */
 	private Log getOrCreateLog(ExtensionContext context) {
 		return getOrCreate(context, Log.class, Log::new);
-	}
-
-	/**
-	 * Sets the passed value to all fields with {@link Inject} annotation and matching value type.
-	 *
-	 * @param context The current extension context
-	 * @param value The value to inject (must be not {@code null})
-	 * @param <T> Value type
-	 * @throws IllegalAccessException Failed to set the value
-	 */
-	private <T> void injectFields(ExtensionContext context, T value) throws IllegalAccessException {
-		Optional<TestInstances> instances = context.getTestInstances();
-		if (instances.isPresent()) {
-			for (Object object : instances.get().getAllInstances()) {
-				List<Field> fields = AnnotationSupport.findAnnotatedFields(
-					object.getClass(),
-					Inject.class,
-					field -> field.getType().isAssignableFrom(value.getClass()),
-					HierarchyTraversalMode.TOP_DOWN
-				);
-
-				for (Field field : fields) {
-					field.setAccessible(true);
-					field.set(object, value);
-				}
-			}
-		}
 	}
 
 }
