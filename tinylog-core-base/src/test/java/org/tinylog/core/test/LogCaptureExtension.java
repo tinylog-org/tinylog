@@ -9,10 +9,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstances;
@@ -30,9 +27,7 @@ import org.tinylog.core.backend.LoggingBackend;
  *     Use the annotation {@link CaptureLogEntries} to apply this extension.
  * </p>
  */
-public class LogCaptureExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
-
-	private static final Namespace NAMESPACE = Namespace.create(LogCaptureExtension.class);
+public class LogCaptureExtension extends AbstractExtension implements ParameterResolver {
 
 	/** */
 	public LogCaptureExtension() {
@@ -142,15 +137,15 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	 * @return The {@link Framework} instance from the store
 	 */
 	private Framework getOrCreateFramework(ExtensionContext context) {
-		return context.getStore(NAMESPACE).getOrComputeIfAbsent(
+		return getOrCreate(
+			context,
 			Framework.class,
-			type -> new Framework(false, false) {
+			() -> new Framework(false, false) {
 				@Override
 				protected LoggingBackend createLoggingBackend() {
 					return getOrCreateLoggingBackend(context);
 				}
-			},
-			Framework.class
+			}
 		);
 	}
 
@@ -163,10 +158,10 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	 * @return The {@link CaptureLoggingBackend} instance from the store
 	 */
 	private CaptureLoggingBackend getOrCreateLoggingBackend(ExtensionContext context) {
-		return context.getStore(NAMESPACE).getOrComputeIfAbsent(
+		return getOrCreate(
+			context,
 			CaptureLoggingBackend.class,
-			type -> new CaptureLoggingBackend(getOrCreateLog(context)),
-			CaptureLoggingBackend.class
+			() -> new CaptureLoggingBackend(getOrCreateLog(context))
 		);
 	}
 
@@ -178,11 +173,7 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 	 * @return The {@link Log} instance from the store
 	 */
 	private Log getOrCreateLog(ExtensionContext context) {
-		return context.getStore(NAMESPACE).getOrComputeIfAbsent(
-			Log.class,
-			type -> new Log(),
-			Log.class
-		);
+		return getOrCreate(context, Log.class, Log::new);
 	}
 
 	/**
@@ -209,18 +200,6 @@ public class LogCaptureExtension implements ParameterResolver, BeforeEachCallbac
 					field.set(object, value);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Removes a value from the store if present.
-	 *
-	 * @param context The current extension context
-	 * @param key The key of the value to remove form the store
-	 */
-	private void remove(ExtensionContext context, Class<?> key) {
-		if (context.getStore(NAMESPACE).remove(key) == null) {
-			context.getParent().ifPresent(parent -> remove(parent, key));
 		}
 	}
 

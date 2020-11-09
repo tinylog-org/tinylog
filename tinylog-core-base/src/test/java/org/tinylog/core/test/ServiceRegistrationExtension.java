@@ -12,11 +12,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 /**
@@ -26,9 +22,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
  *     Use the annotation {@link RegisterService} to apply this extension.
  * </p>
  */
-public class ServiceRegistrationExtension implements BeforeEachCallback, AfterEachCallback {
-
-	private static final Namespace NAMESPACE = Namespace.create(ServiceRegistrationExtension.class);
+public class ServiceRegistrationExtension extends AbstractExtension {
 
 	/** */
 	public ServiceRegistrationExtension() {
@@ -58,9 +52,8 @@ public class ServiceRegistrationExtension implements BeforeEachCallback, AfterEa
 			ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();
 			ClassLoader wrappedLoader = new URLClassLoader(urls, defaultLoader);
 
-			Store store = context.getStore(NAMESPACE);
-			store.put(Path.class, temporaryFolder);
-			store.put(ClassLoader.class, defaultLoader);
+			put(context, Path.class, temporaryFolder);
+			put(context, ClassLoader.class, defaultLoader);
 
 			Thread.currentThread().setContextClassLoader(wrappedLoader);
 			temporaryFolder.toFile().deleteOnExit();
@@ -69,14 +62,12 @@ public class ServiceRegistrationExtension implements BeforeEachCallback, AfterEa
 
 	@Override
 	public void afterEach(ExtensionContext context) throws IOException {
-		Store store = context.getStore(NAMESPACE);
-
-		ClassLoader loader = store.get(ClassLoader.class, ClassLoader.class);
+		ClassLoader loader = get(context, ClassLoader.class);
 		if (loader != null) {
 			Thread.currentThread().setContextClassLoader(loader);
 		}
 
-		Path folder = store.get(Path.class, Path.class);
+		Path folder = get(context, Path.class);
 		if (folder != null) {
 			for (Path path : Files.walk(folder).sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
 				Files.deleteIfExists(path);
