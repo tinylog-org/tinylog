@@ -40,17 +40,6 @@ public class Log {
 	}
 
 	/**
-	 * Appends a new log entry to the end of this log.
-	 *
-	 * @param entry Log entry to append to this log
-	 */
-	public void add(LogEntry entry) {
-		if (entry.getLevel().ordinal() <= minLevel.ordinal()) {
-			entries.add(entry);
-		}
-	}
-
-	/**
 	 * Retrieves all stored log entries and clears the entire log afterwards.
 	 *
 	 * @return All store log entries
@@ -60,6 +49,17 @@ public class Log {
 			return entries;
 		} finally {
 			entries = new ArrayList<>();
+		}
+	}
+
+	/**
+	 * Appends a new log entry to the end of this log.
+	 *
+	 * @param entry Log entry to append to this log
+	 */
+	void add(LogEntry entry) {
+		if (entry.getLevel().ordinal() <= minLevel.ordinal()) {
+			entries.add(entry);
 		}
 	}
 
