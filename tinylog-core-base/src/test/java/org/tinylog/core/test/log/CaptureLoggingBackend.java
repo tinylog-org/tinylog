@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.log;
 
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;

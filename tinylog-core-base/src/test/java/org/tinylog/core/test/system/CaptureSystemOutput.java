@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.system;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

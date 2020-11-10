@@ -21,12 +21,12 @@ import org.junit.platform.commons.support.HierarchyTraversalMode;
 /**
  * Base extension class for custom parameterized JUnit5 extensions.
  */
-abstract class AbstractParameterizedExtension extends AbstractExtension implements ParameterResolver {
+public abstract class AbstractParameterizedExtension extends AbstractExtension implements ParameterResolver {
 
 	private final Map<Class<?>, Function<ExtensionContext, ?>> parameters;
 
 	/** */
-	AbstractParameterizedExtension() {
+	public AbstractParameterizedExtension() {
 		parameters = new HashMap<>();
 	}
 

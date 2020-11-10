@@ -3,7 +3,7 @@ package org.tinylog.core.runtime;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.test.CaptureLogEntries;
+import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

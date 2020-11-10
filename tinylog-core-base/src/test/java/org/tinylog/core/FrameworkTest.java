@@ -13,9 +13,9 @@ import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.test.CaptureSystemOutput;
-import org.tinylog.core.test.Output;
-import org.tinylog.core.test.RegisterService;
+import org.tinylog.core.test.service.RegisterService;
+import org.tinylog.core.test.system.CaptureSystemOutput;
+import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.clearInvocations;

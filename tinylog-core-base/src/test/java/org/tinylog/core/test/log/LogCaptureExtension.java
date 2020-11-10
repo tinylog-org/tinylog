@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.log;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.test.AbstractParameterizedExtension;
 
 /**
  * JUnit extension for capturing output log entries.

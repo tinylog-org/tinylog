@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
-import org.tinylog.core.test.CaptureLogEntries;
-import org.tinylog.core.test.Log;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

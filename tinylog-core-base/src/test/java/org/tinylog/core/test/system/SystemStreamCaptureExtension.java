@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.system;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -12,9 +12,10 @@ import java.util.regex.Pattern;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.tinylog.core.test.AbstractParameterizedExtension;
 
 /**
- * JUnit extension for capturing output to {@link System#out} and {@link System#err}.
+ * JUnit extension for capturing output from {@link System#out} and {@link System#err}.
  *
  * <p>
  *     Use the annotation {@link CaptureSystemOutput} to apply this extension.

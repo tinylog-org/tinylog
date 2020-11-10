@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.service;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
+import org.tinylog.core.test.AbstractExtension;
 
 /**
  * JUnit extension for registering service implementations for {@link ServiceLoader}.

@@ -1,4 +1,4 @@
-package org.tinylog.core.test;
+package org.tinylog.core.test.log;
 
 import java.util.ArrayList;
 import java.util.List;

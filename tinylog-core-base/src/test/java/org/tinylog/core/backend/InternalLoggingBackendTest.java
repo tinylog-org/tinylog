@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
-import org.tinylog.core.test.CaptureSystemOutput;
-import org.tinylog.core.test.Output;
+import org.tinylog.core.test.system.CaptureSystemOutput;
+import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

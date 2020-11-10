@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.test.CaptureSystemOutput;
+import org.tinylog.core.test.system.CaptureSystemOutput;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

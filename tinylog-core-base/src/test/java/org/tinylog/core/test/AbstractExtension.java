@@ -11,12 +11,12 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store;
 /**
  * Base extension class for custom JUnit5 extensions.
  */
-abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallback {
+public abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallback {
 
 	private final Namespace namespace;
 
 	/** */
-	AbstractExtension() {
+	public AbstractExtension() {
 		namespace = Namespace.create(getClass());
 	}
 

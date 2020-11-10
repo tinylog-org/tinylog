@@ -5,9 +5,9 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
-import org.tinylog.core.test.CaptureLogEntries;
-import org.tinylog.core.test.Log;
-import org.tinylog.core.test.LogEntry;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
+import org.tinylog.core.test.log.LogEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

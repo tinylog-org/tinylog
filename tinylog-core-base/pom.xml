@@ -106,7 +106,7 @@
                                 </manifestEntries>
                             </archive>
                             <includes>
-                                <include>org/tinylog/core/test/*</include>
+                                <include>org/tinylog/core/test/**</include>
                             </includes>
                         </configuration>
                     </execution>
