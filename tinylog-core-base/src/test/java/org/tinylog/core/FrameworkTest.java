@@ -2,6 +2,8 @@ package org.tinylog.core;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.backend.BundleLoggingBackend;
@@ -11,16 +13,21 @@ import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.runtime.RuntimeFlavor;
+import org.tinylog.core.test.CaptureSystemOutput;
+import org.tinylog.core.test.Output;
 import org.tinylog.core.test.RegisterService;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+@CaptureSystemOutput(excludes = "TINYLOG WARN:.*tinylog-impl\\.jar.*")
 class FrameworkTest {
+
+	@Inject
+	private Output output;
 
 	/**
 	 * Verifies that a {@link RuntimeFlavor} is provided.
@@ -216,14 +223,12 @@ class FrameworkTest {
 		 * Verifies that the internal logger is initialized after startup.
 		 */
 		@Test
-		void initializeInternalLoggerAfterStartup() throws Exception {
+		void initializeInternalLoggerAfterStartup() {
 			Framework framework = new Framework(false, false);
 			try {
-				String output = tapSystemErr(() -> {
-					framework.startUp();
-					InternalLogger.warn(null, "Hello World!");
-				});
-				assertThat(output).contains("TINYLOG WARN", "Hello World!");
+				framework.startUp();
+				InternalLogger.warn(null, "Hello World!");
+				assertThat(output.consume()).containsExactly("TINYLOG WARN: Hello World!");
 			} finally {
 				framework.shutDown();
 			}
@@ -240,15 +245,14 @@ class FrameworkTest {
 		/**
 		 * Verifies that the internal logging backend is loaded if none other is available.
 		 */
+		@CaptureSystemOutput // Reset the default excludes
 		@Test
-		void loadInternalLoggingBackend() throws Exception {
+		void loadInternalLoggingBackend() {
 			Framework framework = new Framework(false, false);
-
-			String output = tapSystemErr(
-				() -> assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class)
-			);
-
-			assertThat(output).contains("TINYLOG WARN", "tinylog-impl");
+			assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class);
+			assertThat(output.consume())
+				.hasSize(1)
+				.allSatisfy(line -> assertThat(line).contains("TINYLOG WARN", "tinylog-impl.jar"));
 		}
 
 		/**
@@ -322,15 +326,15 @@ class FrameworkTest {
 		 */
 		@RegisterService(service = LoggingBackendBuilder.class, implementations = TestOneLoggingBackendBuilder.class)
 		@Test
-		void fallbackForEntireInvalidName() throws Exception {
-			String output = tapSystemErr(() -> {
-				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backends", "test0");
-				LoggingBackend backend = framework.getLoggingBackend();
-				assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
-			});
+		void fallbackForEntireInvalidName() {
+			Framework framework = new Framework(true, false);
+			framework.getConfiguration().set("backends", "test0");
+			LoggingBackend backend = framework.getLoggingBackend();
 
-			assertThat(output).contains("TINYLOG ERROR", "test0");
+			assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
+			assertThat(output.consume())
+				.hasSize(1)
+				.allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test0"));
 		}
 
 		/**
@@ -341,15 +345,15 @@ class FrameworkTest {
 			implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
 		)
 		@Test
-		void fallbackForPartialInvalidName() throws Exception {
-			String output = tapSystemErr(() -> {
-				Framework framework = new Framework(true, false);
-				framework.getConfiguration().set("backends", "test2, test3");
-				LoggingBackend backend = framework.getLoggingBackend();
-				assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
-			});
+		void fallbackForPartialInvalidName() {
+			Framework framework = new Framework(true, false);
+			framework.getConfiguration().set("backends", "test2, test3");
+			LoggingBackend backend = framework.getLoggingBackend();
 
-			assertThat(output).contains("TINYLOG ERROR", "test3");
+			assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
+			assertThat(output.consume())
+				.hasSize(1)
+				.allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test3"));
 		}
 
 		/**

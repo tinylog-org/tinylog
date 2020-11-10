@@ -1,16 +1,23 @@
 package org.tinylog.core.backend;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
+import org.tinylog.core.test.CaptureSystemOutput;
+import org.tinylog.core.test.Output;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureSystemOutput
 class InternalLoggingBackendTest {
+	
+	@Inject
+	private Output output;
 
 	/**
 	 * Verifies that a plain text message can be output at the severity levels warn and error.
@@ -19,8 +26,8 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void plainTextMessage(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+	public void plainTextMessage(Level level) {
+		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -28,9 +35,9 @@ class InternalLoggingBackendTest {
 			"Hello World!",
 			null,
 			null
-		));
+		);
 
-		assertThat(output).isEqualTo("TINYLOG " + level + ": Hello World!" + System.lineSeparator());
+		assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello World!");
 	}
 
 	/**
@@ -40,8 +47,8 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void formattedTextMessage(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+	public void formattedTextMessage(Level level) {
+		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -49,9 +56,9 @@ class InternalLoggingBackendTest {
 			"Hello {}!",
 			new Object[] {"world"},
 			new EnhancedMessageFormatter(new Framework(false, false))
-		));
+		);
 
-		assertThat(output).isEqualTo("TINYLOG " + level + ": Hello world!" + System.lineSeparator());
+		assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello world!");
 	}
 
 	/**
@@ -61,14 +68,14 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void exceptionOnly(Level level) throws Exception {
+	public void exceptionOnly(Level level) {
 		Exception exception = new NullPointerException();
 		exception.setStackTrace(new StackTraceElement[] {
 			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
 			new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
 		});
 
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -76,12 +83,12 @@ class InternalLoggingBackendTest {
 			null,
 			null,
 			null
-		));
+		);
 
-		assertThat(output).isEqualTo(
-			"TINYLOG " + level + ": java.lang.NullPointerException" + System.lineSeparator()
-			+ "\tat example.MyClass.foo(MyClass.java:42)" + System.lineSeparator()
-			+ "\tat example.OtherClass.bar(OtherClass.java:42)" + System.lineSeparator()
+		assertThat(output.consume()).containsExactly(
+			"TINYLOG " + level + ": java.lang.NullPointerException",
+			"\tat example.MyClass.foo(MyClass.java:42)",
+			"\tat example.OtherClass.bar(OtherClass.java:42)"
 		);
 	}
 
@@ -92,13 +99,13 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void exceptionWithCustomMessage(Level level) throws Exception {
+	public void exceptionWithCustomMessage(Level level) {
 		Exception exception = new UnsupportedOperationException();
 		exception.setStackTrace(new StackTraceElement[] {
 			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
 		});
 
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -106,11 +113,11 @@ class InternalLoggingBackendTest {
 			"Oops!",
 			null,
 			null
-		));
+		);
 
-		assertThat(output).isEqualTo(
-			"TINYLOG " + level + ": Oops!: java.lang.UnsupportedOperationException" + System.lineSeparator()
-				+ "\tat example.MyClass.foo(MyClass.java:42)" + System.lineSeparator()
+		assertThat(output.consume()).containsExactly(
+			"TINYLOG " + level + ": Oops!: java.lang.UnsupportedOperationException",
+			"\tat example.MyClass.foo(MyClass.java:42)"
 		);
 	}
 
@@ -121,8 +128,8 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-	public void discardNonServeLogEntries(Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+	public void discardNonServeLogEntries(Level level) {
+		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
 			level,
@@ -130,9 +137,9 @@ class InternalLoggingBackendTest {
 			"Hello World!",
 			null,
 			null
-		));
+		);
 
-		assertThat(output).isEmpty();
+		assertThat(output.consume()).isEmpty();
 	}
 
 	/**
@@ -143,8 +150,8 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
-	public void discardNonTinylogLogEntries(String tag, Level level) throws Exception {
-		String output = tapSystemErr(() -> new InternalLoggingBackend().log(
+	public void discardNonTinylogLogEntries(String tag, Level level) {
+		new InternalLoggingBackend().log(
 			null,
 			tag,
 			level,
@@ -152,9 +159,9 @@ class InternalLoggingBackendTest {
 			"Hello World!",
 			null,
 			null
-		));
+		);
 
-		assertThat(output).isEmpty();
+		assertThat(output.consume()).isEmpty();
 	}
 
 }
