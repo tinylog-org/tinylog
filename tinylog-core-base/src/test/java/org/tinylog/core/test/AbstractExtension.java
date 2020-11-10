@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
 /**
  * Base extension class for custom JUnit5 extensions.
@@ -28,7 +29,7 @@ abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallbac
 	 * @return The stored value if present, otherwise {@code null}
 	 */
 	protected <T> T get(ExtensionContext context, Class<T> type) {
-		return context.getStore(namespace).get(type, type);
+		return getStore(context).get(type, type);
 	}
 
 	/**
@@ -42,7 +43,7 @@ abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallbac
 	 * @return The stored value
 	 */
 	protected <T> T getOrCreate(ExtensionContext context, Class<T> type, Supplier<T> producer) {
-		return context.getStore(namespace).getOrComputeIfAbsent(type, key -> producer.get(), type);
+		return getStore(context).getOrComputeIfAbsent(type, key -> producer.get(), type);
 	}
 
 	/**
@@ -55,7 +56,7 @@ abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallbac
 	 * @param <T> The generic value type
 	 */
 	protected <T> void put(ExtensionContext context, Class<T> type, T instance) {
-		context.getStore(namespace).put(type, instance);
+		getStore(context).put(type, instance);
 	}
 
 	/**
@@ -65,9 +66,19 @@ abstract class AbstractExtension implements BeforeEachCallback, AfterEachCallbac
 	 * @param type The type of the value to remove
 	 */
 	protected void remove(ExtensionContext context, Class<?> type) {
-		if (context.getStore(namespace).remove(type) == null) {
+		if (getStore(context).remove(type) == null) {
 			context.getParent().ifPresent(parent -> remove(parent, type));
 		}
+	}
+
+	/**
+	 * Gets the store for putting and retrieving values.
+	 *
+	 * @param context The current extension context
+	 * @return The store
+	 */
+	protected Store getStore(ExtensionContext context) {
+		return context.getStore(namespace);
 	}
 
 }
