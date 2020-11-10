@@ -1,7 +1,7 @@
 tinylog 2
 =========
-[![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.2)](https://travis-ci.org/pmwmedia/tinylog)
-[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.2/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.2)
+[![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.3)](https://travis-ci.org/pmwmedia/tinylog/branches)
+[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.3/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.3)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog-impl/badge.svg)](https://search.maven.org/search?q=g:org.tinylog)
 
 Example
