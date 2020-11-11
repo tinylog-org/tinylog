@@ -28,7 +28,7 @@ public interface LoggingBackendBuilder {
 	/**
 	 * Creates a new instance of the logging backend.
 	 *
-	 * @param framework Configuration and hooks
+	 * @param framework The actual logging framework instance
 	 * @return New instance of the logging backend
 	 */
 	LoggingBackend create(Framework framework);
