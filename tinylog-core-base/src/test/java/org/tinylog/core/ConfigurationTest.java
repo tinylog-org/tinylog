@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.loader.ConfigurationLoaderBuilder;
 import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -23,6 +25,9 @@ class ConfigurationTest {
 
 	@Inject
 	private Framework framework;
+
+	@Inject
+	private Log log;
 
 	/**
 	 * Tests for getting and setting values.
@@ -216,6 +221,61 @@ class ConfigurationTest {
 
 			assertThat(configuration.getValue("first")).isEqualTo("yes");
 			assertThat(configuration.getValue("second")).isNull();
+		}
+
+		/**
+		 * Verifies that a configuration loader can be defined by name.
+		 */
+		@RegisterService(
+			service = ConfigurationLoaderBuilder.class,
+			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+		)
+		@Test
+		void defineConfigurationLoaderByName() throws Exception {
+			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
+			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
+
+			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
+			when(secondLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("second", "yes"));
+
+			Configuration configuration = new Configuration();
+
+			restoreSystemProperties(() -> {
+				System.setProperty("tinylog.configurationLoader", "test1");
+				configuration.load(framework);
+			});
+
+			assertThat(configuration.getValue("first")).isEqualTo("yes");
+			assertThat(configuration.getValue("second")).isNull();
+		}
+
+		/**
+		 * Verifies that an invalid configuration name is reported and another available configuration loader will be
+		 * used instead.
+		 */
+		@RegisterService(
+			service = ConfigurationLoaderBuilder.class,
+			implementations = TestOneConfigurationLoaderBuilder.class
+		)
+		@Test
+		void reportInvalidConfigurationLoaderName() throws Exception {
+			ConfigurationLoader loader = TestOneConfigurationLoaderBuilder.loader;
+			when(loader.load(any(ClassLoader.class))).thenReturn(singletonMap("foo", "bar"));
+
+			Configuration configuration = new Configuration();
+
+			restoreSystemProperties(() -> {
+				System.setProperty("tinylog.configurationLoader", "test0");
+				configuration.load(framework);
+			});
+
+			assertThat(configuration.getValue("foo")).isEqualTo("bar");
+			assertThat(log.consume())
+				.hasSize(1)
+				.allSatisfy(entry -> {
+					assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+					assertThat(entry.getMessage()).contains("test0");
+				});
 		}
 
 		/**

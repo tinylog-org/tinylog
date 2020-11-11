@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.tinylog.core.internal.InternalLogger;
@@ -26,6 +27,8 @@ public class Configuration {
 		"The configuration has already been applied and cannot be modified anymore";
 
 	private static final int MAX_LOCALE_ARGUMENTS = 3;
+
+	private static final String CONFIGURATION_LOADER_PROPERTY = "tinylog.configurationLoader";
 
 	private final Properties properties;
 	private boolean frozen;
@@ -135,11 +138,30 @@ public class Configuration {
 			if (frozen) {
 				throw new UnsupportedOperationException(FROZEN_MESSAGE);
 			} else {
+				String name = System.getProperty(CONFIGURATION_LOADER_PROPERTY);
+
 				List<ConfigurationLoaderBuilder> builders = SafeServiceLoader.asList(
 					framework,
 					ConfigurationLoaderBuilder.class,
 					"configuration loader"
 				);
+
+				if (name != null) {
+					Optional<ConfigurationLoaderBuilder> optional = builders
+						.stream()
+						.filter(builder -> name.toLowerCase(Locale.ENGLISH).equals(builder.getName()))
+						.findFirst();
+
+					if (optional.isPresent()) {
+						builders = Collections.singletonList(optional.get());
+					} else {
+						InternalLogger.error(
+							null,
+							"Could not find any configuration loader with the name \"{}\" in the classpath",
+							name
+						);
+					}
+				}
 
 				builders.stream()
 					.sorted(Comparator.comparingInt(ConfigurationLoaderBuilder::getPriority).reversed())
