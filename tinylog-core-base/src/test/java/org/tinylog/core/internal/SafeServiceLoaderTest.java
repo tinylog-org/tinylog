@@ -91,6 +91,7 @@ class SafeServiceLoaderTest {
 	/**
 	 * Verifies that a consume operation can be executed for a single service implementation.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void consumeSingleServiceImplementation() {
 		FirstServiceImpl implementation = new FirstServiceImpl();
@@ -103,6 +104,7 @@ class SafeServiceLoaderTest {
 	/**
 	 * Verifies that a failed consume operation is logged but does not throw any exception.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void logFailedConsuming() {
 		FirstServiceImpl implementation = new FirstServiceImpl();
