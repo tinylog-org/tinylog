@@ -14,6 +14,6 @@ public interface ConfigurationLoader {
 	 * @return The loaded configuration as map if any configuration could be found and successfully loaded, or
 	 *         {@code null} if there is no suitable configuration
 	 */
-	Map<?, ?> load(ClassLoader classLoader);
+	Map<Object, Object> load(ClassLoader classLoader);
 
 }

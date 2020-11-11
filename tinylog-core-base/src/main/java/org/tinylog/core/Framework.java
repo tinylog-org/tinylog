@@ -47,7 +47,7 @@ public class Framework {
 		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
 
 		if (loadConfiguration) {
-			configuration.loadPropertiesFile(getClassLoader());
+			configuration.load(this);
 		}
 	}
 

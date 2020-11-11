@@ -1,24 +1,17 @@
 package org.tinylog.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Locale;
 
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.tinylog.core.loader.ConfigurationLoader;
+import org.tinylog.core.loader.ConfigurationLoaderBuilder;
 import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
+import org.tinylog.core.test.service.RegisterService;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +22,7 @@ import static org.mockito.Mockito.when;
 class ConfigurationTest {
 
 	@Inject
-	private Log log;
+	private Framework framework;
 
 	/**
 	 * Tests for getting and setting values.
@@ -176,200 +169,57 @@ class ConfigurationTest {
 	}
 
 	/**
-	 * Tests for loading from file.
+	 * Tests for loading from registered configuration loaders.
 	 */
 	@Nested
-	class PropertiesFile {
+	class Loading {
 
 		/**
-		 * Custom temporary folder for creating files.
+		 * Verifies that the configuration loader with the highest priority will be used.
 		 */
-		@TempDir
-		Path folder;
-
-		/**
-		 * Verifies that {@code tinylog.properties} will be loaded, if there is no other properties file.
-		 */
+		@RegisterService(
+			service = ConfigurationLoaderBuilder.class,
+			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+		)
 		@Test
-		void loadDefaultProductionPropertiesFile() throws IOException {
-			createTextFile("tinylog.properties", "environment = production");
+		void useConfigurationLoaderWithHighestPriority() {
+			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
+			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
+
+			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
+			when(secondLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("second", "yes"));
 
 			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(generateClassLoader());
-			assertThat(configuration.getValue("environment")).isEqualTo("production");
+			configuration.load(framework);
+
+			assertThat(configuration.getValue("first")).isNull();
+			assertThat(configuration.getValue("second")).isEqualTo("yes");
 		}
 
 		/**
-		 * Verifies that {@code tinylog-test.properties} will be loaded, if there is no other properties file.
+		 * Verifies that a configuration loader that cannot provide and configuration is skipped.
 		 */
+		@RegisterService(
+			service = ConfigurationLoaderBuilder.class,
+			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+		)
 		@Test
-		void loadDefaultTestPropertiesFile() throws IOException {
-			createTextFile("tinylog-test.properties", "environment = test");
+		void skipConfigurationLoaderWithoutResult() {
+			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
+			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
+
+			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
+			when(secondLoader.load(any(ClassLoader.class))).thenReturn(null);
 
 			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(generateClassLoader());
-			assertThat(configuration.getValue("environment")).isEqualTo("test");
+			configuration.load(framework);
+
+			assertThat(configuration.getValue("first")).isEqualTo("yes");
+			assertThat(configuration.getValue("second")).isNull();
 		}
 
 		/**
-		 * Verifies that {@code tinylog-dev.properties} will be loaded, if there is no other properties file.
-		 */
-		@Test
-		void loadDefaultDevelopmentPropertiesFile() throws IOException {
-			createTextFile("tinylog-dev.properties", "environment = development");
-
-			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(generateClassLoader());
-			assertThat(configuration.getValue("environment")).isEqualTo("development");
-		}
-
-		/**
-		 * Verifies that {@code tinylog-test.properties} will be loaded, if {@code tinylog.properties} and
-		 * {@code tinylog-test.properties} are available.
-		 */
-		@Test
-		void preferTestOverProductionPropertiesFile() throws IOException {
-			createTextFile("tinylog.properties", "production = yes");
-			createTextFile("tinylog-test.properties", "test = yes");
-
-			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(generateClassLoader());
-			assertThat(configuration.getValue("production")).isNull();
-			assertThat(configuration.getValue("test")).isEqualTo("yes");
-		}
-
-		/**
-		 * Verifies that {@code tinylog-dev.properties} will be loaded, if {@code tinylog-test.properties} and
-		 * {@code tinylog-dev.properties} are available.
-		 */
-		@Test
-		void preferDevelopmentOverTestPropertiesFile() throws IOException {
-			createTextFile("tinylog-test.properties", "test = yes");
-			createTextFile("tinylog-dev.properties", "development = yes");
-
-			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(generateClassLoader());
-			assertThat(configuration.getValue("test")).isNull();
-			assertThat(configuration.getValue("development")).isEqualTo("yes");
-		}
-
-		/**
-		 * Verifies that a custom resource from the classpath can be provided as tinylog configuration.
-		 */
-		@Test
-		void loadCustomResource() throws Exception {
-			restoreSystemProperties(() -> {
-				createTextFile("my-configuration.properties", "foo = bar");
-				System.setProperty("tinylog.configuration", "my-configuration.properties");
-
-				Configuration configuration = new Configuration();
-				configuration.loadPropertiesFile(generateClassLoader());
-				assertThat(configuration.getValue("foo")).isEqualTo("bar");
-			});
-		}
-
-		/**
-		 * Verifies that a custom local file can be provided as tinylog configuration.
-		 */
-		@Test
-		void loadCustomLocalFile() throws Exception {
-			restoreSystemProperties(() -> {
-				Path file = createTextFile("my-configuration.properties", "foo = bar");
-				System.setProperty("tinylog.configuration", file.toString());
-
-				Configuration configuration = new Configuration();
-				configuration.loadPropertiesFile(getClass().getClassLoader());
-				assertThat(configuration.getValue("foo")).isEqualTo("bar");
-			});
-		}
-
-		/**
-		 * Verifies that a custom URL can be provided as tinylog configuration.
-		 */
-		@Test
-		void loadCustomUrl() throws Exception {
-			restoreSystemProperties(() -> {
-				Path file = createTextFile("my-configuration.properties", "foo = bar");
-				System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
-
-				Configuration configuration = new Configuration();
-				configuration.loadPropertiesFile(getClass().getClassLoader());
-				assertThat(configuration.getValue("foo")).isEqualTo("bar");
-			});
-		}
-
-		/**
-		 * Verifies that no default properties files will be loaded, if a custom configuration is provided.
-		 */
-		@Test
-		void preferCustomOverDefaultPropertiesFile() throws Exception {
-			restoreSystemProperties(() -> {
-				createTextFile("tinylog-custom.properties", "custom = yes");
-				createTextFile("tinylog.properties", "production = yes");
-				createTextFile("tinylog-test.properties", "test = yes");
-				createTextFile("tinylog-dev.properties", "development = yes");
-
-				System.setProperty("tinylog.configuration", "tinylog-custom.properties");
-
-				Configuration configuration = new Configuration();
-				configuration.loadPropertiesFile(generateClassLoader());
-				assertThat(configuration.getValue("custom")).isEqualTo("yes");
-				assertThat(configuration.getValue("production")).isNull();
-				assertThat(configuration.getValue("test")).isNull();
-				assertThat(configuration.getValue("development")).isNull();
-			});
-		}
-
-		/**
-		 * Verifies that an error will be output and configuration will be loaded from an available classpath resource,
-		 * if the defined custom configuration does not exist.
-		 */
-		@Test
-		void printErrorIfCustomPropertiesFileDoesNotExist() throws Exception {
-			restoreSystemProperties(() -> {
-				createTextFile("tinylog.properties", "production = yes");
-
-				System.setProperty("tinylog.configuration", folder.resolve("tinylog-custom.properties").toString());
-				Configuration configuration = new Configuration();
-				configuration.loadPropertiesFile(generateClassLoader());
-
-				assertThat(configuration.getValue("production")).isEqualTo("yes");
-				assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
-					assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-					assertThat(entry.getMessage()).contains("tinylog-custom.properties");
-				});
-			});
-		}
-
-		/**
-		 * Verifies that an error message will be output, if a resource stream throws an {@link IOException}.
-		 */
-		@Test
-		void printErrorIfLoadingPropertiesFileFails() {
-			ClassLoader classLoader = new URLClassLoader(new URL[0], getClass().getClassLoader()) {
-				@Override
-				public InputStream getResourceAsStream(String name) {
-					try {
-						InputStream stream = mock(InputStream.class);
-						when(stream.read(any(byte[].class))).thenThrow(new IOException("Invalid resource"));
-						return stream;
-					} catch (IOException ex) {
-						throw new RuntimeException(ex);
-					}
-				}
-			};
-
-			Configuration configuration = new Configuration();
-			configuration.loadPropertiesFile(classLoader);
-
-			assertThat(log.consume()).hasSize(3).allSatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getThrowable()).hasMessage("Invalid resource");
-			});
-		}
-
-		/**
-		 * Verifies that loading properties file is not allowed after freezing.
+		 * Verifies that loading is not allowed after freezing.
 		 */
 		@Test
 		void freeze() {
@@ -378,34 +228,55 @@ class ConfigurationTest {
 
 			configuration.freeze();
 			assertThat(configuration.isFrozen()).isTrue();
-			assertThatCode(() -> configuration.loadPropertiesFile(getClass().getClassLoader()))
-				.isInstanceOf(UnsupportedOperationException.class);
+			assertThatCode(() -> configuration.load(framework)).isInstanceOf(UnsupportedOperationException.class);
 		}
 
-		/**
-		 * Generates a class loader that contains the current temporary folder as source for loading resource files.
-		 *
-		 * @return The created class loader
-		 * @throws MalformedURLException Failed to provide the current temporary folder as URL
-		 */
-		private ClassLoader generateClassLoader() throws MalformedURLException {
-			URL[] urls = new URL[] {folder.toUri().toURL()};
-			return new URLClassLoader(urls, getClass().getClassLoader());
+	}
+
+	/**
+	 * Additional logging configuration builder for JUnit tests.
+	 */
+	public static final class TestOneConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
+
+		private static final ConfigurationLoader loader = mock(ConfigurationLoader.class);
+
+		@Override
+		public String getName() {
+			return "test1";
 		}
 
-		/**
-		 * Creates a text file in the current temporary folder.
-		 *
-		 * @param fileName File name for the text file
-		 * @param lines Lines to write to the text file
-		 * @return The created file
-		 * @throws IOException Failed to create a text file
-		 */
-		private Path createTextFile(String fileName, String... lines) throws IOException {
-			Path file = folder.resolve(fileName);
-			String content = String.join("\n", lines);
-			Files.write(file, content.getBytes(StandardCharsets.UTF_8));
-			return file;
+		@Override
+		public int getPriority() {
+			return 1;
+		}
+
+		@Override
+		public ConfigurationLoader create() {
+			return loader;
+		}
+
+	}
+
+	/**
+	 * Additional logging configuration builder for JUnit tests.
+	 */
+	public static final class TestTwoConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
+
+		private static final ConfigurationLoader loader = mock(ConfigurationLoader.class);
+
+		@Override
+		public String getName() {
+			return "test2";
+		}
+
+		@Override
+		public int getPriority() {
+			return 2;
+		}
+
+		@Override
+		public ConfigurationLoader create() {
+			return loader;
 		}
 
 	}

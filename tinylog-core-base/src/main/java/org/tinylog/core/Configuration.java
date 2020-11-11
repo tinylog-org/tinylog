@@ -2,13 +2,15 @@ package org.tinylog.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.loader.PropertiesLoader;
+import org.tinylog.core.internal.SafeServiceLoader;
+import org.tinylog.core.loader.ConfigurationLoaderBuilder;
 
 /**
  * Configuration for tinylog.
@@ -123,20 +125,29 @@ public class Configuration {
 	}
 
 	/**
-	 * Loads the configuration from default properties file if available.
+	 * Loads the configuration.
 	 *
-	 * @param classLoader The class loader to use for loading resources from classpath
+	 * @param framework The actual logging framework instance
 	 * @throws UnsupportedOperationException The configuration has already been applied and cannot be modified anymore
 	 */
-	void loadPropertiesFile(ClassLoader classLoader) {
+	void load(Framework framework) {
 		synchronized (properties) {
 			if (frozen) {
 				throw new UnsupportedOperationException(FROZEN_MESSAGE);
 			} else {
-				Map<?, ?> settings = new PropertiesLoader().load(classLoader);
-				if (settings != null) {
-					properties.putAll(settings);
-				}
+				List<ConfigurationLoaderBuilder> builders = SafeServiceLoader.asList(
+					framework,
+					ConfigurationLoaderBuilder.class,
+					"configuration loader"
+				);
+
+				builders.stream()
+					.sorted(Comparator.comparingInt(ConfigurationLoaderBuilder::getPriority).reversed())
+					.map(ConfigurationLoaderBuilder::create)
+					.map(loader -> loader.load(framework.getClassLoader()))
+					.filter(Objects::nonNull)
+					.findFirst()
+					.ifPresent(properties::putAll);
 			}
 		}
 	}
