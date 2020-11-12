@@ -13,12 +13,10 @@ import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
 class ConfigurationTest {
@@ -188,11 +186,8 @@ class ConfigurationTest {
 		)
 		@Test
 		void useConfigurationLoaderWithHighestPriority() {
-			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
-			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
-
-			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
-			when(secondLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("second", "yes"));
+			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
+			TestTwoConfigurationLoaderBuilder.loader = classLoader -> singletonMap("second", "yes");
 
 			Configuration configuration = new Configuration();
 			configuration.load(framework);
@@ -210,11 +205,8 @@ class ConfigurationTest {
 		)
 		@Test
 		void skipConfigurationLoaderWithoutResult() {
-			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
-			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
-
-			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
-			when(secondLoader.load(any(ClassLoader.class))).thenReturn(null);
+			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
+			TestTwoConfigurationLoaderBuilder.loader = classLoader -> null;
 
 			Configuration configuration = new Configuration();
 			configuration.load(framework);
@@ -232,11 +224,8 @@ class ConfigurationTest {
 		)
 		@Test
 		void defineConfigurationLoaderByName() throws Exception {
-			ConfigurationLoader firstLoader = TestOneConfigurationLoaderBuilder.loader;
-			when(firstLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("first", "yes"));
-
-			ConfigurationLoader secondLoader = TestTwoConfigurationLoaderBuilder.loader;
-			when(secondLoader.load(any(ClassLoader.class))).thenReturn(singletonMap("second", "yes"));
+			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
+			TestTwoConfigurationLoaderBuilder.loader = classLoader -> singletonMap("second", "yes");
 
 			Configuration configuration = new Configuration();
 
@@ -259,9 +248,7 @@ class ConfigurationTest {
 		)
 		@Test
 		void reportInvalidConfigurationLoaderName() throws Exception {
-			ConfigurationLoader loader = TestOneConfigurationLoaderBuilder.loader;
-			when(loader.load(any(ClassLoader.class))).thenReturn(singletonMap("foo", "bar"));
-
+			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("foo", "bar");
 			Configuration configuration = new Configuration();
 
 			restoreSystemProperties(() -> {
@@ -298,7 +285,7 @@ class ConfigurationTest {
 	 */
 	public static final class TestOneConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
 
-		private static final ConfigurationLoader loader = mock(ConfigurationLoader.class);
+		private static ConfigurationLoader loader = classLoader -> emptyMap();
 
 		@Override
 		public String getName() {
@@ -322,7 +309,7 @@ class ConfigurationTest {
 	 */
 	public static final class TestTwoConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
 
-		private static final ConfigurationLoader loader = mock(ConfigurationLoader.class);
+		private static ConfigurationLoader loader = classLoader -> emptyMap();
 
 		@Override
 		public String getName() {
