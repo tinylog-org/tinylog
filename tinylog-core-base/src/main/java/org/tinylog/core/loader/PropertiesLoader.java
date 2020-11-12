@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
@@ -40,11 +41,11 @@ public class PropertiesLoader implements ConfigurationLoader {
 	}
 
 	@Override
-	public Map<Object, Object> load(ClassLoader classLoader) {
+	public Map<Object, Object> load(Framework framework) {
 		String file = System.getProperty(CONFIGURATION_PROPERTY);
 
 		if (file != null) {
-			try (InputStream stream = getInputStream(classLoader, file)) {
+			try (InputStream stream = getInputStream(framework.getClassLoader(), file)) {
 				InternalLogger.info(null, "Load configuration from \"{}\"", file);
 				Properties properties = new Properties();
 				properties.load(stream);
@@ -55,7 +56,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 		}
 
 		for (String name : CONFIGURATION_FILES) {
-			try (InputStream stream = classLoader.getResourceAsStream(name)) {
+			try (InputStream stream = framework.getClassLoader().getResourceAsStream(name)) {
 				if (stream == null) {
 					InternalLogger.debug(null, "Configuration file \"{}\" does not exist", name);
 				} else {

@@ -297,7 +297,7 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public Map<Object, Object> load(ClassLoader classLoader) {
+		public Map<Object, Object> load(Framework framework) {
 			return data;
 		}
 
@@ -321,7 +321,7 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public Map<Object, Object> load(ClassLoader classLoader) {
+		public Map<Object, Object> load(Framework framework) {
 			return data;
 		}
 

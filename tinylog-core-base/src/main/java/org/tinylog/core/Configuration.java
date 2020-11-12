@@ -165,7 +165,7 @@ public class Configuration {
 
 				loaders.stream()
 					.sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
-					.map(loader -> loader.load(framework.getClassLoader()))
+					.map(loader -> loader.load(framework))
 					.filter(Objects::nonNull)
 					.findFirst()
 					.ifPresent(properties::putAll);
