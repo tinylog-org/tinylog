@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javax.inject.Inject;
 
@@ -36,6 +37,24 @@ class PropertiesLoaderTest {
 
 	@Inject
 	private Log log;
+
+	/**
+	 * Verifies that the name is "properties".
+	 */
+	@Test
+	void name() {
+		PropertiesLoader loader = new PropertiesLoader();
+		assertThat(loader.getName()).isEqualTo("properties");
+	}
+
+	/**
+	 * Verifies that the priority is "0".
+	 */
+	@Test
+	void priority() {
+		PropertiesLoader loader = new PropertiesLoader();
+		assertThat(loader.getPriority()).isZero();
+	}
 
 	/**
 	 * Verifies that {@code tinylog.properties} will be loaded, if there is no other properties file.
@@ -200,6 +219,15 @@ class PropertiesLoaderTest {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).hasMessage("Invalid resource");
 		});
+	}
+
+	/**
+	 * Verifies that the builder is registered as service.
+	 */
+	@Test
+	void service() {
+		assertThat(ServiceLoader.load(ConfigurationLoader.class))
+			.anyMatch(loader -> loader instanceof PropertiesLoader);
 	}
 
 	/**

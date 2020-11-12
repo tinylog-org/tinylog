@@ -1,19 +1,18 @@
 package org.tinylog.core;
 
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.loader.ConfigurationLoader;
-import org.tinylog.core.loader.ConfigurationLoaderBuilder;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -181,13 +180,13 @@ class ConfigurationTest {
 		 * Verifies that the configuration loader with the highest priority will be used.
 		 */
 		@RegisterService(
-			service = ConfigurationLoaderBuilder.class,
-			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+			service = ConfigurationLoader.class,
+			implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
 		)
 		@Test
 		void useConfigurationLoaderWithHighestPriority() {
-			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
-			TestTwoConfigurationLoaderBuilder.loader = classLoader -> singletonMap("second", "yes");
+			TestOneConfigurationLoader.data = singletonMap("first", "yes");
+			TestTwoConfigurationLoader.data = singletonMap("second", "yes");
 
 			Configuration configuration = new Configuration();
 			configuration.load(framework);
@@ -200,13 +199,13 @@ class ConfigurationTest {
 		 * Verifies that a configuration loader that cannot provide and configuration is skipped.
 		 */
 		@RegisterService(
-			service = ConfigurationLoaderBuilder.class,
-			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+			service = ConfigurationLoader.class,
+			implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
 		)
 		@Test
 		void skipConfigurationLoaderWithoutResult() {
-			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
-			TestTwoConfigurationLoaderBuilder.loader = classLoader -> null;
+			TestOneConfigurationLoader.data = singletonMap("first", "yes");
+			TestTwoConfigurationLoader.data = null;
 
 			Configuration configuration = new Configuration();
 			configuration.load(framework);
@@ -219,13 +218,13 @@ class ConfigurationTest {
 		 * Verifies that a configuration loader can be defined by name.
 		 */
 		@RegisterService(
-			service = ConfigurationLoaderBuilder.class,
-			implementations = {TestOneConfigurationLoaderBuilder.class, TestTwoConfigurationLoaderBuilder.class}
+			service = ConfigurationLoader.class,
+			implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
 		)
 		@Test
 		void defineConfigurationLoaderByName() throws Exception {
-			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("first", "yes");
-			TestTwoConfigurationLoaderBuilder.loader = classLoader -> singletonMap("second", "yes");
+			TestOneConfigurationLoader.data = singletonMap("first", "yes");
+			TestTwoConfigurationLoader.data = singletonMap("second", "yes");
 
 			Configuration configuration = new Configuration();
 
@@ -243,12 +242,12 @@ class ConfigurationTest {
 		 * used instead.
 		 */
 		@RegisterService(
-			service = ConfigurationLoaderBuilder.class,
-			implementations = TestOneConfigurationLoaderBuilder.class
+			service = ConfigurationLoader.class,
+			implementations = TestOneConfigurationLoader.class
 		)
 		@Test
 		void reportInvalidConfigurationLoaderName() throws Exception {
-			TestOneConfigurationLoaderBuilder.loader = classLoader -> singletonMap("foo", "bar");
+			TestOneConfigurationLoader.data = singletonMap("foo", "bar");
 			Configuration configuration = new Configuration();
 
 			restoreSystemProperties(() -> {
@@ -283,9 +282,9 @@ class ConfigurationTest {
 	/**
 	 * Additional logging configuration builder for JUnit tests.
 	 */
-	public static final class TestOneConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
+	public static final class TestOneConfigurationLoader implements ConfigurationLoader {
 
-		private static ConfigurationLoader loader = classLoader -> emptyMap();
+		private static Map<Object, Object> data;
 
 		@Override
 		public String getName() {
@@ -298,8 +297,8 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public ConfigurationLoader create() {
-			return loader;
+		public Map<Object, Object> load(ClassLoader classLoader) {
+			return data;
 		}
 
 	}
@@ -307,9 +306,9 @@ class ConfigurationTest {
 	/**
 	 * Additional logging configuration builder for JUnit tests.
 	 */
-	public static final class TestTwoConfigurationLoaderBuilder implements ConfigurationLoaderBuilder {
+	public static final class TestTwoConfigurationLoader implements ConfigurationLoader {
 
-		private static ConfigurationLoader loader = classLoader -> emptyMap();
+		private static Map<Object, Object> data;
 
 		@Override
 		public String getName() {
@@ -322,8 +321,8 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public ConfigurationLoader create() {
-			return loader;
+		public Map<Object, Object> load(ClassLoader classLoader) {
+			return data;
 		}
 
 	}

@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.core.loader.ConfigurationLoaderBuilder;
+import org.tinylog.core.loader.ConfigurationLoader;
 
 /**
  * Configuration for tinylog.
@@ -140,20 +140,20 @@ public class Configuration {
 			} else {
 				String name = System.getProperty(CONFIGURATION_LOADER_PROPERTY);
 
-				List<ConfigurationLoaderBuilder> builders = SafeServiceLoader.asList(
+				List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
 					framework,
-					ConfigurationLoaderBuilder.class,
+					ConfigurationLoader.class,
 					"configuration loader"
 				);
 
 				if (name != null) {
-					Optional<ConfigurationLoaderBuilder> optional = builders
+					Optional<ConfigurationLoader> optional = loaders
 						.stream()
-						.filter(builder -> name.toLowerCase(Locale.ENGLISH).equals(builder.getName()))
+						.filter(loader -> name.toLowerCase(Locale.ENGLISH).equals(loader.getName()))
 						.findFirst();
 
 					if (optional.isPresent()) {
-						builders = Collections.singletonList(optional.get());
+						loaders = Collections.singletonList(optional.get());
 					} else {
 						InternalLogger.error(
 							null,
@@ -163,9 +163,8 @@ public class Configuration {
 					}
 				}
 
-				builders.stream()
-					.sorted(Comparator.comparingInt(ConfigurationLoaderBuilder::getPriority).reversed())
-					.map(ConfigurationLoaderBuilder::create)
+				loaders.stream()
+					.sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
 					.map(loader -> loader.load(framework.getClassLoader()))
 					.filter(Objects::nonNull)
 					.findFirst()

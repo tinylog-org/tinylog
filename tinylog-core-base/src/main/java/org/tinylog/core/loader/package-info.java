@@ -1,4 +1,4 @@
 /**
- * Configuration loader interfaces and default implementation.
+ * Configuration loader interface and default implementation.
  */
 package org.tinylog.core.loader;

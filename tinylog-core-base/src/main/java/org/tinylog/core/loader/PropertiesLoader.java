@@ -30,6 +30,16 @@ public class PropertiesLoader implements ConfigurationLoader {
 	}
 
 	@Override
+	public String getName() {
+		return "properties";
+	}
+
+	@Override
+	public int getPriority() {
+		return 0;
+	}
+
+	@Override
 	public Map<Object, Object> load(ClassLoader classLoader) {
 		String file = System.getProperty(CONFIGURATION_PROPERTY);
 
