@@ -222,7 +222,7 @@ class PropertiesLoaderTest {
 	}
 
 	/**
-	 * Verifies that the builder is registered as service.
+	 * Verifies that the loader is registered as service.
 	 */
 	@Test
 	void service() {
