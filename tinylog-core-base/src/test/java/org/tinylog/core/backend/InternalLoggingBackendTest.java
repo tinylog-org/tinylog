@@ -8,16 +8,54 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
+import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.system.CaptureSystemOutput;
 import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @CaptureSystemOutput
 class InternalLoggingBackendTest {
 	
 	@Inject
 	private Output output;
+
+	/**
+	 * Verifies that logging is disabled for untagged log entries at all severity levels.
+	 *
+	 * @param level The severity level to test
+	 */
+	@ParameterizedTest
+	@EnumSource(Level.class)
+	public void untaggedLogEntriesDisabled(Level level) {
+		InternalLoggingBackend backend = new InternalLoggingBackend();
+		assertThat(backend.isEnabled(mock(StackTraceLocation.class), null, level)).isFalse();
+	}
+
+	/**
+	 * Verifies that logging is disabled for tinylog log entries at trace, debug, and info severity levels.
+	 *
+	 * @param level The severity level to test
+	 */
+	@ParameterizedTest
+	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
+	public void tinylogLogEntriesDisabled(Level level) {
+		InternalLoggingBackend backend = new InternalLoggingBackend();
+		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isFalse();
+	}
+
+	/**
+	 * Verifies that logging is enabled for tinylog log entries at warn and error severity levels.
+	 *
+	 * @param level The severity level to test
+	 */
+	@ParameterizedTest
+	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+	public void tinylogLogEntriesEnabled(Level level) {
+		InternalLoggingBackend backend = new InternalLoggingBackend();
+		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isTrue();
+	}
 
 	/**
 	 * Verifies that a plain text message can be output at the severity levels warn and error.

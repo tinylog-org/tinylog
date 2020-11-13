@@ -14,6 +14,16 @@ import org.tinylog.core.runtime.StackTraceLocation;
 public interface LoggingBackend {
 
 	/**
+	 * Checks if a severity level is enabled for outputting log entries.
+	 *
+	 * @param location Stack trace location of caller (required)
+	 * @param tag Category tag (optional)
+	 * @param level The severity level to check (required)
+	 * @return {@code true} if log entries of the passed severity level will be output, {@code false} if not
+	 */
+	boolean isEnabled(StackTraceLocation location, String tag, Level level);
+
+	/**
 	 * Issues a new log entry.
 	 *
 	 * @param location Stack trace location of caller (required)

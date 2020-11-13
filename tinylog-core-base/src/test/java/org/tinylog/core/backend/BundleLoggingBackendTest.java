@@ -11,8 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class BundleLoggingBackendTest {
 
@@ -25,6 +28,69 @@ class BundleLoggingBackendTest {
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
 		assertThat(parent.getProviders()).containsExactlyInAnyOrder(first, second);
+	}
+
+	/**
+	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code false}, if
+	 * all logging is disabled for all child logging backends.
+	 */
+	@Test
+	public void allDisabled() {
+		LoggingBackend first = mock(LoggingBackend.class);
+		when(first.isEnabled(any(), any(), any())).thenReturn(false);
+
+		LoggingBackend second = mock(LoggingBackend.class);
+		when(second.isEnabled(any(), any(), any())).thenReturn(false);
+
+		StackTraceLocation location = mock(StackTraceLocation.class);
+
+		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
+		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isFalse();
+
+		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(second).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+	}
+
+	/**
+	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code true}, if
+	 * all logging is enabled for at least one child logging backend.
+	 */
+	@Test
+	public void partlyEnabled() {
+		LoggingBackend first = mock(LoggingBackend.class);
+		when(first.isEnabled(any(), any(), any())).thenReturn(false);
+
+		LoggingBackend second = mock(LoggingBackend.class);
+		when(second.isEnabled(any(), any(), any())).thenReturn(true);
+
+		StackTraceLocation location = mock(StackTraceLocation.class);
+
+		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
+		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isTrue();
+
+		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(second).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+	}
+
+	/**
+	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code true}, if
+	 * all logging is enabled for all child logging backends.
+	 */
+	@Test
+	public void allEnabled() {
+		LoggingBackend first = mock(LoggingBackend.class);
+		when(first.isEnabled(any(), any(), any())).thenReturn(true);
+
+		LoggingBackend second = mock(LoggingBackend.class);
+		when(second.isEnabled(any(), any(), any())).thenReturn(true);
+
+		StackTraceLocation location = mock(StackTraceLocation.class);
+
+		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
+		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isTrue();
+
+		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(second, never()).isEnabled(any(), any(), any());
 	}
 
 	/**

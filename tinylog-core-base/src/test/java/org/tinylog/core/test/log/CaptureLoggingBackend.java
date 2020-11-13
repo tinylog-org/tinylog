@@ -20,6 +20,11 @@ class CaptureLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
+	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+		return true;
+	}
+
+	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
 		String output = arguments == null ? String.valueOf(message) : formatter.format(message.toString(), arguments);

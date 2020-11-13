@@ -14,6 +14,11 @@ public class NopLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
+	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+		return false;
+	}
+
+	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
 		// Ignore

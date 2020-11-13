@@ -31,6 +31,18 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
+	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+		StackTraceLocation childLocation = location.push();
+		for (LoggingBackend backend : backends) {
+			if (backend.isEnabled(childLocation, tag, level)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
 		StackTraceLocation childLocation = location.push();

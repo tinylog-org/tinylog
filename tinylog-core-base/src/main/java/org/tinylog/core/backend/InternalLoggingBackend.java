@@ -19,6 +19,11 @@ public class InternalLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
+	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+		return TAG.equals(tag) && level.ordinal() <= Level.WARN.ordinal();
+	}
+
+	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
 		if (TAG.equals(tag) && level.ordinal() <= Level.WARN.ordinal()) {
