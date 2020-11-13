@@ -245,6 +245,87 @@ class PropertiesLoaderTest {
 	}
 
 	/**
+	 * Verifies that a system property without any default value can be resolved.
+	 */
+	@Test
+	void resolveExistingSystemPropertyWithoutDefault() throws Exception {
+		createTextFile("tinylog.properties", "example = #{foo}");
+
+		restoreSystemProperties(() -> {
+			System.setProperty("foo", "42");
+			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+
+			assertThat(configuration).containsExactly(entry("example", "42"));
+		});
+	}
+
+	/**
+	 * Verifies that a system property without any default value will be kept unchanged, if it cannot be resolved.
+	 */
+	@Test
+	void resolveMissingSystemPropertyWithoutDefault() throws Exception {
+		createTextFile("tinylog.properties", "example = #{foo}");
+
+		restoreSystemProperties(() -> {
+			System.clearProperty("foo");
+			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+
+			assertThat(configuration).containsExactly(entry("example", "#{foo}"));
+			assertThat(log.consume()).hasSize(1).anySatisfy(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+				assertThat(entry.getMessage()).contains("foo");
+			});
+		});
+	}
+
+	/**
+	 * Verifies that a system property with a defined default value can be resolved.
+	 */
+	@Test
+	void resolveExistingSystemPropertyWithDefault() throws Exception {
+		createTextFile("tinylog.properties", "example = #{foo|default}");
+
+		restoreSystemProperties(() -> {
+			System.setProperty("foo", "42");
+			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+
+			assertThat(configuration).containsExactly(entry("example", "42"));
+		});
+	}
+
+	/**
+	 * Verifies that the default value of a system property with a defined default value will be used, if the system
+	 * property cannot be resolved.
+	 */
+	@Test
+	void resolveMissingSystemPropertyWithDefault() throws Exception {
+		createTextFile("tinylog.properties", "example = #{foo|default}");
+
+		restoreSystemProperties(() -> {
+			System.clearProperty("foo");
+			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+
+			assertThat(configuration).containsExactly(entry("example", "default"));
+		});
+	}
+
+	/**
+	 * Verifies that multiple system properties can be resolved.
+	 */
+	@Test
+	void resolveMultipleSystemProperties() throws Exception {
+		createTextFile("tinylog.properties", "example = <#{foo}> <#{bar}>");
+
+		restoreSystemProperties(() -> {
+			System.setProperty("foo", "1");
+			System.setProperty("bar", "2");
+			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+
+			assertThat(configuration).containsExactly(entry("example", "<1> <2>"));
+		});
+	}
+
+	/**
 	 * Verifies that the loader is registered as service.
 	 */
 	@Test
