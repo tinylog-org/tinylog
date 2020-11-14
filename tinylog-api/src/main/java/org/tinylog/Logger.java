@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentMap;
 public final class Logger {
 
 	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<>();
-	private static final TaggedLogger logger = new TaggedLogger(null);
 
 	/** */
 	private Logger() {
@@ -26,7 +25,7 @@ public final class Logger {
 	 */
 	public static TaggedLogger tag(String tag) {
 		if (tag == null || tag.isEmpty()) {
-			return logger;
+			return loggers.computeIfAbsent("", untagged -> new TaggedLogger(null));
 		} else {
 			return loggers.computeIfAbsent(tag, TaggedLogger::new);
 		}
