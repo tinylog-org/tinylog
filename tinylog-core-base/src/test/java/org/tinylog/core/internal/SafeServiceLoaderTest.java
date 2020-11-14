@@ -32,7 +32,7 @@ class SafeServiceLoaderTest {
 	 */
 	@RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
 	@Test
-	public void loadAllServiceImplementations() {
+	void loadAllServiceImplementations() {
 		List<FooService> services = SafeServiceLoader.asList(
 			framework,
 			FooService.class,
@@ -50,7 +50,7 @@ class SafeServiceLoaderTest {
 	 */
 	@RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
 	@Test
-	public void mapAllServiceImplementations() {
+	void mapAllServiceImplementations() {
 		List<String> names = SafeServiceLoader.asList(
 			framework,
 			FooService.class,
@@ -65,7 +65,7 @@ class SafeServiceLoaderTest {
 	 * Verifies that a map operation can be executed for a single service implementation.
 	 */
 	@Test
-	public void mapSingleServiceImplementation() {
+	void mapSingleServiceImplementation() {
 		List<String> names = new ArrayList<>();
 		SafeServiceLoader.execute(names, new FirstServiceImpl(), "map", FooService::getName);
 
@@ -76,7 +76,7 @@ class SafeServiceLoaderTest {
 	 * Verifies that a failed map operation is logged but does not throw any exception.
 	 */
 	@Test
-	public void logFailedMapping() {
+	void logFailedMapping() {
 		List<String> names = new ArrayList<>();
 		SafeServiceLoader.execute(names, new EvilServiceImpl(), "map", FooService::getName);
 
@@ -93,7 +93,7 @@ class SafeServiceLoaderTest {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void consumeSingleServiceImplementation() {
+	void consumeSingleServiceImplementation() {
 		FirstServiceImpl implementation = new FirstServiceImpl();
 		Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
 		SafeServiceLoader.execute(implementation, "consume", action);
@@ -106,7 +106,7 @@ class SafeServiceLoaderTest {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void logFailedConsuming() {
+	void logFailedConsuming() {
 		FirstServiceImpl implementation = new FirstServiceImpl();
 		Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
 		doThrow(UnsupportedOperationException.class).when(action).accept(implementation);

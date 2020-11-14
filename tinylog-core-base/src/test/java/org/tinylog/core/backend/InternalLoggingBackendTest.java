@@ -28,7 +28,7 @@ class InternalLoggingBackendTest {
 	 * entries.
 	 */
 	@Test
-	public void untaggedVisibility() {
+	void untaggedVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
 
 		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
@@ -43,7 +43,7 @@ class InternalLoggingBackendTest {
 	 * for internal tinylog log entries.
 	 */
 	@Test
-	public void tinylogVisibility() {
+	void tinylogVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
 
 		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
@@ -60,7 +60,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(Level.class)
-	public void untaggedLogEntriesDisabled(Level level) {
+	void untaggedLogEntriesDisabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
 		assertThat(backend.isEnabled(mock(StackTraceLocation.class), null, level)).isFalse();
 	}
@@ -72,7 +72,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-	public void tinylogLogEntriesDisabled(Level level) {
+	void tinylogLogEntriesDisabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
 		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isFalse();
 	}
@@ -84,7 +84,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void tinylogLogEntriesEnabled(Level level) {
+	void tinylogLogEntriesEnabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
 		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isTrue();
 	}
@@ -96,7 +96,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void plainTextMessage(Level level) {
+	void plainTextMessage(Level level) {
 		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
@@ -117,7 +117,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void formattedTextMessage(Level level) {
+	void formattedTextMessage(Level level) {
 		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
@@ -138,7 +138,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void exceptionOnly(Level level) {
+	void exceptionOnly(Level level) {
 		Exception exception = new NullPointerException();
 		exception.setStackTrace(new StackTraceElement[] {
 			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
@@ -169,7 +169,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	public void exceptionWithCustomMessage(Level level) {
+	void exceptionWithCustomMessage(Level level) {
 		Exception exception = new UnsupportedOperationException();
 		exception.setStackTrace(new StackTraceElement[] {
 			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
@@ -198,7 +198,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-	public void discardNonServeLogEntries(Level level) {
+	void discardNonServeLogEntries(Level level) {
 		new InternalLoggingBackend().log(
 			null,
 			"tinylog",
@@ -220,7 +220,7 @@ class InternalLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
-	public void discardNonTinylogLogEntries(String tag, Level level) {
+	void discardNonTinylogLogEntries(String tag, Level level) {
 		new InternalLoggingBackend().log(
 			null,
 			tag,

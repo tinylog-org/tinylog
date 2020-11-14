@@ -24,7 +24,7 @@ class BundleLoggingBackendTest {
 	 * Verifies that all passed child logging backends are stored.
 	 */
 	@Test
-	public void childProviders() {
+	void childProviders() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
@@ -35,7 +35,7 @@ class BundleLoggingBackendTest {
 	 * Verifies that the level visibility of all child logging backends is included.
 	 */
 	@Test
-	public void visibility() {
+	void visibility() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		when(first.getLevelVisibility("foo")).thenReturn(
 			new LevelVisibility(false, false, false, true, true)
@@ -61,7 +61,7 @@ class BundleLoggingBackendTest {
 	 * all logging is disabled for all child logging backends.
 	 */
 	@Test
-	public void allDisabled() {
+	void allDisabled() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		when(first.isEnabled(any(), any(), any())).thenReturn(false);
 
@@ -82,7 +82,7 @@ class BundleLoggingBackendTest {
 	 * all logging is enabled for at least one child logging backend.
 	 */
 	@Test
-	public void partlyEnabled() {
+	void partlyEnabled() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		when(first.isEnabled(any(), any(), any())).thenReturn(false);
 
@@ -103,7 +103,7 @@ class BundleLoggingBackendTest {
 	 * all logging is enabled for all child logging backends.
 	 */
 	@Test
-	public void allEnabled() {
+	void allEnabled() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		when(first.isEnabled(any(), any(), any())).thenReturn(true);
 
@@ -123,7 +123,7 @@ class BundleLoggingBackendTest {
 	 * Verifies that log entries are passed to all assigned child backends.
 	 */
 	@Test
-	public void provideLogsToChildren() {
+	void provideLogsToChildren() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));

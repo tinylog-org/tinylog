@@ -14,7 +14,7 @@ class BaseStackTraceAccessTest {
 	 * Verifies that an invokable method handle is provided for existing and valid methods.
 	 */
 	@Test
-	public void validMethod() throws Throwable {
+	void validMethod() throws Throwable {
 		MethodHandle handle = access.getMethod(
 			ignore -> true, String.class.getName(), "substring", int.class, int.class
 		);
@@ -27,7 +27,7 @@ class BaseStackTraceAccessTest {
 	 * Verifies that {@code null} is provided for existing but invalid methods.
 	 */
 	@Test
-	public void invalidMethod() {
+	void invalidMethod() {
 		MethodHandle handle = access.getMethod(
 			ignore -> false, String.class.getName(), "substring", int.class, int.class
 		);
@@ -39,7 +39,7 @@ class BaseStackTraceAccessTest {
 	 * Verifies that {@code null} is provided for non-existent classes.
 	 */
 	@Test
-	public void nonExistentClass() {
+	void nonExistentClass() {
 		MethodHandle handle = access.getMethod(
 			ignore -> true, "invalid.Foo", "substring", int.class, int.class
 		);
@@ -51,7 +51,7 @@ class BaseStackTraceAccessTest {
 	 * Verifies that {@code null} is provided for non-existent methods.
 	 */
 	@Test
-	public void nonExistentMethod() {
+	void nonExistentMethod() {
 		MethodHandle handle = access.getMethod(
 			ignore -> true, String.class.getName(), "substring", double.class, double.class
 		);

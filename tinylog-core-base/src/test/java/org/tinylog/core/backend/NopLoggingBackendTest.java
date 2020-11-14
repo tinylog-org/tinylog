@@ -21,7 +21,7 @@ class NopLoggingBackendTest {
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {"tinylog", "foo"})
-	public void visibility(String tag) {
+	void visibility(String tag) {
 		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibility(tag);
 
 		assertThat(visibility.isTraceEnabled()).isFalse();
@@ -38,7 +38,7 @@ class NopLoggingBackendTest {
 	 */
 	@ParameterizedTest
 	@EnumSource(Level.class)
-	public void allLevelsDisabled(Level level) {
+	void allLevelsDisabled(Level level) {
 		NopLoggingBackend backend = new NopLoggingBackend();
 		assertThat(backend.isEnabled(mock(StackTraceLocation.class), null, level)).isFalse();
 	}
@@ -47,7 +47,7 @@ class NopLoggingBackendTest {
 	 * Verifies that log entries are accepted.
 	 */
 	@Test
-	public void acceptLogEntries() {
+	void acceptLogEntries() {
 		new NopLoggingBackend().log(
 			mock(StackTraceLocation.class), null, Level.TRACE, null, "Hello world!", null, null
 		);
