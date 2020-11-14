@@ -93,13 +93,13 @@ public class PropertiesLoader implements ConfigurationLoader {
 		);
 
 		for (VariableResolver resolver : resolvers) {
-			String prefix = Pattern.quote(Character.toString(resolver.getPrefix()));
-			String regex = prefix + "\\{([^|{}]+)(?:\\|([^{}]+))?}";
+			String prefix = resolver.getPrefix();
+			String regex = Pattern.quote(prefix) + "\\{([^|{}]+)(?:\\|([^{}]+))?}";
 			Pattern pattern = Pattern.compile(regex);
 
 			for (String key : properties.stringPropertyNames()) {
 				String value = properties.getProperty(key);
-				if (value.indexOf(resolver.getPrefix()) >= 0) {
+				if (value.contains(prefix)) {
 					Matcher matcher = pattern.matcher(value);
 					StringBuffer buffer = new StringBuffer();
 					while (matcher.find()) {

@@ -19,12 +19,12 @@ class SystemPropertyResolverTest {
 	}
 
 	/**
-	 * Verifies that the prefix character is '#'.
+	 * Verifies that the prefix character is "#".
 	 */
 	@Test
 	void prefix() {
 		SystemPropertyResolver resolver = new SystemPropertyResolver();
-		assertThat(resolver.getPrefix()).isEqualTo('#');
+		assertThat(resolver.getPrefix()).isEqualTo("#");
 	}
 
 	/**

@@ -15,8 +15,8 @@ public class SystemPropertyResolver implements VariableResolver {
 	}
 
 	@Override
-	public char getPrefix() {
-		return '#';
+	public String getPrefix() {
+		return "#";
 	}
 
 	@Override

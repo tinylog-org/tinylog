@@ -18,12 +18,12 @@ class EnvironmentVariableResolverTest {
 	}
 
 	/**
-	 * Verifies that the prefix character is '$'.
+	 * Verifies that the prefix character is "$".
 	 */
 	@Test
 	void prefix() {
 		EnvironmentVariableResolver resolver = new EnvironmentVariableResolver();
-		assertThat(resolver.getPrefix()).isEqualTo('$');
+		assertThat(resolver.getPrefix()).isEqualTo("$");
 	}
 
 	/**

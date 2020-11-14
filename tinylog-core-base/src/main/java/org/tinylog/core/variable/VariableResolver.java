@@ -16,9 +16,9 @@ public interface VariableResolver {
 	 * Gets the prefix character to identify this variable resolver. The prefix character is the character that comes
 	 * directly before the opening curly bracket.
 	 *
-	 * @return The prefix character for this variable resolver
+	 * @return The prefix for this variable resolver (must contain at least one character)
 	 */
-	char getPrefix();
+	String getPrefix();
 
 	/**
 	 * Resolves a variable by its name.
