@@ -3,8 +3,6 @@ package org.tinylog.core;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.system.CaptureSystemOutput;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,14 +23,6 @@ class TinylogTest {
 	}
 
 	/**
-	 * Verifies that a {@link RuntimeFlavor} is provided.
-	 */
-	@Test
-	void runtime() {
-		assertThat(Tinylog.getRuntime()).isNotNull();
-	}
-
-	/**
 	 * Verifies that a {@link Configuration} is provided.
 	 */
 	@Test
@@ -41,11 +31,11 @@ class TinylogTest {
 	}
 
 	/**
-	 * Verifies that a {@link LoggingBackend} is provided.
+	 * Verifies that the {@link Framework} instance is provided.
 	 */
 	@Test
-	void loggingBackend() {
-		assertThat(Tinylog.getLoggingBackend()).isNotNull();
+	void framework() {
+		assertThat(Tinylog.getFramework()).isNotNull();
 	}
 
 	/**

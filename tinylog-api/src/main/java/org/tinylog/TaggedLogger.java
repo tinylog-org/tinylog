@@ -1,8 +1,12 @@
 package org.tinylog;
 
 import org.tinylog.core.Configuration;
+import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
 import org.tinylog.core.Tinylog;
+import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.runtime.RuntimeFlavor;
 
 /**
  * Logger for issuing tagged log entries.
@@ -10,25 +14,26 @@ import org.tinylog.core.backend.LoggingBackend;
 public final class TaggedLogger {
 
 	private final String tag;
-	private final Configuration configuration;
+	private final RuntimeFlavor runtime;
 	private final LoggingBackend backend;
+	private final LevelVisibility visibility;
 
 	/**
 	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
 	 */
 	TaggedLogger(String tag) {
-		this(tag, Tinylog.getConfiguration(), Tinylog.getLoggingBackend());
+		this(tag, Tinylog.getFramework());
 	}
 
 	/**
 	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
-	 * @param configuration The configuration for the logger
-	 * @param backend The logging backend for the logger
+	 * @param framework The actual framework instance
 	 */
-	TaggedLogger(String tag, Configuration configuration, LoggingBackend backend) {
+	TaggedLogger(String tag, Framework framework) {
 		this.tag = tag;
-		this.configuration = configuration;
-		this.backend = backend;
+		this.runtime = framework.getRuntime();
+		this.backend = framework.getLoggingBackend();
+		this.visibility = backend.getLevelVisibility(tag);
 	}
 
 	/**

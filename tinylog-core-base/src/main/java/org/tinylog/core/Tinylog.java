@@ -1,8 +1,5 @@
 package org.tinylog.core;
 
-import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.runtime.RuntimeFlavor;
-
 /**
  * Global access to the tinylog framework.
  */
@@ -15,15 +12,6 @@ public final class Tinylog {
 	}
 
 	/**
-	 * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
-	 *
-	 * @return The appropriate runtime instance
-	 */
-	public static RuntimeFlavor getRuntime() {
-		return framework.getRuntime();
-	}
-
-	/**
 	 * Gets the configuration.
 	 *
 	 * @return The configuration of tinylog
@@ -33,17 +21,16 @@ public final class Tinylog {
 	}
 
 	/**
-	 * Gets the actual logging backend implementation.
+	 * Gets the actual framework instance.
 	 *
 	 * <p>
-	 *     This method should only be called by (third-party) logging APIs. Logging backends are not to be used for
-	 *     logging in an application or library.
+	 *     This framework instance is only for tinylog itself and tinylog extensions.
 	 * </p>
 	 *
-	 * @return The actual logging backend implementation
+	 * @return The actual framework instance
 	 */
-	public static LoggingBackend getLoggingBackend() {
-		return framework.getLoggingBackend();
+	public static Framework getFramework() {
+		return framework;
 	}
 
 	/**
