@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.tinylog.core.Framework;
@@ -98,9 +98,16 @@ public class PropertiesLoader implements ConfigurationLoader {
 			Pattern pattern = Pattern.compile(regex);
 
 			for (String key : properties.stringPropertyNames()) {
-				String property = properties.getProperty(key);
-				property = pattern.matcher(property).replaceAll(result -> resolveVariable(result, resolver));
-				properties.setProperty(key, property);
+				String value = properties.getProperty(key);
+				if (value.indexOf(resolver.getPrefix()) >= 0) {
+					Matcher matcher = pattern.matcher(value);
+					StringBuffer buffer = new StringBuffer();
+					while (matcher.find()) {
+						matcher.appendReplacement(buffer, resolveVariable(matcher, resolver));
+					}
+					matcher.appendTail(buffer);
+					properties.setProperty(key, buffer.toString());
+				}
 			}
 		}
 
@@ -127,16 +134,16 @@ public class PropertiesLoader implements ConfigurationLoader {
 	/**
 	 * Resolves a found variable.
 	 *
-	 * @param result Found variable placeholder
+	 * @param matcher The actual matcher at a found variable placeholder
 	 * @param resolver The resolver to resolve the found variable placeholder
 	 * @return The replacement text for the found variable placeholder
 	 */
-	private static String resolveVariable(MatchResult result, VariableResolver resolver) {
-		String name = result.group(1);
+	private static String resolveVariable(Matcher matcher, VariableResolver resolver) {
+		String name = matcher.group(1);
 		String value = resolver.resolve(name);
 
 		if (value == null) {
-			value = result.group(2);
+			value = matcher.group(2);
 			if (value == null) {
 				InternalLogger.warn(
 					null,
@@ -145,7 +152,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 					resolver.getName().substring(1),
 					name
 				);
-				value = result.group();
+				value = matcher.group();
 			}
 		}
 
