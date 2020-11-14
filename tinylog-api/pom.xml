@@ -23,6 +23,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
@@ -46,7 +51,13 @@
             <artifactId>tinylog-core-base</artifactId>
             <scope>provided</scope>
         </dependency>
-     </dependencies>
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog-core-base</artifactId>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

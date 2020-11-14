@@ -1,8 +1,6 @@
 package org.tinylog;
 
-import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
-import org.tinylog.core.Level;
 import org.tinylog.core.Tinylog;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
