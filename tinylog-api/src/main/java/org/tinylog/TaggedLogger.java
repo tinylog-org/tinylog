@@ -32,9 +32,9 @@ public final class TaggedLogger {
 	}
 
 	/**
-	 * Gets the assigned case-sensitive tag.
+	 * Gets the assigned case-sensitive category tag.
 	 *
-	 * @return The assigned tag or {@code null} if the logger is untagged
+	 * @return The assigned category tag, or {@code null} if the logger is untagged
 	 */
 	public String getTag() {
 		return tag;

@@ -16,10 +16,12 @@ public final class Logger {
 	}
 
 	/**
-	 * Retrieves a tagged logger instance. Tags are case-sensitive. If a tagged logger does not yet exists for the
-	 * passed tag, a new logger is created. This method always returns the same logger instance for the same tag.
+	 * Retrieves a tagged logger instance. Category tags are case-sensitive. If a tagged logger does not yet exists for
+	 * the passed tag, a new logger will be created. This method always returns the same logger instance for the same
+	 * tag.
 	 *
-	 * @param tag Tag for logger or {@code null} for receiving an untagged logger
+	 * @param tag The case-sensitive category tag of the requested logger, or {@code null} for receiving an untagged
+	 *            logger
 	 * @return Logger instance
 	 */
 	public static TaggedLogger tag(String tag) {
