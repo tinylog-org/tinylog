@@ -2,6 +2,7 @@ package org.tinylog.core.backend;
 
 import java.util.Arrays;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -23,11 +24,36 @@ class BundleLoggingBackendTest {
 	 * Verifies that all passed child logging backends are stored.
 	 */
 	@Test
-	public void getChildProviders() {
+	public void childProviders() {
 		LoggingBackend first = mock(LoggingBackend.class);
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
 		assertThat(parent.getProviders()).containsExactlyInAnyOrder(first, second);
+	}
+
+	/**
+	 * Verifies that the level visibility of all child logging backends is included.
+	 */
+	@Test
+	public void visibility() {
+		LoggingBackend first = mock(LoggingBackend.class);
+		when(first.getLevelVisibility("foo")).thenReturn(
+			new LevelVisibility(false, false, false, true, true)
+		);
+
+		LoggingBackend second = mock(LoggingBackend.class);
+		when(second.getLevelVisibility("foo")).thenReturn(
+			new LevelVisibility(false, false, true, true, true)
+		);
+
+		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
+		LevelVisibility visibility = backend.getLevelVisibility("foo");
+
+		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isTrue();
+		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isTrue();
+		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isTrue();
 	}
 
 	/**

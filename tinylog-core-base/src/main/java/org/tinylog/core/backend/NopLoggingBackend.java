@@ -9,8 +9,15 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 public class NopLoggingBackend implements LoggingBackend {
 
+	private static final LevelVisibility VISIBILITY = new LevelVisibility(false, false, false, false, false);
+
 	/** */
 	public NopLoggingBackend() {
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibility(String tag) {
+		return VISIBILITY;
 	}
 
 	@Override

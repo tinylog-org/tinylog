@@ -14,8 +14,20 @@ public class InternalLoggingBackend implements LoggingBackend {
 
 	private static final String TAG = "tinylog";
 
+	private static final LevelVisibility TAGGED = new LevelVisibility(false, false, false, true, true);
+	private static final LevelVisibility DEFAULT = new LevelVisibility(false, false, false, false, false);
+
 	/** */
 	public InternalLoggingBackend() {
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibility(String tag) {
+		if (TAG.equals(tag)) {
+			return TAGGED;
+		} else {
+			return DEFAULT;
+		}
 	}
 
 	@Override

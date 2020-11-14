@@ -14,6 +14,15 @@ import org.tinylog.core.runtime.StackTraceLocation;
 public interface LoggingBackend {
 
 	/**
+	 * Retrieves the visibility of all severity levels for a category tag. Log entries whose severity levels are set to
+	 * {@code false} do not need to be passed to this logging backend since they are never output.
+	 *
+	 * @param tag The category tag for which the visibility of severity levels is requested
+	 * @return The visibilities of all severity levels
+	 */
+	LevelVisibility getLevelVisibility(String tag);
+
+	/**
 	 * Checks if a severity level is enabled for outputting log entries.
 	 *
 	 * @param location Stack trace location of caller (required)

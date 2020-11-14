@@ -2,6 +2,8 @@ package org.tinylog.core.backend;
 
 import javax.inject.Inject;
 
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -20,6 +22,36 @@ class InternalLoggingBackendTest {
 	
 	@Inject
 	private Output output;
+
+	/**
+	 * Verifies that all severity levels are disabled in the precalculated level visibility object for untagged log
+	 * entries.
+	 */
+	@Test
+	public void untaggedVisibility() {
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
+
+		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isFalse();
+	}
+
+	/**
+	 * Verifies that only the warn and error severity levels are enabled in the precalculated level visibility object
+	 * for internal tinylog log entries.
+	 */
+	@Test
+	public void tinylogVisibility() {
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
+
+		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isFalse();
+		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isTrue();
+		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isTrue();
+	}
 
 	/**
 	 * Verifies that logging is disabled for untagged log entries at all severity levels.

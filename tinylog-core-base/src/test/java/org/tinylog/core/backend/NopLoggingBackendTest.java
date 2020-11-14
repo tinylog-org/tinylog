@@ -3,6 +3,8 @@ package org.tinylog.core.backend;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -10,6 +12,24 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
 
 class NopLoggingBackendTest {
+
+	/**
+	 * Verifies that all severity levels are disabled in the precalculated level visibility object.
+	 *
+	 * @param tag The category tag to test
+	 */
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"tinylog", "foo"})
+	public void visibility(String tag) {
+		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibility(tag);
+
+		assertThat(visibility.isTraceEnabled()).isFalse();
+		assertThat(visibility.isDebugEnabled()).isFalse();
+		assertThat(visibility.isInfoEnabled()).isFalse();
+		assertThat(visibility.isWarnEnabled()).isFalse();
+		assertThat(visibility.isErrorEnabled()).isFalse();
+	}
 
 	/**
 	 * Verifies that logging is disabled for all severity levels.

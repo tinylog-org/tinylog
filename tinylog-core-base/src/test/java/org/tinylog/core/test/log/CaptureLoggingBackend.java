@@ -1,6 +1,7 @@
 package org.tinylog.core.test.log;
 
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
@@ -10,6 +11,8 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 class CaptureLoggingBackend implements LoggingBackend {
 
+	private static final LevelVisibility VISIBILITY = new LevelVisibility(true, true, true, true, true);
+
 	private final Log log;
 
 	/**
@@ -17,6 +20,11 @@ class CaptureLoggingBackend implements LoggingBackend {
 	 */
 	CaptureLoggingBackend(Log log) {
 		this.log = log;
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibility(String tag) {
+		return VISIBILITY;
 	}
 
 	@Override

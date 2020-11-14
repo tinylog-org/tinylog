@@ -12,6 +12,8 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 public class BundleLoggingBackend implements LoggingBackend {
 
+	private static final LevelVisibility INVISIBLE = new LevelVisibility(false, false, false, false, false);
+
 	private final List<LoggingBackend> backends;
 
 	/**
@@ -28,6 +30,20 @@ public class BundleLoggingBackend implements LoggingBackend {
 	 */
 	public List<LoggingBackend> getProviders() {
 		return Collections.unmodifiableList(backends);
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibility(String tag) {
+		return backends.stream()
+			.map(backend -> backend.getLevelVisibility(tag))
+			.reduce((first, second) -> new LevelVisibility(
+				first.isTraceEnabled() || second.isTraceEnabled(),
+				first.isDebugEnabled() || second.isDebugEnabled(),
+				first.isInfoEnabled() || second.isInfoEnabled(),
+				first.isWarnEnabled() || second.isWarnEnabled(),
+				first.isErrorEnabled() || second.isErrorEnabled()
+			))
+			.orElse(INVISIBLE);
 	}
 
 	@Override
