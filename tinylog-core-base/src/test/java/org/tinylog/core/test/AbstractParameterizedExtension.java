@@ -1,8 +1,6 @@
 package org.tinylog.core.test;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,36 +54,6 @@ public abstract class AbstractParameterizedExtension extends AbstractExtension i
 	 */
 	protected <T> void registerParameter(Class<T> type, Function<ExtensionContext, T> producer) {
 		parameters.put(type, producer);
-	}
-
-	/**
-	 * Finds all registered annotations.
-	 *
-	 * @param context The extension context
-	 * @param annotationClass The annotation class to search for
-	 * @param <A> The generic annotation class
-	 * @return All found annotations
-	 */
-	protected <A extends Annotation> List<A> findAnnotations(ExtensionContext context, Class<A> annotationClass) {
-		List<A> annotations = new ArrayList<>();
-
-		context.getTestInstances().ifPresent(instances -> {
-			for (Object object : instances.getAllInstances()) {
-				A annotation = object.getClass().getAnnotation(annotationClass);
-				if (annotation != null) {
-					annotations.add(annotation);
-				}
-			}
-		});
-
-		context.getTestMethod().ifPresent(method -> {
-			A annotation = method.getAnnotation(annotationClass);
-			if (annotation != null) {
-				annotations.add(annotation);
-			}
-		});
-
-		return annotations;
 	}
 
 	/**

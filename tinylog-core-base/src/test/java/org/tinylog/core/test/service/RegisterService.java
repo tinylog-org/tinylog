@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * JUnit extension annotation for registering service implementations for {@link ServiceLoader}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @ExtendWith(ServiceRegistrationExtension.class)
 public @interface RegisterService {
 

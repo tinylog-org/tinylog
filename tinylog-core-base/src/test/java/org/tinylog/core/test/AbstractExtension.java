@@ -1,5 +1,8 @@
 package org.tinylog.core.test;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -79,6 +82,36 @@ public abstract class AbstractExtension implements BeforeEachCallback, AfterEach
 	 */
 	protected Store getStore(ExtensionContext context) {
 		return context.getStore(namespace);
+	}
+
+	/**
+	 * Finds all registered annotations.
+	 *
+	 * @param context The extension context
+	 * @param annotationClass The annotation class to search for
+	 * @param <A> The generic annotation class
+	 * @return All found annotations
+	 */
+	protected <A extends Annotation> List<A> findAnnotations(ExtensionContext context, Class<A> annotationClass) {
+		List<A> annotations = new ArrayList<>();
+
+		context.getTestInstances().ifPresent(instances -> {
+			for (Object object : instances.getAllInstances()) {
+				A annotation = object.getClass().getAnnotation(annotationClass);
+				if (annotation != null) {
+					annotations.add(annotation);
+				}
+			}
+		});
+
+		context.getTestMethod().ifPresent(method -> {
+			A annotation = method.getAnnotation(annotationClass);
+			if (annotation != null) {
+				annotations.add(annotation);
+			}
+		});
+
+		return annotations;
 	}
 
 }

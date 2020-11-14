@@ -8,12 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.commons.support.AnnotationSupport;
 import org.tinylog.core.test.AbstractExtension;
 
 /**
@@ -31,22 +29,15 @@ public class ServiceRegistrationExtension extends AbstractExtension {
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws IOException {
-		Optional<RegisterService> annotation = AnnotationSupport.findAnnotation(
-			context.getRequiredTestMethod(),
-			RegisterService.class
-		);
-
-		if (annotation.isPresent()) {
-			RegisterService configuration = annotation.get();
-
+		for (RegisterService annotation : findAnnotations(context, RegisterService.class)) {
 			Path temporaryFolder = Files.createTempDirectory(null);
 			Path serviceFolder = temporaryFolder.resolve("META-INF").resolve("services");
 			Files.createDirectories(serviceFolder);
 
-			String content = Arrays.stream(configuration.implementations())
+			String content = Arrays.stream(annotation.implementations())
 				.map(Class::getName)
 				.collect(Collectors.joining("\n"));
-			Path file = serviceFolder.resolve(configuration.service().getName());
+			Path file = serviceFolder.resolve(annotation.service().getName());
 			Files.write(file, content.getBytes(StandardCharsets.UTF_8));
 
 			URL[] urls = new URL[] {temporaryFolder.toUri().toURL()};
