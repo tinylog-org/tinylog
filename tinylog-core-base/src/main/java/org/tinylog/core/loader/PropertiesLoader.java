@@ -94,7 +94,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 
 		for (VariableResolver resolver : resolvers) {
 			String prefix = resolver.getPrefix();
-			String regex = Pattern.quote(prefix) + "\\{([^|{}]+)(?:\\|([^{}]+))?}";
+			String regex = Pattern.quote(prefix) + "\\{([^|{}]+)(?:\\|([^{}]+))?\\}";
 			Pattern pattern = Pattern.compile(regex);
 
 			for (String key : properties.stringPropertyNames()) {
