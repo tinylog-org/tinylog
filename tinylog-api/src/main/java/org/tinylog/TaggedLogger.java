@@ -14,16 +14,16 @@ public final class TaggedLogger {
 	private final LoggingBackend backend;
 
 	/**
-	 * @param tag Case-sensitive tag for the logger
+	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
 	 */
 	TaggedLogger(String tag) {
 		this(tag, Tinylog.getConfiguration(), Tinylog.getLoggingBackend());
 	}
 
 	/**
-	 * @param tag Case-sensitive tag for the logger
-	 * @param configuration Custom configuration for the logger
-	 * @param backend Logging backend for the logger
+	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
+	 * @param configuration The configuration for the logger
+	 * @param backend The logging backend for the logger
 	 */
 	TaggedLogger(String tag, Configuration configuration, LoggingBackend backend) {
 		this.tag = tag;
