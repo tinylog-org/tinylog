@@ -28,14 +28,7 @@ public final class Logger {
 		if (tag == null || tag.isEmpty()) {
 			return logger;
 		} else {
-			TaggedLogger logger = loggers.get(tag);
-			if (logger == null) {
-				logger = new TaggedLogger(tag);
-				TaggedLogger existing = loggers.putIfAbsent(tag, logger);
-				return existing == null ? logger : existing;
-			} else {
-				return logger;
-			}
+			return loggers.computeIfAbsent(tag, TaggedLogger::new);
 		}
 	}
 
