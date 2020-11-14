@@ -1,9 +1,11 @@
 package org.tinylog;
 
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.test.system.CaptureSystemOutput;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureSystemOutput(excludes = "TINYLOG WARN:.*tinylog-impl\\.jar.*")
 class LoggerTest {
 
 	/**
