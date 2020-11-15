@@ -1,5 +1,7 @@
 package org.tinylog.core.test.log;
 
+import java.util.function.Supplier;
+
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
@@ -42,7 +44,20 @@ class CaptureLoggingBackend implements LoggingBackend {
 	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
-		String output = arguments == null ? String.valueOf(message) : formatter.format(message.toString(), arguments);
+		if (message instanceof Supplier<?>) {
+			message = ((Supplier<?>) message).get();
+		}
+
+		String output;
+
+		if (message == null) {
+			output = null;
+		} else if (arguments == null) {
+			output = String.valueOf(message);
+		} else {
+			output = formatter.format(message.toString(), arguments);
+		}
+
 		log.add(new LogEntry(location.getCallerClassName(), tag, level, throwable, output));
 	}
 
