@@ -6,6 +6,7 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ServiceLoader;
@@ -29,27 +30,28 @@ public class ServiceRegistrationExtension extends AbstractExtension {
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws IOException {
-		for (RegisterService annotation : findAnnotations(context, RegisterService.class)) {
-			Path temporaryFolder = Files.createTempDirectory(null);
-			Path serviceFolder = temporaryFolder.resolve("META-INF").resolve("services");
-			Files.createDirectories(serviceFolder);
+		Path temporaryFolder = Files.createTempDirectory(null);
+		Path serviceFolder = temporaryFolder.resolve("META-INF").resolve("services");
+		Files.createDirectories(serviceFolder);
 
+		for (RegisterService annotation : findAnnotations(context, RegisterService.class)) {
 			String content = Arrays.stream(annotation.implementations())
 				.map(Class::getName)
 				.collect(Collectors.joining("\n"));
 			Path file = serviceFolder.resolve(annotation.service().getName());
-			Files.write(file, content.getBytes(StandardCharsets.UTF_8));
-
-			URL[] urls = new URL[] {temporaryFolder.toUri().toURL()};
-			ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();
-			ClassLoader wrappedLoader = new URLClassLoader(urls, defaultLoader);
-
-			put(context, Path.class, temporaryFolder);
-			put(context, ClassLoader.class, defaultLoader);
-
-			Thread.currentThread().setContextClassLoader(wrappedLoader);
-			temporaryFolder.toFile().deleteOnExit();
+			byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+			Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 		}
+
+		URL[] urls = new URL[] {temporaryFolder.toUri().toURL()};
+		ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader wrappedLoader = new URLClassLoader(urls, defaultLoader);
+
+		put(context, Path.class, temporaryFolder);
+		put(context, ClassLoader.class, defaultLoader);
+
+		Thread.currentThread().setContextClassLoader(wrappedLoader);
+		temporaryFolder.toFile().deleteOnExit();
 	}
 
 	@Override
