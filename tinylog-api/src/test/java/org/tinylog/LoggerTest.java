@@ -1,7 +1,9 @@
 package org.tinylog;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -39,12 +41,27 @@ class LoggerTest {
 	private static MockedStatic<Tinylog> tinylogMock;
 
 	/**
+	 * Mocks the static tinylog class.
+	 */
+	@BeforeAll
+	static void create() {
+		tinylogMock = mockStatic(Tinylog.class);
+	}
+
+	/**
+	 * Restores the mocked tinylog class.
+	 */
+	@AfterAll
+	static void dispose() {
+		tinylogMock.close();
+	}
+
+	/**
 	 * Initializes all mocks.
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
-	@BeforeAll
-	static void init() {
-		tinylogMock = mockStatic(Tinylog.class);
+	@BeforeEach
+	void init() {
 		tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
 		when(backend.getLevelVisibility(null)).thenReturn(visibility);
 	}
@@ -56,14 +73,6 @@ class LoggerTest {
 	void reset() {
 		tinylogMock.reset();
 		Mockito.reset(backend, visibility);
-	}
-
-	/**
-	 * Restores the tinylog class.
-	 */
-	@AfterEach
-	void dispose() {
-		tinylogMock.close();
 	}
 
 	/**
@@ -115,10 +124,69 @@ class LoggerTest {
 	@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
 	void isTraceEnabled(boolean visible, boolean enabled) {
 		when(visibility.isTraceEnabled()).thenReturn(visible);
-
 		lenient().when(backend.isEnabled(notNull(), eq(null), eq(Level.TRACE))).thenReturn(enabled);
 
 		assertThat(Logger.isTraceEnabled()).isEqualTo(visible && enabled);
+	}
+
+	/**
+	 * Verifies the results of the {@link Logger#isDebugEnabled()} method.
+	 *
+	 * @param visible The value for {@link LevelVisibility#isDebugEnabled()}
+	 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+	 */
+	@ParameterizedTest
+	@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+	void isDebugEnabled(boolean visible, boolean enabled) {
+		when(visibility.isDebugEnabled()).thenReturn(visible);
+		lenient().when(backend.isEnabled(notNull(), eq(null), eq(Level.DEBUG))).thenReturn(enabled);
+
+		assertThat(Logger.isDebugEnabled()).isEqualTo(visible && enabled);
+	}
+
+	/**
+	 * Verifies the results of the {@link Logger#isInfoEnabled()} method.
+	 *
+	 * @param visible The value for {@link LevelVisibility#isInfoEnabled()}
+	 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+	 */
+	@ParameterizedTest
+	@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+	void isInfoEnabled(boolean visible, boolean enabled) {
+		when(visibility.isInfoEnabled()).thenReturn(visible);
+		lenient().when(backend.isEnabled(notNull(), eq(null), eq(Level.INFO))).thenReturn(enabled);
+
+		assertThat(Logger.isInfoEnabled()).isEqualTo(visible && enabled);
+	}
+
+	/**
+	 * Verifies the results of the {@link Logger#isWarnEnabled()} method.
+	 *
+	 * @param visible The value for {@link LevelVisibility#isWarnEnabled()}
+	 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+	 */
+	@ParameterizedTest
+	@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+	void isWarnEnabled(boolean visible, boolean enabled) {
+		when(visibility.isWarnEnabled()).thenReturn(visible);
+		lenient().when(backend.isEnabled(notNull(), eq(null), eq(Level.WARN))).thenReturn(enabled);
+
+		assertThat(Logger.isWarnEnabled()).isEqualTo(visible && enabled);
+	}
+
+	/**
+	 * Verifies the results of the {@link Logger#isErrorEnabled()} method.
+	 *
+	 * @param visible The value for {@link LevelVisibility#isErrorEnabled()}
+	 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+	 */
+	@ParameterizedTest
+	@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+	void isErrorEnabled(boolean visible, boolean enabled) {
+		when(visibility.isErrorEnabled()).thenReturn(visible);
+		lenient().when(backend.isEnabled(notNull(), eq(null), eq(Level.ERROR))).thenReturn(enabled);
+
+		assertThat(Logger.isErrorEnabled()).isEqualTo(visible && enabled);
 	}
 
 }
