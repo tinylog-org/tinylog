@@ -161,7 +161,6 @@
         <module name="PackageAnnotation"/>
         <module name="PackageDeclaration"/>
         <module name="PackageName"/>
-        <module name="ParameterAssignment"/>
         <module name="ParameterName"/>
         <module name="ParameterNumber"/>
         <module name="ParenPad"/>
