@@ -11,7 +11,6 @@ import org.tinylog.core.test.log.LogEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries(minLevel = Level.TRACE)
 class InternalLoggerTest {
 
 	@Inject
@@ -23,6 +22,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a trace log entry with a plain text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.TRACE)
 	@Test
 	void traceMessage() {
 		InternalLogger.trace(null, "Hello World!");
@@ -32,6 +32,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a trace log entry with a placeholder message and arguments can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.TRACE)
 	@Test
 	void traceMessageWithArguments() {
 		InternalLogger.trace(null, "Hello {}!", "Alice");
@@ -41,6 +42,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a trace log entry with an exception and a custom text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.TRACE)
 	@Test
 	void traceExceptionAndMessage() {
 		Exception exception = new Exception();
@@ -49,8 +51,21 @@ class InternalLoggerTest {
 	}
 
 	/**
+	 * Verifies that no trace log entries wil be issued, if the trace severity level is disabled.
+	 */
+	@CaptureLogEntries(minLevel = Level.DEBUG)
+	@Test
+	void traceDisabled() {
+		InternalLogger.trace(null, "Hello World!");
+		InternalLogger.trace(null, "Hello {}!", "Alice");
+
+		assertThat(log.consume()).isEmpty();
+	}
+
+	/**
 	 * Verifies that a debug log entry with a plain text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.DEBUG)
 	@Test
 	void debugMessage() {
 		InternalLogger.debug(null, "Hello World!");
@@ -60,6 +75,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a debug log entry with a placeholder message and arguments can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.DEBUG)
 	@Test
 	void debugMessageWithArguments() {
 		InternalLogger.debug(null, "Hello {}!", "Alice");
@@ -69,6 +85,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a debug log entry with an exception and a custom text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.DEBUG)
 	@Test
 	void debugExceptionAndMessage() {
 		Exception exception = new Exception();
@@ -77,8 +94,21 @@ class InternalLoggerTest {
 	}
 
 	/**
+	 * Verifies that no debug log entries wil be issued, if the debug debug level is disabled.
+	 */
+	@CaptureLogEntries(minLevel = Level.INFO)
+	@Test
+	void debugDisabled() {
+		InternalLogger.debug(null, "Hello World!");
+		InternalLogger.debug(null, "Hello {}!", "Alice");
+
+		assertThat(log.consume()).isEmpty();
+	}
+
+	/**
 	 * Verifies that an info log entry with a plain text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.INFO)
 	@Test
 	void infoMessage() {
 		InternalLogger.info(null, "Hello World!");
@@ -88,6 +118,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that an info log entry with a placeholder message and arguments can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.INFO)
 	@Test
 	void infoMessageWithArguments() {
 		InternalLogger.info(null, "Hello {}!", "Alice");
@@ -97,6 +128,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that an info log entry with an exception and a custom text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.INFO)
 	@Test
 	void infoExceptionAndMessage() {
 		Exception exception = new Exception();
@@ -105,8 +137,21 @@ class InternalLoggerTest {
 	}
 
 	/**
+	 * Verifies that no info log entries wil be issued, if the info severity level is disabled.
+	 */
+	@CaptureLogEntries(minLevel = Level.WARN)
+	@Test
+	void infoDisabled() {
+		InternalLogger.info(null, "Hello World!");
+		InternalLogger.info(null, "Hello {}!", "Alice");
+
+		assertThat(log.consume()).isEmpty();
+	}
+
+	/**
 	 * Verifies that a warn log entry with a plain text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.WARN)
 	@Test
 	void warnMessage() {
 		InternalLogger.warn(null, "Hello World!");
@@ -116,6 +161,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a warn log entry with a placeholder message and arguments can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.WARN)
 	@Test
 	void warnMessageWithArguments() {
 		InternalLogger.warn(null, "Hello {}!", "Alice");
@@ -125,6 +171,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that a warn log entry with an exception and a custom text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.WARN)
 	@Test
 	void warnExceptionAndMessage() {
 		Exception exception = new Exception();
@@ -133,8 +180,21 @@ class InternalLoggerTest {
 	}
 
 	/**
+	 * Verifies that no warn log entries wil be issued, if the warn severity level is disabled.
+	 */
+	@CaptureLogEntries(minLevel = Level.ERROR)
+	@Test
+	void warnDisabled() {
+		InternalLogger.warn(null, "Hello World!");
+		InternalLogger.warn(null, "Hello {}!", "Alice");
+
+		assertThat(log.consume()).isEmpty();
+	}
+
+	/**
 	 * Verifies that an error log entry with a plain text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.ERROR)
 	@Test
 	void errorMessage() {
 		InternalLogger.error(null, "Hello World!");
@@ -144,6 +204,7 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that an error log entry with a placeholder message and arguments can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.ERROR)
 	@Test
 	void errorMessageWithArguments() {
 		InternalLogger.error(null, "Hello {}!", "Alice");
@@ -153,11 +214,24 @@ class InternalLoggerTest {
 	/**
 	 * Verifies that an error log entry with an exception and a custom text message can be issued.
 	 */
+	@CaptureLogEntries(minLevel = Level.ERROR)
 	@Test
 	void errorExceptionAndMessage() {
 		Exception exception = new Exception();
 		InternalLogger.error(exception, "Oops!");
 		assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
+	}
+
+	/**
+	 * Verifies that no error log entries wil be issued, if the error severity level is disabled.
+	 */
+	@CaptureLogEntries(minLevel = Level.OFF)
+	@Test
+	void errorDisabled() {
+		InternalLogger.error(null, "Hello World!");
+		InternalLogger.error(null, "Hello {}!", "Alice");
+
+		assertThat(log.consume()).isEmpty();
 	}
 
 	/**
@@ -173,6 +247,19 @@ class InternalLoggerTest {
 		assertThat(log.consume()).containsExactly(
 			new LogEntry(InternalLogger.class.getName(), "tinylog", Level.INFO, null, "Hello World!")
 		);
+	}
+
+	/**
+	 * Verifies that log entries will be discarded, if the internal logger is initialized with a less severe level.
+	 */
+	@CaptureLogEntries(minLevel = Level.WARN, autostart = false)
+	@Test
+	void delayedDiscarding() {
+		InternalLogger.info(null, "Hello World!");
+		assertThat(log.consume()).isEmpty();
+
+		InternalLogger.init(framework);
+		assertThat(log.consume()).isEmpty();
 	}
 
 	/**

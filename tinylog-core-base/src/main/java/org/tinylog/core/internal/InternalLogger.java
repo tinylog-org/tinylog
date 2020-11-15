@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -21,7 +22,7 @@ public final class InternalLogger {
 	private static final int CALLER_STACK_TRACE_DEPTH = 3;
 
 	private static final Object mutex = new Object();
-	private static volatile State state;
+	private static volatile State state = new State(null, null, null);
 	private static List<LogEntry> entries = new ArrayList<>();
 
 	/** */
@@ -56,7 +57,7 @@ public final class InternalLogger {
 	 */
 	public static void reset() {
 		synchronized (mutex) {
-			state = null;
+			state = new State(null, null, null);
 			entries = new ArrayList<>();
 		}
 	}
@@ -68,7 +69,9 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void trace(Throwable ex, String message) {
-		log(Level.TRACE, ex, message, null);
+		if (state.visibility.isTraceEnabled()) {
+			log(Level.TRACE, ex, message, null);
+		}
 	}
 
 	/**
@@ -79,7 +82,9 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void trace(Throwable ex, String message, Object... arguments) {
-		log(Level.TRACE, ex, message, arguments);
+		if (state.visibility.isTraceEnabled()) {
+			log(Level.TRACE, ex, message, arguments);
+		}
 	}
 
 	/**
@@ -89,7 +94,9 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void debug(Throwable ex, String message) {
-		log(Level.DEBUG, ex, message, null);
+		if (state.visibility.isDebugEnabled()) {
+			log(Level.DEBUG, ex, message, null);
+		}
 	}
 
 	/**
@@ -100,7 +107,9 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void debug(Throwable ex, String message, Object... arguments) {
-		log(Level.DEBUG, ex, message, arguments);
+		if (state.visibility.isDebugEnabled()) {
+			log(Level.DEBUG, ex, message, arguments);
+		}
 	}
 
 	/**
@@ -110,7 +119,9 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void info(Throwable ex, String message) {
-		log(Level.INFO, ex, message, null);
+		if (state.visibility.isInfoEnabled()) {
+			log(Level.INFO, ex, message, null);
+		}
 	}
 
 	/**
@@ -121,7 +132,9 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void info(Throwable ex, String message, Object... arguments) {
-		log(Level.INFO, ex, message, arguments);
+		if (state.visibility.isInfoEnabled()) {
+			log(Level.INFO, ex, message, arguments);
+		}
 	}
 
 	/**
@@ -131,7 +144,9 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void warn(Throwable ex, String message) {
-		log(Level.WARN, ex, message, null);
+		if (state.visibility.isWarnEnabled()) {
+			log(Level.WARN, ex, message, null);
+		}
 	}
 
 	/**
@@ -142,7 +157,9 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void warn(Throwable ex, String message, Object... arguments) {
-		log(Level.WARN, ex, message, arguments);
+		if (state.visibility.isWarnEnabled()) {
+			log(Level.WARN, ex, message, arguments);
+		}
 	}
 
 	/**
@@ -152,7 +169,9 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void error(Throwable ex, String message) {
-		log(Level.ERROR, ex, message, null);
+		if (state.visibility.isErrorEnabled()) {
+			log(Level.ERROR, ex, message, null);
+		}
 	}
 
 	/**
@@ -163,7 +182,9 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void error(Throwable ex, String message, Object... arguments) {
-		log(Level.ERROR, ex, message, arguments);
+		if (state.visibility.isErrorEnabled()) {
+			log(Level.ERROR, ex, message, arguments);
+		}
 	}
 
 	/**
@@ -177,16 +198,16 @@ public final class InternalLogger {
 	private static void log(Level level, Throwable throwable, String message, Object[] arguments) {
 		State state = InternalLogger.state;
 
-		if (state == null) {
+		if (state.backend == null) {
 			synchronized (mutex) {
 				state = InternalLogger.state;
-				if (state == null) {
+				if (state.backend == null) {
 					entries.add(new LogEntry(level, throwable, message, arguments));
 				}
 			}
 		}
 
-		if (state != null) {
+		if (state.backend != null) {
 			StackTraceLocation location = state.runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
 			state.backend.log(location, TAG, level, throwable, message, arguments, state.formatter);
 		}
@@ -200,6 +221,7 @@ public final class InternalLogger {
 		private final RuntimeFlavor runtime;
 		private final LoggingBackend backend;
 		private final MessageFormatter formatter;
+		private final LevelVisibility visibility;
 
 		/**
 		 * @param runtime Runtime flavor for extraction of stack trace location
@@ -210,6 +232,12 @@ public final class InternalLogger {
 			this.runtime = runtime;
 			this.backend = backend;
 			this.formatter = formatter;
+
+			if (backend == null) {
+				visibility = new LevelVisibility(true, true, true, true, true);
+			} else {
+				visibility = backend.getLevelVisibility(TAG);
+			}
 		}
 
 	}
