@@ -2,7 +2,6 @@ package org.tinylog;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
-import org.tinylog.core.Tinylog;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.runtime.RuntimeFlavor;
@@ -18,13 +17,6 @@ public final class TaggedLogger {
 	private final RuntimeFlavor runtime;
 	private final LoggingBackend backend;
 	private final LevelVisibility visibility;
-
-	/**
-	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
-	 */
-	TaggedLogger(String tag) {
-		this(tag, Tinylog.getFramework());
-	}
 
 	/**
 	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
