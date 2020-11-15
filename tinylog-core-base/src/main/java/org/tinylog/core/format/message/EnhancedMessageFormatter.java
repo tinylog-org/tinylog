@@ -3,6 +3,7 @@ package org.tinylog.core.format.message;
 import java.text.ChoiceFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
@@ -83,6 +84,10 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	 * @return The formatted representation of the passed value
 	 */
 	private String render(String pattern, Object value) {
+		if (value instanceof Supplier<?>) {
+			value = ((Supplier<?>) value).get();
+		}
+
 		if (!pattern.isEmpty()) {
 			if (isConditional(pattern)) {
 				return new ChoiceFormat(format(pattern, value)).format(value);

@@ -2,6 +2,7 @@ package org.tinylog.core.format.message;
 
 import java.text.ChoiceFormat;
 import java.time.LocalTime;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -70,6 +71,17 @@ class EnhancedMessageFormatterTest {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
 		String output = formatter.format("It is {hh:mm a}.", LocalTime.of(12, 30));
 		assertThat(output).isEqualTo("It is 12:30 PM.");
+	}
+
+	/**
+	 * Verifies that a lazy argument can be formatted.
+	 */
+	@Test
+	void formatLazyArgument() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
+		Supplier<?> supplier = () -> "Alice";
+		String output = formatter.format("Hello {}!", supplier);
+		assertThat(output).isEqualTo("Hello Alice!");
 	}
 
 	/**
