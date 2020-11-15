@@ -11,25 +11,32 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 class CaptureLoggingBackend implements LoggingBackend {
 
-	private static final LevelVisibility VISIBILITY = new LevelVisibility(true, true, true, true, true);
-
 	private final Log log;
+	private final Level visibleLevel;
 
 	/**
 	 * @param log All issued log entries will be stored in this {@link Log}
+	 * @param visibleLevel The minimum visible severity level for {@link #getLevelVisibility(String)}
 	 */
-	CaptureLoggingBackend(Log log) {
+	CaptureLoggingBackend(Log log, Level visibleLevel) {
 		this.log = log;
+		this.visibleLevel = visibleLevel;
 	}
 
 	@Override
 	public LevelVisibility getLevelVisibility(String tag) {
-		return VISIBILITY;
+		return new LevelVisibility(
+			Level.TRACE.ordinal() <= visibleLevel.ordinal(),
+			Level.DEBUG.ordinal() <= visibleLevel.ordinal(),
+			Level.INFO.ordinal() <= visibleLevel.ordinal(),
+			Level.WARN.ordinal() <= visibleLevel.ordinal(),
+			Level.ERROR.ordinal() <= visibleLevel.ordinal()
+		);
 	}
 
 	@Override
 	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
-		return true;
+		return level.ordinal() <= log.getMinLevel().ordinal();
 	}
 
 	@Override
