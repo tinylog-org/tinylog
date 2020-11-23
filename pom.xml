@@ -268,8 +268,6 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>3.1.1</version>
                     <configuration>
-                        <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <configLocation>configuration/checkstyle-rules.xml</configLocation>
                         <propertyExpansion>workspace_loc=${root.basedir}</propertyExpansion>
