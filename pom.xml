@@ -495,8 +495,6 @@
 					</dependencies>
 					<configuration>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
-						<failOnViolation>true</failOnViolation>
-						<violationSeverity>warning</violationSeverity>
 						<configLocation>${project.parent.basedir}/configuration/checkstyle-rules.xml</configLocation>
 						<propertyExpansion>workspace_loc=${project.parent.basedir}</propertyExpansion>
 						<linkXRef>false</linkXRef>
