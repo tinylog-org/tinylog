@@ -283,7 +283,7 @@ class PropertiesLoaderTest {
 	 */
 	@Test
 	void resolveExistingSystemPropertyWithDefault() throws Exception {
-		createTextFile("tinylog.properties", "example = #{foo|default}");
+		createTextFile("tinylog.properties", "example = #{ foo | default }");
 
 		restoreSystemProperties(() -> {
 			System.setProperty("foo", "42");
@@ -299,7 +299,7 @@ class PropertiesLoaderTest {
 	 */
 	@Test
 	void resolveMissingSystemPropertyWithDefault() throws Exception {
-		createTextFile("tinylog.properties", "example = #{foo|default}");
+		createTextFile("tinylog.properties", "example = #{ foo | default }");
 
 		restoreSystemProperties(() -> {
 			System.clearProperty("foo");

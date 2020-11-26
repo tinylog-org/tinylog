@@ -139,7 +139,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 	 * @return The replacement text for the found variable placeholder
 	 */
 	private static String resolveVariable(Matcher matcher, VariableResolver resolver) {
-		String name = matcher.group(1);
+		String name = matcher.group(1).trim();
 		String value = resolver.resolve(name);
 
 		if (value == null) {
@@ -153,6 +153,8 @@ public class PropertiesLoader implements ConfigurationLoader {
 					name
 				);
 				value = matcher.group();
+			} else {
+				value = value.trim();
 			}
 		}
 
