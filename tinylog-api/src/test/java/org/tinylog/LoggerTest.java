@@ -80,7 +80,7 @@ class LoggerTest {
 	 * Tests for category tests.
 	 */
 	@Nested
-	public class Tags {
+	class Tags {
 
 		/**
 		 * Verifies that the same logger instance is returned for the same tag.
@@ -127,7 +127,7 @@ class LoggerTest {
 	 * Tests for severity levels.
 	 */
 	@Nested
-	public class Levels {
+	class Levels {
 
 		/**
 		 * Verifies the results of the {@link Logger#isTraceEnabled()} method.

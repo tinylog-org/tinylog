@@ -32,7 +32,7 @@ class TaggedLoggerTest {
 	 */
 	@CaptureLogEntries
 	@Nested
-	public class Tags {
+	class Tags {
 
 		@Inject
 		private Framework framework;
@@ -62,7 +62,7 @@ class TaggedLoggerTest {
 	 */
 	@ExtendWith(MockitoExtension.class)
 	@Nested
-	public class Levels {
+	class Levels {
 
 		@Mock
 		private LoggingBackend backend;
@@ -177,7 +177,7 @@ class TaggedLoggerTest {
 	 * Tests for issuing log entries.
 	 */
 	@Nested
-	public class LogEntries {
+	class LogEntries {
 
 		private static final String TAG = "test";
 
@@ -204,7 +204,7 @@ class TaggedLoggerTest {
 		 * Tests issuing log entries if the assigned severity level is enabled.
 		 */
 		@Nested
-		public class Enabled {
+		class Enabled {
 
 			/**
 			 * Verifies that a trace log entry with a plain text message can be issued.
@@ -804,7 +804,7 @@ class TaggedLoggerTest {
 		 * Tests discarding log entries if the assigned severity level is disabled.
 		 */
 		@Nested
-		public class Disabled {
+		class Disabled {
 
 			/**
 			 * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
