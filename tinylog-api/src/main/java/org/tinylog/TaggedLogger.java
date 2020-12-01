@@ -51,7 +51,7 @@ public final class TaggedLogger {
 	 *
 	 * <p>
 	 *     If this method returns {@code true}, an issued trace log entry will be output. If this method returns
-	 *     {@code false}, issued trace log entries will be discarded. 
+	 *     {@code false}, issued trace log entries will be discarded.
 	 * </p>
 	 *
 	 * @return {@code true} if enabled, otherwise {@code false}
@@ -716,8 +716,8 @@ public final class TaggedLogger {
 	 * Checks if the warn severity level is enabled for the actual class and tag.
 	 *
 	 * <p>
-	 *     If this method returns {@code true}, an issued warn log entry will be output. If this method returns
-	 *     {@code false}, issued warn log entries will be discarded.
+	 *     If this method returns {@code true}, an issued warning log entry will be output. If this method returns
+	 *     {@code false}, issued warning log entries will be discarded.
 	 * </p>
 	 *
 	 * @return {@code true} if enabled, otherwise {@code false}
