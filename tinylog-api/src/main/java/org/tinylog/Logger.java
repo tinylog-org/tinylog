@@ -4,11 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.tinylog.core.Framework;
-import org.tinylog.core.Level;
 import org.tinylog.core.Tinylog;
-import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.runtime.RuntimeFlavor;
 
 /**
  * Static logger for issuing log entries.
@@ -17,18 +13,14 @@ public final class Logger {
 
 	private static final int CALLER_STACK_TRACE_DEPTH = 2;
 
-	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<>();
-
 	private static final Framework framework;
-	private static final RuntimeFlavor runtime;
-	private static final LoggingBackend backend;
-	private static final LevelVisibility visibility;
+	private static final ConcurrentMap<String, TaggedLogger> taggedLoggers;
+	private static final TaggedLogger logger;
 	
 	static {
 		framework = Tinylog.getFramework();
-		runtime = framework.getRuntime();
-		backend = framework.getLoggingBackend();
-		visibility = backend.getLevelVisibility(null);
+		taggedLoggers = new ConcurrentHashMap<>();
+		logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH + 1, null, framework);
 	}
 
 	/** */
@@ -46,9 +38,15 @@ public final class Logger {
 	 */
 	public static TaggedLogger tag(String tag) {
 		if (tag == null || tag.isEmpty()) {
-			return loggers.computeIfAbsent("", key -> new TaggedLogger(null, framework));
+			return taggedLoggers.computeIfAbsent(
+				"",
+				key -> new TaggedLogger(CALLER_STACK_TRACE_DEPTH, null, framework)
+			);
 		} else {
-			return loggers.computeIfAbsent(tag, key -> new TaggedLogger(key, framework));
+			return taggedLoggers.computeIfAbsent(
+				tag,
+				key -> new TaggedLogger(CALLER_STACK_TRACE_DEPTH, key, framework)
+			);
 		}
 	}
 
@@ -63,8 +61,7 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isTraceEnabled() {
-		return visibility.isTraceEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.TRACE);
+		return logger.isTraceEnabled();
 	}
 
 	/**
@@ -78,8 +75,7 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isDebugEnabled() {
-		return visibility.isDebugEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.DEBUG);
+		return logger.isDebugEnabled();
 	}
 
 	/**
@@ -93,8 +89,7 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isInfoEnabled() {
-		return visibility.isInfoEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.INFO);
+		return logger.isInfoEnabled();
 	}
 
 	/**
@@ -108,8 +103,7 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isWarnEnabled() {
-		return visibility.isWarnEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.WARN);
+		return logger.isWarnEnabled();
 	}
 
 	/**
@@ -123,8 +117,7 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isErrorEnabled() {
-		return visibility.isErrorEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.ERROR);
+		return logger.isErrorEnabled();
 	}
 
 }

@@ -16,8 +16,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 public final class TaggedLogger {
 
-	private static final int CALLER_STACK_TRACE_DEPTH = 2;
-
+	private final int depth;
 	private final String tag;
 	private final RuntimeFlavor runtime;
 	private final LoggingBackend backend;
@@ -25,10 +24,12 @@ public final class TaggedLogger {
 	private final MessageFormatter formatter;
 
 	/**
+	 * @param depth The depth of the caller class in the stack trace
 	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
 	 * @param framework The actual framework instance
 	 */
-	TaggedLogger(String tag, Framework framework) {
+	TaggedLogger(int depth, String tag, Framework framework) {
+		this.depth = depth;
 		this.tag = tag;
 		this.runtime = framework.getRuntime();
 		this.backend = framework.getLoggingBackend();
@@ -57,7 +58,7 @@ public final class TaggedLogger {
 	 */
 	public boolean isTraceEnabled() {
 		return visibility.isTraceEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.TRACE);
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(depth), tag, Level.TRACE);
 	}
 
 	/**
@@ -77,7 +78,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Object message) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, null, message, null, null);
 		}
 	}
@@ -100,7 +101,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Supplier<?> message) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, null, message, null, null);
 		}
 	}
@@ -124,7 +125,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(String message, Object... arguments) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
@@ -149,7 +150,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(String message, Supplier<?>... arguments) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
@@ -166,7 +167,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Throwable exception) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, exception, null, null, null);
 		}
 	}
@@ -185,7 +186,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Throwable exception, String message) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, exception, message, null, null);
 		}
 	}
@@ -209,7 +210,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Throwable exception, Supplier<String> message) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, exception, message, null, null);
 		}
 	}
@@ -235,7 +236,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Throwable exception, String message, Object... arguments) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
@@ -262,7 +263,7 @@ public final class TaggedLogger {
 	 */
 	public void trace(Throwable exception, String message, Supplier<?>... arguments) {
 		if (visibility.isTraceEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
@@ -279,7 +280,7 @@ public final class TaggedLogger {
 	 */
 	public boolean isDebugEnabled() {
 		return visibility.isDebugEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.DEBUG);
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(depth), tag, Level.DEBUG);
 	}
 
 	/**
@@ -299,7 +300,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Object message) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, null, message, null, null);
 		}
 	}
@@ -322,7 +323,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Supplier<?> message) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, null, message, null, null);
 		}
 	}
@@ -346,7 +347,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(String message, Object... arguments) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
@@ -371,7 +372,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(String message, Supplier<?>... arguments) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
@@ -388,7 +389,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Throwable exception) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, exception, null, null, null);
 		}
 	}
@@ -407,7 +408,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Throwable exception, String message) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, exception, message, null, null);
 		}
 	}
@@ -431,7 +432,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Throwable exception, Supplier<String> message) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, exception, message, null, null);
 		}
 	}
@@ -457,7 +458,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Throwable exception, String message, Object... arguments) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
@@ -484,7 +485,7 @@ public final class TaggedLogger {
 	 */
 	public void debug(Throwable exception, String message, Supplier<?>... arguments) {
 		if (visibility.isDebugEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
@@ -501,7 +502,7 @@ public final class TaggedLogger {
 	 */
 	public boolean isInfoEnabled() {
 		return visibility.isInfoEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.INFO);
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(depth), tag, Level.INFO);
 	}
 
 	/**
@@ -521,7 +522,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Object message) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, null, message, null, null);
 		}
 	}
@@ -544,7 +545,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Supplier<?> message) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, null, message, null, null);
 		}
 	}
@@ -568,7 +569,7 @@ public final class TaggedLogger {
 	 */
 	public void info(String message, Object... arguments) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, null, message, arguments, formatter);
 		}
 	}
@@ -593,7 +594,7 @@ public final class TaggedLogger {
 	 */
 	public void info(String message, Supplier<?>... arguments) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, null, message, arguments, formatter);
 		}
 	}
@@ -610,7 +611,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Throwable exception) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, exception, null, null, null);
 		}
 	}
@@ -629,7 +630,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Throwable exception, String message) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, exception, message, null, null);
 		}
 	}
@@ -653,7 +654,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Throwable exception, Supplier<String> message) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, exception, message, null, null);
 		}
 	}
@@ -679,7 +680,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Throwable exception, String message, Object... arguments) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
@@ -706,7 +707,7 @@ public final class TaggedLogger {
 	 */
 	public void info(Throwable exception, String message, Supplier<?>... arguments) {
 		if (visibility.isInfoEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
@@ -723,7 +724,7 @@ public final class TaggedLogger {
 	 */
 	public boolean isWarnEnabled() {
 		return visibility.isWarnEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.WARN);
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(depth), tag, Level.WARN);
 	}
 
 	/**
@@ -743,7 +744,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Object message) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, null, message, null, null);
 		}
 	}
@@ -766,7 +767,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Supplier<?> message) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, null, message, null, null);
 		}
 	}
@@ -790,7 +791,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(String message, Object... arguments) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, null, message, arguments, formatter);
 		}
 	}
@@ -815,7 +816,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(String message, Supplier<?>... arguments) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, null, message, arguments, formatter);
 		}
 	}
@@ -832,7 +833,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Throwable exception) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, exception, null, null, null);
 		}
 	}
@@ -851,7 +852,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Throwable exception, String message) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, exception, message, null, null);
 		}
 	}
@@ -875,7 +876,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Throwable exception, Supplier<String> message) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, exception, message, null, null);
 		}
 	}
@@ -901,7 +902,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Throwable exception, String message, Object... arguments) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
@@ -928,7 +929,7 @@ public final class TaggedLogger {
 	 */
 	public void warn(Throwable exception, String message, Supplier<?>... arguments) {
 		if (visibility.isWarnEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
@@ -945,7 +946,7 @@ public final class TaggedLogger {
 	 */
 	public boolean isErrorEnabled() {
 		return visibility.isErrorEnabled()
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.ERROR);
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(depth), tag, Level.ERROR);
 	}
 
 	/**
@@ -965,7 +966,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Object message) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, null, message, null, null);
 		}
 	}
@@ -988,7 +989,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Supplier<?> message) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, null, message, null, null);
 		}
 	}
@@ -1012,7 +1013,7 @@ public final class TaggedLogger {
 	 */
 	public void error(String message, Object... arguments) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
@@ -1037,7 +1038,7 @@ public final class TaggedLogger {
 	 */
 	public void error(String message, Supplier<?>... arguments) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
@@ -1054,7 +1055,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Throwable exception) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, exception, null, null, null);
 		}
 	}
@@ -1073,7 +1074,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Throwable exception, String message) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, exception, message, null, null);
 		}
 	}
@@ -1097,7 +1098,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Throwable exception, Supplier<String> message) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, exception, message, null, null);
 		}
 	}
@@ -1123,7 +1124,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Throwable exception, String message, Object... arguments) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}
@@ -1150,7 +1151,7 @@ public final class TaggedLogger {
 	 */
 	public void error(Throwable exception, String message, Supplier<?>... arguments) {
 		if (visibility.isErrorEnabled()) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(depth);
 			backend.log(location, tag, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}
