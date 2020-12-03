@@ -6,9 +6,19 @@ import org.tinylog.core.format.value.ValueFormatBuilder;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.InternalLoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
+import org.tinylog.core.loader.ConfigurationLoader;
+import org.tinylog.core.loader.PropertiesLoader;
+import org.tinylog.core.variable.EnvironmentVariableResolver;
+import org.tinylog.core.variable.SystemPropertyResolver;
+import org.tinylog.core.variable.VariableResolver;
 
 module org.tinylog.core {
 	uses Hook;
+
+	uses LoggingBackendBuilder;
+	provides LoggingBackendBuilder with
+		InternalLoggingBackendBuilder,
+		NopLoggingBackendBuilder;
 
 	uses ValueFormatBuilder;
 	provides ValueFormatBuilder with
@@ -16,10 +26,14 @@ module org.tinylog.core {
 		JavaTimeFormatBuilder,
 		NumberFormatBuilder;
 
-	uses LoggingBackendBuilder;
-	provides LoggingBackendBuilder with
-		InternalLoggingBackendBuilder,
-		NopLoggingBackendBuilder;
+	uses ConfigurationLoader;
+	provides ConfigurationLoader with
+		PropertiesLoader;
+
+	uses VariableResolver;
+	provides VariableResolver with
+		EnvironmentVariableResolver,
+		SystemPropertyResolver;
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.backend;
