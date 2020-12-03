@@ -34,10 +34,10 @@ class TaggedLogger internal constructor(private val tag: String?) {
 
 	// @formatter:off
 	private val minimumLevelCoversTrace = isCoveredByMinimumLevel(tag, Level.TRACE)
-	private val minimumLevelCoversDebug = isCoveredByMinimumLevel(tag, Level.TRACE)
-	private val minimumLevelCoversInfo  = isCoveredByMinimumLevel(tag, Level.TRACE)
-	private val minimumLevelCoversWarn  = isCoveredByMinimumLevel(tag, Level.TRACE)
-	private val minimumLevelCoversError = isCoveredByMinimumLevel(tag, Level.TRACE)
+	private val minimumLevelCoversDebug = isCoveredByMinimumLevel(tag, Level.DEBUG)
+	private val minimumLevelCoversInfo  = isCoveredByMinimumLevel(tag, Level.INFO)
+	private val minimumLevelCoversWarn  = isCoveredByMinimumLevel(tag, Level.WARN)
+	private val minimumLevelCoversError = isCoveredByMinimumLevel(tag, Level.ERROR)
 	// @formatter:on
 
 	/**
