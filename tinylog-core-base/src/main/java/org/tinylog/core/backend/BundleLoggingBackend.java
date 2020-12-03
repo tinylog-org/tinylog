@@ -28,7 +28,7 @@ public class BundleLoggingBackend implements LoggingBackend {
 	 *
 	 * @return The wrapped child logging backends
 	 */
-	public List<LoggingBackend> getProviders() {
+	public List<LoggingBackend> getChildren() {
 		return Collections.unmodifiableList(backends);
 	}
 

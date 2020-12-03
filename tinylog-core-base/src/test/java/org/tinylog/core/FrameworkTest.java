@@ -279,7 +279,7 @@ class FrameworkTest {
 			LoggingBackend backend = framework.getLoggingBackend();
 			assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getProviders();
+			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
 			assertThat(children).containsExactlyInAnyOrder(
 				TestOneLoggingBackendBuilder.backend, TestTwoLoggingBackendBuilder.backend
 			);
@@ -314,7 +314,7 @@ class FrameworkTest {
 			LoggingBackend backend = framework.getLoggingBackend();
 			assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getProviders();
+			Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
 			assertThat(children).containsExactlyInAnyOrder(
 				TestOneLoggingBackendBuilder.backend, new NopLoggingBackendBuilder().create(null)
 			);

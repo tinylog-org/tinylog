@@ -28,7 +28,7 @@ class BundleLoggingBackendTest {
 		LoggingBackend first = mock(LoggingBackend.class);
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
-		assertThat(parent.getProviders()).containsExactlyInAnyOrder(first, second);
+		assertThat(parent.getChildren()).containsExactlyInAnyOrder(first, second);
 	}
 
 	/**
