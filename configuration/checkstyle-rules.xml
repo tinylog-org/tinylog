@@ -82,7 +82,9 @@
         </module>
         <module name="IllegalToken"/>
         <module name="IllegalTokenText"/>
-        <module name="IllegalType"/>
+        <module name="IllegalType">
+            <property name="tokens" value="ANNOTATION_FIELD_DEF, METHOD_CALL, METHOD_DEF, METHOD_REF, PARAMETER_DEF, VARIABLE_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF, RECORD_COMPONENT_DEF"/>
+        </module>
         <module name="ImportOrder">
             <property name="groups" value="java,javax,org,com"/>
             <property name="separated" value="true"/>
