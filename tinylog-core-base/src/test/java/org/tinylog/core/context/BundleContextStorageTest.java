@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,11 +40,11 @@ class BundleContextStorageTest {
 	 */
 	@Test
 	void receiveMapping() {
-		when(firstChildStorage.getMapping()).thenReturn(Map.of("foo", "1", "bar", "1"));
-		when(secondChildStorage.getMapping()).thenReturn(Map.of("bar", "2", "other", "2"));
+		when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1", "bar", "1"));
+		when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2", "other", "2"));
 
 		assertThat(bundleStorage.getMapping())
-			.containsExactlyInAnyOrderEntriesOf(Map.of("foo", "1", "bar", "1", "other", "2"));
+			.containsExactlyInAnyOrderEntriesOf(ImmutableMap.of("foo", "1", "bar", "1", "other", "2"));
 	}
 
 	/**
@@ -100,7 +102,7 @@ class BundleContextStorageTest {
 	 */
 	@Test
 	void replaceWithNewMapping() {
-		Map<String, String> mapping = Map.of("foo", "42");
+		Map<String, String> mapping = ImmutableMap.of("foo", "42");
 
 		bundleStorage.replace(mapping);
 
@@ -114,13 +116,13 @@ class BundleContextStorageTest {
 	 */
 	@Test
 	void replaceWithOriginMapping() {
-		when(firstChildStorage.getMapping()).thenReturn(Map.of("foo", "1"));
-		when(secondChildStorage.getMapping()).thenReturn(Map.of("bar", "2"));
+		when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
+		when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
 
 		bundleStorage.replace(bundleStorage.getMapping());
 
-		verify(firstChildStorage).replace(Map.of("foo", "1"));
-		verify(secondChildStorage).replace(Map.of("bar", "2"));
+		verify(firstChildStorage).replace(ImmutableMap.of("foo", "1"));
+		verify(secondChildStorage).replace(ImmutableMap.of("bar", "2"));
 	}
 
 	/**
@@ -129,15 +131,15 @@ class BundleContextStorageTest {
 	 */
 	@Test
 	void replaceWithModifiedMapping() {
-		when(firstChildStorage.getMapping()).thenReturn(Map.of("foo", "1"));
-		when(secondChildStorage.getMapping()).thenReturn(Map.of("bar", "2"));
+		when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
+		when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
 
 		Map<String, String> mapping = bundleStorage.getMapping();
 		mapping.put("foo", "42");
 		bundleStorage.replace(mapping);
 
-		verify(firstChildStorage).replace(Map.of("foo", "42", "bar", "2"));
-		verify(secondChildStorage).replace(Map.of("foo", "42", "bar", "2"));
+		verify(firstChildStorage).replace(ImmutableMap.of("foo", "42", "bar", "2"));
+		verify(secondChildStorage).replace(ImmutableMap.of("foo", "42", "bar", "2"));
 	}
 
 	/**
@@ -146,15 +148,15 @@ class BundleContextStorageTest {
 	 */
 	@Test
 	void replaceWithForeignMapping() {
-		when(firstChildStorage.getMapping()).thenReturn(Map.of("foo", "1"));
-		when(secondChildStorage.getMapping()).thenReturn(Map.of("bar", "2"));
+		when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
+		when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
 
 		BundleContextStorage other = new BundleContextStorage(Arrays.asList(firstChildStorage, secondChildStorage));
 		Map<String, String> mapping = other.getMapping();
 		bundleStorage.replace(mapping);
 
-		verify(firstChildStorage).replace(Map.of("foo", "1", "bar", "2"));
-		verify(secondChildStorage).replace(Map.of("foo", "1", "bar", "2"));
+		verify(firstChildStorage).replace(ImmutableMap.of("foo", "1", "bar", "2"));
+		verify(secondChildStorage).replace(ImmutableMap.of("foo", "1", "bar", "2"));
 	}
 
 	/**
