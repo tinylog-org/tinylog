@@ -37,6 +37,7 @@ module org.tinylog.core {
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.backend;
+	exports org.tinylog.core.context;
 	exports org.tinylog.core.format.message;
 	exports org.tinylog.core.format.value;
 	exports org.tinylog.core.loader;
