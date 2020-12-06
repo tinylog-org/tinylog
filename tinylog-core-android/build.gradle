@@ -24,6 +24,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.0.2"
     androidTestImplementation "androidx.test:runner:1.3.0"
     androidTestImplementation "com.github.stefanbirkner:system-lambda:1.1.1"
+    androidTestImplementation "com.google.guava:guava:30.0-android"
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.2.0"
     androidTestImplementation "javax.inject:javax.inject:1"
     androidTestImplementation "org.assertj:assertj-core:3.18.0"
