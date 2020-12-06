@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -23,6 +24,11 @@ class CaptureLoggingBackend implements LoggingBackend {
 	CaptureLoggingBackend(Log log, Level visibleLevel) {
 		this.log = log;
 		this.visibleLevel = visibleLevel;
+	}
+
+	@Override
+	public ContextStorage getContextStorage() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

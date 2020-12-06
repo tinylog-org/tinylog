@@ -6,12 +6,23 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
 
 class NopLoggingBackendTest {
+
+	/**
+	 * Verifies that the provided context storage does not store any context values.
+	 */
+	@Test
+	void contextStorage() {
+		ContextStorage storage = new NopLoggingBackend().getContextStorage();
+		storage.put("foo", "42");
+		assertThat(storage.getMapping()).isEmpty();
+	}
 
 	/**
 	 * Verifies that all severity levels are disabled in the precalculated level visibility object.

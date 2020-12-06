@@ -3,12 +3,14 @@ package org.tinylog.core.backend;
 import javax.inject.Inject;
 
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.system.CaptureSystemOutput;
@@ -22,6 +24,16 @@ class InternalLoggingBackendTest {
 	
 	@Inject
 	private Output output;
+
+	/**
+	 * Verifies that the provided context storage does not store any context values.
+	 */
+	@Test
+	void contextStorage() {
+		ContextStorage storage = new InternalLoggingBackend().getContextStorage();
+		storage.put("foo", "42");
+		AssertionsForInterfaceTypes.assertThat(storage.getMapping()).isEmpty();
+	}
 
 	/**
 	 * Verifies that all severity levels are disabled in the precalculated level visibility object for untagged log

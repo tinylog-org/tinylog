@@ -2,8 +2,11 @@ package org.tinylog.core.backend;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.tinylog.core.Level;
+import org.tinylog.core.context.BundleContextStorage;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -15,11 +18,17 @@ public class BundleLoggingBackend implements LoggingBackend {
 	private static final LevelVisibility INVISIBLE = new LevelVisibility(false, false, false, false, false);
 
 	private final List<LoggingBackend> backends;
+	private final ContextStorage storage;
 
 	/**
 	 * @param backends Logging backends to combine
 	 */
 	public BundleLoggingBackend(List<LoggingBackend> backends) {
+		List<ContextStorage> storages = backends.stream()
+			.map(LoggingBackend::getContextStorage)
+			.collect(Collectors.toList());
+
+		this.storage = new BundleContextStorage(storages);
 		this.backends = backends;
 	}
 
@@ -30,6 +39,11 @@ public class BundleLoggingBackend implements LoggingBackend {
 	 */
 	public List<LoggingBackend> getChildren() {
 		return Collections.unmodifiableList(backends);
+	}
+
+	@Override
+	public ContextStorage getContextStorage() {
+		return storage;
 	}
 
 	@Override

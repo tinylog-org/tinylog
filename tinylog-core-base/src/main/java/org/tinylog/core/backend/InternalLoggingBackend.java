@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.tinylog.core.Level;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.context.NopContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -14,11 +16,18 @@ public class InternalLoggingBackend implements LoggingBackend {
 
 	private static final String TAG = "tinylog";
 
+	private static final ContextStorage STORAGE = new NopContextStorage();
+
 	private static final LevelVisibility TAGGED = new LevelVisibility(false, false, false, true, true);
 	private static final LevelVisibility DEFAULT = new LevelVisibility(false, false, false, false, false);
 
 	/** */
 	public InternalLoggingBackend() {
+	}
+
+	@Override
+	public ContextStorage getContextStorage() {
+		return STORAGE;
 	}
 
 	@Override

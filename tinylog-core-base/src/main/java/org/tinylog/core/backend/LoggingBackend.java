@@ -1,6 +1,7 @@
 package org.tinylog.core.backend;
 
 import org.tinylog.core.Level;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
@@ -12,6 +13,13 @@ import org.tinylog.core.runtime.StackTraceLocation;
  * </p>
  */
 public interface LoggingBackend {
+
+	/**
+	 * Retrieves the thread-based context value storage.
+	 *
+	 * @return The storage for thread-based context values
+	 */
+	ContextStorage getContextStorage();
 
 	/**
 	 * Retrieves the visibility of all severity levels for a category tag. Log entries whose severity levels are set to

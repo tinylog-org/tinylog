@@ -1,12 +1,16 @@
 package org.tinylog.core.backend;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
+
+import com.google.common.collect.ImmutableMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.not;
@@ -19,6 +23,26 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class BundleLoggingBackendTest {
+
+	/**
+	 * Verifies that the provided context storage is based on the context storage of the child logging backends.
+	 */
+	@Test
+	void contextStorage() {
+		ContextStorage firstStorage = mock(ContextStorage.class);
+		LoggingBackend firstBackend = mock(LoggingBackend.class);
+		when(firstBackend.getContextStorage()).thenReturn(firstStorage);
+		when(firstStorage.getMapping()).thenReturn(Collections.singletonMap("foo", "1"));
+
+		ContextStorage secondStorage = mock(ContextStorage.class);
+		LoggingBackend secondBackend = mock(LoggingBackend.class);
+		when(secondBackend.getContextStorage()).thenReturn(secondStorage);
+		when(secondStorage.getMapping()).thenReturn(Collections.singletonMap("bar", "2"));
+
+		BundleLoggingBackend bundleBackend = new BundleLoggingBackend(Arrays.asList(firstBackend, secondBackend));
+		assertThat(bundleBackend.getContextStorage().getMapping())
+			.containsExactlyInAnyOrderEntriesOf(ImmutableMap.of("foo", "1", "bar", "2"));
+	}
 
 	/**
 	 * Verifies that all passed child logging backends are stored.
