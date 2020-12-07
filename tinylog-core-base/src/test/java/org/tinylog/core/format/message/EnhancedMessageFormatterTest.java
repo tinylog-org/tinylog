@@ -227,6 +227,20 @@ class EnhancedMessageFormatterTest {
 	}
 
 	/**
+	 * Verifies that there is a fallback for invalid {@link ChoiceFormat} patterns.
+	 */
+	@Test
+	void formatConditionalWithInValidPattern() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
+		assertThat(formatter.format("{#|#}", 42)).isEqualTo("42");
+
+		assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("#|#", "42");
+		});
+	}
+
+	/**
 	 * Verifies that pipes can be escaped to avoid conditional formatting.
 	 */
 	@Test

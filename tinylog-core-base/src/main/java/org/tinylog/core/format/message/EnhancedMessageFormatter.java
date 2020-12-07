@@ -104,9 +104,13 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 
 		if (!pattern.isEmpty()) {
 			if (isConditional(pattern)) {
-				Object singleton = value;
-				Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
-				return new ChoiceFormat(format(pattern, iterator)).format(value);
+				try {
+					Object singleton = value;
+					Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
+					return new ChoiceFormat(format(pattern, iterator)).format(value);
+				} catch (RuntimeException ex) {
+					InternalLogger.error(ex, "Invalid choice format pattern \"{}\" for value \"{}\"", pattern, value);
+				}
 			} else {
 				for (ValueFormat format : formats) {
 					if (format.isSupported(value)) {
