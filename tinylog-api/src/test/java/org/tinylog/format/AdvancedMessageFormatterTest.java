@@ -128,12 +128,22 @@ public final class AdvancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that {@link NumberFormat} compatible patterns can be used in {@link ChoiceFormat} patterns.
+	 * Verifies that a single {@link NumberFormat} compatible pattern can be used in {@link ChoiceFormat} patterns.
 	 */
 	@Test
-	public void choiceAndNumberFormat() {
+	public void choiceAndSingleNumberFormat() {
 		assertThat(format("{0#zero|1#one|1<{000}}", 0)).isEqualTo("zero");
 		assertThat(format("{0#zero|1#one|1<{000}}", 42)).isEqualTo("042");
+	}
+
+	/**
+	 * Verifies that multiple different {@link NumberFormat} compatible patterns can be used in {@link ChoiceFormat}
+	 * patterns.
+	 */
+	@Test
+	public void choiceAndMultipleNumberFormats() {
+		assertThat(format("{0#{0.00}|10#{#,###}}", 0)).isEqualTo("0.00");
+		assertThat(format("{0#{0.00}|10#{#,###}}", 1000)).isEqualTo("1,000");
 	}
 
 	/**

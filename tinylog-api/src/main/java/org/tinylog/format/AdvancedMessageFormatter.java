@@ -17,6 +17,8 @@ import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
 
 import org.tinylog.Level;
@@ -48,13 +50,25 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 
 	@Override
 	public String format(final String message, final Object[] arguments) {
+		return format(message, Arrays.asList(arguments).iterator());
+	}
+
+	/**
+	 * Formats a text message. All placeholders will be replaced with the given arguments.
+	 *
+	 * @param message
+	 *            Text message with placeholders
+	 * @param arguments
+	 *            Replacements for placeholders
+	 * @return Formatted text message
+	 */
+	private String format(final String message, final Iterator<Object> arguments) {
 		int length = message.length();
 
 		StringBuilder builder = new StringBuilder(length + ADDITIONAL_STRING_BUILDER_CAPACITY);
 		StringBuilder buffer = new StringBuilder(length + ADDITIONAL_STRING_BUILDER_CAPACITY);
 		StringBuilder current = builder;
 
-		int argumentIndex = 0;
 		int openingTickIndex = -1;
 		int openingCurlyBrackets = 0;
 
@@ -67,7 +81,7 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 				} else {
 					openingTickIndex = openingTickIndex < 0 ? index : -1;
 				}
-			} else if (character == '{' && index + 1 < length && argumentIndex < arguments.length && openingTickIndex < 0) {
+			} else if (character == '{' && index + 1 < length && arguments.hasNext() && openingTickIndex < 0) {
 				if (openingCurlyBrackets++ == 0) {
 					current = buffer;
 				} else {
@@ -75,7 +89,7 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 				}
 			} else if (character == '}' && openingCurlyBrackets > 0 && openingTickIndex < 0) {
 				if (--openingCurlyBrackets == 0) {
-					Object argument = resolve(arguments[argumentIndex++]);
+					Object argument = resolve(arguments.next());
 					if (buffer.length() == 0) {
 						builder.append(argument);
 					} else {
@@ -117,7 +131,7 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		try {
 			return getFormatter(pattern, argument).format(argument);
 		} catch (IllegalArgumentException ex) {
-			InternalLogger.log(Level.WARN, "Illegal argument '" + String.valueOf(argument) + "' for pattern '" + pattern + "'");
+			InternalLogger.log(Level.WARN, "Illegal argument '" + argument + "' for pattern '" + pattern + "'");
 			return String.valueOf(argument);
 		}
 	}
@@ -136,7 +150,7 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		if (pattern.indexOf('|') != -1) {
 			int start = pattern.indexOf('{');
 			if (start >= 0 && start < pattern.lastIndexOf('}')) {
-				return new ChoiceFormat(format(pattern, new Object[] { argument }));
+				return new ChoiceFormat(format(pattern, new EndlessIterator<Object>(argument)));
 			} else {
 				return new ChoiceFormat(pattern);
 			}

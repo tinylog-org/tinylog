@@ -31,6 +31,12 @@
 		<Bug pattern="REC_CATCH_EXCEPTION, PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
 	</Match>
 	<Match>
+		<!-- Endless Iterator -->
+		<Class name="org.tinylog.format.EndlessIterator" />
+		<!-- Iterator does not throw NoSuchElementException by design -->
+		<Bug pattern="IT_NO_SUCH_ELEMENT" />
+	</Match>
+	<Match>
 		<!-- Base Class for Format Pattern Writers -->
 		<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
