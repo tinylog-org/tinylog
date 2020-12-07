@@ -190,10 +190,22 @@ class EnhancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that the {@link ChoiceFormat} syntax is supported for conditional formatting.
+	 * Verifies that the {@link ChoiceFormat} syntax is supported for conditional formatting without any placeholders.
 	 */
 	@Test
-	void formatConditional() {
+	void formatConditionalWithoutPlaceholders() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
+		String message = "{-1#negative|0#zero|0<positive}";
+		assertThat(formatter.format(message, -1)).isEqualTo("negative");
+		assertThat(formatter.format(message, 0)).isEqualTo("zero");
+		assertThat(formatter.format(message, +1)).isEqualTo("positive");
+	}
+
+	/**
+	 * Verifies that the {@link ChoiceFormat} syntax is supported for conditional formatting with a single placeholder.
+	 */
+	@Test
+	void formatConditionalWithSinglePlaceholder() {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
 		String message = "There {0#are no files|1#is one file|1<are {#,###} files}.";
 		assertThat(formatter.format(message, -1)).isEqualTo("There are no files.");
@@ -201,6 +213,17 @@ class EnhancedMessageFormatterTest {
 		assertThat(formatter.format(message, 1)).isEqualTo("There is one file.");
 		assertThat(formatter.format(message, 2)).isEqualTo("There are 2 files.");
 		assertThat(formatter.format(message, 1000)).isEqualTo("There are 1,000 files.");
+	}
+
+	/**
+	 * Verifies that the {@link ChoiceFormat} syntax is supported for conditional formatting with multiple placeholders.
+	 */
+	@Test
+	void formatConditionalWithMultiplePlaceholders() {
+		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
+		String message = "The call took {0#{0.00}|10#{#,###}} seconds.";
+		assertThat(formatter.format(message, 0.00)).isEqualTo("The call took 0.00 seconds.");
+		assertThat(formatter.format(message, 1000)).isEqualTo("The call took 1,000 seconds.");
 	}
 
 	/**

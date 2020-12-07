@@ -1,9 +1,12 @@
 package org.tinylog.core.format.message;
 
 import java.text.ChoiceFormat;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
@@ -43,8 +46,20 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 
 	@Override
 	public String format(String message, Object... arguments) {
+		return format(message, Arrays.stream(arguments).iterator());
+	}
+
+	/**
+	 * Replaces all placeholders with real values.
+	 *
+	 * @param message
+	 *            Text message with placeholders
+	 * @param arguments
+	 *            Replacements for placeholders
+	 * @return Formatted text message
+	 */
+	private String format(String message, Iterator<Object> arguments) {
 		int length = message.length();
-		int argument = 0;
 
 		StringBuilder builder = new StringBuilder(length + EXTRA_CAPACITY);
 
@@ -59,13 +74,12 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 					index = closingQuotePosition;
 					continue;
 				}
-			} else if (character == '{' && argument < arguments.length) {
+			} else if (character == '{' && arguments.hasNext()) {
 				int closingCurlyBracketPosition = findClosingCurlyBracket(message, index + 1, length);
 				if (closingCurlyBracketPosition > 0) {
 					String pattern = message.substring(index + 1, closingCurlyBracketPosition);
-					builder.append(render(pattern, arguments[argument]));
+					builder.append(render(pattern, arguments.next()));
 					index = closingCurlyBracketPosition;
-					argument += 1;
 					continue;
 				}
 			}
@@ -90,7 +104,9 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 
 		if (!pattern.isEmpty()) {
 			if (isConditional(pattern)) {
-				return new ChoiceFormat(format(pattern, value)).format(value);
+				Object singleton = value;
+				Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
+				return new ChoiceFormat(format(pattern, iterator)).format(value);
 			} else {
 				for (ValueFormat format : formats) {
 					if (format.isSupported(value)) {
