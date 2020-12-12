@@ -28,6 +28,7 @@
         <module>tinylog-core</module>
         <module>tinylog-core-base</module>
         <module>tinylog-core-modern</module>
+        <module>tinylog-impl</module>
     </modules>
 
     <profiles>
