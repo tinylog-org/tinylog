@@ -40,6 +40,7 @@ module org.tinylog.core {
 	exports org.tinylog.core.context;
 	exports org.tinylog.core.format.message;
 	exports org.tinylog.core.format.value;
+	exports org.tinylog.core.internal;
 	exports org.tinylog.core.loader;
 	exports org.tinylog.core.runtime;
 	exports org.tinylog.core.variable;
