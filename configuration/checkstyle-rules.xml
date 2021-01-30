@@ -164,7 +164,6 @@
         <module name="PackageDeclaration"/>
         <module name="PackageName"/>
         <module name="ParameterName"/>
-        <module name="ParameterNumber"/>
         <module name="ParenPad"/>
         <module name="RedundantImport"/>
         <module name="RedundantModifier"/>

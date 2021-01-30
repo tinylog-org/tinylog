@@ -3,7 +3,7 @@ package org.tinylog.core.internal;
 import org.tinylog.core.Level;
 
 /**
- * Immutable log entry record.
+ * Immutable log entry record for tinylog's {@link InternalLogger internal logger}.
  */
 final class LogEntry {
 
