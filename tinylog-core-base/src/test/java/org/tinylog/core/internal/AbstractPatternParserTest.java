@@ -1,5 +1,7 @@
 package org.tinylog.core.internal;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -34,7 +36,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void singleQuote() {
-		setPlaceholders(Map.of("time", "twelve"));
+		setPlaceholders(ImmutableMap.of("time", "twelve"));
 		assertThat(parse("It is {time} o'clock.")).isEqualTo("It is twelve o'clock.");
 	}
 
@@ -43,7 +45,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void escapedQuote() {
-		setPlaceholders(Map.of("time", "twelve"));
+		setPlaceholders(ImmutableMap.of("time", "twelve"));
 		assertThat(parse("It is {time} o''clock.")).isEqualTo("It is twelve o'clock.");
 	}
 
@@ -52,7 +54,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void singlePlaceholder() {
-		setPlaceholders(Map.of("foo", "Alice"));
+		setPlaceholders(ImmutableMap.of("foo", "Alice"));
 		assertThat(parse("Hello {foo}!")).isEqualTo("Hello Alice!");
 	}
 
@@ -70,7 +72,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void multiplePlaceholders() {
-		setPlaceholders(Map.of("foo", "Alice", "bar", "Bob"));
+		setPlaceholders(ImmutableMap.of("foo", "Alice", "bar", "Bob"));
 		assertThat(parse("Hello {foo} and {bar}!")).isEqualTo("Hello Alice and Bob!");
 	}
 
@@ -79,7 +81,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void nestedBrackets() {
-		setPlaceholders(Map.of("{foo}", "Alice"));
+		setPlaceholders(ImmutableMap.of("{foo}", "Alice"));
 		assertThat(parse("Hello {{foo}}!")).isEqualTo("Hello Alice!");
 	}
 
@@ -88,7 +90,7 @@ class AbstractPatternParserTest {
 	 */
 	@Test
 	void nestedQuotedBrackets() {
-		setPlaceholders(Map.of("'{}'", "Alice"));
+		setPlaceholders(ImmutableMap.of("'{}'", "Alice"));
 		assertThat(parse("Hello {'{}'}!")).isEqualTo("Hello Alice!");
 	}
 
