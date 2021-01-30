@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.format.value.ValueFormatBuilder;
+import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
 
@@ -24,13 +26,11 @@ import org.tinylog.core.internal.SafeServiceLoader;
  * </p>
  *
  * <p>
- *     Curly brackets and other characters can be escaped by wrapping them in singe quotes ('). Two directly consecutive
- *     singe quotes ('') are output as one singe quote.
+ *     Curly brackets and other characters can be escaped by wrapping them in sing#e quotes ('). Two directly
+ *     consecutive single quotes ('') are output as one single quote.
  * </p>
  */
-public class EnhancedMessageFormatter implements MessageFormatter {
-
-	private static final int EXTRA_CAPACITY = 32;
+public class EnhancedMessageFormatter extends AbstractPatternParser implements MessageFormatter {
 
 	private final List<ValueFormat> formats;
 
@@ -59,35 +59,15 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 	 * @return Formatted text message
 	 */
 	private String format(String message, Iterator<Object> arguments) {
-		int length = message.length();
-
-		StringBuilder builder = new StringBuilder(length + EXTRA_CAPACITY);
-
-		for (int index = 0; index < length; ++index) {
-			char character = message.charAt(index);
-			if (character == '\'') {
-				int closingQuotePosition = findClosingQuote(message, index + 1);
-				if (closingQuotePosition == index + 1) {
-					continue;
-				} else if (closingQuotePosition > 0) {
-					builder.append(message, index + 1, closingQuotePosition);
-					index = closingQuotePosition;
-					continue;
-				}
-			} else if (character == '{' && arguments.hasNext()) {
-				int closingCurlyBracketPosition = findClosingCurlyBracket(message, index + 1, length);
-				if (closingCurlyBracketPosition > 0) {
-					String pattern = message.substring(index + 1, closingCurlyBracketPosition);
-					builder.append(render(pattern, arguments.next()));
-					index = closingCurlyBracketPosition;
-					continue;
-				}
+		BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
+			if (arguments.hasNext()) {
+				builder.append(render(group, arguments.next()));
+			} else {
+				builder.append('{').append(group).append('}');
 			}
+		};
 
-			builder.append(character);
-		}
-
-		return builder.toString();
+		return parse(message, groupConsumer).toString();
 	}
 
 	/**
@@ -148,48 +128,6 @@ public class EnhancedMessageFormatter implements MessageFormatter {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Finds the next single quote (').
-	 *
-	 * @param message The text in which to search for a single quote
-	 * @param start The position from which the search is to be started
-	 * @return Position of the found single quote or -1 if none could be found
-	 */
-	private int findClosingQuote(String message, int start) {
-		return message.indexOf('\'', start);
-	}
-
-	/**
-	 * Finds the next closing curly bracket '{'.
-	 *
-	 * @param message The text in which to search for a closing curly bracket
-	 * @param start The included position from which the search is to be started
-	 * @param end The excluded position at which the search is to be stopped
-	 * @return Position of the found closing curly bracket or -1 if none could be found
-	 */
-	private int findClosingCurlyBracket(String message, int start, int end) {
-		int openCount = 1;
-
-		for (int index = start; index < end; ++index) {
-			char character = message.charAt(index);
-			if (character == '\'') {
-				int closingQuotePosition = findClosingQuote(message, index + 1);
-				if (closingQuotePosition > 0) {
-					index = closingQuotePosition;
-				}
-			} else if (character == '{') {
-				openCount += 1;
-			} else if (character == '}') {
-				openCount -= 1;
-				if (openCount == 0) {
-					return index;
-				}
-			}
-		}
-
-		return -1;
 	}
 
 }

@@ -130,26 +130,6 @@ class EnhancedMessageFormatterTest {
 	}
 
 	/**
-	 * Verifies that one single quote can be output.
-	 */
-	@Test
-	void keepSingleQuote() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
-		String output = formatter.format("It is {} o'clock.", "twelve");
-		assertThat(output).isEqualTo("It is twelve o'clock.");
-	}
-
-	/**
-	 * Verifies that two directly consecutive singe quotes are output as one single quote.
-	 */
-	@Test
-	void convertSingleQuote() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
-		String output = formatter.format("It is {} o''clock.", "twelve");
-		assertThat(output).isEqualTo("It is twelve o'clock.");
-	}
-
-	/**
 	 * Verifies that curly brackets can be escaped by single quotes.
 	 */
 	@Test
@@ -167,16 +147,6 @@ class EnhancedMessageFormatterTest {
 		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
 		String output = formatter.format("It is {hh 'o''clock'}.", LocalTime.of(12, 0));
 		assertThat(output).isEqualTo("It is 12 o'clock.");
-	}
-
-	/**
-	 * Verifies that an oping curly bracket is output unmodified if there is no corresponding closing curly bracket.
-	 */
-	@Test
-	void ignoreOpeningCurlyBracketWithoutClosingBracket() {
-		EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework);
-		String output = formatter.format("Here is a mistake: <{>", 42);
-		assertThat(output).isEqualTo("Here is a mistake: <{>");
 	}
 
 	/**
