@@ -1,5 +1,7 @@
 package org.tinylog.core;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Map;
 
@@ -99,6 +101,67 @@ class ConfigurationTest {
 		void getMissingLocale() {
 			Configuration configuration = new Configuration();
 			assertThat(configuration.getLocale()).isSameAs(Locale.getDefault());
+		}
+
+		/**
+		 * Verifies that UTC can be set as time zone via property "zone".
+		 */
+		@Test
+		void getUtcZone() {
+			Configuration configuration = new Configuration().set("zone", "UTC");
+			assertThat(configuration.getZone().normalized()).isEqualTo(ZoneOffset.UTC);
+		}
+
+		/**
+		 * Verifies that an offset time zone can be set relative to UTC via property "zone".
+		 */
+		@Test
+		void getOffsetZone() {
+			Configuration configuration = new Configuration().set("zone", "UTC+01:30");
+			assertThat(configuration.getZone().normalized()).isEqualTo(ZoneOffset.ofHoursMinutes(1, 30));
+		}
+
+		/**
+		 * Verifies that Europe/London can be set as time zone via property "zone".
+		 */
+		@Test
+		void getBritishZone() {
+			Configuration configuration = new Configuration().set("zone", "Europe/London");
+			assertThat(configuration.getZone()).isEqualTo(ZoneId.of("Europe/London"));
+		}
+
+		/**
+		 * Verifies that Europe/Berlin can be set as time zone via property "zone".
+		 */
+		@Test
+		void getGermanZone() {
+			Configuration configuration = new Configuration().set("zone", "Europe/Berlin");
+			assertThat(configuration.getZone()).isEqualTo(ZoneId.of("Europe/Berlin"));
+		}
+
+		/**
+		 * Verifies that {@link ZoneOffset#systemDefault()} will be returned if property "zone" contains an invalid
+		 * value.
+		 */
+		@Test
+		void getInvalidZone() {
+			Configuration configuration = new Configuration().set("zone", "Invalid/Foo");
+			assertThat(configuration.getZone()).isSameAs(ZoneOffset.systemDefault());
+			assertThat(log.consume())
+				.isNotEmpty()
+				.anySatisfy(entry -> {
+					assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+					assertThat(entry.getMessage()).contains("Invalid/Foo\"");
+				});
+		}
+
+		/**
+		 * Verifies that {@link ZoneOffset#systemDefault()} will be returned if property "zone" is not set.
+		 */
+		@Test
+		void getMissingZone() {
+			Configuration configuration = new Configuration();
+			assertThat(configuration.getZone()).isSameAs(ZoneOffset.systemDefault());
 		}
 
 		/**

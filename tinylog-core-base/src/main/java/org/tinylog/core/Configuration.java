@@ -1,5 +1,8 @@
 package org.tinylog.core;
 
+import java.time.DateTimeException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +67,26 @@ public class Configuration {
 			String[] tokens = value.split("_", MAX_LOCALE_ARGUMENTS);
 			return new Locale(tokens[0], tokens.length > 1 ? tokens[1] : "", tokens.length > 2 ? tokens[2] : "");
 		}
+	}
+
+	/**
+	 * Gets the configured zone ID from property "zone". If the property is not set, {@link ZoneOffset#systemDefault()}
+	 * will be returned instead.
+	 *
+	 * @return The configured zone ID or {@link ZoneOffset#systemDefault()} if not set
+	 */
+	public ZoneId getZone() {
+		String value = getValue("zone");
+
+		if (value != null) {
+			try {
+				return ZoneId.of(value);
+			} catch (DateTimeException ex) {
+				InternalLogger.error(ex, "Could not resolve a zone ID for \"" + value + "\"");
+			}
+		}
+
+		return ZoneOffset.systemDefault();
 	}
 
 	/**
