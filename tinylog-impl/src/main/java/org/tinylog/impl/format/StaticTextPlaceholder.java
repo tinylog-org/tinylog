@@ -2,8 +2,11 @@ package org.tinylog.impl.format;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 
 /**
  * Wrapper for outputting plain static text.
@@ -22,6 +25,11 @@ public class StaticTextPlaceholder implements Placeholder {
 	 */
 	public StaticTextPlaceholder(String text) {
 		this.text = text;
+	}
+
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.noneOf(LogEntryValue.class);
 	}
 
 	@Override

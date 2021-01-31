@@ -15,6 +15,15 @@ import static org.mockito.Mockito.verify;
 class StaticTextPlaceholderTest {
 
 	/**
+	 * Verifies that none log entry values are defined as required by the static text placeholder.
+	 */
+	@Test
+	void requiredLogEntryValues() {
+		StaticTextPlaceholder placeholder = new StaticTextPlaceholder("Hello World!");
+		assertThat(placeholder.getRequiredLogEntryValues()).isEmpty();
+	}
+
+	/**
 	 * Verifies that the passed static text is output unchanged.
 	 */
 	@Test

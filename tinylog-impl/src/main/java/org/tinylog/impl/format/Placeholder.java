@@ -2,13 +2,33 @@ package org.tinylog.impl.format;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 
 /**
  * Placeholder implementations resolve the real values for placeholders in format patterns.
  */
 public interface Placeholder {
+
+
+	/**
+	 * Returns a set with all required log entry properties used by this placeholder.
+	 *
+	 * <p>
+	 *     For performance optimization, tinylog may not set properties of {@link LogEntry LogEntries} that a
+	 *     placeholder does not define as required.
+	 * </p>
+	 *
+	 * <p>
+	 *     tinylog calls this method only once during the initialization phase and assumes that the set of required log
+	 *     entry properties will never change afterwards.
+	 * </p>
+	 *
+	 * @return The set of all required log entry properties
+	 */
+	Set<LogEntryValue> getRequiredLogEntryValues();
 
 	/**
 	 * Renders this placeholder for a passed log entry.

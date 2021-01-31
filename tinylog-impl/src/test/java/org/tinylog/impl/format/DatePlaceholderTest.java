@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
@@ -19,6 +20,15 @@ import static org.mockito.Mockito.verify;
 class DatePlaceholderTest {
 
 	private final DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(ZoneOffset.UTC);
+
+	/**
+	 * Verifies that the log entry value {@link LogEntryValue#TIMESTAMP} is defined as required by the date placeholder.
+	 */
+	@Test
+	void requiredLogEntryValues() {
+		DatePlaceholder placeholder = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT);
+		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+	}
 
 	/**
 	 * Verifies that the formatted date and time of a log entry will be output, if the timestamp is set.

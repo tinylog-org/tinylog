@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
@@ -13,6 +14,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class ClassPlaceholderTest {
+
+	/**
+	 * Verifies that the log entry value {@link LogEntryValue#CLASS} is defined as required by the class placeholder.
+	 */
+	@Test
+	void requiredLogEntryValues() {
+		ClassPlaceholder placeholder = new ClassPlaceholder();
+		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.CLASS);
+	}
 
 	/**
 	 * Verifies that the source class name of a log entry will be output, if set.

@@ -5,8 +5,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 
 /**
  * Placeholder implementation for resolving the date and time of issue for a log entry.
@@ -20,6 +23,11 @@ public class DatePlaceholder implements Placeholder {
 	 */
 	public DatePlaceholder(DateTimeFormatter formatter) {
 		this.formatter = formatter;
+	}
+
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return EnumSet.of(LogEntryValue.TIMESTAMP);
 	}
 
 	@Override

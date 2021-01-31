@@ -2,9 +2,12 @@ package org.tinylog.impl.format;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.LogEntryValue;
 
 /**
  * Bundle of multiple child placeholders.
@@ -23,6 +26,13 @@ public class BundlePlaceholder implements Placeholder {
 	 */
 	public BundlePlaceholder(List<Placeholder> placeholders) {
 		this.placeholders = placeholders;
+	}
+
+	@Override
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		Set<LogEntryValue> requiredValues = EnumSet.noneOf(LogEntryValue.class);
+		placeholders.forEach(placeholder -> requiredValues.addAll(placeholder.getRequiredLogEntryValues()));
+		return requiredValues;
 	}
 
 	@Override
