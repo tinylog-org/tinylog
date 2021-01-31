@@ -20,7 +20,7 @@ class ClassPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that "&lt;unknown&gt;" will be output, if the class name is not set.
+	 * Verifies that {@code <unknown>} will be output, if the class name is not set.
 	 */
 	@Test
 	void renderWithoutClassName() {
