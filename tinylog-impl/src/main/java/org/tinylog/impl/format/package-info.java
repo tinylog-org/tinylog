@@ -1,4 +1,4 @@
 /**
- * Renderer and placeholders for format patterns for log entries.
+ * Parser and placeholders for format patterns for log entries.
  */
 package org.tinylog.impl.format;

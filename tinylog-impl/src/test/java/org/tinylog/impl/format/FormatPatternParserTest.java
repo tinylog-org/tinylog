@@ -1,0 +1,154 @@
+package org.tinylog.impl.format;
+
+import java.time.Instant;
+
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
+import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
+import org.tinylog.core.test.service.RegisterService;
+import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.test.PlaceholderRenderer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+class FormatPatternParserTest {
+
+	@Inject
+	private Framework framework;
+	
+	@Inject
+	private Log log;
+
+	/**
+	 * Verifies that plain static text is output unchanged.
+	 */
+	@Test
+	void plaintText() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("Hello World!", logEntry)).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that grouped static text is output unchanged without any curly brackets.
+	 */
+	@Test
+	void groupedText() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("{1} + {2} = {3}", logEntry)).isEqualTo("1 + 2 = 3");
+	}
+
+	/**
+	 * Verifies that escaped curly brackets are output.
+	 */
+	@Test
+	void escapedGroups() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("'{1}' + '{2}' = '{3}'", logEntry)).isEqualTo("{1} + {2} = {3}");
+	}
+
+	/**
+	 * Verifies that escaped static text is output without quotes.
+	 */
+	@Test
+	void escapedTextInGroups() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("{'1'} + {'2'} = {'3'}", logEntry)).isEqualTo("1 + 2 = 3");
+	}
+
+	/**
+	 * Verifies that a placeholder can be resolved, if the entire format pattern is a placeholder.
+	 */
+	@Test
+	void resolveWholePlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().className("foo.Bar").create();
+		assertThat(format("class", logEntry)).isEqualTo("foo.Bar");
+	}
+
+	/**
+	 * Verifies that a placeholder in curly brackets can be resolved.
+	 */
+	@Test
+	void resolveSubPlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().className("foo.Bar").create();
+		assertThat(format("Class <{class}>", logEntry)).isEqualTo("Class <foo.Bar>");
+	}
+
+	/**
+	 * Verifies that a placeholder nested in multiple curly brackets can be resolved.
+	 */
+	@Test
+	void resolveNestedPlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().className("foo.Bar").create();
+		assertThat(format("Class {<{class}>}", logEntry)).isEqualTo("Class <foo.Bar>");
+	}
+
+	/**
+	 * Verifies that a placeholder with a plain unescaped parameter can be resolved.
+	 */
+	@Test
+	void resolvePlainParameterizedPlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		assertThat(format("date: HH:mm", logEntry)).isEqualTo("00:00");
+	}
+
+	/**
+	 * Verifies that a placeholder with a partly escaped parameter can be resolved.
+	 */
+	@Test
+	void resolveEscapedParameterizedPlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		assertThat(format("date: H'h'mm", logEntry)).isEqualTo("0h00");
+	}
+
+	/**
+	 * Verifies that a non-instantiable placeholder is reported.
+	 */
+	@RegisterService(service = PlaceholderBuilder.class, implementations = EvilPlaceholderBuilder.class)
+	@Test
+	void resolveNonInstantiablePlaceholder() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("evil", logEntry)).isEqualTo("evil");
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("evil");
+			assertThat(entry.getThrowable()).isInstanceOf(UnsupportedOperationException.class);
+		});
+	}
+
+	/**
+	 * Parses and renders a format pattern by using {@link FormatPatternParser}.
+	 *
+	 * @param pattern The format pattern to parse
+	 * @param logEntry The log entry to render
+	 * @return The formatted log entry
+	 */
+	private String format(String pattern, LogEntry logEntry) {
+		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
+		return new PlaceholderRenderer(placeholder).render(logEntry);
+	}
+
+	/**
+	 * Placeholder builder that always throws an {@link UnsupportedOperationException} when trying to create a new
+	 * placeholder.
+	 */
+	public static class EvilPlaceholderBuilder implements PlaceholderBuilder {
+
+		@Override
+		public String getName() {
+			return "evil";
+		}
+
+		@Override
+		public Placeholder create(Framework framework, String value) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+}
