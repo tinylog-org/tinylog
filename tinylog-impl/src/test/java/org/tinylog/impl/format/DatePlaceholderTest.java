@@ -1,5 +1,8 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +13,8 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class DatePlaceholderTest {
 
@@ -33,6 +38,29 @@ class DatePlaceholderTest {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter));
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
+	}
+
+	/**
+	 * Verifies that the date and time of a log entry will be applied to a {@link PreparedStatement}, if set.
+	 */
+	@Test
+	void applyWithTimestamp() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		new DatePlaceholder(formatter).apply(statement, 42, logEntry);
+		verify(statement).setTimestamp(42, new Timestamp(0));
+	}
+
+	/**
+	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the date and time of issue is not
+	 * set.
+	 */
+	@Test
+	void applyWithoutTimestamp() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		new DatePlaceholder(formatter).apply(statement, 42, logEntry);
+		verify(statement).setTimestamp(42, null);
 	}
 
 }

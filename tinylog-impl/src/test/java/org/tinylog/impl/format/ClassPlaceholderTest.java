@@ -1,11 +1,16 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class ClassPlaceholderTest {
 
@@ -27,6 +32,28 @@ class ClassPlaceholderTest {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new ClassPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
+	}
+
+	/**
+	 * Verifies that the source class name of a log entry will be applied to a {@link PreparedStatement}, if set.
+	 */
+	@Test
+	void applyWithClassName() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
+		new ClassPlaceholder().apply(statement, 42, logEntry);
+		verify(statement).setString(42, "foo.MyClass");
+	}
+
+	/**
+	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the source class name is not set.
+	 */
+	@Test
+	void applyWithoutClassName() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		new ClassPlaceholder().apply(statement, 42, logEntry);
+		verify(statement).setString(42, null);
 	}
 
 }

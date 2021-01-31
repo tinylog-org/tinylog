@@ -1,5 +1,8 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.tinylog.impl.LogEntry;
 
 /**
@@ -24,6 +27,11 @@ public class StaticTextPlaceholder implements Placeholder {
 	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		builder.append(text);
+	}
+
+	@Override
+	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+		statement.setString(index, text);
 	}
 
 }

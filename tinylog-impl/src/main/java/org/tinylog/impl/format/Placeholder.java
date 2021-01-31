@@ -1,5 +1,8 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.tinylog.impl.LogEntry;
 
 /**
@@ -18,5 +21,15 @@ public interface Placeholder {
 	 * @param entry The log entry to render
 	 */
 	void render(StringBuilder builder, LogEntry entry);
+
+	/**
+	 * Applies the corresponding log entry values for this placeholder to a prepared SQL statement.
+	 *
+	 * @param statement The target SQL statement
+	 * @param index The parameter index to fill in the passed SQL statement
+	 * @param entry The log entry to apply
+	 * @throws SQLException Failed to set the parameter in the passed SQL statement
+	 */
+	void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException;
 
 }

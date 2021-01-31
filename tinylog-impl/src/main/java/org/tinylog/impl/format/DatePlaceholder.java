@@ -1,5 +1,8 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
@@ -27,6 +30,12 @@ public class DatePlaceholder implements Placeholder {
 		} else {
 			formatter.formatTo(instant, builder);
 		}
+	}
+
+	@Override
+	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+		Instant instant = entry.getTimestamp();
+		statement.setTimestamp(index, instant == null ? null : Timestamp.from(instant));
 	}
 
 }

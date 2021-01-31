@@ -1,5 +1,7 @@
 package org.tinylog.impl.format;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.tinylog.impl.LogEntry;
@@ -26,6 +28,14 @@ public class BundlePlaceholder implements Placeholder {
 	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		placeholders.forEach(placeholder -> placeholder.render(builder, entry));
+	}
+
+	@Override
+	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+		StringBuilder builder = new StringBuilder();
+		render(builder, entry);
+
+		statement.setString(index, builder.toString());
 	}
 
 }
