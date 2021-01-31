@@ -29,15 +29,14 @@ public class DatePlaceholderBuilder implements PlaceholderBuilder {
 		Locale locale = framework.getConfiguration().getLocale();
 		ZoneId zone = framework.getConfiguration().getZone();
 
-		DateTimeFormatter formatter;
 		try {
-			formatter = DateTimeFormatter.ofPattern(pattern, locale);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
+			return new DatePlaceholder(formatter.withZone(zone), value != null);
 		} catch (IllegalArgumentException ex) {
 			InternalLogger.error(ex, "Invalid date time pattern: \"" + pattern + "\"");
-			formatter = DateTimeFormatter.ofPattern(DEFAULT_PATTERN, locale);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_PATTERN, locale);
+			return new DatePlaceholder(formatter.withZone(zone), false);
 		}
-
-		return new DatePlaceholder(formatter.withZone(zone));
 	}
 
 }

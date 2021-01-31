@@ -26,7 +26,7 @@ class DatePlaceholderTest {
 	 */
 	@Test
 	void requiredLogEntryValues() {
-		DatePlaceholder placeholder = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT);
+		DatePlaceholder placeholder = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT, false);
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
 	}
 
@@ -35,7 +35,7 @@ class DatePlaceholderTest {
 	 */
 	@Test
 	void renderWithTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter));
+		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01T00:00:00Z");
 	}
@@ -45,19 +45,20 @@ class DatePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter));
+		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
 	}
 
 	/**
-	 * Verifies that the date and time of a log entry will be applied to a {@link PreparedStatement}, if set.
+	 * Verifies that the date and time of a log entry will be applied as a {@link Timestamp} to a
+	 * {@link PreparedStatement}, if the date and time of issue is set.
 	 */
 	@Test
-	void applyWithTimestamp() throws SQLException {
+	void applyUnformattedWithTimestamp() throws SQLException {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		new DatePlaceholder(formatter).apply(statement, 42, logEntry);
+		new DatePlaceholder(formatter, false).apply(statement, 42, logEntry);
 		verify(statement).setTimestamp(42, new Timestamp(0));
 	}
 
@@ -66,11 +67,35 @@ class DatePlaceholderTest {
 	 * set.
 	 */
 	@Test
-	void applyWithoutTimestamp() throws SQLException {
+	void applyUnformattedWithoutTimestamp() throws SQLException {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new DatePlaceholder(formatter).apply(statement, 42, logEntry);
+		new DatePlaceholder(formatter, false).apply(statement, 42, logEntry);
 		verify(statement).setTimestamp(42, null);
+	}
+
+	/**
+	 * Verifies that the date and time of a log entry will be applied as formatted string to a
+	 * {@link PreparedStatement}, if the date and time of issue is set.
+	 */
+	@Test
+	void applyFormattedWithTimestamp() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		new DatePlaceholder(formatter, true).apply(statement, 42, logEntry);
+		verify(statement).setString(42, "1970-01-01T00:00:00Z");
+	}
+
+	/**
+	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the date and time of issue is not
+	 * set.
+	 */
+	@Test
+	void applyFormattedWithoutTimestamp() throws SQLException {
+		PreparedStatement statement = mock(PreparedStatement.class);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		new DatePlaceholder(formatter, true).apply(statement, 42, logEntry);
+		verify(statement).setString(42, null);
 	}
 
 }

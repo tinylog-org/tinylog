@@ -23,7 +23,7 @@ class BundlePlaceholderTest {
 	 */
 	@Test
 	void requiredLogEntryValues() {
-		DatePlaceholder firstChild = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT);
+		DatePlaceholder firstChild = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT, false);
 		ClassPlaceholder secondChild = new ClassPlaceholder();
 		BundlePlaceholder bundlePlaceholder = new BundlePlaceholder(Arrays.asList(firstChild, secondChild));
 

@@ -17,12 +17,16 @@ import org.tinylog.impl.LogEntryValue;
 public class DatePlaceholder implements Placeholder {
 
 	private final DateTimeFormatter formatter;
+	private final boolean formatForSql;
 
 	/**
 	 * @param formatter The formatter to use for formatting the date and time of issue
+	 * @param formatForSql The date and time of issue will be applied as formatted string to prepared SQL statements if
+	 *                     set to {@code true}, otherwise it will be applied as {@link Timestamp SQL timestamp}
 	 */
-	public DatePlaceholder(DateTimeFormatter formatter) {
+	public DatePlaceholder(DateTimeFormatter formatter, boolean formatForSql) {
 		this.formatter = formatter;
+		this.formatForSql = formatForSql;
 	}
 
 	@Override
@@ -43,7 +47,12 @@ public class DatePlaceholder implements Placeholder {
 	@Override
 	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
 		Instant instant = entry.getTimestamp();
-		statement.setTimestamp(index, instant == null ? null : Timestamp.from(instant));
+
+		if (formatForSql) {
+			statement.setString(index, instant == null ? null : formatter.format(instant));
+		} else {
+			statement.setTimestamp(index, instant == null ? null : Timestamp.from(instant));
+		}
 	}
 
 }
