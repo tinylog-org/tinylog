@@ -1,1 +1,2 @@
 org.tinylog.impl.format.ClassPlaceholderBuilder
+org.tinylog.impl.format.DatePlaceholderBuilder
