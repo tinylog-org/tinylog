@@ -146,7 +146,7 @@ class ConfigurationTest {
 		@Test
 		void getInvalidZone() {
 			Configuration configuration = new Configuration().set("zone", "Invalid/Foo");
-			assertThat(configuration.getZone()).isSameAs(ZoneOffset.systemDefault());
+			assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
 			assertThat(log.consume()).anySatisfy(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("Invalid/Foo");
@@ -159,7 +159,7 @@ class ConfigurationTest {
 		@Test
 		void getMissingZone() {
 			Configuration configuration = new Configuration();
-			assertThat(configuration.getZone()).isSameAs(ZoneOffset.systemDefault());
+			assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
 		}
 
 		/**
