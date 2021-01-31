@@ -26,7 +26,7 @@ import org.tinylog.core.internal.SafeServiceLoader;
  * </p>
  *
  * <p>
- *     Curly brackets and other characters can be escaped by wrapping them in sing#e quotes ('). Two directly
+ *     Curly brackets and other characters can be escaped by wrapping them in single quotes ('). Two directly
  *     consecutive single quotes ('') are output as one single quote.
  * </p>
  */
