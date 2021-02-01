@@ -40,12 +40,10 @@ class ClassPlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		ClassPlaceholderBuilder builder = new ClassPlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(ClassPlaceholder.class);
-		assertThat(log.consume())
-			.hasSizeGreaterThanOrEqualTo(1)
-			.anySatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.WARN);
-				assertThat(entry.getMessage()).contains("foo");
-			});
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+			assertThat(entry.getMessage()).contains("foo");
+		});
 	}
 
 	/**

@@ -40,12 +40,10 @@ class AndroidIndexBasedStackTraceLocationTest {
 		String caller = location.getCallerClassName();
 
 		assertThat(caller).isNull();
-		assertThat(log.consume())
-			.hasSizeGreaterThanOrEqualTo(1)
-			.anySatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getMessage()).contains(Integer.toString(depth));
-			});
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains(Integer.toString(depth));
+		});
 	}
 
 	/**
@@ -61,7 +59,7 @@ class AndroidIndexBasedStackTraceLocationTest {
 			.isEqualTo(AndroidIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(AndroidIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("validCallerStackTraceElement");
-		assertThat(caller.getLineNumber()).isEqualTo(57);
+		assertThat(caller.getLineNumber()).isEqualTo(55);
 	}
 
 	/**
@@ -76,12 +74,10 @@ class AndroidIndexBasedStackTraceLocationTest {
 		StackTraceElement caller = location.getCallerStackTraceElement();
 
 		assertThat(caller).isNull();
-		assertThat(log.consume())
-			.hasSizeGreaterThanOrEqualTo(1)
-			.anySatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getMessage()).contains(Integer.toString(depth));
-			});
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains(Integer.toString(depth));
+		});
 	}
 
 	/**
@@ -97,7 +93,7 @@ class AndroidIndexBasedStackTraceLocationTest {
 			.isEqualTo(AndroidIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(AndroidIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("passedStackTraceLocation");
-		assertThat(caller.getLineNumber()).isEqualTo(93);
+		assertThat(caller.getLineNumber()).isEqualTo(89);
 	}
 
 	/**

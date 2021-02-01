@@ -39,12 +39,10 @@ class JavaIndexBasedStackTraceLocationTest {
 		String caller = location.getCallerClassName();
 
 		assertThat(caller).isNull();
-		assertThat(log.consume())
-			.hasSizeGreaterThanOrEqualTo(1)
-			.anySatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getMessage()).contains(Integer.toString(depth));
-			});
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains(Integer.toString(depth));
+		});
 	}
 
 	/**
@@ -60,7 +58,7 @@ class JavaIndexBasedStackTraceLocationTest {
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("validCallerStackTraceElement");
-		assertThat(caller.getLineNumber()).isEqualTo(56);
+		assertThat(caller.getLineNumber()).isEqualTo(54);
 	}
 
 	/**
@@ -76,12 +74,10 @@ class JavaIndexBasedStackTraceLocationTest {
 
 		assertThat(caller).isNull();
 
-		assertThat(log.consume())
-			.hasSizeGreaterThanOrEqualTo(1)
-			.anySatisfy(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getMessage()).contains(Integer.toString(depth));
-			});
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains(Integer.toString(depth));
+		});
 	}
 
 	/**
@@ -97,7 +93,7 @@ class JavaIndexBasedStackTraceLocationTest {
 			.isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getSimpleName() + ".java");
 		assertThat(caller.getClassName()).isEqualTo(JavaIndexBasedStackTraceLocationTest.class.getName());
 		assertThat(caller.getMethodName()).isEqualTo("passedStackTraceLocation");
-		assertThat(caller.getLineNumber()).isEqualTo(93);
+		assertThat(caller.getLineNumber()).isEqualTo(89);
 	}
 
 	/**

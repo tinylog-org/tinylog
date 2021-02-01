@@ -271,7 +271,7 @@ class PropertiesLoaderTest {
 			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "#{foo}"));
-			assertThat(log.consume()).hasSize(1).anySatisfy(entry -> {
+			assertThat(log.consume()).anySatisfy(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 				assertThat(entry.getMessage()).contains("foo");
 			});
