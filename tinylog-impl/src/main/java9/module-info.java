@@ -1,5 +1,6 @@
 import org.tinylog.impl.format.ClassNamePlaceholderBuilder;
 import org.tinylog.impl.format.ClassPlaceholderBuilder;
+import org.tinylog.impl.format.ContextPlaceholderBuilder;
 import org.tinylog.impl.format.DatePlaceholderBuilder;
 import org.tinylog.impl.format.LevelPlaceholderBuilder;
 import org.tinylog.impl.format.PlaceholderBuilder;
@@ -13,6 +14,7 @@ module org.tinylog.impl {
 	provides PlaceholderBuilder with
 		ClassNamePlaceholderBuilder,
 		ClassPlaceholderBuilder,
+		ContextPlaceholderBuilder,
 		DatePlaceholderBuilder,
 		LevelPlaceholderBuilder,
 		SeverityCodePlaceholderBuilder;
