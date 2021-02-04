@@ -7,4 +7,5 @@ org.tinylog.impl.format.FilePlaceholderBuilder
 org.tinylog.impl.format.LevelPlaceholderBuilder
 org.tinylog.impl.format.LinePlaceholderBuilder
 org.tinylog.impl.format.MessageOnlyPlaceholderBuilder
+org.tinylog.impl.format.MessagePlaceholderBuilder
 org.tinylog.impl.format.SeverityCodePlaceholderBuilder
