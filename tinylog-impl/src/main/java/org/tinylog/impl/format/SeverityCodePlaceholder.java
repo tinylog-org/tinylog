@@ -27,7 +27,11 @@ public class SeverityCodePlaceholder implements Placeholder {
 	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		Level level = entry.getSeverityLevel();
-		builder.append(level == null ? "?" : level.ordinal());
+		if (level == null) {
+			builder.append("?");
+		} else {
+			builder.append(level.ordinal());
+		}
 	}
 
 	@Override
