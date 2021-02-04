@@ -36,13 +36,13 @@ class LevelPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that {@code <unknown>} will be output, if the severity level is not set.
+	 * Verifies that {@code <level unknown>} will be output, if the severity level is not set.
 	 */
 	@Test
 	void renderWithoutSeverityLevel() {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new LevelPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
+		assertThat(renderer.render(logEntry)).isEqualTo("<level unknown>");
 	}
 
 	/**

@@ -35,13 +35,13 @@ class ClassPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that {@code <unknown>} will be output, if the class name is not set.
+	 * Verifies that {@code <class unknown>} will be output, if the class name is not set.
 	 */
 	@Test
 	void renderWithoutClassName() {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new ClassPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
+		assertThat(renderer.render(logEntry)).isEqualTo("<class unknown>");
 	}
 
 	/**

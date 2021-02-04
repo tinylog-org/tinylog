@@ -41,13 +41,13 @@ class DatePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that {@code <unknown>} will be output, if the timestamp is not set.
+	 * Verifies that {@code <timestamp unknown>} will be output, if the timestamp is not set.
 	 */
 	@Test
 	void renderWithoutTimestamp() {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo("<unknown>");
+		assertThat(renderer.render(logEntry)).isEqualTo("<timestamp unknown>");
 	}
 
 	/**

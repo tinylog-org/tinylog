@@ -23,7 +23,7 @@ public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 		} else {
 			int commaIndex = value.indexOf(',');
 			if (commaIndex < 0) {
-				return new ContextPlaceholder(value, "<unknown>", null);
+				return new ContextPlaceholder(value, "<" + value + " not set>", null);
 			} else {
 				String key = value.substring(0, commaIndex);
 				String defaultValue = value.substring(commaIndex + 1);

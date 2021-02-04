@@ -26,7 +26,7 @@ public class LevelPlaceholder implements Placeholder {
 	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		Level level = entry.getSeverityLevel();
-		builder.append(level == null ? "<unknown>" : level);
+		builder.append(level == null ? "<level unknown>" : level);
 	}
 
 	@Override

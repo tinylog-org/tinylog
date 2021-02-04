@@ -38,7 +38,7 @@ public class DatePlaceholder implements Placeholder {
 	public void render(StringBuilder builder, LogEntry entry) {
 		Instant instant = entry.getTimestamp();
 		if (instant == null) {
-			builder.append("<unknown>");
+			builder.append("<timestamp unknown>");
 		} else {
 			formatter.formatTo(instant, builder);
 		}

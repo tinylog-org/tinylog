@@ -47,7 +47,7 @@ class ContextPlaceholderBuilderTest {
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
 
 		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
-		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<unknown>");
+		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<foo not set>");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
 
 		PreparedStatement statement = mock(PreparedStatement.class);

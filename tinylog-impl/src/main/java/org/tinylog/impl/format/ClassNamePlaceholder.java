@@ -25,7 +25,7 @@ public class ClassNamePlaceholder implements Placeholder {
 	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		String simpleClassName = extractSimpleClassName(entry.getClassName());
-		builder.append(simpleClassName == null ? "<unknown>" : simpleClassName);
+		builder.append(simpleClassName == null ? "<class unknown>" : simpleClassName);
 	}
 
 	@Override
