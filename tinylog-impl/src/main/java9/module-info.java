@@ -6,6 +6,7 @@ import org.tinylog.impl.format.ExceptionPlaceholderBuilder;
 import org.tinylog.impl.format.FilePlaceholderBuilder;
 import org.tinylog.impl.format.LevelPlaceholderBuilder;
 import org.tinylog.impl.format.LinePlaceholderBuilder;
+import org.tinylog.impl.format.MessageOnlyPlaceholderBuilder;
 import org.tinylog.impl.format.PlaceholderBuilder;
 import org.tinylog.impl.format.SeverityCodePlaceholderBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
@@ -23,6 +24,7 @@ module org.tinylog.impl {
 		FilePlaceholderBuilder,
 		LevelPlaceholderBuilder,
 		LinePlaceholderBuilder,
+		MessageOnlyPlaceholderBuilder,
 		SeverityCodePlaceholderBuilder;
 
 	uses WriterBuilder;
