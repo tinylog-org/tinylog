@@ -11,6 +11,7 @@ import org.tinylog.impl.format.MessagePlaceholderBuilder;
 import org.tinylog.impl.format.MethodPlaceholderBuilder;
 import org.tinylog.impl.format.PackagePlaceholderBuilder;
 import org.tinylog.impl.format.PlaceholderBuilder;
+import org.tinylog.impl.format.ProcessIdPlaceholderBuilder;
 import org.tinylog.impl.format.SeverityCodePlaceholderBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
 
@@ -31,6 +32,7 @@ module org.tinylog.impl {
 		MessagePlaceholderBuilder,
 		MethodPlaceholderBuilder,
 		PackagePlaceholderBuilder,
+		ProcessIdPlaceholderBuilder,
 		SeverityCodePlaceholderBuilder;
 
 	uses WriterBuilder;
