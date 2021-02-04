@@ -3,6 +3,7 @@ org.tinylog.impl.format.ClassPlaceholderBuilder
 org.tinylog.impl.format.ContextPlaceholderBuilder
 org.tinylog.impl.format.DatePlaceholderBuilder
 org.tinylog.impl.format.ExceptionPlaceholderBuilder
-org.tinylog.impl.format.LevelPlaceholderBuilder
 org.tinylog.impl.format.FilePlaceholderBuilder
+org.tinylog.impl.format.LevelPlaceholderBuilder
+org.tinylog.impl.format.LinePlaceholderBuilder
 org.tinylog.impl.format.SeverityCodePlaceholderBuilder
