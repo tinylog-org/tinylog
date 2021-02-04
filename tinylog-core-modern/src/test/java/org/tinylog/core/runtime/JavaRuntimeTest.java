@@ -3,19 +3,17 @@ package org.tinylog.core.runtime;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class AndroidRuntimeTest {
+class JavaRuntimeTest {
 
 	/**
 	 * Verifies that a valid process ID is provided.
 	 */
-	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void processId() {
-		long pid = new AndroidRuntime().getProcessId();
+		long pid = new JavaRuntime().getProcessId();
 		assertThat(pid).isGreaterThan(0);
 	}
 
@@ -24,9 +22,9 @@ class AndroidRuntimeTest {
 	 */
 	@Test
 	void stackTraceLocationAtIndex() {
-		StackTraceLocation location = new AndroidRuntime().getStackTraceLocationAtIndex(0);
-		assertThat(location).isInstanceOf(AndroidIndexBasedStackTraceLocation.class);
-		assertThat(location.getCallerClassName()).isEqualTo(AndroidRuntimeTest.class.getName());
+		StackTraceLocation location = new JavaRuntime().getStackTraceLocationAtIndex(0);
+		assertThat(location).isInstanceOf(JavaIndexBasedStackTraceLocation.class);
+		assertThat(location.getCallerClassName()).isEqualTo(JavaRuntimeTest.class.getName());
 	}
 
 	/**
@@ -34,11 +32,11 @@ class AndroidRuntimeTest {
 	 */
 	@Test
 	void stackTraceLocationAfterClass() {
-		StackTraceLocation location = new AndroidRuntime().getStackTraceLocationAfterClass(Callee.class.getName());
-		assertThat(location).isInstanceOf(AndroidClassNameBasedStackTraceLocation.class);
+		StackTraceLocation location = new JavaRuntime().getStackTraceLocationAfterClass(Callee.class.getName());
+		assertThat(location).isInstanceOf(JavaClassNameBasedStackTraceLocation.class);
 
 		String className = Callee.execute(() -> getCallerClassName(location.push()));
-		assertThat(className).isEqualTo(AndroidRuntimeTest.class.getName());
+		assertThat(className).isEqualTo(JavaRuntimeTest.class.getName());
 	}
 
 	/**

@@ -6,6 +6,13 @@ package org.tinylog.core.runtime;
 public interface RuntimeFlavor {
 
 	/**
+	 * Gets the process ID of the current process.
+	 *
+	 * @return The process ID of the current process
+	 */
+	long getProcessId();
+
+	/**
 	 * Gets the stack trace location at a defined index.
 	 *
 	 * @param index Depth in the stack trace

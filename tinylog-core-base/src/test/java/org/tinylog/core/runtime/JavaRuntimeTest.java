@@ -1,12 +1,65 @@
 package org.tinylog.core.runtime;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
+import org.tinylog.core.Level;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+@CaptureLogEntries
 class JavaRuntimeTest {
+
+	@Inject
+	private Log log;
+
+	/**
+	 * Verifies that a valid process ID is provided.
+	 */
+	@Test
+	void validProcessId() {
+		long pid = new JavaRuntime().getProcessId();
+		assertThat(pid).isGreaterThan(0);
+	}
+
+	/**
+	 * Verifies that a meaningful error will be logged, if the process ID cannot be resolved from
+	 * {@link RuntimeMXBean#getName()} on Java 8.
+	 *
+	 * @param runtimeName The invalid runtime name to test
+	 */
+	@EnabledForJreRange(max = JRE.JAVA_8)
+	@ParameterizedTest
+	@ValueSource(strings = {"bar", "foo@localhost"})
+	void invalidProcessId(String runtimeName) {
+		RuntimeMXBean bean = mock(RuntimeMXBean.class);
+		when(bean.getName()).thenReturn(runtimeName);
+
+		try (MockedStatic<ManagementFactory> factory = mockStatic(ManagementFactory.class)) {
+			factory.when(ManagementFactory::getRuntimeMXBean).thenReturn(bean);
+
+			long pid = new JavaRuntime().getProcessId();
+			assertThat(pid).isEqualTo(-1);
+			assertThat(log.consume()).anySatisfy(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+				assertThat(entry.getMessage()).contains(runtimeName);
+			});
+		}
+	}
 
 	/**
 	 * Verifies that a valid stack location can be extracted from a defined index.
