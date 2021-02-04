@@ -16,7 +16,8 @@ import static org.mockito.Mockito.verify;
 class ClassNamePlaceholderTest {
 
 	/**
-	 * Verifies that the log entry value {@link LogEntryValue#CLASS} is defined as required by the class placeholder.
+	 * Verifies that the log entry value {@link LogEntryValue#CLASS} is defined as required by the class name
+	 * placeholder.
 	 */
 	@Test
 	void requiredLogEntryValues() {
