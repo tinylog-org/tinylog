@@ -64,10 +64,28 @@ android {
     }
 
     sourceSets {
-        main.java.srcDirs += "../tinylog-core-base/src/main/java"
-        main.resources.srcDirs += "../tinylog-core-base/src/main/resources"
+        main {
+            java {
+                srcDirs += "../tinylog-core-base/src/main/java"
+                srcDirs += "../tinylog-impl/src/main/java"
+            }
 
-        androidTest.java.srcDirs += "../tinylog-core-base/src/test/java"
-        androidTest.resources.srcDirs += "../tinylog-core-base/src/test/resources"
+            resources {
+                srcDirs += "../tinylog-core-base/src/main/resources"
+                srcDirs += "../tinylog-impl/src/main/resources"
+            }
+        }
+
+        androidTest {
+            java {
+                srcDirs += "../tinylog-core-base/src/test/java"
+                srcDirs += "../tinylog-impl/src/test/java"
+            }
+
+            resources {
+                srcDirs += "../tinylog-core-base/src/test/resources"
+                srcDirs += "../tinylog-impl/src/test/resources"
+            }
+        }
     }
 }

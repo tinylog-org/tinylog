@@ -77,7 +77,7 @@ class DatePlaceholderBuilderTest {
 
 		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		assertThat(renderer.render(logEntry)).isEqualTo("1 January 1970 - 12.00 PM");
+		assertThat(renderer.render(logEntry)).matches("1 January 1970 - 12\\.00 (pm|PM)");
 	}
 
 	/**

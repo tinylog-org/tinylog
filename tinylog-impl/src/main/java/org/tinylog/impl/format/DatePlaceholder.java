@@ -16,6 +16,8 @@ import org.tinylog.impl.LogEntryValue;
  */
 public class DatePlaceholder implements Placeholder {
 
+	private static final long MILLIS_PER_SECOND = 1_000;
+
 	private final DateTimeFormatter formatter;
 	private final boolean formatForSql;
 
@@ -50,8 +52,12 @@ public class DatePlaceholder implements Placeholder {
 
 		if (formatForSql) {
 			statement.setString(index, instant == null ? null : formatter.format(instant));
+		} else if (instant == null) {
+			statement.setTimestamp(index, null);
 		} else {
-			statement.setTimestamp(index, instant == null ? null : Timestamp.from(instant));
+			Timestamp timestamp = new Timestamp(instant.getEpochSecond() * MILLIS_PER_SECOND);
+			timestamp.setNanos(instant.getNano());
+			statement.setTimestamp(index, timestamp);
 		}
 	}
 
