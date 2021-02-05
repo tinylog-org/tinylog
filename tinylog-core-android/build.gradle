@@ -67,9 +67,7 @@ android {
         main.java.srcDirs += "../tinylog-core-base/src/main/java"
         main.resources.srcDirs += "../tinylog-core-base/src/main/resources"
 
-        androidTest {
-            java.srcDirs += "../tinylog-core-base/src/test/java"
-            resources.srcDirs += "../tinylog-core-base/src/test/resources"
-        }
+        androidTest.java.srcDirs += "../tinylog-core-base/src/test/java"
+        androidTest.resources.srcDirs += "../tinylog-core-base/src/test/resources"
     }
 }
