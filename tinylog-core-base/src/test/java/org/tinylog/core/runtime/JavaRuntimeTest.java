@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +31,7 @@ class JavaRuntimeTest {
 	/**
 	 * Verifies that a valid process ID is provided.
 	 */
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void validProcessId() {
 		long pid = new JavaRuntime().getProcessId();
