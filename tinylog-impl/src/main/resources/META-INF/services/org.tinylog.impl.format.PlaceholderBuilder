@@ -15,3 +15,4 @@ org.tinylog.impl.format.SeverityCodePlaceholderBuilder
 org.tinylog.impl.format.TagPlaceholderBuilder
 org.tinylog.impl.format.ThreadIdPlaceholderBuilder
 org.tinylog.impl.format.ThreadPlaceholderBuilder
+org.tinylog.impl.format.TimestampPlaceholderBuilder
