@@ -67,11 +67,13 @@ android {
         main {
             java {
                 srcDirs += "../tinylog-core-base/src/main/java"
+                srcDirs += "../tinylog-api/src/main/java"
                 srcDirs += "../tinylog-impl/src/main/java"
             }
 
             resources {
                 srcDirs += "../tinylog-core-base/src/main/resources"
+                srcDirs += "../tinylog-api/src/main/resources"
                 srcDirs += "../tinylog-impl/src/main/resources"
             }
         }
