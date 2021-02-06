@@ -12,3 +12,4 @@ org.tinylog.impl.format.MethodPlaceholderBuilder
 org.tinylog.impl.format.PackagePlaceholderBuilder
 org.tinylog.impl.format.ProcessIdPlaceholderBuilder
 org.tinylog.impl.format.SeverityCodePlaceholderBuilder
+org.tinylog.impl.format.TagPlaceholderBuilder
