@@ -13,6 +13,8 @@ import org.tinylog.core.variable.SystemPropertyResolver;
 import org.tinylog.core.variable.VariableResolver;
 
 module org.tinylog.core {
+	requires java.management;
+
 	uses Hook;
 
 	uses LoggingBackendBuilder;

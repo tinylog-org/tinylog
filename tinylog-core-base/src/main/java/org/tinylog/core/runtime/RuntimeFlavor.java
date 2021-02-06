@@ -1,5 +1,7 @@
 package org.tinylog.core.runtime;
 
+import java.time.Duration;
+
 /**
  * Abstraction of API that depends on the Java version or flavor.
  */
@@ -11,6 +13,13 @@ public interface RuntimeFlavor {
 	 * @return The process ID of the current process
 	 */
 	long getProcessId();
+
+	/**
+	 * Gets the uptime of the application.
+	 *
+	 * @return The uptime of the application
+	 */
+	Duration getUptime();
 
 	/**
 	 * Gets the stack trace location at a defined index.

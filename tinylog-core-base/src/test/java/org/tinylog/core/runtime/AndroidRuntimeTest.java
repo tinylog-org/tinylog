@@ -1,5 +1,6 @@
 package org.tinylog.core.runtime;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -7,16 +8,32 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 class AndroidRuntimeTest {
 
 	/**
 	 * Verifies that a valid process ID is provided.
 	 */
-	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	@Test
 	void processId() {
 		long pid = new AndroidRuntime().getProcessId();
 		assertThat(pid).isGreaterThan(0);
+	}
+
+	/**
+	 * Verifies that valid uptime values are provided.
+	 */
+	@Test
+	void uptime() throws InterruptedException {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Duration time1 = runtime.getUptime();
+		assertThat(time1).isBetween(Duration.ZERO, Duration.ofHours(1));
+
+		Thread.sleep(1);
+
+		Duration time2 = runtime.getUptime();
+		assertThat(time2).isGreaterThan(time1);
 	}
 
 	/**

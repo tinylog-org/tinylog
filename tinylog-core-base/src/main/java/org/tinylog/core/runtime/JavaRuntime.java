@@ -1,6 +1,8 @@
 package org.tinylog.core.runtime;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.time.Duration;
 
 import org.tinylog.core.internal.InternalLogger;
 
@@ -9,13 +11,16 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class JavaRuntime implements RuntimeFlavor {
 
+	private final RuntimeMXBean runtimeBean;
+
 	/** */
 	public JavaRuntime() {
+		runtimeBean = ManagementFactory.getRuntimeMXBean();
 	}
 
 	@Override
 	public long getProcessId() {
-		String name = ManagementFactory.getRuntimeMXBean().getName();
+		String name = runtimeBean.getName();
 		int atIndex = name.indexOf('@');
 
 		if (atIndex > 0) {
@@ -29,6 +34,11 @@ public class JavaRuntime implements RuntimeFlavor {
 		}
 
 		return -1;
+	}
+
+	@Override
+	public Duration getUptime() {
+		return Duration.ofMillis(runtimeBean.getUptime());
 	}
 
 	@Override

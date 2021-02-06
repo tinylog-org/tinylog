@@ -10,16 +10,12 @@ public class ManagementFactory {
     }
 
     /**
-     * Gets the runtime MX bean.
+     * Gets an instance the runtime MX bean.
      *
-     * <p>
-     *     This method is just a skeleton and throws always an {@link UnsupportedOperationException}.
-     * </p>
-     *
-     * @return The runtime MX bean
+     * @return Runtime MX bean instance
      */
     public static RuntimeMXBean getRuntimeMXBean() {
-        throw new UnsupportedOperationException();
+        return new RuntimeMXBean();
     }
 
 }

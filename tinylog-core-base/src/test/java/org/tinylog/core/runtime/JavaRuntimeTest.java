@@ -2,6 +2,7 @@ package org.tinylog.core.runtime;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -61,6 +62,23 @@ class JavaRuntimeTest {
 				assertThat(entry.getMessage()).contains(runtimeName);
 			});
 		}
+	}
+
+	/**
+	 * Verifies that valid uptime values are provided.
+	 */
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	@Test
+	void uptime() throws InterruptedException {
+		JavaRuntime runtime = new JavaRuntime();
+
+		Duration time1 = runtime.getUptime();
+		assertThat(time1).isBetween(Duration.ZERO, Duration.ofHours(1));
+
+		Thread.sleep(1);
+
+		Duration time2 = runtime.getUptime();
+		assertThat(time2).isGreaterThan(time1);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package org.tinylog.core.runtime;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,22 @@ class JavaRuntimeTest {
 	void processId() {
 		long pid = new JavaRuntime().getProcessId();
 		assertThat(pid).isGreaterThan(0);
+	}
+
+	/**
+	 * Verifies that valid uptime values are provided.
+	 */
+	@Test
+	void uptime() throws InterruptedException {
+		JavaRuntime runtime = new JavaRuntime();
+
+		Duration time1 = runtime.getUptime();
+		assertThat(time1).isBetween(Duration.ZERO, Duration.ofHours(1));
+
+		Thread.sleep(1);
+
+		Duration time2 = runtime.getUptime();
+		assertThat(time2).isGreaterThan(time1);
 	}
 
 	/**
