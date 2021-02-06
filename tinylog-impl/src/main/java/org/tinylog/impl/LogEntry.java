@@ -1,5 +1,6 @@
 package org.tinylog.impl;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.tinylog.core.Level;
 public class LogEntry {
 
 	private final Instant timestamp;
+	private final Duration uptime;
 	private final Thread thread;
 	private final Map<String, String> context;
 	private final String className;
@@ -24,6 +26,7 @@ public class LogEntry {
 
 	/**
 	 * @param timestamp Date and time of issue
+	 * @param uptime Passed time since application start
 	 * @param thread Source thread of issue
 	 * @param context Present thread context values
 	 * @param className Fully-qualified source class name
@@ -35,9 +38,11 @@ public class LogEntry {
 	 * @param message Human-readable logged text message
 	 * @param exception Logged exception or any other kind of throwable
 	 */
-	public LogEntry(Instant timestamp, Thread thread, Map<String, String> context, String className, String methodName,
-			String fileName, int lineNumber, String tag, Level severityLevel, String message, Throwable exception) {
+	public LogEntry(Instant timestamp, Duration uptime, Thread thread, Map<String, String> context, String className,
+			String methodName, String fileName, int lineNumber, String tag, Level severityLevel, String message,
+			Throwable exception) {
 		this.timestamp = timestamp;
+		this.uptime = uptime;
 		this.thread = thread;
 		this.context = context;
 		this.className = className;
@@ -58,10 +63,24 @@ public class LogEntry {
 	 *     {@link LogEntryValue#TIMESTAMP} as required log entry value.
 	 * </p>
 	 *
-	 * @return The date and time off issue
+	 * @return The date and time of issue
 	 */
 	public Instant getTimestamp() {
 		return timestamp;
+	}
+
+	/**
+	 * Gets the passed time since application start when this log entry was issued.
+	 *
+	 * <p>
+	 *     This method can return {@code null}, if none of the active writers have defined {@link LogEntryValue#UPTIME}
+	 *     as required log entry value.
+	 * </p>
+	 *
+	 * @return The passed time since application start
+	 */
+	public Duration getUptime() {
+		return uptime;
 	}
 
 	/**

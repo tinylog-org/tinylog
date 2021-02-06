@@ -1,5 +1,6 @@
 package org.tinylog.impl.test;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.tinylog.impl.LogEntry;
 public class LogEntryBuilder {
 
 	private Instant timestamp;
+	private Duration uptime;
 	private Thread thread;
 	private final Map<String, String> context;
 	private String className;
@@ -32,14 +34,27 @@ public class LogEntryBuilder {
 
 	/**
 	 * Sets the date and time when this log entry was issued.
-	 * 
+	 *
 	 * @param timestamp Date and time of issue
 	 * @return The same log entry builder instance
-	 * 
+	 *
 	 * @see LogEntry#getTimestamp()
 	 */
 	public LogEntryBuilder timestamp(Instant timestamp) {
 		this.timestamp = timestamp;
+		return this;
+	}
+
+	/**
+	 * Sets the passed time since application start when this log entry was issued.
+	 *
+	 * @param uptime Passed time since application start
+	 * @return The same log entry builder instance
+	 *
+	 * @see LogEntry#getUptime()
+	 */
+	public LogEntryBuilder uptime(Duration uptime) {
+		this.uptime = uptime;
 		return this;
 	}
 
@@ -185,8 +200,8 @@ public class LogEntryBuilder {
 	 * @return Newly created {@link LogEntry} instance
 	 */
 	public LogEntry create() {
-		return new LogEntry(timestamp, thread, context, className, methodName, fileName, lineNumber, tag, severityLevel,
-			message, exception);
+		return new LogEntry(timestamp, uptime, thread, context, className, methodName, fileName, lineNumber, tag,
+			severityLevel, message, exception);
 	}
 
 }

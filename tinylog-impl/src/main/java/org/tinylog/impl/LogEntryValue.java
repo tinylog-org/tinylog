@@ -15,6 +15,13 @@ public enum LogEntryValue {
 	TIMESTAMP,
 
 	/**
+	 * The passed time since application.
+	 *
+	 * @see  LogEntry#getUptime()
+	 */
+	UPTIME,
+
+	/**
 	 * The source thread of issue.
 	 *
 	 * @see LogEntry#getThread()
