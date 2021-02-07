@@ -182,6 +182,11 @@
         <module name="SuperClone"/>
         <module name="SuperFinalize"/>
         <module name="SuppressWarnings"/>
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="START IGNORE CODE STYLE" />
+            <property name="onCommentFormat" value="END IGNORE CODE STYLE" />
+            <property name="checkFormat" value="NoWhitespaceBefore|ParenPad|SingleSpaceSeparator" />
+        </module>
         <module name="ThrowsCount"/>
         <module name="TodoComment">
             <property name="format" value="(TODO)|(FIXME)" />
