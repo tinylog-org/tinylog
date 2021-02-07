@@ -17,6 +17,7 @@ import org.tinylog.impl.format.TagPlaceholderBuilder;
 import org.tinylog.impl.format.ThreadIdPlaceholderBuilder;
 import org.tinylog.impl.format.ThreadPlaceholderBuilder;
 import org.tinylog.impl.format.TimestampPlaceholderBuilder;
+import org.tinylog.impl.format.UptimePlaceholderBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
 
 module org.tinylog.impl {
@@ -41,7 +42,8 @@ module org.tinylog.impl {
 		TagPlaceholderBuilder,
 		ThreadIdPlaceholderBuilder,
 		ThreadPlaceholderBuilder,
-		TimestampPlaceholderBuilder;
+		TimestampPlaceholderBuilder,
+		UptimePlaceholderBuilder;
 
 	uses WriterBuilder;
 
