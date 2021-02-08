@@ -1,5 +1,7 @@
 package org.tinylog.impl.writer;
 
+import java.util.Map;
+
 import org.tinylog.core.Framework;
 
 /**
@@ -34,8 +36,9 @@ public interface WriterBuilder {
 	 * </p>
 	 *
 	 * @param framework The actual logging framework instance
+	 * @param configuration The configuration properties for the new writer instance
 	 * @return New instance of the writer
 	 */
-	Writer create(Framework framework);
+	Writer create(Framework framework, Map<String, String> configuration);
 
 }
