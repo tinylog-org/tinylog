@@ -19,6 +19,7 @@ import org.tinylog.impl.format.ThreadPlaceholderBuilder;
 import org.tinylog.impl.format.TimestampPlaceholderBuilder;
 import org.tinylog.impl.format.UptimePlaceholderBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
+import org.tinylog.impl.writer.ConsoleWriterBuilder;
 
 module org.tinylog.impl {
 	requires org.tinylog.core;
@@ -46,6 +47,8 @@ module org.tinylog.impl {
 		UptimePlaceholderBuilder;
 
 	uses WriterBuilder;
+	provides WriterBuilder with
+		ConsoleWriterBuilder;
 
 	exports org.tinylog.impl;
 }
