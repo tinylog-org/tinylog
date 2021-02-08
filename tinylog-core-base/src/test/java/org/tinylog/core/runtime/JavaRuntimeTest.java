@@ -75,7 +75,7 @@ class JavaRuntimeTest {
 		Duration time1 = runtime.getUptime();
 		assertThat(time1).isBetween(Duration.ZERO, Duration.ofHours(1));
 
-		Thread.sleep(1);
+		Thread.sleep(10);
 
 		Duration time2 = runtime.getUptime();
 		assertThat(time2).isGreaterThan(time1);
