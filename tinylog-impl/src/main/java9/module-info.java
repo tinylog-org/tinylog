@@ -51,4 +51,6 @@ module org.tinylog.impl {
 		ConsoleWriterBuilder;
 
 	exports org.tinylog.impl;
+	exports org.tinylog.impl.format;
+	exports org.tinylog.impl.writer;
 }
