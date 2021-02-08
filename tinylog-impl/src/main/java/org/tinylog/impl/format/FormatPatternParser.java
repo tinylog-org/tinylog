@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
@@ -26,6 +27,8 @@ import org.tinylog.core.internal.SafeServiceLoader;
  * </p>
  */
 public class FormatPatternParser extends AbstractPatternParser {
+
+	private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\n|\r");
 
 	private final Framework framework;
 	private final Map<String, PlaceholderBuilder> builders;
@@ -49,6 +52,17 @@ public class FormatPatternParser extends AbstractPatternParser {
 	 * @return Renderable placeholder
 	 */
 	public Placeholder parse(String pattern) {
+		String normalizedPattern = NEW_LINE_PATTERN.matcher(pattern).replaceAll(System.lineSeparator());
+		return rawParse(normalizedPattern);
+	}
+
+	/**
+	 * Parses a format pattern without normalizing new lines.
+	 *
+	 * @param pattern The format pattern to parse
+	 * @return Renderable placeholder
+	 */
+	private Placeholder rawParse(String pattern) {
 		List<Placeholder> placeholders = new ArrayList<>();
 
 		BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {

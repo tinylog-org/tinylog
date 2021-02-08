@@ -1,10 +1,16 @@
 package org.tinylog.impl.format;
 
 import java.time.Instant;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
@@ -32,6 +38,20 @@ class FormatPatternParserTest {
 	void plaintText() {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(format("Hello World!", logEntry)).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that new lines in all known formats are converted into the new line format of the current operating
+	 * system.
+	 *
+	 * @param pattern The format pattern with new lines to test
+	 * @param expected The expected render output including a new line in the format of the current operating
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(NewLineExamplesProvider.class)
+	void normalizeNewLines(String pattern, String expected) {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format(pattern, logEntry)).isEqualTo(expected);
 	}
 
 	/**
@@ -131,6 +151,26 @@ class FormatPatternParserTest {
 	private String format(String pattern, LogEntry logEntry) {
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 		return new PlaceholderRenderer(placeholder).render(logEntry);
+	}
+
+	/**
+	 * Arguments provider for providing tuples of the source format pattern and the expected rendered output.
+	 *
+	 * @see #normalizeNewLines(String, String)
+	 */
+	private static class NewLineExamplesProvider implements ArgumentsProvider {
+
+		@Override
+		public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+			/* START IGNORE CODE STYLE */
+			return Stream.of(
+				Arguments.of("Unix\n"       , "Unix"        + System.lineSeparator()),
+				Arguments.of("Classic Mac\n", "Classic Mac" + System.lineSeparator()),
+				Arguments.of("Windows\r\n"  , "Windows"     + System.lineSeparator())
+			);
+			/* END IGNORE CODE STYLE */
+		}
+
 	}
 
 	/**
