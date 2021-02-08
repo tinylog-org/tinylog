@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +29,9 @@ class ConsoleWriterBuilderTest {
 
 	@Inject
 	private Framework framework;
+
+	@Inject
+	private Log log;
 
 	@Mock
 	private PrintStream mockedOutputStream;
@@ -108,6 +112,30 @@ class ConsoleWriterBuilderTest {
 		} finally {
 			writer.close();
 		}
+	}
+
+	/**
+	 * Verifies that an illegal severity level as threshold is logged and the writer uses the default severity level
+	 * threshold {@link Level#WARN} instead.
+	 */
+	@Test
+	void illegalSeverityLevelThreshold() throws Exception {
+		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "foo");
+		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
+		try {
+			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
+			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
+
+			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
+			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
+		} finally {
+			writer.close();
+		}
+
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("foo");
+		});
 	}
 
 	/**
