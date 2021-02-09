@@ -11,6 +11,10 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
+import org.tinylog.impl.format.placeholder.BundlePlaceholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholder.PlaceholderBuilder;
+import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
 
 /**
  * Parser for format patterns with placeholders and plain static text. Placeholders and sub format patterns can be

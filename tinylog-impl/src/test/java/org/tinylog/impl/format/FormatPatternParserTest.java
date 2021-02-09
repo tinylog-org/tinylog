@@ -17,6 +17,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholder.PlaceholderBuilder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 

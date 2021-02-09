@@ -7,7 +7,7 @@ import java.util.Set;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.Placeholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
  * Synchronous writer that outputs formatted log entries to {@link System#out} and {@link System#err} respectively.

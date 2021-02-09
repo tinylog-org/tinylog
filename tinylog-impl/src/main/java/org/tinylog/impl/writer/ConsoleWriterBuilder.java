@@ -7,7 +7,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.format.FormatPatternParser;
-import org.tinylog.impl.format.Placeholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
  * Builder for creating {@link ConsoleWriter ConsoleWriters}.

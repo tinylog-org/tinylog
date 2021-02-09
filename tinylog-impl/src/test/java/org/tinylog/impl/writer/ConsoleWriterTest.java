@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.MessageOnlyPlaceholder;
+import org.tinylog.impl.format.placeholder.MessageOnlyPlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
