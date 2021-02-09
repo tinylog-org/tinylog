@@ -18,6 +18,7 @@ import org.tinylog.impl.format.placeholder.ThreadIdPlaceholderBuilder;
 import org.tinylog.impl.format.placeholder.ThreadPlaceholderBuilder;
 import org.tinylog.impl.format.placeholder.TimestampPlaceholderBuilder;
 import org.tinylog.impl.format.placeholder.UptimePlaceholderBuilder;
+import org.tinylog.impl.format.style.MinLengthStyleBuilder;
 import org.tinylog.impl.format.style.StyleBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
 import org.tinylog.impl.writer.ConsoleWriterBuilder;
@@ -48,6 +49,8 @@ module org.tinylog.impl {
 		UptimePlaceholderBuilder;
 
 	uses StyleBuilder;
+	provides StyleBuilder with
+		MinLengthStyleBuilder;
 
 	uses WriterBuilder;
 	provides WriterBuilder with
