@@ -1,5 +1,7 @@
 package org.tinylog.impl.format.style;
 
+import java.util.Arrays;
+
 import org.tinylog.core.internal.InternalLogger;
 
 /**
@@ -26,22 +28,18 @@ public class MinLengthStyle implements Style {
 		int difference = minLength - valueLength;
 
 		if (difference > 0) {
-			builder.setLength(totalLength + difference);
-
 			switch (position) {
 				case LEFT:
-					replaceWithSpaces(builder, totalLength, difference);
+					insertSpaces(builder, totalLength, difference);
 					break;
 				case CENTER:
 					int leftSpaces = difference / 2;
+					insertSpaces(builder, start, leftSpaces);
 					int rightSpaces = difference - leftSpaces;
-					moveString(builder, start, valueLength, leftSpaces);
-					replaceWithSpaces(builder, start, leftSpaces);
-					replaceWithSpaces(builder, start + leftSpaces + valueLength, rightSpaces);
+					insertSpaces(builder, start + leftSpaces + valueLength, rightSpaces);
 					break;
 				case RIGHT:
-					moveString(builder, start, valueLength, difference);
-					replaceWithSpaces(builder, start, difference);
+					insertSpaces(builder, start, difference);
 					break;
 				default:
 					InternalLogger.error(null, "Illegal position \"" + position + "\" for min length style");
@@ -51,29 +49,16 @@ public class MinLengthStyle implements Style {
 	}
 
 	/**
-	 * Moves a substring within a string builder.
+	 * Inserts a sequence of space characters into a string builder.
 	 *
 	 * @param builder The string builder to modify
-	 * @param index The index of the substring to move
-	 * @param length The length of the substring to move
-	 * @param offset The target position of the substring, relative to the origin index
+	 * @param index The index, where to insert the space characters into the string builder
+	 * @param count The number of space characters to insert
 	 */
-	private static void moveString(StringBuilder builder, int index, int length, int offset) {
-		String value = builder.substring(index, index + length);
-		builder.replace(index + offset, index + offset + length, value);
-	}
-
-	/**
-	 * Overwrites a sequence in a string builder with space characters.
-	 *
-	 * @param builder The string builder to modify
-	 * @param start The index in the string builder, where to start overwriting
-	 * @param count The number of characters to overwrite with a space character
-	 */
-	private static void replaceWithSpaces(StringBuilder builder, int start, int count) {
-		for (int index = start; index < start + count; ++index) {
-			builder.setCharAt(index, ' ');
-		}
+	private static void insertSpaces(StringBuilder builder, int index, int count) {
+		char[] spaces = new char[count];
+		Arrays.fill(spaces, ' ');
+		builder.insert(index, spaces);
 	}
 
 }
