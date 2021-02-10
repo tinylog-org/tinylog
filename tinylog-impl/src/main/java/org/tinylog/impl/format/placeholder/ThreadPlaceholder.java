@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Placeholder implementation for resolving the source thread name of a log entry.
@@ -29,9 +29,14 @@ public class ThreadPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		Thread thread = entry.getThread();
-		statement.setString(index, thread == null ? null : thread.getName());
+
+		if (thread == null) {
+			return new SqlRecord<>(Types.VARCHAR, null);
+		} else {
+			return new SqlRecord<>(Types.VARCHAR, thread.getName());
+		}
 	}
 
 }

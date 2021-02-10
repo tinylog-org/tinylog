@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Wrapper for outputting plain static text.
@@ -38,8 +38,8 @@ public class StaticTextPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
-		statement.setString(index, text);
+	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
+		return new SqlRecord<>(Types.VARCHAR, text);
 	}
 
 }

@@ -1,17 +1,15 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class PackagePlaceholderTest {
 
@@ -56,38 +54,41 @@ class PackagePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that an string will be applied to a {@link PreparedStatement}, if a fully-qualified class name with
+	 * Verifies that an string will be resolved, if a fully-qualified class name with
 	 * package information is set.
 	 */
 	@Test
-	void applyWithDefaultPackage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithDefaultPackage() {
 		LogEntry logEntry = new LogEntryBuilder().className("MyClass").create();
-		new PackagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, "MyClass");
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "MyClass"));
 	}
 
 	/**
-	 * Verifies that the package name of a log entry will be applied to a {@link PreparedStatement}, if a
-	 * fully-qualified class name with package information is set.
+	 * Verifies that the package name of a log entry will be resolved, if a fully-qualified class name with package
+	 * information is set.
 	 */
 	@Test
-	void applyWithFullyQualifiedPackage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithFullyQualifiedPackage() {
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
-		new PackagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, "org.foo");
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "org.foo"));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the source class name is not set.
+	 * Verifies that {@code null} will be resolved, if the source class name is not set.
 	 */
 	@Test
-	void applyWithoutPackage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutPackage() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new PackagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, null);
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
 	}
 
 }

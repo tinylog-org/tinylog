@@ -1,11 +1,10 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Placeholder implementations resolve the real values for placeholders in format patterns.
@@ -42,13 +41,11 @@ public interface Placeholder {
 	void render(StringBuilder builder, LogEntry entry);
 
 	/**
-	 * Applies the corresponding log entry values for this placeholder to a prepared SQL statement.
+	 * Resolves the {@link SqlRecord} for a passed log entry.
 	 *
-	 * @param statement The target SQL statement
-	 * @param index The parameter index to fill in the passed SQL statement
-	 * @param entry The log entry to apply
-	 * @throws SQLException Failed to set the parameter in the passed SQL statement
+	 * @param entry The log entry to resolve
+	 * @return The resolved typed SQL value to insert or update into an SQL table
 	 */
-	void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException;
+	SqlRecord<?> resolve(LogEntry entry);
 
 }

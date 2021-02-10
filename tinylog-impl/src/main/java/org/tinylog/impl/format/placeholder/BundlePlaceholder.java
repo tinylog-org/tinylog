@@ -1,13 +1,13 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Bundle of multiple child placeholders.
@@ -41,11 +41,10 @@ public class BundlePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		StringBuilder builder = new StringBuilder();
 		render(builder, entry);
-
-		statement.setString(index, builder.toString());
+		return new SqlRecord<>(Types.LONGVARCHAR, builder);
 	}
 
 }

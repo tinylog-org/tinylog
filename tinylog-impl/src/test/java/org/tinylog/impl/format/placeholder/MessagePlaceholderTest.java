@@ -2,18 +2,16 @@ package org.tinylog.impl.format.placeholder;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class MessagePlaceholderTest {
 
@@ -71,53 +69,57 @@ class MessagePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if neither a log message nor an
-	 * exception are set.
+	 * Verifies that {@code null} will be resolved, if neither a log message nor an exception is set.
 	 */
 	@Test
-	void applyWithoutMessageOrException() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutMessageOrException() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new MessagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, null);
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, null));
 	}
 
 	/**
-	 * Verifies that the log message will be correctly applied to a {@link PreparedStatement}, if the log message is set
-	 * but not an exception.
+	 * Verifies that the log message will be correctly resolved, if the log message is set but not an exception.
 	 */
 	@Test
-	void applyWithMessageOnly() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithMessageOnly() {
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-		new MessagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, "Hello World!");
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "Hello World!"));
 	}
 
 	/**
-	 * Verifies that the exception will be correctly applied to a {@link PreparedStatement}, if the exception is set but
-	 * not a log message.
+	 * Verifies that the exception will be correctly resolved, if the exception is set but not a log message.
 	 */
 	@Test
-	void applyWithExceptionOnly() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithExceptionOnly() {
 		Exception exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
-		new MessagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, print(exception));
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
 	}
 
 	/**
-	 * Verifies that the log message and the exception will be correctly applied to a {@link PreparedStatement}, if both
-	 * are set.
+	 * Verifies that the log message and the exception will be correctly resolved, if both are set.
 	 */
 	@Test
-	void applyWithMessageAndException() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithMessageAndException() {
 		Exception exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().message("Oops").exception(exception).create();
-		new MessagePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, "Oops: " + print(exception));
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "Oops: " + print(exception)));
 	}
 
 	/**

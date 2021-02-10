@@ -1,13 +1,13 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Placeholder implementation for resolving the {@link Level severity level} of a log entry.
@@ -30,9 +30,9 @@ public class LevelPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		Level level = entry.getSeverityLevel();
-		statement.setString(index, level == null ? null : level.toString());
+		return new SqlRecord<>(Types.VARCHAR, level == null ? null : level.toString());
 	}
 
 }

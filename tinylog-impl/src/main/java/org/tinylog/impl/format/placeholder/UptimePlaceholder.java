@@ -1,8 +1,7 @@
 package org.tinylog.impl.format.placeholder;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -13,6 +12,7 @@ import java.util.function.ToLongFunction;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Placeholder implementation for resolving the passed time since application start when a log entry was issued.
@@ -60,24 +60,24 @@ public class UptimePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+	public SqlRecord<?> resolve(LogEntry entry) {
 		Duration duration = entry.getUptime();
 
 		if (formatForSql) {
 			if (duration == null) {
-				statement.setString(index, null);
+				return new SqlRecord<>(Types.VARCHAR, null);
 			} else {
 				StringBuilder builder = new StringBuilder();
 				format(builder, duration);
-				statement.setString(index, builder.toString());
+				return new SqlRecord<>(Types.VARCHAR, builder);
 			}
 		} else {
 			if (duration == null) {
-				statement.setBigDecimal(index, null);
+				return new SqlRecord<>(Types.NUMERIC, null);
 			} else {
 				BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds());
 				BigDecimal nanos = BigDecimal.valueOf(duration.getNano(), NANOS_SCALE);
-				statement.setBigDecimal(index, seconds.add(nanos));
+				return new SqlRecord<>(Types.NUMERIC, seconds.add(nanos));
 			}
 		}
 	}

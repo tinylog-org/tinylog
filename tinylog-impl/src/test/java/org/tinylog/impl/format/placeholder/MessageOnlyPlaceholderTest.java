@@ -1,17 +1,15 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class MessageOnlyPlaceholderTest {
 
@@ -46,25 +44,27 @@ class MessageOnlyPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the log message of a log entry will be applied to a{@link PreparedStatement}, if set.
+	 * Verifies that the log message of a log entry will be resolved, if set.
 	 */
 	@Test
-	void applyWithMessage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithMessage() {
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-		new MessageOnlyPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, "Hello World!");
+		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "Hello World!"));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the log message is not set.
+	 * Verifies that {@code null} will be resolved, if the log message is not set.
 	 */
 	@Test
-	void applyWithoutMessage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutMessage() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new MessageOnlyPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, null);
+		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, null));
 	}
 
 }

@@ -1,19 +1,16 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class SeverityCodePlaceholderTest {
 
@@ -48,26 +45,27 @@ class SeverityCodePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the numeric severity level code of a log entry will be applied to a {@link PreparedStatement},
-	 * if the severity level is set.
+	 * Verifies that the numeric severity level code of a log entry will be resolved,  if the severity level is set.
 	 */
 	@Test
-	void applyWithSeverityLevel() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithSeverityLevel() {
 		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
-		new SeverityCodePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setInt(42, 3);
+		SeverityCodePlaceholder placeholder = new SeverityCodePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.INTEGER, 3));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the severity level is not set.
+	 * Verifies that {@code null} will be resolved, if the severity level is not set.
 	 */
 	@Test
-	void applyWithoutSeverityLevel() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutSeverityLevel() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new SeverityCodePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setNull(42, Types.INTEGER);
+		SeverityCodePlaceholder placeholder = new SeverityCodePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.INTEGER, null));
 	}
 
 }

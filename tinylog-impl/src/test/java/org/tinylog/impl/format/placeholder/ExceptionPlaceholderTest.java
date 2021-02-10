@@ -2,18 +2,16 @@ package org.tinylog.impl.format.placeholder;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class ExceptionPlaceholderTest {
 
@@ -89,70 +87,75 @@ class ExceptionPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if no exception or other kind of
+	 * Verifies that {@code null} will be resolved, if no exception or other kind of
 	 * throwable is set.
 	 */
 	@Test
-	void applyWithoutException() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutException() {
 		LogEntry logEntry = new LogEntryBuilder().create();
 
-		new ExceptionPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, null);
+		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, null));
 	}
 
 	/**
-	 * Verifies that an exception without description message is applied to a {@link PreparedStatement} correctly.
+	 * Verifies that an exception without description message is resolved correctly.
 	 */
 	@Test
-	void applyExceptionWithoutMessage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveExceptionWithoutMessage() {
 		RuntimeException exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 
-		new ExceptionPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, print(exception));
+		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
 	}
 
 	/**
-	 * Verifies that an exception with description message is applied to a {@link PreparedStatement} correctly.
+	 * Verifies that an exception with description message is resolved correctly.
 	 */
 	@Test
-	void applyExceptionWithMessage() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveExceptionWithMessage() {
 		RuntimeException exception = new RuntimeException("Oops!");
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 
-		new ExceptionPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, print(exception));
+		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
 	}
 
 	/**
-	 * Verifies that an exception containing a suppressed exception is applied to a {@link PreparedStatement} correctly.
+	 * Verifies that an exception containing a suppressed exception is resolved correctly.
 	 */
 	@Test
-	void applyExceptionWithSuppression() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveExceptionWithSuppression() {
 		RuntimeException exception = new RuntimeException();
 		exception.addSuppressed(new IllegalAccessException());
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 
-		new ExceptionPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, print(exception));
+		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
 	}
 
 	/**
-	 * Verifies that an exception containing a cause exception is applied to a {@link PreparedStatement} correctly.
+	 * Verifies that an exception containing a cause exception is resolved correctly.
 	 */
 	@Test
-	void applyExceptionWithCause() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveExceptionWithCause() {
 		IllegalAccessException cause = new IllegalAccessException();
 		RuntimeException exception = new RuntimeException(cause);
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 
-		new ExceptionPlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setString(42, print(exception));
+		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
 	}
 
 	/**

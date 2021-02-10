@@ -1,17 +1,15 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class TagPlaceholderTest {
 
@@ -47,27 +45,27 @@ class TagPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the assigned tag of tagged log entries is applied to a {@link PreparedStatement}.
+	 * Verifies that the assigned tag of tagged log entries is resolved.
 	 */
 	@Test
-	void applyWithTag() throws SQLException {
+	void resolveWithTag() {
 		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
-		PreparedStatement statement = mock(PreparedStatement.class);
 		LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
-		placeholder.apply(statement, 42, logEntry);
-		verify(statement).setString(42, "foo");
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "foo"));
 	}
 
 	/**
-	 * Verifies that the default value is applied to a {@link PreparedStatement} for untagged log entries.
+	 * Verifies that the default value is resolved for untagged log entries.
 	 */
 	@Test
-	void applyWithoutTag() throws SQLException {
+	void resolveWithoutTag() {
 		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
-		PreparedStatement statement = mock(PreparedStatement.class);
 		LogEntry logEntry = new LogEntryBuilder().create();
-		placeholder.apply(statement, 42, logEntry);
-		verify(statement).setString(42, "-");
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "-"));
 	}
 
 }

@@ -1,8 +1,7 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -10,12 +9,11 @@ import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class DatePlaceholderTest {
 
@@ -51,51 +49,54 @@ class DatePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the date and time of a log entry will be applied as a {@link Timestamp} to a
-	 * {@link PreparedStatement}, if the date and time of issue is set.
+	 * Verifies that the date and time of a log entry will be resolved as a {@link Timestamp}, if the date and time of
+	 * issue is set.
 	 */
 	@Test
-	void applyUnformattedWithTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveUnformattedWithTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		new DatePlaceholder(formatter, false).apply(statement, 42, logEntry);
-		verify(statement).setTimestamp(42, new Timestamp(0));
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.TIMESTAMP, new Timestamp(0)));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the date and time of issue is not
+	 * Verifies that {@code null} will be resolved, if the date and time of issue is not
 	 * set.
 	 */
 	@Test
-	void applyUnformattedWithoutTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveUnformattedWithoutTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new DatePlaceholder(formatter, false).apply(statement, 42, logEntry);
-		verify(statement).setTimestamp(42, null);
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.TIMESTAMP, null));
 	}
 
 	/**
-	 * Verifies that the date and time of a log entry will be applied as formatted string to a
-	 * {@link PreparedStatement}, if the date and time of issue is set.
+	 * Verifies that the date and time of a log entry will be resolved as formatted string, if the date and time of
+	 * issue is set.
 	 */
 	@Test
-	void applyFormattedWithTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveFormattedWithTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		new DatePlaceholder(formatter, true).apply(statement, 42, logEntry);
-		verify(statement).setString(42, "1970-01-01T00:00:00Z");
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "1970-01-01T00:00:00Z"));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the date and time of issue is not
-	 * set.
+	 * Verifies that {@code null} will be resolved, if the date and time of issue is not set.
 	 */
 	@Test
-	void applyFormattedWithoutTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveFormattedWithoutTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new DatePlaceholder(formatter, true).apply(statement, 42, logEntry);
-		verify(statement).setString(42, null);
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
 	}
 
 }

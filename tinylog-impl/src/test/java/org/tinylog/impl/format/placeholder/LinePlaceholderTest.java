@@ -1,18 +1,15 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class LinePlaceholderTest {
 
@@ -46,27 +43,27 @@ class LinePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the line number of a log entry in the source file will be applied to a{@link PreparedStatement},
-	 * if set.
+	 * Verifies that the line number of a log entry in the source file will be resolved, if set.
 	 */
 	@Test
-	void applyWithSourceLineName() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithSourceLineName() {
 		LogEntry logEntry = new LogEntryBuilder().lineNumber(100).create();
-		new LinePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setInt(42, 100);
+		LinePlaceholder placeholder = new LinePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.INTEGER, 100));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the line number in the source file
-	 * is not set.
+	 * Verifies that {@code null} will be resolved, if the line number in the source file is not set.
 	 */
 	@Test
-	void applyWithoutSourceLineName() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutSourceLineName() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new LinePlaceholder().apply(statement, 42, logEntry);
-		verify(statement).setNull(42, Types.INTEGER);
+		LinePlaceholder placeholder = new LinePlaceholder();
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.INTEGER, null));
 	}
 
 }

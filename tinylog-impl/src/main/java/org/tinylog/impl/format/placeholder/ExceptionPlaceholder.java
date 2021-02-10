@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 
 /**
  * Placeholder implementation for printing the exception including its stack trace for a log entry.
@@ -34,15 +34,15 @@ public class ExceptionPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void apply(PreparedStatement statement, int index, LogEntry entry) throws SQLException {
+	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		Throwable throwable = entry.getException();
 
 		if (throwable == null) {
-			statement.setString(index, null);
+			return new SqlRecord<>(Types.LONGVARCHAR, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
 			appendThrowable(builder, "", throwable, EMPTY_STACK_TRACE);
-			statement.setString(index, builder.toString());
+			return new SqlRecord<>(Types.LONGVARCHAR, builder);
 		}
 	}
 

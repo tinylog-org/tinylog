@@ -1,19 +1,16 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class TimestampPlaceholderTest {
 
@@ -48,25 +45,27 @@ class TimestampPlaceholderTest {
 	}
 
 	/**
-	 * Verifies that the timestamp of issue of a log entry will be applied to a {@link PreparedStatement}, if present.
+	 * Verifies that the timestamp of issue of a log entry will be resolved, if present.
 	 */
 	@Test
-	void applyWithTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.ofEpochMilli(1000)).create();
-		new TimestampPlaceholder(Instant::toEpochMilli).apply(statement, 42, logEntry);
-		verify(statement).setLong(42, 1000);
+		TimestampPlaceholder placeholder = new TimestampPlaceholder(Instant::toEpochMilli);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.BIGINT, 1000L));
 	}
 
 	/**
-	 * Verifies that {@code null} will be applied to a {@link PreparedStatement}, if the timestamp is not present.
+	 * Verifies that {@code null} will be resolved, if the timestamp is not present.
 	 */
 	@Test
-	void applyWithoutTimestamp() throws SQLException {
-		PreparedStatement statement = mock(PreparedStatement.class);
+	void resolveWithoutTimestamp() {
 		LogEntry logEntry = new LogEntryBuilder().create();
-		new TimestampPlaceholder(Instant::toEpochMilli).apply(statement, 42, logEntry);
-		verify(statement).setNull(42, Types.BIGINT);
+		TimestampPlaceholder placeholder = new TimestampPlaceholder(Instant::toEpochMilli);
+		assertThat(placeholder.resolve(logEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.BIGINT, null));
 	}
 
 }

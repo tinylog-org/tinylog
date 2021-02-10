@@ -1,7 +1,6 @@
 package org.tinylog.impl.format.placeholder;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -10,13 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 @CaptureLogEntries
 class ContextPlaceholderBuilderTest {
@@ -42,7 +40,7 @@ class ContextPlaceholderBuilderTest {
 	 * Verifies that context placeholders without any custom default value are instantiated correctly.
 	 */
 	@Test
-	void creationWithKeyOnly() throws SQLException {
+	void creationWithKeyOnly() {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
 
@@ -50,18 +48,20 @@ class ContextPlaceholderBuilderTest {
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<foo not set>");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
 
-		PreparedStatement statement = mock(PreparedStatement.class);
-		placeholder.apply(statement, 42, emptyLogEntry);
-		verify(statement).setString(42, null);
-		placeholder.apply(statement, 42, filledLogEntry);
-		verify(statement).setString(42, "boo");
+		assertThat(placeholder.resolve(emptyLogEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+
+		assertThat(placeholder.resolve(filledLogEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "boo"));
 	}
 
 	/**
 	 * Verifies that context placeholders with a custom default value are instantiated correctly.
 	 */
 	@Test
-	void creationWithKeyAndDefaultValue() throws SQLException {
+	void creationWithKeyAndDefaultValue() {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo,bar");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
 
@@ -69,11 +69,13 @@ class ContextPlaceholderBuilderTest {
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("bar");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
 
-		PreparedStatement statement = mock(PreparedStatement.class);
-		placeholder.apply(statement, 42, emptyLogEntry);
-		verify(statement).setString(42, "bar");
-		placeholder.apply(statement, 42, filledLogEntry);
-		verify(statement).setString(42, "boo");
+		assertThat(placeholder.resolve(emptyLogEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "bar"));
+
+		assertThat(placeholder.resolve(filledLogEntry))
+			.usingRecursiveComparison()
+			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "boo"));
 	}
 
 	/**
