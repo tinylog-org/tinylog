@@ -10,7 +10,6 @@ public enum Position {
 	 */
 	LEFT,
 
-
 	/**
 	 * The string should be centered.
 	 */
