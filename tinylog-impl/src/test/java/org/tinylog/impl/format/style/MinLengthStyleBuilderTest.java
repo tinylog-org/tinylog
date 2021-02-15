@@ -7,7 +7,11 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.impl.test.StyleRenderer;
+import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -15,6 +19,8 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 @CaptureLogEntries
 class MinLengthStyleBuilderTest {
+
+	private final Placeholder fooPlaceholder = new StaticTextPlaceholder("foo");
 
 	@Inject
 	private Framework framework;
@@ -24,9 +30,10 @@ class MinLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithMinLengthOnly() {
-		Style style = new MinLengthStyleBuilder().create(framework, "5");
-		StyleRenderer renderer = new StyleRenderer(style);
-		assertThat(renderer.render("foo")).isEqualTo("foo  ");
+		Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5");
+		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(logEntry)).isEqualTo("foo  ");
 	}
 
 	/**
@@ -34,9 +41,10 @@ class MinLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithMinLengthAndPosition() {
-		Style style = new MinLengthStyleBuilder().create(framework, "5,center");
-		StyleRenderer renderer = new StyleRenderer(style);
-		assertThat(renderer.render("foo")).isEqualTo(" foo ");
+		Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5,center");
+		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(logEntry)).isEqualTo(" foo ");
 	}
 
 	/**
@@ -44,7 +52,7 @@ class MinLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithMissingMinLength() {
-		Throwable throwable = catchThrowable(() -> new MinLengthStyleBuilder().create(framework, null));
+		Throwable throwable = catchThrowable(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, null));
 		assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
 		assertThat(throwable.getMessage()).containsIgnoringCase("minimum length");
 	}
@@ -54,7 +62,7 @@ class MinLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithInvalidMinLength() {
-		assertThatCode(() -> new MinLengthStyleBuilder().create(framework, "boo"))
+		assertThatCode(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, "boo"))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessageContaining("boo");
 	}
@@ -64,7 +72,7 @@ class MinLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithInvalidPosition() {
-		assertThatCode(() -> new MinLengthStyleBuilder().create(framework, "5,boo"))
+		assertThatCode(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5,boo"))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessageContaining("boo");
 	}

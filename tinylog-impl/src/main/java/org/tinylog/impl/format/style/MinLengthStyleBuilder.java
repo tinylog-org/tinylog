@@ -3,6 +3,7 @@ package org.tinylog.impl.format.style;
 import java.util.Locale;
 
 import org.tinylog.core.Framework;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
  * Builder for creating {@link MinLengthStyle MinLengthStyles}.
@@ -19,15 +20,16 @@ public class MinLengthStyleBuilder implements StyleBuilder {
 	}
 
 	@Override
-	public Style create(Framework framework, String value) {
+	public Placeholder create(Framework framework, Placeholder placeholder, String value) {
 		if (value == null) {
 			throw new IllegalArgumentException("Minimum length is not defined for min length style");
 		} else {
 			int commaIndex = value.indexOf(',');
 			if (commaIndex < 0) {
-				return new MinLengthStyle(parseMinLength(value.trim()), Position.LEFT);
+				return new MinLengthStyle(placeholder, parseMinLength(value.trim()), Position.LEFT);
 			} else {
 				return new MinLengthStyle(
+					placeholder,
 					parseMinLength(value.substring(0, commaIndex).trim()),
 					parsePosition(value.substring(commaIndex + 1).trim())
 				);

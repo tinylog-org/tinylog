@@ -1,13 +1,22 @@
 package org.tinylog.impl.format.style;
 
 import org.tinylog.core.Framework;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
- * Builder for creating {@link Style Styles}.
+ * Builder for creating style wrapper for {@link Placeholder Placeholders}.
  *
  * <p>
  *     New style builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
  * </p>
+ *
+ * <p>
+ *     Typically, new style wrappers extend {@link AbstractStylePlaceholder}, which simplifies the implementation of
+ *     style wrappers and already contains much common functionality. However, a style builder can create any kind of
+ *     placeholder that implements the interface {@link Placeholder}.
+ * </p>
+ *
+ * @see AbstractStylePlaceholder
  */
 public interface StyleBuilder {
 
@@ -25,12 +34,13 @@ public interface StyleBuilder {
 	String getName();
 
 	/**
-	 * Creates a new instance of the style.
+	 * Creates a new style wrapper of another placeholder.
 	 *
 	 * @param framework The actual logging framework instance
-	 * @param value Optional configuration value for the created style
-	 * @return New instance of the style
+	 * @param placeholder The actual placeholder to style
+	 * @param value Optional configuration value for the style
+	 * @return New instance of the styled placeholder
 	 */
-	Style create(Framework framework, String value);
+	Placeholder create(Framework framework, Placeholder placeholder, String value);
 
 }

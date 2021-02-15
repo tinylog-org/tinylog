@@ -3,26 +3,29 @@ package org.tinylog.impl.format.style;
 import java.util.Arrays;
 
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
- * Style implementation for setting a configurable minimum length.
+ * Styled placeholder wrapper for applying a configurable minimum length.
  */
-public class MinLengthStyle implements Style {
+public class MinLengthStyle extends AbstractStylePlaceholder {
 
 	private final int minLength;
 	private final Position position;
 
 	/**
+	 * @param placeholder The actual placeholder to style
 	 * @param minLength The minimum length for the input string
 	 * @param position The position for the input string
 	 */
-	public MinLengthStyle(int minLength, Position position) {
+	public MinLengthStyle(Placeholder placeholder, int minLength, Position position) {
+		super(placeholder);
 		this.minLength = minLength;
 		this.position = position;
 	}
 
 	@Override
-	public void apply(StringBuilder builder, int start) {
+	protected void apply(StringBuilder builder, int start) {
 		int totalLength = builder.length();
 		int valueLength = totalLength - start;
 		int difference = minLength - valueLength;

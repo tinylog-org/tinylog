@@ -2,6 +2,10 @@ package org.tinylog.impl.format.style;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +29,10 @@ class MinLengthStyleTest {
 		"'foo', 5, RIGHT , '  foo'"
 	})
 	void apply(String input, int minLength, Position position, String expected) {
-		StringBuilder builder = new StringBuilder("prefix..." + input);
-		new MinLengthStyle(minLength, position).apply(builder, 9);
-		assertThat(builder.toString()).isEqualTo("prefix..." + expected);
+		MinLengthStyle style = new MinLengthStyle(new StaticTextPlaceholder(input), minLength, position);
+		PlaceholderRenderer renderer = new PlaceholderRenderer(style);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(logEntry)).isEqualTo(expected);
 	}
 
 }
