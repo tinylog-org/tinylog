@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.placeholder.ClassPlaceholder;
 import org.tinylog.impl.format.placeholder.PackagePlaceholder;
 import org.tinylog.impl.format.placeholder.Placeholder;
 import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
@@ -36,6 +37,20 @@ class MaxLengthStyleBuilderTest {
 		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("fo");
+	}
+
+	/**
+	 * Verifies that a max length style can be created for a {@link ClassPlaceholder} with maximum length passed as
+	 * configuration value.
+	 */
+	@Test
+	void creationForClass() {
+		Placeholder classPlaceholder = new ClassPlaceholder();
+		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, classPlaceholder, "11");
+
+		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
+		assertThat(renderer.render(logEntry)).isEqualTo("o.f.MyClass");
 	}
 
 	/**
