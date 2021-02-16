@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.placeholder.PackagePlaceholder;
 import org.tinylog.impl.format.placeholder.Placeholder;
 import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
@@ -20,20 +21,35 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 @CaptureLogEntries
 class MaxLengthStyleBuilderTest {
 
-	private final Placeholder fooPlaceholder = new StaticTextPlaceholder("foo");
-
 	@Inject
 	private Framework framework;
 
 	/**
-	 * Verifies that a max length style can be created with maximum length passed as configuration value.
+	 * Verifies that a max length style can be created for a {@link StaticTextPlaceholder} with maximum length passed as
+	 * configuration value.
 	 */
 	@Test
-	void creationWithMaxLength() {
-		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, fooPlaceholder, "2");
+	void creationForText() {
+		Placeholder textPlaceholder = new StaticTextPlaceholder("foo");
+		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, textPlaceholder, "2");
+
 		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("fo");
+	}
+
+	/**
+	 * Verifies that a max length style can be created for a {@link PackagePlaceholder} with maximum length passed as
+	 * configuration value.
+	 */
+	@Test
+	void creationForPackage() {
+		Placeholder packagePlaceholder = new PackagePlaceholder();
+		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, packagePlaceholder, "5");
+
+		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
+		assertThat(renderer.render(logEntry)).isEqualTo("o.foo");
 	}
 
 	/**
@@ -41,7 +57,8 @@ class MaxLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithMissingMaxLength() {
-		Throwable throwable = catchThrowable(() -> new MaxLengthStyleBuilder().create(framework, fooPlaceholder, null));
+		Placeholder placeholder = new StaticTextPlaceholder("foo");
+		Throwable throwable = catchThrowable(() -> new MaxLengthStyleBuilder().create(framework, placeholder, null));
 		assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
 		assertThat(throwable.getMessage()).containsIgnoringCase("maximum length");
 	}
@@ -51,9 +68,10 @@ class MaxLengthStyleBuilderTest {
 	 */
 	@Test
 	void creationWithInvalidMaxLength() {
-		assertThatCode(() -> new MaxLengthStyleBuilder().create(framework, fooPlaceholder, "boo"))
+		Placeholder placeholder = new StaticTextPlaceholder("foo");
+		assertThatCode(() -> new MaxLengthStyleBuilder().create(framework, placeholder, "bar"))
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessageContaining("boo");
+			.hasMessageContaining("bar");
 	}
 
 	/**

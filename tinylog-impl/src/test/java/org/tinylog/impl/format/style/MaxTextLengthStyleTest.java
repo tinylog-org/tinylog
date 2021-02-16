@@ -9,14 +9,14 @@ import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MaxLengthStyleTest {
+class MaxTextLengthStyleTest {
 
 	/**
 	 * Verifies that the max length style is applied to input strings as expected.
 	 *
 	 * @param input The source string to which the max length style should be applied
 	 * @param maxLength The maximum length for the input string
-	 * @param expected The expected result after applying the min length style
+	 * @param expected The expected result after applying the max length style
 	 */
 	@ParameterizedTest
 	@CsvSource({
@@ -44,7 +44,7 @@ class MaxLengthStyleTest {
 		"'abcde', 6, 'abcde'"
 	})
 	void apply(String input, int maxLength, String expected) {
-		MaxLengthStyle style = new MaxLengthStyle(new StaticTextPlaceholder(input), maxLength);
+		MaxTextLengthStyle style = new MaxTextLengthStyle(new StaticTextPlaceholder(input), maxLength);
 		PlaceholderRenderer renderer = new PlaceholderRenderer(style);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo(expected);

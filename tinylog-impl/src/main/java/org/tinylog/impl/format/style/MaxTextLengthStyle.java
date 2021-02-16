@@ -5,7 +5,7 @@ import org.tinylog.impl.format.placeholder.Placeholder;
 /**
  * Styled placeholder wrapper for applying a configurable maximum length.
  */
-public class MaxLengthStyle extends AbstractStylePlaceholder {
+public class MaxTextLengthStyle extends AbstractStylePlaceholder {
 
 	private static final String ELLIPSIS = "...";
 
@@ -15,7 +15,7 @@ public class MaxLengthStyle extends AbstractStylePlaceholder {
 	 * @param placeholder The actual placeholder to style
 	 * @param maxLength The maximum length for the input string
 	 */
-	public MaxLengthStyle(Placeholder placeholder, int maxLength) {
+	public MaxTextLengthStyle(Placeholder placeholder, int maxLength) {
 		super(placeholder);
 		this.maxLength = maxLength;
 	}
