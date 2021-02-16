@@ -18,7 +18,6 @@ import org.tinylog.impl.test.PlaceholderRenderer;
 import com.google.common.collect.ImmutableList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
 
 class AbstractStylePlaceholderTest {
 
@@ -83,7 +82,7 @@ class AbstractStylePlaceholderTest {
 	@Test
 	void renderBundledPlaceholder() {
 		Placeholder prefix = new StaticTextPlaceholder("foo:");
-		Placeholder styled = spy(new StylePlaceholder(new MessageOnlyPlaceholder()));
+		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
 		PlaceholderRenderer renderer = new PlaceholderRenderer(new BundlePlaceholder(ImmutableList.of(prefix, styled)));
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
@@ -153,7 +152,7 @@ class AbstractStylePlaceholderTest {
 	@Test
 	void resolveBundledPlaceholder() {
 		Placeholder prefix = new StaticTextPlaceholder("foo:");
-		Placeholder styled = spy(new StylePlaceholder(new MessageOnlyPlaceholder()));
+		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
 		Placeholder bundle = new BundlePlaceholder(ImmutableList.of(prefix, styled));
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
