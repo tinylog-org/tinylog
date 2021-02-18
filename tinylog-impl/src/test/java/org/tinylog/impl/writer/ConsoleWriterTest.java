@@ -57,7 +57,8 @@ class ConsoleWriterTest {
 	void requiredLogEntryValues() {
 		ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN);
 		try {
-			assertThat(writer.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
+			assertThat(writer.getRequiredLogEntryValues())
+				.containsExactlyInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
 		} finally {
 			writer.close();
 		}

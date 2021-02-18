@@ -23,7 +23,7 @@ class MessagePlaceholderTest {
 	void requiredLogEntryValues() {
 		MessagePlaceholder placeholder = new MessagePlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues())
-			.containsExactly(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+			.containsExactlyInAnyOrder(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 	}
 
 	/**
