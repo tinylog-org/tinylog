@@ -19,6 +19,7 @@ import org.tinylog.core.test.service.RegisterService;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.placeholder.Placeholder;
 import org.tinylog.impl.format.placeholder.PlaceholderBuilder;
+import org.tinylog.impl.format.style.StyleBuilder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 
@@ -84,6 +85,15 @@ class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that escaped pipes are output without quotes.
+	 */
+	@Test
+	void escapedPipes() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(format("1 '|' 2 '|' 3", logEntry)).isEqualTo("1 | 2 | 3");
+	}
+
+	/**
 	 * Verifies that a placeholder can be resolved, if the entire format pattern is a placeholder.
 	 */
 	@Test
@@ -131,11 +141,60 @@ class FormatPatternParserTest {
 	/**
 	 * Verifies that a non-instantiable placeholder is reported.
 	 */
-	@RegisterService(service = PlaceholderBuilder.class, implementations = EvilPlaceholderBuilder.class)
+	@RegisterService(service = PlaceholderBuilder.class, implementations = EvilBuilder.class)
 	@Test
 	void resolveNonInstantiablePlaceholder() {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(format("evil", logEntry)).isEqualTo("evil");
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("evil");
+			assertThat(entry.getThrowable()).isInstanceOf(UnsupportedOperationException.class);
+		});
+	}
+
+	/**
+	 * Verifies that a single style can be applied to a placeholder.
+	 */
+	@Test
+	void applySingleStyle() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
+		assertThat(format("message | max-length: 5", logEntry)).isEqualTo("He...");
+	}
+
+	/**
+	 * Verifies that multiple styles can be applied to a placeholder.
+	 */
+	@Test
+	void applyMultipleStyles() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
+		assertThat(format("message | min-length: 5 | max-length: 5", logEntry)).isEqualTo("He...");
+
+		logEntry = new LogEntryBuilder().message("Hi!").create();
+		assertThat(format("message | min-length: 5 | max-length: 5", logEntry)).isEqualTo("Hi!  ");
+	}
+
+	/**
+	 * Verifies that an unknown style is reported and does not influence the output of the placeholder.
+	 */
+	@Test
+	void reportNonExistentStyle() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
+		assertThat(format("message | foo", logEntry)).isEqualTo("Hello!");
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("foo");
+		});
+	}
+
+	/**
+	 * Verifies that a non-instantiable style is reported and does not influence the output of the placeholder.
+	 */
+	@RegisterService(service = StyleBuilder.class, implementations = EvilBuilder.class)
+	@Test
+	void reportNonInstantiableStyle() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
+		assertThat(format("message | evil", logEntry)).isEqualTo("Hello!");
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("evil");
@@ -177,9 +236,9 @@ class FormatPatternParserTest {
 
 	/**
 	 * Placeholder builder that always throws an {@link UnsupportedOperationException} when trying to create a new
-	 * placeholder.
+	 * placeholder or style.
 	 */
-	public static class EvilPlaceholderBuilder implements PlaceholderBuilder {
+	public static class EvilBuilder implements PlaceholderBuilder, StyleBuilder {
 
 		@Override
 		public String getName() {
@@ -188,6 +247,11 @@ class FormatPatternParserTest {
 
 		@Override
 		public Placeholder create(Framework framework, String value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Placeholder create(Framework framework, Placeholder placeholder, String value) {
 			throw new UnsupportedOperationException();
 		}
 
