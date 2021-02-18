@@ -1,6 +1,7 @@
 package org.tinylog.impl.writer;
 
 import java.io.PrintStream;
+import java.time.Instant;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -16,6 +17,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
+import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -64,10 +66,37 @@ class ConsoleWriterBuilderTest {
 	}
 
 	/**
-	 * Verifies that a new line will be appended to the format pattern automatically.
+	 * Verifies that the default format pattern will be used, if no custom format pattern is set.
 	 */
 	@Test
-	void appendNewLineToPattern() throws Exception {
+	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+	void defaultPattern() throws Exception {
+		Map<String, String> configuration = ImmutableMap.of("threshold", "off");
+		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
+		try {
+			LogEntry logEntry = new LogEntryBuilder()
+				.timestamp(Instant.EPOCH)
+				.thread(new Thread(() -> { }, "main"))
+				.severityLevel(Level.INFO)
+				.className("org.MyClass")
+				.methodName("foo")
+				.message("Hello World!")
+				.create();
+
+			writer.log(logEntry);
+
+			verify(mockedOutputStream)
+				.print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
+		} finally {
+			writer.close();
+		}
+	}
+
+	/**
+	 * Verifies that a new line will be appended to a custom format pattern automatically.
+	 */
+	@Test
+	void appendNewLineToCustomPattern() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "off");
 		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
 		try {

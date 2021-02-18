@@ -14,6 +14,9 @@ import org.tinylog.impl.format.placeholder.Placeholder;
  */
 public class ConsoleWriterBuilder implements WriterBuilder {
 
+	private static final String DEFAULT_PATTERN =
+		"{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
+
 	private static final Level DEFAULT_THRESHOLD = Level.WARN;
 
 	/** */
@@ -27,7 +30,7 @@ public class ConsoleWriterBuilder implements WriterBuilder {
 
 	@Override
 	public Writer create(Framework framework, Map<String, String> configuration) {
-		String pattern = configuration.get("pattern") + System.lineSeparator();
+		String pattern = configuration.getOrDefault("pattern", DEFAULT_PATTERN) + System.lineSeparator();
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 
 		String threshold = configuration.get("threshold");
