@@ -60,7 +60,7 @@ public abstract class AbstractParameterizedExtension extends AbstractExtension i
 	 * Sets the passed value to all fields with {@link javax.inject.Inject} annotation and matching value type.
 	 *
 	 * @param context The current extension context
-	 * @param value The value to inject (must be not {@code null})
+	 * @param value The value to inject (must not be {@code null})
 	 * @param <T> The value type
 	 * @throws IllegalAccessException Failed to set the value
 	 */
