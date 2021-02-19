@@ -132,7 +132,7 @@ public class FormatPatternParser extends AbstractPatternParser {
 	 *
 	 * <p>
 	 *     Example:
-	 *     <pre><code>"class-name | min-size:8 | max-size:8" -> ["class-name", "min-size:8", "max-size:8"]</code></pre>
+	 *     <pre><code>"class | min-length:8 | max-length:8" -> ["class", "min-length:8", "max-length:8"]</code></pre>
 	 * </p>
 	 *
 	 * @param pattern The format pattern to split

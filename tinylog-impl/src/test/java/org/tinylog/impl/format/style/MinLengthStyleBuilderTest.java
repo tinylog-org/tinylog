@@ -58,7 +58,7 @@ class MinLengthStyleBuilderTest {
 	}
 
 	/**
-	 * Verifies that a configuration value with an illegal minimum size is rejected.
+	 * Verifies that a configuration value with an illegal minimum length is rejected.
 	 */
 	@Test
 	void creationWithInvalidMinLength() {

@@ -79,7 +79,7 @@ class MaxLengthStyleBuilderTest {
 	}
 
 	/**
-	 * Verifies that a configuration value with an illegal maximum size is rejected.
+	 * Verifies that a configuration value with an illegal maximum length is rejected.
 	 */
 	@Test
 	void creationWithInvalidMaxLength() {
