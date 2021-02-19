@@ -25,12 +25,25 @@ public class MaxLengthStyleBuilder implements StyleBuilder {
 	public Placeholder create(Framework framework, Placeholder placeholder, String value) {
 		if (value == null) {
 			throw new IllegalArgumentException("Maximum length is not defined for max length style");
-		} else if (placeholder instanceof ClassPlaceholder) {
-			return new MaxPackageLengthStyle(placeholder, parseMaxLength(value.trim()));
-		} else if (placeholder instanceof PackagePlaceholder) {
-			return new MaxPackageLengthStyle(placeholder, parseMaxLength(value.trim()));
 		} else {
-			return new MaxTextLengthStyle(placeholder, parseMaxLength(value.trim()));
+			return create(placeholder, parseMaxLength(value.trim()));
+		}
+	}
+
+	/**
+	 * Applies a {@link AbstractMaxLengthStyle maximum length style wrapper} to a placeholder.
+	 *
+	 * @param placeholder The actual placeholder to style
+	 * @param maxLength The maximum length for the placeholder's output
+	 * @return The styled placeholder
+	 */
+	public static Placeholder create(Placeholder placeholder, int maxLength) {
+		if (placeholder instanceof ClassPlaceholder) {
+			return new MaxPackageLengthStyle(placeholder, maxLength);
+		} else if (placeholder instanceof PackagePlaceholder) {
+			return new MaxPackageLengthStyle(placeholder, maxLength);
+		} else {
+			return new MaxTextLengthStyle(placeholder, maxLength);
 		}
 	}
 
