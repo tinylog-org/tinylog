@@ -70,7 +70,8 @@ final class AndroidRuntime implements RuntimeDialect {
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		return getCallerStackTraceElement(loggerClassName).getClassName();
+		StackTraceElement element = getCallerStackTraceElement(loggerClassName);
+		return element == null ? null : element.getClassName();
 	}
 
 	@Override
@@ -89,12 +90,7 @@ final class AndroidRuntime implements RuntimeDialect {
 			}
 		}
 
-		StackTraceElement element = findStackTraceElement(loggerClassName, new Throwable().getStackTrace());
-		if (element == null) {
-			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
-		} else {
-			return element;
-		}
+		return findStackTraceElement(loggerClassName, new Throwable().getStackTrace());
 	}
 
 	@Override

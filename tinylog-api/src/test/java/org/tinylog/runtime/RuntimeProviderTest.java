@@ -18,8 +18,11 @@ import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
+import org.tinylog.Logger;
+import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +32,12 @@ import static org.mockito.Mockito.mock;
  * Tests for {@link RuntimeProvider}.
  */
 public final class RuntimeProviderTest {
+
+	/**
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	private String runtime;
 	private String version;
@@ -158,6 +167,16 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
+	 * Verifies that pre-filled {@link StackTraceElement} will be returned, if stack trace does not contain the expected
+	 * successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerClassName() {
+		assertThat(RuntimeProvider.getCallerClassName(Logger.class.getName())).isEqualTo("<unknown class>");
+		assertThat(systemStream.consumeErrorOutput()).contains(Logger.class.getName(), "missing");
+	}
+
+	/**
 	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
 	 * defined as index.
 	 */
@@ -192,6 +211,18 @@ public final class RuntimeProviderTest {
 				assertThat(fetchedElement.getLineNumber()).isEqualTo(currentElement.getLineNumber() + 1);
 			}
 		};
+	}
+
+	/**
+	 * Verifies that pre-filled {@link StackTraceElement} will be returned, if stack trace does not contain the expected
+	 * successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerStackTraceElement() {
+		assertThat(RuntimeProvider.getCallerStackTraceElement(Logger.class.getName())).isEqualTo(
+			new StackTraceElement("<unknown class>", "<unknown method>", "<unknown file>", -1)
+		);
+		assertThat(systemStream.consumeErrorOutput()).contains(Logger.class.getName(), "missing");
 	}
 
 	/**

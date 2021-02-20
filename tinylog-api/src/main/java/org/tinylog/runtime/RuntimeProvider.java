@@ -16,6 +16,9 @@ package org.tinylog.runtime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.tinylog.Level;
+import org.tinylog.provider.InternalLogger;
+
 /**
  * Provider for getting runtime specific data from Virtual Machine.
  */
@@ -99,7 +102,14 @@ public final class RuntimeProvider {
 	 * @return Fully-qualified class name of caller
 	 */
 	public static String getCallerClassName(final String loggerClassName) {
-		return stripAnonymousPart(dialect.getCallerClassName(loggerClassName));
+		String callerClassName = dialect.getCallerClassName(loggerClassName);
+
+		if (callerClassName == null) {
+			InternalLogger.log(Level.ERROR, "Logger class \"" + loggerClassName + "\" is missing in stack trace");
+			return "<unknown class>";
+		} else {
+			return stripAnonymousPart(callerClassName);
+		}
 	}
 
 	/**
@@ -123,7 +133,14 @@ public final class RuntimeProvider {
 	 * @return Stack trace element of a caller
 	 */
 	public static StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
-		return normalizeClassName(dialect.getCallerStackTraceElement(loggerClassName));
+		StackTraceElement element = dialect.getCallerStackTraceElement(loggerClassName);
+
+		if (element == null) {
+			InternalLogger.log(Level.ERROR, "Logger class \"" + loggerClassName + "\" is missing in stack trace");
+			return new StackTraceElement("<unknown class>", "<unknown method>", "<unknown file>", -1);
+		} else {
+			return normalizeClassName(element);
+		}
 	}
 
 	/**

@@ -58,22 +58,26 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final int depth) {
-		return StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth)).getClassName();
+		StackFrame frame = StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth));
+		return frame == null ? null : frame.getClassName();
 	}
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		return StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName)).getClassName();
+		StackFrame frame = StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName));
+		return frame == null ? null : frame.getClassName();
 	}
 
 	@Override
 	public StackTraceElement getCallerStackTraceElement(final int depth) {
-		return StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth)).toStackTraceElement();
+		StackFrame frame = StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth));
+		return frame == null ? null : frame.toStackTraceElement();
 	}
 
 	@Override
 	public StackTraceElement getCallerStackTraceElement(final String loggerClassName) {
-		return StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName)).toStackTraceElement();
+		StackFrame frame = StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName));
+		return frame == null ? null : frame.toStackTraceElement();
 	}
 
 	@Override
@@ -118,7 +122,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 		@Override
 		public StackFrame apply(final Stream<StackFrame> stream) {
-			return stream.skip(index).findFirst().get();
+			return stream.skip(index).findFirst().orElse(null);
 		}
 
 	}
@@ -156,7 +160,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 				}
 			}
 
-			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
+			return null;
 		}
 	}
 	

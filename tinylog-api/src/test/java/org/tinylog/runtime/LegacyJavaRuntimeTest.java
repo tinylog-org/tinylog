@@ -31,7 +31,6 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -144,6 +143,15 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerClassName() {
+		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
+		assertThat(runtime.getCallerClassName(Logger.class.getName())).isNull();
+	}
+
+	/**
 	 * Verifies that the fully-qualified class name of a caller can be returned, if {@link sun.reflect.Reflection} is
 	 * not available.
 	 */
@@ -174,15 +182,12 @@ public final class LegacyJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
 	 */
 	@Test
 	public void missingSuccessorForCallerStackTraceElement() {
 		LegacyJavaRuntime runtime = new LegacyJavaRuntime();
-
-		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining(Logger.class.getName());
+		assertThat(runtime.getCallerStackTraceElement(Logger.class.getName())).isNull();
 	}
 
 	/**

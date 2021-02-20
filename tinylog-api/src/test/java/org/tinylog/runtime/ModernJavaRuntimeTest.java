@@ -21,7 +21,6 @@ import org.tinylog.Logger;
 import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link ModernJavaRuntime}.
@@ -91,6 +90,15 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForCallerClassName() {
+		ModernJavaRuntime runtime = new ModernJavaRuntime();
+		assertThat(runtime.getCallerClassName(Logger.class.getName())).isNull();
+	}
+
+	/**
 	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
 	 * defined as index.
 	 */
@@ -110,15 +118,12 @@ public final class ModernJavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
 	 */
 	@Test
 	public void missingSuccessorForCallerStackTraceElement() {
 		ModernJavaRuntime runtime = new ModernJavaRuntime();
-
-		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining(Logger.class.getName());
+		assertThat(runtime.getCallerStackTraceElement(Logger.class.getName())).isNull();
 	}
 
 	/**

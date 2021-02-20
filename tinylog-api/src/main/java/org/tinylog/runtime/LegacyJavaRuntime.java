@@ -75,7 +75,8 @@ public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		return getCallerStackTraceElement(loggerClassName).getClassName();
+		StackTraceElement element = getCallerStackTraceElement(loggerClassName);
+		return element == null ? null : element.getClassName();
 	}
 
 	@Override
@@ -109,7 +110,7 @@ public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 		if (index < trace.length) {
 			return trace[index];
 		} else {
-			throw new IllegalStateException("Logger class \"" + loggerClassName + "\" is missing in stack trace");
+			return null;
 		}
 	}
 

@@ -37,7 +37,6 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.TimestampFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.tinylog.assertions.Assertions.assertThat;
@@ -151,6 +150,20 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
+	 */
+	@Test
+	public void missingSuccessorForClassName() {
+		AndroidRuntime runtime = new AndroidRuntime();
+
+		Method method = Whitebox.getMethod(AndroidRuntimeTest.class, "fillStackTraceElements", Thread.class, StackTraceElement[].class);
+		Whitebox.setInternalState(runtime, Method.class, method);
+		Whitebox.setInternalState(runtime, int.class, 5);
+
+		assertThat(runtime.getCallerClassName(Logger.class.getName())).isNull();
+	}
+
+	/**
 	 * Verifies that the complete stack trace element of a caller will be returned correctly, if depth in stack trace is
 	 * defined as index.
 	 */
@@ -181,7 +194,7 @@ public final class AndroidRuntimeTest {
 	}
 
 	/**
-	 * Verifies that an exception will be thrown, if stack trace does not contain the expected successor.
+	 * Verifies that {@code null} will be returned, if stack trace does not contain the expected successor.
 	 */
 	@Test
 	public void missingSuccessorForCallerStackTraceElement() {
@@ -191,9 +204,7 @@ public final class AndroidRuntimeTest {
 		Whitebox.setInternalState(runtime, Method.class, method);
 		Whitebox.setInternalState(runtime, int.class, 5);
 
-		assertThatThrownBy(() -> runtime.getCallerStackTraceElement(Logger.class.getName()))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining(Logger.class.getName());
+		assertThat(runtime.getCallerStackTraceElement(Logger.class.getName())).isNull();
 	}
 
 	/**
