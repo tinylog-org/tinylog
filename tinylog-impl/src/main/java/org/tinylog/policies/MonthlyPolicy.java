@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Martin Winandy
+ * Copyright 2021 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -16,12 +16,12 @@ package org.tinylog.policies;
 import java.util.Calendar;
 
 /**
- * Policy for triggering a rollover every day at a define time. The default time is 00:00.
+ * Policy for triggering a rollover every month at a define time. The default time is 00:00.
  */
-public final class DailyPolicy extends AbstractDatePolicy {
+public class MonthlyPolicy extends AbstractDatePolicy {
 
 	/** */
-	public DailyPolicy() {
+	public MonthlyPolicy() {
 		this(null);
 	}
 
@@ -29,12 +29,13 @@ public final class DailyPolicy extends AbstractDatePolicy {
 	 * @param argument
 	 *            Time for starting new log file (e.g. "23:30")
 	 */
-	public DailyPolicy(final String argument) {
-		super("daily policy", argument);
+	public MonthlyPolicy(final String argument) {
+		super("monthly policy", argument);
 	}
 
 	@Override
 	protected void truncate(final Calendar calendar, final int hourOfDay, final int minuteOfHour) {
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		calendar.set(Calendar.MINUTE, minuteOfHour);
 		calendar.set(Calendar.SECOND, 0);
@@ -43,12 +44,12 @@ public final class DailyPolicy extends AbstractDatePolicy {
 
 	@Override
 	protected void scrollBack(final Calendar calendar) {
-		calendar.add(Calendar.DATE, -1);
+		calendar.add(Calendar.MONTH, -1);
 	}
 
 	@Override
 	protected void scrollAhead(final Calendar calendar) {
-		calendar.add(Calendar.DATE, 1);
+		calendar.add(Calendar.MONTH, 1);
 	}
 
 }

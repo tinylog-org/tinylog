@@ -17,6 +17,7 @@ module org.tinylog.impl {
 
 	provides org.tinylog.policies.Policy with
 			org.tinylog.policies.DailyPolicy,
+			org.tinylog.policies.MonthlyPolicy,
 			org.tinylog.policies.StartupPolicy,
 			org.tinylog.policies.SizePolicy;
 
