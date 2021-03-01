@@ -54,6 +54,8 @@ public class FileWriter implements AsyncWriter {
 		this.chunk = new byte[CHUNK_CAPACITY];
 		this.chunkMaxSize = CHUNK_CAPACITY - (int) (this.file.length() % CHUNK_CAPACITY);
 		this.chunkSize = 0;
+
+		this.file.seek(this.file.length());
 	}
 
 	@Override

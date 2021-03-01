@@ -52,6 +52,24 @@ class FileWriterTest {
 	}
 
 	/**
+	 * Verifies that an already existing file is continued and not overwritten.
+	 */
+	@Test
+	void appendExistingFile() throws IOException {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
+			writer.log(entry);
+		}
+
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+			LogEntry entry = new LogEntryBuilder().message("Goodbye.").create();
+			writer.log(entry);
+		}
+
+		assertThat(logFile).hasContent("Hello World!Goodbye.");
+	}
+
+	/**
 	 * Verifies that a single short string (smaller than the used buffer) is written to the log file.
 	 */
 	@Test
