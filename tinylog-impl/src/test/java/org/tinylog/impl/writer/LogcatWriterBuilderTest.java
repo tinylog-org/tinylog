@@ -80,12 +80,9 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap());
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap())) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, null, "Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -101,12 +98,9 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, "foo", "Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -122,12 +116,9 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, "12345678901234567890...", "Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -143,12 +134,9 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("message-pattern", "{class-name}: {message}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, null, "MyClass: Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -181,11 +169,8 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap());
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap())) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			Pattern pattern = Pattern.compile("\\W+I\\W+Hello World!$");
@@ -204,11 +189,8 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 			Pattern pattern = Pattern.compile("\\W+I\\W+foo\\W+Hello World!$");
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
@@ -226,11 +208,8 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			Pattern pattern = Pattern.compile("\\W+I\\W+12345678901234567890\\.\\.\\.\\W+Hello World!$");
@@ -249,11 +228,8 @@ class LogcatWriterBuilderTest {
 				.create();
 
 			Map<String, String> configuration = ImmutableMap.of("message-pattern", "{class-name}: {message}");
-			Writer writer = new LogcatWriterBuilder().create(framework, configuration);
-			try {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			Pattern pattern = Pattern.compile("\\W+I\\W+MyClass: Hello World!$");

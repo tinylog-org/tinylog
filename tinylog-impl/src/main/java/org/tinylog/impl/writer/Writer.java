@@ -18,7 +18,7 @@ import org.tinylog.impl.LogEntryValue;
  *     Alternately, the interface {@link AsyncWriter} can be used for outputting log entries asynchronously.
  * </p>
  */
-public interface Writer {
+public interface Writer extends AutoCloseable {
 
 	/**
 	 * Returns a set with all required log entry properties used by this writer.
@@ -59,6 +59,7 @@ public interface Writer {
 	 *
 	 * @throws Exception Any exception can be thrown, if closing of resources fails
 	 */
+	@Override
 	void close() throws Exception;
 
 }

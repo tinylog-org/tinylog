@@ -72,8 +72,7 @@ class ConsoleWriterBuilderTest {
 	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 	void defaultPattern() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("threshold", "off");
-		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
-		try {
+		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			LogEntry logEntry = new LogEntryBuilder()
 				.timestamp(Instant.EPOCH)
 				.thread(new Thread(() -> { }, "main"))
@@ -87,8 +86,6 @@ class ConsoleWriterBuilderTest {
 
 			verify(mockedOutputStream)
 				.print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -98,12 +95,9 @@ class ConsoleWriterBuilderTest {
 	@Test
 	void appendNewLineToCustomPattern() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "off");
-		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
-		try {
+		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
 			verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -113,15 +107,12 @@ class ConsoleWriterBuilderTest {
 	@Test
 	void defaultSeverityLevelThreshold() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}");
-		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
-		try {
+		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
 			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
 			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -131,15 +122,12 @@ class ConsoleWriterBuilderTest {
 	@Test
 	void customSeverityLevelThreshold() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "error");
-		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
-		try {
+		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
 			writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello system err!").create());
 			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -150,15 +138,12 @@ class ConsoleWriterBuilderTest {
 	@Test
 	void illegalSeverityLevelThreshold() throws Exception {
 		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "foo");
-		Writer writer = new ConsoleWriterBuilder().create(framework, configuration);
-		try {
+		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
 			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
 			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		} finally {
-			writer.close();
 		}
 
 		assertThat(log.consume()).anySatisfy(entry -> {

@@ -55,12 +55,9 @@ class ConsoleWriterTest {
 	 */
 	@Test
 	void requiredLogEntryValues() {
-		ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN);
-		try {
+		try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
 			assertThat(writer.getRequiredLogEntryValues())
 				.containsExactlyInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -69,8 +66,7 @@ class ConsoleWriterTest {
 	 */
 	@Test
 	void logging() {
-		ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN);
-		try {
+		try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.TRACE).message("Hello Trace!").create());
 			verify(mockedOutputStream).print("Hello Trace!");
 
@@ -85,8 +81,6 @@ class ConsoleWriterTest {
 
 			writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello Error!").create());
 			verify(mockedErrorStream).print("Hello Error!");
-		} finally {
-			writer.close();
 		}
 	}
 

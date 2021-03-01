@@ -45,12 +45,9 @@ class FileWriterTest {
 	 */
 	@Test
 	void requiredLogEntryValues() throws IOException {
-		FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8);
-		try {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			assertThat(writer.getRequiredLogEntryValues())
 				.containsExactlyInAnyOrder(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
-		} finally {
-			writer.close();
 		}
 	}
 
@@ -59,12 +56,9 @@ class FileWriterTest {
 	 */
 	@Test
 	void writeSingleShortMessage() throws IOException {
-		FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8);
-		try {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
-		} finally {
-			writer.close();
 		}
 
 		assertThat(logFile).hasContent("Hello World!");
@@ -75,15 +69,12 @@ class FileWriterTest {
 	 */
 	@Test
 	void writeMultipleShortMessage() throws IOException {
-		FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8);
-		try {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
 
 			entry = new LogEntryBuilder().message("Goodbye.").create();
 			writer.log(entry);
-		} finally {
-			writer.close();
 		}
 
 		assertThat(logFile).hasContent("Hello World!Goodbye.");
@@ -99,12 +90,9 @@ class FileWriterTest {
 			builder.append(i % 10);
 		}
 
-		FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8);
-		try {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			LogEntry entry = new LogEntryBuilder().message(builder.toString()).create();
 			writer.log(entry);
-		} finally {
-			writer.close();
 		}
 
 		assertThat(logFile).hasContent(builder.toString());
@@ -131,8 +119,7 @@ class FileWriterTest {
 
 		String fourth = ">";
 
-		FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8);
-		try {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			LogEntry entry = new LogEntryBuilder().message(first).create();
 			writer.log(entry);
 
@@ -144,8 +131,6 @@ class FileWriterTest {
 
 			entry = new LogEntryBuilder().message(fourth).create();
 			writer.log(entry);
-		} finally {
-			writer.close();
 		}
 
 		assertThat(logFile).hasContent(first + second + third + fourth);

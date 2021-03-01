@@ -50,15 +50,12 @@ class LogcatWriterTest {
 		 */
 		@Test
 		void untaggedRequiredLogEntryValues() {
-			LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
 				assertThat(writer.getRequiredLogEntryValues()).containsExactlyInAnyOrder(
 					LogEntryValue.LEVEL,
 					LogEntryValue.MESSAGE,
 					LogEntryValue.EXCEPTION
 				);
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -68,16 +65,13 @@ class LogcatWriterTest {
 		 */
 		@Test
 		void taggedRequiredLogEntryValues() {
-			LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder())) {
 				assertThat(writer.getRequiredLogEntryValues()).containsExactlyInAnyOrder(
 					LogEntryValue.LEVEL,
 					LogEntryValue.CLASS,
 					LogEntryValue.MESSAGE,
 					LogEntryValue.EXCEPTION
 				);
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -123,12 +117,9 @@ class LogcatWriterTest {
 				.message("Hello World!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(androidPriority, null, "Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -148,12 +139,9 @@ class LogcatWriterTest {
 				.message("Hello World!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder())) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(androidPriority, "MyClass", "Hello World!"));
-			} finally {
-				writer.close();
 			}
 		}
 
@@ -167,12 +155,9 @@ class LogcatWriterTest {
 				.message("Hello Hell!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
 				writer.log(logEntry);
 				logMock.verifyNoInteractions();
-			} finally {
-				writer.close();
 			}
 
 			assertThat(log.consume()).anySatisfy(entry -> {
@@ -215,11 +200,8 @@ class LogcatWriterTest {
 				.message("Hello World!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			Pattern pattern = Pattern.compile("\\W+" + androidPriority + "\\W+Hello World!$");
@@ -242,11 +224,8 @@ class LogcatWriterTest {
 				.message("Hello World!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder())) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			Pattern pattern = Pattern.compile("\\W+" + androidPriority + "\\W+MyClass\\W+Hello World!$");
@@ -263,11 +242,8 @@ class LogcatWriterTest {
 				.message("Hello Hell!")
 				.create();
 
-			LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder());
-			try {
+			try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
 				writer.log(logEntry);
-			} finally {
-				writer.close();
 			}
 
 			assertThat(logcat.fetchOutput()).noneSatisfy(line -> assertThat(line).contains("Hello Hell!"));
