@@ -25,6 +25,7 @@
 
     <modules>
         <module>tinylog-api</module>
+        <module>tinylog-benchmarks</module>
         <module>tinylog-core</module>
         <module>tinylog-core-base</module>
         <module>tinylog-core-modern</module>
@@ -149,6 +150,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>3.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>1.28</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
