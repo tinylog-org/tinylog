@@ -25,6 +25,7 @@ import org.tinylog.impl.format.style.MinLengthStyleBuilder;
 import org.tinylog.impl.format.style.StyleBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
 import org.tinylog.impl.writer.ConsoleWriterBuilder;
+import org.tinylog.impl.writer.FileWriterBuilder;
 import org.tinylog.impl.writer.LogcatWriterBuilder;
 
 module org.tinylog.impl {
@@ -62,6 +63,7 @@ module org.tinylog.impl {
 	uses WriterBuilder;
 	provides WriterBuilder with
 		ConsoleWriterBuilder,
+		FileWriterBuilder,
 		LogcatWriterBuilder;
 
 	exports org.tinylog.impl;
