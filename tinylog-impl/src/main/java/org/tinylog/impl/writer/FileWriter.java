@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -47,7 +48,9 @@ public class FileWriter implements AsyncWriter {
 
 		this.placeholder = placeholder;
 		this.file = new RandomAccessFile(file.toString(), "rw");
-		this.encoder = charset.newEncoder();
+		this.encoder = charset.newEncoder()
+				.onUnmappableCharacter(CodingErrorAction.REPLACE)
+				.onMalformedInput(CodingErrorAction.REPLACE);
 
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 

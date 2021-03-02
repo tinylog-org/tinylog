@@ -154,4 +154,17 @@ class FileWriterTest {
 		assertThat(logFile).hasContent(first + second + third + fourth);
 	}
 
+	/**
+	 * Verifies that a character that is not supported by the passed charset is replaced by a question mark ("?").
+	 */
+	@Test
+	void writeUnsupportedCharacter() throws IOException {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.US_ASCII)) {
+			LogEntry entry = new LogEntryBuilder().message("<ä>").create();
+			writer.log(entry);
+		}
+
+		assertThat(logFile).hasContent("<?>");
+	}
+
 }
