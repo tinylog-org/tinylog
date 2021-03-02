@@ -213,6 +213,11 @@
                 <artifactId>tinylog-core-modern</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.tinylog</groupId>
+                <artifactId>tinylog-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -268,7 +273,7 @@
                     <version>4.2.1</version>
                     <extensions>true</extensions>
                     <configuration>
-                         <instructions>
+                        <instructions>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
                             <_exportcontents>!META-INF.versions.9,*</_exportcontents>
                             <_fixupmessages>"*META-INF/versions/9*"</_fixupmessages>
