@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>tinylog-benchmarks</artifactId>
+    <artifactId>benchmarks</artifactId>
 
     <description>Performance benchmarks for tinylog and other logging frameworks</description>
     <url>${website.url}</url>

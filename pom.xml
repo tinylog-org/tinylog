@@ -24,8 +24,8 @@
     </properties>
 
     <modules>
+        <module>benchmarks</module>
         <module>tinylog-api</module>
-        <module>tinylog-benchmarks</module>
         <module>tinylog-core</module>
         <module>tinylog-core-base</module>
         <module>tinylog-core-modern</module>
