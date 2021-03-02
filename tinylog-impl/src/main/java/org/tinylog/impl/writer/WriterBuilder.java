@@ -38,7 +38,8 @@ public interface WriterBuilder {
 	 * @param framework The actual logging framework instance
 	 * @param configuration The configuration properties for the new writer instance
 	 * @return New instance of the writer
+	 * @throws Exception Failed to create a new writer for the passed configuration
 	 */
-	Writer create(Framework framework, Map<String, String> configuration);
+	Writer create(Framework framework, Map<String, String> configuration) throws Exception;
 
 }
