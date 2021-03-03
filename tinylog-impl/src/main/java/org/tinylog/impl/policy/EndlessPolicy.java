@@ -12,12 +12,12 @@ public class EndlessPolicy implements Policy {
 	}
 
 	@Override
-	public boolean canContinueFile(Path path) {
+	public boolean canContinueFile(Path file) {
 		return true;
 	}
 
 	@Override
-	public void init(Path path) {
+	public void init(Path file) {
 		// Ignore
 	}
 

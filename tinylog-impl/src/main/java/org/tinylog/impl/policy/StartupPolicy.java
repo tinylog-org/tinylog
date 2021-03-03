@@ -13,12 +13,12 @@ public class StartupPolicy implements Policy {
 	}
 
 	@Override
-	public boolean canContinueFile(Path path) {
+	public boolean canContinueFile(Path file) {
 		return false;
 	}
 
 	@Override
-	public void init(Path path) {
+	public void init(Path file) {
 		// Ignore
 	}
 
