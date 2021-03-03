@@ -23,6 +23,7 @@ import org.tinylog.impl.format.style.LengthStyleBuilder;
 import org.tinylog.impl.format.style.MaxLengthStyleBuilder;
 import org.tinylog.impl.format.style.MinLengthStyleBuilder;
 import org.tinylog.impl.format.style.StyleBuilder;
+import org.tinylog.impl.policy.PolicyBuilder;
 import org.tinylog.impl.writer.WriterBuilder;
 import org.tinylog.impl.writer.ConsoleWriterBuilder;
 import org.tinylog.impl.writer.FileWriterBuilder;
@@ -60,6 +61,8 @@ module org.tinylog.impl {
 		MaxLengthStyleBuilder,
 		MinLengthStyleBuilder;
 
+	uses PolicyBuilder;
+
 	uses WriterBuilder;
 	provides WriterBuilder with
 		ConsoleWriterBuilder,
@@ -70,5 +73,6 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.format;
 	exports org.tinylog.impl.format.placeholder;
 	exports org.tinylog.impl.format.style;
+	exports org.tinylog.impl.policy;
 	exports org.tinylog.impl.writer;
 }
