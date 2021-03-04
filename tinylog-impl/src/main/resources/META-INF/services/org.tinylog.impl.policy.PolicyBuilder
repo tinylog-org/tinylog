@@ -1,1 +1,2 @@
+org.tinylog.impl.policy.SizePolicyBuilder
 org.tinylog.impl.policy.StartupPolicyBuilder
