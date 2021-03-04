@@ -85,7 +85,7 @@ class TaggedLoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isTraceEnabled(boolean visible, boolean enabled) {
 			when(backend.getLevelVisibility("test")).thenReturn(
 				new LevelVisibility(visible, false, false, false, false)
@@ -104,7 +104,7 @@ class TaggedLoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isDebugEnabled(boolean visible, boolean enabled) {
 			when(backend.getLevelVisibility("test")).thenReturn(
 				new LevelVisibility(true, visible, false, false, false)
@@ -123,7 +123,7 @@ class TaggedLoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isInfoEnabled(boolean visible, boolean enabled) {
 			when(backend.getLevelVisibility("test")).thenReturn(
 				new LevelVisibility(true, true, visible, false, false)
@@ -142,7 +142,7 @@ class TaggedLoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isWarnEnabled(boolean visible, boolean enabled) {
 			when(backend.getLevelVisibility("test")).thenReturn(
 				new LevelVisibility(true, true, true, visible, false)
@@ -161,7 +161,7 @@ class TaggedLoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isErrorEnabled(boolean visible, boolean enabled) {
 			when(backend.getLevelVisibility("test")).thenReturn(
 				new LevelVisibility(true, true, true, true, visible)

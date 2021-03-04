@@ -143,7 +143,7 @@ class LoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isTraceEnabled(boolean visible, boolean enabled) {
 			when(visibility.isTraceEnabled()).thenReturn(visible);
 			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled);
@@ -158,7 +158,7 @@ class LoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isDebugEnabled(boolean visible, boolean enabled) {
 			when(visibility.isDebugEnabled()).thenReturn(visible);
 			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled);
@@ -173,7 +173,7 @@ class LoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isInfoEnabled(boolean visible, boolean enabled) {
 			when(visibility.isInfoEnabled()).thenReturn(visible);
 			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled);
@@ -188,7 +188,7 @@ class LoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isWarnEnabled(boolean visible, boolean enabled) {
 			when(visibility.isWarnEnabled()).thenReturn(visible);
 			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled);
@@ -203,7 +203,7 @@ class LoggerTest {
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
 		 */
 		@ParameterizedTest
-		@CsvSource(value = {"false,false", "false,true", "true,false", "true,true"})
+		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
 		void isErrorEnabled(boolean visible, boolean enabled) {
 			when(visibility.isErrorEnabled()).thenReturn(visible);
 			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled);
