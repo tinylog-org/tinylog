@@ -13,16 +13,12 @@
 
 package org.tinylog.benchmarks.logging.tinylog2;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.AbstractLifeCycle;
 import org.tinylog.benchmarks.logging.LocationInfo;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.provider.ProviderRegistry;
@@ -31,7 +27,7 @@ import org.tinylog.provider.ProviderRegistry;
  * Life cycle for initializing and shutting down tinylog.
  */
 @State(Scope.Benchmark)
-public class LifeCycle {
+public class LifeCycle extends AbstractLifeCycle {
 
 	@Param
 	private LocationInfo locationInfo;
@@ -39,23 +35,14 @@ public class LifeCycle {
 	@Param({"false", "true"})
 	private boolean async;
 
-	private Path file;
-
 	/**
 	 *
 	 */
 	public LifeCycle() {
 	}
 
-	/**
-	 * Initializes tinylog.
-	 *
-	 * @throws IOException Failed creating temporary log file
-	 */
-	@Setup(Level.Trial)
-	public void init() throws IOException {
-		file = Files.createTempFile("tinylog2_", ".log");
-
+	@Override
+	protected void init(final Path file) {
 		Configuration.set("autoshutdown", "false");
 		Configuration.set("level", "info");
 		Configuration.set("writer", "file");
@@ -73,16 +60,9 @@ public class LifeCycle {
 		Configuration.set("writingthread", Boolean.toString(async));
 	}
 
-	/**
-	 * Shuts down tinylog.
-	 *
-	 * @throws InterruptedException Interrupted while waiting for complete shutdown
-	 * @throws IOException          Failed to delete log file
-	 */
-	@TearDown(Level.Trial)
-	public void shutDown() throws InterruptedException, IOException {
+	@Override
+	protected void shutDown() throws InterruptedException {
 		ProviderRegistry.getLoggingProvider().shutdown();
-		Files.delete(file);
 	}
 
 }

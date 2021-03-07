@@ -13,17 +13,13 @@
 
 package org.tinylog.benchmarks.logging.logback;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
 import org.slf4j.LoggerFactory;
+import org.tinylog.benchmarks.logging.AbstractLifeCycle;
 import org.tinylog.benchmarks.logging.LocationInfo;
 
 import ch.qos.logback.classic.AsyncAppender;
@@ -39,7 +35,7 @@ import ch.qos.logback.core.util.FileSize;
  * Life cycle for initializing and shutting down Logback.
  */
 @State(Scope.Benchmark)
-public class LifeCycle {
+public class LifeCycle extends AbstractLifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
@@ -51,7 +47,6 @@ public class LifeCycle {
 
 	private LoggerContext context;
 	private Logger logger;
-	private Path file;
 	private Appender<ILoggingEvent> appender;
 
 	/**
@@ -60,19 +55,12 @@ public class LifeCycle {
 	public LifeCycle() {
 	}
 
-	/**
-	 * Initializes Logback.
-	 *
-	 * @throws IOException Failed creating temporary log file
-	 */
-	@Setup(Level.Trial)
-	public void init() throws IOException {
+	@Override
+	protected void init(final Path file) {
 		context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
 		logger = context.getLogger(LogbackBenchmark.class);
 		logger.setLevel(ch.qos.logback.classic.Level.INFO);
-
-		file = Files.createTempFile("logback_", ".log");
 
 		appender = async ? createAsyncAppender(file.toString()) : createFileAppender(file.toString());
 		appender.start();
@@ -90,16 +78,10 @@ public class LifeCycle {
 		return logger;
 	}
 
-	/**
-	 * Shuts down Logback.
-	 *
-	 * @throws IOException Failed to delete log file
-	 */
-	@TearDown(Level.Trial)
-	public void release() throws IOException {
+	@Override
+	protected void shutDown() {
 		appender.stop();
 		context.stop();
-		Files.delete(file);
 	}
 
 	/**

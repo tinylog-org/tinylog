@@ -14,24 +14,21 @@
 package org.tinylog.benchmarks.logging.jul;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.AbstractLifeCycle;
 import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down java.util.logging.
  */
 @State(Scope.Benchmark)
-public class LifeCycle {
+public class LifeCycle extends AbstractLifeCycle {
 
 	@Param
 	private LocationInfo locationInfo;
@@ -46,15 +43,9 @@ public class LifeCycle {
 	public LifeCycle() {
 	}
 
-	/**
-	 * Initializes java.util.logging.
-	 *
-	 * @throws IOException Failed creating temporary log file
-	 */
-	@Setup(Level.Trial)
-	public void init() throws IOException {
+	@Override
+	protected void init(final Path file) throws IOException {
 		logger = Logger.getLogger(JulBenchmark.class.getName());
-		file = Files.createTempFile("jul_", ".log");
 		handler = new FileHandler(file.toString(), false);
 		handler.setFormatter(new SimpleFormatter(locationInfo));
 		logger.addHandler(handler);
@@ -71,16 +62,10 @@ public class LifeCycle {
 		return logger;
 	}
 
-	/**
-	 * Shuts down java.util.logging.
-	 *
-	 * @throws IOException Failed to delete log file
-	 */
-	@TearDown(Level.Trial)
-	public void release() throws IOException {
+	@Override
+	protected void shutDown() {
 		handler.close();
 		logger.removeHandler(handler);
-		Files.delete(file);
 	}
 
 }

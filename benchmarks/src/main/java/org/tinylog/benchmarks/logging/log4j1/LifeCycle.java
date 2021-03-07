@@ -14,7 +14,6 @@
 package org.tinylog.benchmarks.logging.log4j1;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.log4j.Appender;
@@ -23,19 +22,17 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.AbstractLifeCycle;
 import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down Log4j.
  */
 @State(Scope.Benchmark)
-public class LifeCycle {
+public class LifeCycle extends AbstractLifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
@@ -55,14 +52,8 @@ public class LifeCycle {
 	public LifeCycle() {
 	}
 
-	/**
-	 * Initializes Log4j.
-	 *
-	 * @throws IOException Failed creating temporary log file or appender
-	 */
-	@Setup(Level.Trial)
-	public void init() throws IOException {
-		file = Files.createTempFile("log4j1_", ".log");
+	@Override
+	protected void init(final Path file) throws IOException {
 		appender = createAppender(file.toString());
 
 		logger = Logger.getLogger(Log4j1Benchmark.class);
@@ -80,15 +71,9 @@ public class LifeCycle {
 		return logger;
 	}
 
-	/**
-	 * Shuts down Log4j.
-	 *
-	 * @throws IOException Failed to delete log file
-	 */
-	@TearDown(Level.Trial)
-	public void release() throws IOException {
+	@Override
+	protected void shutDown() {
 		appender.close();
-		Files.delete(file);
 	}
 
 	/**
