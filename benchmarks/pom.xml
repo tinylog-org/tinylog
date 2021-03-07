@@ -100,43 +100,43 @@
 		<profile>
 			<id>log4j1</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Log4j1Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j1\.Log4j1Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>log4j2</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Log4j2Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j2\.Log4j2Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>logback</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.LogbackBenchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.logback\.LogbackBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>jul</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.JulBenchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.jul\.JulBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>tinylog1</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog1Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog1\.Tinylog1Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>tinylog2</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.Tinylog2Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog2\.Tinylog2Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>no-op</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.NoOpBenchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.noop\.NoOpBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<!-- Fast Benchmarks -->

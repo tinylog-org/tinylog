@@ -11,27 +11,46 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging;
+package org.tinylog.benchmarks.logging.tinylog2;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.tinylog.Logger;
 
 /**
- * No operation benchmark for comparison with issuing log entries that are discarded.
+ * Benchmark for tinylog 2.
  */
-public class NoOpBenchmark {
+public class Tinylog2Benchmark {
+
+	private static final int MAGIC_NUMBER = 42;
 
 	/** */
-	public NoOpBenchmark() {
+	public Tinylog2Benchmark() {
 	}
 
 	/**
-	 * Benchmarks invoking an empty method.
+	 * Benchmarks issuing log entries that will be discarded.
+	 *
+	 * @param lifeCycle
+	 *            Can be ignored
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
-	public void emptyMethod() {
+	public void discard(final LifeCycle lifeCycle) {
+		Logger.debug("Hello {}!", MAGIC_NUMBER);
+	}
+
+	/**
+	 * Benchmarks issuing log entries that will be output.
+	 *
+	 * @param lifeCycle
+	 *            Can be ignored
+	 */
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	public void output(final LifeCycle lifeCycle) {
+		Logger.info("Hello {}!", MAGIC_NUMBER);
 	}
 
 }
