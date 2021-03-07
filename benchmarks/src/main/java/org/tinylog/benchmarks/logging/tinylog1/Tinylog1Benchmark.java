@@ -48,9 +48,11 @@ public class Tinylog1Benchmark {
 	 *            Can be ignored
 	 */
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
-		Logger.info("Hello {}!", MAGIC_NUMBER);
+		for (int i = 0; i < 1_000_000; ++i) {
+			Logger.info("Hello {}!", MAGIC_NUMBER);
+		}
 	}
 
 }

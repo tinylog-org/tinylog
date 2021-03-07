@@ -13,6 +13,7 @@
 
 package org.tinylog.benchmarks.logging.log4j2;
 
+import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -47,9 +48,12 @@ public class Log4j2Benchmark {
 	 *            Life cycle with logger instance
 	 */
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().info("Hello {}!", MAGIC_NUMBER);
+		Logger logger = lifeCycle.getLogger();
+		for (int i = 0; i < 1_000_000; ++i) {
+			logger.info("Hello {}!", MAGIC_NUMBER);
+		}
 	}
 
 }

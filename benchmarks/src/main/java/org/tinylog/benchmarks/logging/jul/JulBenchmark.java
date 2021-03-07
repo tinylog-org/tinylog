@@ -13,6 +13,8 @@
 
 package org.tinylog.benchmarks.logging.jul;
 
+import java.util.logging.Logger;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -47,9 +49,12 @@ public class JulBenchmark {
 	 *            Life cycle with logger instance
 	 */
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().log(java.util.logging.Level.INFO, "Hello {0}!", MAGIC_NUMBER);
+		Logger logger = lifeCycle.getLogger();
+		for (int i = 0; i < 1_000_000; ++i) {
+			logger.log(java.util.logging.Level.INFO, "Hello {0}!", MAGIC_NUMBER);
+		}
 	}
 
 }
