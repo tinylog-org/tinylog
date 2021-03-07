@@ -13,16 +13,18 @@
 
 package org.tinylog.benchmarks.logging.logback;
 
-import ch.qos.logback.classic.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+
+import ch.qos.logback.classic.Logger;
 
 /**
  * Benchmark for Logback.
  */
 public class LogbackBenchmark {
 
+	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
@@ -42,7 +44,7 @@ public class LogbackBenchmark {
 	}
 
 	/**
-	 * Benchmarks issuing log entries that will be output.
+	 * Benchmarks issuing log entries that will be actually output.
 	 *
 	 * @param lifeCycle
 	 *            Life cycle with logger instance
@@ -51,7 +53,7 @@ public class LogbackBenchmark {
 	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
-		for (int i = 0; i < 1_000_000; ++i) {
+		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			logger.info("Hello {}!", MAGIC_NUMBER);
 		}
 	}

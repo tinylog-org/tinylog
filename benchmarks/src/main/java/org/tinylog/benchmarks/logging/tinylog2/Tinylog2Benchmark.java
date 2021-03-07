@@ -23,6 +23,7 @@ import org.tinylog.Logger;
  */
 public class Tinylog2Benchmark {
 
+	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
@@ -42,7 +43,7 @@ public class Tinylog2Benchmark {
 	}
 
 	/**
-	 * Benchmarks issuing log entries that will be output.
+	 * Benchmarks issuing log entries that will be actually output.
 	 *
 	 * @param lifeCycle
 	 *            Can be ignored
@@ -50,7 +51,7 @@ public class Tinylog2Benchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
-		for (int i = 0; i < 1_000_000; ++i) {
+		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			Logger.info("Hello {}!", MAGIC_NUMBER);
 		}
 	}

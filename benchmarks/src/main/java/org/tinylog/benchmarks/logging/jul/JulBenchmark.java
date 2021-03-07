@@ -24,6 +24,7 @@ import org.openjdk.jmh.annotations.Mode;
  */
 public class JulBenchmark {
 
+	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
@@ -43,7 +44,7 @@ public class JulBenchmark {
 	}
 
 	/**
-	 * Benchmarks issuing log entries that will be output.
+	 * Benchmarks issuing log entries that will be actually output.
 	 *
 	 * @param lifeCycle
 	 *            Life cycle with logger instance
@@ -52,7 +53,7 @@ public class JulBenchmark {
 	@BenchmarkMode(Mode.SingleShotTime)
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
-		for (int i = 0; i < 1_000_000; ++i) {
+		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			logger.log(java.util.logging.Level.INFO, "Hello {0}!", MAGIC_NUMBER);
 		}
 	}
