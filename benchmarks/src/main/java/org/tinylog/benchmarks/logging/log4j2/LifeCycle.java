@@ -29,6 +29,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down Log4j.
@@ -37,6 +38,9 @@ import org.openjdk.jmh.annotations.TearDown;
 public class LifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
+
+	@Param
+	private LocationInfo locationInfo;
 
 	@Param({"false", "true"})
 	private boolean async;
@@ -69,11 +73,21 @@ public class LifeCycle {
 		builder.append("<Appenders>");
 		builder.append("<File name=\"file\" fileName=\"" + file + "\"");
 		builder.append(" bufferedIO=\"" + async + "\" bufferSize=\"" + BUFFER_SIZE + "\">");
-		builder.append("<PatternLayout><Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n</Pattern></PatternLayout>");
+		builder.append("<PatternLayout><Pattern>");
+
+		if (locationInfo == LocationInfo.NONE) {
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t]: %m%n");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t] %c: %m%n");
+		} else {
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+		}
+
+		builder.append("</Pattern></PatternLayout>");
 		builder.append("</File>");
 		builder.append("</Appenders>");
 		builder.append("<Loggers>");
-		builder.append("<Root level=\"info\" includeLocation=\"true\">");
+		builder.append("<Root level=\"info\" includeLocation=\"" + (locationInfo == LocationInfo.FULL) + "\">");
 		builder.append("<AppenderRef ref=\"file\"/>");
 		builder.append("</Root>");
 		builder.append("</Loggers>");

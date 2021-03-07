@@ -29,6 +29,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down Log4j.
@@ -37,6 +38,9 @@ import org.openjdk.jmh.annotations.TearDown;
 public class LifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
+
+	@Param
+	private LocationInfo locationInfo;
 
 	@Param({"false", "true"})
 	private boolean async;
@@ -95,11 +99,18 @@ public class LifeCycle {
 	 * @throws IOException Failed creating appender
 	 */
 	private Appender createAppender(final String file) throws IOException {
-		Layout layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+		Layout layout;
+		if (locationInfo == LocationInfo.NONE) {
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t]: %m%n");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %c: %m%n");
+		} else {
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+		}
 
 		if (async) {
 			AsyncAppender appender = new AsyncAppender();
-			appender.setLocationInfo(true);
+			appender.setLocationInfo(locationInfo == LocationInfo.FULL);
 			appender.addAppender(new FileAppender(layout, file, false, true, BUFFER_SIZE));
 			return appender;
 		} else {

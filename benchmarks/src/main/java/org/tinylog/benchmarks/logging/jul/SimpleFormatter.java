@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+import org.tinylog.benchmarks.logging.LocationInfo;
+
 /**
  * Simple formatter for formatting log records.
  */
@@ -28,12 +30,14 @@ public final class SimpleFormatter extends Formatter {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private final SimpleDateFormat formatter;
+	private final LocationInfo locationInfo;
 
 	/**
-	 *
+	 * @param locationInfo Location information to output
 	 */
-	public SimpleFormatter() {
-		formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public SimpleFormatter(final LocationInfo locationInfo) {
+		this.formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		this.locationInfo = locationInfo;
 	}
 
 	@Override
@@ -48,10 +52,17 @@ public final class SimpleFormatter extends Formatter {
 		builder.append(" [");
 		builder.append(Thread.currentThread().getName());
 		builder.append("] ");
-		builder.append(record.getSourceClassName());
-		builder.append(".");
-		builder.append(record.getSourceMethodName());
-		builder.append("(): ");
+
+		if (locationInfo == LocationInfo.FULL) {
+			builder.append(record.getSourceClassName());
+			builder.append(".");
+			builder.append(record.getSourceMethodName());
+			builder.append("()");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			builder.append(record.getLoggerName());
+		}
+
+		builder.append("():");
 		builder.append(formatMessage(record));
 
 		if (record.getThrown() != null) {

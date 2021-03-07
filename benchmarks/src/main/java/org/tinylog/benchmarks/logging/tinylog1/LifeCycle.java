@@ -25,12 +25,16 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.writers.FileWriter;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down tinylog.
  */
 @State(Scope.Benchmark)
 public class LifeCycle {
+
+	@Param
+	private LocationInfo locationInfo;
 
 	@Param({"false", "true"})
 	private boolean async;
@@ -54,10 +58,17 @@ public class LifeCycle {
 		file = Files.createTempFile("tinylog1_", ".log");
 		writer = new FileWriter(file.toString(), async);
 
-		Configurator configurator = Configurator.defaultConfig()
-				.level(org.pmw.tinylog.Level.INFO)
-				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}")
-				.writer(writer);
+		Configurator configurator = Configurator.defaultConfig();
+		configurator.level(org.pmw.tinylog.Level.INFO);
+		configurator.writer(writer);
+
+		if (locationInfo == LocationInfo.NONE) {
+			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}]: {message}");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}: {message}");
+		} else {
+			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+		}
 
 		if (async) {
 			configurator = configurator.writingThread(null);

@@ -20,16 +20,21 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down java.util.logging.
  */
 @State(Scope.Benchmark)
 public class LifeCycle {
+
+	@Param
+	private LocationInfo locationInfo;
 
 	private Logger logger;
 	private Path file;
@@ -51,7 +56,7 @@ public class LifeCycle {
 		logger = Logger.getLogger(JulBenchmark.class.getName());
 		file = Files.createTempFile("jul_", ".log");
 		handler = new FileHandler(file.toString(), false);
-		handler.setFormatter(new SimpleFormatter());
+		handler.setFormatter(new SimpleFormatter(locationInfo));
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
 		logger.setLevel(java.util.logging.Level.INFO);

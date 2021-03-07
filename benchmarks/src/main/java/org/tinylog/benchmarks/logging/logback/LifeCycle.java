@@ -24,6 +24,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.slf4j.LoggerFactory;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Logger;
@@ -41,6 +42,9 @@ import ch.qos.logback.core.util.FileSize;
 public class LifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
+
+	@Param
+	private LocationInfo locationInfo;
 
 	@Param({"false", "true"})
 	private boolean async;
@@ -106,7 +110,7 @@ public class LifeCycle {
 	 */
 	private Appender<ILoggingEvent> createAsyncAppender(final String file) {
 		AsyncAppender appender = new AsyncAppender();
-		appender.setIncludeCallerData(true);
+		appender.setIncludeCallerData(locationInfo == LocationInfo.FULL);
 		appender.setDiscardingThreshold(0);
 		appender.setContext(context);
 
@@ -133,7 +137,15 @@ public class LifeCycle {
 
 		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 		encoder.setContext(context);
-		encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+
+		if (locationInfo == LocationInfo.NONE) {
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread]: %message%n");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %logger: %message%n");
+		} else {
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+		}
+
 		encoder.setImmediateFlush(!async);
 		encoder.start();
 		appender.setEncoder(encoder);

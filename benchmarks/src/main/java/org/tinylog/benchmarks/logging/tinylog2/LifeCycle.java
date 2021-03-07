@@ -23,6 +23,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.LocationInfo;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.provider.ProviderRegistry;
 
@@ -31,6 +32,9 @@ import org.tinylog.provider.ProviderRegistry;
  */
 @State(Scope.Benchmark)
 public class LifeCycle {
+
+	@Param
+	private LocationInfo locationInfo;
 
 	@Param({"false", "true"})
 	private boolean async;
@@ -57,7 +61,15 @@ public class LifeCycle {
 		Configuration.set("writer", "file");
 		Configuration.set("writer.buffered", Boolean.toString(async));
 		Configuration.set("writer.file", file.toString());
-		Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+
+		if (locationInfo == LocationInfo.NONE) {
+			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}]: {message}");
+		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}: {message}");
+		} else {
+			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+		}
+
 		Configuration.set("writingthread", Boolean.toString(async));
 	}
 
