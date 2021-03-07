@@ -37,7 +37,7 @@ public class JulBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void discard(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().log(java.util.logging.Level.CONFIG, "Hello {}!", MAGIC_NUMBER);
+		lifeCycle.getLogger().log(java.util.logging.Level.CONFIG, "Hello {0}!", MAGIC_NUMBER);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class JulBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void output(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().log(java.util.logging.Level.INFO, "Hello {}!", MAGIC_NUMBER);
+		lifeCycle.getLogger().log(java.util.logging.Level.INFO, "Hello {0}!", MAGIC_NUMBER);
 	}
 
 }

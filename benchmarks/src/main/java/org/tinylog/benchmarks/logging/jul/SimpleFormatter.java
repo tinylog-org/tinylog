@@ -51,18 +51,20 @@ public final class SimpleFormatter extends Formatter {
 		builder.append(date);
 		builder.append(" [");
 		builder.append(Thread.currentThread().getName());
-		builder.append("] ");
+		builder.append("]");
 
 		if (locationInfo == LocationInfo.FULL) {
+			builder.append(" ");
 			builder.append(record.getSourceClassName());
 			builder.append(".");
 			builder.append(record.getSourceMethodName());
 			builder.append("()");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+			builder.append(" ");
 			builder.append(record.getLoggerName());
 		}
 
-		builder.append("():");
+		builder.append(": ");
 		builder.append(formatMessage(record));
 
 		if (record.getThrown() != null) {
