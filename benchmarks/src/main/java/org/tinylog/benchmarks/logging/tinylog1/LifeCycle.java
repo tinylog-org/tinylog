@@ -53,11 +53,14 @@ public class LifeCycle extends AbstractLifeCycle {
 		configurator.writer(writer);
 
 		if (locationInfo == LocationInfo.NONE) {
-			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}]: {message}");
+			configurator
+				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} - {thread} - {level}: {message}");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}: {message}");
+			configurator
+				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} - {thread} - {class} - {level}: {message}");
 		} else {
-			configurator.formatPattern("{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+			configurator
+				.formatPattern("{date:yyyy-MM-dd HH:mm:ss} - {thread} - {class}.{method}() - {level}: {message}");
 		}
 
 		if (async) {

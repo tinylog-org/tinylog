@@ -49,21 +49,22 @@ public final class SimpleFormatter extends Formatter {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append(date);
-		builder.append(" [");
+		builder.append(" - ");
 		builder.append(Thread.currentThread().getName());
-		builder.append("]");
 
 		if (locationInfo == LocationInfo.FULL) {
-			builder.append(" ");
+			builder.append(" - ");
 			builder.append(record.getSourceClassName());
 			builder.append(".");
 			builder.append(record.getSourceMethodName());
 			builder.append("()");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			builder.append(" ");
+			builder.append(" - ");
 			builder.append(record.getLoggerName());
 		}
 
+		builder.append(" - ");
+		builder.append(record.getLevel());
 		builder.append(": ");
 		builder.append(formatMessage(record));
 

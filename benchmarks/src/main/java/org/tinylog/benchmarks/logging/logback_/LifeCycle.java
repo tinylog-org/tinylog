@@ -121,11 +121,11 @@ public class LifeCycle extends AbstractLifeCycle {
 		encoder.setContext(context);
 
 		if (locationInfo == LocationInfo.NONE) {
-			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread]: %message%n");
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %level: %message%n");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %logger: %message%n");
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %logger - %level: %message%n");
 		} else {
-			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} [%thread] %class.%method\\(\\): %message%n");
+			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %class.%method\\(\\) - %level: %message%n");
 		}
 
 		encoder.setImmediateFlush(!async);

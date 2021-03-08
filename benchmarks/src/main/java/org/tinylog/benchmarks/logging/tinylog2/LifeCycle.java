@@ -50,11 +50,20 @@ public class LifeCycle extends AbstractLifeCycle {
 		Configuration.set("writer.file", file.toString());
 
 		if (locationInfo == LocationInfo.NONE) {
-			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}]: {message}");
+			Configuration.set(
+				"writer.format",
+				"{date:yyyy-MM-dd HH:mm:ss} - {thread} - {level}: {message}"
+			);
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}: {message}");
+			Configuration.set(
+				"writer.format",
+				"{date:yyyy-MM-dd HH:mm:ss} - {thread} - {class} - {level}: {message}"
+			);
 		} else {
-			Configuration.set("writer.format", "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}(): {message}");
+			Configuration.set(
+				"writer.format",
+				"{date:yyyy-MM-dd HH:mm:ss} - {thread} - {class}.{method}() - {level}: {message}"
+			);
 		}
 
 		Configuration.set("writingthread", Boolean.toString(async));

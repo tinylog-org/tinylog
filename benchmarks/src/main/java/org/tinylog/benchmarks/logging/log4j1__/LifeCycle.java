@@ -86,11 +86,11 @@ public class LifeCycle extends AbstractLifeCycle {
 	private Appender createAppender(final String file) throws IOException {
 		Layout layout;
 		if (locationInfo == LocationInfo.NONE) {
-			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t]: %m%n");
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %p: %m%n");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %c: %m%n");
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %c - %p: %m%n");
 		} else {
-			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %C.%M() - %p: %m%n");
 		}
 
 		if (async) {

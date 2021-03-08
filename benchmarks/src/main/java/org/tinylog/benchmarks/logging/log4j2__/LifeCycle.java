@@ -66,11 +66,11 @@ public class LifeCycle extends AbstractLifeCycle {
 		builder.append("<PatternLayout><Pattern>");
 
 		if (locationInfo == LocationInfo.NONE) {
-			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t]: %m%n");
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %p: %m%n");
 		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t] %c: %m%n");
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %c - %p: %m%n");
 		} else {
-			builder.append("%d{yyyy-MM-dd HH:mm:ss} [%t] %C.%M(): %m%n");
+			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %C.%M() - %p: %m%n");
 		}
 
 		builder.append("</Pattern></PatternLayout>");
