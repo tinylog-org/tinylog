@@ -17,39 +17,27 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.tinylog.Logger;
+import org.tinylog.benchmarks.logging.AbstractBenchmark;
 
 /**
  * Benchmark for tinylog 2.
  */
-public class Tinylog2Benchmark {
-
-	private static final int LOG_ENTRIES = 1_000_000;
-	private static final int MAGIC_NUMBER = 42;
+public class Tinylog2Benchmark extends AbstractBenchmark<LifeCycle> {
 
 	/** */
 	public Tinylog2Benchmark() {
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be discarded.
-	 *
-	 * @param lifeCycle
-	 *            Can be ignored
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
+	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		Logger.debug("Hello {}!", MAGIC_NUMBER);
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be actually output.
-	 *
-	 * @param lifeCycle
-	 *            Can be ignored
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
+	@Override
 	public void output(final LifeCycle lifeCycle) {
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			Logger.info("Hello {}!", MAGIC_NUMBER);

@@ -18,39 +18,27 @@ import java.util.logging.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.tinylog.benchmarks.logging.AbstractBenchmark;
 
 /**
  * Benchmark for java.util.logging aka JUL.
  */
-public class Jul_____Benchmark {
-
-	private static final int LOG_ENTRIES = 1_000_000;
-	private static final int MAGIC_NUMBER = 42;
+public class Jul_____Benchmark extends AbstractBenchmark<LifeCycle> {
 
 	/** */
 	public Jul_____Benchmark() {
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be discarded.
-	 *
-	 * @param lifeCycle
-	 *            Life cycle with logger instance
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
+	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		lifeCycle.getLogger().log(java.util.logging.Level.CONFIG, "Hello {0}!", MAGIC_NUMBER);
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be actually output.
-	 *
-	 * @param lifeCycle
-	 *            Life cycle with logger instance
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
+	@Override
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
 		for (int i = 0; i < LOG_ENTRIES; ++i) {

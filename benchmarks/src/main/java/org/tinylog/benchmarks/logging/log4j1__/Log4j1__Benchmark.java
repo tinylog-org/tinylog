@@ -17,39 +17,27 @@ import org.apache.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.tinylog.benchmarks.logging.AbstractBenchmark;
 
 /**
  * Benchmark for Apache Log4j 1.
  */
-public class Log4j1__Benchmark {
-
-	private static final int LOG_ENTRIES = 1_000_000;
-	private static final int MAGIC_NUMBER = 42;
+public class Log4j1__Benchmark extends AbstractBenchmark<LifeCycle> {
 
 	/** */
 	public Log4j1__Benchmark() {
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be discarded.
-	 *
-	 * @param lifeCycle
-	 *            Life cycle with logger instance
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
+	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		lifeCycle.getLogger().debug("Hello " + MAGIC_NUMBER + "!");
 	}
 
-	/**
-	 * Benchmarks issuing log entries that will be actually output.
-	 *
-	 * @param lifeCycle
-	 *            Life cycle with logger instance
-	 */
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
+	@Override
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
