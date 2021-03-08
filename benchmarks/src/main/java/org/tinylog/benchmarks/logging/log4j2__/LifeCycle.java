@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.log4j2;
+package org.tinylog.benchmarks.logging.log4j2__;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -87,7 +87,7 @@ public class LifeCycle extends AbstractLifeCycle {
 		ConfigurationSource source = new ConfigurationSource(new ByteArrayInputStream(configuration));
 		Configurator.initialize(null, source);
 
-		logger = LogManager.getLogger(Log4j2Benchmark.class);
+		logger = LogManager.getLogger(Log4j2__Benchmark.class);
 	}
 
 	/**

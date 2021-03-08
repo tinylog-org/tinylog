@@ -163,7 +163,9 @@
 		<module name="PackageName" />
 		<module name="ParameterName" />
 		<module name="StaticVariableName" />
-		<module name="TypeName" />
+		<module name="TypeName">
+			<property name="format" value="^[A-Z][a-zA-Z0-9]*(_*Benchmark)?$" />
+		</module>
 
 		<!-- Size Violations -->
 

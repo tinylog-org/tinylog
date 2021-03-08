@@ -11,23 +11,24 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.log4j2;
+package org.tinylog.benchmarks.logging.logback_;
 
-import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 
+import ch.qos.logback.classic.Logger;
+
 /**
- * Benchmark for Apache Log4j 2.
+ * Benchmark for Logback.
  */
-public class Log4j2Benchmark {
+public class Logback_Benchmark {
 
 	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
-	public Log4j2Benchmark() {
+	public Logback_Benchmark() {
 	}
 
 	/**

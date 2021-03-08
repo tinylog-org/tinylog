@@ -11,24 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.jul;
+package org.tinylog.benchmarks.logging.log4j1__;
 
-import java.util.logging.Logger;
-
+import org.apache.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 
 /**
- * Benchmark for java.util.logging aka JUL.
+ * Benchmark for Apache Log4j 1.
  */
-public class JulBenchmark {
+public class Log4j1__Benchmark {
 
 	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
-	public JulBenchmark() {
+	public Log4j1__Benchmark() {
 	}
 
 	/**
@@ -40,7 +39,7 @@ public class JulBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void discard(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().log(java.util.logging.Level.CONFIG, "Hello {0}!", MAGIC_NUMBER);
+		lifeCycle.getLogger().debug("Hello " + MAGIC_NUMBER + "!");
 	}
 
 	/**
@@ -54,7 +53,7 @@ public class JulBenchmark {
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
-			logger.log(java.util.logging.Level.INFO, "Hello {0}!", MAGIC_NUMBER);
+			logger.info("Hello " + MAGIC_NUMBER + "!");
 		}
 	}
 

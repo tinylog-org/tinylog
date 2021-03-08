@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.jul;
+package org.tinylog.benchmarks.logging.jul_____;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

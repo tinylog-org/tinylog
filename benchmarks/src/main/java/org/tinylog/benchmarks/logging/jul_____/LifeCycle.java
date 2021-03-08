@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.jul;
+package org.tinylog.benchmarks.logging.jul_____;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -45,7 +45,7 @@ public class LifeCycle extends AbstractLifeCycle {
 
 	@Override
 	protected void init(final Path file) throws IOException {
-		logger = Logger.getLogger(JulBenchmark.class.getName());
+		logger = Logger.getLogger(Jul_____Benchmark.class.getName());
 		handler = new FileHandler(file.toString(), false);
 		handler.setFormatter(new SimpleFormatter(locationInfo));
 		logger.addHandler(handler);

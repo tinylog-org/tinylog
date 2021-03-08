@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.logback;
+package org.tinylog.benchmarks.logging.logback_;
 
 import java.nio.file.Path;
 
@@ -59,7 +59,7 @@ public class LifeCycle extends AbstractLifeCycle {
 	protected void init(final Path file) {
 		context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-		logger = context.getLogger(LogbackBenchmark.class);
+		logger = context.getLogger(Logback_Benchmark.class);
 		logger.setLevel(ch.qos.logback.classic.Level.INFO);
 
 		appender = async ? createAsyncAppender(file.toString()) : createFileAppender(file.toString());

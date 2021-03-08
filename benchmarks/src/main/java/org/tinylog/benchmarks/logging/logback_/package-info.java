@@ -12,6 +12,6 @@
  */
 
 /**
- * JMH benchmarks for Apache Log4j 1.
+ * JMH benchmarks for Logback.
  */
-package org.tinylog.benchmarks.logging.log4j1;
+package org.tinylog.benchmarks.logging.logback_;

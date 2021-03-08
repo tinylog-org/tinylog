@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.log4j1;
+package org.tinylog.benchmarks.logging.log4j1__;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -56,7 +56,7 @@ public class LifeCycle extends AbstractLifeCycle {
 	protected void init(final Path file) throws IOException {
 		appender = createAppender(file.toString());
 
-		logger = Logger.getLogger(Log4j1Benchmark.class);
+		logger = Logger.getLogger(Log4j1__Benchmark.class);
 		logger.removeAllAppenders();
 		logger.addAppender(appender);
 		logger.setLevel(org.apache.log4j.Level.INFO);

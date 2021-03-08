@@ -11,23 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.logging.log4j1;
+package org.tinylog.benchmarks.logging.log4j2__;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 
 /**
- * Benchmark for Apache Log4j 1.
+ * Benchmark for Apache Log4j 2.
  */
-public class Log4j1Benchmark {
+public class Log4j2__Benchmark {
 
 	private static final int LOG_ENTRIES = 1_000_000;
 	private static final int MAGIC_NUMBER = 42;
 
 	/** */
-	public Log4j1Benchmark() {
+	public Log4j2__Benchmark() {
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class Log4j1Benchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void discard(final LifeCycle lifeCycle) {
-		lifeCycle.getLogger().debug("Hello " + MAGIC_NUMBER + "!");
+		lifeCycle.getLogger().debug("Hello {}!", MAGIC_NUMBER);
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class Log4j1Benchmark {
 	public void output(final LifeCycle lifeCycle) {
 		Logger logger = lifeCycle.getLogger();
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
-			logger.info("Hello " + MAGIC_NUMBER + "!");
+			logger.info("Hello {}!", MAGIC_NUMBER);
 		}
 	}
 

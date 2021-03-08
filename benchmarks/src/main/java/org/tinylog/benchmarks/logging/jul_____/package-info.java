@@ -14,4 +14,4 @@
 /**
  * JMH benchmarks for java.util.logging aka JUL.
  */
-package org.tinylog.benchmarks.logging.jul;
+package org.tinylog.benchmarks.logging.jul_____;
