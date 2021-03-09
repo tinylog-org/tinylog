@@ -20,23 +20,29 @@ package org.tinylog.benchmarks.logging;
  */
 public abstract class AbstractBenchmark<T extends AbstractLifeCycle> {
 
-	protected static final int LOG_ENTRIES = 1_000_000;
-	protected static final int MAGIC_NUMBER = 42;
+	/**
+	 * Number of log entries to issue in {@link #output(AbstractLifeCycle)}.
+	 */
+	public static final int LOG_ENTRIES = 1_000_000;
+
+	/**
+	 * Argument for parameterized log entries.
+	 */
+	public static final int MAGIC_NUMBER = 42;
 
 	/**
 	 * Benchmarks issuing a single log entry that will be discarded.
 	 *
-	 * @param lifeCycle
-	 *            Life cycle of the logging framework to benchmark
+	 * @param lifeCycle Life cycle of the logging framework to benchmark
 	 */
 	public abstract void discard(T lifeCycle);
 
 	/**
 	 * Benchmarks issuing a bunch of log entries that will be actually output.
 	 *
-	 * @param lifeCycle
-	 *            Life cycle of the logging framework to benchmark
+	 * @param lifeCycle Life cycle of the logging framework to benchmark
+	 * @throws Exception Failed to output log entries
 	 */
-	public abstract void output(T lifeCycle);
+	public abstract void output(T lifeCycle) throws Exception;
 
 }

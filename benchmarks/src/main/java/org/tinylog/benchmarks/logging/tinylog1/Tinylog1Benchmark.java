@@ -13,6 +13,8 @@
 
 package org.tinylog.benchmarks.logging.tinylog1;
 
+import java.io.IOException;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -38,10 +40,12 @@ public class Tinylog1Benchmark extends AbstractBenchmark<LifeCycle> {
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
 	@Override
-	public void output(final LifeCycle lifeCycle) {
+	public void output(final LifeCycle lifeCycle) throws IOException, InterruptedException {
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			Logger.info("Hello {}!", MAGIC_NUMBER);
 		}
+
+		lifeCycle.waitForWriting();
 	}
 
 }

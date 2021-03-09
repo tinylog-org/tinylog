@@ -13,6 +13,8 @@
 
 package org.tinylog.benchmarks.logging.log4j2__;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -38,11 +40,13 @@ public class Log4j2__Benchmark extends AbstractBenchmark<LifeCycle> {
 	@Benchmark
 	@BenchmarkMode(Mode.SingleShotTime)
 	@Override
-	public void output(final LifeCycle lifeCycle) {
+	public void output(final LifeCycle lifeCycle) throws IOException, InterruptedException {
 		Logger logger = lifeCycle.getLogger();
 		for (int i = 0; i < LOG_ENTRIES; ++i) {
 			logger.info("Hello {}!", MAGIC_NUMBER);
 		}
+
+		lifeCycle.waitForWriting();
 	}
 
 }

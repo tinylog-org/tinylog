@@ -13,6 +13,7 @@
 
 package org.tinylog.benchmarks.logging;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -22,12 +23,18 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.tinylog.benchmarks.logging.tinylog2.Tinylog2Benchmark;
 
 /**
  * Base life cycle for initializing and shutting logging frameworks down.
  */
 @State(Scope.Benchmark)
 public abstract class AbstractLifeCycle {
+
+	private static final long MAX_BUFFER = 64 * 1024;
+
+	private volatile long fileSize;
+	private volatile long logEntryLength;
 
 	@Param
 	private LocationInfo locationInfo;
@@ -49,6 +56,30 @@ public abstract class AbstractLifeCycle {
 	public final void init() throws Exception {
 		file = Files.createTempFile("jmh_logging_", ".log");
 		init(file);
+	}
+
+	/**
+	 * Updates the current log file size and the expected log entry length.
+	 *
+	 * @throws IOException Failed to access the log file
+	 */
+	@Setup(Level.Iteration)
+	public final void updateSize() throws IOException {
+		fileSize = Files.size(file);
+		logEntryLength = calculateLogEntryLength();
+	}
+
+	/**
+	 * Waits until all log entries are written.
+	 *
+	 * @throws IOException Failed to access the log file
+	 * @throws InterruptedException Interrupted while waiting
+	 */
+	public final void waitForWriting() throws IOException, InterruptedException {
+		long expectedSize = fileSize + logEntryLength * AbstractBenchmark.LOG_ENTRIES - MAX_BUFFER;
+		while (Files.size(file) < expectedSize) {
+			Thread.sleep(1);
+		}
 	}
 
 	/**
@@ -84,6 +115,37 @@ public abstract class AbstractLifeCycle {
 	 */
 	protected final LocationInfo getLocationInfo() {
 		return locationInfo;
+	}
+
+	/**
+	 * Calculates the length of each log entry.
+	 *
+	 * @return The log entry length in bytes
+	 */
+	private long calculateLogEntryLength() {
+		long length = 0;
+
+		length += "yyyy-MM-dd HH:mm:ss".length();
+		length += " - ".length();
+		length += Thread.currentThread().getName().length();
+
+		if (locationInfo != LocationInfo.NONE) {
+			length += " - ".length();
+			length += Tinylog2Benchmark.class.getName().length();
+		}
+
+		if (locationInfo == LocationInfo.FULL) {
+			length += ".output()".length();
+		}
+
+		length += " - ".length();
+		length += "INFO: ".length();
+		length += "Hello ".length();
+		length += Integer.toString(AbstractBenchmark.MAGIC_NUMBER).length();
+		length += "!".length();
+		length += System.lineSeparator().length();
+
+		return length;
 	}
 
 }
