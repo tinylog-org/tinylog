@@ -36,14 +36,10 @@ public class LifeCycle extends AbstractLifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
-	@Param
-	private LocationInfo locationInfo;
-
 	@Param({"false", "true"})
 	private boolean async;
 
 	private Logger logger;
-	private Path file;
 	private Appender appender;
 
 	/**
@@ -85,9 +81,9 @@ public class LifeCycle extends AbstractLifeCycle {
 	 */
 	private Appender createAppender(final String file) throws IOException {
 		Layout layout;
-		if (locationInfo == LocationInfo.NONE) {
+		if (getLocationInfo() == LocationInfo.NONE) {
 			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %p: %m%n");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+		} else if (getLocationInfo() == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
 			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %c - %p: %m%n");
 		} else {
 			layout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} - %t - %C.%M() - %p: %m%n");
@@ -95,7 +91,7 @@ public class LifeCycle extends AbstractLifeCycle {
 
 		if (async) {
 			AsyncAppender appender = new AsyncAppender();
-			appender.setLocationInfo(locationInfo == LocationInfo.FULL);
+			appender.setLocationInfo(getLocationInfo() == LocationInfo.FULL);
 			appender.addAppender(new FileAppender(layout, file, false, true, BUFFER_SIZE));
 			return appender;
 		} else {

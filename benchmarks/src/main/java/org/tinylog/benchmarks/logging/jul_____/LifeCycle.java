@@ -18,11 +18,9 @@ import java.nio.file.Path;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.tinylog.benchmarks.logging.AbstractLifeCycle;
-import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Life cycle for initializing and shutting down java.util.logging.
@@ -30,11 +28,7 @@ import org.tinylog.benchmarks.logging.LocationInfo;
 @State(Scope.Benchmark)
 public class LifeCycle extends AbstractLifeCycle {
 
-	@Param
-	private LocationInfo locationInfo;
-
 	private Logger logger;
-	private Path file;
 	private FileHandler handler;
 
 	/**
@@ -47,7 +41,7 @@ public class LifeCycle extends AbstractLifeCycle {
 	protected void init(final Path file) throws IOException {
 		logger = Logger.getLogger(Jul_____Benchmark.class.getName());
 		handler = new FileHandler(file.toString(), false);
-		handler.setFormatter(new SimpleFormatter(locationInfo));
+		handler.setFormatter(new SimpleFormatter(getLocationInfo()));
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
 		logger.setLevel(java.util.logging.Level.INFO);

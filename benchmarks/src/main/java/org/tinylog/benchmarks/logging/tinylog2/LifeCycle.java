@@ -29,9 +29,6 @@ import org.tinylog.provider.ProviderRegistry;
 @State(Scope.Benchmark)
 public class LifeCycle extends AbstractLifeCycle {
 
-	@Param
-	private LocationInfo locationInfo;
-
 	@Param({"false", "true"})
 	private boolean async;
 
@@ -49,12 +46,12 @@ public class LifeCycle extends AbstractLifeCycle {
 		Configuration.set("writer.buffered", Boolean.toString(async));
 		Configuration.set("writer.file", file.toString());
 
-		if (locationInfo == LocationInfo.NONE) {
+		if (getLocationInfo() == LocationInfo.NONE) {
 			Configuration.set(
 				"writer.format",
 				"{date:yyyy-MM-dd HH:mm:ss} - {thread} - {level}: {message}"
 			);
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+		} else if (getLocationInfo() == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
 			Configuration.set(
 				"writer.format",
 				"{date:yyyy-MM-dd HH:mm:ss} - {thread} - {class} - {level}: {message}"

@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -27,6 +28,9 @@ import org.openjdk.jmh.annotations.TearDown;
  */
 @State(Scope.Benchmark)
 public abstract class AbstractLifeCycle {
+
+	@Param
+	private LocationInfo locationInfo;
 
 	private Path file;
 
@@ -72,5 +76,14 @@ public abstract class AbstractLifeCycle {
 	 * @throws Exception Failed to shut the logging framework down
 	 */
 	protected abstract void shutDown() throws Exception;
+
+	/**
+	 * Gets the configured location information.
+	 *
+	 * @return Configured location information
+	 */
+	protected final LocationInfo getLocationInfo() {
+		return locationInfo;
+	}
 
 }

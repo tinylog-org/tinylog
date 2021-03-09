@@ -36,9 +36,6 @@ public class LifeCycle extends AbstractLifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
-	@Param
-	private LocationInfo locationInfo;
-
 	@Param({"false", "true"})
 	private boolean async;
 
@@ -65,9 +62,9 @@ public class LifeCycle extends AbstractLifeCycle {
 		builder.append(" bufferedIO=\"" + async + "\" bufferSize=\"" + BUFFER_SIZE + "\">");
 		builder.append("<PatternLayout><Pattern>");
 
-		if (locationInfo == LocationInfo.NONE) {
+		if (getLocationInfo() == LocationInfo.NONE) {
 			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %p: %m%n");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+		} else if (getLocationInfo() == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
 			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %c - %p: %m%n");
 		} else {
 			builder.append("%d{yyyy-MM-dd HH:mm:ss} - %t - %C.%M() - %p: %m%n");
@@ -77,7 +74,7 @@ public class LifeCycle extends AbstractLifeCycle {
 		builder.append("</File>");
 		builder.append("</Appenders>");
 		builder.append("<Loggers>");
-		builder.append("<Root level=\"info\" includeLocation=\"" + (locationInfo == LocationInfo.FULL) + "\">");
+		builder.append("<Root level=\"info\" includeLocation=\"" + (getLocationInfo() == LocationInfo.FULL) + "\">");
 		builder.append("<AppenderRef ref=\"file\"/>");
 		builder.append("</Root>");
 		builder.append("</Loggers>");

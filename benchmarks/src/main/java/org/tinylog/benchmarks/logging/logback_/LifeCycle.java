@@ -39,9 +39,6 @@ public class LifeCycle extends AbstractLifeCycle {
 
 	private static final int BUFFER_SIZE = 64 * 1024;
 
-	@Param
-	private LocationInfo locationInfo;
-
 	@Param({"false", "true"})
 	private boolean async;
 
@@ -92,7 +89,7 @@ public class LifeCycle extends AbstractLifeCycle {
 	 */
 	private Appender<ILoggingEvent> createAsyncAppender(final String file) {
 		AsyncAppender appender = new AsyncAppender();
-		appender.setIncludeCallerData(locationInfo == LocationInfo.FULL);
+		appender.setIncludeCallerData(getLocationInfo() == LocationInfo.FULL);
 		appender.setDiscardingThreshold(0);
 		appender.setContext(context);
 
@@ -120,9 +117,9 @@ public class LifeCycle extends AbstractLifeCycle {
 		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 		encoder.setContext(context);
 
-		if (locationInfo == LocationInfo.NONE) {
+		if (getLocationInfo() == LocationInfo.NONE) {
 			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %level: %message%n");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+		} else if (getLocationInfo() == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
 			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %logger - %level: %message%n");
 		} else {
 			encoder.setPattern("%date{yyyy-MM-dd HH:mm:ss} - %thread - %class.%method\\(\\) - %level: %message%n");
