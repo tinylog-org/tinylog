@@ -6,6 +6,23 @@ on:
 
 jobs:
 
+  development-build:
+    name: Development build with JDK 9
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 9
+      - uses: skjolber/maven-cache-github-action@v1
+        with:
+          step: restore
+      - run: mvn -P dev --batch-mode --update-snapshots verify
+      - uses: skjolber/maven-cache-github-action@v1
+        with:
+          step: save
+      - uses: codecov/codecov-action@v1
+
   android-tests:
     name: Tests on Android
     runs-on: macos-10.15
