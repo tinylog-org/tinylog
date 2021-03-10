@@ -21,3 +21,4 @@ jobs:
         with:
           api-level: 29
           script: cd ./tinylog-android-test && chmod +x ./gradlew && ./gradlew createDebugCoverageReport
+      - uses: codecov/codecov-action@v1
