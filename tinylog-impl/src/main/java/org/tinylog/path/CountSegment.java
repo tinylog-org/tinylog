@@ -22,11 +22,8 @@ import org.tinylog.runtime.Timestamp;
  */
 final class CountSegment implements Segment {
 
-	private long count;
-
 	/** */
 	CountSegment() {
-		count = 0;
 	}
 
 	@Override
@@ -48,6 +45,7 @@ final class CountSegment implements Segment {
 			filePrefix = separator == prefix.length() - 1 ? "" : prefix.substring(separator + 1);
 		}
 
+		long count = 0;
 		if (directory.isDirectory()) {
 			String[] entries = directory.list();
 			if (entries != null) {
@@ -62,7 +60,7 @@ final class CountSegment implements Segment {
 			}
 		}
 
-		return Long.toString(count++);
+		return Long.toString(count);
 	}
 
 	@Override
