@@ -7,18 +7,16 @@ on:
 jobs:
 
   android-tests:
-
     name: Tests on Android
     runs-on: macos-10.15
-
     steps:
-
       - uses: actions/checkout@v2
-
       - uses: actions/setup-java@v1
         with:
           java-version: 8
-
+      - uses: burrunan/gradle-cache-action@v1
+        with:
+          build-root-directory: tinylog-android-test
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
