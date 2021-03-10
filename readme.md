@@ -1,10 +1,10 @@
 tinylog 2
 =========
-[![Build Status](https://travis-ci.org/pmwmedia/tinylog.svg?branch=v2.3)](https://travis-ci.org/pmwmedia/tinylog/branches)
-[![Code Coverage](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.3/graph/badge.svg)](https://codecov.io/gh/pmwmedia/tinylog/branch/v2.3)
+[![Build Status](https://travis-ci.org/tinylog-org/tinylog.svg?branch=v2.3)](https://travis-ci.org/tinylog-org/tinylog/branches)
+[![Code Coverage](https://codecov.io/gh/tinylog-org/tinylog/branch/v2.3/graph/badge.svg)](https://codecov.io/gh/tinylog-org/tinylog/branch/v2.3)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog-impl/badge.svg)](https://search.maven.org/search?q=g:org.tinylog)
-[![Percentage of issues still open](https://isitmaintained.com/badge/open/pmwmedia/tinylog.svg)](https://github.com/pmwmedia/tinylog/issues "Percentage of issues still open")
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/pmwmedia/tinylog.svg)](https://github.com/pmwmedia/tinylog/issues "Average time to resolve an issue")
+[![Percentage of issues still open](https://isitmaintained.com/badge/open/tinylog-org/tinylog.svg)](https://github.com/tinylog-org/tinylog/issues "Percentage of issues still open")
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/tinylog-org/tinylog.svg)](https://github.com/tinylog-org/tinylog/issues "Average time to resolve an issue")
 
 Example
 -------
