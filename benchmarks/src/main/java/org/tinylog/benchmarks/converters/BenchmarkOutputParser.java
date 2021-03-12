@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,17 +32,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.tinylog.Logger;
+import org.tinylog.benchmarks.logging.AbstractBenchmark;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Parser for parsing the results of the logging framework benchmark from JMH.
  */
 public final class BenchmarkOutputParser {
 
-	private static final Pattern LINE_PATTERN = Pattern.compile("(\\w+)Benchmark\\.(\\w+) +[\\w/]+ +\\w+ +\\d* +(\\d+[,\\.]\\d+) .*");
+	private static final Pattern LINE_PATTERN = Pattern.compile(
+		"(\\w+\\.)*(\\p{Alnum}+)_*Benchmark\\.(\\w+) +[\\w/]+ +(\\w+) +(\\w+) +\\d+ +(\\d+[,.]\\d+) .*"
+	);
 
-	private static final int GROUP_FRAMEWORK_NAME = 1;
-	private static final int GROUP_BENCHMARK_NAME = 2;
-	private static final int GROUP_SCORE_VALUE = 3;
+	private static final int GROUP_FRAMEWORK_NAME = 2;
+	private static final int GROUP_BENCHMARK_NAME = 3;
+	private static final int GROUP_LOCATION_VALUE = 4;
+	private static final int GROUP_MODE_VALUE = 5;
+	private static final int GROUP_SCORE_VALUE = 6;
 
 	private final Collection<String> frameworks;
 
@@ -61,15 +68,17 @@ public final class BenchmarkOutputParser {
 	 *            Results of the logging framework benchmark from JMH
 	 * @return Mapping with the benchmark name, the internal framework name and its scores
 	 */
-	public Map<String, Map<String, List<BigDecimal>>> parse(final String file) {
+	public Map<BenchmarkEntity, Map<String, List<BigDecimal>>> parse(final String file) {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(openResource(file), StandardCharsets.UTF_8))) {
-			Map<String, Map<String, List<BigDecimal>>> benchmarks = new TreeMap<>(Collections.reverseOrder());
+			Map<BenchmarkEntity, Map<String, List<BigDecimal>>> benchmarks = new TreeMap<>(Collections.reverseOrder());
 
 			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 				Matcher matcher = LINE_PATTERN.matcher(line);
 				if (matcher.matches()) {
 					String framework = matcher.group(GROUP_FRAMEWORK_NAME);
 					String benchmark = matcher.group(GROUP_BENCHMARK_NAME);
+					String location = matcher.group(GROUP_LOCATION_VALUE);
+					String mode = matcher.group(GROUP_MODE_VALUE);
 					String score = matcher.group(GROUP_SCORE_VALUE);
 
 					if (!frameworks.contains(framework)) {
@@ -77,21 +86,17 @@ public final class BenchmarkOutputParser {
 						return Collections.emptyMap();
 					}
 
-					BigDecimal parsedScore = new BigDecimal(score.replaceAll("[,\\.]", "."));
-
-					Map<String, List<BigDecimal>> benchmarkEntry = benchmarks.get(benchmark);
-					if (benchmarkEntry == null) {
-						benchmarkEntry = new LinkedHashMap<>();
-						benchmarks.put(benchmark, benchmarkEntry);
+					BigDecimal parsedScore = new BigDecimal(score.replaceAll("[,.]", "."));
+					if ("ss".equals(mode)) {
+						BigDecimal multiplicand = BigDecimal.valueOf(AbstractBenchmark.LOG_ENTRIES);
+						parsedScore = multiplicand.divide(parsedScore, RoundingMode.HALF_UP);
 					}
 
-					List<BigDecimal> scores = benchmarkEntry.get(framework);
-					if (scores == null) {
-						scores = new ArrayList<>();
-						benchmarkEntry.put(framework, scores);
-					}
-
-					scores.add(parsedScore);
+					BenchmarkEntity type = new BenchmarkEntity(benchmark, Enum.valueOf(LocationInfo.class, location));
+					benchmarks
+						.computeIfAbsent(type, key -> new LinkedHashMap<>())
+						.computeIfAbsent(framework, key -> new ArrayList<>())
+						.add(parsedScore);
 				}
 			}
 

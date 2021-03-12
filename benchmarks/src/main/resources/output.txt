@@ -1,23 +1,68 @@
-Benchmark                  (async)   Mode  Cnt           Score          Error  Units
-JulBenchmark.discard           N/A  thrpt  100   926042812,251 ±  1805434,426  ops/s
-JulBenchmark.output            N/A  thrpt  100       55892,202 ±      299,037  ops/s
-Log4j1Benchmark.discard      false  thrpt  100   554779539,670 ±   205870,999  ops/s
-Log4j1Benchmark.discard       true  thrpt  100   554718392,409 ±   442192,416  ops/s
-Log4j1Benchmark.output       false  thrpt  100       43702,794 ±      291,673  ops/s
-Log4j1Benchmark.output        true  thrpt  100       80110,627 ±      797,033  ops/s
-Log4j2Benchmark.discard      false  thrpt  100   512255316,014 ±  5131212,717  ops/s
-Log4j2Benchmark.discard       true  thrpt  100   516118830,873 ±  1011845,720  ops/s
-Log4j2Benchmark.output       false  thrpt  100       46489,596 ±      183,666  ops/s
-Log4j2Benchmark.output        true  thrpt  100       94692,016 ±      463,418  ops/s
-LogbackBenchmark.discard     false  thrpt  100   571848192,822 ±   774663,778  ops/s
-LogbackBenchmark.discard      true  thrpt  100   571816430,167 ±   552868,950  ops/s
-LogbackBenchmark.output      false  thrpt  100       42893,934 ±      293,751  ops/s
-LogbackBenchmark.output       true  thrpt  100       72880,915 ±      763,961  ops/s
-Tinylog1Benchmark.discard    false  thrpt  100   935020822,320 ±   446889,190  ops/s
-Tinylog1Benchmark.discard     true  thrpt  100   933573858,526 ±   917579,335  ops/s
-Tinylog1Benchmark.output     false  thrpt  100       89945,414 ±      423,386  ops/s
-Tinylog1Benchmark.output      true  thrpt  100      380230,176 ±     3156,450  ops/s
-Tinylog2Benchmark.discard    false  thrpt  100  2443854754,805 ± 30265642,998  ops/s
-Tinylog2Benchmark.discard     true  thrpt  100  2344761131,492 ± 22653762,501  ops/s
-Tinylog2Benchmark.output     false  thrpt  100       85114,550 ±      421,458  ops/s
-Tinylog2Benchmark.output      true  thrpt  100      427773,785 ±     2776,986  ops/s
+Benchmark                                   (async)          (locationInfo)   Mode  Cnt           Score          Error  Units
+o.t.b.l.jul_____.Jul_____Benchmark.discard      N/A                    NONE  thrpt  100   957491832,997 �  1855807,222  ops/s
+o.t.b.l.jul_____.Jul_____Benchmark.discard      N/A  CLASS_OR_CATEGORY_ONLY  thrpt  100   958892623,787 �  1330384,487  ops/s
+o.t.b.l.jul_____.Jul_____Benchmark.discard      N/A                    FULL  thrpt  100   960941046,393 �   332132,330  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard    false                    NONE  thrpt  100   570007014,412 �   141704,014  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard    false  CLASS_OR_CATEGORY_ONLY  thrpt  100   569817113,945 �   504618,796  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard    false                    FULL  thrpt  100   570003445,016 �   126134,516  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard     true                    NONE  thrpt  100   569997548,063 �   148359,953  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard     true  CLASS_OR_CATEGORY_ONLY  thrpt  100   569117549,284 �  1340442,634  ops/s
+o.t.b.l.log4j1__.Log4j1__Benchmark.discard     true                    FULL  thrpt  100   569442935,359 �  1056754,455  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard    false                    NONE  thrpt  100   525750097,854 �  1958636,102  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard    false  CLASS_OR_CATEGORY_ONLY  thrpt  100   528039800,811 �   733888,308  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard    false                    FULL  thrpt  100   525341408,930 �  3251813,743  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard     true                    NONE  thrpt  100   527659816,340 �   524241,424  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard     true  CLASS_OR_CATEGORY_ONLY  thrpt  100   527863108,720 �   213456,967  ops/s
+o.t.b.l.log4j2__.Log4j2__Benchmark.discard     true                    FULL  thrpt  100   527682409,045 �   508478,689  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard    false                    NONE  thrpt  100   583831190,528 �   343806,139  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard    false  CLASS_OR_CATEGORY_ONLY  thrpt  100   583772153,854 �   186560,145  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard    false                    FULL  thrpt  100   583671340,500 �   698776,711  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard     true                    NONE  thrpt  100   583934458,554 �   338434,240  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard     true  CLASS_OR_CATEGORY_ONLY  thrpt  100   583227734,627 �   712259,325  ops/s
+o.t.b.l.logback_.Logback_Benchmark.discard     true                    FULL  thrpt  100   583613930,454 �   715341,349  ops/s
+o.t.b.l.noop.NoOpBenchmark.emptyMethod          N/A                     N/A  thrpt  100  2418710872,273 � 46763573,825  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard    false                    NONE  thrpt  100   954765759,914 �   319253,659  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard    false  CLASS_OR_CATEGORY_ONLY  thrpt  100   954283087,087 �  1201360,930  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard    false                    FULL  thrpt  100   953067941,474 �  1292725,305  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard     true                    NONE  thrpt  100   954537835,690 �   265380,209  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard     true  CLASS_OR_CATEGORY_ONLY  thrpt  100   954216157,027 �  1411957,135  ops/s
+o.t.b.l.tinylog1.Tinylog1Benchmark.discard     true                    FULL  thrpt  100   954452274,024 �   619758,682  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard    false                    NONE  thrpt  100  2421118364,592 � 25422773,328  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard    false  CLASS_OR_CATEGORY_ONLY  thrpt  100  2422895759,100 � 32663589,650  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard    false                    FULL  thrpt  100  2364140135,372 � 22365992,699  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard     true                    NONE  thrpt  100  2399709517,341 � 33060412,854  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard     true  CLASS_OR_CATEGORY_ONLY  thrpt  100  2430391142,866 � 51666392,072  ops/s
+o.t.b.l.tinylog2.Tinylog2Benchmark.discard     true                    FULL  thrpt  100  2241905568,052 � 52133982,351  ops/s
+o.t.b.l.jul_____.Jul_____Benchmark.output       N/A                    NONE     ss  100          10,571 �        0,277   s/op
+o.t.b.l.jul_____.Jul_____Benchmark.output       N/A  CLASS_OR_CATEGORY_ONLY     ss  100          10,841 �        0,084   s/op
+o.t.b.l.jul_____.Jul_____Benchmark.output       N/A                    FULL     ss  100          21,796 �        0,273   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output     false                    NONE     ss  100           8,367 �        0,066   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output     false  CLASS_OR_CATEGORY_ONLY     ss  100           9,003 �        0,129   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output     false                    FULL     ss  100          25,020 �        0,272   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output      true                    NONE     ss  100           1,309 �        0,081   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output      true  CLASS_OR_CATEGORY_ONLY     ss  100           1,570 �        0,028   s/op
+o.t.b.l.log4j1__.Log4j1__Benchmark.output      true                    FULL     ss  100          13,250 �        0,349   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output     false                    NONE     ss  100           9,320 �        0,182   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output     false  CLASS_OR_CATEGORY_ONLY     ss  100           9,281 �        0,046   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output     false                    FULL     ss  100          18,765 �        0,102   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output      true                    NONE     ss  100           8,606 �        0,050   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output      true  CLASS_OR_CATEGORY_ONLY     ss  100           8,975 �        0,033   s/op
+o.t.b.l.log4j2__.Log4j2__Benchmark.output      true                    FULL     ss  100           9,737 �        0,046   s/op
+o.t.b.l.logback_.Logback_Benchmark.output     false                    NONE     ss  100           7,746 �        0,035   s/op
+o.t.b.l.logback_.Logback_Benchmark.output     false  CLASS_OR_CATEGORY_ONLY     ss  100           7,962 �        0,046   s/op
+o.t.b.l.logback_.Logback_Benchmark.output     false                    FULL     ss  100          23,903 �        0,210   s/op
+o.t.b.l.logback_.Logback_Benchmark.output      true                    NONE     ss  100           0,651 �        0,019   s/op
+o.t.b.l.logback_.Logback_Benchmark.output      true  CLASS_OR_CATEGORY_ONLY     ss  100           0,805 �        0,027   s/op
+o.t.b.l.logback_.Logback_Benchmark.output      true                    FULL     ss  100          13,315 �        0,161   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output     false                    NONE     ss  100           7,682 �        0,032   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output     false  CLASS_OR_CATEGORY_ONLY     ss  100          11,216 �        0,409   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output     false                    FULL     ss  100          11,549 �        0,075   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output      true                    NONE     ss  100           0,512 �        0,043   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output      true  CLASS_OR_CATEGORY_ONLY     ss  100           2,391 �        0,016   s/op
+o.t.b.l.tinylog1.Tinylog1Benchmark.output      true                    FULL     ss  100           2,745 �        0,040   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output     false                    NONE     ss  100           8,023 �        0,030   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output     false  CLASS_OR_CATEGORY_ONLY     ss  100          11,251 �        0,062   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output     false                    FULL     ss  100          12,148 �        0,086   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output      true                    NONE     ss  100           0,397 �        0,018   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output      true  CLASS_OR_CATEGORY_ONLY     ss  100           2,101 �        0,011   s/op
+o.t.b.l.tinylog2.Tinylog2Benchmark.output      true                    FULL     ss  100           2,378 �        0,014   s/op

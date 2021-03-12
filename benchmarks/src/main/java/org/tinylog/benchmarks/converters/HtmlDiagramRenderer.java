@@ -16,6 +16,7 @@ package org.tinylog.benchmarks.converters;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -47,14 +48,14 @@ public final class HtmlDiagramRenderer {
 	 * @param benchmarks
 	 *            Results of logging framework benchmarks
 	 */
-	public void output(final Map<String, Map<String, List<BigDecimal>>> benchmarks) {
-		for (Entry<String, Map<String, List<BigDecimal>>> benchmark : benchmarks.entrySet()) {
+	public void output(final Map<BenchmarkEntity, Map<String, List<BigDecimal>>> benchmarks) {
+		for (Entry<BenchmarkEntity, Map<String, List<BigDecimal>>> benchmark : benchmarks.entrySet()) {
 			BigDecimal max = benchmark.getValue().values().stream()
-				.flatMap(list -> list.stream())
+				.flatMap(Collection::stream)
 				.max(Comparator.naturalOrder())
 				.orElse(BigDecimal.ONE);
 
-			System.out.println(benchmark.getKey().toUpperCase(Locale.ENGLISH));
+			System.out.println(benchmark.getKey());
 			System.out.println();
 
 			System.out.println("<div class=\"table-responsive\"><table class=\"table benchmark\">");
