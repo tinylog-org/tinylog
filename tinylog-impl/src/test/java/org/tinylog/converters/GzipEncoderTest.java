@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Rule;
@@ -89,6 +90,25 @@ public final class GzipEncoderTest {
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.contains(file.getAbsolutePath());
+	}
+
+	/**
+	 * Verifies that a meaningful error will be output, if the compressed file cannot be created.
+	 *
+	 * @throws IOException
+	 *             Failed to read or write file
+	 */
+	@Test
+	public void reportNonCreatableCompressionFile() throws IOException {
+		File file = folder.newFile();
+		folder.newFolder(file.getName() + ".gz");
+
+		new GzipEncoder(file).run();
+
+		assertThat(systemStream.consumeErrorOutput())
+			.contains("ERROR")
+			.containsPattern(Pattern.quote(file.getAbsolutePath()) + "[^.]")
+			.contains(file.getAbsolutePath() + ".gz");
 	}
 
 	/**

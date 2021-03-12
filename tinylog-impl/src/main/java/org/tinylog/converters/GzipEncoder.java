@@ -44,6 +44,14 @@ final class GzipEncoder implements Runnable {
 	GzipEncoder(final File file) {
 		sourceFile = file;
 		targetFile = new File(file.getAbsolutePath() + FILE_EXTENSION);
+
+		try {
+			if (!targetFile.createNewFile()) {
+				InternalLogger.log(Level.ERROR, "Failed to pre-create file '" + targetFile + "'");
+			}
+		} catch (IOException ex) {
+			InternalLogger.log(Level.ERROR, ex, "Failed to pre-create file '" + targetFile + "'");
+		}
 	}
 
 	@Override
