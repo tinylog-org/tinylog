@@ -1,6 +1,6 @@
 tinylog 2
 =========
-[![Build Status](https://travis-ci.org/tinylog-org/tinylog.svg?branch=v2.3)](https://travis-ci.org/tinylog-org/tinylog/branches)
+[![Build](https://github.com/tinylog-org/tinylog/actions/workflows/build.yaml/badge.svg?branch=v2.3&event=push)](https://github.com/tinylog-org/tinylog/actions/workflows/build.yaml)
 [![Code Coverage](https://codecov.io/gh/tinylog-org/tinylog/branch/v2.3/graph/badge.svg)](https://codecov.io/gh/tinylog-org/tinylog/branch/v2.3)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog-impl/badge.svg)](https://search.maven.org/search?q=g:org.tinylog)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/tinylog-org/tinylog.svg)](https://github.com/tinylog-org/tinylog/issues "Percentage of issues still open")
