@@ -1,4 +1,4 @@
-package org.tinylog.impl;
+package org.tinylog.impl.backend;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.writer.AsyncWriter;
 
 /**
