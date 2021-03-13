@@ -75,6 +75,7 @@ module org.tinylog.impl {
 		LogcatWriterBuilder;
 
 	exports org.tinylog.impl;
+	exports org.tinylog.impl.backend;
 	exports org.tinylog.impl.format;
 	exports org.tinylog.impl.format.placeholder;
 	exports org.tinylog.impl.format.style;
