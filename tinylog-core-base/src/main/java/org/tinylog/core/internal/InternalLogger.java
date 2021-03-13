@@ -17,7 +17,11 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 public final class InternalLogger {
 
-	private static final String TAG = "tinylog";
+	/**
+	 * The tag to use for internal tinylog log entries.
+	 */
+	public static final String TAG = "tinylog";
+
 	private static final int INTERNAL_STACK_TRACE_DEPTH = 1;
 	private static final int CALLER_STACK_TRACE_DEPTH = 3;
 
