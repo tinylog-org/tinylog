@@ -20,4 +20,10 @@
 		id="javadocMethodDefault"
 	/>
 
+	<!-- Generated Source Files -->
+	<suppress
+		files="[/\\]target[/\\]generated\-sources[/\\].*\.java"
+		checks=".*"
+	/>
+
 </suppressions>
