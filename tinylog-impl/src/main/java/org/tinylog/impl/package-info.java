@@ -1,4 +1,4 @@
 /**
- * tinylog native logging backend implementation.
+ * tinylog's native logging backend implementation.
  */
 package org.tinylog.impl;

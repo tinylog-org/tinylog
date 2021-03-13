@@ -1,4 +1,4 @@
-package org.tinylog.impl.backend;
+package org.tinylog.impl;
 
 import java.util.Collections;
 
@@ -9,7 +9,6 @@ import org.mockito.InOrder;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
-import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writer.AsyncWriter;
 

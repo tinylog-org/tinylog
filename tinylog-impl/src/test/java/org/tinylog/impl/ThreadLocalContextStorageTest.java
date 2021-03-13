@@ -1,4 +1,4 @@
-package org.tinylog.impl.backend;
+package org.tinylog.impl;
 
 import java.util.Collections;
 
