@@ -59,6 +59,24 @@ class ConfigurationTest {
 		}
 
 		/**
+		 * Verifies that the check for presence of an existing value returns {@code true}.
+		 */
+		@Test
+		void checkPresenceOfExistingValue() {
+			Configuration configuration = new Configuration().set("foo", "42");
+			assertThat(configuration.isPresent("foo")).isTrue();
+		}
+
+		/**
+		 * Verifies that the check for presence of a missing value returns {@code false}.
+		 */
+		@Test
+		void checkPresenceOfMissingValue() {
+			Configuration configuration = new Configuration();
+			assertThat(configuration.isPresent("foo")).isFalse();
+		}
+
+		/**
 		 * Verifies that an empty value for property "locale" is interpreted as {@link Locale#ROOT}.
 		 */
 		@Test

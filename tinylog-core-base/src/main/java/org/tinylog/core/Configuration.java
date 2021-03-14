@@ -66,6 +66,18 @@ public class Configuration {
 	}
 
 	/**
+	 * Checks if a value is stored for the passed key.
+	 *
+	 * @param key The key to search for
+	 * @return {@code true} if a value is stored for the passed key, {@code false} otherwise
+	 */
+	public boolean isPresent(String key) {
+		synchronized (properties) {
+			return properties.containsKey(key);
+		}
+	}
+
+	/**
 	 * Gets the configured locale from property "locale". If the property is not set, {@link Locale#getDefault()} will
 	 * be returned instead.
 	 *
