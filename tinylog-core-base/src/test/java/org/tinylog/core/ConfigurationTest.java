@@ -14,6 +14,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
+import com.google.common.collect.ImmutableMap;
+
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -214,6 +216,27 @@ class ConfigurationTest {
 		void getMissingListValue() {
 			Configuration configuration = new Configuration();
 			assertThat(configuration.getList("foo")).isEmpty();
+		}
+
+		/**
+		 * Verifies that an existing prefixed subset of the configuration can be retrieved.
+		 */
+		@Test
+		void getSubConfiguration() {
+			Configuration configuration = new Configuration()
+				.set("bar", "1")
+				.set("foo", "2")
+				.set("foo.alice", "3")
+				.set("foo.bob", "4")
+				.set("foobar", "5")
+				.getSubConfiguration("foo");
+
+			assertThat(configuration.getValue("bar")).isNull();
+			assertThat(configuration.getValue("foo")).isNull();
+			assertThat(configuration.getValue("alice")).isEqualTo("3");
+			assertThat(configuration.getValue("bob")).isEqualTo("4");
+			assertThat(configuration.getValue("foobar")).isNull();
+			assertThat(configuration.isFrozen()).isTrue();
 		}
 
 		/**

@@ -6,8 +6,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -127,6 +129,32 @@ public class Configuration {
 				return elements;
 			}
 		}
+	}
+
+	/**
+	 * Collects all properties that start with the passed prefix. The function adds implicitly a dot to the passed
+	 * prefix as separator character.
+	 *
+	 * <p>
+	 *     For example, the property "foo.bar=42" would be returned as "bar=42" for a prefix "foo".
+	 * </p>
+	 *
+	 * @param prefix The prefix of desired property keys
+	 * @return All found properties with keys shortened by the prefix
+	 */
+	public Configuration getSubConfiguration(String prefix) {
+		Configuration configuration = new Configuration();
+
+		synchronized (properties) {
+			for (String key : properties.stringPropertyNames()) {
+				if (key.startsWith(prefix + ".")) {
+					configuration.set(key.substring(prefix.length() + ".".length()), properties.getProperty(key));
+				}
+			}
+		}
+
+		configuration.frozen = true;
+		return configuration;
 	}
 
 	/**
