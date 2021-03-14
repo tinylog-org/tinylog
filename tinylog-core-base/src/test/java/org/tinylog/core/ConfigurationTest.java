@@ -14,8 +14,6 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
-import com.google.common.collect.ImmutableMap;
-
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,7 +166,7 @@ class ConfigurationTest {
 		 * Verifies that an existing value can be received.
 		 */
 		@Test
-		void getExistingStringValue() {
+		void getExistingStringValueWithoutDefault() {
 			Configuration configuration = new Configuration().set("foo", "42");
 			assertThat(configuration.getValue("foo")).isEqualTo("42");
 		}
@@ -177,9 +175,27 @@ class ConfigurationTest {
 		 * Verifies that {@code null} is returned for a missing value.
 		 */
 		@Test
-		void getMissingStringValue() {
+		void getMissingStringValueWithoutDefault() {
 			Configuration configuration = new Configuration();
 			assertThat(configuration.getValue("foo")).isNull();
+		}
+
+		/**
+		 * Verifies that an existing value can be received.
+		 */
+		@Test
+		void getExistingStringValueWithDefault() {
+			Configuration configuration = new Configuration().set("foo", "42");
+			assertThat(configuration.getValue("foo", "-")).isEqualTo("42");
+		}
+
+		/**
+		 * Verifies that the passed default value is returned for a missing value.
+		 */
+		@Test
+		void getMissingStringValueWithDefault() {
+			Configuration configuration = new Configuration();
+			assertThat(configuration.getValue("foo", "-")).isEqualTo("-");
 		}
 
 		/**

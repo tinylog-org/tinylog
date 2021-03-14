@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Map;
 
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.format.FormatPatternParser;
@@ -29,16 +29,16 @@ public class FileWriterBuilder implements WriterBuilder {
 	}
 
 	@Override
-	public Writer create(Framework framework, Map<String, String> configuration) throws IOException {
-		String pattern = configuration.getOrDefault("pattern", DEFAULT_PATTERN) + System.lineSeparator();
+	public Writer create(Framework framework, Configuration configuration) throws IOException {
+		String pattern = configuration.getValue("pattern", DEFAULT_PATTERN) + System.lineSeparator();
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 
-		String fileName = configuration.get("file");
+		String fileName = configuration.getValue("file");
 		if (fileName == null) {
 			throw new IllegalArgumentException("Required property \"file\" is missing for file writer");
 		}
 
-		String charsetName = configuration.get("charset");
+		String charsetName = configuration.getValue("charset");
 		Charset charset = StandardCharsets.UTF_8;
 		if (charsetName != null) {
 			try {

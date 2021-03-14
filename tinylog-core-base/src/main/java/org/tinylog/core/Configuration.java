@@ -6,10 +6,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -94,12 +92,25 @@ public class Configuration {
 	/**
 	 * Searches the value of a specific key.
 	 *
-	 * @param key Key to search
+	 * @param key The key to search for
 	 * @return The found value or {@code null} if the key does not exist
 	 */
 	public String getValue(String key) {
 		synchronized (properties) {
 			return properties.getProperty(key);
+		}
+	}
+
+	/**
+	 * Searches the value of a specific key.
+	 *
+	 * @param key The key to search for
+	 * @param defaultValue The default value to use if there is no value stored for the passed key
+	 * @return The found value or the passed default value if the key does not exist
+	 */
+	public String getValue(String key, String defaultValue) {
+		synchronized (properties) {
+			return properties.getProperty(key, defaultValue);
 		}
 	}
 

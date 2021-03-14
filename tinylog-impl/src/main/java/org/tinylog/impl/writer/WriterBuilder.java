@@ -1,7 +1,6 @@
 package org.tinylog.impl.writer;
 
-import java.util.Map;
-
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 
 /**
@@ -40,6 +39,6 @@ public interface WriterBuilder {
 	 * @return New instance of the writer
 	 * @throws Exception Failed to create a new writer for the passed configuration
 	 */
-	Writer create(Framework framework, Map<String, String> configuration) throws Exception;
+	Writer create(Framework framework, Configuration configuration) throws Exception;
 
 }

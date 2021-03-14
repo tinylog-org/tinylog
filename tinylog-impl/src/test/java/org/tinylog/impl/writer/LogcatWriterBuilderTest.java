@@ -1,7 +1,5 @@
 package org.tinylog.impl.writer;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
@@ -14,14 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.mockito.MockedStatic;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.Logcat;
-
-import com.google.common.collect.ImmutableMap;
 
 import android.util.Log;
 
@@ -80,7 +77,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			try (Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap())) {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, new Configuration())) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, null, "Hello World!"));
 			}
@@ -97,7 +94,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
+			Configuration configuration = new Configuration().set("tag-pattern", "{tag}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, "foo", "Hello World!"));
@@ -115,7 +112,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
+			Configuration configuration = new Configuration().set("tag-pattern", "{tag}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, "12345678901234567890...", "Hello World!"));
@@ -133,7 +130,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("message-pattern", "{class-name}: {message}");
+			Configuration configuration = new Configuration().set("message-pattern", "{class-name}: {message}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 				logMock.verify(() -> Log.println(Log.INFO, null, "MyClass: Hello World!"));
@@ -169,7 +166,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			try (Writer writer = new LogcatWriterBuilder().create(framework, Collections.emptyMap())) {
+			try (Writer writer = new LogcatWriterBuilder().create(framework, new Configuration())) {
 				writer.log(logEntry);
 			}
 
@@ -188,7 +185,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
+			Configuration configuration = new Configuration().set("tag-pattern", "{tag}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 			}
@@ -207,7 +204,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("tag-pattern", "{tag}");
+			Configuration configuration = new Configuration().set("tag-pattern", "{tag}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 			}
@@ -227,7 +224,7 @@ class LogcatWriterBuilderTest {
 				.message("Hello World!")
 				.create();
 
-			Map<String, String> configuration = ImmutableMap.of("message-pattern", "{class-name}: {message}");
+			Configuration configuration = new Configuration().set("message-pattern", "{class-name}: {message}");
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 			}

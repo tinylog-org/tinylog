@@ -1,7 +1,6 @@
 package org.tinylog.impl.writer;
 
-import java.util.Map;
-
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.impl.format.FormatPatternParser;
 import org.tinylog.impl.format.placeholder.Placeholder;
@@ -27,10 +26,10 @@ public class LogcatWriterBuilder implements WriterBuilder {
 	}
 
 	@Override
-	public Writer create(Framework framework, Map<String, String> configuration) {
+	public Writer create(Framework framework, Configuration configuration) {
 		FormatPatternParser formatPatternParser = new FormatPatternParser(framework);
 
-		String tagPattern = configuration.getOrDefault("tag-pattern", DEFAULT_TAG_PATTERN);
+		String tagPattern = configuration.getValue("tag-pattern", DEFAULT_TAG_PATTERN);
 		Placeholder tagPlaceholder = null;
 		if (tagPattern != null) {
 			Placeholder placeholder = formatPatternParser.parse(tagPattern);
@@ -38,7 +37,7 @@ public class LogcatWriterBuilder implements WriterBuilder {
 			tagPlaceholder = maxLengthStyleBuilder.create(framework, placeholder, Integer.toString(MAX_TAG_LENGTH));
 		}
 
-		String messagePattern = configuration.getOrDefault("message-pattern", DEFAULT_MESSAGE_PATTERN);
+		String messagePattern = configuration.getValue("message-pattern", DEFAULT_MESSAGE_PATTERN);
 		Placeholder messagePlaceholder = formatPatternParser.parse(messagePattern);
 
 		return new LogcatWriter(tagPlaceholder, messagePlaceholder);

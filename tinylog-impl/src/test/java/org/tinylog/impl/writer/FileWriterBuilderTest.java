@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -16,14 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
-
-import com.google.common.collect.ImmutableMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -66,7 +63,7 @@ class FileWriterBuilderTest {
 	@Test
 	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 	void defaultPattern() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("file", logFile.toString());
+		Configuration configuration = new Configuration().set("file", logFile.toString());
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			LogEntry logEntry = new LogEntryBuilder()
@@ -90,10 +87,9 @@ class FileWriterBuilderTest {
 	 */
 	@Test
 	void appendNewLineToCustomPattern() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of(
-			"pattern", "{message}",
-			"file", logFile.toString()
-		);
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", logFile.toString());
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("Hello World!").create());
@@ -107,7 +103,7 @@ class FileWriterBuilderTest {
 	 */
 	@Test
 	void missingFileName() {
-		Map<String, String> configuration = Collections.emptyMap();
+		Configuration configuration = new Configuration();
 		Throwable throwable = catchThrowable(() -> new FileWriterBuilder().create(framework, configuration).close());
 
 		assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
@@ -122,11 +118,10 @@ class FileWriterBuilderTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"utf8", "utf-8", "UTF8", "UTF-8"})
 	void utf8Charset(String charsetName) throws Exception {
-		Map<String, String> configuration = ImmutableMap.of(
-			"pattern", "{message}",
-			"file", logFile.toString(),
-			"charset", charsetName
-		);
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", logFile.toString())
+			.set("charset", charsetName);
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
@@ -145,11 +140,10 @@ class FileWriterBuilderTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"ascii", "us-ascii", "ASCII", "US-ASCII"})
 	void asciiCharset(String charsetName) throws Exception {
-		Map<String, String> configuration = ImmutableMap.of(
-			"pattern", "{message}",
-			"file", logFile.toString(),
-			"charset", charsetName
-		);
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", logFile.toString())
+			.set("charset", charsetName);
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
@@ -166,11 +160,10 @@ class FileWriterBuilderTest {
 	 */
 	@Test
 	void invalidCharset() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of(
-			"pattern", "{message}",
-			"file", logFile.toString(),
-			"charset", "dummy"
-		);
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", logFile.toString())
+			.set("charset", "dummy");
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("Hello World!").create());

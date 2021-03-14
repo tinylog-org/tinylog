@@ -1,8 +1,8 @@
 package org.tinylog.impl.writer;
 
 import java.util.Locale;
-import java.util.Map;
 
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
@@ -29,11 +29,11 @@ public class ConsoleWriterBuilder implements WriterBuilder {
 	}
 
 	@Override
-	public Writer create(Framework framework, Map<String, String> configuration) {
-		String pattern = configuration.getOrDefault("pattern", DEFAULT_PATTERN) + System.lineSeparator();
+	public Writer create(Framework framework, Configuration configuration) {
+		String pattern = configuration.getValue("pattern", DEFAULT_PATTERN) + System.lineSeparator();
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 
-		String threshold = configuration.get("threshold");
+		String threshold = configuration.getValue("threshold");
 		Level level = DEFAULT_THRESHOLD;
 		if (threshold != null) {
 			try {

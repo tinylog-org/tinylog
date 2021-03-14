@@ -2,7 +2,6 @@ package org.tinylog.impl.writer;
 
 import java.io.PrintStream;
 import java.time.Instant;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -13,14 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
-
-import com.google.common.collect.ImmutableMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -71,7 +69,7 @@ class ConsoleWriterBuilderTest {
 	@Test
 	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 	void defaultPattern() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("threshold", "off");
+		Configuration configuration = new Configuration().set("threshold", "off");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			LogEntry logEntry = new LogEntryBuilder()
 				.timestamp(Instant.EPOCH)
@@ -94,7 +92,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void appendNewLineToCustomPattern() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "off");
+		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "off");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
 			verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
@@ -106,7 +104,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void defaultSeverityLevelThreshold() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}");
+		Configuration configuration = new Configuration().set("pattern", "{message}");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
@@ -121,7 +119,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void customSeverityLevelThreshold() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "error");
+		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "error");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
@@ -137,7 +135,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void illegalSeverityLevelThreshold() throws Exception {
-		Map<String, String> configuration = ImmutableMap.of("pattern", "{message}", "threshold", "foo");
+		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "foo");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
 			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
