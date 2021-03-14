@@ -43,9 +43,9 @@ public class ConsoleWriterBuilder implements WriterBuilder {
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(
 					null,
-					"Property \"{}={}\" does not contain a valid severity level",
-					configuration.resolveFullKey(THRESHOLD_KEY),
-					threshold
+					"Invalid severity level \"{}\" in property \"{}\"",
+					threshold,
+					configuration.resolveFullKey(THRESHOLD_KEY)
 				);
 			}
 		}

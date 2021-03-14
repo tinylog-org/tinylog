@@ -40,7 +40,7 @@ public class FileWriterBuilder implements WriterBuilder {
 		String fileName = configuration.getValue(FILE_KEY);
 		if (fileName == null) {
 			String fullKey = configuration.resolveFullKey(FILE_KEY);
-			throw new IllegalArgumentException("Required property \"" + fullKey + "\" is missing");
+			throw new IllegalArgumentException("File name is missing in required property \"" + fullKey + "\"");
 		}
 
 		String charsetName = configuration.getValue(CHARSET_KEY);
@@ -51,7 +51,7 @@ public class FileWriterBuilder implements WriterBuilder {
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.error(
 					ex,
-					"Cannot find a supported charset for \"{}\" in property \"{}\"",
+					"Invalid charset \"{}\" in property \"{}\"",
 					charsetName,
 					configuration.resolveFullKey(CHARSET_KEY)
 				);

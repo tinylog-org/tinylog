@@ -96,9 +96,9 @@ public class Configuration {
 			} catch (DateTimeException ex) {
 				InternalLogger.error(
 					ex,
-					"Could not resolve a zone ID for property \"{}={}\"",
-					resolveFullKey("zone"),
-					value
+					"Invalid zone ID \"{}\" in property \"{}\"",
+					value,
+					resolveFullKey("zone")
 				);
 			}
 		}
