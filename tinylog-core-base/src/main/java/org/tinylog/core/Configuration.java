@@ -1,5 +1,6 @@
 package org.tinylog.core;
 
+import java.text.Collator;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -169,6 +170,36 @@ public class Configuration {
 				return elements;
 			}
 		}
+	}
+
+	/**
+	 * Collects all root keys.
+	 *
+	 * <p>
+	 *     A root key is only the part of key until the first dot. For example, the root key for the property "foo.bar"
+	 *     is "foo". Properties that do not contain a dot are used unchanged as root key.
+	 * </p>
+	 *
+	 * @return Distinct list of all root keys in alphabetical order
+	 */
+	public List<String> getRootKeys() {
+		List<String> keys = new ArrayList<>();
+
+		synchronized (properties) {
+			for (String key : properties.stringPropertyNames()) {
+				int index = key.indexOf('.');
+				if (index >= 0) {
+					key = key.substring(0, index);
+				}
+
+				if (!keys.contains(key)) {
+					keys.add(key);
+				}
+			}
+		}
+
+		keys.sort(Collator.getInstance(Locale.ENGLISH));
+		return keys;
 	}
 
 	/**

@@ -314,6 +314,21 @@ class ConfigurationTest {
 		}
 
 		/**
+		 * Verifies that all root keys are collected completely and in alphabetical order.
+		 */
+		@Test
+		void getRootKeys() {
+			Configuration configuration = new Configuration()
+				.set("bar", "1")
+				.set("foo.alice", "2")
+				.set("foo.bob", "3")
+				.set("foobar", "4")
+				.set("boo", "5");
+
+			assertThat(configuration.getRootKeys()).containsExactly("bar", "boo", "foo", "foobar");
+		}
+
+		/**
 		 * Verifies that no further modifications are allowed after freezing.
 		 */
 		@Test
