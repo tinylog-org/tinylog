@@ -33,11 +33,23 @@ public class Configuration {
 
 	private static final String CONFIGURATION_LOADER_PROPERTY = "tinylog.configurationLoader";
 
+	private final Configuration parent;
+	private final String prefix;
 	private final Properties properties;
 	private boolean frozen;
 
 	/** */
 	public Configuration() {
+		this(null, null);
+	}
+
+	/**
+	 * @param parent The parent configuration ({@code null} for root configurations)
+	 * @param prefix The prefix for resolving real keys for subset configurations ({@code null} for root configurations)
+	 */
+	private Configuration(Configuration parent, String prefix) {
+		this.parent = parent;
+		this.prefix = prefix;
 		this.properties = new Properties();
 		this.frozen = false;
 	}
@@ -62,7 +74,7 @@ public class Configuration {
 	public Locale getLocale() {
 		String value = getValue("locale");
 		if (value == null) {
-			return Locale.getDefault();
+			return parent == null ? Locale.getDefault() : parent.getLocale();
 		} else {
 			String[] tokens = value.split("_", MAX_LOCALE_ARGUMENTS);
 			return new Locale(tokens[0], tokens.length > 1 ? tokens[1] : "", tokens.length > 2 ? tokens[2] : "");
@@ -82,11 +94,16 @@ public class Configuration {
 			try {
 				return ZoneId.of(value);
 			} catch (DateTimeException ex) {
-				InternalLogger.error(ex, "Could not resolve a zone ID for \"" + value + "\"");
+				InternalLogger.error(
+					ex,
+					"Could not resolve a zone ID for property \"{}={}\"",
+					resolveFullKey("zone"),
+					value
+				);
 			}
 		}
 
-		return ZoneOffset.systemDefault();
+		return parent == null ? ZoneOffset.systemDefault() : parent.getZone();
 	}
 
 	/**
@@ -154,18 +171,37 @@ public class Configuration {
 	 * @return All found properties with keys shortened by the prefix
 	 */
 	public Configuration getSubConfiguration(String prefix) {
-		Configuration configuration = new Configuration();
+		prefix = prefix + ".";
 
+		Configuration configuration = new Configuration(this, resolveFullKey(prefix));
 		synchronized (properties) {
 			for (String key : properties.stringPropertyNames()) {
-				if (key.startsWith(prefix + ".")) {
-					configuration.set(key.substring(prefix.length() + ".".length()), properties.getProperty(key));
+				if (key.startsWith(prefix)) {
+					configuration.set(key.substring(prefix.length()), properties.getProperty(key));
 				}
 			}
 		}
-
 		configuration.frozen = true;
 		return configuration;
+	}
+
+	/**
+	 * Resolves the full key as used in the root configuration.
+	 *
+	 * <p>
+	 *     For root configurations, this function always returns the passed key unchanged. For sub configurations, the
+	 *     prefix is added in front of the passed key.
+	 * </p>
+	 *
+	 * @param key The key to resolve
+	 * @return The full key  as used in the root configuration
+	 */
+	public String resolveFullKey(String key) {
+		if (prefix == null) {
+			return key;
+		} else {
+			return prefix + key;
+		}
 	}
 
 	/**

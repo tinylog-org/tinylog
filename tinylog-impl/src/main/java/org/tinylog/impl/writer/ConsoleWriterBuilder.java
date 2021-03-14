@@ -14,9 +14,11 @@ import org.tinylog.impl.format.placeholder.Placeholder;
  */
 public class ConsoleWriterBuilder implements WriterBuilder {
 
+	private static final String PATTERN_KEY = "pattern";
 	private static final String DEFAULT_PATTERN =
 		"{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
 
+	private static final String THRESHOLD_KEY = "threshold";
 	private static final Level DEFAULT_THRESHOLD = Level.WARN;
 
 	/** */
@@ -30,16 +32,21 @@ public class ConsoleWriterBuilder implements WriterBuilder {
 
 	@Override
 	public Writer create(Framework framework, Configuration configuration) {
-		String pattern = configuration.getValue("pattern", DEFAULT_PATTERN) + System.lineSeparator();
+		String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 
-		String threshold = configuration.getValue("threshold");
+		String threshold = configuration.getValue(THRESHOLD_KEY);
 		Level level = DEFAULT_THRESHOLD;
 		if (threshold != null) {
 			try {
 				level = Level.valueOf(threshold.toUpperCase(Locale.ENGLISH));
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.error(ex, "Threshold value \"{}\" is not a valid severity level", threshold);
+				InternalLogger.error(
+					null,
+					"Property \"{}={}\" does not contain a valid severity level",
+					configuration.resolveFullKey(THRESHOLD_KEY),
+					threshold
+				);
 			}
 		}
 

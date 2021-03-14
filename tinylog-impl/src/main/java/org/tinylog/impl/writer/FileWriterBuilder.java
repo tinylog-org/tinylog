@@ -19,6 +19,10 @@ public class FileWriterBuilder implements WriterBuilder {
 	private static final String DEFAULT_PATTERN =
 		"{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
 
+	private static final String PATTERN_KEY = "pattern";
+	private static final String FILE_KEY = "file";
+	private static final String CHARSET_KEY = "charset";
+
 	/** */
 	public FileWriterBuilder() {
 	}
@@ -30,21 +34,27 @@ public class FileWriterBuilder implements WriterBuilder {
 
 	@Override
 	public Writer create(Framework framework, Configuration configuration) throws IOException {
-		String pattern = configuration.getValue("pattern", DEFAULT_PATTERN) + System.lineSeparator();
+		String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
 
-		String fileName = configuration.getValue("file");
+		String fileName = configuration.getValue(FILE_KEY);
 		if (fileName == null) {
-			throw new IllegalArgumentException("Required property \"file\" is missing for file writer");
+			String fullKey = configuration.resolveFullKey(FILE_KEY);
+			throw new IllegalArgumentException("Required property \"" + fullKey + "\" is missing");
 		}
 
-		String charsetName = configuration.getValue("charset");
+		String charsetName = configuration.getValue(CHARSET_KEY);
 		Charset charset = StandardCharsets.UTF_8;
 		if (charsetName != null) {
 			try {
 				charset = Charset.forName(charsetName);
 			} catch (IllegalArgumentException ex) {
-				InternalLogger.error(ex, "Cannot find a supported charset for \"{}\"", charsetName);
+				InternalLogger.error(
+					ex,
+					"Cannot find a supported charset for \"{}\" in property \"{}\"",
+					charsetName,
+					configuration.resolveFullKey(CHARSET_KEY)
+				);
 			}
 		}
 

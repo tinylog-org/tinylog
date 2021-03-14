@@ -11,9 +11,11 @@ import org.tinylog.impl.format.style.MaxLengthStyleBuilder;
  */
 public class LogcatWriterBuilder implements WriterBuilder {
 
+	private static final String TAG_PATTERN_KEY = "tag-pattern";
+	private static final String DEFAULT_TAG_PATTERN = null;
 	private static final int MAX_TAG_LENGTH = 23;
 
-	private static final String DEFAULT_TAG_PATTERN = null;
+	private static final String MESSAGE_PATTERN_KEY = "message-pattern";
 	private static final String DEFAULT_MESSAGE_PATTERN = "{message}";
 
 	/** */
@@ -29,7 +31,7 @@ public class LogcatWriterBuilder implements WriterBuilder {
 	public Writer create(Framework framework, Configuration configuration) {
 		FormatPatternParser formatPatternParser = new FormatPatternParser(framework);
 
-		String tagPattern = configuration.getValue("tag-pattern", DEFAULT_TAG_PATTERN);
+		String tagPattern = configuration.getValue(TAG_PATTERN_KEY, DEFAULT_TAG_PATTERN);
 		Placeholder tagPlaceholder = null;
 		if (tagPattern != null) {
 			Placeholder placeholder = formatPatternParser.parse(tagPattern);
@@ -37,7 +39,7 @@ public class LogcatWriterBuilder implements WriterBuilder {
 			tagPlaceholder = maxLengthStyleBuilder.create(framework, placeholder, Integer.toString(MAX_TAG_LENGTH));
 		}
 
-		String messagePattern = configuration.getValue("message-pattern", DEFAULT_MESSAGE_PATTERN);
+		String messagePattern = configuration.getValue(MESSAGE_PATTERN_KEY, DEFAULT_MESSAGE_PATTERN);
 		Placeholder messagePlaceholder = formatPatternParser.parse(messagePattern);
 
 		return new LogcatWriter(tagPlaceholder, messagePlaceholder);

@@ -104,6 +104,26 @@ class ConfigurationTest {
 		}
 
 		/**
+		 * Verifies that the locale of the parent configuration is inherited in a child configuration by default.
+		 */
+		@Test
+		void inheritLocaleFromParent() {
+			Configuration parent = new Configuration().set("locale", "en");
+			Configuration child = parent.getSubConfiguration("foo");
+			assertThat(child.getLocale()).isEqualTo(Locale.ENGLISH);
+		}
+
+		/**
+		 * Verifies that the locale of the parent configuration can be overridden by the child configuration prefix.
+		 */
+		@Test
+		void overrideLocaleFromParent() {
+			Configuration parent = new Configuration().set("locale", "en").set("foo.locale", "de");
+			Configuration child = parent.getSubConfiguration("foo");
+			assertThat(child.getLocale()).isEqualTo(Locale.GERMAN);
+		}
+
+		/**
 		 * Verifies that UTC can be set as time zone via property "zone".
 		 */
 		@Test
@@ -160,6 +180,26 @@ class ConfigurationTest {
 		void getMissingZone() {
 			Configuration configuration = new Configuration();
 			assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
+		}
+
+		/**
+		 * Verifies that the zone of the parent configuration is inherited in a child configuration by default.
+		 */
+		@Test
+		void inheritZoneFromParent() {
+			Configuration parent = new Configuration().set("zone", "Europe/London");
+			Configuration child = parent.getSubConfiguration("foo");
+			assertThat(child.getZone()).isEqualTo(ZoneId.of("Europe/London"));
+		}
+
+		/**
+		 * Verifies that the zone of the parent configuration can be overridden by the child configuration prefix.
+		 */
+		@Test
+		void overrideZoneFromParent() {
+			Configuration parent = new Configuration().set("zone", "Europe/London").set("foo.zone", "Europe/Berlin");
+			Configuration child = parent.getSubConfiguration("foo");
+			assertThat(child.getZone()).isEqualTo(ZoneId.of("Europe/Berlin"));
 		}
 
 		/**
@@ -266,6 +306,41 @@ class ConfigurationTest {
 			configuration.freeze();
 			assertThat(configuration.isFrozen()).isTrue();
 			assertThatCode(() -> configuration.set("foo", "42")).isInstanceOf(UnsupportedOperationException.class);
+		}
+
+	}
+
+	/**
+	 * Tests for resolving full keys.
+	 */
+	@Nested
+	class FullKey {
+
+		/**
+		 * Verifies that a key is not prefixed by a root configuration.
+		 */
+		@Test
+		void rootConfiguration() {
+			Configuration configuration = new Configuration();
+			assertThat(configuration.resolveFullKey("foo")).isEqualTo("foo");
+		}
+
+		/**
+		 * Verifies that a key is prefixed by a child configuration.
+		 */
+		@Test
+		void childConfiguration() {
+			Configuration configuration = new Configuration().getSubConfiguration("bar");
+			assertThat(configuration.resolveFullKey("foo")).isEqualTo("bar.foo");
+		}
+
+		/**
+		 * Verifies that a key is prefixed by a grandchild configuration.
+		 */
+		@Test
+		void grandchildConfiguration() {
+			Configuration configuration = new Configuration().getSubConfiguration("boo").getSubConfiguration("bar");
+			assertThat(configuration.resolveFullKey("foo")).isEqualTo("boo.bar.foo");
 		}
 
 	}
