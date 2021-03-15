@@ -17,7 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.regex.Pattern;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
@@ -27,7 +26,6 @@ import org.tinylog.core.LogEntryValue;
  */
 final class MessageToken implements Token {
 
-	private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\n|\r");
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	/** */
@@ -43,7 +41,20 @@ final class MessageToken implements Token {
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		String message = logEntry.getMessage();
 		if (message != null) {
-			builder.append(NEW_LINE_PATTERN.matcher(message).replaceAll(NEW_LINE));
+			builder.ensureCapacity(builder.length() + message.length());
+			for (int i = 0; i < message.length(); ++i) {
+				char character = message.charAt(i);
+				if (character == '\r') {
+					builder.append(NEW_LINE);
+					if (i + 1 < message.length() && message.charAt(i + 1) == '\n') {
+						i += 1;
+					}
+				} else if (character == '\n') {
+					builder.append(NEW_LINE);
+				} else {
+					builder.append(character);
+				}
+			}
 		}
 	}
 
