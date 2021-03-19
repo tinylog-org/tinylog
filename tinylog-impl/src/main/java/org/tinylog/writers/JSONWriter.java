@@ -14,7 +14,6 @@
 package org.tinylog.writers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -65,22 +64,19 @@ public final class JSONWriter implements Writer {
 	private static final byte[] BRACKET_CLOSE_BYTE = "]".getBytes();
 
 	/**
-	 * @throws FileNotFoundException    Log file does not exist or cannot be opened
-	 *                                  for any other reason
+	 * @throws IOException              File not found or couldn't access file
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
-	public JSONWriter() throws FileNotFoundException {
+	public JSONWriter() throws IOException {
 		this(Collections.<String, String>emptyMap());
 	}
 
 	/**
 	 * @param properties Configuration for writer
-	 *
-	 * @throws FileNotFoundException    Log file does not exist or cannot be opened
-	 *                                  for any other reason
+	 * @throws IOException              File not found or couldn't access file
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
-	public JSONWriter(final Map<String, String> properties) throws FileNotFoundException {
+	public JSONWriter(final Map<String, String> properties) throws IOException {
 
 		String exceptionFilter = properties.get("exception");
 		messageToken = new FormatPatternParser(exceptionFilter).parse(MESSAGE_PATTERN);
@@ -90,50 +86,57 @@ public final class JSONWriter implements Writer {
 		classToken = new FormatPatternParser(exceptionFilter).parse(CLASS_PATTERN);
 		threadToken = new FormatPatternParser(exceptionFilter).parse(THREAD_PATTERN);
 
-		String fileName = properties.get("file");
-		if (fileName == null) {
-			throw new IllegalArgumentException("File name is missing for file writer");
-		}
-		String charsetName = properties.get("charset");
-		try {
-			charset = charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
-		} catch (IllegalArgumentException ex) {
-			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
-			charset = Charset.defaultCharset();
-		}
-		boolean append = Boolean.parseBoolean(properties.get("append"));
-		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
-		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
+		charset = getCharset(properties);
 
+		String fileName = getFileName(properties);
 		File file = new File(fileName).getAbsoluteFile();
 		file.getParentFile().mkdirs();
 
+		boolean append = Boolean.parseBoolean(properties.get("append"));
 		FileOutputStream stream = new FileOutputStream(file, append);
 		fileChannel = stream.getChannel();
+
 		writer = new OutputStreamWriter(stream);
 
+		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
 		if (buffered) {
 			writer = new BufferedWriterDecorator(writer);
 		}
 
+		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
 		if (!writingThread) {
 			writer = new SynchronizedWriterDecorator(writer, stream);
 		}
 
+		preprocessFile(append);
+	}
+
+	private Charset getCharset(final Map<String, String> properties) {
+		String charsetName = properties.get("charset");
 		try {
-			if (append && fileChannel.size() > BRACKET_CLOSE_BYTE.length) {
-				fileChannel.truncate(fileChannel.size() - BRACKET_CLOSE_BYTE.length);
-				writer.write(COMMA_BYTE, COMMA_BYTE.length);
-			}
-			if (fileChannel.size() == 0) {
-				writer.write(BRACKET_OPEN_BYTE, BRACKET_OPEN_BYTE.length);
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
+		} catch (IllegalArgumentException ex) {
+			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
+			return Charset.defaultCharset();
 		}
 	}
 
-	private String buildJsonEntry(final LogEntry logEntry, StringBuilder builder) {
+	private String getFileName(final Map<String, String> properties) {
+		String fileName = properties.get("file");
+		if (fileName == null) {
+			throw new IllegalArgumentException("File name is missing for file writer");
+		}
+		return fileName;
+	}
+
+	private void writeProperty(Token token, LogEntry logEntry, StringBuilder builder, boolean hasPrevious) {
+		if (hasPrevious) {
+			builder.append(",\n");
+		}
+		token.render(logEntry, builder);
+	}
+
+	private String buildJsonLogEntry(final LogEntry logEntry, StringBuilder builder) {
 		boolean hasMessage = logEntry.getMessage() != null;
 		boolean hasTimestamp = logEntry.getTimestamp() != null;
 		boolean hasLevel = logEntry.getLevel() != null;
@@ -142,51 +145,37 @@ public final class JSONWriter implements Writer {
 		boolean hasThread = logEntry.getThread() != null;
 
 		if (hasMessage) {
-			messageToken.render(logEntry, builder);
+			writeProperty(messageToken, logEntry, builder, false);
 		}
 		if (hasTimestamp) {
-			if (hasMessage) {
-				builder.append(",\n");
-			}
-			timestampToken.render(logEntry, builder);
+			writeProperty(timestampToken, logEntry, builder, hasMessage);
 		}
 		if (hasLevel) {
-			if (hasTimestamp) {
-				builder.append(",\n");
-			}
-			levelToken.render(logEntry, builder);
+			writeProperty(levelToken, logEntry, builder, hasTimestamp);
 		}
 		if (hasClass) {
-			if (hasLevel) {
-				builder.append(",\n");
-			}
-			classToken.render(logEntry, builder);
+			writeProperty(classToken, logEntry, builder, hasLevel);
 		}
 		if (hasMethod) {
-			if (hasClass) {
-				builder.append(",\n");
-			}
-			methodToken.render(logEntry, builder);
+			writeProperty(methodToken, logEntry, builder, hasClass);
 		}
 		if (hasThread) {
-			if (hasMethod) {
-				builder.append(",\n");
-			}
-			threadToken.render(logEntry, builder);
+			writeProperty(threadToken, logEntry, builder, hasMethod);
 		}
 		return String.format(JSON_OBJECT, builder.toString());
 	}
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		String text;
+		String jsonLogEntry;
 		if (builder == null) {
 			builder = new StringBuilder();
 		} else {
 			builder.setLength(0);
 		}
-		text = buildJsonEntry(logEntry, builder);
-		writer.write((text + ",").getBytes(charset), (text + ",").length());
+		jsonLogEntry = buildJsonLogEntry(logEntry, builder);
+		jsonLogEntry += ",";
+		writer.write(jsonLogEntry.getBytes(charset), jsonLogEntry.length());
 	}
 
 	@Override
@@ -196,9 +185,23 @@ public final class JSONWriter implements Writer {
 
 	@Override
 	public void close() throws IOException {
+		postprocessFile();
+		writer.close();
+	}
+
+	private void preprocessFile(boolean append) throws IOException {
+		if (append && fileChannel.size() > BRACKET_CLOSE_BYTE.length) {
+			fileChannel.truncate(fileChannel.size() - BRACKET_CLOSE_BYTE.length);
+			writer.write(COMMA_BYTE, COMMA_BYTE.length);
+		}
+		if (fileChannel.size() == 0) {
+			writer.write(BRACKET_OPEN_BYTE, BRACKET_OPEN_BYTE.length);
+		}
+	}
+
+	private void postprocessFile() throws IOException {
 		fileChannel.truncate(fileChannel.size() - COMMA_BYTE.length);
 		writer.write(BRACKET_CLOSE_BYTE, BRACKET_CLOSE_BYTE.length);
-		writer.close();
 	}
 
 	@Override
