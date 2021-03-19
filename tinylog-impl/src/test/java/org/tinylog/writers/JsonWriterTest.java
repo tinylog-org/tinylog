@@ -27,7 +27,7 @@ import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
 
-public final class JSONWriterTest {
+public final class JsonWriterTest {
 
     /**
      * Redirects and collects system output streams.
@@ -49,14 +49,14 @@ public final class JSONWriterTest {
         properties.put("buffered", "false");
         properties.put("append", "false");
 
-        JSONWriter writer;
-        writer = new JSONWriter(properties);
-        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JSONWriterTest.class).create();
+        JsonWriter writer;
+        writer = new JsonWriter(properties);
+        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
         writer.write(givenLogEntry);
         writer.write(givenLogEntry);
         writer.close();
 
-        writer = new JSONWriter(properties);
+        writer = new JsonWriter(properties);
         writer.write(givenLogEntry);
         writer.write(givenLogEntry);
         writer.close();
@@ -81,14 +81,14 @@ public final class JSONWriterTest {
         properties.put("buffered", "false");
         properties.put("append", "true");
 
-        JSONWriter writer;
-        writer = new JSONWriter(properties);
-        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JSONWriterTest.class).create();
+        JsonWriter writer;
+        writer = new JsonWriter(properties);
+        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
         writer.write(givenLogEntry);
         writer.write(givenLogEntry);
         writer.close();
 
-        writer = new JSONWriter(properties);
+        writer = new JsonWriter(properties);
         writer.write(givenLogEntry);
         writer.write(givenLogEntry);
         writer.close();
@@ -113,9 +113,9 @@ public final class JSONWriterTest {
         properties.put("buffered", "false");
         properties.put("append", "false");
 
-        JSONWriter writer;
-        writer = new JSONWriter(properties);
-        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JSONWriterTest.class).create();
+        JsonWriter writer;
+        writer = new JsonWriter(properties);
+        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
         writer.write(givenLogEntry);
         writer.close();
 
@@ -139,9 +139,9 @@ public final class JSONWriterTest {
         properties.put("buffered", "false");
         properties.put("append", "true");
 
-        JSONWriter writer;
-        writer = new JSONWriter(properties);
-        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JSONWriterTest.class).create();
+        JsonWriter writer;
+        writer = new JsonWriter(properties);
+        LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
         writer.write(givenLogEntry);
         writer.write(givenLogEntry);
         writer.close();

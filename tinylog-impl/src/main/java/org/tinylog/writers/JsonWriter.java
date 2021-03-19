@@ -38,7 +38,7 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
  * Writer for outputting log entries to a log file. Already existing files can
  * be continued and the output can be buffered for improving performance.
  */
-public final class JSONWriter implements Writer {
+public final class JsonWriter implements Writer {
 	private Charset charset;
 	private ByteArrayWriter writer;
 	private FileChannel fileChannel;
@@ -67,7 +67,7 @@ public final class JSONWriter implements Writer {
 	 * @throws IOException              File not found or couldn't access file
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
-	public JSONWriter() throws IOException {
+	public JsonWriter() throws IOException {
 		this(Collections.<String, String>emptyMap());
 	}
 
@@ -76,7 +76,7 @@ public final class JSONWriter implements Writer {
 	 * @throws IOException              File not found or couldn't access file
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
-	public JSONWriter(final Map<String, String> properties) throws IOException {
+	public JsonWriter(final Map<String, String> properties) throws IOException {
 
 		String exceptionFilter = properties.get("exception");
 		messageToken = new FormatPatternParser(exceptionFilter).parse(MESSAGE_PATTERN);
