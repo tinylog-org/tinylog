@@ -46,6 +46,8 @@ public final class JsonWriter implements Writer {
 	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
 	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
 	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
+	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	private Charset charset;
 	private ByteArrayWriter writer;
 	private FileChannel fileChannel;
@@ -134,7 +136,7 @@ public final class JsonWriter implements Writer {
 	private void writeProperty(final Token token, final LogEntry logEntry, final StringBuilder builder,
 			final boolean hasPrevious) {
 		if (hasPrevious) {
-			builder.append(",%n");
+			builder.append(String.format(",%s", NEW_LINE));
 		}
 		token.render(logEntry, builder);
 	}
