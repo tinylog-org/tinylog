@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
-
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
@@ -54,17 +52,18 @@ public final class JSONWriter implements Writer {
 	private final Token timestampToken;
 	private static final String TIMESTAMP_PATTERN = "\"timestamp\": \"{date}\"";
 	private final Token methodToken;
-	private static final String METHOD_PATTERN = "\"method\": \"{method}\"";
+	private static final String METHOD_PATTERN = "\"method\": \"{method}()\"";
 	private final Token levelToken;
 	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
 	private final Token classToken;
 	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
+	private final Token threadToken;
+	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
 
 	private static final byte[] COMMA_BYTE = ",".getBytes();
 	private static final byte[] BRACKET_OPEN_BYTE = "[".getBytes();
 	private static final byte[] BRACKET_CLOSE_BYTE = "]".getBytes();
 
-	private
 	/**
 	 * @throws FileNotFoundException    Log file does not exist or cannot be opened
 	 *                                  for any other reason
@@ -89,6 +88,7 @@ public final class JSONWriter implements Writer {
 		methodToken = new FormatPatternParser(exceptionFilter).parse(METHOD_PATTERN);
 		levelToken = new FormatPatternParser(exceptionFilter).parse(LEVEL_PATTERN);
 		classToken = new FormatPatternParser(exceptionFilter).parse(CLASS_PATTERN);
+		threadToken = new FormatPatternParser(exceptionFilter).parse(THREAD_PATTERN);
 
 		String fileName = properties.get("file");
 		if (fileName == null) {
@@ -119,6 +119,7 @@ public final class JSONWriter implements Writer {
 		if (!writingThread) {
 			writer = new SynchronizedWriterDecorator(writer, stream);
 		}
+
 		try {
 			if (append && fileChannel.size() > BRACKET_CLOSE_BYTE.length) {
 				fileChannel.truncate(fileChannel.size() - BRACKET_CLOSE_BYTE.length);
@@ -138,6 +139,8 @@ public final class JSONWriter implements Writer {
 		boolean hasLevel = logEntry.getLevel() != null;
 		boolean hasMethod = logEntry.getMethodName() != null;
 		boolean hasClass = logEntry.getClassName() != null;
+		boolean hasThread = logEntry.getThread() != null;
+
 		if (hasMessage) {
 			messageToken.render(logEntry, builder);
 		}
@@ -164,6 +167,12 @@ public final class JSONWriter implements Writer {
 				builder.append(",\n");
 			}
 			methodToken.render(logEntry, builder);
+		}
+		if (hasThread) {
+			if (hasMethod) {
+				builder.append(",\n");
+			}
+			threadToken.render(logEntry, builder);
 		}
 		return String.format(JSON_OBJECT, builder.toString());
 	}
