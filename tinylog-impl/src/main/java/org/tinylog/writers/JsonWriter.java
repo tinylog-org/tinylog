@@ -120,7 +120,7 @@ public final class JsonWriter implements Writer {
 			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
 		} catch (IllegalArgumentException ex) {
 			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
-			return StandardCharsets.UTF_8;
+			return Charset.defaultCharset();
 		}
 	}
 
