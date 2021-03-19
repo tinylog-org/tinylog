@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Martin Winandy
+ * Copyright 2021 Direnc Timur
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -35,33 +36,32 @@ import org.tinylog.writers.raw.OutputStreamWriter;
 import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 /**
- * Writer for outputting log entries to a log file. Already existing files can
- * be continued and the output can be buffered for improving performance.
+ * Writer for outputting log entries to a log file in JSON format. Already
+ * existing files can be continued.
  */
 public final class JsonWriter implements Writer {
+	private static final String JSON_OBJECT = "{%n%s%n}";
+	private static final String MESSAGE_PATTERN = "\"message\": \"{message}\"";
+	private static final String TIMESTAMP_PATTERN = "\"timestamp\": \"{date}\"";
+	private static final String METHOD_PATTERN = "\"method\": \"{method}()\"";
+	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
+	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
+	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
 	private Charset charset;
 	private ByteArrayWriter writer;
 	private FileChannel fileChannel;
 
-	private static final String JSON_OBJECT = "{\n%s\n}";
-
 	private StringBuilder builder;
 	private final Token messageToken;
-	private static final String MESSAGE_PATTERN = "\"message\": \"{message}\"";
 	private final Token timestampToken;
-	private static final String TIMESTAMP_PATTERN = "\"timestamp\": \"{date}\"";
 	private final Token methodToken;
-	private static final String METHOD_PATTERN = "\"method\": \"{method}()\"";
 	private final Token levelToken;
-	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
 	private final Token classToken;
-	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
 	private final Token threadToken;
-	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
 
-	private static final byte[] COMMA_BYTE = ",".getBytes();
-	private static final byte[] BRACKET_OPEN_BYTE = "[".getBytes();
-	private static final byte[] BRACKET_CLOSE_BYTE = "]".getBytes();
+	private byte[] commaByte;
+	private byte[] bracketOpenByte;
+	private byte[] bracketCloseByte;
 
 	/**
 	 * @throws IOException              File not found or couldn't access file
@@ -87,6 +87,9 @@ public final class JsonWriter implements Writer {
 		threadToken = new FormatPatternParser(exceptionFilter).parse(THREAD_PATTERN);
 
 		charset = getCharset(properties);
+		commaByte = ",".getBytes(charset);
+		bracketOpenByte = "[".getBytes(charset);
+		bracketCloseByte = "]".getBytes(charset);
 
 		String fileName = getFileName(properties);
 		File file = new File(fileName).getAbsoluteFile();
@@ -117,7 +120,7 @@ public final class JsonWriter implements Writer {
 			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
 		} catch (IllegalArgumentException ex) {
 			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
-			return Charset.defaultCharset();
+			return StandardCharsets.UTF_8;
 		}
 	}
 
@@ -129,14 +132,15 @@ public final class JsonWriter implements Writer {
 		return fileName;
 	}
 
-	private void writeProperty(Token token, LogEntry logEntry, StringBuilder builder, boolean hasPrevious) {
+	private void writeProperty(final Token token, final LogEntry logEntry, final StringBuilder builder,
+			final boolean hasPrevious) {
 		if (hasPrevious) {
-			builder.append(",\n");
+			builder.append(",%n");
 		}
 		token.render(logEntry, builder);
 	}
 
-	private String buildJsonLogEntry(final LogEntry logEntry, StringBuilder builder) {
+	private String buildJsonLogEntry(final LogEntry logEntry, final StringBuilder builder) {
 		boolean hasMessage = logEntry.getMessage() != null;
 		boolean hasTimestamp = logEntry.getTimestamp() != null;
 		boolean hasLevel = logEntry.getLevel() != null;
@@ -189,19 +193,19 @@ public final class JsonWriter implements Writer {
 		writer.close();
 	}
 
-	private void preprocessFile(boolean append) throws IOException {
-		if (append && fileChannel.size() > BRACKET_CLOSE_BYTE.length) {
-			fileChannel.truncate(fileChannel.size() - BRACKET_CLOSE_BYTE.length);
-			writer.write(COMMA_BYTE, COMMA_BYTE.length);
+	private void preprocessFile(final boolean append) throws IOException {
+		if (append && fileChannel.size() > bracketCloseByte.length) {
+			fileChannel.truncate(fileChannel.size() - bracketCloseByte.length);
+			writer.write(commaByte, commaByte.length);
 		}
 		if (fileChannel.size() == 0) {
-			writer.write(BRACKET_OPEN_BYTE, BRACKET_OPEN_BYTE.length);
+			writer.write(bracketOpenByte, bracketOpenByte.length);
 		}
 	}
 
 	private void postprocessFile() throws IOException {
-		fileChannel.truncate(fileChannel.size() - COMMA_BYTE.length);
-		writer.write(BRACKET_CLOSE_BYTE, BRACKET_CLOSE_BYTE.length);
+		fileChannel.truncate(fileChannel.size() - commaByte.length);
+		writer.write(bracketCloseByte, bracketCloseByte.length);
 	}
 
 	@Override
