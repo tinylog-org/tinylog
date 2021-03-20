@@ -14,8 +14,10 @@
 package org.tinylog.writers;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -47,10 +49,12 @@ public final class JsonWriter implements Writer {
 	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
 	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
 	private static final String NEW_LINE = System.getProperty("line.separator");
+	private static final int BUFFER_SIZE = 1024;
 
 	private Charset charset;
 	private ByteArrayWriter writer;
 	private FileChannel fileChannel;
+	private FileChannel inputChannel;
 
 	private StringBuilder builder;
 	private final Token messageToken;
@@ -98,6 +102,7 @@ public final class JsonWriter implements Writer {
 
 		boolean append = Boolean.parseBoolean(properties.get("append"));
 		FileOutputStream stream = new FileOutputStream(file, append);
+
 		fileChannel = stream.getChannel();
 
 		writer = new OutputStreamWriter(stream);
@@ -112,7 +117,10 @@ public final class JsonWriter implements Writer {
 			writer = new SynchronizedWriterDecorator(writer, stream);
 		}
 
-		preprocessFile(append);
+		try (FileInputStream inputStream = new FileInputStream(file)) {
+			inputChannel = inputStream.getChannel();
+			preprocessFile(append);
+		}
 	}
 
 	private Charset getCharset(final Map<String, String> properties) {
@@ -194,19 +202,42 @@ public final class JsonWriter implements Writer {
 		writer.close();
 	}
 
-	private void preprocessFile(final boolean append) throws IOException {
-		if (append && fileChannel.size() > bracketCloseByte.length) {
-			fileChannel.truncate(fileChannel.size() - bracketCloseByte.length);
-			writer.write(commaByte, commaByte.length);
+	private void preprocessFile(final boolean append) throws IOException, IllegalArgumentException {
+		if (append && inputChannel.size() > 0) {
+			long sizeToTruncate = 0;
+			long currentPosition = inputChannel.size();
+			boolean foundClosingBracket = false;
+			while (!foundClosingBracket) {
+				long from = Math.max(0, currentPosition - BUFFER_SIZE);
+				long numberOfBytes = Math.min(currentPosition, BUFFER_SIZE);
+				MappedByteBuffer section = inputChannel.map(FileChannel.MapMode.READ_ONLY, from, numberOfBytes);
+				byte[] bytes = new byte[section.remaining()];
+				section.get(bytes);
+				if (bytes.length == 0) {
+					throw new IllegalArgumentException(
+							"Invalid JSON file. The file is missing a closing bracket for the array.");
+				}
+				for (int i = bytes.length - 1; i >= 0; i--, currentPosition--) {
+					sizeToTruncate += 1;
+					if (bytes[i] == ']') {
+						foundClosingBracket = true;
+						break;
+					}
+				}
+			}
+			long newFileSize = fileChannel.size() - sizeToTruncate;
+			fileChannel.truncate(newFileSize);
+			writer.write(commaByte, 1);
 		}
-		if (fileChannel.size() == 0) {
-			writer.write(bracketOpenByte, bracketOpenByte.length);
+
+		if (inputChannel.size() == 0) {
+			writer.write(bracketOpenByte, 1);
 		}
 	}
 
 	private void postprocessFile() throws IOException {
 		fileChannel.truncate(fileChannel.size() - commaByte.length);
-		writer.write(bracketCloseByte, bracketCloseByte.length);
+		writer.write(bracketCloseByte, 1);
 	}
 
 	@Override
