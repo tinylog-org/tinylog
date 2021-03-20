@@ -116,10 +116,15 @@ public final class JsonWriter implements Writer {
 		if (!writingThread) {
 			writer = new SynchronizedWriterDecorator(writer, stream);
 		}
-
-		try (FileInputStream inputStream = new FileInputStream(file)) {
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(file);
 			inputChannel = inputStream.getChannel();
 			preprocessFile(append);
+		} finally {
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
 	}
 
