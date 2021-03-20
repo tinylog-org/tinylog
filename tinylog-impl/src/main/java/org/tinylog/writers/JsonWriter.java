@@ -202,6 +202,14 @@ public final class JsonWriter implements Writer {
 		writer.close();
 	}
 
+	/**
+	 * Preprocesses the JSON file. If append mode is on, deletes the closing bracket
+	 * and adds a comma instead. If it's a new file, appends an opening bracket.
+	 * 
+	 * @param append Append Mode on or off
+	 * @throws IOException              Error reading or writing file
+	 * @throws IllegalArgumentException Invalid file format
+	 */
 	private void preprocessFile(final boolean append) throws IOException, IllegalArgumentException {
 		if (append && inputChannel.size() > 0) {
 			long sizeToTruncate = 0;
@@ -235,6 +243,13 @@ public final class JsonWriter implements Writer {
 		}
 	}
 
+	/**
+	 * Postprocesses the JSON file. Attempts to delete the trailing comma and
+	 * appends closing bracket which were handled in
+	 * {@link #preprocessFile(boolean)}
+	 * 
+	 * @throws IOException Error writing to file
+	 */
 	private void postprocessFile() throws IOException {
 		fileChannel.truncate(fileChannel.size() - commaByte.length);
 		writer.write(bracketCloseByte, 1);
