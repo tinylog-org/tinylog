@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.tinylog.Level;
@@ -78,10 +80,8 @@ public final class JsonWriter implements Writer {
 	public JsonWriter(final Map<String, String> properties) throws IOException {
 		String exceptionFilter = properties.get("exception");
 		StringBuilder jsonPatternBuilder = new StringBuilder();
-		jsonPatternBuilder.append("\t\t").append(MESSAGE_PATTERN).append(",").append(NEW_LINE).append("\t\t")
-				.append(TIMESTAMP_PATTERN).append(",").append(NEW_LINE).append("\t\t").append(METHOD_PATTERN)
-				.append(",").append(NEW_LINE).append("\t\t").append(LEVEL_PATTERN).append(",").append(NEW_LINE)
-				.append("\t\t").append(CLASS_PATTERN).append(",").append(NEW_LINE).append("\t\t")
+		jsonPatternBuilder.append(MESSAGE_PATTERN).append(",").append(TIMESTAMP_PATTERN).append(",")
+				.append(METHOD_PATTERN).append(",").append(LEVEL_PATTERN).append(",").append(CLASS_PATTERN).append(",")
 				.append(THREAD_PATTERN);
 		token = new FormatPatternParser(exceptionFilter).parse(jsonPatternBuilder.toString());
 
@@ -147,10 +147,20 @@ public final class JsonWriter implements Writer {
 		} else {
 			builder.setLength(0);
 		}
-		builder.append(NEW_LINE).append("\t{").append(NEW_LINE);
+		builder.append("{");
 		token.render(logEntry, builder);
-		builder.append(NEW_LINE).append("\t}");
+		builder.append("}");
 		builder.append(",");
+
+		List<Integer> lineBreakIndexes = new ArrayList<>();
+		int lastIndexOf = builder.indexOf(NEW_LINE);
+		int currentIndexOf = builder.indexOf(NEW_LINE, lastIndexOf + 1);
+		while (currentIndexOf >= 0 && lastIndexOf != currentIndexOf) {
+			lineBreakIndexes.add(currentIndexOf);
+			lastIndexOf = currentIndexOf;
+			currentIndexOf = builder.indexOf(NEW_LINE, currentIndexOf + 1);
+		}
+		lineBreakIndexes.forEach(index -> builder.replace(index, index + NEW_LINE.length() + 1, "\\n"));
 		writer.write(builder.toString().getBytes(charset), builder.length());
 	}
 
