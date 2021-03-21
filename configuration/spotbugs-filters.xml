@@ -38,13 +38,10 @@
 	</Match>
 	<Match>
 		<!-- Base Class for Format Pattern Writers -->
-		<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
-		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
-		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-	</Match>
-	<Match>
-		<!-- JsonWriter -->
-		<Class name="org.tinylog.writers.JsonWriter" />
+		<Or>
+			<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
+			<Class name="org.tinylog.writers.JsonWriter" />
+		</Or>
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
 	</Match>
