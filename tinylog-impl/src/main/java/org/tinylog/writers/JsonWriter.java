@@ -241,7 +241,7 @@ public final class JsonWriter implements Writer {
 	private static List<Token> createTokens(final Map<String, String> properties) {
 		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
 
-		List<Token> tokens = new ArrayList<>();
+		List<Token> tokens = new ArrayList<Token>();
 		for (Entry<String, String> entry : properties.entrySet()) {
 			if (entry.getKey().toLowerCase(Locale.ROOT).startsWith(FIELD_PREFIX)) {
 				String tokenPattern = new StringBuilder().append("\"").append(entry.getKey().replace(FIELD_PREFIX, ""))
