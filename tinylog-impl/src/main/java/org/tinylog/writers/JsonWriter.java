@@ -22,7 +22,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.tinylog.Level;
@@ -41,13 +40,13 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
  * existing files can be continued.
  */
 public final class JsonWriter implements Writer {
-	private static final String JSON_OBJECT = "{%n%s%n}";
 	private static final String MESSAGE_PATTERN = "\"message\": \"{message}\"";
 	private static final String TIMESTAMP_PATTERN = "\"timestamp\": \"{date}\"";
 	private static final String METHOD_PATTERN = "\"method\": \"{method}()\"";
 	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
 	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
 	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
+
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final int BUFFER_SIZE = 1024;
 
@@ -57,12 +56,7 @@ public final class JsonWriter implements Writer {
 	private FileChannel inputChannel;
 
 	private StringBuilder builder;
-	private final Token messageToken;
-	private final Token timestampToken;
-	private final Token methodToken;
-	private final Token levelToken;
-	private final Token classToken;
-	private final Token threadToken;
+	private final Token token;
 
 	private byte[] commaByte;
 	private byte[] bracketOpenByte;
@@ -82,14 +76,14 @@ public final class JsonWriter implements Writer {
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
 	public JsonWriter(final Map<String, String> properties) throws IOException {
-
 		String exceptionFilter = properties.get("exception");
-		messageToken = new FormatPatternParser(exceptionFilter).parse(MESSAGE_PATTERN);
-		timestampToken = new FormatPatternParser(exceptionFilter).parse(TIMESTAMP_PATTERN);
-		methodToken = new FormatPatternParser(exceptionFilter).parse(METHOD_PATTERN);
-		levelToken = new FormatPatternParser(exceptionFilter).parse(LEVEL_PATTERN);
-		classToken = new FormatPatternParser(exceptionFilter).parse(CLASS_PATTERN);
-		threadToken = new FormatPatternParser(exceptionFilter).parse(THREAD_PATTERN);
+		StringBuilder jsonPatternBuilder = new StringBuilder();
+		jsonPatternBuilder.append("\t\t").append(MESSAGE_PATTERN).append(",").append(NEW_LINE).append("\t\t")
+				.append(TIMESTAMP_PATTERN).append(",").append(NEW_LINE).append("\t\t").append(METHOD_PATTERN)
+				.append(",").append(NEW_LINE).append("\t\t").append(LEVEL_PATTERN).append(",").append(NEW_LINE)
+				.append("\t\t").append(CLASS_PATTERN).append(",").append(NEW_LINE).append("\t\t")
+				.append(THREAD_PATTERN);
+		token = new FormatPatternParser(exceptionFilter).parse(jsonPatternBuilder.toString());
 
 		charset = getCharset(properties);
 		commaByte = ",".getBytes(charset);
@@ -146,54 +140,18 @@ public final class JsonWriter implements Writer {
 		return fileName;
 	}
 
-	private void writeProperty(final Token token, final LogEntry logEntry, final StringBuilder builder,
-			final boolean hasPrevious) {
-		if (hasPrevious) {
-			builder.append(String.format(",%s", NEW_LINE));
-		}
-		token.render(logEntry, builder);
-	}
-
-	private String buildJsonLogEntry(final LogEntry logEntry, final StringBuilder builder) {
-		boolean hasMessage = logEntry.getMessage() != null;
-		boolean hasTimestamp = logEntry.getTimestamp() != null;
-		boolean hasLevel = logEntry.getLevel() != null;
-		boolean hasMethod = logEntry.getMethodName() != null;
-		boolean hasClass = logEntry.getClassName() != null;
-		boolean hasThread = logEntry.getThread() != null;
-
-		if (hasMessage) {
-			writeProperty(messageToken, logEntry, builder, false);
-		}
-		if (hasTimestamp) {
-			writeProperty(timestampToken, logEntry, builder, hasMessage);
-		}
-		if (hasLevel) {
-			writeProperty(levelToken, logEntry, builder, hasTimestamp);
-		}
-		if (hasClass) {
-			writeProperty(classToken, logEntry, builder, hasLevel);
-		}
-		if (hasMethod) {
-			writeProperty(methodToken, logEntry, builder, hasClass);
-		}
-		if (hasThread) {
-			writeProperty(threadToken, logEntry, builder, hasMethod);
-		}
-		return String.format(JSON_OBJECT, builder.toString());
-	}
-
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		String jsonLogEntry;
 		if (builder == null) {
 			builder = new StringBuilder();
 		} else {
 			builder.setLength(0);
 		}
-		jsonLogEntry = buildJsonLogEntry(logEntry, builder);
-		jsonLogEntry += ",";
-		writer.write(jsonLogEntry.getBytes(charset), jsonLogEntry.length());
+		builder.append(NEW_LINE).append("\t{").append(NEW_LINE);
+		token.render(logEntry, builder);
+		builder.append(NEW_LINE).append("\t}");
+		builder.append(",");
+		writer.write(builder.toString().getBytes(charset), builder.length());
 	}
 
 	@Override
@@ -257,12 +215,13 @@ public final class JsonWriter implements Writer {
 	 */
 	private void postprocessFile() throws IOException {
 		fileChannel.truncate(fileChannel.size() - commaByte.length);
+		writer.write(NEW_LINE.getBytes(charset), 1);
 		writer.write(bracketCloseByte, 1);
 	}
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.noneOf(LogEntryValue.class);
+		return token.getRequiredLogEntryValues();
 	}
 
 }
