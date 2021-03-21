@@ -48,6 +48,8 @@ public final class JsonWriterTest {
 		properties.put("file", file);
 		properties.put("buffered", "false");
 		properties.put("append", "false");
+		properties.put("field.level", "level");
+		properties.put("field.message", "message");
 
 		JsonWriter writer;
 		writer = new JsonWriter(properties);
@@ -62,8 +64,8 @@ public final class JsonWriterTest {
 		writer.close();
 
 		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\": \"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\": \"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\":\"%s\"", expectedLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\":\"%s\"", expectedLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
 		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
@@ -85,6 +87,8 @@ public final class JsonWriterTest {
 		properties.put("file", file);
 		properties.put("buffered", "false");
 		properties.put("append", "true");
+		properties.put("field.level", "level");
+		properties.put("field.message", "message");
 
 		JsonWriter writer;
 		writer = new JsonWriter(properties);
@@ -99,8 +103,8 @@ public final class JsonWriterTest {
 		writer.close();
 
 		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\": \"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\": \"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\":\"%s\"", expectedLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\":\"%s\"", expectedLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
 		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;

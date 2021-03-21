@@ -23,8 +23,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
@@ -42,15 +45,9 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
  * existing files can be continued.
  */
 public final class JsonWriter implements Writer {
-	private static final String MESSAGE_PATTERN = "\"message\": \"{message}\"";
-	private static final String TIMESTAMP_PATTERN = "\"timestamp\": \"{date}\"";
-	private static final String METHOD_PATTERN = "\"method\": \"{method}()\"";
-	private static final String LEVEL_PATTERN = "\"level\": \"{level}\"";
-	private static final String CLASS_PATTERN = "\"class\": \"{class}\"";
-	private static final String THREAD_PATTERN = "\"thread\": \"{thread}\"";
-
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final int BUFFER_SIZE = 1024;
+	private static final String FIELD_PREFIX = "field.";
 
 	private Charset charset;
 	private ByteArrayWriter writer;
@@ -58,7 +55,7 @@ public final class JsonWriter implements Writer {
 	private FileChannel inputChannel;
 
 	private StringBuilder builder;
-	private final Token token;
+	private final List<Token> tokens;
 
 	private byte[] commaByte;
 	private byte[] bracketOpenByte;
@@ -78,13 +75,7 @@ public final class JsonWriter implements Writer {
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
 	public JsonWriter(final Map<String, String> properties) throws IOException {
-		String exceptionFilter = properties.get("exception");
-		StringBuilder jsonPatternBuilder = new StringBuilder();
-		jsonPatternBuilder.append(MESSAGE_PATTERN).append(",").append(TIMESTAMP_PATTERN).append(",")
-				.append(METHOD_PATTERN).append(",").append(LEVEL_PATTERN).append(",").append(CLASS_PATTERN).append(",")
-				.append(THREAD_PATTERN);
-		token = new FormatPatternParser(exceptionFilter).parse(jsonPatternBuilder.toString());
-
+		tokens = createTokens(properties);
 		charset = getCharset(properties);
 		commaByte = ",".getBytes(charset);
 		bracketOpenByte = "[".getBytes(charset);
@@ -120,6 +111,7 @@ public final class JsonWriter implements Writer {
 				inputStream.close();
 			}
 		}
+
 	}
 
 	private Charset getCharset(final Map<String, String> properties) {
@@ -148,7 +140,13 @@ public final class JsonWriter implements Writer {
 			builder.setLength(0);
 		}
 		builder.append("{");
-		token.render(logEntry, builder);
+		for (int i = 0; i < tokens.size(); i++) {
+			Token token = tokens.get(i);
+			token.render(logEntry, builder);
+			if (i + 1 < tokens.size()) {
+				builder.append(",");
+			}
+		}
 		builder.append("}");
 		builder.append(",");
 
@@ -231,7 +229,25 @@ public final class JsonWriter implements Writer {
 
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		return token.getRequiredLogEntryValues();
+		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
+		for (Token token : tokens) {
+			values.addAll(token.getRequiredLogEntryValues());
+		}
+		return values;
+	}
+
+	private static List<Token> createTokens(final Map<String, String> properties) {
+		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
+
+		List<Token> tokens = new ArrayList<>();
+		for (Entry<String, String> entry : properties.entrySet()) {
+			if (entry.getKey().toLowerCase(Locale.ROOT).startsWith(FIELD_PREFIX)) {
+				String tokenPattern = new StringBuilder().append("\"").append(entry.getKey().replace(FIELD_PREFIX, ""))
+						.append("\":\"{").append(entry.getValue()).append("}\"").toString();
+				tokens.add(parser.parse(tokenPattern));
+			}
+		}
+		return tokens;
 	}
 
 }
