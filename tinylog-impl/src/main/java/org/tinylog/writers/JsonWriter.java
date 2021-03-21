@@ -150,7 +150,7 @@ public final class JsonWriter implements Writer {
 		builder.append("}");
 		builder.append(",");
 
-		List<Integer> lineBreakIndexes = new ArrayList<>();
+		List<Integer> lineBreakIndexes = new ArrayList<Integer>();
 		int lastIndexOf = builder.indexOf(NEW_LINE);
 		int currentIndexOf = builder.indexOf(NEW_LINE, lastIndexOf + 1);
 		while (currentIndexOf >= 0 && lastIndexOf != currentIndexOf) {
