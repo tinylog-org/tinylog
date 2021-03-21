@@ -151,11 +151,9 @@ public final class JsonWriter implements Writer {
 		builder.append(",");
 
 		List<Integer> lineBreakIndexes = new ArrayList<Integer>();
-		int lastIndexOf = builder.indexOf(NEW_LINE);
-		int currentIndexOf = builder.indexOf(NEW_LINE, lastIndexOf + 1);
-		while (currentIndexOf >= 0 && lastIndexOf != currentIndexOf) {
+		int currentIndexOf = builder.indexOf(NEW_LINE, 0);
+		while (currentIndexOf >= 0) {
 			lineBreakIndexes.add(currentIndexOf);
-			lastIndexOf = currentIndexOf;
 			currentIndexOf = builder.indexOf(NEW_LINE, currentIndexOf + 1);
 		}
 		for (int index : lineBreakIndexes) {
