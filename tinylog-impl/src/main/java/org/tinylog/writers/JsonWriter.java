@@ -158,7 +158,9 @@ public final class JsonWriter implements Writer {
 			lastIndexOf = currentIndexOf;
 			currentIndexOf = builder.indexOf(NEW_LINE, currentIndexOf + 1);
 		}
-		lineBreakIndexes.forEach(index -> builder.replace(index, index + NEW_LINE.length() + 1, "\\n"));
+		for (int index : lineBreakIndexes) {
+			builder.replace(index, index + NEW_LINE.length() + 1, "\\n");
+		}
 		writer.write(builder.toString().getBytes(charset), builder.length());
 	}
 
