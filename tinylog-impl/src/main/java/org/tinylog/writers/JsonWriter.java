@@ -150,16 +150,19 @@ public final class JsonWriter implements Writer {
 		builder.append("}");
 		builder.append(",");
 
-		List<Integer> lineBreakIndexes = new ArrayList<Integer>();
-		int currentIndexOf = builder.indexOf(NEW_LINE, 0);
-		while (currentIndexOf >= 0) {
-			lineBreakIndexes.add(currentIndexOf);
-			currentIndexOf = builder.indexOf(NEW_LINE, currentIndexOf + 1);
-		}
-		for (int index : lineBreakIndexes) {
-			builder.replace(index, index + NEW_LINE.length() + 1, "\\n");
-		}
+		escapeCharacter("\\", "\\\\");
+		escapeCharacter(NEW_LINE, "\\n");
+		escapeCharacter("\t", "\\t");
 		writer.write(builder.toString().getBytes(charset), builder.length());
+		}
+
+	private void escapeCharacter(String character, String escapeWith) {
+		int index = builder.indexOf(character);
+		while (index != -1) {
+			builder.replace(index, index + character.length(), escapeWith);
+			index += escapeWith.length();
+			index = builder.indexOf(character, index);
+		}
 	}
 
 	@Override
