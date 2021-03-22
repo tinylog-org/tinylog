@@ -26,7 +26,7 @@ In the [configuration folder](./configuration), there is an [Eclipse code format
 
 tinylog 2 supports any Java version from Java 6 and later. Therefore, all source code must be compatible with Java 6. For example, the usage of diamond operators and lambdas is not supported.
 
-In general, tinylog uses standard Java source code style and Checkstyle will report and violations. However, please keep in mind to write JUnit tests for all new classes and methods and document them with Javadoc comments.
+In general, tinylog uses standard Java source code style and Checkstyle will report and violations. However, please keep in mind to write JUnit tests for all new classes and methods and document them with Javadoc comments. JUnit tests for new code should test all code branches including corner cases, errors, and exception handling. A good code coverage is usually between 85% and 100%. Codecov will automatically post a code coverage report when creating or updating a pull request.
 
 ## Commits
 
