@@ -21,7 +21,7 @@ public class Application {
 }
 ```
 
-```
+```properties
 level            = INFO
 
 writer1          = console
