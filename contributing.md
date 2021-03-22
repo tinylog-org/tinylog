@@ -24,6 +24,6 @@ In the [configuration folder](./configuration), there is a [code formatter](./co
 
 ## Source code
 
-tinylog 2 supports any Java version from Java 6 and later. Therefore, all source code must be compatible with Java 6. Therefore, the usage of diamond operators and lambdas is not supported.
+tinylog 2 supports any Java version from Java 6 and later. Therefore, all source code must be compatible with Java 6. For example, the usage of diamond operators and lambdas is not supported.
 
 In general, tinylog uses standard Java source code style and Checkstyle will report and violations. However, please keep in mind to write JUnit tests for all new classes and methods and document them with Javadoc comments.
