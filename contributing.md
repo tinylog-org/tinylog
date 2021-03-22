@@ -20,7 +20,7 @@ Before creating a pull request, please always ensure that this Maven command can
 
 ## IDE support
 
-In the [configuration folder](./configuration), there is a [code formatter](./configuration/formatter.xml) for Eclipse and [Checkstyle rules](./configuration/checkstyle-rules.xml), which can be used for Eclipse's and IntelliJ's Checkstyle integration for showing Checkstyle violations directly in the IDE. 
+In the [configuration folder](./configuration), there is an [Eclipse code formatter](./configuration/formatter.xml), which can be also imported in IntelliJ and VS Code. There are also [Checkstyle rules](./configuration/checkstyle-rules.xml), which can be used for the Checkstyle integrations of all popular IDEs for showing Checkstyle violations directly in the IDE while writing code.
 
 ## Source code
 
