@@ -21,12 +21,19 @@ public class Application {
 }
 ```
 
-Support
--------
+```
+level            = INFO
+
+writer1          = console
+writer1.format   = {date: HH:mm:ss.SSS} {class}.{method}() {level}: {message}
+
+writer2          = rolling file
+writer2.file     = logs/{date: yyyy-MM-dd}/log_{count}.txt
+writer2.policies = startup, daily: 03:00
+writer2.format   = {date: HH:mm:ss} [{thread}] {level}: {message}
+```
 
 More information about tinylog including a detailed user manual and the Javadoc documentation can be found on https://tinylog.org/v2/.
-
-On GitHub, issues and pull requests are always welcome :)
 
 Contributing
 ------------
