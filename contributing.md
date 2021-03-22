@@ -27,3 +27,25 @@ In the [configuration folder](./configuration), there is an [Eclipse code format
 tinylog 2 supports any Java version from Java 6 and later. Therefore, all source code must be compatible with Java 6. For example, the usage of diamond operators and lambdas is not supported.
 
 In general, tinylog uses standard Java source code style and Checkstyle will report and violations. However, please keep in mind to write JUnit tests for all new classes and methods and document them with Javadoc comments.
+
+## Commits
+
+When committing to tinylog, the subject line of the commit message should start with a verb, not end with any punctuation, and be no longer than 72 characters. If a more detailed message description is useful, it can be put after the subject line, separated by a blank line. For the optional detailed message description, there is no line length limit and it may contain one or more sentences. The associated issue or pull request can either be in parentheses at the end of the subject line or be part of the text body.
+
+Good examples for commit messages:
+
+```
+Add automatic module names and reuse them for bundles (#110)
+```
+
+```
+Add encoder runnable for compressing files by GZIP algorithm
+
+See #139
+```
+
+```
+Run Checkstyle and Findbugs during verify phase
+
+This avoids side effects with instrumented classes from JaCoCo.
+```
