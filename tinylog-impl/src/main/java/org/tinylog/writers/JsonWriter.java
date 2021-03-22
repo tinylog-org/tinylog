@@ -154,9 +154,9 @@ public final class JsonWriter implements Writer {
 		escapeCharacter(NEW_LINE, "\\n");
 		escapeCharacter("\t", "\\t");
 		writer.write(builder.toString().getBytes(charset), builder.length());
-		}
+	}
 
-	private void escapeCharacter(String character, String escapeWith) {
+	private void escapeCharacter(final String character, final String escapeWith) {
 		int index = builder.indexOf(character);
 		while (index != -1) {
 			builder.replace(index, index + character.length(), escapeWith);

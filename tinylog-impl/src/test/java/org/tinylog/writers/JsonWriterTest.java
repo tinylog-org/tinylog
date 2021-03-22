@@ -14,6 +14,7 @@
 package org.tinylog.writers;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public final class JsonWriterTest {
 
+	private static final String NEW_LINE = System.getProperty("line.separator");
 	/**
 	 * Redirects and collects system output streams.
 	 */
@@ -173,4 +175,108 @@ public final class JsonWriterTest {
 		assertThat(indexOfComma).isLessThan(indexOfOpeningSecondJsonObject)
 				.isGreaterThan(indexOfClosingFirstJsonObject);
 	}
+
+	/**
+	 * Verifies that input fields match output properties in JSON.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void evaluatesFieldsCorrectly() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("field.msg", "message");
+		properties.put("field.lvl", "level");
+
+		JsonWriter writer;
+		writer = new JsonWriter(properties);
+		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+		writer.write(givenLogEntry);
+		writer.close();
+
+		String expectedMessageField = String.format("\"msg\":\"%s\"", givenLogEntry.getMessage());
+		String expectedLevelField = String.format("\"lvl\":\"%s\"", givenLogEntry.getLevel());
+		String resultingEntry = FileSystem.readFile(file);
+		assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
+	}
+
+	/**
+	 * Verifies that exception is thrown when there is no file name.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void expectsFilename() throws IOException {
+		Map<String, String> properties = new HashMap<>();
+
+		new JsonWriter(properties);
+	}
+
+	/**
+	 * Verifies that an invalid charset is handled with the default charset.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void handlesInvalidCharset() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("field.message", "message");
+		properties.put("charset", "asdf");
+
+		JsonWriter writer = new JsonWriter(properties);
+		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+		writer.write(givenLogEntry);
+		writer.close();
+
+		String resultingEntry = FileSystem.readFile(file, Charset.defaultCharset());
+		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("charset")
+				.containsOnlyOnce("asdf");
+		assertThat(resultingEntry).contains(givenLogEntry.getMessage());
+	}
+
+	/**
+	 * Verifies that special characters get escaped.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void escapesCharacters() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("field.message", "message");
+
+		JsonWriter writer = new JsonWriter(properties);
+		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class)
+				.message("Hello World!" + NEW_LINE + "\t\t" + NEW_LINE).create();
+		writer.write(givenLogEntry);
+		writer.close();
+
+		String expectedMessage = "Hello World!\\n\\t\\t\\n";
+		String resultingEntry = FileSystem.readFile(file);
+
+		assertThat(resultingEntry).contains(expectedMessage);
+	}
+
+	/**
+	 * Verifies that an exception is thrown when there is an invalid JSON file
+	 * (currently only missing closing bracket).
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void handlesInvalidJsonFile() throws IOException {
+		String file = FileSystem.createTemporaryFile("[{}");
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("append", "true");
+		properties.put("field.message", "message");
+
+		new JsonWriter(properties);
+	}
+
 }
