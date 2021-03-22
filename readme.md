@@ -28,16 +28,12 @@ More information about tinylog including a detailed user manual and the Javadoc 
 
 On GitHub, issues and pull requests are always welcome :)
 
-Build tinylog
--------------
+Contributing
+------------
 
-tinylog requires Maven 3.5 and JDK 9 for building. Newer JDKs cannot compile legacy code for older Java versions, and older JDKs cannot compile new features for the latest Java versions. [OpenJDK 9](https://jdk.java.net/archive/) is still available on [java.net](https://jdk.java.net/archive/) and [Oracle JDK 9](https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html) on [oracle.com](https://www.oracle.com/java/technologies/javase/javase9-archive-downloads.html).
+On GitHub, issues and pull requests are always welcome :)
 
-Build command:
-
-	mvn clean install
-
-A new folder "target" with Javadoc documentation and all JARs will be created in the root directory. The generated JARs contain Java 6 byte code and are compatible with any JRE 7 and higher as well as with Android API level 1 and higher.
+For building tinylog or contributing to this project, please take a look at [contributing.md](./contributing.md).
 
 License
 -------
