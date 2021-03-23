@@ -154,12 +154,12 @@ public final class JsonWriter implements Writer {
 		Token[] tokenEntries = jsonProperties.values().toArray(new Token[jsonProperties.size()]);
 		String[] fields = jsonProperties.keySet().toArray(new String[jsonProperties.size()]);
 
+		StringBuilder tokenStringBuilder = new StringBuilder();
 		for (int i = 0; i < tokenEntries.length; i++) {
-
 			builder.append("\"").append(fields[i]).append("\":\"");
 
-			StringBuilder tokenStringBuilder = new StringBuilder();
 			Token token = tokenEntries[i];
+			tokenStringBuilder.setLength(0);
 			token.render(logEntry, tokenStringBuilder);
 
 			escapeCharacter("\\", "\\\\", tokenStringBuilder);
