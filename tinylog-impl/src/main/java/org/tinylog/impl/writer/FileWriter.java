@@ -49,8 +49,8 @@ public class FileWriter implements AsyncWriter {
 		this.placeholder = placeholder;
 		this.file = new RandomAccessFile(file.toString(), "rw");
 		this.encoder = charset.newEncoder()
-				.onUnmappableCharacter(CodingErrorAction.REPLACE)
-				.onMalformedInput(CodingErrorAction.REPLACE);
+			.onUnmappableCharacter(CodingErrorAction.REPLACE)
+			.onMalformedInput(CodingErrorAction.REPLACE);
 
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 
@@ -133,4 +133,5 @@ public class FileWriter implements AsyncWriter {
 			builder.ensureCapacity(0);
 		}
 	}
+
 }
