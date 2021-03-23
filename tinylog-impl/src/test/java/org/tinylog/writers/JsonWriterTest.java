@@ -252,11 +252,11 @@ public final class JsonWriterTest {
 
 		JsonWriter writer = new JsonWriter(properties);
 		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class)
-				.message("Hello World!" + NEW_LINE + "\t\t" + NEW_LINE).create();
+				.message("Hello World!" + NEW_LINE + "\t\t" + NEW_LINE + "\"\f\b").create();
 		writer.write(givenLogEntry);
 		writer.close();
 
-		String expectedMessage = "Hello World!\\n\\t\\t\\n";
+		String expectedMessage = "Hello World!\\n\\t\\t\\n\\\"\\f\\b";
 		String resultingEntry = FileSystem.readFile(file);
 
 		assertThat(resultingEntry).contains(expectedMessage);

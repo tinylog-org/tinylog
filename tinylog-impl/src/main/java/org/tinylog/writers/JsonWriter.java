@@ -20,11 +20,10 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,7 +54,7 @@ public final class JsonWriter implements Writer {
 	private FileChannel inputChannel;
 
 	private StringBuilder builder;
-	private final List<Token> tokens;
+	private final Map<String, Token> jsonProperties;
 
 	private byte[] commaByte;
 	private byte[] bracketOpenByte;
@@ -75,7 +74,7 @@ public final class JsonWriter implements Writer {
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
 	public JsonWriter(final Map<String, String> properties) throws IOException {
-		tokens = createTokens(properties);
+		jsonProperties = createTokens(properties);
 		charset = getCharset(properties);
 		commaByte = ",".getBytes(charset);
 		bracketOpenByte = "[".getBytes(charset);
@@ -139,29 +138,47 @@ public final class JsonWriter implements Writer {
 		} else {
 			builder.setLength(0);
 		}
+		prepareJsonObject(logEntry);
+		writer.write(builder.toString().getBytes(charset), builder.length());
+	}
+
+	private void prepareJsonObject(final LogEntry logEntry) {
 		builder.append("{");
-		for (int i = 0; i < tokens.size(); i++) {
-			Token token = tokens.get(i);
-			token.render(logEntry, builder);
-			if (i + 1 < tokens.size()) {
+		Token[] tokenEntries = jsonProperties.values().toArray(new Token[jsonProperties.size()]);
+		String[] fields = jsonProperties.keySet().toArray(new String[jsonProperties.size()]);
+		for (int i = 0; i < tokenEntries.length; i++) {
+
+			builder.append("\"").append(fields[i]).append("\":\"");
+
+			StringBuilder tokenStringBuilder = new StringBuilder();
+			Token token = tokenEntries[i];
+			token.render(logEntry, tokenStringBuilder);
+
+			escapeCharacter("\\", "\\\\", tokenStringBuilder);
+			escapeCharacter("\"", "\\\"", tokenStringBuilder);
+			escapeCharacter(NEW_LINE, "\\n", tokenStringBuilder);
+			escapeCharacter("\t", "\\t", tokenStringBuilder);
+			escapeCharacter("\b", "\\b", tokenStringBuilder);
+			escapeCharacter("\f", "\\f", tokenStringBuilder);
+			escapeCharacter("\n", "\\n", tokenStringBuilder);
+			escapeCharacter("\r", "\\r", tokenStringBuilder);
+
+			builder.append(tokenStringBuilder.toString()).append("\"");
+
+			if (i + 1 < jsonProperties.size()) {
 				builder.append(",");
 			}
 		}
 		builder.append("}");
 		builder.append(",");
-
-		escapeCharacter("\\", "\\\\");
-		escapeCharacter(NEW_LINE, "\\n");
-		escapeCharacter("\t", "\\t");
-		writer.write(builder.toString().getBytes(charset), builder.length());
 	}
 
-	private void escapeCharacter(final String character, final String escapeWith) {
-		int index = builder.indexOf(character);
+	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder) {
+		int index = stringBuilder.indexOf(character);
 		while (index != -1) {
-			builder.replace(index, index + character.length(), escapeWith);
+			stringBuilder.replace(index, index + character.length(), escapeWith);
 			index += escapeWith.length();
-			index = builder.indexOf(character, index);
+			index = stringBuilder.indexOf(character, index);
 		}
 	}
 
@@ -233,21 +250,19 @@ public final class JsonWriter implements Writer {
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
 		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
-		for (Token token : tokens) {
+		for (Token token : jsonProperties.values()) {
 			values.addAll(token.getRequiredLogEntryValues());
 		}
 		return values;
 	}
 
-	private static List<Token> createTokens(final Map<String, String> properties) {
+	private static Map<String, Token> createTokens(final Map<String, String> properties) {
 		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
 
-		List<Token> tokens = new ArrayList<Token>();
+		Map<String, Token> tokens = new HashMap<String, Token>();
 		for (Entry<String, String> entry : properties.entrySet()) {
 			if (entry.getKey().toLowerCase(Locale.ROOT).startsWith(FIELD_PREFIX)) {
-				String tokenPattern = new StringBuilder().append("\"").append(entry.getKey().replace(FIELD_PREFIX, ""))
-						.append("\":\"{").append(entry.getValue()).append("}\"").toString();
-				tokens.add(parser.parse(tokenPattern));
+				tokens.put(entry.getKey().replace(FIELD_PREFIX, ""), parser.parse(entry.getValue()));
 			}
 		}
 		return tokens;
