@@ -113,24 +113,6 @@ public final class JsonWriter implements Writer {
 
 	}
 
-	private Charset getCharset(final Map<String, String> properties) {
-		String charsetName = properties.get("charset");
-		try {
-			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
-		} catch (IllegalArgumentException ex) {
-			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
-			return Charset.defaultCharset();
-		}
-	}
-
-	private String getFileName(final Map<String, String> properties) {
-		String fileName = properties.get("file");
-		if (fileName == null) {
-			throw new IllegalArgumentException("File name is missing for file writer");
-		}
-		return fileName;
-	}
-
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		if (builder == null) {
@@ -138,14 +120,40 @@ public final class JsonWriter implements Writer {
 		} else {
 			builder.setLength(0);
 		}
-		prepareJsonObject(logEntry);
+		addJsonObject(logEntry);
 		writer.write(builder.toString().getBytes(charset), builder.length());
 	}
 
-	private void prepareJsonObject(final LogEntry logEntry) {
+	@Override
+	public void flush() throws IOException {
+		writer.flush();
+	}
+
+	@Override
+	public void close() throws IOException {
+		postprocessFile();
+		writer.close();
+	}
+
+	@Override
+	public Collection<LogEntryValue> getRequiredLogEntryValues() {
+		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
+		for (Token token : jsonProperties.values()) {
+			values.addAll(token.getRequiredLogEntryValues());
+		}
+		return values;
+	}
+
+	/**
+	 * Prepares and adds a Json Object. Also escapes special characters.
+	 * 
+	 * @param logEntry LogEntry with information for token
+	 */
+	private void addJsonObject(final LogEntry logEntry) {
 		builder.append("{");
 		Token[] tokenEntries = jsonProperties.values().toArray(new Token[jsonProperties.size()]);
 		String[] fields = jsonProperties.keySet().toArray(new String[jsonProperties.size()]);
+
 		for (int i = 0; i < tokenEntries.length; i++) {
 
 			builder.append("\"").append(fields[i]).append("\":\"");
@@ -182,15 +190,22 @@ public final class JsonWriter implements Writer {
 		}
 	}
 
-	@Override
-	public void flush() throws IOException {
-		writer.flush();
+	private Charset getCharset(final Map<String, String> properties) {
+		String charsetName = properties.get("charset");
+		try {
+			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
+		} catch (IllegalArgumentException ex) {
+			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
+			return Charset.defaultCharset();
+		}
 	}
 
-	@Override
-	public void close() throws IOException {
-		postprocessFile();
-		writer.close();
+	private String getFileName(final Map<String, String> properties) {
+		String fileName = properties.get("file");
+		if (fileName == null) {
+			throw new IllegalArgumentException("File name is missing for file writer");
+		}
+		return fileName;
 	}
 
 	/**
@@ -245,15 +260,6 @@ public final class JsonWriter implements Writer {
 		fileChannel.truncate(fileChannel.size() - commaByte.length);
 		writer.write(NEW_LINE.getBytes(charset), 1);
 		writer.write(bracketCloseByte, 1);
-	}
-
-	@Override
-	public Collection<LogEntryValue> getRequiredLogEntryValues() {
-		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
-		for (Token token : jsonProperties.values()) {
-			values.addAll(token.getRequiredLogEntryValues());
-		}
-		return values;
 	}
 
 	private static Map<String, Token> createTokens(final Map<String, String> properties) {
