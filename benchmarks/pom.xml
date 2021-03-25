@@ -147,6 +147,39 @@
 				<benchmark.iterations>1</benchmark.iterations>
 			</properties>
 		</profile>
+		<!-- JDK Flight Recorder profiler -->
+		<profile>
+			<id>profiler</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<arguments>
+								<argument>-classpath</argument>
+								<classpath />
+								<argument>org.openjdk.jmh.Main</argument>
+								<argument>${benchmark.class}</argument>
+								<argument>-f</argument>
+								<argument>${benchmark.forks}</argument>
+								<argument>-wi</argument>
+								<argument>${benchmark.iterations}</argument>
+								<argument>-i</argument>
+								<argument>${benchmark.iterations}</argument>
+								<argument>-prof</argument>
+								<argument>org.tinylog.benchmarks.JdkFlightRecorderProfiler</argument>
+								<argument>-v</argument>
+								<argument>EXTRA</argument>
+							</arguments>
+							<environmentVariables>
+								<jmh.profiler.directory>${project.build.directory}/profiler</jmh.profiler.directory>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>
