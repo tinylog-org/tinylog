@@ -38,6 +38,29 @@ public final class JsonWriterTest {
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
+	 * Verifies that with no logging, an empty array is created.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void noWriting() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("buffered", "false");
+		properties.put("append", "false");
+
+		JsonWriter writer = new JsonWriter(properties);
+		writer.close();
+
+		String expectedFileContent = "[\n]";
+		String resultingEntry = FileSystem.readFile(file);
+
+		assertThat(resultingEntry).isEqualTo(expectedFileContent);
+	}
+
+	/**
 	 * Verifies that file is rewritten.
 	 *
 	 * @throws IOException Failed writing to file
@@ -84,6 +107,7 @@ public final class JsonWriterTest {
 	@Test
 	public void appendingWriting() throws IOException {
 		String file = FileSystem.createTemporaryFile();
+		file = "log.json";
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
