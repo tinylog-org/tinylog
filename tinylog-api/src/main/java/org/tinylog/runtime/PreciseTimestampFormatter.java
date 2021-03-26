@@ -33,7 +33,8 @@ public final class PreciseTimestampFormatter implements TimestampFormatter {
 	private final DateTimeFormatter formatter;
 	private final TemporalUnit truncationUnit;
 
-	private Instant lastInstant;
+	private Instant minInstant;
+	private Instant maxInstant;
 	private String lastFormat;
 
 	/**
@@ -54,6 +55,9 @@ public final class PreciseTimestampFormatter implements TimestampFormatter {
 		} else {
 			truncationUnit = ChronoUnit.MINUTES;
 		}
+
+		minInstant = Instant.MAX;
+		maxInstant = Instant.MIN;
 	}
 
 	@Override
@@ -69,7 +73,7 @@ public final class PreciseTimestampFormatter implements TimestampFormatter {
 	@Override
 	public String format(final Timestamp timestamp) {
 		Instant instant = timestamp.toInstant();
-		return truncationUnit == null ? formatter.format(instant) : format(instant.truncatedTo(truncationUnit));
+		return truncationUnit == null ? formatter.format(instant) : format(instant);
 	}
 
 	/**
@@ -81,8 +85,9 @@ public final class PreciseTimestampFormatter implements TimestampFormatter {
 	 */
 	private String format(final Instant instant) {
 		synchronized (formatter) {
-			if (!instant.equals(lastInstant)) {
-				lastInstant = instant;
+			if (!instant.isBefore(maxInstant) || instant.isBefore(minInstant)) {
+				minInstant = instant.truncatedTo(truncationUnit);
+				maxInstant = minInstant.plus(1, truncationUnit);
 				lastFormat = formatter.format(instant);
 			}
 			return lastFormat;
