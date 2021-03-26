@@ -13,10 +13,10 @@
 
 package org.tinylog.writers.raw;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,10 +57,10 @@ public final class RandomAccessFileWriterTest {
 	public void writing() throws IOException {
 		writer.write(new byte[] { 1, 2 }, 2);
 		writer.write(new byte[] { 3 }, 1);
-		byte[] writtenBytes = FileSystem.readFile(filePath).getBytes();
+		byte[] writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
 		assertThat(writtenBytes).startsWith((byte) 1, (byte) 2, (byte) 3);
 		writer.close();
-		writtenBytes = FileSystem.readFile(filePath).getBytes();
+		writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
 		assertThat(writtenBytes).startsWith((byte) 1, (byte) 2, (byte) 3);
 	}
 

@@ -147,14 +147,14 @@ public final class JsonWriter implements Writer {
 	private void addJsonObject(final LogEntry logEntry, final StringBuilder builder) {
 		builder.append(NEW_LINE);
 		builder.append('\t');
-		builder.append("{");
+		builder.append("{").append(NEW_LINE);
 
 		Token[] tokenEntries = jsonProperties.values().toArray(new Token[0]);
 		String[] fields = jsonProperties.keySet().toArray(new String[0]);
 
 		StringBuilder tokenStringBuilder = new StringBuilder();
 		for (int i = 0; i < tokenEntries.length; i++) {
-			builder.append("\"").append(fields[i]).append("\":\"");
+			builder.append("\t\t\"").append(fields[i]).append("\" : \"");
 
 			Token token = tokenEntries[i];
 			tokenStringBuilder.setLength(0);
@@ -169,13 +169,13 @@ public final class JsonWriter implements Writer {
 			escapeCharacter("\n", "\\n", tokenStringBuilder);
 			escapeCharacter("\r", "\\r", tokenStringBuilder);
 
-			builder.append(tokenStringBuilder.toString()).append("\"");
+			builder.append(tokenStringBuilder.toString()).append("\" ");
 
 			if (i + 1 < jsonProperties.size()) {
-				builder.append(", ");
+				builder.append(",").append(NEW_LINE);
 			}
 		}
-		builder.append("},");
+		builder.append(NEW_LINE).append("\t},");
 	}
 
 	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder) {
@@ -205,7 +205,7 @@ public final class JsonWriter implements Writer {
 		return fileName;
 	}
 
-	private boolean isWhitespace(byte character) {
+	private boolean isWhitespace(final byte character) {
 		return character == '\n' || character == '\r' || character == ' ';
 	}
 

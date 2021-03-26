@@ -89,8 +89,8 @@ public final class JsonWriterTest {
 		writer.close();
 
 		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\":\"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\":\"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\" : \"%s\"", expectedLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\" : \"%s\"", expectedLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
 		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
@@ -107,7 +107,6 @@ public final class JsonWriterTest {
 	@Test
 	public void appendingWriting() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		file = "log.json";
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
@@ -129,8 +128,8 @@ public final class JsonWriterTest {
 		writer.close();
 
 		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\":\"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\":\"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\" : \"%s\"", expectedLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\" : \"%s\"", expectedLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
 		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
@@ -220,8 +219,8 @@ public final class JsonWriterTest {
 		writer.write(givenLogEntry);
 		writer.close();
 
-		String expectedMessageField = String.format("\"msg\":\"%s\"", givenLogEntry.getMessage());
-		String expectedLevelField = String.format("\"lvl\":\"%s\"", givenLogEntry.getLevel());
+		String expectedMessageField = String.format("\"msg\" : \"%s\"", givenLogEntry.getMessage());
+		String expectedLevelField = String.format("\"lvl\" : \"%s\"", givenLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 		assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
 	}
