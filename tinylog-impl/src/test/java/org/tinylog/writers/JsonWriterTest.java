@@ -15,13 +15,17 @@ package org.tinylog.writers;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
+import org.tinylog.core.TinylogLoggingProviderTest.LogEntryValues;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
@@ -300,6 +304,31 @@ public final class JsonWriterTest {
 		properties.put("field.message", "message");
 
 		new JsonWriter(properties);
+	}
+
+	/**
+	 * Verifies that the required {@link LogEntryValues} are correctly evaluated.
+	 * 
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void evaluatesRequiredLogValuesCorrectly() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("append", "true");
+		properties.put("field.message", "message");
+		properties.put("field.date", "date");
+		properties.put("field.line", "line");
+
+		Writer writer = new JsonWriter(properties);
+
+		Collection<LogEntryValue> logValues = writer.getRequiredLogEntryValues();
+
+		List<LogEntryValue> expectedValues = List.of(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION, LogEntryValue.DATE,
+				LogEntryValue.LINE);
+
+		assertThat(logValues).containsAll(expectedValues);
 	}
 
 }
