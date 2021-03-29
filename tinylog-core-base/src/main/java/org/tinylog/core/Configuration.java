@@ -1,17 +1,17 @@
 package org.tinylog.core;
 
-import java.text.Collator;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
@@ -36,7 +36,7 @@ public class Configuration {
 
 	private final Configuration parent;
 	private final String prefix;
-	private final Properties properties;
+	private final Map<String, String> properties;
 	private boolean frozen;
 
 	/** */
@@ -51,7 +51,7 @@ public class Configuration {
 	private Configuration(Configuration parent, String prefix) {
 		this.parent = parent;
 		this.prefix = prefix;
-		this.properties = new Properties();
+		this.properties = new LinkedHashMap<>();
 		this.frozen = false;
 	}
 
@@ -127,7 +127,7 @@ public class Configuration {
 	 */
 	public String getValue(String key) {
 		synchronized (properties) {
-			return properties.getProperty(key);
+			return properties.get(key);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class Configuration {
 	 */
 	public String getValue(String key, String defaultValue) {
 		synchronized (properties) {
-			return properties.getProperty(key, defaultValue);
+			return properties.getOrDefault(key, defaultValue);
 		}
 	}
 
@@ -156,7 +156,7 @@ public class Configuration {
 	 */
 	public List<String> getList(String key) {
 		synchronized (properties) {
-			String value = properties.getProperty(key);
+			String value = properties.get(key);
 			if (value == null) {
 				return Collections.emptyList();
 			} else {
@@ -180,13 +180,13 @@ public class Configuration {
 	 *     is "foo". Properties that do not contain a dot are used unchanged as root key.
 	 * </p>
 	 *
-	 * @return Distinct list of all root keys in alphabetical order
+	 * @return Distinct list of all root keys in insert order
 	 */
 	public List<String> getRootKeys() {
 		List<String> keys = new ArrayList<>();
 
 		synchronized (properties) {
-			for (String key : properties.stringPropertyNames()) {
+			for (String key : properties.keySet()) {
 				int index = key.indexOf('.');
 				if (index >= 0) {
 					key = key.substring(0, index);
@@ -198,7 +198,6 @@ public class Configuration {
 			}
 		}
 
-		keys.sort(Collator.getInstance(Locale.ENGLISH));
 		return keys;
 	}
 
@@ -218,9 +217,10 @@ public class Configuration {
 
 		Configuration configuration = new Configuration(this, resolveFullKey(prefix));
 		synchronized (properties) {
-			for (String key : properties.stringPropertyNames()) {
+			for (Map.Entry<String, String> entry : properties.entrySet()) {
+				String key = entry.getKey();
 				if (key.startsWith(prefix)) {
-					configuration.set(key.substring(prefix.length()), properties.getProperty(key));
+					configuration.set(key.substring(prefix.length()), entry.getValue());
 				}
 			}
 		}
@@ -262,7 +262,7 @@ public class Configuration {
 				throw new UnsupportedOperationException(FROZEN_MESSAGE);
 			}
 
-			properties.setProperty(key, value);
+			properties.put(key, value);
 		}
 
 		return this;

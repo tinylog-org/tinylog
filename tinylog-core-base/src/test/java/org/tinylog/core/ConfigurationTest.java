@@ -325,7 +325,7 @@ class ConfigurationTest {
 				.set("foobar", "4")
 				.set("boo", "5");
 
-			assertThat(configuration.getRootKeys()).containsExactly("bar", "boo", "foo", "foobar");
+			assertThat(configuration.getRootKeys()).containsExactly("bar", "foo", "foobar", "boo");
 		}
 
 		/**
@@ -492,7 +492,7 @@ class ConfigurationTest {
 	 */
 	public static final class TestOneConfigurationLoader implements ConfigurationLoader {
 
-		private static Map<Object, Object> data;
+		private static Map<String, String> data;
 
 		@Override
 		public String getName() {
@@ -505,7 +505,7 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public Map<Object, Object> load(Framework framework) {
+		public Map<String, String> load(Framework framework) {
 			return data;
 		}
 
@@ -516,7 +516,7 @@ class ConfigurationTest {
 	 */
 	public static final class TestTwoConfigurationLoader implements ConfigurationLoader {
 
-		private static Map<Object, Object> data;
+		private static Map<String, String> data;
 
 		@Override
 		public String getName() {
@@ -529,7 +529,7 @@ class ConfigurationTest {
 		}
 
 		@Override
-		public Map<Object, Object> load(Framework framework) {
+		public Map<String, String> load(Framework framework) {
 			return data;
 		}
 

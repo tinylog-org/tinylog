@@ -44,6 +44,6 @@ public interface ConfigurationLoader {
 	 * @return The loaded configuration as map if any configuration could be found and successfully loaded, or
 	 *         {@code null} if there is no suitable configuration
 	 */
-	Map<Object, Object> load(Framework framework);
+	Map<String, String> load(Framework framework);
 
 }

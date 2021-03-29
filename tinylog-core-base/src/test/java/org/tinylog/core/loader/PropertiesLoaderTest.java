@@ -85,7 +85,7 @@ class PropertiesLoaderTest {
 	void loadDefaultProductionPropertiesFile() throws IOException {
 		createTextFile("tinylog.properties", "environment = production");
 
-		Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 		assertThat(configuration).containsExactly(entry("environment", "production"));
 	}
 
@@ -96,7 +96,7 @@ class PropertiesLoaderTest {
 	void loadDefaultTestPropertiesFile() throws IOException {
 		createTextFile("tinylog-test.properties", "environment = test");
 
-		Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 		assertThat(configuration).containsExactly(entry("environment", "test"));
 	}
 
@@ -107,7 +107,7 @@ class PropertiesLoaderTest {
 	void loadDefaultDevelopmentPropertiesFile() throws IOException {
 		createTextFile("tinylog-dev.properties", "environment = development");
 
-		Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 		assertThat(configuration).containsExactly(entry("environment", "development"));
 	}
 
@@ -120,7 +120,7 @@ class PropertiesLoaderTest {
 		createTextFile("tinylog.properties", "production = yes");
 		createTextFile("tinylog-test.properties", "test = yes");
 
-		Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 		assertThat(configuration).containsExactly(entry("test", "yes"));
 	}
 
@@ -133,7 +133,7 @@ class PropertiesLoaderTest {
 		createTextFile("tinylog-test.properties", "test = yes");
 		createTextFile("tinylog-dev.properties", "development = yes");
 
-		Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 		assertThat(configuration).containsExactly(entry("development", "yes"));
 	}
 
@@ -146,7 +146,7 @@ class PropertiesLoaderTest {
 			createTextFile("my-configuration.properties", "foo = bar");
 			System.setProperty("tinylog.configuration", "my-configuration.properties");
 
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 			assertThat(configuration).containsExactly(entry("foo", "bar"));
 		});
 	}
@@ -160,7 +160,7 @@ class PropertiesLoaderTest {
 			Path file = createTextFile("my-configuration.properties", "foo = bar");
 			System.setProperty("tinylog.configuration", file.toString());
 
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 			assertThat(configuration).containsExactly(entry("foo", "bar"));
 		});
 	}
@@ -174,7 +174,7 @@ class PropertiesLoaderTest {
 			Path file = createTextFile("my-configuration.properties", "foo = bar");
 			System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
 
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 			assertThat(configuration).containsExactly(entry("foo", "bar"));
 		});
 	}
@@ -192,7 +192,7 @@ class PropertiesLoaderTest {
 
 			System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 			assertThat(configuration).containsExactly(entry("custom", "yes"));
 		});
 	}
@@ -207,7 +207,7 @@ class PropertiesLoaderTest {
 			createTextFile("tinylog.properties", "production = yes");
 			System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 			assertThat(configuration).containsExactly(entry("production", "yes"));
 
 			assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
@@ -245,6 +245,17 @@ class PropertiesLoaderTest {
 	}
 
 	/**
+	 * Verifies that the original order of all properties is preserved.
+	 */
+	@Test
+	void preserveOrderOfProperties() throws IOException {
+		createTextFile("tinylog.properties", "b=1", "c=2", "a=3");
+
+		Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+		assertThat(configuration).containsExactly(entry("b", "1"), entry("c", "2"), entry("a", "3"));
+	}
+
+	/**
 	 * Verifies that a system property without any default value can be resolved.
 	 */
 	@Test
@@ -253,7 +264,7 @@ class PropertiesLoaderTest {
 
 		restoreSystemProperties(() -> {
 			System.setProperty("foo", "42");
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "42"));
 		});
@@ -268,7 +279,7 @@ class PropertiesLoaderTest {
 
 		restoreSystemProperties(() -> {
 			System.clearProperty("foo");
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "#{foo}"));
 			assertThat(log.consume()).anySatisfy(entry -> {
@@ -287,7 +298,7 @@ class PropertiesLoaderTest {
 
 		restoreSystemProperties(() -> {
 			System.setProperty("foo", "42");
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "42"));
 		});
@@ -303,7 +314,7 @@ class PropertiesLoaderTest {
 
 		restoreSystemProperties(() -> {
 			System.clearProperty("foo");
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "default"));
 		});
@@ -319,7 +330,7 @@ class PropertiesLoaderTest {
 		restoreSystemProperties(() -> {
 			System.setProperty("foo", "1");
 			System.setProperty("bar", "2");
-			Map<Object, Object> configuration = new PropertiesLoader().load(enrichedFramework);
+			Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
 
 			assertThat(configuration).containsExactly(entry("example", "<1> <2>"));
 		});

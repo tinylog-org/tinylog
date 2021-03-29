@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 	}
 
 	@Override
-	public Map<Object, Object> load(Framework framework) {
+	public Map<String, String> load(Framework framework) {
 		String file = System.getProperty(CONFIGURATION_PROPERTY);
 
 		if (file != null) {
@@ -82,9 +83,15 @@ public class PropertiesLoader implements ConfigurationLoader {
 	 * @return All properties as map
 	 * @throws IOException Failed to read from the passed input stream
 	 */
-	private Map<Object, Object> load(Framework framework, InputStream stream) throws IOException {
-		Properties properties = new Properties();
-		properties.load(stream);
+	private Map<String, String> load(Framework framework, InputStream stream) throws IOException {
+		Map<String, String> map = new LinkedHashMap<>();
+
+		new Properties() {
+			@Override
+			public Object put(Object key, Object value) {
+				return map.put((String) key, (String) value);
+			}
+		}.load(stream);
 
 		List<VariableResolver> resolvers = SafeServiceLoader.asList(
 			framework,
@@ -97,8 +104,8 @@ public class PropertiesLoader implements ConfigurationLoader {
 			String regex = Pattern.quote(prefix) + "\\{([^|{}]+)(?:\\|([^{}]+))?\\}";
 			Pattern pattern = Pattern.compile(regex);
 
-			for (String key : properties.stringPropertyNames()) {
-				String value = properties.getProperty(key);
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				String value = entry.getValue();
 				if (value.contains(prefix)) {
 					Matcher matcher = pattern.matcher(value);
 					StringBuffer buffer = new StringBuffer();
@@ -106,12 +113,12 @@ public class PropertiesLoader implements ConfigurationLoader {
 						matcher.appendReplacement(buffer, resolveVariable(matcher, resolver));
 					}
 					matcher.appendTail(buffer);
-					properties.setProperty(key, buffer.toString());
+					map.put(entry.getKey(), buffer.toString());
 				}
 			}
 		}
 
-		return properties;
+		return map;
 	}
 
 	/**
