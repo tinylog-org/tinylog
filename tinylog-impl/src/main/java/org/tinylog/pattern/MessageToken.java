@@ -40,21 +40,33 @@ final class MessageToken implements Token {
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
 		String message = logEntry.getMessage();
+
 		if (message != null) {
-			builder.ensureCapacity(builder.length() + message.length());
-			for (int i = 0; i < message.length(); ++i) {
-				char character = message.charAt(i);
-				if (character == '\r') {
+			int cartridgeReturn = message.indexOf('\r');
+			int lineFeed = message.indexOf('\n');
+			int position = 0;
+
+			while (true) {
+				if (cartridgeReturn >= 0 && (lineFeed < 0 || cartridgeReturn < lineFeed)) {
+					builder.append(message, position, cartridgeReturn);
 					builder.append(NEW_LINE);
-					if (i + 1 < message.length() && message.charAt(i + 1) == '\n') {
-						i += 1;
+
+					position = cartridgeReturn + 1;
+					cartridgeReturn = message.indexOf('\r', position);
+				} else if (lineFeed >= 0) {
+					if (position == 0 || message.charAt(position - 1) != '\r') {
+						builder.append(message, position, lineFeed);
+						builder.append(NEW_LINE);
 					}
-				} else if (character == '\n') {
-					builder.append(NEW_LINE);
+
+					position = lineFeed + 1;
+					lineFeed = message.indexOf('\n', position);
 				} else {
-					builder.append(character);
+					break;
 				}
 			}
+
+			builder.append(message, position, message.length());
 		}
 	}
 
