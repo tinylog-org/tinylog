@@ -73,6 +73,17 @@ public class StackTraceBenchmark {
 	}
 
 	/**
+	 * Benchmarks getting the caller class from stack trace walker.
+	 *
+	 * @return Found caller class
+	 */
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	public Class<?> stackWalkerCallerClass() {
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+	}
+
+	/**
 	 * Benchmarks extracting a class via Sun reflection.
 	 * 
 	 * @return Found class
