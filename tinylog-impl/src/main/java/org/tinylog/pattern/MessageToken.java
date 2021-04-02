@@ -62,11 +62,10 @@ final class MessageToken implements Token {
 					position = lineFeed + 1;
 					lineFeed = message.indexOf('\n', position);
 				} else {
+					builder.append(message, position, message.length());
 					break;
 				}
 			}
-
-			builder.append(message, position, message.length());
 		}
 	}
 
