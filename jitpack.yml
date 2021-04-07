@@ -1,0 +1,4 @@
+jdk:
+  - openjdk9
+install:
+  - mvn clean install -DskipTests -Dcheckstyle.skip -Dspotbugs.skip -Dmaven.javadoc.skip -P release
