@@ -30,9 +30,11 @@ import org.tinylog.provider.InternalLogger;
 @IgnoreJRERequirement
 final class ModernJavaRuntime extends AbstractJavaRuntime {
 
+	private static final ClassContextSecurityManager securityManager = new ClassContextSecurityManager();
+
 	private static final Timestamp startTime = new PreciseTimestamp(
-			ManagementFactory.getRuntimeMXBean().getStartTime(),
-			0
+		ManagementFactory.getRuntimeMXBean().getStartTime(),
+		0
 	);
 
 	private final ProcessHandle currentProcess = getCurrentProcess();
@@ -58,14 +60,29 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final int depth) {
-		StackFrame frame = StackWalker.getInstance().walk(new FixedStackFrameExtractor(depth));
-		return frame == null ? null : frame.getClassName();
+		Class<?>[] classes = securityManager.getClassContext();
+		return classes.length > depth + 1 ? classes[depth + 1].getName() : null;
 	}
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		StackFrame frame = StackWalker.getInstance().walk(new DynamicStackFrameExtractor(loggerClassName));
-		return frame == null ? null : frame.getClassName();
+		Class<?>[] classes = securityManager.getClassContext();
+		int index = 0;
+
+		while (index < classes.length) {
+			if (loggerClassName.equals(classes[index++].getName())) {
+				break;
+			}
+		}
+
+		while (index < classes.length) {
+			String className = classes[index++].getName();
+			if (!loggerClassName.equals(className)) {
+				return className;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -102,6 +119,22 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 			InternalLogger.log(Level.ERROR, ex, "Failed to receive the handle of the current process");
 			return null;
 		}
+	}
+
+	/**
+	 * Security manager with accessible {@link SecurityManager#getClassContext()}.
+	 */
+	private static final class ClassContextSecurityManager extends SecurityManager {
+
+		/** */
+		private ClassContextSecurityManager() {
+		}
+
+		@Override
+		protected Class<?>[] getClassContext() {
+			return super.getClassContext();
+		}
+
 	}
 
 	/**
