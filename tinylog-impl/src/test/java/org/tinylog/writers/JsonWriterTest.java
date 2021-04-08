@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class JsonWriterTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	/**
 	 * Redirects and collects system output streams.
 	 */
@@ -92,14 +93,13 @@ public final class JsonWriterTest {
 		writer.write(givenLogEntry);
 		writer.close();
 
-		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\" : \"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\" : \"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
-		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
+		int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
 		int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
-		assertThat(resultingMessagCount).isEqualTo(2);
+		assertThat(resultingMessageCount).isEqualTo(2);
 		assertThat(resultingLevelCount).isEqualTo(2);
 	}
 
@@ -131,14 +131,13 @@ public final class JsonWriterTest {
 		writer.write(givenLogEntry);
 		writer.close();
 
-		LogEntry expectedLogEntry = givenLogEntry;
-		String expectedMessage = String.format("\"message\" : \"%s\"", expectedLogEntry.getMessage());
-		String expectedLevel = String.format("\"level\" : \"%s\"", expectedLogEntry.getLevel());
+		String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
+		String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
 		String resultingEntry = FileSystem.readFile(file);
 
-		int resultingMessagCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
+		int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
 		int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
-		assertThat(resultingMessagCount).isEqualTo(4);
+		assertThat(resultingMessageCount).isEqualTo(4);
 		assertThat(resultingLevelCount).isEqualTo(4);
 	}
 
@@ -174,7 +173,7 @@ public final class JsonWriterTest {
 	}
 
 	/**
-	 * Verifies that JSON entries are correctly added and are seperated by commas.
+	 * Verifies that JSON entries are correctly added and are separated by commas.
 	 * 
 	 * @throws IOException Failed writing to file
 	 */
