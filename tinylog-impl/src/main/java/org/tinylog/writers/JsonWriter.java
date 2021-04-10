@@ -152,24 +152,23 @@ public final class JsonWriter implements Writer {
 		Token[] tokenEntries = jsonProperties.values().toArray(new Token[0]);
 		String[] fields = jsonProperties.keySet().toArray(new String[0]);
 
-		StringBuilder tokenStringBuilder = new StringBuilder();
 		for (int i = 0; i < tokenEntries.length; i++) {
 			builder.append("\t\t\"").append(fields[i]).append("\" : \"");
+			int start = builder.length();
 
 			Token token = tokenEntries[i];
-			tokenStringBuilder.setLength(0);
-			token.render(logEntry, tokenStringBuilder);
+			token.render(logEntry, builder);
 
-			escapeCharacter("\\", "\\\\", tokenStringBuilder);
-			escapeCharacter("\"", "\\\"", tokenStringBuilder);
-			escapeCharacter(NEW_LINE, "\\n", tokenStringBuilder);
-			escapeCharacter("\t", "\\t", tokenStringBuilder);
-			escapeCharacter("\b", "\\b", tokenStringBuilder);
-			escapeCharacter("\f", "\\f", tokenStringBuilder);
-			escapeCharacter("\n", "\\n", tokenStringBuilder);
-			escapeCharacter("\r", "\\r", tokenStringBuilder);
+			escapeCharacter("\\", "\\\\", builder, start);
+			escapeCharacter("\"", "\\\"", builder, start);
+			escapeCharacter(NEW_LINE, "\\n", builder, start);
+			escapeCharacter("\t", "\\t", builder, start);
+			escapeCharacter("\b", "\\b", builder, start);
+			escapeCharacter("\f", "\\f", builder, start);
+			escapeCharacter("\n", "\\n", builder, start);
+			escapeCharacter("\r", "\\r", builder, start);
 
-			builder.append(tokenStringBuilder.toString()).append("\" ");
+			builder.append("\" ");
 
 			if (i + 1 < jsonProperties.size()) {
 				builder.append(",").append(NEW_LINE);
@@ -178,12 +177,14 @@ public final class JsonWriter implements Writer {
 		builder.append(NEW_LINE).append("\t},");
 	}
 
-	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder) {
-		int index = stringBuilder.indexOf(character);
-		while (index != -1) {
+	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder,
+			final int startIndex) {
+		for (
+			int index = stringBuilder.indexOf(character, startIndex);
+			index != -1;
+			index = stringBuilder.indexOf(character, index + escapeWith.length())
+		) {
 			stringBuilder.replace(index, index + character.length(), escapeWith);
-			index += escapeWith.length();
-			index = stringBuilder.indexOf(character, index);
 		}
 	}
 
