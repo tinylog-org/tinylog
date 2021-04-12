@@ -58,7 +58,7 @@ public class LifeCycle extends AbstractLifeCycle {
 		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		builder.append("<Configuration>");
 		builder.append("<Appenders>");
-		builder.append("<File name=\"file\" fileName=\"" + file + "\"");
+		builder.append("<File name=\"file\" fileName=\"" + file + "\" immediateFlush=\"" + !async + "\"");
 		builder.append(" bufferedIO=\"" + async + "\" bufferSize=\"" + BUFFER_SIZE + "\">");
 		builder.append("<PatternLayout><Pattern>");
 
