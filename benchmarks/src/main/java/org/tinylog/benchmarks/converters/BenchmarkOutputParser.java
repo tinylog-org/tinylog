@@ -41,7 +41,7 @@ import org.tinylog.benchmarks.logging.LocationInfo;
 public final class BenchmarkOutputParser {
 
 	private static final Pattern LINE_PATTERN = Pattern.compile(
-		"(\\w+\\.)*(\\p{Alnum}+)_*Benchmark\\.(\\w+) +[\\w/]+ +(\\w+) +(\\w+) +\\d+ +(\\d+[,.]\\d+) .*"
+		"(\\w+\\.)*(\\p{Alnum}+)_*Benchmark\\.(\\w+) +[\\w/]+ +([\\w/]+) +(\\w+) +\\d+ +(\\d+[,.]\\d+) .*"
 	);
 
 	private static final int GROUP_FRAMEWORK_NAME = 2;
@@ -92,7 +92,8 @@ public final class BenchmarkOutputParser {
 						parsedScore = multiplicand.divide(parsedScore, RoundingMode.HALF_UP);
 					}
 
-					BenchmarkEntity type = new BenchmarkEntity(benchmark, Enum.valueOf(LocationInfo.class, location));
+					LocationInfo locationEnum = "N/A".equals(location) ? null : Enum.valueOf(LocationInfo.class, location);
+					BenchmarkEntity type = new BenchmarkEntity(benchmark, locationEnum);
 					benchmarks
 						.computeIfAbsent(type, key -> new LinkedHashMap<>())
 						.computeIfAbsent(framework, key -> new ArrayList<>())

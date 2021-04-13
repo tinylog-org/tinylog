@@ -13,6 +13,7 @@
 
 package org.tinylog.benchmarks.converters;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import org.tinylog.benchmarks.logging.LocationInfo;
@@ -34,6 +35,25 @@ public class BenchmarkEntity implements Comparable<BenchmarkEntity> {
 		this.location = location;
 	}
 
+	/**
+	 * Gets the benchmark name.
+	 *
+	 * @return The name of the benchmark
+	 */
+	public String getBenchmark() {
+		return benchmark;
+	}
+
+	/**
+	 * Gets the used location info.
+	 *
+	 * @return The used location ino
+	 * @see LocationInfo
+	 */
+	public LocationInfo getLocation() {
+		return location;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof BenchmarkEntity) {
@@ -48,7 +68,7 @@ public class BenchmarkEntity implements Comparable<BenchmarkEntity> {
 	public int compareTo(final BenchmarkEntity other) {
 		int result = benchmark.compareTo(other.benchmark);
 		if (result == 0) {
-			result = location.compareTo(other.location);
+			result = Comparator.nullsLast(LocationInfo::compareTo).compare(location, other.location);
 		}
 		return result;
 	}
