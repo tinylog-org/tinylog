@@ -66,49 +66,46 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 		int length = message.length();
 
 		StringBuilder builder = new StringBuilder(length + ADDITIONAL_STRING_BUILDER_CAPACITY);
-		StringBuilder buffer = new StringBuilder(length + ADDITIONAL_STRING_BUILDER_CAPACITY);
-		StringBuilder current = builder;
 
 		int openingTickIndex = -1;
-		int openingCurlyBrackets = 0;
+		int openingCurlyBracketIndex = -1;
+		int openingCurlyBracketsCount = 0;
 
 		for (int index = 0; index < length; ++index) {
 			char character = message.charAt(index);
-			if (escape && character == '\'' && index + 1 < length && openingCurlyBrackets == 0) {
+			if (escape && character == '\'' && index + 1 < length && openingCurlyBracketsCount == 0) {
 				if (message.charAt(index + 1) == '\'') {
-					current.append('\'');
+					builder.append('\'');
 					index += 1;
 				} else {
-					openingTickIndex = openingTickIndex < 0 ? index : -1;
+					openingTickIndex = openingTickIndex < 0 ? builder.length() : -1;
 				}
 			} else if (character == '{' && index + 1 < length && arguments.hasNext() && openingTickIndex < 0) {
-				if (openingCurlyBrackets++ == 0) {
-					current = buffer;
+				if (openingCurlyBracketsCount++ == 0) {
+					openingCurlyBracketIndex = builder.length();
 				} else {
-					current.append(character);
+					builder.append(character);
 				}
-			} else if (character == '}' && openingCurlyBrackets > 0 && openingTickIndex < 0) {
-				if (--openingCurlyBrackets == 0) {
+			} else if (character == '}' && openingCurlyBracketsCount > 0 && openingTickIndex < 0) {
+				if (--openingCurlyBracketsCount == 0) {
 					Object argument = resolve(arguments.next());
-					if (buffer.length() == 0) {
+					if (openingCurlyBracketIndex == builder.length()) {
 						builder.append(argument);
 					} else {
-						builder.append(format(buffer.toString(), argument));
-						buffer.setLength(0);
+						String pattern = builder.substring(openingCurlyBracketIndex);
+						builder.setLength(openingCurlyBracketIndex);
+						builder.append(format(pattern, argument));
 					}
-					buffer.setLength(0);
-					current = builder;
 				} else {
-					current.append(character);
+					builder.append(character);
 				}
 			} else {
-				current.append(character);
+				builder.append(character);
 			}
 		}
 
-		if (buffer.length() > 0) {
-			builder.append('{');
-			builder.append(buffer);
+		if (openingCurlyBracketsCount > 0) {
+			builder.insert(openingCurlyBracketIndex, '{');
 		}
 
 		if (openingTickIndex >= 0) {

@@ -31,6 +31,7 @@ public final class HtmlConverterApplication {
 		FRAMEWORKS.put("Log4j1", new Framework("Log4j", "with async appender", org.apache.log4j.Logger.class));
 		FRAMEWORKS.put("Logback", new Framework("Logback", "with async appender", ch.qos.logback.classic.Logger.class));
 		FRAMEWORKS.put("Jul", new Framework("java.util.logging"));
+		FRAMEWORKS.put("NoOp", new Framework("Empty Method"));
 	}
 
 	/** */

@@ -26,14 +26,14 @@ import org.tinylog.core.LogEntryValue;
  */
 final class BundleToken implements Token {
 
-	private final Collection<Token> tokens;
+	private final Token[] tokens;
 
 	/**
 	 * @param tokens
 	 *            Base tokens
 	 */
 	BundleToken(final Collection<Token> tokens) {
-		this.tokens = tokens;
+		this.tokens = tokens.toArray(new Token[0]);
 	}
 
 	@Override
@@ -47,11 +47,11 @@ final class BundleToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		for (Token token : tokens) {
-			token.render(logEntry, builder);
+		for (int i = 0; i < tokens.length; ++i) {
+			tokens[i].render(logEntry, builder);
 		}
 	}
-	
+
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		StringBuilder builder = new StringBuilder();

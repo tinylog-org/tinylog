@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.tinylog.benchmarks.logging.LocationInfo;
 
 /**
  * Renderer for creating HTML diagrams from results of logging framework benchmarks for tinylog.org.
@@ -50,7 +53,12 @@ public final class HtmlDiagramRenderer {
 	 */
 	public void output(final Map<BenchmarkEntity, Map<String, List<BigDecimal>>> benchmarks) {
 		for (Entry<BenchmarkEntity, Map<String, List<BigDecimal>>> benchmark : benchmarks.entrySet()) {
-			BigDecimal max = benchmark.getValue().values().stream()
+			String benchmarkName = benchmark.getKey().getBenchmark();
+			LocationInfo locationInfo = benchmark.getKey().getLocation();
+
+			BigDecimal max = benchmarks.entrySet().stream()
+				.filter(entry -> Objects.equals(benchmarkName, entry.getKey().getBenchmark()))
+				.flatMap(entry -> entry.getValue().values().stream())
 				.flatMap(Collection::stream)
 				.max(Comparator.naturalOrder())
 				.orElse(BigDecimal.ONE);
@@ -62,8 +70,15 @@ public final class HtmlDiagramRenderer {
 
 			System.out.println("\t<thead>");
 			System.out.println("\t\t<tr>");
-			System.out.println("\t\t\t<th>Framework</th>");
-			System.out.println("\t\t\t<th>Processed Log Entries per Second</th>");
+
+			if (locationInfo == null) {
+				System.out.println("\t\t\t<th>No-Op Benchmark</th>");
+				System.out.println("\t\t\t<th>Invocations per Second</th>");
+			} else {
+				System.out.println("\t\t\t<th>Framework</th>");
+				System.out.println("\t\t\t<th>Processed Log Entries per Second</th>");
+			}
+
 			System.out.println("\t\t</tr>");
 			System.out.println("\t</thead>");
 
@@ -71,20 +86,21 @@ public final class HtmlDiagramRenderer {
 
 			for (Entry<String, Framework> framework : frameworks.entrySet()) {
 				List<BigDecimal> scores = benchmark.getValue().get(framework.getKey());
+				if (scores != null) {
+					for (int i = 0; i < scores.size(); ++i) {
+						BigDecimal total = scores.get(i).setScale(0, RoundingMode.HALF_UP);
+						BigDecimal percentage = scores.get(i).multiply(PERCENTAGE).divide(max, DECIMAL_PLACES, RoundingMode.HALF_UP);
 
-				for (int i = 0; i < scores.size(); ++i) {
-					BigDecimal total = scores.get(i).setScale(0, RoundingMode.HALF_UP);
-					BigDecimal percentage = scores.get(i).multiply(PERCENTAGE).divide(max, DECIMAL_PLACES, RoundingMode.HALF_UP);
+						String label = i == 0 ? framework.getValue().getName() : framework.getValue().getAsync();
 
-					String label = i == 0 ? framework.getValue().getName() : framework.getValue().getAsync();
-
-					System.out.println("\t\t" + (i == 0 ? "<tr>" : "<tr class=\"advanced\">"));
-					System.out.println("\t\t\t<td>" + label + "</td>");
-					System.out.println("\t\t\t<td>");
-					System.out.println("\t\t\t\t<div class=\"bar\" style=\"width: " + percentage + "%\">&nbsp;</div>");
-					System.out.println("\t\t\t\t<div class=\"total\">" + NUMBER_FORMAT.format(total) + "</div></td>");
-					System.out.println("\t\t\t</td>");
-					System.out.println("\t\t</tr>");
+						System.out.println("\t\t" + (i == 0 ? "<tr>" : "<tr class=\"advanced\">"));
+						System.out.println("\t\t\t<td>" + label + "</td>");
+						System.out.println("\t\t\t<td>");
+						System.out.println("\t\t\t\t<div class=\"bar\" style=\"width: " + percentage + "%\">&nbsp;</div>");
+						System.out.println("\t\t\t\t<div class=\"total\">" + NUMBER_FORMAT.format(total) + "</div></td>");
+						System.out.println("\t\t\t</td>");
+						System.out.println("\t\t</tr>");
+					}
 				}
 			}
 

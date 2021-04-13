@@ -73,6 +73,17 @@ public class StackTraceBenchmark {
 	}
 
 	/**
+	 * Benchmarks getting the caller class from stack trace walker.
+	 *
+	 * @return Found caller class
+	 */
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	public Class<?> stackWalkerCallerClass() {
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+	}
+
+	/**
 	 * Benchmarks extracting a class via Sun reflection.
 	 * 
 	 * @return Found class
@@ -86,13 +97,24 @@ public class StackTraceBenchmark {
 
 	/**
 	 * Benchmarks extracting a stack trace element from stack trace of a throwable.
-	 * 
+	 *
 	 * @return Found stack trace element
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public StackTraceElement throwable() {
 		return new Throwable().getStackTrace()[1];
+	}
+
+	/**
+	 * Benchmarks extracting caller class context from security manager.
+	 *
+	 * @return Found stack trace element
+	 */
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	public Class<?> securityManager() {
+		return new ClassContextSecurityManager().getClassContext()[1];
 	}
 
 	/* Throwable.getStackTraceElement() is only available on Java 8 and prior */
@@ -147,6 +169,22 @@ public class StackTraceBenchmark {
 			return stream.skip(index).findFirst().get();
 		}
 	
+	}
+
+	/**
+	 * Security manager with accessible {@link SecurityManager#getClassContext()}.
+	 */
+	private static final class ClassContextSecurityManager extends SecurityManager {
+
+		/** */
+		private ClassContextSecurityManager() {
+		}
+
+		@Override
+		protected Class<?>[] getClassContext() {
+			return super.getClassContext();
+		}
+
 	}
 	
 }

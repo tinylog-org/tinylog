@@ -100,37 +100,37 @@
 		<profile>
 			<id>log4j1</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j1\.Log4j1Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j1(_*)\.Log4j1(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>log4j2</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j2\.Log4j2Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j2(_*)\.Log4j2(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>logback</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.logback\.LogbackBenchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.logback(_*)\.Logback(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>jul</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.jul\.JulBenchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.jul(_*)\.Jul(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>tinylog1</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog1\.Tinylog1Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog1(_*)\.Tinylog1(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
 			<id>tinylog2</id>
 			<properties>
-				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog2\.Tinylog2Benchmark</benchmark.class>
+				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog2(_*)\.Tinylog2(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
