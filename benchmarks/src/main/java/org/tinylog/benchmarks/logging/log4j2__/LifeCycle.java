@@ -51,7 +51,7 @@ public class LifeCycle extends AbstractLifeCycle {
 	@Override
 	protected void init(final Path file) throws IOException {
 		if (async) {
-			System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+			System.setProperty("log4j2.contextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		}
 
 		StringBuilder builder = new StringBuilder();
