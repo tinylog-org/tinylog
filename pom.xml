@@ -166,6 +166,25 @@
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
 		</profile>
+		<profile>
+			<id>javadoc-workaround-for-java-9</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<configuration>
+								<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>
@@ -585,8 +604,6 @@
 						</archive>
 						<doctitle>${project.name} ${project.version}</doctitle>
 						<source>8</source>
-						<!-- Set the Javadoc executable explicitly, if Maven cannot find it automatically -->
-						<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 					</configuration>
 					<executions>
 						<execution>
