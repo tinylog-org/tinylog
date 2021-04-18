@@ -50,10 +50,6 @@ public class LifeCycle extends AbstractLifeCycle {
 
 	@Override
 	protected void init(final Path file) throws IOException {
-		if (async) {
-			System.setProperty("log4j2.contextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-		}
-
 		StringBuilder builder = new StringBuilder();
 		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		builder.append("<Configuration>");
@@ -74,9 +70,17 @@ public class LifeCycle extends AbstractLifeCycle {
 		builder.append("</File>");
 		builder.append("</Appenders>");
 		builder.append("<Loggers>");
-		builder.append("<Root level=\"info\" includeLocation=\"" + (getLocationInfo() == LocationInfo.FULL) + "\">");
-		builder.append("<AppenderRef ref=\"file\"/>");
-		builder.append("</Root>");
+
+		if (async) {
+			builder.append("<AsyncRoot level=\"info\" includeLocation=\"" + (getLocationInfo() == LocationInfo.FULL) + "\">");
+			builder.append("<AppenderRef ref=\"file\"/>");
+			builder.append("</AsyncRoot>");
+		} else {
+			builder.append("<Root level=\"info\" includeLocation=\"" + (getLocationInfo() == LocationInfo.FULL) + "\">");
+			builder.append("<AppenderRef ref=\"file\"/>");
+			builder.append("</Root>");
+		}
+
 		builder.append("</Loggers>");
 		builder.append("</Configuration>");
 
