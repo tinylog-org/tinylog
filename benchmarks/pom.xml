@@ -79,69 +79,69 @@
 	<profiles>
 		<!-- Java API -->
 		<profile>
-			<id>date-and-time</id>
+			<id>benchmark-date-and-time</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.api\.DateAndTimeBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>stack-trace</id>
+			<id>benchmark-stack-trace</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.api\.StackTraceBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>writing</id>
+			<id>benchmark-writing</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.api\.WritingBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<!-- Logging Frameworks -->
 		<profile>
-			<id>log4j1</id>
+			<id>benchmark-log4j1</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j1(_*)\.Log4j1(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>log4j2</id>
+			<id>benchmark-log4j2</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.log4j2(_*)\.Log4j2(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>logback</id>
+			<id>benchmark-logback</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.logback(_*)\.Logback(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>jul</id>
+			<id>benchmark-jul</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.jul(_*)\.Jul(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>tinylog1</id>
+			<id>benchmark-tinylog1</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog1(_*)\.Tinylog1(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>tinylog2</id>
+			<id>benchmark-tinylog2</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.tinylog2(_*)\.Tinylog2(_*)Benchmark</benchmark.class>
 			</properties>
 		</profile>
 		<profile>
-			<id>no-op</id>
+			<id>benchmark-no-op</id>
 			<properties>
 				<benchmark.class>org\.tinylog\.benchmarks\.logging\.noop\.NoOpBenchmark</benchmark.class>
 			</properties>
 		</profile>
 		<!-- Fast Benchmarks -->
 		<profile>
-			<id>fast</id>
+			<id>benchmark-option-fast</id>
 			<properties>
 				<benchmark.forks>1</benchmark.forks>
 				<benchmark.iterations>1</benchmark.iterations>
@@ -149,7 +149,7 @@
 		</profile>
 		<!-- JDK Flight Recorder profiler -->
 		<profile>
-			<id>profiler</id>
+			<id>benchmark-option-profiler</id>
 			<build>
 				<plugins>
 					<plugin>
