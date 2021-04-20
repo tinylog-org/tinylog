@@ -1,0 +1,117 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version"
+        required: true
+        default: "2."
+
+jobs:
+  publish:
+    name: Publish tinylog ${{github.event.inputs.version}}
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Import GPG secret key for OSSRH
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{secrets.OSSRH_GPG_SECRET_KEY}}
+          passphrase: ${{secrets.OSSRH_GPG_PASSWORD}}
+
+      - name: Configure GIT
+        run: |
+          git config --global user.name "${{github.actor}}"
+          git config --global user.email "${{github.actor}}@users.noreply.github.com"
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 9
+        uses: actions/setup-java@v1
+        with:
+          java-version: 9
+          server-id: ossrh
+          server-username: pmw
+          server-password: ${{secrets.OSSRH_SERVER_PASSWORD}}
+
+      - name: Store original version
+        run: |
+          echo "ORIGINAL_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+      - name: Create version ${{github.event.inputs.version}}
+        run: |
+          mvn -DnewVersion=${{github.event.inputs.version}} -DgenerateBackupPoms=false --no-transfer-progress --batch-mode versions:set
+          git commit -am "Release version ${{github.event.inputs.version}}"
+          git tag "${{github.event.inputs.version}}"
+
+      - name: Deploy version ${{github.event.inputs.version}}
+        run: |
+          mvn -P release -Dgpg.passphrase=$OSSRH_GPG_PASSWORD --no-transfer-progress --batch-mode clean package
+        env:
+          OSSRH_GPG_PASSWORD: ${{secrets.OSSRH_GPG_PASSWORD}}
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          server-id: ossrh
+          server-username: pmw
+          server-password: ${{secrets.OSSRH_SERVER_PASSWORD}}
+
+      - name: Generate API documentation
+        run: |
+          cd tinylog-api
+          mvn -P release -Dgpg.passphrase=${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}} --no-transfer-progress --batch-mode javadoc:javadoc
+
+      - name: Restore original version
+        run: |
+          mvn -DnewVersion=${ORIGINAL_VERSION} -DgenerateBackupPoms=false --no-transfer-progress --batch-mode versions:set
+          git commit -am "Restore snapshot version ${ORIGINAL_VERSION}"
+
+      - name: Push changes
+        run: |
+          git push origin
+          git push origin "${{github.event.inputs.version}}"
+
+      - name: Create release draft
+        uses: ncipollo/release-action@v1
+        with:
+          name: "Version ${{github.event.inputs.version}}"
+          tag: "${{github.event.inputs.version}}"
+          artifacts: "target/*"
+          prerelease: ${{contains(github.event.inputs.version, '-')}}
+          draft: true
+          token: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Upload API documentation
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
+        with:
+          ftp_host: tinylog.org
+          ftp_username: tinylog2-api-docs@tinylog.org
+          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_API_DOCS}}
+          local_source_dir: "tinylog-api/target/site/apidocs"
+          dist_target_dir: "."
+
+      - name: Upload ZIP files
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
+        with:
+          ftp_host: tinylog.org
+          ftp_username: tinylog2-zip-files@tinylog.org
+          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_ZIP_FILES}}
+          local_source_dir: "target"
+          dist_target_dir: "."
+
+      - name: Create P2 repository
+        run: |
+          mvn -P release --no-transfer-progress --batch-mode --non-recursive p2:site
+
+      - name: Upload P2 repository
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
+        with:
+          ftp_host: tinylog.org
+          ftp_username: tinylog2-p2-repository@tinylog.org
+          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_P2_REPOSITORY}}
+          local_source_dir: "target/repository"
+          dist_target_dir: "."
