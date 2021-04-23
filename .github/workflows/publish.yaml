@@ -48,7 +48,7 @@ jobs:
 
       - name: Deploy version ${{github.event.inputs.version}}
         run: |
-          mvn -P release -Dgpg.passphrase=$OSSRH_GPG_PASSWORD --no-transfer-progress --batch-mode clean package
+          mvn -P release -Dgpg.passphrase=$OSSRH_GPG_PASSWORD --no-transfer-progress --batch-mode clean deploy
         env:
           OSSRH_GPG_PASSWORD: ${{secrets.OSSRH_GPG_PASSWORD}}
 
