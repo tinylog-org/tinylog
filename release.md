@@ -1,29 +1,12 @@
 Releasing a New Version
 =======================
 
-Preconditions
--------------
-
- * Repository https://github.com/pmwmedia/tinylog.git cloned and actual
- * JDK 8 and JDK 9 installed
- * Maven 3 installed
- * GPG installed
- * Certificate for oss.sonatype.org imported
- * Passphrase and path to executable for GPG set in settings.xml
- * Username and password for oss.sonatype.org and tinylog's FTP server set in settings.xml
-
 Steps for Each Release
 ----------------------
 
- 1. Set new version: mvn versions:set -DnewVersion=VERSION -DgenerateBackupPoms=false
- 2. Create a tag with new version number as name
- 3. Deploy with JDK 9: mvn clean deploy -P release
- 4. Upload P2 repository: mvn p2:site wagon:upload -P release --non-recursive
- 5. Upload ZIP archives from target to website
- 6. Generate Javadoc for tinylog API with JDK 8: mvn javadoc:javadoc
- 7. Upload generated Javadoc for tinylog API to website
- 8. Restore snapshot version: mvn versions:set -DnewVersion=2.MINOR-SNAPSHOT -DgenerateBackupPoms=false
- 9. Push all commits and tags
-10. Create release on GitHub with ZIP archives from target
-11. Update tinylog version on website
-12. Release a new post on website
+1. Run [publish workflow](https://github.com/tinylog-org/tinylog/actions/workflows/publish.yaml) on GitHub
+2. Publish [release](https://github.com/tinylog-org/tinylog/releases) on GitHub
+   - See closed issues in [milestones](https://github.com/tinylog-org/tinylog/milestones)
+3. Update [tinylog version](https://tinylog.org/v2/wp-admin/options-general.php?page=custom-global-variables) on website
+4. Update [documentation](https://github.com/tinylog-org/tinylog/wiki) on Wiki
+5. Release a [new post](https://tinylog.org/v2/wp-admin/post-new.php) on website
