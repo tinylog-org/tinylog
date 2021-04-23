@@ -47,25 +47,14 @@ jobs:
           nexus_username: pmw
           nexus_password: ${{secrets.OSSRH_SERVER_PASSWORD}}
 
-      - name: Set up JDK 8
-        uses: actions/setup-java@v1
+      - name: Upload ZIP files
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
         with:
-          java-version: 8
-
-      - name: Generate API documentation
-        run: |
-          cd tinylog-api
-          mvn -P release --no-transfer-progress --batch-mode javadoc:javadoc
-
-      - name: Restore original version
-        run: |
-          mvn -DnewVersion=${ORIGINAL_VERSION} -DgenerateBackupPoms=false --no-transfer-progress --batch-mode versions:set
-          git commit -am "Restore snapshot version ${ORIGINAL_VERSION}"
-
-      - name: Push changes
-        run: |
-          git push origin
-          git push origin "${{github.event.inputs.version}}"
+          ftp_host: tinylog.org
+          ftp_username: tinylog2-zip-files@tinylog.org
+          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_ZIP_FILES}}
+          local_source_dir: "target"
+          dist_target_dir: "."
 
       - name: Create release draft
         uses: ncipollo/release-action@v1
@@ -76,24 +65,6 @@ jobs:
           prerelease: ${{contains(github.event.inputs.version, '-')}}
           draft: true
           token: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Upload API documentation
-        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
-        with:
-          ftp_host: tinylog.org
-          ftp_username: tinylog2-api-docs@tinylog.org
-          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_API_DOCS}}
-          local_source_dir: "tinylog-api/target/site/apidocs"
-          dist_target_dir: "."
-
-      - name: Upload ZIP files
-        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
-        with:
-          ftp_host: tinylog.org
-          ftp_username: tinylog2-zip-files@tinylog.org
-          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_ZIP_FILES}}
-          local_source_dir: "target"
-          dist_target_dir: "."
 
       - name: Create P2 repository
         run: |
@@ -107,3 +78,32 @@ jobs:
           ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_P2_REPOSITORY}}
           local_source_dir: "target/repository"
           dist_target_dir: "."
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: Generate API documentation
+        run: |
+          cd tinylog-api
+          mvn -P release --no-transfer-progress --batch-mode javadoc:javadoc
+
+      - name: Upload API documentation
+        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
+        with:
+          ftp_host: tinylog.org
+          ftp_username: tinylog2-api-docs@tinylog.org
+          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_API_DOCS}}
+          local_source_dir: "tinylog-api/target/site/apidocs"
+          dist_target_dir: "."
+
+      - name: Restore original version
+        run: |
+          mvn -DnewVersion=${ORIGINAL_VERSION} -DgenerateBackupPoms=false --no-transfer-progress --batch-mode versions:set
+          git commit -am "Restore snapshot version ${ORIGINAL_VERSION}"
+
+      - name: Push changes
+        run: |
+          git push origin
+          git push origin "${{github.event.inputs.version}}"
