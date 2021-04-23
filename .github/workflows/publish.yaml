@@ -80,16 +80,19 @@ jobs:
           dist_target_dir: "."
 
       - name: Set up JDK 8
+        if: ${{!contains(github.event.inputs.version, '-')}}
         uses: actions/setup-java@v1
         with:
           java-version: 8
 
       - name: Generate API documentation
+        if: ${{!contains(github.event.inputs.version, '-')}}
         run: |
           cd tinylog-api
           mvn -P release --no-transfer-progress --batch-mode javadoc:javadoc
 
       - name: Upload API documentation
+        if: ${{!contains(github.event.inputs.version, '-')}}
         uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
         with:
           ftp_host: tinylog.org
