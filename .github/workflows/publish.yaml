@@ -14,12 +14,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
 
-      - name: Import GPG secret key for OSSRH
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{secrets.OSSRH_GPG_SECRET_KEY}}
-          passphrase: ${{secrets.OSSRH_GPG_PASSWORD}}
-
       - name: Configure GIT
         run: |
           git config --global user.name "${{github.actor}}"
@@ -32,9 +26,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 9
-          server-id: ossrh
-          server-username: pmw
-          server-password: ${{secrets.OSSRH_SERVER_PASSWORD}}
 
       - name: Store original version
         run: |
@@ -47,23 +38,24 @@ jobs:
           git tag "${{github.event.inputs.version}}"
 
       - name: Deploy version ${{github.event.inputs.version}}
-        run: |
-          mvn -P release -Dgpg.passphrase=$OSSRH_GPG_PASSWORD --no-transfer-progress --batch-mode clean deploy
-        env:
-          OSSRH_GPG_PASSWORD: ${{secrets.OSSRH_GPG_PASSWORD}}
+        uses: samuelmeuli/action-maven-publish@v1
+        with:
+          maven_profiles: release
+          maven_args: "--no-transfer-progress --batch-mode"
+          gpg_private_key: ${{secrets.OSSRH_GPG_SECRET_KEY}}
+          gpg_passphrase: ${{secrets.OSSRH_GPG_PASSWORD}}
+          nexus_username: pmw
+          nexus_password: ${{secrets.OSSRH_SERVER_PASSWORD}}
 
       - name: Set up JDK 8
         uses: actions/setup-java@v1
         with:
           java-version: 8
-          server-id: ossrh
-          server-username: pmw
-          server-password: ${{secrets.OSSRH_SERVER_PASSWORD}}
 
       - name: Generate API documentation
         run: |
           cd tinylog-api
-          mvn -P release -Dgpg.passphrase=${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}} --no-transfer-progress --batch-mode javadoc:javadoc
+          mvn -P release --no-transfer-progress --batch-mode javadoc:javadoc
 
       - name: Restore original version
         run: |
