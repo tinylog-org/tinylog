@@ -114,7 +114,9 @@ public final class JsonWriter implements Writer {
 		}
 
 		addJsonObject(logEntry, builder);
-		writer.write(builder.toString().getBytes(charset), builder.length());
+
+		byte[] data = builder.toString().getBytes(charset);
+		writer.write(data, data.length);
 	}
 
 	@Override
