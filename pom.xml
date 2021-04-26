@@ -138,8 +138,6 @@
 				<kotlin.compiler.apiVersion>1.3</kotlin.compiler.apiVersion>
 				<!-- Skip Animal Sniffer plug-in by default as it cannot handle module-info class files on builds without clean goal -->
 				<animal.sniffer.skip>true</animal.sniffer.skip>
-				<!-- Disable Javadoc and Dokka by default as both Maven plug-ins needs additional configurations on some environments -->
-				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 		</profile>
 		<profile>
@@ -155,8 +153,6 @@
 				<kotlin.compiler.apiVersion>1.3</kotlin.compiler.apiVersion>
 				<!-- Enable Animal Sniffer for release builds -->
 				<animal.sniffer.skip>false</animal.sniffer.skip>
-				<!-- Enable Javadoc and Dokka for release builds -->
-				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
 		</profile>
 		<profile>
