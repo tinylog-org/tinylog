@@ -180,14 +180,6 @@
 		</profile>
 	</profiles>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>kotlinx</id>
-			<name>Kotlinx</name>
-			<url>https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven</url>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
