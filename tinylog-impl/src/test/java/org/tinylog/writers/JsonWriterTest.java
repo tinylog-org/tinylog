@@ -59,7 +59,7 @@ public final class JsonWriterTest {
 		JsonWriter writer = new JsonWriter(properties);
 		writer.close();
 
-		String expectedFileContent = "[" + NEW_LINE + "]";
+		String expectedFileContent = "[]";
 		String resultingEntry = FileSystem.readFile(file);
 
 		assertThat(resultingEntry).isEqualTo(expectedFileContent);
