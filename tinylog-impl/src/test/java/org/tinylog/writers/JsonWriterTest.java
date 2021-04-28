@@ -330,4 +330,30 @@ public final class JsonWriterTest {
 		assertThat(logValues).containsAll(expectedValues);
 	}
 
+	/**
+	 * Verifies that file is valid between log entries.
+	 *
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void correctStateBetweenWrites() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("buffered", "false");
+		properties.put("append", "false");
+		properties.put("field.level", "level");
+
+		JsonWriter writer;
+		writer = new JsonWriter(properties);
+		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+		writer.write(givenLogEntry);
+		String expectedFirstEntry = String.format("[%s\t{%s\t\t\"level\" : \"%s\"%s\t}%s]", NEW_LINE, NEW_LINE,
+				givenLogEntry.getLevel(), NEW_LINE, NEW_LINE);
+		String resultingEntry = FileSystem.readFile(file);
+		assertThat(resultingEntry).isEqualTo(expectedFirstEntry);
+		writer.close();
+	}
+
 }
