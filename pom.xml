@@ -38,6 +38,17 @@
 		<git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Ensure that Eclipse and IntelliJ use Java 9 -->
+		<maven.compiler.source>9</maven.compiler.source>
+		<maven.compiler.target>9</maven.compiler.target>
+		<maven.compiler.testSource>9</maven.compiler.testSource>
+		<maven.compiler.testTarget>9</maven.compiler.testTarget>
+		<!-- Kotlin versions -->
+		<kotlin.compiler.languageVersion>1.3</kotlin.compiler.languageVersion>
+		<kotlin.compiler.apiVersion>1.3</kotlin.compiler.apiVersion>
+		<!-- Skip Animal Sniffer plug-in by default as it cannot handle module-info class files on builds without clean goal -->
+		<animal.sniffer.skip>true</animal.sniffer.skip>
+
 
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
@@ -122,24 +133,6 @@
 	</distributionManagement>
 
 	<profiles>
-		<profile>
-			<id>dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<!-- Ensure that Eclipse and IntelliJ use Java 9 -->
-				<maven.compiler.source>9</maven.compiler.source>
-				<maven.compiler.target>9</maven.compiler.target>
-				<maven.compiler.testSource>9</maven.compiler.testSource>
-				<maven.compiler.testTarget>9</maven.compiler.testTarget>
-				<!-- Kotlin versions -->
-				<kotlin.compiler.languageVersion>1.3</kotlin.compiler.languageVersion>
-				<kotlin.compiler.apiVersion>1.3</kotlin.compiler.apiVersion>
-				<!-- Skip Animal Sniffer plug-in by default as it cannot handle module-info class files on builds without clean goal -->
-				<animal.sniffer.skip>true</animal.sniffer.skip>
-			</properties>
-		</profile>
 		<profile>
 			<id>release</id>
 			<properties>
