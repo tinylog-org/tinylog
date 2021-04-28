@@ -141,9 +141,6 @@
 				<maven.compiler.target>1.6</maven.compiler.target>
 				<maven.compiler.testSource>9</maven.compiler.testSource>
 				<maven.compiler.testTarget>9</maven.compiler.testTarget>
-				<!-- Kotlin versions -->
-				<kotlin.compiler.languageVersion>1.3</kotlin.compiler.languageVersion>
-				<kotlin.compiler.apiVersion>1.3</kotlin.compiler.apiVersion>
 				<!-- Enable Animal Sniffer for release builds -->
 				<animal.sniffer.skip>false</animal.sniffer.skip>
 			</properties>
