@@ -33,7 +33,7 @@ public class DatePlaceholderBuilder implements PlaceholderBuilder {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
 			return new DatePlaceholder(formatter.withZone(zone), value != null);
 		} catch (IllegalArgumentException ex) {
-			InternalLogger.error(ex, "Invalid date time pattern: \"" + pattern + "\"");
+			InternalLogger.error(ex, "Invalid date time pattern: \"{}\"", pattern);
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_PATTERN, locale);
 			return new DatePlaceholder(formatter.withZone(zone), false);
 		}
