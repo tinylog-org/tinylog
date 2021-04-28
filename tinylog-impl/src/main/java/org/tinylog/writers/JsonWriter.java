@@ -139,9 +139,8 @@ public final class JsonWriter implements Writer {
 	}
 
 	private boolean isFirstEntry() throws IOException {
-		boolean firstEntry = true;
 		if (randomAccessFile.length() == 0) {
-			firstEntry = false;
+			return true;
 		} else {
 			byte[] bytes = new byte[BUFFER_SIZE];
 			randomAccessFile.seek(0);
@@ -149,11 +148,11 @@ public final class JsonWriter implements Writer {
 			for (int i = numberOfBytes - 1; i >= 0; i--) {
 				byte letter = bytes[i];
 				if (letter == '{') {
-					firstEntry = false;
+					return false;
 				}
 			}
 		}
-		return firstEntry;
+		return true;
 	}
 
 	/**
@@ -186,7 +185,7 @@ public final class JsonWriter implements Writer {
 			escapeCharacter("\n", "\\n", builder, start);
 			escapeCharacter("\r", "\\r", builder, start);
 
-			builder.append("\" ");
+			builder.append("\"");
 
 			if (i + 1 < jsonProperties.size()) {
 				builder.append(",").append(NEW_LINE);
@@ -225,6 +224,14 @@ public final class JsonWriter implements Writer {
 		return character == '\n' || character == '\r' || character == ' ';
 	}
 
+	/**
+	 * Removes the last occurrence of given character beginning from the end, if
+	 * it's available. Searches only for length of {@link #BUFFER_SIZE}
+	 * 
+	 * @param character Character to remove
+	 * @return true if the character was removed
+	 * @throws IOException File not found or couldn't access file
+	 */
 	private boolean removeLastOccurenceOfIfAvailable(final char character) throws IOException {
 		long sizeToTruncate = 0;
 		boolean foundChar = false;
@@ -253,6 +260,15 @@ public final class JsonWriter implements Writer {
 		return foundChar;
 	}
 
+	/**
+	 * The method checks for availability of a character in the RandomAccessFile.
+	 * Only checks for length of the {@link #BUFFER_SIZE}.
+	 * 
+	 * @param character Character to check for availability
+	 * @param start     Offset where the search should begin
+	 * @return boolean if the character was found
+	 * @throws IOException File not found or couldn't access file
+	 */
 	private boolean isCharacterAvailable(final char character, final long start) throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		randomAccessFile.seek(start);
