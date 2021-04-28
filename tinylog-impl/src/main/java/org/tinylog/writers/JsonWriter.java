@@ -225,7 +225,7 @@ public final class JsonWriter implements Writer {
 		return character == '\n' || character == '\r' || character == ' ';
 	}
 
-	private boolean removeLastOccurenceOfIfAvailable(char character) throws IOException {
+	private boolean removeLastOccurenceOfIfAvailable(final char character) throws IOException {
 		long sizeToTruncate = 0;
 		boolean foundChar = false;
 
@@ -253,7 +253,7 @@ public final class JsonWriter implements Writer {
 		return foundChar;
 	}
 
-	private boolean isCharacterAvailable(char character, long start) throws IOException {
+	private boolean isCharacterAvailable(final char character, final long start) throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		randomAccessFile.seek(start);
 		int numberOfBytes = randomAccessFile.read(bytes);
