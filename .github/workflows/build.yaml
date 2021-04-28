@@ -17,7 +17,7 @@ jobs:
       - uses: skjolber/maven-cache-github-action@v1
         with:
           step: restore
-      - run: mvn -P dev --batch-mode --update-snapshots verify
+      - run: mvn --batch-mode --update-snapshots verify
       - uses: skjolber/maven-cache-github-action@v1
         with:
           step: save

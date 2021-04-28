@@ -18,6 +18,10 @@
         <git.url>https://github.com/pmwmedia/tinylog</git.url>
         <git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
         <git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
+        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>9</maven.compiler.target>
+        <maven.compiler.testSource>9</maven.compiler.testSource>
+        <maven.compiler.testTarget>9</maven.compiler.testTarget>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
         <website.url>https://tinylog.org/</website.url>
@@ -34,22 +38,8 @@
 
     <profiles>
         <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <!-- Ensure that Eclipse and IntelliJ use Java 9 or later -->
-                <maven.compiler.source>9</maven.compiler.source>
-                <maven.compiler.target>9</maven.compiler.target>
-                <maven.compiler.testSource>9</maven.compiler.testSource>
-                <maven.compiler.testTarget>9</maven.compiler.testTarget>
-            </properties>
-        </profile>
-        <profile>
             <id>release</id>
             <properties>
-                <!-- Real Java versions for clean release builds -->
                 <maven.compiler.source>8</maven.compiler.source>
                 <maven.compiler.target>8</maven.compiler.target>
                 <maven.compiler.testSource>8</maven.compiler.testSource>
