@@ -203,9 +203,12 @@ public final class JsonWriter implements Writer {
 	}
 
 	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder,
-								 final int startIndex) {
-		for (int index = stringBuilder.indexOf(character, startIndex); index != -1; index = stringBuilder
-				.indexOf(character, index + escapeWith.length())) {
+								final int startIndex) {
+		for (
+			int index = stringBuilder.indexOf(character, startIndex);
+			index != -1;
+			index = stringBuilder.indexOf(character, index + escapeWith.length())
+		) {
 			stringBuilder.replace(index, index + character.length(), escapeWith);
 		}
 	}
@@ -244,13 +247,14 @@ public final class JsonWriter implements Writer {
 		randomAccessFile.seek(Math.max(0, randomAccessFile.length() - BUFFER_SIZE));
 
 		for (int i = randomAccessFile.read(bytes) - character.length; i >= 0; i--) {
-			sizeToTruncate += 1;
 
 			if (isCharacter(character, bytes, i)) {
+				sizeToTruncate += character.length;
 				foundChar = true;
 			} else if (foundChar && !isWhitespace(bytes, i)) {
-				sizeToTruncate -= 1;
 				break;
+			} else {
+				sizeToTruncate += 1;
 			}
 		}
 		if (!foundChar) {
