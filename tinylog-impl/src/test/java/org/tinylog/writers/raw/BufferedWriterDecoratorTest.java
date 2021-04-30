@@ -50,10 +50,10 @@ public final class BufferedWriterDecoratorTest {
 	@Test
 	public void writing() throws IOException {
 		writer.write(new byte[] { 1, 2 }, 2);
-		writer.write(new byte[] { 3 }, 1);
+		writer.write(new byte[] { 3, 4, 5, 6 }, 1, 3);
 		writer.close();
 
-		assertThat(stream.toByteArray()).startsWith((byte) 1, (byte) 2, (byte) 3);
+		assertThat(stream.toByteArray()).startsWith((byte) 1, (byte) 2, (byte) 4, (byte) 5, (byte) 6);
 	}
 
 	/**
@@ -65,12 +65,12 @@ public final class BufferedWriterDecoratorTest {
 	 */
 	@Test
 	public void flushing() throws IOException {
-		writer.write(new byte[] { 1 }, 1);
+		writer.write(new byte[] { 1 }, 0, 1);
 		writer.write(new byte[BUFFER_CAPACITY - 2], BUFFER_CAPACITY - 2);
 		assertThat(stream.toByteArray()).isEmpty();
 
-		writer.write(new byte[] { 2 }, 1);
-		writer.write(new byte[] { 3 }, 1);
+		writer.write(new byte[] { 2 }, 0, 1);
+		writer.write(new byte[] { 3 }, 0, 1);
 		assertThat(stream.toByteArray()).startsWith((byte) 1).endsWith((byte) 2).hasSize(BUFFER_CAPACITY);
 
 		writer.flush();
@@ -90,7 +90,7 @@ public final class BufferedWriterDecoratorTest {
 		data[BUFFER_CAPACITY - 1] = 2;
 		data[BUFFER_CAPACITY] = 3;
 
-		writer.write(data, data.length);
+		writer.write(data, 0, data.length);
 		writer.close();
 
 		assertThat(stream.toByteArray()).isEqualTo(data);

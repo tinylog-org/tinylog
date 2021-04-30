@@ -13,7 +13,6 @@
 
 package org.tinylog.writers;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -32,12 +31,12 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	private final ByteArrayWriter writer;
 
 	/**
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             Log file is not defined in configuration
 	 */
-	public FileWriter() throws FileNotFoundException {
+	public FileWriter() throws IOException {
 		this(Collections.<String, String>emptyMap());
 	}
 
@@ -45,12 +44,12 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	 * @param properties
 	 *            Configuration for writer
 	 *
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             Log file is not defined in configuration
 	 */
-	public FileWriter(final Map<String, String> properties) throws FileNotFoundException {
+	public FileWriter(final Map<String, String> properties) throws IOException {
 		super(properties);
 
 		String fileName = getFileName(properties);
@@ -59,13 +58,13 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
 
 		charset = getCharset(properties);
-		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false);
+		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false, charset);
 	}
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		byte[] data = render(logEntry).getBytes(charset);
-		writer.write(data, data.length);
+		writer.write(data, 0, data.length);
 	}
 
 	@Override

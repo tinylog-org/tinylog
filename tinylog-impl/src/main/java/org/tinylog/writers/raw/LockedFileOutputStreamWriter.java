@@ -37,11 +37,16 @@ public final class LockedFileOutputStreamWriter implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int length) throws IOException {
+		write(data, 0, length);
+	}
+
+	@Override
+	public void write(final byte[] data, final int offset, final int length) throws IOException {
 		FileChannel channel = stream.getChannel();
 		FileLock lock = channel.lock();
 		try {
 			channel.position(channel.size());
-			stream.write(data, 0, length);
+			stream.write(data, offset, length);
 		} finally {
 			lock.release();
 		}

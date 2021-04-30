@@ -13,7 +13,6 @@
 
 package org.tinylog.writers;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
@@ -41,14 +40,12 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 	private final ByteArrayWriter writer;
 
 	/**
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
 	 * @throws IOException
-	 *             Lock for log file cannot be accessed
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             Log file is not defined in configuration
 	 */
-	public SharedFileWriter() throws FileNotFoundException, IOException {
+	public SharedFileWriter() throws IOException {
 		this(Collections.<String, String>emptyMap());
 	}
 
@@ -56,14 +53,12 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 	 * @param properties
 	 *            Configuration for writer
 	 *
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
 	 * @throws IOException
-	 *             Lock for log file cannot be accessed
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             Log file is not defined in configuration
 	 */
-	public SharedFileWriter(final Map<String, String> properties) throws FileNotFoundException, IOException {
+	public SharedFileWriter(final Map<String, String> properties) throws IOException {
 		super(properties);
 
 		String fileName = getFileName(properties);
@@ -93,13 +88,13 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 		}
 
 		charset = getCharset(properties);
-		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, true);
+		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, true, charset);
 	}
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		byte[] data = render(logEntry).getBytes(charset);
-		writer.write(data, data.length);
+		writer.write(data, 0, data.length);
 	}
 
 	@Override

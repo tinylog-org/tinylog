@@ -14,7 +14,6 @@
 package org.tinylog.writers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -57,12 +56,12 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	private ByteArrayWriter writer;
 
 	/**
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             A property has an invalid value or is missing in configuration
 	 */
-	public RollingFileWriter() throws FileNotFoundException {
+	public RollingFileWriter() throws IOException {
 		this(Collections.<String, String>emptyMap());
 	}
 
@@ -70,12 +69,12 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 * @param properties
 	 *            Configuration for writer
 	 *
-	 * @throws FileNotFoundException
-	 *             Log file does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Log file cannot be opened for write access
 	 * @throws IllegalArgumentException
 	 *             A property has an invalid value or is missing in configuration
 	 */
-	public RollingFileWriter(final Map<String, String> properties) throws FileNotFoundException {
+	public RollingFileWriter(final Map<String, String> properties) throws IOException {
 		super(properties);
 
 		path = new DynamicPath(getFileName(properties));
@@ -110,7 +109,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		charset = getCharset(properties);
 		buffered = Boolean.parseBoolean(properties.get("buffered"));
 		writingThread = Boolean.parseBoolean(properties.get("writingthread"));
-		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, false, false);
+		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, charset);
 	}
 
 	@Override
@@ -161,7 +160,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			converter.close();
 
 			String fileName = path.resolve();
-			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, false, false);
+			writer = createByteArrayWriterAndLinkLatest(fileName, false, buffered, charset);
 
 			for (Policy policy : policies) {
 				policy.reset();
@@ -173,7 +172,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		}
 
 		byte[] convertedData = converter.write(data);
-		writer.write(convertedData, convertedData.length);
+		writer.write(convertedData, 0, convertedData.length);
 	}
 
 	/**
@@ -232,19 +231,17 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	 *            An already existing file should be continued
 	 * @param buffered
 	 *            Output should be buffered
-	 * @param threadSafe
-	 *            Created writer must be thread-safe
-	 * @param shared
-	 *            Output file is shared with other processes
+	 * @param charset
+	 *            Charset used by the writer
 	 * @return Writer for writing to passed file
-	 * @throws FileNotFoundException
-	 *             File does not exist or cannot be opened for any other reason
+	 * @throws IOException
+	 *             Log file cannot be opened for write access
 	 */
 	@IgnoreJRERequirement
-	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append, final boolean buffered,
-		final boolean threadSafe, final boolean shared) throws FileNotFoundException {
+	private ByteArrayWriter createByteArrayWriterAndLinkLatest(final String fileName, final boolean append,
+			final boolean buffered, final Charset charset) throws IOException {
 		converter.open(fileName);
-		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, threadSafe, shared);
+		ByteArrayWriter writer = createByteArrayWriter(fileName, append, buffered, false, false, charset);
 		if (linkToLatest != null) {
 			File logFile = new File(fileName);
 			File linkFile = new File(linkToLatest.resolve());
