@@ -65,7 +65,7 @@ public final class FileWriter extends AbstractFormatPatternWriter {
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
 		byte[] data = render(logEntry).getBytes(charset);
-		writer.write(data, data.length);
+		writer.write(data, 0, data.length);
 	}
 
 	@Override

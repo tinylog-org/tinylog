@@ -60,7 +60,7 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 	@Override
 	public void flush() throws IOException {
 		if (position > 0) {
-			writer.write(buffer, position);
+			writer.write(buffer, 0, position);
 			position = 0;
 		}
 
@@ -70,7 +70,7 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 	@Override
 	public void close() throws IOException {
 		if (position > 0) {
-			writer.write(buffer, position);
+			writer.write(buffer, 0, position);
 		}
 
 		writer.close();
