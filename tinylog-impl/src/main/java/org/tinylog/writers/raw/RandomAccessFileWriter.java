@@ -32,7 +32,12 @@ public final class RandomAccessFileWriter implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int length) throws IOException {
-		file.write(data, 0, length);
+		write(data, 0, length);
+	}
+
+	@Override
+	public void write(final byte[] data, final int offset, final int length) throws IOException {
+		file.write(data, offset, length);
 	}
 
 	@Override

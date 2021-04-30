@@ -55,13 +55,17 @@ public final class RandomAccessFileWriterTest {
 	 */
 	@Test
 	public void writing() throws IOException {
-		writer.write(new byte[] { 1, 2 }, 2);
-		writer.write(new byte[] { 3 }, 1);
+		writer.write(new byte[] { 1, 2, 3 }, 2);
+		writer.write(new byte[] { 4, 5, 6, 7 }, 1, 2);
+
 		byte[] writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
-		assertThat(writtenBytes).startsWith((byte) 1, (byte) 2, (byte) 3);
+		assertThat(writtenBytes).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
+
+		writer.flush();
 		writer.close();
+
 		writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
-		assertThat(writtenBytes).startsWith((byte) 1, (byte) 2, (byte) 3);
+		assertThat(writtenBytes).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
 	}
 
 }
