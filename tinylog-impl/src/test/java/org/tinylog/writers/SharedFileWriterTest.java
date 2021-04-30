@@ -256,9 +256,11 @@ public final class SharedFileWriterTest {
 
 		SharedFileWriter writer = new SharedFileWriter(tripletonMap("file", file, "format", "{message}", "charset", "UTF-16"));
 		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+		writer.write(LogEntryBuilder.empty().message("Goodbye!").create());
 		writer.close();
 
-		assertThat(FileSystem.readFile(file, StandardCharsets.UTF_16)).isEqualTo("Hello World!" + NEW_LINE);
+		assertThat(FileSystem.readFile(file, StandardCharsets.UTF_16))
+			.isEqualTo("Hello World!" + NEW_LINE + "Goodbye!" + NEW_LINE);
 	}
 
 	/**
