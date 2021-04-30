@@ -33,7 +33,12 @@ public final class OutputStreamWriter implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int length) throws IOException {
-		stream.write(data, 0, length);
+		write(data, 0, length);
+	}
+
+	@Override
+	public void write(final byte[] data, final int offset, final int length) throws IOException {
+		stream.write(data, offset, length);
 	}
 
 	@Override

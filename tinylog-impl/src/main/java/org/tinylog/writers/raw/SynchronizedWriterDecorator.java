@@ -36,8 +36,13 @@ public final class SynchronizedWriterDecorator implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int length) throws IOException {
+		write(data, 0, length);
+	}
+
+	@Override
+	public void write(final byte[] data, final int offset, final int length) throws IOException {
 		synchronized (mutex) {
-			writer.write(data, length);
+			writer.write(data, offset, length);
 		}
 	}
 

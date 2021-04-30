@@ -50,10 +50,11 @@ public final class LockedFileOutputStreamWriterTest {
 		LockedFileOutputStreamWriter writer = new LockedFileOutputStreamWriter(stream);
 
 		writer.write(new byte[] { 'A', 'B', 'C' }, 2);
+		writer.write(new byte[] { 'D', 'E', 'F', 'G' }, 1, 2);
 		writer.flush();
 		writer.close();
 
-		assertThat(FileSystem.readFile(fileName)).isEqualTo("AB");
+		assertThat(FileSystem.readFile(fileName)).isEqualTo("ABEF");
 		assertThat(stream.getChannel().isOpen()).isFalse();
 	}
 
@@ -107,7 +108,7 @@ public final class LockedFileOutputStreamWriterTest {
 		LockedFileOutputStreamWriter writer = new LockedFileOutputStreamWriter(new FileOutputStream(file, true));
 
 		for (int i = 0; i < NUMBER_OF_LINES; ++i) {
-			writer.write(DATA, DATA.length);
+			writer.write(DATA, 0, DATA.length);
 		}
 
 		writer.close();

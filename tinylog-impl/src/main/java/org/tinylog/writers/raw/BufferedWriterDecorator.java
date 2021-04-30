@@ -39,15 +39,20 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int length) throws IOException {
+		write(data, 0, length);
+	}
+
+	@Override
+	public void write(final byte[] data, final int offset, final int length) throws IOException {
 		if (position > 0 && BUFFER_CAPACITY - position < length) {
-			writer.write(buffer, position);
+			writer.write(buffer, 0, position);
 			position = 0;
 		}
 
 		if (BUFFER_CAPACITY < length) {
-			writer.write(data, length);
+			writer.write(data, offset, length);
 		} else {
-			System.arraycopy(data, 0, buffer, position, length);
+			System.arraycopy(data, offset, buffer, position, length);
 			position += length;
 		}
 	}

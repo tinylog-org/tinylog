@@ -41,10 +41,11 @@ public final class OutputStreamWriterTest {
 		OutputStreamWriter writer = new OutputStreamWriter(stream);
 
 		writer.write(new byte[] { 1, 2, 3 }, 2);
+		writer.write(new byte[] { 4, 5, 6, 7 }, 1, 2);
 		writer.flush();
 		writer.close();
 
-		assertThat(stream.toByteArray()).containsExactly((byte) 1, (byte) 2);
+		assertThat(stream.toByteArray()).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
 		verify(stream, times(1)).close();
 	}
 

@@ -29,8 +29,24 @@ public interface ByteArrayWriter {
 	 *            Number of bytes to output
 	 * @throws IOException
 	 *             Writing failed
+	 * @deprecated Replaced by {@link #write(byte[], int, int)}
 	 */
+	@Deprecated
 	void write(byte[] data, int length) throws IOException;
+
+	/**
+	 * Outputs a byte array.
+	 *
+	 * @param data
+	 *            Byte array to output
+	 * @param offset
+	 *            Start offset to output
+	 * @param length
+	 *            Number of bytes to output
+	 * @throws IOException
+	 *             Writing failed
+	 */
+	void write(byte[] data, int offset, int length) throws IOException;
 
 	/**
 	 * Forces writing of any buffered data.

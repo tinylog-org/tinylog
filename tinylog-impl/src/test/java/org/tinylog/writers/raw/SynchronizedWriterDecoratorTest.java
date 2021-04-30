@@ -26,19 +26,36 @@ import static org.mockito.Mockito.verify;
 public final class SynchronizedWriterDecoratorTest {
 
 	/**
-	 * Verifies that {@code write()} method of underlying writer will be invoked.
+	 * Verifies that {@link SynchronizedWriterDecorator#write(byte[], int)} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Writing failed
 	 */
 	@Test
-	public void write() throws IOException {
+	public void writeWithoutOffset() throws IOException {
 		ByteArrayWriter mock = mock(ByteArrayWriter.class);
 
 		byte[] data = new byte[0];
 		new SynchronizedWriterDecorator(mock, new Object()).write(data, 42);
 
-		verify(mock).write(data, 42);
+		verify(mock).write(data, 0, 42);
+	}
+
+	/**
+	 * Verifies that {@link SynchronizedWriterDecorator#write(byte[], int, int)} method of underlying writer will be
+	 * invoked.
+	 *
+	 * @throws IOException
+	 *             Writing failed
+	 */
+	@Test
+	public void writeWithOffset() throws IOException {
+		ByteArrayWriter mock = mock(ByteArrayWriter.class);
+
+		byte[] data = new byte[0];
+		new SynchronizedWriterDecorator(mock, new Object()).write(data, 1, 42);
+
+		verify(mock).write(data, 1, 42);
 	}
 
 	/**
