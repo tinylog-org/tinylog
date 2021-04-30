@@ -49,7 +49,6 @@
 		<!-- Skip Animal Sniffer plug-in by default as it cannot handle module-info class files on builds without clean goal -->
 		<animal.sniffer.skip>true</animal.sniffer.skip>
 
-
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
