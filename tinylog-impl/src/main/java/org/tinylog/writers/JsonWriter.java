@@ -71,11 +71,13 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		charset = getCharset(properties);
 		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false, charset);
 
+		byte[] charsetHeader = getCharsetHeader(charset);
+
 		jsonProperties = createTokens(properties);
-		newLineBytes = NEW_LINE.getBytes(charset);
-		commaBytes = ",".getBytes(charset);
-		bracketOpenBytes = "[".getBytes(charset);
-		bracketCloseBytes = "]".getBytes(charset);
+		newLineBytes = removeHeader(NEW_LINE.getBytes(charset), charsetHeader.length);
+		commaBytes = removeHeader(",".getBytes(charset), charsetHeader.length);
+		bracketOpenBytes = removeHeader("[".getBytes(charset), charsetHeader.length);
+		bracketCloseBytes = removeHeader("]".getBytes(charset), charsetHeader.length);
 
 		if (writingThread) {
 			builder = new StringBuilder();
@@ -229,6 +231,12 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 		writer.write(newLineBytes, 0, newLineBytes.length);
 		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
+	}
+
+	private static byte[] removeHeader(byte[] bytes, int length) {
+		byte[] result = new byte[bytes.length - length];
+		System.arraycopy(bytes, length, result, 0, result.length);
+		return result;
 	}
 
 	private static Map<String, Token> createTokens(final Map<String, String> properties) {
