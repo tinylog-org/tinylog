@@ -116,7 +116,7 @@ public final class JsonWriter implements Writer {
 		addJsonObject(logEntry, builder);
 
 		byte[] data = builder.toString().getBytes(charset);
-		writer.write(data, data.length);
+		writer.write(data, 0, data.length);
 	}
 
 	@Override
@@ -251,10 +251,10 @@ public final class JsonWriter implements Writer {
 			long newFileSize = randomAccessFile.length() - sizeToTruncate;
 			randomAccessFile.setLength(newFileSize);
 			randomAccessFile.seek(randomAccessFile.length());
-			writer.write(commaBytes, commaBytes.length);
+			writer.write(commaBytes, 0, commaBytes.length);
 		} else {
 			randomAccessFile.setLength(0);
-			writer.write(bracketOpenBytes, bracketOpenBytes.length);
+			writer.write(bracketOpenBytes, 0, bracketOpenBytes.length);
 		}
 	}
 
@@ -273,8 +273,8 @@ public final class JsonWriter implements Writer {
 			}
 		}
 
-		writer.write(newLineBytes, newLineBytes.length);
-		writer.write(bracketCloseBytes, bracketCloseBytes.length);
+		writer.write(newLineBytes, 0, newLineBytes.length);
+		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
 	}
 
 	private static Map<String, Token> createTokens(final Map<String, String> properties) {
