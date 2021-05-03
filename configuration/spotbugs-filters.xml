@@ -37,9 +37,9 @@
 		<Bug pattern="IT_NO_SUCH_ELEMENT" />
 	</Match>
 	<Match>
-		<!-- Base Class for Format Pattern Writers -->
+		<!-- Base Class for File Based Writers -->
 		<Or>
-			<Class name="org.tinylog.writers.AbstractFormatPatternWriter" />
+			<Class name="org.tinylog.writers.AbstractFileBasedWriter" />
 			<Class name="org.tinylog.writers.JsonWriter" />
 		</Or>
 		<!-- It doesn't matter if "File.mkdirs()" creates new directories (returns "true") or if these exist already (returns "false") -->
