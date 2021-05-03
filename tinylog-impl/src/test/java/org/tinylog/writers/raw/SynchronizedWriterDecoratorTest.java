@@ -74,18 +74,18 @@ public final class SynchronizedWriterDecoratorTest {
 	}
 
 	/**
-	 * Verifies that {@link ByteArrayWriter#shrink(int)} method of underlying writer will be invoked.
+	 * Verifies that {@link ByteArrayWriter#truncate(int)} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Resizing failed
 	 */
 	@Test
-	public void shrink() throws IOException {
+	public void truncate() throws IOException {
 		ByteArrayWriter mock = mock(ByteArrayWriter.class);
 
-		new SynchronizedWriterDecorator(mock, new Object()).shrink(42);
+		new SynchronizedWriterDecorator(mock, new Object()).truncate(42);
 
-		verify(mock).shrink(42);
+		verify(mock).truncate(42);
 	}
 
 	/**

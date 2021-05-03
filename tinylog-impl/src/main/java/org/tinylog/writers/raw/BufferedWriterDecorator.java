@@ -70,11 +70,11 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
-	public void shrink(final int length) throws IOException {
-		if (length <= position) {
-			position -= length;
+	public void truncate(final int count) throws IOException {
+		if (count <= position) {
+			position -= count;
 		} else {
-			writer.shrink(length - position);
+			writer.truncate(count - position);
 			position = 0;
 		}
 	}

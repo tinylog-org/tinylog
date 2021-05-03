@@ -70,14 +70,14 @@ public interface ByteArrayWriter {
 	void write(byte[] data, int offset, int length) throws IOException;
 
 	/**
-	 * Shrinks the file size.
+	 * Truncates the file size.
 	 *
-	 * @param length
+	 * @param count
 	 *            Number of bytes to remove from the file end
 	 * @throws IOException
 	 *             Resizing failed
 	 */
-	void shrink(int length) throws IOException;
+	void truncate(int count) throws IOException;
 
 	/**
 	 * Forces writing of any buffered data.

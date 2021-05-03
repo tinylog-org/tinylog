@@ -69,11 +69,11 @@ public final class LockedRandomAccessFileWriter implements ByteArrayWriter {
 	}
 
 	@Override
-	public void shrink(final int length) throws IOException {
+	public void truncate(final int count) throws IOException {
 		FileChannel channel = file.getChannel();
 		FileLock lock = channel.lock();
 		try {
-			file.setLength(Math.max(0, channel.size() - length));
+			file.setLength(Math.max(0, channel.size() - count));
 		} finally {
 			lock.release();
 		}

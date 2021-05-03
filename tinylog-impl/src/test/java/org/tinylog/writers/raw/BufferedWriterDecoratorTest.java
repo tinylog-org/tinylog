@@ -144,7 +144,7 @@ public final class BufferedWriterDecoratorTest {
 	 * @throws IOException Resizing failed
 	 */
 	@Test
-	public void shrinking() throws IOException {
+	public void truncating() throws IOException {
 		String path = FileSystem.createTemporaryFile();
 		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
 		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
@@ -156,11 +156,11 @@ public final class BufferedWriterDecoratorTest {
 
 		byte[] data = new byte[16];
 
-		decorator.shrink(4);
+		decorator.truncate(4);
 		assertThat(decorator.readTail(data, 0, 16)).isEqualTo(6);
 		assertThat(data).startsWith(0, 1, 2, 3, 4, 5);
 
-		decorator.shrink(4);
+		decorator.truncate(4);
 		assertThat(decorator.readTail(data, 0, 16)).isEqualTo(2);
 		assertThat(data).startsWith(0, 1);
 

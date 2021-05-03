@@ -54,9 +54,9 @@ public final class SynchronizedWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
-	public void shrink(final int length) throws IOException {
+	public void truncate(final int count) throws IOException {
 		synchronized (mutex) {
-			writer.shrink(length);
+			writer.truncate(count);
 		}
 	}
 

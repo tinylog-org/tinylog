@@ -88,13 +88,13 @@ public final class RandomAccessFileWriterTest {
 	 * @throws IOException Resizing failed
 	 */
 	@Test
-	public void shrinking() throws IOException {
+	public void truncating() throws IOException {
 		String path = FileSystem.createTemporaryFile();
 		RandomAccessFile file = new RandomAccessFile(path, "rw");
 		file.write(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
 		RandomAccessFileWriter writer = new RandomAccessFileWriter(file);
-		writer.shrink(4);
+		writer.truncate(4);
 		writer.close();
 
 		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly(0, 1, 2, 3, 4, 5);

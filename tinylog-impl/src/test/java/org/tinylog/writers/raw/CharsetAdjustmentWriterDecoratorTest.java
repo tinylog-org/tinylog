@@ -93,18 +93,18 @@ public class CharsetAdjustmentWriterDecoratorTest {
 	}
 
 	/**
-	 * Verifies that {@link ByteArrayWriter#shrink(int)} method of underlying writer will be invoked.
+	 * Verifies that {@link ByteArrayWriter#truncate(int)} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Resizing failed
 	 */
 	@Test
-	public void shrink() throws IOException {
+	public void truncate() throws IOException {
 		ByteArrayWriter mock = mock(ByteArrayWriter.class);
 
-		new CharsetAdjustmentWriterDecorator(mock, CHARSET_HEADER).shrink(42);
+		new CharsetAdjustmentWriterDecorator(mock, CHARSET_HEADER).truncate(42);
 
-		verify(mock).shrink(42);
+		verify(mock).truncate(42);
 	}
 
 }

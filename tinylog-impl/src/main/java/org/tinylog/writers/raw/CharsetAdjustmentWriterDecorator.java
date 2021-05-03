@@ -61,8 +61,8 @@ public class CharsetAdjustmentWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
-	public void shrink(final int length) throws IOException {
-		writer.shrink(length);
+	public void truncate(final int count) throws IOException {
+		writer.truncate(count);
 	}
 
 	@Override

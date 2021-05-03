@@ -208,7 +208,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 						"Invalid JSON file. The file is missing a closing bracket for the array.");
 			}
 
-			writer.shrink(sizeToTruncate);
+			writer.truncate(sizeToTruncate);
 			writer.write(commaBytes, 0, commaBytes.length);
 		} else {
 			writer.write(bracketOpenBytes, 0, bracketOpenBytes.length);
@@ -226,14 +226,14 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 
 		if (numberOfBytes > 0 && bytes[numberOfBytes - 1] == ',') {
-			writer.shrink(1);
+			writer.truncate(1);
 		}
 
 		writer.write(newLineBytes, 0, newLineBytes.length);
 		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
 	}
 
-	private static byte[] removeHeader(byte[] bytes, int length) {
+	private static byte[] removeHeader(final byte[] bytes, final int length) {
 		byte[] result = new byte[bytes.length - length];
 		System.arraycopy(bytes, length, result, 0, result.length);
 		return result;

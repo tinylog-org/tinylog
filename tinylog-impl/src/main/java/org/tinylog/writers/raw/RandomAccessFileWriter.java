@@ -48,8 +48,8 @@ public final class RandomAccessFileWriter implements ByteArrayWriter {
 	}
 
 	@Override
-	public void shrink(final int length) throws IOException {
-		file.setLength(Math.max(0, file.length() - length));
+	public void truncate(final int count) throws IOException {
+		file.setLength(Math.max(0, file.length() - count));
 	}
 
 	@Override
