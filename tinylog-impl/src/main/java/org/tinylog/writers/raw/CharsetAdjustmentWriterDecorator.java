@@ -42,6 +42,11 @@ public class CharsetAdjustmentWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
+	public int readTail(final byte[] data, final int offset, final int length) throws IOException {
+		return writer.readTail(data, offset, length);
+	}
+
+	@Override
 	public void write(final byte[] data, final int length) throws IOException {
 		write(data, 0, length);
 	}
@@ -53,6 +58,11 @@ public class CharsetAdjustmentWriterDecorator implements ByteArrayWriter {
 		} else {
 			writer.write(data, offset, length);
 		}
+	}
+
+	@Override
+	public void shrink(final int length) throws IOException {
+		writer.shrink(length);
 	}
 
 	@Override

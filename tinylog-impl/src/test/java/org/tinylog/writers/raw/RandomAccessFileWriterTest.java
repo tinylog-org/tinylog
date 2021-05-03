@@ -16,16 +16,46 @@ package org.tinylog.writers.raw;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.atIndex;
 
 /**
  * Tests for {@link RandomAccessFileWriter}.
  */
 public final class RandomAccessFileWriterTest {
+
+	/**
+	 * Verifies that stored data can be read from tail.
+	 *
+	 * @throws IOException Reading failed
+	 */
+	@Test
+	public void reading() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile file = new RandomAccessFile(path, "rw");
+		file.write(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(file);
+		byte[] data = new byte[16];
+
+		assertThat(writer.readTail(data, 2, 4)).isEqualTo(4);
+		assertThat(data)
+			.contains(6, atIndex(2))
+			.contains(7, atIndex(3))
+			.contains(8, atIndex(4))
+			.contains(9, atIndex(5));
+
+		assertThat(writer.readTail(data, 0, 16)).isEqualTo(10);
+		assertThat(data).startsWith(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+		writer.close();
+	}
 
 	/**
 	 * Verifies that written data will be available after writing and after closing
@@ -50,6 +80,24 @@ public final class RandomAccessFileWriterTest {
 
 		writtenBytes = FileSystem.readFile(path).getBytes(Charset.defaultCharset());
 		assertThat(writtenBytes).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
+	}
+
+	/**
+	 * Verifies that stored data can be shrunk.
+	 *
+	 * @throws IOException Resizing failed
+	 */
+	@Test
+	public void shrinking() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile file = new RandomAccessFile(path, "rw");
+		file.write(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(file);
+		writer.shrink(4);
+		writer.close();
+
+		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly(0, 1, 2, 3, 4, 5);
 	}
 
 }

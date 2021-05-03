@@ -35,6 +35,13 @@ public final class SynchronizedWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
+	public int readTail(final byte[] data, final int offset, final int length) throws IOException {
+		synchronized (mutex) {
+			return writer.readTail(data, offset, length);
+		}
+	}
+
+	@Override
 	public void write(final byte[] data, final int length) throws IOException {
 		write(data, 0, length);
 	}
@@ -43,6 +50,13 @@ public final class SynchronizedWriterDecorator implements ByteArrayWriter {
 	public void write(final byte[] data, final int offset, final int length) throws IOException {
 		synchronized (mutex) {
 			writer.write(data, offset, length);
+		}
+	}
+
+	@Override
+	public void shrink(final int length) throws IOException {
+		synchronized (mutex) {
+			writer.shrink(length);
 		}
 	}
 

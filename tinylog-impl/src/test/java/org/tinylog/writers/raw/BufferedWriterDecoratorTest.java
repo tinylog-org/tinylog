@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.atIndex;
 
 /**
  * Tests for {@link BufferedWriterDecorator}.
@@ -29,6 +30,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class BufferedWriterDecoratorTest {
 
 	private static final int BUFFER_CAPACITY = 64 * 1024;
+
+	/**
+	 * Verifies that stored data can be read from tail.
+	 *
+	 * @throws IOException Reading failed
+	 */
+	@Test
+	public void reading() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
+		BufferedWriterDecorator decorator = new BufferedWriterDecorator(writer);
+
+		decorator.write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
+		decorator.flush();
+		decorator.write(new byte[] { 5, 6, 7, 8, 9 }, 0, 5);
+
+		byte[] data = new byte[8];
+
+		assertThat(decorator.readTail(data, 2, 4)).isEqualTo(4);
+		assertThat(data)
+			.contains(6, atIndex(2))
+			.contains(7, atIndex(3))
+			.contains(8, atIndex(4))
+			.contains(9, atIndex(5));
+
+		assertThat(decorator.readTail(data, 0, 8)).isEqualTo(8);
+		assertThat(data).startsWith(2, 3, 4, 5, 6, 7, 8, 9);
+
+		decorator.close();
+	}
 
 	/**
 	 * Verifies that written data will be available after closing writer.
@@ -104,6 +136,35 @@ public final class BufferedWriterDecoratorTest {
 		decorator.close();
 
 		assertThat(Files.readAllBytes(Paths.get(path))).isEqualTo(data);
+	}
+
+	/**
+	 * Verifies that stored data can be shrunk.
+	 *
+	 * @throws IOException Resizing failed
+	 */
+	@Test
+	public void shrinking() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
+		BufferedWriterDecorator decorator = new BufferedWriterDecorator(writer);
+
+		decorator.write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
+		decorator.flush();
+		decorator.write(new byte[] { 5, 6, 7, 8, 9 }, 0, 5);
+
+		byte[] data = new byte[16];
+
+		decorator.shrink(4);
+		assertThat(decorator.readTail(data, 0, 16)).isEqualTo(6);
+		assertThat(data).startsWith(0, 1, 2, 3, 4, 5);
+
+		decorator.shrink(4);
+		assertThat(decorator.readTail(data, 0, 16)).isEqualTo(2);
+		assertThat(data).startsWith(0, 1);
+
+		decorator.close();
 	}
 
 }

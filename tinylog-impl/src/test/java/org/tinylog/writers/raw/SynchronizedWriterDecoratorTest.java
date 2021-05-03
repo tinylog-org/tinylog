@@ -26,7 +26,23 @@ import static org.mockito.Mockito.verify;
 public final class SynchronizedWriterDecoratorTest {
 
 	/**
-	 * Verifies that {@link SynchronizedWriterDecorator#write(byte[], int)} method of underlying writer will be invoked.
+	 * Verifies that {@link ByteArrayWriter#readTail(byte[], int, int)} method of underlying writer will be invoked.
+	 *
+	 * @throws IOException
+	 *             Reading failed
+	 */
+	@Test
+	public void readTail() throws IOException {
+		ByteArrayWriter mock = mock(ByteArrayWriter.class);
+
+		byte[] data = new byte[0];
+		new SynchronizedWriterDecorator(mock, new Object()).readTail(data, 1, 2);
+
+		verify(mock).readTail(data, 1, 2);
+	}
+
+	/**
+	 * Verifies that {@link ByteArrayWriter#write(byte[], int, int)} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Writing failed
@@ -42,8 +58,7 @@ public final class SynchronizedWriterDecoratorTest {
 	}
 
 	/**
-	 * Verifies that {@link SynchronizedWriterDecorator#write(byte[], int, int)} method of underlying writer will be
-	 * invoked.
+	 * Verifies that {@link ByteArrayWriter#write(byte[], int, int)} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Writing failed
@@ -59,7 +74,22 @@ public final class SynchronizedWriterDecoratorTest {
 	}
 
 	/**
-	 * Verifies that {@code flush()} method of underlying writer will be invoked.
+	 * Verifies that {@link ByteArrayWriter#shrink(int)} method of underlying writer will be invoked.
+	 *
+	 * @throws IOException
+	 *             Resizing failed
+	 */
+	@Test
+	public void shrink() throws IOException {
+		ByteArrayWriter mock = mock(ByteArrayWriter.class);
+
+		new SynchronizedWriterDecorator(mock, new Object()).shrink(42);
+
+		verify(mock).shrink(42);
+	}
+
+	/**
+	 * Verifies that {@link ByteArrayWriter#flush()} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Flushing failed
@@ -74,7 +104,7 @@ public final class SynchronizedWriterDecoratorTest {
 	}
 
 	/**
-	 * Verifies that {@code close()} method of underlying writer will be invoked.
+	 * Verifies that {@link ByteArrayWriter#close()} method of underlying writer will be invoked.
 	 *
 	 * @throws IOException
 	 *             Closing failed

@@ -31,6 +31,13 @@ public final class RandomAccessFileWriter implements ByteArrayWriter {
 	}
 
 	@Override
+	public int readTail(final byte[] data, final int offset, final int length) throws IOException {
+		long fileLength = file.length();
+		file.seek(Math.max(0, fileLength - length));
+		return file.read(data, offset, (int) Math.min(fileLength, length));
+	}
+
+	@Override
 	public void write(final byte[] data, final int length) throws IOException {
 		write(data, 0, length);
 	}
@@ -38,6 +45,11 @@ public final class RandomAccessFileWriter implements ByteArrayWriter {
 	@Override
 	public void write(final byte[] data, final int offset, final int length) throws IOException {
 		file.write(data, offset, length);
+	}
+
+	@Override
+	public void shrink(final int length) throws IOException {
+		file.setLength(Math.max(0, file.length() - length));
 	}
 
 	@Override

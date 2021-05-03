@@ -22,11 +22,31 @@ import org.junit.Test;
 import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link CharsetAdjustmentWriterDecorator}.
  */
 public class CharsetAdjustmentWriterDecoratorTest {
+
+	private static final byte[] CHARSET_HEADER = { 'A', 'B' };
+
+	/**
+	 * Verifies that {@link ByteArrayWriter#readTail(byte[], int, int)} method of underlying writer will be invoked.
+	 *
+	 * @throws IOException
+	 *             Reading failed
+	 */
+	@Test
+	public void readTail() throws IOException {
+		ByteArrayWriter mock = mock(ByteArrayWriter.class);
+
+		byte[] data = new byte[0];
+		new CharsetAdjustmentWriterDecorator(mock, CHARSET_HEADER).readTail(data, 1, 2);
+
+		verify(mock).readTail(data, 1, 2);
+	}
 
 	/**
 	 * Verifies that charset headers are detected and skipped correctly.
@@ -36,12 +56,10 @@ public class CharsetAdjustmentWriterDecoratorTest {
 	 */
 	@Test
 	public void writeDataWithHeader() throws IOException {
-		byte[] charsetHeader = { 'A', 'B' };
-
 		String path = FileSystem.createTemporaryFile();
 		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
 		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
-		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, charsetHeader);
+		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, CHARSET_HEADER);
 
 		decorator.write(new byte[] { 'A', 'B', 'C' }, 3);
 		decorator.write(new byte[] { 'A', 'B', 'D', 'E' }, 4);
@@ -60,12 +78,10 @@ public class CharsetAdjustmentWriterDecoratorTest {
 	 */
 	@Test
 	public void writeDataWithoutHeader() throws IOException {
-		byte[] charsetHeader = { 'A', 'B' };
-
 		String path = FileSystem.createTemporaryFile();
 		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
 		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
-		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, charsetHeader);
+		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, CHARSET_HEADER);
 
 		decorator.write(new byte[] { 'C' }, 1);
 		decorator.write(new byte[] { 'D', 'E', 'F' }, 3);
@@ -74,6 +90,21 @@ public class CharsetAdjustmentWriterDecoratorTest {
 		decorator.close();
 
 		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly('C', 'D', 'E', 'F', 'B', 'C', 'D');
+	}
+
+	/**
+	 * Verifies that {@link ByteArrayWriter#shrink(int)} method of underlying writer will be invoked.
+	 *
+	 * @throws IOException
+	 *             Resizing failed
+	 */
+	@Test
+	public void shrink() throws IOException {
+		ByteArrayWriter mock = mock(ByteArrayWriter.class);
+
+		new CharsetAdjustmentWriterDecorator(mock, CHARSET_HEADER).shrink(42);
+
+		verify(mock).shrink(42);
 	}
 
 }

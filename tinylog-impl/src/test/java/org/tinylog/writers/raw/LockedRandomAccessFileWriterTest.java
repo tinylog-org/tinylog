@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,6 +28,7 @@ import org.tinylog.util.FileSystem;
 import org.tinylog.util.JvmProcessBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.atIndex;
 
 /**
  * Tests for {@link LockedRandomAccessFileWriter}.
@@ -39,13 +42,40 @@ public final class LockedRandomAccessFileWriterTest {
 	private static final byte[] DATA = LINE.getBytes(Charset.defaultCharset());
 
 	/**
+	 * Verifies that stored data can be read from tail.
+	 *
+	 * @throws IOException Reading failed
+	 */
+	@Test
+	public void reading() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile file = new RandomAccessFile(path, "rw");
+		file.write(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+
+		LockedRandomAccessFileWriter writer = new LockedRandomAccessFileWriter(file);
+		byte[] data = new byte[16];
+
+		assertThat(writer.readTail(data, 2, 4)).isEqualTo(4);
+		assertThat(data)
+			.contains(6, atIndex(2))
+			.contains(7, atIndex(3))
+			.contains(8, atIndex(4))
+			.contains(9, atIndex(5));
+
+		assertThat(writer.readTail(data, 0, 16)).isEqualTo(10);
+		assertThat(data).startsWith(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+		writer.close();
+	}
+
+	/**
 	 * Verifies that a {@link FileOutputStream} is wrapped correctly.
 	 *
 	 * @throws IOException
 	 *             Failed accessing temporary file
 	 */
 	@Test
-	public void singleProcess() throws IOException {
+	public void writingBySingleProcess() throws IOException {
 		String path = FileSystem.createTemporaryFile();
 		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
 		LockedRandomAccessFileWriter writer = new LockedRandomAccessFileWriter(randomAccessFile);
@@ -67,7 +97,7 @@ public final class LockedRandomAccessFileWriterTest {
 	 *             Interrupted while waiting for process
 	 */
 	@Test
-	public void multipleProcesses() throws IOException, InterruptedException {
+	public void writingByMultipleProcesses() throws IOException, InterruptedException {
 		File file = new File(FileSystem.createTemporaryFile());
 		String path = file.getAbsolutePath();
 
@@ -88,6 +118,24 @@ public final class LockedRandomAccessFileWriterTest {
 		assertThat(FileSystem.readFile(path))
 			.hasLineCount(NUMBER_OF_PROCESSES * NUMBER_OF_LINES)
 			.matches("(" + Pattern.quote(LINE) + "){" + (NUMBER_OF_PROCESSES * NUMBER_OF_LINES) + "}");
+	}
+
+	/**
+	 * Verifies that stored data can be shrunk.
+	 *
+	 * @throws IOException Resizing failed
+	 */
+	@Test
+	public void shrinking() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile file = new RandomAccessFile(path, "rw");
+		file.write(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+
+		LockedRandomAccessFileWriter writer = new LockedRandomAccessFileWriter(file);
+		writer.shrink(4);
+		writer.close();
+
+		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly(0, 1, 2, 3, 4, 5);
 	}
 
 	/**

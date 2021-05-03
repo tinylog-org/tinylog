@@ -38,6 +38,18 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 	}
 
 	@Override
+	public int readTail(final byte[] data, final int offset, final int length) throws IOException {
+		if (length <= position) {
+			System.arraycopy(buffer, position - length, data, offset, length);
+			return length;
+		} else {
+			int readBytes = writer.readTail(data, offset, length - position);
+			System.arraycopy(buffer, 0, data, offset + readBytes, position);
+			return readBytes + position;
+		}
+	}
+
+	@Override
 	public void write(final byte[] data, final int length) throws IOException {
 		write(data, 0, length);
 	}
@@ -54,6 +66,16 @@ public final class BufferedWriterDecorator implements ByteArrayWriter {
 		} else {
 			System.arraycopy(data, offset, buffer, position, length);
 			position += length;
+		}
+	}
+
+	@Override
+	public void shrink(final int length) throws IOException {
+		if (length <= position) {
+			position -= length;
+		} else {
+			writer.shrink(length - position);
+			position = 0;
 		}
 	}
 

@@ -38,6 +38,20 @@ public final class LockedRandomAccessFileWriter implements ByteArrayWriter {
 	}
 
 	@Override
+	public int readTail(final byte[] data, final int offset, final int length) throws IOException {
+		FileChannel channel = file.getChannel();
+		FileLock lock = channel.lock();
+		try {
+			long fileSize = channel.size();
+			int bytesToRead = (int) Math.min(fileSize, length);
+			channel.position(fileSize - bytesToRead);
+			return file.read(data, offset, bytesToRead);
+		} finally {
+			lock.release();
+		}
+	}
+
+	@Override
 	public void write(final byte[] data, final int length) throws IOException {
 		write(data, 0, length);
 	}
@@ -49,6 +63,17 @@ public final class LockedRandomAccessFileWriter implements ByteArrayWriter {
 		try {
 			channel.position(channel.size());
 			file.write(data, offset, length);
+		} finally {
+			lock.release();
+		}
+	}
+
+	@Override
+	public void shrink(final int length) throws IOException {
+		FileChannel channel = file.getChannel();
+		FileLock lock = channel.lock();
+		try {
+			file.setLength(Math.max(0, channel.size() - length));
 		} finally {
 			lock.release();
 		}

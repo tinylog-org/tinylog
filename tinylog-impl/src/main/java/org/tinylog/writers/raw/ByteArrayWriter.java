@@ -21,6 +21,27 @@ import java.io.IOException;
 public interface ByteArrayWriter {
 
 	/**
+	 * Reads the last bytes.
+	 *
+	 * <p>
+	 *     The bytes are read from the end of the current file. If the file size is equal to or greater than the passed
+	 *     length, the passed array is filled completely. Otherwise, the passed array is filled with the entire
+	 *     available file content and all remaining bytes of the array are left untouched.
+	 * </p>
+	 *
+	 * @param data
+	 *            Target byte array for storing the read bytes
+	 * @param offset
+	 *            Start offset to fill passed byte array
+	 * @param length
+	 *            Maximum number of bytes to read
+	 * @return Number of read bytes
+	 * @throws IOException
+	 *             Reading failed
+	 */
+	int readTail(byte[] data, int offset, int length) throws IOException;
+
+	/**
 	 * Outputs a byte array.
 	 *
 	 * @param data
@@ -47,6 +68,16 @@ public interface ByteArrayWriter {
 	 *             Writing failed
 	 */
 	void write(byte[] data, int offset, int length) throws IOException;
+
+	/**
+	 * Shrinks the file size.
+	 *
+	 * @param length
+	 *            Number of bytes to remove from the file end
+	 * @throws IOException
+	 *             Resizing failed
+	 */
+	void shrink(int length) throws IOException;
 
 	/**
 	 * Forces writing of any buffered data.
