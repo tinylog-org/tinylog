@@ -13,9 +13,7 @@
 
 package org.tinylog.writers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,30 +23,23 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.pattern.FormatPatternParser;
 import org.tinylog.pattern.Token;
-import org.tinylog.provider.InternalLogger;
-import org.tinylog.writers.raw.BufferedWriterDecorator;
 import org.tinylog.writers.raw.ByteArrayWriter;
-import org.tinylog.writers.raw.RandomAccessFileWriter;
-import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 /**
- * Writer for outputting log entries to a log file in JSON format. Already
- * existing files can be continued.
+ * Writer for outputting log entries to a log file in JSON format. Already existing files can be continued.
  */
-public final class JsonWriter implements Writer {
+public final class JsonWriter extends AbstractFileBasedWriter {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final int BUFFER_SIZE = 1024;
 	private static final String FIELD_PREFIX = "field.";
 
 	private final Charset charset;
-	private final RandomAccessFile randomAccessFile;
-	private ByteArrayWriter writer;
+	private final ByteArrayWriter writer;
 
 	private StringBuilder builder;
 	private final Map<String, Token> jsonProperties;
@@ -72,35 +63,25 @@ public final class JsonWriter implements Writer {
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
 	public JsonWriter(final Map<String, String> properties) throws IOException {
-		jsonProperties = createTokens(properties);
+		String fileName = getFileName(properties);
+		boolean append = Boolean.parseBoolean(properties.get("append"));
+		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
+		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
+
 		charset = getCharset(properties);
+		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false, charset);
+
+		jsonProperties = createTokens(properties);
 		newLineBytes = NEW_LINE.getBytes(charset);
 		commaBytes = ",".getBytes(charset);
 		bracketOpenBytes = "[".getBytes(charset);
 		bracketCloseBytes = "]".getBytes(charset);
 
-		String fileName = getFileName(properties);
-		File file = new File(fileName).getAbsoluteFile();
-		file.getParentFile().mkdirs();
-
-		boolean append = Boolean.parseBoolean(properties.get("append"));
-
-		randomAccessFile = new RandomAccessFile(file, "rw");
-		writer = new RandomAccessFileWriter(randomAccessFile);
-
-		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
-		if (buffered) {
-			writer = new BufferedWriterDecorator(writer);
-		}
-
-		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
 		if (writingThread) {
 			builder = new StringBuilder();
-		} else {
-			writer = new SynchronizedWriterDecorator(writer, randomAccessFile);
 		}
 
-		preProcessFile(append);
+		preProcessFile();
 	}
 
 	@Override
@@ -190,46 +171,23 @@ public final class JsonWriter implements Writer {
 		}
 	}
 
-	private Charset getCharset(final Map<String, String> properties) {
-		String charsetName = properties.get("charset");
-		try {
-			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
-		} catch (IllegalArgumentException ex) {
-			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
-			return Charset.defaultCharset();
-		}
-	}
-
-	private String getFileName(final Map<String, String> properties) {
-		String fileName = properties.get("file");
-		if (fileName == null) {
-			throw new IllegalArgumentException("File name is missing for file writer");
-		}
-		return fileName;
-	}
-
 	private boolean isWhitespace(final byte character) {
 		return character == '\n' || character == '\r' || character == ' ';
 	}
 
 	/**
-	 * Pre-processes the JSON file. If append mode is on, deletes the closing
-	 * bracket and adds a comma instead. If it's a new file, appends an opening
-	 * bracket.
+	 * Pre-processes the JSON file.
 	 *
-	 *
-	 * @param append Append Mode on or off
 	 * @throws IOException              Error reading or writing file
 	 * @throws IllegalArgumentException Invalid file format
 	 */
-	private void preProcessFile(final boolean append) throws IOException, IllegalArgumentException {
-		if (append && randomAccessFile.length() > 0) {
-			long sizeToTruncate = 0;
-			boolean foundClosingBracket = false;
+	private void preProcessFile() throws IOException, IllegalArgumentException {
+		byte[] bytes = new byte[BUFFER_SIZE];
+		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 
-			byte[] bytes = new byte[BUFFER_SIZE];
-			randomAccessFile.seek(Math.max(0, randomAccessFile.length() - BUFFER_SIZE));
-			int numberOfBytes = randomAccessFile.read(bytes);
+		if (numberOfBytes > 0) {
+			int sizeToTruncate = 0;
+			boolean foundClosingBracket = false;
 
 			for (int i = numberOfBytes - 1; i >= 0; i--) {
 				byte letter = bytes[i];
@@ -248,29 +206,25 @@ public final class JsonWriter implements Writer {
 						"Invalid JSON file. The file is missing a closing bracket for the array.");
 			}
 
-			long newFileSize = randomAccessFile.length() - sizeToTruncate;
-			randomAccessFile.setLength(newFileSize);
-			randomAccessFile.seek(randomAccessFile.length());
+			writer.shrink(sizeToTruncate);
 			writer.write(commaBytes, 0, commaBytes.length);
 		} else {
-			randomAccessFile.setLength(0);
 			writer.write(bracketOpenBytes, 0, bracketOpenBytes.length);
 		}
 	}
 
 	/**
 	 * Post-processes the JSON file. Attempts to delete the trailing comma and
-	 * appends closing bracket which were handled in
-	 * {@link #preProcessFile(boolean)}.
+	 * appends closing bracket which were handled in {@link #preProcessFile()}.
 	 *
 	 * @throws IOException Error writing to file
 	 */
 	private void postProcessFile() throws IOException {
-		if (randomAccessFile.length() > 0) {
-			randomAccessFile.seek(randomAccessFile.length() - 1);
-			if (randomAccessFile.read() == ',') {
-				randomAccessFile.setLength(randomAccessFile.length() - 1);
-			}
+		byte[] bytes = new byte[BUFFER_SIZE];
+		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
+
+		if (numberOfBytes > 0 && bytes[numberOfBytes - 1] == ',') {
+			writer.shrink(1);
 		}
 
 		writer.write(newLineBytes, 0, newLineBytes.length);
