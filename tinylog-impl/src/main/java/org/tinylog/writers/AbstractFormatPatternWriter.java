@@ -14,9 +14,8 @@
 package org.tinylog.writers;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -32,8 +31,8 @@ import org.tinylog.provider.InternalLogger;
 import org.tinylog.writers.raw.BufferedWriterDecorator;
 import org.tinylog.writers.raw.ByteArrayWriter;
 import org.tinylog.writers.raw.CharsetAdjustmentWriterDecorator;
-import org.tinylog.writers.raw.LockedFileOutputStreamWriter;
-import org.tinylog.writers.raw.OutputStreamWriter;
+import org.tinylog.writers.raw.LockedRandomAccessFileWriter;
+import org.tinylog.writers.raw.RandomAccessFileWriter;
 import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 
 /**
@@ -135,28 +134,32 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 		file.getParentFile().mkdirs();
 
 		byte[] charsetHeader = getCharsetHeader(charset);
-		FileOutputStream stream = new FileOutputStream(file, append);
-		ByteArrayWriter writer = shared ? new LockedFileOutputStreamWriter(stream) : new OutputStreamWriter(stream);
+		RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+		ByteArrayWriter writer;
+		if (shared) {
+			FileLock lock = randomAccessFile.getChannel().lock();
+			try {
+				prepareLogFile(randomAccessFile, append, charsetHeader);
+			} finally {
+				lock.release();
+			}
+
+			writer = new LockedRandomAccessFileWriter(randomAccessFile);
+		} else {
+			prepareLogFile(randomAccessFile, append, charsetHeader);
+			writer = new RandomAccessFileWriter(randomAccessFile);
+		}
 
 		if (buffered) {
 			writer = new BufferedWriterDecorator(writer);
 		}
 
 		if (threadSafe) {
-			writer = new SynchronizedWriterDecorator(writer, stream);
+			writer = new SynchronizedWriterDecorator(writer, randomAccessFile);
 		}
 
 		if (charsetHeader.length > 0) {
-			FileChannel channel = stream.getChannel();
-			FileLock lock = channel.lock();
-			try {
-				if (channel.size() == 0) {
-					stream.write(charsetHeader, 0, charsetHeader.length);
-				}
-			} finally {
-				lock.release();
-			}
-
 			writer = new CharsetAdjustmentWriterDecorator(writer, charsetHeader);
 		}
 
@@ -195,6 +198,19 @@ public abstract class AbstractFormatPatternWriter implements Writer {
 		byte[] singleSpace = " ".getBytes(charset);
 		byte[] doubleSpace = "  ".getBytes(charset);
 		return Arrays.copyOf(doubleSpace, singleSpace.length * 2 - doubleSpace.length);
+	}
+
+	private static void prepareLogFile(final RandomAccessFile randomAccessFile, final boolean append,
+			final byte[] charsetHeader) throws IOException {
+		if (append) {
+			randomAccessFile.seek(randomAccessFile.length());
+		} else {
+			randomAccessFile.setLength(0);
+		}
+
+		if (charsetHeader.length > 0 && randomAccessFile.length() == 0) {
+			randomAccessFile.write(charsetHeader, 0, charsetHeader.length);
+		}
 	}
 
 }

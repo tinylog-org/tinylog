@@ -46,8 +46,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
@@ -325,7 +325,8 @@ public final class SharedFileWriterTest {
 		when(mockedLock.isShared()).thenReturn(false);
 
 		FileChannel mockedChannel = mock(FileChannel.class);
-		when(mockedChannel.lock(anyLong(), anyLong(), eq(true))).thenReturn(mockedLock);
+		when(mockedChannel.lock()).thenReturn(mockedLock);
+		when(mockedChannel.lock(anyLong(), anyLong(), anyBoolean())).thenReturn(mockedLock);
 
 		RandomAccessFile mockedFile = mock(RandomAccessFile.class);
 		when(mockedFile.getChannel()).thenReturn(mockedChannel);

@@ -16,6 +16,7 @@ package org.tinylog.writers.raw;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,9 +28,9 @@ import org.tinylog.util.JvmProcessBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link LockedFileOutputStreamWriter}.
+ * Tests for {@link LockedRandomAccessFileWriter}.
  */
-public final class LockedFileOutputStreamWriterTest {
+public final class LockedRandomAccessFileWriterTest {
 
 	private static final int NUMBER_OF_PROCESSES = 5;
 	private static final int NUMBER_OF_LINES = 1000;
@@ -45,17 +46,16 @@ public final class LockedFileOutputStreamWriterTest {
 	 */
 	@Test
 	public void singleProcess() throws IOException {
-		String fileName = FileSystem.createTemporaryFile();
-		FileOutputStream stream = new FileOutputStream(fileName);
-		LockedFileOutputStreamWriter writer = new LockedFileOutputStreamWriter(stream);
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		LockedRandomAccessFileWriter writer = new LockedRandomAccessFileWriter(randomAccessFile);
 
 		writer.write(new byte[] { 'A', 'B', 'C' }, 2);
 		writer.write(new byte[] { 'D', 'E', 'F', 'G' }, 1, 2);
 		writer.flush();
 		writer.close();
 
-		assertThat(FileSystem.readFile(fileName)).isEqualTo("ABEF");
-		assertThat(stream.getChannel().isOpen()).isFalse();
+		assertThat(FileSystem.readFile(path)).isEqualTo("ABEF");
 	}
 
 	/**
@@ -75,7 +75,7 @@ public final class LockedFileOutputStreamWriterTest {
 			throw new IOException("Failed to delete temporary file: " + path);
 		}
 
-		List<Process> processes = new JvmProcessBuilder(LockedFileOutputStreamWriterTest.class, path).start(NUMBER_OF_PROCESSES);
+		List<Process> processes = new JvmProcessBuilder(LockedRandomAccessFileWriterTest.class, path).start(NUMBER_OF_PROCESSES);
 
 		if (!file.createNewFile()) {
 			throw new IOException("Failed to recreate temporary file: " + path);
@@ -105,7 +105,8 @@ public final class LockedFileOutputStreamWriterTest {
 			Thread.yield();
 		}
 
-		LockedFileOutputStreamWriter writer = new LockedFileOutputStreamWriter(new FileOutputStream(file, true));
+		RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+		LockedRandomAccessFileWriter writer = new LockedRandomAccessFileWriter(randomAccessFile);
 
 		for (int i = 0; i < NUMBER_OF_LINES; ++i) {
 			writer.write(DATA, 0, DATA.length);

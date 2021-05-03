@@ -13,11 +13,13 @@
 
 package org.tinylog.writers.raw;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,19 +30,6 @@ public final class BufferedWriterDecoratorTest {
 
 	private static final int BUFFER_CAPACITY = 64 * 1024;
 
-	private BufferedWriterDecorator writer;
-	private ByteArrayOutputStream stream;
-
-	/**
-	 * Creates a new instance of {@link BufferedWriterDecorator}. Output data will be stored in a
-	 * {@link ByteArrayOutputStream}.
-	 */
-	@Before
-	public void init() {
-		stream = new ByteArrayOutputStream();
-		writer = new BufferedWriterDecorator(new OutputStreamWriter(stream));
-	}
-
 	/**
 	 * Verifies that written data will be available after closing writer.
 	 *
@@ -49,11 +38,16 @@ public final class BufferedWriterDecoratorTest {
 	 */
 	@Test
 	public void writing() throws IOException {
-		writer.write(new byte[] { 1, 2 }, 2);
-		writer.write(new byte[] { 3, 4, 5, 6 }, 1, 3);
-		writer.close();
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
+		BufferedWriterDecorator decorator = new BufferedWriterDecorator(writer);
 
-		assertThat(stream.toByteArray()).startsWith((byte) 1, (byte) 2, (byte) 4, (byte) 5, (byte) 6);
+		decorator.write(new byte[] { 1, 2 }, 2);
+		decorator.write(new byte[] { 3, 4, 5, 6 }, 1, 3);
+		decorator.close();
+
+		assertThat(Files.readAllBytes(Paths.get(path))).startsWith((byte) 1, (byte) 2, (byte) 4, (byte) 5, (byte) 6);
 	}
 
 	/**
@@ -65,16 +59,27 @@ public final class BufferedWriterDecoratorTest {
 	 */
 	@Test
 	public void flushing() throws IOException {
-		writer.write(new byte[] { 1 }, 0, 1);
-		writer.write(new byte[BUFFER_CAPACITY - 2], BUFFER_CAPACITY - 2);
-		assertThat(stream.toByteArray()).isEmpty();
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
+		BufferedWriterDecorator decorator = new BufferedWriterDecorator(writer);
 
-		writer.write(new byte[] { 2 }, 0, 1);
-		writer.write(new byte[] { 3 }, 0, 1);
-		assertThat(stream.toByteArray()).startsWith((byte) 1).endsWith((byte) 2).hasSize(BUFFER_CAPACITY);
+		decorator.write(new byte[] { 1 }, 0, 1);
+		decorator.write(new byte[BUFFER_CAPACITY - 2], BUFFER_CAPACITY - 2);
+		assertThat(Files.readAllBytes(Paths.get(path))).isEmpty();
 
-		writer.flush();
-		assertThat(stream.toByteArray()).startsWith((byte) 1).endsWith((byte) 2, (byte) 3).hasSize(BUFFER_CAPACITY + 1);
+		decorator.write(new byte[] { 2 }, 0, 1);
+		decorator.write(new byte[] { 3 }, 0, 1);
+		assertThat(Files.readAllBytes(Paths.get(path)))
+			.startsWith((byte) 1)
+			.endsWith((byte) 2)
+			.hasSize(BUFFER_CAPACITY);
+
+		decorator.flush();
+		assertThat(Files.readAllBytes(Paths.get(path)))
+			.startsWith((byte) 1)
+			.endsWith((byte) 2, (byte) 3)
+			.hasSize(BUFFER_CAPACITY + 1);
 	}
 
 	/**
@@ -85,15 +90,20 @@ public final class BufferedWriterDecoratorTest {
 	 */
 	@Test
 	public void dataBiggerThanBuffer() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
+		BufferedWriterDecorator decorator = new BufferedWriterDecorator(writer);
+
 		byte[] data = new byte[BUFFER_CAPACITY + 1];
 		data[0] = 1;
 		data[BUFFER_CAPACITY - 1] = 2;
 		data[BUFFER_CAPACITY] = 3;
 
-		writer.write(data, 0, data.length);
-		writer.close();
+		decorator.write(data, 0, data.length);
+		decorator.close();
 
-		assertThat(stream.toByteArray()).isEqualTo(data);
+		assertThat(Files.readAllBytes(Paths.get(path))).isEqualTo(data);
 	}
 
 }

@@ -13,12 +13,10 @@
 
 package org.tinylog.writers.raw;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.tinylog.util.FileSystem;
 
@@ -29,24 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class RandomAccessFileWriterTest {
 
-	private RandomAccessFileWriter writer;
-	private String filePath;
-	private RandomAccessFile file;
-
-	/**
-	 * Creates a new instance of {@link RandomAccessFileWriter}. Output data will be
-	 * written in a {@link RandomAccessFile}.
-	 * 
-	 * @throws IOException           Failed creating file
-	 * @throws FileNotFoundException Could not find file
-	 */
-	@Before
-	public void init() throws FileNotFoundException, IOException {
-		filePath = FileSystem.createTemporaryFile();
-		file = new RandomAccessFile(filePath, "rw");
-		writer = new RandomAccessFileWriter(file);
-	}
-
 	/**
 	 * Verifies that written data will be available after writing and after closing
 	 * the writer.
@@ -55,16 +35,20 @@ public final class RandomAccessFileWriterTest {
 	 */
 	@Test
 	public void writing() throws IOException {
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile file = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(file);
+
 		writer.write(new byte[] { 1, 2, 3 }, 2);
 		writer.write(new byte[] { 4, 5, 6, 7 }, 1, 2);
 
-		byte[] writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
+		byte[] writtenBytes = FileSystem.readFile(path).getBytes(Charset.defaultCharset());
 		assertThat(writtenBytes).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
 
 		writer.flush();
 		writer.close();
 
-		writtenBytes = FileSystem.readFile(filePath).getBytes(Charset.defaultCharset());
+		writtenBytes = FileSystem.readFile(path).getBytes(Charset.defaultCharset());
 		assertThat(writtenBytes).containsExactly((byte) 1, (byte) 2, (byte) 5, (byte) 6);
 	}
 

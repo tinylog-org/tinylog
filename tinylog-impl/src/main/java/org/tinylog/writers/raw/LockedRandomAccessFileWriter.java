@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Martin Winandy
+ * Copyright 2017 Martin Winandy
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,21 +14,27 @@
 package org.tinylog.writers.raw;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 /**
- * Wrapper for using any {@link OutputStream} as writer.
+ * Wrapper for using a {@link RandomAccessFile} as writer.
+ *
+ * <p>
+ *	  In opposite to {@link RandomAccessFileWriter}, this writer uses {@link FileLock FileLocks} to support writing from
+ *	  multiple processes into the same file.
+ * </p>
  */
-public final class OutputStreamWriter implements ByteArrayWriter {
+public final class LockedRandomAccessFileWriter implements ByteArrayWriter {
 
-	private final OutputStream stream;
+	private final RandomAccessFile file;
 
 	/**
-	 * @param stream
-	 *            Underlying output stream
+	 * @param file Underlying random access file
 	 */
-	public OutputStreamWriter(final OutputStream stream) {
-		this.stream = stream;
+	public LockedRandomAccessFileWriter(final RandomAccessFile file) {
+		this.file = file;
 	}
 
 	@Override
@@ -38,7 +44,14 @@ public final class OutputStreamWriter implements ByteArrayWriter {
 
 	@Override
 	public void write(final byte[] data, final int offset, final int length) throws IOException {
-		stream.write(data, offset, length);
+		FileChannel channel = file.getChannel();
+		FileLock lock = channel.lock();
+		try {
+			channel.position(channel.size());
+			file.write(data, offset, length);
+		} finally {
+			lock.release();
+		}
 	}
 
 	@Override
@@ -47,7 +60,7 @@ public final class OutputStreamWriter implements ByteArrayWriter {
 
 	@Override
 	public void close() throws IOException {
-		stream.close();
+		file.close();
 	}
 
 }

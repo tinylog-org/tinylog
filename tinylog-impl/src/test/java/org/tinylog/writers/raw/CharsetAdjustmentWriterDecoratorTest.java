@@ -13,10 +13,13 @@
 
 package org.tinylog.writers.raw;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.junit.Test;
+import org.tinylog.util.FileSystem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,8 +38,9 @@ public class CharsetAdjustmentWriterDecoratorTest {
 	public void writeDataWithHeader() throws IOException {
 		byte[] charsetHeader = { 'A', 'B' };
 
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		OutputStreamWriter writer = new OutputStreamWriter(stream);
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
 		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, charsetHeader);
 
 		decorator.write(new byte[] { 'A', 'B', 'C' }, 3);
@@ -45,7 +49,7 @@ public class CharsetAdjustmentWriterDecoratorTest {
 		decorator.flush();
 		decorator.close();
 
-		assertThat(stream.toByteArray()).containsExactly('C', 'D', 'E', 'F');
+		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly('C', 'D', 'E', 'F');
 	}
 
 	/**
@@ -58,8 +62,9 @@ public class CharsetAdjustmentWriterDecoratorTest {
 	public void writeDataWithoutHeader() throws IOException {
 		byte[] charsetHeader = { 'A', 'B' };
 
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		OutputStreamWriter writer = new OutputStreamWriter(stream);
+		String path = FileSystem.createTemporaryFile();
+		RandomAccessFile randomAccessFile = new RandomAccessFile(path, "rw");
+		RandomAccessFileWriter writer = new RandomAccessFileWriter(randomAccessFile);
 		CharsetAdjustmentWriterDecorator decorator = new CharsetAdjustmentWriterDecorator(writer, charsetHeader);
 
 		decorator.write(new byte[] { 'C' }, 1);
@@ -68,7 +73,7 @@ public class CharsetAdjustmentWriterDecoratorTest {
 		decorator.flush();
 		decorator.close();
 
-		assertThat(stream.toByteArray()).containsExactly('C', 'D', 'E', 'F', 'B', 'C', 'D');
+		assertThat(Files.readAllBytes(Paths.get(path))).containsExactly('C', 'D', 'E', 'F', 'B', 'C', 'D');
 	}
 
 }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Wrapper for using any {@link RandomAccessFile} as writer.
+ * Wrapper for using a {@link RandomAccessFile} as writer.
  */
 public final class RandomAccessFileWriter implements ByteArrayWriter {
 
