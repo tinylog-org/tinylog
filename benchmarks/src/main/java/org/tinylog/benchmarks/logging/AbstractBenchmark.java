@@ -45,4 +45,13 @@ public abstract class AbstractBenchmark<T extends AbstractLifeCycle> {
 	 */
 	public abstract void output(T lifeCycle) throws Exception;
 
+	/**
+	 * Benchmarks a single logging statement. Used with {@code Mode.SampleTime}
+	 * to measure logging latency.
+	 *
+	 * @param lifeCycle Life cycle of the logging framework to benchmark
+	 * @throws Exception Failed to output log entries
+	 */
+	public abstract void outputSingle(T lifeCycle) throws Exception;
+
 }

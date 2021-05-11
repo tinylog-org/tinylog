@@ -31,7 +31,7 @@ public class Tinylog1Benchmark extends AbstractBenchmark<LifeCycle> {
 	}
 
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode({Mode.Throughput, Mode.SampleTime})
 	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		Logger.debug("Hello {}!", MAGIC_NUMBER);
@@ -46,6 +46,13 @@ public class Tinylog1Benchmark extends AbstractBenchmark<LifeCycle> {
 		}
 
 		lifeCycle.waitForWriting();
+	}
+
+	@Benchmark
+	@BenchmarkMode(Mode.SampleTime)
+	@Override
+	public void outputSingle(final LifeCycle lifeCycle) throws IOException, InterruptedException {
+		Logger.info("Hello {}!", MAGIC_NUMBER);
 	}
 
 }

@@ -30,7 +30,7 @@ public class NoOpBenchmark {
 	 * Benchmarks invoking an empty method.
 	 */
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode({Mode.Throughput, Mode.SampleTime})
 	public void emptyMethod() {
 	}
 

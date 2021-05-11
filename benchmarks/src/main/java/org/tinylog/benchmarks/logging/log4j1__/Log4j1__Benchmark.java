@@ -31,7 +31,7 @@ public class Log4j1__Benchmark extends AbstractBenchmark<LifeCycle> {
 	}
 
 	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
+	@BenchmarkMode({Mode.Throughput, Mode.SampleTime})
 	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		lifeCycle.getLogger().debug("Hello " + MAGIC_NUMBER + "!");
@@ -47,6 +47,13 @@ public class Log4j1__Benchmark extends AbstractBenchmark<LifeCycle> {
 		}
 
 		lifeCycle.waitForWriting();
+	}
+
+	@Benchmark
+	@BenchmarkMode(Mode.SampleTime)
+	@Override
+	public void outputSingle(final LifeCycle lifeCycle) throws IOException, InterruptedException {
+		lifeCycle.getLogger().info("Hello " + MAGIC_NUMBER + "!");
 	}
 
 }
