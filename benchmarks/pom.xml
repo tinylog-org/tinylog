@@ -162,6 +162,7 @@
 						<artifactId>exec-maven-plugin</artifactId>
 						<configuration>
 							<arguments>
+								<argument>-Dfile.encoding=UTF-8</argument>
 								<argument>-classpath</argument>
 								<classpath />
 								<argument>org.openjdk.jmh.Main</argument>
@@ -213,6 +214,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<configuration>
 					<arguments>
+						<argument>-Dfile.encoding=UTF-8</argument>
 						<argument>-classpath</argument>
 						<classpath />
 						<argument>org.openjdk.jmh.Main</argument>
