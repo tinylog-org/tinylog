@@ -225,6 +225,10 @@
 						<argument>${benchmark.iterations}</argument>
 						<argument>-i</argument>
 						<argument>${benchmark.iterations}</argument>
+						<argument>-rf</argument>
+						<argument>text</argument>
+						<argument>-rff</argument>
+						<argument>${project.basedir}/src/main/resources/output.txt</argument>
 					</arguments>
 				</configuration>
 			</plugin>
