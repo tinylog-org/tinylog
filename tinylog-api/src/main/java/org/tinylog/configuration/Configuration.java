@@ -45,9 +45,9 @@ import org.tinylog.runtime.RuntimeProvider;
  * 
  * <p>
  * The default property loading behavior can be changed by supplying a property service loader which reads the properties
- * in any other way. The properties can have a priority. The service loader which loads the properties with the highes
+ * in any other way. The properties can have a priority. The service loader which loads the properties with the highest
  * priority is chosen. Alternatively, the loader can be directly chosen by setting a system property
- * "{@code tinylog.configurationLoader}" to the simple class name of the desired loader.  
+ * "{@code tinylog.configurationloader}" to the simple class name of the desired loader.
  * </p>
  */
 public final class Configuration {
@@ -100,12 +100,16 @@ public final class Configuration {
 				} else if (loader == null) {
 					loader = currentLoader;
 				} else {
-					InternalLogger.log(Level.ERROR, "Ignoring more than one configuration loader (" + currentLoader.getClass() + ").");
+					InternalLogger.log(
+						Level.WARN,
+						"Multiple configuration loaders found. Configuration loader " + currentLoader.getClass() + " will be ignored."
+					);
 				}
-				// No user loader found. Use the internal loader.
-				if (loader == null) {
-					loader = internalLoader;
-				}
+			}
+
+			// No user loader found. Use the internal loader.
+			if (loader == null) {
+				loader = internalLoader;
 			}
 		}
 		
