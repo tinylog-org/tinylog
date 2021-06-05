@@ -3,6 +3,7 @@ module org.tinylog.impl {
 	requires static java.sql;
 	requires org.tinylog.api;
 
+	exports org.tinylog.converters;
 	exports org.tinylog.core;
 	exports org.tinylog.path;
 	exports org.tinylog.pattern;
@@ -11,9 +12,13 @@ module org.tinylog.impl {
 	exports org.tinylog.writers;
 	exports org.tinylog.writers.raw;
 
+	uses org.tinylog.converters.FileConverter;
 	uses org.tinylog.policies.Policy;
 	uses org.tinylog.throwable.ThrowableFilter;
 	uses org.tinylog.writers.Writer;
+
+	provides org.tinylog.converters.FileConverter with
+			org.tinylog.converters.GzipFileConverter;
 
 	provides org.tinylog.policies.Policy with
 			org.tinylog.policies.DailyPolicy,
