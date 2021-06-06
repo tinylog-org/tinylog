@@ -704,8 +704,8 @@ public final class ConfigurationTest {
 		
 		loadProperties(null);
 		assertThat(Configuration.get("DummyConfigurationLoader")).isEqualTo("123");
-		assertThat(systemStream.consumeErrorOutput()).contains("ERROR")
-			.containsOnlyOnce("Ignoring more than one configuration loader");
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN")
+			.containsOnlyOnce("Multiple configuration loaders found.");
 		
 		System.clearProperty("tinylog.configurationloader");
 		FileSystem.deleteServiceFile(ConfigurationLoader.class);
