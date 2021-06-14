@@ -13,10 +13,10 @@
 
 package org.tinylog.kotlin
 
-import java.util.ArrayList
-
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 
 import org.assertj.core.api.Assertions.assertThat
@@ -37,48 +37,34 @@ import org.tinylog.rules.SystemStreamCollector
 /**
  * Tests for [TaggedLogger].
  *
- * @param level
- * Actual severity level under test
- * @param traceEnabled
- * Determines if [TRACE][Level.TRACE] level is enabled
- * @param debugEnabled
- * Determines if [DEBUG][Level.DEBUG] level is enabled
- * @param infoEnabled
- * Determines if [INFO][Level.INFO] level is enabled
- * @param warnEnabled
- * Determines if [WARN][Level.WARN] level is enabled
- * @param errorEnabled
- * Determines if [ERROR][Level.ERROR] level is enabled
+ * @param tag1Configuration
+ * The logging level configuration for the first tag
+ * @param tag2Configuration
+ * The logging level configuration
  */
 @RunWith(Parameterized::class)
-class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boolean, private val debugEnabled: Boolean,
-	                   private val infoEnabled: Boolean, private val warnEnabled: Boolean, private val errorEnabled: Boolean) {
+class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, private val tag2Configuration: LevelConfiguration?) {
 
 	companion object {
-
 		/**
-		 * Returns for all severity levels which severity levels are enabled.
+		 * Returns all different combinations of logging levels for up two tags for the tests.
 		 *
-		 * @return Each object array contains the severity level itself and five booleans for [TRACE][Level.TRACE]
-		 * ... [ERROR][Level.ERROR] to determine whether these severity levels are enabled
+		 * @return Each object array represents a combination. A value of null means the tag isn't present in the combination.
 		 */
 		@JvmStatic
-		@Parameters(name = "{0}")
-		fun getLevels(): Collection<Array<Any>> {
-			val levels = ArrayList<Array<Any>>()
+		@Parameters(name = "{0}, {1}")
+		fun getLevels(): Collection<Array<Any?>> {
+			val levels = ArrayList<Array<Any?>>()
 
-			// @formatter:off
-			levels.add(arrayOf(Level.TRACE, true,  true,  true,  true,  true))
-			levels.add(arrayOf(Level.DEBUG, false, true,  true,  true,  true))
-			levels.add(arrayOf(Level.INFO,  false, false, true,  true,  true))
-			levels.add(arrayOf(Level.WARN,  false, false, false, true,  true))
-			levels.add(arrayOf(Level.ERROR, false, false, false, false, true))
-			levels.add(arrayOf(Level.OFF,   false, false, false, false, false))
-			// @formatter:on
+			LevelConfiguration.AVAILABLE_LEVELS.forEach { tag1 ->
+				levels.add(arrayOf(tag1, null))
+				LevelConfiguration.AVAILABLE_LEVELS.forEach { tag2 ->
+					levels.add(arrayOf(tag1, tag2))
+				}
+			}
 
 			return levels
 		}
-
 	}
 
 	/**
@@ -88,40 +74,51 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	@Rule
 	val systemStream = SystemStreamCollector(false)
 
-	private val tag = "test"
+	private val tag1 = "test"
+	private val tag2 = "other tag"
 	private val loggingProvider = mockk<LoggingProvider>()
-	private val logger = TaggedLogger(tag)
+	private var logger: TaggedLogger? = null
 
 	/**
 	 * Applies the mocked logging provider and overrides all depending fields.
 	 */
 	@Before
 	fun applyLoggingProvider() {
-		every { loggingProvider.getMinimumLevel(tag) } returns level
+		mockkStatic(ProviderRegistry::class)
+		every { ProviderRegistry.getLoggingProvider() } returns loggingProvider
 
-		every { loggingProvider.isEnabled(any(), tag, Level.TRACE) } returns  traceEnabled
-		every { loggingProvider.isEnabled(any(), tag, Level.DEBUG) } returns  debugEnabled
-		every { loggingProvider.isEnabled(any(), tag, Level.INFO) } returns  infoEnabled
-		every { loggingProvider.isEnabled(any(), tag, Level.WARN) } returns  warnEnabled
-		every { loggingProvider.isEnabled(any(), tag, Level.ERROR) } returns  errorEnabled
+		every { loggingProvider.getMinimumLevel(tag1) } returns tag1Configuration.level
+
+		every { loggingProvider.isEnabled(any(), tag1, Level.TRACE) } returns tag1Configuration.traceEnabled
+		every { loggingProvider.isEnabled(any(), tag1, Level.DEBUG) } returns tag1Configuration.debugEnabled
+		every { loggingProvider.isEnabled(any(), tag1, Level.INFO) } returns tag1Configuration.infoEnabled
+		every { loggingProvider.isEnabled(any(), tag1, Level.WARN) } returns tag1Configuration.warnEnabled
+		every { loggingProvider.isEnabled(any(), tag1, Level.ERROR) } returns tag1Configuration.errorEnabled
+
+		logger = if (tag2Configuration == null) {
+			TaggedLogger(tag1)
+		} else {
+			every { loggingProvider.getMinimumLevel(tag2) } returns tag2Configuration.level
+
+			every { loggingProvider.isEnabled(any(), tag2, Level.TRACE) } returns tag2Configuration.traceEnabled
+			every { loggingProvider.isEnabled(any(), tag2, Level.DEBUG) } returns tag2Configuration.debugEnabled
+			every { loggingProvider.isEnabled(any(), tag2, Level.INFO) } returns tag2Configuration.infoEnabled
+			every { loggingProvider.isEnabled(any(), tag2, Level.WARN) } returns tag2Configuration.warnEnabled
+			every { loggingProvider.isEnabled(any(), tag2, Level.ERROR) } returns tag2Configuration.errorEnabled
+			TaggedLogger(setOf(tag1, tag2))
+		}
 
 		every { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
 		every { loggingProvider.log(any<String>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
-
-		Whitebox.setProperty(logger, LoggingProvider::class, loggingProvider)
-		Whitebox.setProperty(logger, "minimumLevelCoversTrace", traceEnabled)
-		Whitebox.setProperty(logger, "minimumLevelCoversDebug", debugEnabled)
-		Whitebox.setProperty(logger, "minimumLevelCoversInfo", infoEnabled)
-		Whitebox.setProperty(logger, "minimumLevelCoversWarn", warnEnabled)
-		Whitebox.setProperty(logger, "minimumLevelCoversError", errorEnabled)
 	}
 
 	/**
-	 * Resets the logging provider in [TaggedLogger].
+	 * Resets the mocks and the state of the logger.
 	 */
 	@After
-	fun resetLoggingProvider() {
-		Whitebox.setProperty(logger, LoggingProvider::class, ProviderRegistry.getLoggingProvider())
+	fun resetState() {
+		Whitebox.setProperty(logger!!, LoggingProvider::class, ProviderRegistry.getLoggingProvider())
+		clearAllMocks()
 	}
 
 	/**
@@ -129,7 +126,13 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun isTraceEnabled() {
-		assertThat(logger.isTraceEnabled()).isEqualTo(traceEnabled)
+		assertThat(logger!!.isTraceEnabled()).isEqualTo(
+			if (tag2Configuration == null) {
+				tag1Configuration.traceEnabled
+			} else {
+				tag1Configuration.traceEnabled || tag2Configuration.traceEnabled
+			}
+		)
 	}
 
 	/**
@@ -137,12 +140,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceObject() {
-		logger.trace(42)
+		logger!!.trace(42)
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, null, 42) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, 42) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, null, null, 42) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -151,12 +160,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceString() {
-		logger.trace("Hello World!")
+		logger!!.trace("Hello World!")
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, null, "Hello World!") }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, null, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -165,12 +180,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceLazyMessage() {
-		logger.trace { "Hello World!" }
+		logger!!.trace { "Hello World!" }
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, null, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -179,12 +200,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceMessageAndArguments() {
-		logger.trace("Hello {}!", "World")
+		logger!!.trace("Hello {}!", "World")
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.TRACE,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.TRACE,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -194,12 +241,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun traceMessageAndLazyArguments() {
-		logger.trace("The number is {}", { 42 })
+		logger!!.trace("The number is {}", { 42 })
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.TRACE,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.TRACE,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -210,12 +283,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun traceException() {
 		val exception = NullPointerException()
 
-		logger.trace(exception)
+		logger!!.trace(exception)
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, exception, null, null) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, null) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, exception, null, null) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -226,12 +305,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun traceExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger.trace(exception, "Hello World!")
+		logger!!.trace(exception, "Hello World!")
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, exception, null, "Hello World!") }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, exception, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -242,12 +327,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun traceExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger.trace(exception) { "Hello World!" }
+		logger!!.trace(exception) { "Hello World!" }
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, exception, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.TRACE, exception, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -258,12 +349,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun traceExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger.trace(exception, "Hello {}!", "World")
+		logger!!.trace(exception, "Hello {}!", "World")
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.TRACE,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.TRACE,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -275,12 +392,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun traceExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger.trace(exception, "The number is {}", { 42 })
+		logger!!.trace(exception, "The number is {}", { 42 })
 
-		if (traceEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.TRACE,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.TRACE,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -289,7 +432,13 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun isDebugEnabled() {
-		assertThat(logger.isDebugEnabled()).isEqualTo(debugEnabled)
+		assertThat(logger!!.isDebugEnabled()).isEqualTo(
+			if (tag2Configuration == null) {
+				tag1Configuration.debugEnabled
+			} else {
+				tag1Configuration.debugEnabled || tag2Configuration.debugEnabled
+			}
+		)
 	}
 
 	/**
@@ -297,12 +446,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugObject() {
-		logger.debug(42)
+		logger!!.debug(42)
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, null, 42) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, 42) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, null, null, 42) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -311,12 +466,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugString() {
-		logger.debug("Hello World!")
+		logger!!.debug("Hello World!")
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, null, "Hello World!") }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, null, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -325,12 +486,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugLazyMessage() {
-		logger.debug { "Hello World!" }
+		logger!!.debug { "Hello World!" }
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, null, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -339,12 +506,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugMessageAndArguments() {
-		logger.debug("Hello {}!", "World")
+		logger!!.debug("Hello {}!", "World")
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.DEBUG,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.DEBUG,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -354,12 +547,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun debugMessageAndLazyArguments() {
-		logger.debug("The number is {}", { 42 })
+		logger!!.debug("The number is {}", { 42 })
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.DEBUG,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.DEBUG,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -370,12 +589,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun debugException() {
 		val exception = NullPointerException()
 
-		logger.debug(exception)
+		logger!!.debug(exception)
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, exception, null, null) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, null) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, exception, null, null) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -386,12 +611,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun debugExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger.debug(exception, "Hello World!")
+		logger!!.debug(exception, "Hello World!")
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, exception, null, "Hello World!") }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, exception, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -402,12 +633,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun debugExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger.debug(exception) { "Hello World!" }
+		logger!!.debug(exception) { "Hello World!" }
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -418,12 +655,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun debugExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger.debug(exception, "Hello {}!", "World")
+		logger!!.debug(exception, "Hello {}!", "World")
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.DEBUG,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.DEBUG,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -435,12 +698,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun debugExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger.debug(exception, "The number is {}", { 42 })
+		logger!!.debug(exception, "The number is {}", { 42 })
 
-		if (debugEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.DEBUG,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.DEBUG,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -449,7 +738,13 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun isInfoEnabled() {
-		assertThat(logger.isInfoEnabled()).isEqualTo(infoEnabled)
+		assertThat(logger!!.isInfoEnabled()).isEqualTo(
+			if (tag2Configuration == null) {
+				tag1Configuration.infoEnabled
+			} else {
+				tag1Configuration.infoEnabled || tag2Configuration.infoEnabled
+			}
+		)
 	}
 
 	/**
@@ -457,12 +752,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoObject() {
-		logger.info(42)
+		logger!!.info(42)
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, null, 42) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, 42) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, null, null, 42) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -471,12 +772,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoString() {
-		logger.info("Hello World!")
+		logger!!.info("Hello World!")
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, null, "Hello World!") }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, null, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -485,12 +792,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoLazyMessage() {
-		logger.info { "Hello World!" }
+		logger!!.info { "Hello World!" }
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, null, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -499,12 +812,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoMessageAndArguments() {
-		logger.info("Hello {}!", "World")
+		logger!!.info("Hello {}!", "World")
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.INFO,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.INFO,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -514,12 +853,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun infoMessageAndLazyArguments() {
-		logger.info("The number is {}", { 42 })
+		logger!!.info("The number is {}", { 42 })
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.INFO,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.INFO,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -530,12 +895,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun infoException() {
 		val exception = NullPointerException()
 
-		logger.info(exception)
+		logger!!.info(exception)
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, exception, null, null) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, null) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, exception, null, null) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -546,12 +917,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun infoExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger.info(exception, "Hello World!")
+		logger!!.info(exception, "Hello World!")
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, exception, null, "Hello World!") }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, exception, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -562,12 +939,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun infoExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger.info(exception) { "Hello World!" }
+		logger!!.info(exception) { "Hello World!" }
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, exception, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.INFO, exception, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -578,12 +961,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun infoExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger.info(exception, "Hello {}!", "World")
+		logger!!.info(exception, "Hello {}!", "World")
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.INFO,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.INFO,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -595,12 +1004,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun infoExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger.info(exception, "The number is {}", { 42 })
+		logger!!.info(exception, "The number is {}", { 42 })
 
-		if (infoEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.INFO,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.INFO,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -609,7 +1044,13 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun isWarnEnabled() {
-		assertThat(logger.isWarnEnabled()).isEqualTo(warnEnabled)
+		assertThat(logger!!.isWarnEnabled()).isEqualTo(
+			if (tag2Configuration == null) {
+				tag1Configuration.warnEnabled
+			} else {
+				tag1Configuration.warnEnabled || tag2Configuration.warnEnabled
+			}
+		)
 	}
 
 	/**
@@ -617,12 +1058,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnObject() {
-		logger.warn(42)
+		logger!!.warn(42)
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, null, 42) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, 42) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, null, null, 42) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -631,12 +1078,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnString() {
-		logger.warn("Hello World!")
+		logger!!.warn("Hello World!")
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, null, "Hello World!") }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, null, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -645,12 +1098,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnLazyMessage() {
-		logger.warn { "Hello World!" }
+		logger!!.warn { "Hello World!" }
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, null, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -659,12 +1118,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnMessageAndArguments() {
-		logger.warn("Hello {}!", "World")
+		logger!!.warn("Hello {}!", "World")
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.WARN,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.WARN,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -674,12 +1159,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun warnMessageAndLazyArguments() {
-		logger.warn("The number is {}", { 42 })
+		logger!!.warn("The number is {}", { 42 })
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.WARN,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.WARN,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -690,12 +1201,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun warnException() {
 		val exception = NullPointerException()
 
-		logger.warn(exception)
+		logger!!.warn(exception)
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, exception, null, null) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, null) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, exception, null, null) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -706,12 +1223,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun warnExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger.warn(exception, "Hello World!")
+		logger!!.warn(exception, "Hello World!")
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, exception, null, "Hello World!") }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, exception, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -722,12 +1245,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun warnExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger.warn(exception) { "Hello World!" }
+		logger!!.warn(exception) { "Hello World!" }
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, exception, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.WARN, exception, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -738,12 +1267,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun warnExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger.warn(exception, "Hello {}!", "World")
+		logger!!.warn(exception, "Hello {}!", "World")
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.WARN,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.WARN,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -755,12 +1310,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun warnExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger.warn(exception, "The number is {}", { 42 })
+		logger!!.warn(exception, "The number is {}", { 42 })
 
-		if (warnEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.WARN,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.WARN,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -769,7 +1350,13 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun isErrorEnabled() {
-		assertThat(logger.isErrorEnabled()).isEqualTo(errorEnabled)
+		assertThat(logger!!.isErrorEnabled()).isEqualTo(
+			if (tag2Configuration == null) {
+				tag1Configuration.errorEnabled
+			} else {
+				tag1Configuration.errorEnabled || tag2Configuration.errorEnabled
+			}
+		)
 	}
 
 	/**
@@ -777,12 +1364,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorObject() {
-		logger.error(42)
+		logger!!.error(42)
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, null, 42) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, 42) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, null, null, 42) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -791,12 +1384,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorString() {
-		logger.error("Hello World!")
+		logger!!.error("Hello World!")
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, null, "Hello World!") }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, null, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -805,12 +1404,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorLazyMessage() {
-		logger.error { "Hello World!" }
+		logger!!.error { "Hello World!" }
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, null, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -819,12 +1424,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorMessageAndArguments() {
-		logger.error("Hello {}!", "World")
+		logger!!.error("Hello {}!", "World")
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.ERROR,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.ERROR,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -834,12 +1465,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	 */
 	@Test
 	fun errorMessageAndLazyArguments() {
-		logger.error("The number is {}", { 42 })
+		logger!!.error("The number is {}", { 42 })
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.ERROR,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.ERROR,
+					null,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -850,12 +1507,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun errorException() {
 		val exception = NullPointerException()
 
-		logger.error(exception)
+		logger!!.error(exception)
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, exception, null, null) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, null) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, exception, null, null) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -866,12 +1529,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun errorExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger.error(exception, "Hello World!")
+		logger!!.error(exception, "Hello World!")
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, exception, null, "Hello World!") }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, "Hello World!") }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, exception, null, "Hello World!") }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -882,12 +1551,18 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun errorExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger.error(exception) { "Hello World!" }
+		logger!!.error(exception) { "Hello World!" }
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, exception, null, match(provide("Hello World!"))) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, match(provide("Hello World!"))) }
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) { loggingProvider.log(2, tag2, Level.ERROR, exception, null, match(provide("Hello World!"))) }
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -898,12 +1573,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun errorExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger.error(exception, "Hello {}!", "World")
+		logger!!.error(exception, "Hello {}!", "World")
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.ERROR,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.ERROR,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"Hello {}!",
+					"World"
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 
@@ -915,12 +1616,38 @@ class TaggedLoggerTest(private val level: Level, private val traceEnabled: Boole
 	fun errorExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger.error(exception, "The number is {}", { 42 })
+		logger!!.error(exception, "The number is {}", { 42 })
 
-		if (errorEnabled) {
-			verify(exactly = 1) { loggingProvider.log(2, tag, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
+		if (tag1Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag1,
+					Level.ERROR,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
 		} else {
-			verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag1, any(), any(), any(), any(), *anyVararg()) }
+		}
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) {
+			verify(exactly = 1) {
+				loggingProvider.log(
+					2,
+					tag2,
+					Level.ERROR,
+					exception,
+					ofType(AdvancedMessageFormatter::class),
+					"The number is {}",
+					match(provide(42))
+				)
+			}
+		} else {
+			verify(exactly = 0) { loggingProvider.log(any<Int>(), tag2, any(), any(), any(), any(), *anyVararg()) }
 		}
 	}
 

@@ -13,6 +13,9 @@
 
 package org.tinylog;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -44,8 +47,12 @@ public final class Logger {
 	private static final boolean MINIMUM_LEVEL_COVERS_ERROR = isCoveredByMinimumLevel(Level.ERROR);
 	// @formatter:on
 
-	private static final TaggedLogger instance = new TaggedLogger(null);
-	private static final ConcurrentMap<String, TaggedLogger> loggers = new ConcurrentHashMap<String, TaggedLogger>();
+	private static final TaggedLogger instance = new TaggedLogger((String) null);
+	private static final ConcurrentMap<Set<String>, TaggedLogger> loggers = new ConcurrentHashMap<Set<String>, TaggedLogger>();
+
+	static {
+		loggers.put(toUnmodifiableTagsSet((String) null), instance);
+	}
 
 	/** */
 	private Logger() {
@@ -62,15 +69,50 @@ public final class Logger {
 		if (tag == null || tag.isEmpty()) {
 			return instance;
 		} else {
-			TaggedLogger logger = loggers.get(tag);
+			return tags(tag);
+		}
+	}
+
+	/**
+	 * Gets a tagged logger instance that logs to multiple tags. Tags are case-sensitive.
+	 *
+	 * @param tags
+	 *            Tags for the logger or nothing for an untagged logger. If specified, each tag should be unique
+	 * @return Logger instance
+	 */
+	public static TaggedLogger tags(final String...tags) {
+		if (tags == null || tags.length == 0) {
+			return instance;
+		} else {
+			Set<String> tagsSet = toUnmodifiableTagsSet(tags);
+			TaggedLogger logger = loggers.get(tagsSet);
 			if (logger == null) {
-				logger = new TaggedLogger(tag);
-				TaggedLogger existing = loggers.putIfAbsent(tag, logger);
+				logger = new TaggedLogger(tagsSet);
+				TaggedLogger existing = loggers.putIfAbsent(tagsSet, logger);
 				return existing == null ? logger : existing;
 			} else {
 				return logger;
 			}
 		}
+	}
+
+	/**
+	 * Puts the given tags into an immutable {@link Set}. Any "empty" tags are treated as the same as {@code null} tags
+	 *
+	 * @param tags
+	 *            The tags to put into the immutable {@link Set}
+	 * @return Immutable {@link Set} of strings.
+	 */
+	private static Set<String> toUnmodifiableTagsSet(final String... tags) {
+		Set<String> set = new HashSet<String>();
+		for (String entry: tags) {
+			if (entry == null || entry.isEmpty()) {
+				set.add(null);
+			} else {
+				set.add(entry);
+			}
+		}
+		return Collections.unmodifiableSet(set);
 	}
 
 	/**

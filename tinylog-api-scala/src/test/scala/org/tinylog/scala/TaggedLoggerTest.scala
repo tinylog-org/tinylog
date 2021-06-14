@@ -13,45 +13,35 @@
 
 package org.tinylog.scala
 
-import java.util
-
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import org.junit.{After, Before, Rule, Test}
 import org.mockito.ArgumentMatcher
-import org.mockito.ArgumentMatchers.{any, anyInt, anyString, argThat, isNull, eq => eqTo, same}
+import org.mockito.ArgumentMatchers.{any, anyInt, argThat, isNull, same, eq => eqTo}
 import org.mockito.Mockito.{mock, never, verify, when}
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.rule.PowerMockRule
 import org.powermock.reflect.Whitebox
 import org.tinylog.format.MessageFormatter
-import org.tinylog.provider.{LoggingProvider, ProviderRegistry}
+import org.tinylog.provider.LoggingProvider
 import org.tinylog.rules.SystemStreamCollector
 import org.tinylog.{Level, Supplier}
 
+import java.util
+import scala.collection.JavaConverters
+
 /**
 	* Tests for logging methods of [[org.tinylog.scala.Logger]].
-	*
-	* @param level
-	* Actual severity level under test
-	* @param traceEnabled
-	* Determines if [[org.tinylog.Level#TRACE]] is enabled
-	* @param debugEnabled
-	* Determines if [[org.tinylog.Level#DEBUG]] is enabled
-	* @param infoEnabled
-	* Determines if [[org.tinylog.Level#INFO]] is enabled
-	* @param warnEnabled
-	* Determines if [[org.tinylog.Level#WARN]] is enabled
-	* @param errorEnabled
-	* Determines if [[org.tinylog.Level#ERROR]] is enabled
 	*/
 @RunWith(classOf[Parameterized])
 @PrepareForTest(Array(classOf[org.tinylog.TaggedLogger]))
-final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var debugEnabled: Boolean, var infoEnabled: Boolean, var warnEnabled: Boolean, var errorEnabled: Boolean) {
+final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2Configuration: LevelConfiguration) {
 
-	private val TAG = "test"
+	private val TAG1 = "test"
+
+	private val TAG2 = "other tag"
 
 	/**
 		* Activates PowerMock (alternative to [[org.powermock.modules.junit4.PowerMockRunner]]).
@@ -65,13 +55,18 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 
 	private var loggingProvider: LoggingProvider = null
 	private var logger: TaggedLogger = null
+	private var tags: Set[String] = null
 
 	/**
 		* Mocks the underlying logging provider and creates a new tagged logger instance.
 		*/
 	@Before def init(): Unit = {
-		logger = new TaggedLogger(TAG)
-		loggingProvider = mockLoggingProvider()
+    loggingProvider = mockLoggingProvider()
+		tags = Set(TAG1)
+		if (tag2Configuration != null) {
+			tags = tags + TAG2
+		}
+		logger = new TaggedLogger(tags)
 	}
 
 	/**
@@ -86,7 +81,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		* Verifies evaluating whether [[org.tinylog.Level#TRACE]] is enabled.
 		*/
 	@Test def isTraceEnabled(): Unit = {
-		assertThat(logger.isTraceEnabled).isEqualTo(traceEnabled)
+		if (tag2Configuration != null) {
+			assertThat(logger.isTraceEnabled).isEqualTo(tag1Configuration.traceEnabled || tag2Configuration.traceEnabled)
+		} else {
+			assertThat(logger.isTraceEnabled).isEqualTo(tag1Configuration.traceEnabled)
+		}
 	}
 
 	/**
@@ -95,8 +94,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def traceNumber(): Unit = {
 		logger.trace(42.asInstanceOf[Any])
 
-		if (traceEnabled) verify(loggingProvider).log(2, TAG, Level.TRACE, null, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(2, TAG1, Level.TRACE, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(2, TAG2, Level.TRACE, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -105,8 +107,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def traceStaticString(): Unit = {
 		logger.trace("Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(2, TAG, Level.TRACE, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(2, TAG1, Level.TRACE, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(2, TAG2, Level.TRACE, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -116,8 +121,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.trace(s"Hello $name!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -126,8 +134,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def traceLazyMessage(): Unit = {
 		logger.trace(() => "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -136,8 +147,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def traceMessageAndArguments(): Unit = {
 		logger.trace("Hello {}!", "World")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -146,8 +160,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def traceMessageAndLazyArguments(): Unit = {
 		logger.trace("The number is {}", () => 42)
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -157,8 +174,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.trace(exception)
 
-		if (traceEnabled) verify(loggingProvider).log(2, TAG, Level.TRACE, exception, null, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(2, TAG1, Level.TRACE, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(2, TAG2, Level.TRACE, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -168,8 +188,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.trace(exception, "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(2, TAG, Level.TRACE, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(2, TAG1, Level.TRACE, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(2, TAG2, Level.TRACE, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -180,8 +203,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.trace(exception, s"Hello $name!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -191,8 +217,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.trace(exception, () => "Hello World!")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -202,8 +231,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.trace(exception, "Hello {}!", "World")
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -213,15 +245,22 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.trace(exception, "The number is {}", () => 42)
 
-		if (traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.TRACE), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.TRACE), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.traceEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.TRACE), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.TRACE), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
 		* Verifies evaluating whether [[org.tinylog.Level#DEBUG]] is enabled.
 		*/
 	@Test def isDebugEnabled(): Unit = {
-		assertThat(logger.isDebugEnabled).isEqualTo(debugEnabled)
+		if (tag2Configuration != null) {
+			assertThat(logger.isDebugEnabled)isEqualTo(tag1Configuration.debugEnabled || tag2Configuration.debugEnabled)
+		} else {
+			assertThat(logger.isDebugEnabled).isEqualTo(tag1Configuration.debugEnabled)
+		}
 	}
 
 	/**
@@ -230,8 +269,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def debugNumber(): Unit = {
 		logger.debug(42.asInstanceOf[Any])
 
-		if (debugEnabled) verify(loggingProvider).log(2, TAG, Level.DEBUG, null, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(2, TAG1, Level.DEBUG, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(2, TAG2, Level.DEBUG, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -240,8 +282,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def debugStaticString(): Unit = {
 		logger.debug("Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(2, TAG, Level.DEBUG, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(2, TAG1, Level.DEBUG, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(2, TAG2, Level.DEBUG, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -251,8 +296,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.debug(s"Hello $name!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -261,8 +309,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def debugLazyMessage(): Unit = {
 		logger.debug(() => "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -271,8 +322,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def debugMessageAndArguments(): Unit = {
 		logger.debug("Hello {}!", "World")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -281,8 +335,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def debugMessageAndLazyArguments(): Unit = {
 		logger.debug("The number is {}", () => 42)
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -292,8 +349,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.debug(exception)
 
-		if (debugEnabled) verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, null, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(2, TAG1, Level.DEBUG, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(2, TAG2, Level.DEBUG, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -303,8 +363,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.debug(exception, "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(2, TAG, Level.DEBUG, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(2, TAG1, Level.DEBUG, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(2, TAG2, Level.DEBUG, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -315,8 +378,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.debug(exception, s"Hello $name!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -326,8 +392,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.debug(exception, () => "Hello World!")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -337,8 +406,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.debug(exception, "Hello {}!", "World")
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -348,15 +420,22 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.debug(exception, "The number is {}", () => 42)
 
-		if (debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.DEBUG), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.DEBUG), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.debugEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.DEBUG), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.DEBUG), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
 		* Verifies evaluating whether [[org.tinylog.Level#INFO]] is enabled.
 		*/
 	@Test def isInfoEnabled(): Unit = {
-		assertThat(logger.isInfoEnabled).isEqualTo(infoEnabled)
+		if (tag2Configuration != null) {
+			assertThat(logger.isInfoEnabled).isEqualTo(tag1Configuration.infoEnabled || tag2Configuration.infoEnabled)
+		} else {
+			assertThat(logger.isInfoEnabled).isEqualTo(tag1Configuration.infoEnabled)
+		}
 	}
 
 	/**
@@ -365,8 +444,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def infoNumber(): Unit = {
 		logger.info(42.asInstanceOf[Any])
 
-		if (infoEnabled) verify(loggingProvider).log(2, TAG, Level.INFO, null, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(2, TAG1, Level.INFO, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(2, TAG2, Level.INFO, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -375,8 +457,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def infoStaticString(): Unit = {
 		logger.info("Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(2, TAG, Level.INFO, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(2, TAG1, Level.INFO, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(2, TAG2, Level.INFO, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -386,8 +471,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.info(s"Hello $name!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -396,8 +484,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def infoLazyMessage(): Unit = {
 		logger.info(() => "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -406,8 +497,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def infoMessageAndArguments(): Unit = {
 		logger.info("Hello {}!", "World")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -416,8 +510,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def infoMessageAndLazyArguments(): Unit = {
 		logger.info("The number is {}", () => 42)
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -427,8 +524,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.info(exception)
 
-		if (infoEnabled) verify(loggingProvider).log(2, TAG, Level.INFO, exception, null, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(2, TAG1, Level.INFO, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(2, TAG2, Level.INFO, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -438,8 +538,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.info(exception, "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(2, TAG, Level.INFO, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(2, TAG1, Level.INFO, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(2, TAG2, Level.INFO, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -450,8 +553,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.info(exception, s"Hello $name!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -461,8 +567,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.info(exception, () => "Hello World!")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -472,8 +581,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.info(exception, "Hello {}!", "World")
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -483,15 +595,22 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.info(exception, "The number is {}", () => 42)
 
-		if (infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.INFO), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.INFO), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.infoEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.INFO), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.INFO), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
 		* Verifies evaluating whether [[org.tinylog.Level#WARN]] is enabled.
 		*/
 	@Test def isWarnEnabled(): Unit = {
-		assertThat(logger.isWarnEnabled).isEqualTo(warnEnabled)
+		if (tag2Configuration != null) {
+			assertThat(logger.isWarnEnabled).isEqualTo(tag1Configuration.warnEnabled || tag2Configuration.warnEnabled)
+		} else {
+			assertThat(logger.isWarnEnabled).isEqualTo(tag1Configuration.warnEnabled)
+		}
 	}
 
 	/**
@@ -500,8 +619,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def warnNumber(): Unit = {
 		logger.warn(42.asInstanceOf[Any])
 
-		if (warnEnabled) verify(loggingProvider).log(2, TAG, Level.WARN, null, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(2, TAG1, Level.WARN, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(2, TAG2, Level.WARN, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -510,8 +632,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def warnStaticString(): Unit = {
 		logger.warn("Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(2, TAG, Level.WARN, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(2, TAG1, Level.WARN, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(2, TAG2, Level.WARN, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -521,8 +646,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.warn(s"Hello $name!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -531,8 +659,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def warnLazyMessage(): Unit = {
 		logger.warn(() => "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -541,8 +672,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def warnMessageAndArguments(): Unit = {
 		logger.warn("Hello {}!", "World")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), any, any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), any, any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -551,8 +685,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def warnMessageAndLazyArguments(): Unit = {
 		logger.warn("The number is {}", () => 42)
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -562,8 +699,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.warn(exception)
 
-		if (warnEnabled) verify(loggingProvider).log(2, TAG, Level.WARN, exception, null, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(2, TAG1, Level.WARN, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(2, TAG2, Level.WARN, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -573,8 +713,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.warn(exception, "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(2, TAG, Level.WARN, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(2, TAG1, Level.WARN, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(2, TAG2, Level.WARN, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -585,8 +728,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.warn(exception, s"Hello $name!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -596,8 +742,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.warn(exception, () => "Hello World!")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -607,8 +756,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.warn(exception, "Hello {}!", "World")
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -618,15 +770,22 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.warn(exception, "The number is {}", () => 42)
 
-		if (warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.WARN), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.WARN), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.warnEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.WARN), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.WARN), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
 		* Verifies evaluating whether [[org.tinylog.Level#ERROR]] is enabled.
 		*/
 	@Test def isErrorEnabled(): Unit = {
-		assertThat(logger.isErrorEnabled).isEqualTo(errorEnabled)
+		if (tag2Configuration != null) {
+		  assertThat(logger.isErrorEnabled).isEqualTo(tag1Configuration.errorEnabled || tag2Configuration.errorEnabled)
+		} else {
+			assertThat(logger.isErrorEnabled).isEqualTo(tag1Configuration.errorEnabled)
+		}
 	}
 
 	/**
@@ -635,8 +794,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def errorNumber(): Unit = {
 		logger.error(42.asInstanceOf[Any])
 
-		if (errorEnabled) verify(loggingProvider).log(2, TAG, Level.ERROR, null, null, 42, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(2, TAG1, Level.ERROR, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(2, TAG2, Level.ERROR, null, null, 42, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -645,8 +807,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def errorStaticString(): Unit = {
 		logger.error("Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(2, TAG, Level.ERROR, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(2, TAG1, Level.ERROR, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(2, TAG2, Level.ERROR, null, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -656,8 +821,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.error(s"Hello $name!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -666,8 +834,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def errorLazyMessage(): Unit = {
 		logger.error(() => "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), isNull[Throwable], isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -676,8 +847,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def errorMessageAndArguments(): Unit = {
 		logger.error("Hello {}!", "World")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -686,8 +860,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	@Test def errorMessageAndLazyArguments(): Unit = {
 		logger.error("The number is {}", () => 42)
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), isNull[Throwable], any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -697,8 +874,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.error(exception)
 
-		if (errorEnabled) verify(loggingProvider).log(2, TAG, Level.ERROR, exception, null, null, null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(2, TAG1, Level.ERROR, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(2, TAG2, Level.ERROR, exception, null, null, null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -708,8 +888,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.error(exception, "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(2, TAG, Level.ERROR, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(2, TAG1, Level.ERROR, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(2, TAG2, Level.ERROR, exception, null, "Hello World!", null.asInstanceOf[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -720,8 +903,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val name = "Mister"
 		logger.error(exception, s"Hello $name!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello Mister!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -731,8 +917,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.error(exception, () => "Hello World!")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), eqTo(exception), isNull[MessageFormatter], argThat(supplies("Hello World!")), isNull[Array[AnyRef]])
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -742,8 +931,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.error(exception, "Hello {}!", "World")
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), same(exception), any(classOf[MessageFormatter]), eqTo("Hello {}!"), eqTo("World"))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -753,8 +945,11 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		val exception = new NullPointerException
 		logger.error(exception, "The number is {}", () => 42)
 
-		if (errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG), eqTo(Level.ERROR), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
-		else verify(loggingProvider, never).log(anyInt, anyString, any, any, any, any, any[Array[AnyRef]])
+		if (tag1Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG1), eqTo(Level.ERROR), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG1), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
+
+		if (tag2Configuration != null && tag2Configuration.errorEnabled) verify(loggingProvider).log(eqTo(2), eqTo(TAG2), eqTo(Level.ERROR), eqTo(exception), any(classOf[MessageFormatter]), eqTo("The number is {}"), argThat(supplies(42)))
+		else verify(loggingProvider, never).log(anyInt, eqTo(TAG2), eqTo(Level.ERROR), any, any, any, any[Array[AnyRef]])
 	}
 
 	/**
@@ -765,21 +960,30 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 	private def mockLoggingProvider(): LoggingProvider = {
 		val provider = mock(classOf[LoggingProvider])
 
-		when(provider.getMinimumLevel(TAG)).thenReturn(level)
-		when(provider.isEnabled(anyInt, eqTo(TAG), eqTo(Level.TRACE))).thenReturn(traceEnabled)
-		when(provider.isEnabled(anyInt, eqTo(TAG), eqTo(Level.DEBUG))).thenReturn(debugEnabled)
-		when(provider.isEnabled(anyInt, eqTo(TAG), eqTo(Level.INFO))).thenReturn(infoEnabled)
-		when(provider.isEnabled(anyInt, eqTo(TAG), eqTo(Level.WARN))).thenReturn(warnEnabled)
-		when(provider.isEnabled(anyInt, eqTo(TAG), eqTo(Level.ERROR))).thenReturn(errorEnabled)
+		when(provider.getMinimumLevel(null)).thenReturn(Level.OFF)
+		when(provider.isEnabled(anyInt, isNull[String], eqTo(Level.TRACE))).thenReturn(false)
+		when(provider.isEnabled(anyInt, isNull[String], eqTo(Level.DEBUG))).thenReturn(false)
+		when(provider.isEnabled(anyInt, isNull[String], eqTo(Level.INFO))).thenReturn(false)
+		when(provider.isEnabled(anyInt, isNull[String], eqTo(Level.WARN))).thenReturn(false)
+		when(provider.isEnabled(anyInt, isNull[String], eqTo(Level.ERROR))).thenReturn(false)
+
+		when(provider.getMinimumLevel(TAG1)).thenReturn(tag1Configuration.level)
+		when(provider.isEnabled(anyInt, eqTo(TAG1), eqTo(Level.TRACE))).thenReturn(tag1Configuration.traceEnabled)
+		when(provider.isEnabled(anyInt, eqTo(TAG1), eqTo(Level.DEBUG))).thenReturn(tag1Configuration.debugEnabled)
+		when(provider.isEnabled(anyInt, eqTo(TAG1), eqTo(Level.INFO))).thenReturn(tag1Configuration.infoEnabled)
+		when(provider.isEnabled(anyInt, eqTo(TAG1), eqTo(Level.WARN))).thenReturn(tag1Configuration.warnEnabled)
+		when(provider.isEnabled(anyInt, eqTo(TAG1), eqTo(Level.ERROR))).thenReturn(tag1Configuration.errorEnabled)
+
+		if (tag2Configuration != null) {
+			when(provider.getMinimumLevel(TAG2)).thenReturn(tag2Configuration.level)
+			when(provider.isEnabled(anyInt, eqTo(TAG2), eqTo(Level.TRACE))).thenReturn(tag2Configuration.traceEnabled)
+			when(provider.isEnabled(anyInt, eqTo(TAG2), eqTo(Level.DEBUG))).thenReturn(tag2Configuration.debugEnabled)
+			when(provider.isEnabled(anyInt, eqTo(TAG2), eqTo(Level.INFO))).thenReturn(tag2Configuration.infoEnabled)
+			when(provider.isEnabled(anyInt, eqTo(TAG2), eqTo(Level.WARN))).thenReturn(tag2Configuration.warnEnabled)
+			when(provider.isEnabled(anyInt, eqTo(TAG2), eqTo(Level.ERROR))).thenReturn(tag2Configuration.errorEnabled)
+		}
 
 		Whitebox.setInternalState(classOf[org.tinylog.TaggedLogger], provider)
-
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversTrace", traceEnabled)
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversDebug", debugEnabled)
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversInfo", infoEnabled)
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversWarn", warnEnabled)
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversError", errorEnabled)
-
 		return provider
 	}
 
@@ -787,23 +991,36 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 		* Resets the logging provider and all overridden fields in [[org.tinylog.TaggedLogger]].
 		*/
 	private def resetLoggingProvider(): Unit = {
-		Whitebox.setInternalState(classOf[org.tinylog.TaggedLogger], ProviderRegistry.getLoggingProvider)
+		Whitebox.getInternalState[java.util.Map[Set[String], TaggedLogger]](classOf[org.tinylog.Logger], "loggers").clear()
 
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversTrace", isCoveredByMinimumLevel(Level.TRACE))
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversDebug", isCoveredByMinimumLevel(Level.DEBUG))
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversInfo", isCoveredByMinimumLevel(Level.INFO))
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversWarn", isCoveredByMinimumLevel(Level.WARN))
-		Whitebox.setInternalState(logger.logger, "minimumLevelCoversError", isCoveredByMinimumLevel(Level.ERROR))
+		val traceTags = getCoveredTags(Level.TRACE)
+		val debugTags = getCoveredTags(Level.DEBUG)
+		val infoTags = getCoveredTags(Level.INFO)
+		val warnTags = getCoveredTags(Level.WARN)
+		val errorTags = getCoveredTags(Level.ERROR)
+		
+		Whitebox.setInternalState(logger.logger,  "traceTags": String, traceTags: Any)
+		Whitebox.setInternalState(logger.logger, "debugTags": String, debugTags: Any)
+		Whitebox.setInternalState(logger.logger, "infoTags": String, infoTags: Any)
+		Whitebox.setInternalState(logger.logger, "warnTags": String, warnTags: Any)
+		Whitebox.setInternalState(logger.logger, "errorTags": String, errorTags: Any)
+
+		Whitebox.setInternalState(logger.logger, "minimumLevelCoversTrace", !traceTags.isEmpty)
+		Whitebox.setInternalState(logger.logger, "minimumLevelCoversDebug", !debugTags.isEmpty)
+		Whitebox.setInternalState(logger.logger, "minimumLevelCoversInfo", !infoTags.isEmpty)
+		Whitebox.setInternalState(logger.logger, "minimumLevelCoversWarn", !warnTags.isEmpty)
+		Whitebox.setInternalState(logger.logger, "minimumLevelCoversError", !errorTags.isEmpty)
 	}
+
 	/**
-		* Invokes the private method [[org.tinylog.TaggedLogger#isCoveredByMinimumLevel]].
+		* Invokes the private method [[org.tinylog.TaggedLogger#getCoveredTags]].
 		*
 		* @param level
 		* Severity level to check
 		* @return `true` if given severity level is covered, otherwise `false`
 		*/
-	private def isCoveredByMinimumLevel(level: Level): Boolean = {
-		Whitebox.invokeMethod(classOf[org.tinylog.TaggedLogger], "isCoveredByMinimumLevel", TAG, level)
+	private def getCoveredTags(level: Level): java.util.Set[String] = {
+		Whitebox.invokeMethod(classOf[org.tinylog.TaggedLogger], "getCoveredTags", JavaConverters.setAsJavaSet(tags), level)
 	}
 
 	/**
@@ -828,21 +1045,19 @@ final class TaggedLoggerTest(var level: Level, var traceEnabled: Boolean, var de
 object TaggedLoggerTest {
 
 	/**
-		* Returns for all severity levels which severity levels are enabled.
+		* Returns all different combinations of logging levels for up two tags for the tests.
 		*
-		* @return Each object array contains the severity level itself and five booleans for [[org.tinylog.Level#TRACE]]
-		*         ... [[org.tinylog.Level#ERROR]] to determine whether these severity levels are enabled
+		* @return Each object array represents a combination. A value of null means the tag isn't present in the combination.
 		*/
-	@Parameters(name = "{0}") def getLevels: util.Collection[Array[AnyRef]] = {
+	@Parameters(name = "{0}, {1}") def getLevels: util.Collection[Array[AnyRef]] = {
 		val levels = new util.ArrayList[Array[AnyRef]]
-		// @formatter:off
-		levels.add(Array[AnyRef](Level.TRACE, Boolean.box(true),  Boolean.box(true),  Boolean.box(true),  Boolean.box(true),  Boolean.box(true)))
-		levels.add(Array[AnyRef](Level.DEBUG, Boolean.box(false), Boolean.box(true),  Boolean.box(true),  Boolean.box(true),  Boolean.box(true)))
-		levels.add(Array[AnyRef](Level.INFO,  Boolean.box(false), Boolean.box(false), Boolean.box(true),  Boolean.box(true),  Boolean.box(true)))
-		levels.add(Array[AnyRef](Level.WARN,  Boolean.box(false), Boolean.box(false), Boolean.box(false), Boolean.box(true),  Boolean.box(true)))
-		levels.add(Array[AnyRef](Level.ERROR, Boolean.box(false), Boolean.box(false), Boolean.box(false), Boolean.box(false), Boolean.box(true)))
-		levels.add(Array[AnyRef](Level.OFF,   Boolean.box(false), Boolean.box(false), Boolean.box(false), Boolean.box(false), Boolean.box(false)))
-		// @formatter:on
+
+		for (i <- LevelConfiguration.AVAILABLE_LEVELS) {
+      levels.add(Array[AnyRef](i, null))
+			for (j <- LevelConfiguration.AVAILABLE_LEVELS) {
+				levels.add(Array[AnyRef](i, j))
+			}
+    }
 		levels
 	}
 
