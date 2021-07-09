@@ -34,6 +34,7 @@ import org.tinylog.format.AdvancedMessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.LevelConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

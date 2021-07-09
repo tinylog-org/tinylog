@@ -33,6 +33,7 @@ import org.tinylog.format.AdvancedMessageFormatter;
 import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.LevelConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.tinylog.LevelConfiguration.AVAILABLE_LEVELS;
+import static org.tinylog.util.LevelConfiguration.AVAILABLE_LEVELS;
 
 /**
  * Tests for {@link TaggedLogger}.

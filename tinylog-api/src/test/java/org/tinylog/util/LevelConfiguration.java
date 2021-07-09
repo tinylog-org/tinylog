@@ -11,11 +11,13 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog;
+package org.tinylog.util;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.tinylog.Level;
 
 /**
  * This is intended to provide information about which log levels can be logged by a severity level. For example, TRACE is able to log all
