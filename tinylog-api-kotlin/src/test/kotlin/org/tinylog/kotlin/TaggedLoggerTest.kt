@@ -96,7 +96,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 		every { loggingProvider.isEnabled(any(), tag1, Level.ERROR) } returns tag1Configuration.errorEnabled
 
 		logger = if (tag2Configuration == null) {
-			TaggedLogger(tag1)
+			TaggedLogger(setOf(tag1))
 		} else {
 			every { loggingProvider.getMinimumLevel(tag2) } returns tag2Configuration.level
 

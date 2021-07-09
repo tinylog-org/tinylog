@@ -28,8 +28,6 @@ import org.tinylog.provider.ProviderRegistry
  */
 class TaggedLogger internal constructor(private val tags: Set<String?>) {
 
-	constructor(tag: String?) : this(setOf(tag))
-
 	private val stackTraceDepth = 2
 
 	private val formatter = AdvancedMessageFormatter(Configuration.getLocale(), Configuration.isEscapingEnabled())

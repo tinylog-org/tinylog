@@ -38,7 +38,7 @@ object Logger {
 	private val MINIMUM_LEVEL_COVERS_ERROR = isCoveredByMinimumLevel(Level.ERROR)
 	// @formatter:on
 
-	private val instance = TaggedLogger(null)
+	private val instance = TaggedLogger(setOf(null))
 	private val loggers = ConcurrentHashMap<Set<String?>, TaggedLogger>()
 
 	init {
