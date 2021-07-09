@@ -13,12 +13,11 @@
 
 package org.tinylog.kotlin
 
-import java.util.ArrayList
-
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.AfterClass
 import org.junit.Before
@@ -30,6 +29,7 @@ import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import org.tinylog.Level
 import org.tinylog.Supplier
+import org.tinylog.TaggedLogger
 import org.tinylog.format.AdvancedMessageFormatter
 import org.tinylog.provider.LoggingProvider
 import org.tinylog.provider.ProviderRegistry
@@ -45,21 +45,10 @@ class LoggerTest {
 	 * Tests for logging methods.
 	 *
 	 * @param level
-	 * Actual severity level under test
-	 * @param traceEnabled
-	 * Determines if [TRACE][Level.TRACE] level is enabled
-	 * @param debugEnabled
-	 * Determines if [DEBUG][Level.DEBUG] level is enabled
-	 * @param infoEnabled
-	 * Determines if [INFO][Level.INFO] level is enabled
-	 * @param warnEnabled
-	 * Determines if [WARN][Level.WARN] level is enabled
-	 * @param errorEnabled
-	 * Determines if [ERROR][Level.ERROR] level is enabled
+	 * The level and related information about it under test
 	 */
 	@RunWith(Parameterized::class)
-	class Logging(private val level: Level, private val traceEnabled: Boolean, private val debugEnabled: Boolean,
-	              private val infoEnabled: Boolean, private val warnEnabled: Boolean, private val errorEnabled: Boolean) {
+	class Logging(private val level: LevelConfiguration) {
 
 		companion object {
 
@@ -74,14 +63,9 @@ class LoggerTest {
 			fun getLevels(): Collection<Array<Any>> {
 				val levels = ArrayList<Array<Any>>()
 
-				// @formatter:off
-				levels.add(arrayOf(Level.TRACE, true,  true,  true,  true,  true))
-				levels.add(arrayOf(Level.DEBUG, false, true,  true,  true,  true))
-				levels.add(arrayOf(Level.INFO,  false, false, true,  true,  true))
-				levels.add(arrayOf(Level.WARN,  false, false, false, true,  true))
-				levels.add(arrayOf(Level.ERROR, false, false, false, false, true))
-				levels.add(arrayOf(Level.OFF,   false, false, false, false, false))
-				// @formatter:on
+				LevelConfiguration.AVAILABLE_LEVELS.forEach {
+					levels.add(arrayOf(it))
+				}
 
 				return levels
 			}
@@ -127,23 +111,23 @@ class LoggerTest {
 		 */
 		@Before
 		fun applyLoggingProvider() {
-			every { loggingProvider.getMinimumLevel(null) } returns level
+			every { loggingProvider.getMinimumLevel(null) } returns level.level
 
-			every { loggingProvider.isEnabled(any(), null, Level.TRACE) } returns  traceEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.DEBUG) } returns  debugEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.INFO) } returns  infoEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.WARN) } returns  warnEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.ERROR) } returns  errorEnabled
+			every { loggingProvider.isEnabled(any(), null, Level.TRACE) } returns  level.traceEnabled
+			every { loggingProvider.isEnabled(any(), null, Level.DEBUG) } returns  level.debugEnabled
+			every { loggingProvider.isEnabled(any(), null, Level.INFO) } returns  level.infoEnabled
+			every { loggingProvider.isEnabled(any(), null, Level.WARN) } returns  level.warnEnabled
+			every { loggingProvider.isEnabled(any(), null, Level.ERROR) } returns  level.errorEnabled
 
 			every { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
 			every { loggingProvider.log(any<String>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
 
 			Whitebox.setProperty(Logger, LoggingProvider::class, loggingProvider)
-			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled)
-			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled)
-			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled)
-			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled)
-			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled)
+			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_TRACE", level.traceEnabled)
+			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_DEBUG", level.debugEnabled)
+			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_INFO", level.infoEnabled)
+			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_WARN", level.warnEnabled)
+			Whitebox.setProperty(Logger, "MINIMUM_LEVEL_COVERS_ERROR", level.errorEnabled)
 		}
 
 		/**
@@ -151,11 +135,11 @@ class LoggerTest {
 		 */
 		@Test
 		fun coveredByMinimumLevel() {
-			assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(traceEnabled)
-			assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(debugEnabled)
-			assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(infoEnabled)
-			assertThat(isCoveredByMinimumLevel(Level.WARN)).isEqualTo(warnEnabled)
-			assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(errorEnabled)
+			assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(level.traceEnabled)
+			assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(level.debugEnabled)
+			assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(level.infoEnabled)
+			assertThat(isCoveredByMinimumLevel(Level.WARN)).isEqualTo(level.warnEnabled)
+			assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(level.errorEnabled)
 		}
 
 		/**
@@ -163,7 +147,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun isTraceEnabled() {
-			assertThat(Logger.isTraceEnabled()).isEqualTo(traceEnabled)
+			assertThat(Logger.isTraceEnabled()).isEqualTo(level.traceEnabled)
 		}
 
 		/**
@@ -173,7 +157,7 @@ class LoggerTest {
 		fun traceObject() {
 			Logger.trace(42)
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, 42) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -187,7 +171,7 @@ class LoggerTest {
 		fun traceString() {
 			Logger.trace("Hello World!")
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -201,7 +185,7 @@ class LoggerTest {
 		fun traceLazyMessage() {
 			Logger.trace { "Hello World!" }
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -215,7 +199,7 @@ class LoggerTest {
 		fun traceMessageAndArguments() {
 			Logger.trace("Hello {}!", "World")
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -230,7 +214,7 @@ class LoggerTest {
 		fun traceMessageAndLazyArguments() {
 			Logger.trace("The number is {}", { 42 })
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -246,7 +230,7 @@ class LoggerTest {
 
 			Logger.trace(exception)
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, null) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -262,7 +246,7 @@ class LoggerTest {
 
 			Logger.trace(exception, "Hello World!")
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -278,7 +262,7 @@ class LoggerTest {
 
 			Logger.trace(exception) { "Hello World!" }
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -294,7 +278,7 @@ class LoggerTest {
 
 			Logger.trace(exception, "Hello {}!", "World")
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -311,7 +295,7 @@ class LoggerTest {
 
 			Logger.trace(exception, "The number is {}", { 42 })
 
-			if (traceEnabled) {
+			if (level.traceEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.TRACE, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -323,7 +307,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun isDebugEnabled() {
-			assertThat(Logger.isDebugEnabled()).isEqualTo(debugEnabled)
+			assertThat(Logger.isDebugEnabled()).isEqualTo(level.debugEnabled)
 		}
 
 		/**
@@ -333,7 +317,7 @@ class LoggerTest {
 		fun debugObject() {
 			Logger.debug(42)
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, 42) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -347,7 +331,7 @@ class LoggerTest {
 		fun debugString() {
 			Logger.debug("Hello World!")
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -361,7 +345,7 @@ class LoggerTest {
 		fun debugLazyMessage() {
 			Logger.debug { "Hello World!" }
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -375,7 +359,7 @@ class LoggerTest {
 		fun debugMessageAndArguments() {
 			Logger.debug("Hello {}!", "World")
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -390,7 +374,7 @@ class LoggerTest {
 		fun debugMessageAndLazyArguments() {
 			Logger.debug("The number is {}", { 42 })
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -406,7 +390,7 @@ class LoggerTest {
 
 			Logger.debug(exception)
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, null) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -422,7 +406,7 @@ class LoggerTest {
 
 			Logger.debug(exception, "Hello World!")
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -438,7 +422,7 @@ class LoggerTest {
 
 			Logger.debug(exception) { "Hello World!" }
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -454,7 +438,7 @@ class LoggerTest {
 
 			Logger.debug(exception, "Hello {}!", "World")
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -471,7 +455,7 @@ class LoggerTest {
 
 			Logger.debug(exception, "The number is {}", { 42 })
 
-			if (debugEnabled) {
+			if (level.debugEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.DEBUG, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -483,7 +467,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun isInfoEnabled() {
-			assertThat(Logger.isInfoEnabled()).isEqualTo(infoEnabled)
+			assertThat(Logger.isInfoEnabled()).isEqualTo(level.infoEnabled)
 		}
 
 		/**
@@ -493,7 +477,7 @@ class LoggerTest {
 		fun infoObject() {
 			Logger.info(42)
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, 42) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -507,7 +491,7 @@ class LoggerTest {
 		fun infoString() {
 			Logger.info("Hello World!")
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -521,7 +505,7 @@ class LoggerTest {
 		fun infoLazyMessage() {
 			Logger.info { "Hello World!" }
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -535,7 +519,7 @@ class LoggerTest {
 		fun infoMessageAndArguments() {
 			Logger.info("Hello {}!", "World")
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -550,7 +534,7 @@ class LoggerTest {
 		fun infoMessageAndLazyArguments() {
 			Logger.info("The number is {}", { 42 })
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -566,7 +550,7 @@ class LoggerTest {
 
 			Logger.info(exception)
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, null) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -582,7 +566,7 @@ class LoggerTest {
 
 			Logger.info(exception, "Hello World!")
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -598,7 +582,7 @@ class LoggerTest {
 
 			Logger.info(exception) { "Hello World!" }
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -614,7 +598,7 @@ class LoggerTest {
 
 			Logger.info(exception, "Hello {}!", "World")
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -631,7 +615,7 @@ class LoggerTest {
 
 			Logger.info(exception, "The number is {}", { 42 })
 
-			if (infoEnabled) {
+			if (level.infoEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.INFO, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -643,7 +627,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun isWarnEnabled() {
-			assertThat(Logger.isWarnEnabled()).isEqualTo(warnEnabled)
+			assertThat(Logger.isWarnEnabled()).isEqualTo(level.warnEnabled)
 		}
 
 		/**
@@ -653,7 +637,7 @@ class LoggerTest {
 		fun warnObject() {
 			Logger.warn(42)
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, 42) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -667,7 +651,7 @@ class LoggerTest {
 		fun warnString() {
 			Logger.warn("Hello World!")
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -681,7 +665,7 @@ class LoggerTest {
 		fun warnLazyMessage() {
 			Logger.warn { "Hello World!" }
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -695,7 +679,7 @@ class LoggerTest {
 		fun warnMessageAndArguments() {
 			Logger.warn("Hello {}!", "World")
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -710,7 +694,7 @@ class LoggerTest {
 		fun warnMessageAndLazyArguments() {
 			Logger.warn("The number is {}", { 42 })
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -726,7 +710,7 @@ class LoggerTest {
 
 			Logger.warn(exception)
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, null) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -742,7 +726,7 @@ class LoggerTest {
 
 			Logger.warn(exception, "Hello World!")
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -758,7 +742,7 @@ class LoggerTest {
 
 			Logger.warn(exception) { "Hello World!" }
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -774,7 +758,7 @@ class LoggerTest {
 
 			Logger.warn(exception, "Hello {}!", "World")
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -791,7 +775,7 @@ class LoggerTest {
 
 			Logger.warn(exception, "The number is {}", { 42 })
 
-			if (warnEnabled) {
+			if (level.warnEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.WARN, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -803,7 +787,7 @@ class LoggerTest {
 		 */
 		@Test
 		fun isErrorEnabled() {
-			assertThat(Logger.isErrorEnabled()).isEqualTo(errorEnabled)
+			assertThat(Logger.isErrorEnabled()).isEqualTo(level.errorEnabled)
 		}
 
 		/**
@@ -813,7 +797,7 @@ class LoggerTest {
 		fun errorObject() {
 			Logger.error(42)
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, 42) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -827,7 +811,7 @@ class LoggerTest {
 		fun errorString() {
 			Logger.error("Hello World!")
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -841,7 +825,7 @@ class LoggerTest {
 		fun errorLazyMessage() {
 			Logger.error { "Hello World!" }
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -855,7 +839,7 @@ class LoggerTest {
 		fun errorMessageAndArguments() {
 			Logger.error("Hello {}!", "World")
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -870,7 +854,7 @@ class LoggerTest {
 		fun errorMessageAndLazyArguments() {
 			Logger.error("The number is {}", { 42 })
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, null, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -886,7 +870,7 @@ class LoggerTest {
 
 			Logger.error(exception)
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, null) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -902,7 +886,7 @@ class LoggerTest {
 
 			Logger.error(exception, "Hello World!")
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, "Hello World!") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -918,7 +902,7 @@ class LoggerTest {
 
 			Logger.error(exception) { "Hello World!" }
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, null, match(provide("Hello World!"))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -934,7 +918,7 @@ class LoggerTest {
 
 			Logger.error(exception, "Hello {}!", "World")
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "Hello {}!", "World") }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -951,7 +935,7 @@ class LoggerTest {
 
 			Logger.error(exception, "The number is {}", { 42 })
 
-			if (errorEnabled) {
+			if (level.errorEnabled) {
 				verify(exactly = 1) { loggingProvider.log(2, null, Level.ERROR, exception, ofType(AdvancedMessageFormatter::class), "The number is {}", match(provide(42))) }
 			} else {
 				verify(exactly = 0) { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) }
@@ -992,8 +976,21 @@ class LoggerTest {
 		fun untagged() {
 			val logger = Logger.tag(null)
 
-			assertThat(logger).isSameAs(Logger.tag(""))
-			assertThat(Whitebox.getProperty(logger, "tag")).isNull()
+			assertThat(logger)
+				.isSameAs(Logger.tag(""))
+				.isSameAs(Logger.tags())
+				.isSameAs(Logger.tags(null))
+				.isSameAs(Logger.tags(null, null))
+				.isSameAs(Logger.tags(null, ""))
+				.isSameAs(Logger.tags("", ""))
+
+			val tags : Any? = Whitebox.getProperty(logger, "tags")
+			if (tags is Collection<*>) {
+				assertThat(tags)
+					.containsOnly(null)
+			} else {
+				Assertions.fail("tags (${tags}) is expected to be a collection, but isn't")
+			}
 		}
 
 		/**
@@ -1004,8 +1001,63 @@ class LoggerTest {
 		fun tagged() {
 			val logger = Logger.tag("test")
 
-			assertThat(logger).isSameAs(Logger.tag("test")).isNotSameAs(Logger.tag("other"))
-			assertThat(Whitebox.getProperty(logger, "tag")).isEqualTo("test")
+			assertThat(logger).isSameAs(Logger.tag("test")).isSameAs(Logger.tags("test")).isNotSameAs(Logger.tag("other"))
+
+			val tags : Any? = Whitebox.getProperty(logger, "tags")
+			if (tags is Collection<*>) {
+				assertThat(tags).containsOnly("test")
+			} else {
+				Assertions.fail("tags (${tags}) is expected to be a collection, but isn't")
+			}
+		}
+
+		/**
+		 * Verifies that [Logger.tags] returns the same tagged instance of [TaggedLogger] for each
+		 * set of tags with more than one tag.
+		 */
+		@Test
+		fun taggedMultiple() {
+			val logger = Logger.tags("test", "more", "extra")
+
+			assertThat(logger).isNotNull()
+					.isSameAs(Logger.tags("extra", "more", "test"))
+					.isSameAs(Logger.tags("more", "test", "extra", "more", "extra", "test"))
+					.isNotSameAs(Logger.tags("other"))
+					.isNotSameAs(Logger.tags("test", "more"))
+			val tags : Any? = Whitebox.getProperty(logger, "tags")
+			if (tags is Collection<*>) {
+				assertThat(tags)
+						.containsOnly("test", "more", "extra")
+			} else {
+				Assertions.fail("tags (${tags}) is expected to be a collection, but isn't")
+			}
+
+		}
+
+		/**
+		 * Verifies that [Logger.tags] with `null` tag mixed in returns the same tagged instance of
+		 * [TaggedLogger] for each set of tags with more than one tag or if the same tag is repeated multiple times.
+		 */
+		@Test
+		fun taggedMultipleWithNull() {
+			val logger = Logger.tags("test", null, "more")
+			assertThat(logger).isNotNull()
+				.isSameAs(Logger.tags(null, "more", "test"))
+				.isSameAs(Logger.tags("", "more", "test"))
+				.isSameAs(Logger.tags("more", "test", null, "more", null, "test"))
+				.isSameAs(Logger.tags("more", "test", null, "more", "", "test"))
+				.isSameAs(Logger.tags("more", "test", "", "more", "", "test"))
+				.isNotSameAs(Logger.tag("other"))
+				.isNotSameAs(Logger.tags("test", "more"))
+				.isNotSameAs(Logger.tag(null))
+
+			val tags : Any? = Whitebox.getProperty(logger, "tags")
+			if (tags is Collection<*>) {
+				assertThat(tags)
+					.containsOnly("test", null, "more")
+			} else {
+				Assertions.fail("tags (${tags}) is expected to be a collection, but isn't")
+			}
 		}
 
 	}

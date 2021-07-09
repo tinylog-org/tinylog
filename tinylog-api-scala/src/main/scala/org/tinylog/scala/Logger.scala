@@ -22,8 +22,10 @@ import scala.language.experimental.macros
 	*/
 object Logger {
 
-	private val instance = new TaggedLogger(null)
-	private val loggers = new ConcurrentHashMap[String, TaggedLogger]()
+	private val instance = new TaggedLogger(Set(null))
+	private val loggers = new ConcurrentHashMap[Set[String], TaggedLogger]()
+
+	loggers.put(Set(null: String), instance)
 
 	/**
 		* Gets a tagged logger instance. Tags are case-sensitive.
@@ -36,14 +38,28 @@ object Logger {
 		if (tag == null || tag.isEmpty()) {
 			return instance
 		} else {
-			var logger = loggers.get(tag)
+			tags(tag)
+		}
+	}
+
+	/**
+		* Gets a tagged logger instance that logs to multiple tags. Tags are case-sensitive.
+		*
+		* @param tags
+		* Tags for the logger or nothing for an untagged logger. If specified, each tag should be unique
+		* @return Logger instance
+		*/
+	def tags(tags: String*): TaggedLogger = {
+		if (tags == null || tags.isEmpty) {
+			instance
+		} else {
+			val tagsSet = tags.map(t => if (t == null || t.isEmpty) null else t).toSet
+			var logger = loggers.get(tagsSet)
 			if (logger == null) {
-				logger = new TaggedLogger(tag)
-				val existing = loggers.putIfAbsent(tag, logger)
-				return if (existing == null) logger else existing
-			} else {
-				return logger
-			}
+				logger = new TaggedLogger(tagsSet)
+				val existing = loggers.putIfAbsent(tagsSet, logger)
+				if (existing == null) logger else existing
+			} else logger
 		}
 	}
 

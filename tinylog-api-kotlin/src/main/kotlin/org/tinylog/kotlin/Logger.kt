@@ -38,8 +38,12 @@ object Logger {
 	private val MINIMUM_LEVEL_COVERS_ERROR = isCoveredByMinimumLevel(Level.ERROR)
 	// @formatter:on
 
-	private val instance = TaggedLogger(null)
-	private val loggers = ConcurrentHashMap<String, TaggedLogger>()
+	private val instance = TaggedLogger(setOf(null))
+	private val loggers = ConcurrentHashMap<Set<String?>, TaggedLogger>()
+
+	init {
+		loggers[setOf(null)] = instance
+	}
 
 	/**
 	 * Gets a tagged logger instance. Tags are case-sensitive.
@@ -49,17 +53,26 @@ object Logger {
 	 * @return Logger instance
 	 */
 	fun tag(tag: String?): TaggedLogger {
-		if (tag == null || tag.isEmpty()) {
-			return instance
+		return if (tag == null || tag.isEmpty()) {
+			instance
 		} else {
-			var logger = loggers[tag]
-			if (logger == null) {
-				logger = TaggedLogger(tag)
-				val existing = loggers.putIfAbsent(tag, logger)
-				return existing ?: logger
-			} else {
-				return logger
-			}
+			tags(tag)
+		}
+	}
+
+	/**
+	 * Gets a tagged logger instance that logs to multiple tags. Tags are case-sensitive.
+	 *
+	 * @param tags
+	 * 			Tags for the logger or nothing for an untagged logger. If specified, each tag should be unique
+	 * @return Logger instance
+	 */
+	fun tags(vararg tags: String?): TaggedLogger {
+		return if (tags == null || tags.isEmpty()) {
+			instance
+		} else {
+			val tagsSet = tags.map { if (it.isNullOrEmpty()) { null } else { it } }.toSet()
+			loggers.computeIfAbsent(tagsSet) { TaggedLogger(it) }
 		}
 	}
 

@@ -16,6 +16,7 @@ package org.tinylog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,39 +72,13 @@ public final class LoggerTest {
 		@Rule
 		public final SystemStreamCollector systemStream = new SystemStreamCollector(false);
 
-		private Level level;
-
-		private boolean traceEnabled;
-		private boolean debugEnabled;
-		private boolean infoEnabled;
-		private boolean warnEnabled;
-		private boolean errorEnabled;
+		/**
+		 * Information about the severity level under test.
+		 */
+		@Parameterized.Parameter
+		public LevelConfiguration levelConfiguration;
 
 		private LoggingProvider loggingProvider;
-
-		/**
-		 * @param level
-		 *            Actual severity level under test
-		 * @param traceEnabled
-		 *            Determines if {@link Level#TRACE TRACE} level is enabled
-		 * @param debugEnabled
-		 *            Determines if {@link Level#DEBUG DEBUG} level is enabled
-		 * @param infoEnabled
-		 *            Determines if {@link Level#INFO INFO} level is enabled
-		 * @param warnEnabled
-		 *            Determines if {@link Level#WARN WARN} level is enabled
-		 * @param errorEnabled
-		 *            Determines if {@link Level#ERROR ERROR} level is enabled
-		 */
-		public Logging(final Level level, final boolean traceEnabled, final boolean debugEnabled, final boolean infoEnabled,
-			final boolean warnEnabled, final boolean errorEnabled) {
-			this.level = level;
-			this.traceEnabled = traceEnabled;
-			this.debugEnabled = debugEnabled;
-			this.infoEnabled = infoEnabled;
-			this.warnEnabled = warnEnabled;
-			this.errorEnabled = errorEnabled;
-		}
 
 		/**
 		 * Returns for all severity levels which severity levels are enabled.
@@ -114,15 +89,9 @@ public final class LoggerTest {
 		@Parameters(name = "{0}")
 		public static Collection<Object[]> getLevels() {
 			List<Object[]> levels = new ArrayList<>();
-
-			// @formatter:off
-			levels.add(new Object[] { Level.TRACE, true,  true,  true,  true,  true  });
-			levels.add(new Object[] { Level.DEBUG, false, true,  true,  true,  true  });
-			levels.add(new Object[] { Level.INFO,  false, false, true,  true,  true  });
-			levels.add(new Object[] { Level.WARN,  false, false, false, true,  true  });
-			levels.add(new Object[] { Level.ERROR, false, false, false, false, true  });
-			levels.add(new Object[] { Level.OFF,   false, false, false, false, false });
-			// @formatter:on
+			for (LevelConfiguration configuration: LevelConfiguration.AVAILABLE_LEVELS) {
+				levels.add(new Object[] {configuration});
+			}
 
 			return levels;
 		}
@@ -154,11 +123,11 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void coveredByMinimumLevel() throws Exception {
-			assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(traceEnabled);
-			assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(debugEnabled);
-			assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(infoEnabled);
-			assertThat(isCoveredByMinimumLevel(Level.WARN)).isEqualTo(warnEnabled);
-			assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(errorEnabled);
+			assertThat(isCoveredByMinimumLevel(Level.TRACE)).isEqualTo(levelConfiguration.isTraceEnabled());
+			assertThat(isCoveredByMinimumLevel(Level.DEBUG)).isEqualTo(levelConfiguration.isDebugEnabled());
+			assertThat(isCoveredByMinimumLevel(Level.INFO)).isEqualTo(levelConfiguration.isInfoEnabled());
+			assertThat(isCoveredByMinimumLevel(Level.WARN)).isEqualTo(levelConfiguration.isWarnEnabled());
+			assertThat(isCoveredByMinimumLevel(Level.ERROR)).isEqualTo(levelConfiguration.isErrorEnabled());
 		}
 
 		/**
@@ -166,7 +135,7 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void isTraceEnabled() {
-			assertThat(Logger.isTraceEnabled()).isEqualTo(traceEnabled);
+			assertThat(Logger.isTraceEnabled()).isEqualTo(levelConfiguration.isTraceEnabled());
 		}
 
 		/**
@@ -176,7 +145,7 @@ public final class LoggerTest {
 		public void traceObject() {
 			Logger.trace("Hello World!");
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), isNull(), isNull(), eq("Hello World!"), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -192,7 +161,7 @@ public final class LoggerTest {
 			Logger.trace(supplier);
 			verify(supplier, never()).get();
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), isNull(), isNull(), same(supplier), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -206,7 +175,7 @@ public final class LoggerTest {
 		public void traceMessageAndArguments() {
 			Logger.trace("Hello {}!", "World");
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), isNull(), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -224,7 +193,7 @@ public final class LoggerTest {
 			Logger.trace("The number is {}", supplier);
 			verify(supplier, never()).get();
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), isNull(), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -241,7 +210,7 @@ public final class LoggerTest {
 
 			Logger.trace(exception);
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), isNull(), isNull(), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -257,7 +226,7 @@ public final class LoggerTest {
 
 			Logger.trace(exception, "Hello World!");
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), isNull(), eq("Hello World!"),
 						isNull());
 			} else {
@@ -278,7 +247,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), isNull(), same(supplier),
 						isNull());
 			} else {
@@ -296,7 +265,7 @@ public final class LoggerTest {
 
 			Logger.trace(exception, "Hello {}!", "World");
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -317,7 +286,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (traceEnabled) {
+			if (levelConfiguration.isTraceEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.TRACE), same(exception), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -330,7 +299,7 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void isDebugEnabled() {
-			assertThat(Logger.isDebugEnabled()).isEqualTo(debugEnabled);
+			assertThat(Logger.isDebugEnabled()).isEqualTo(levelConfiguration.isDebugEnabled());
 		}
 
 		/**
@@ -340,7 +309,7 @@ public final class LoggerTest {
 		public void debugObject() {
 			Logger.debug("Hello World!");
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), isNull(), isNull(), eq("Hello World!"), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -356,7 +325,7 @@ public final class LoggerTest {
 			Logger.debug(supplier);
 			verify(supplier, never()).get();
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), isNull(), isNull(), same(supplier), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -370,7 +339,7 @@ public final class LoggerTest {
 		public void debugMessageAndArguments() {
 			Logger.debug("Hello {}!", "World");
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), isNull(), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -388,7 +357,7 @@ public final class LoggerTest {
 			Logger.debug("The number is {}", supplier);
 			verify(supplier, never()).get();
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), isNull(), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -405,7 +374,7 @@ public final class LoggerTest {
 
 			Logger.debug(exception);
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), isNull(), isNull(), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -421,7 +390,7 @@ public final class LoggerTest {
 
 			Logger.debug(exception, "Hello World!");
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), isNull(), eq("Hello World!"),
 						isNull());
 			} else {
@@ -442,7 +411,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), isNull(), same(supplier),
 						isNull());
 			} else {
@@ -460,7 +429,7 @@ public final class LoggerTest {
 
 			Logger.debug(exception, "Hello {}!", "World");
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -481,7 +450,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (debugEnabled) {
+			if (levelConfiguration.isDebugEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.DEBUG), same(exception), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -494,7 +463,7 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void isInfoEnabled() {
-			assertThat(Logger.isInfoEnabled()).isEqualTo(infoEnabled);
+			assertThat(Logger.isInfoEnabled()).isEqualTo(levelConfiguration.isInfoEnabled());
 		}
 
 		/**
@@ -504,7 +473,7 @@ public final class LoggerTest {
 		public void infoObject() {
 			Logger.info("Hello World!");
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), isNull(), isNull(), eq("Hello World!"), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -520,7 +489,7 @@ public final class LoggerTest {
 			Logger.info(supplier);
 			verify(supplier, never()).get();
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), isNull(), isNull(), same(supplier), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -534,7 +503,7 @@ public final class LoggerTest {
 		public void infoMessageAndArguments() {
 			Logger.info("Hello {}!", "World");
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
 					eq("World"));
 			} else {
@@ -552,7 +521,7 @@ public final class LoggerTest {
 			Logger.info("The number is {}", supplier);
 			verify(supplier, never()).get();
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), isNull(), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -569,7 +538,7 @@ public final class LoggerTest {
 
 			Logger.info(exception);
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), same(exception), isNull(), isNull(), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -585,7 +554,7 @@ public final class LoggerTest {
 
 			Logger.info(exception, "Hello World!");
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), same(exception), isNull(), eq("Hello World!"),
 						isNull());
 			} else {
@@ -606,7 +575,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), same(exception), isNull(), same(supplier),
 						isNull());
 			} else {
@@ -624,7 +593,7 @@ public final class LoggerTest {
 
 			Logger.info(exception, "Hello {}!", "World");
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -645,7 +614,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (infoEnabled) {
+			if (levelConfiguration.isInfoEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.INFO), same(exception), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -658,7 +627,7 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void isWarnEnabled() {
-			assertThat(Logger.isWarnEnabled()).isEqualTo(warnEnabled);
+			assertThat(Logger.isWarnEnabled()).isEqualTo(levelConfiguration.isWarnEnabled());
 		}
 
 		/**
@@ -668,7 +637,7 @@ public final class LoggerTest {
 		public void warnObject() {
 			Logger.warn("Hello World!");
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), isNull(), isNull(), eq("Hello World!"), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -684,7 +653,7 @@ public final class LoggerTest {
 			Logger.warn(supplier);
 			verify(supplier, never()).get();
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), isNull(), isNull(), same(supplier), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -698,7 +667,7 @@ public final class LoggerTest {
 		public void warnMessageAndArguments() {
 			Logger.warn("Hello {}!", "World");
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), isNull(), any(AdvancedMessageFormatter.class), eq("Hello {}!"),
 					eq("World"));
 			} else {
@@ -716,7 +685,7 @@ public final class LoggerTest {
 			Logger.warn("The number is {}", supplier);
 			verify(supplier, never()).get();
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), isNull(), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -733,7 +702,7 @@ public final class LoggerTest {
 
 			Logger.warn(exception);
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), same(exception), isNull(), isNull(), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -749,7 +718,7 @@ public final class LoggerTest {
 
 			Logger.warn(exception, "Hello World!");
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), same(exception), isNull(), eq("Hello World!"),
 						isNull());
 			} else {
@@ -770,7 +739,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), same(exception), isNull(), same(supplier),
 						isNull());
 			} else {
@@ -788,7 +757,7 @@ public final class LoggerTest {
 
 			Logger.warn(exception, "Hello {}!", "World");
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -809,7 +778,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (warnEnabled) {
+			if (levelConfiguration.isWarnEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.WARN), same(exception), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -822,7 +791,7 @@ public final class LoggerTest {
 		 */
 		@Test
 		public void isErrorEnabled() {
-			assertThat(Logger.isErrorEnabled()).isEqualTo(errorEnabled);
+			assertThat(Logger.isErrorEnabled()).isEqualTo(levelConfiguration.isErrorEnabled());
 		}
 
 		/**
@@ -832,7 +801,7 @@ public final class LoggerTest {
 		public void errorObject() {
 			Logger.error("Hello World!");
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), isNull(), isNull(), eq("Hello World!"), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -848,7 +817,7 @@ public final class LoggerTest {
 			Logger.error(supplier);
 			verify(supplier, never()).get();
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), isNull(), isNull(), same(supplier), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -862,7 +831,7 @@ public final class LoggerTest {
 		public void errorMessageAndArguments() {
 			Logger.error("Hello {}!", "World");
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), isNull(), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -880,7 +849,7 @@ public final class LoggerTest {
 			Logger.error("The number is {}", supplier);
 			verify(supplier, never()).get();
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), isNull(), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -897,7 +866,7 @@ public final class LoggerTest {
 
 			Logger.error(exception);
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), isNull(), isNull(), isNull());
 			} else {
 				verify(loggingProvider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -913,7 +882,7 @@ public final class LoggerTest {
 
 			Logger.error(exception, "Hello World!");
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), isNull(), eq("Hello World!"),
 						isNull());
 			} else {
@@ -934,7 +903,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), isNull(), same(supplier),
 						isNull());
 			} else {
@@ -952,7 +921,7 @@ public final class LoggerTest {
 
 			Logger.error(exception, "Hello {}!", "World");
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(AdvancedMessageFormatter.class),
 					eq("Hello {}!"), eq("World"));
 			} else {
@@ -973,7 +942,7 @@ public final class LoggerTest {
 
 			verify(supplier, never()).get();
 
-			if (errorEnabled) {
+			if (levelConfiguration.isErrorEnabled()) {
 				verify(loggingProvider).log(eq(2), isNull(), eq(Level.ERROR), same(exception), any(AdvancedMessageFormatter.class),
 					eq("The number is {}"), same(supplier));
 			} else {
@@ -989,26 +958,26 @@ public final class LoggerTest {
 		private LoggingProvider mockLoggingProvider() {
 			LoggingProvider provider = mock(LoggingProvider.class);
 
-			when(provider.getMinimumLevel(null)).thenReturn(level);
-			when(provider.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(traceEnabled);
-			when(provider.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(debugEnabled);
-			when(provider.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(infoEnabled);
-			when(provider.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(warnEnabled);
-			when(provider.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(errorEnabled);
+			when(provider.getMinimumLevel(null)).thenReturn(levelConfiguration.getLevel());
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.TRACE))).thenReturn(levelConfiguration.isTraceEnabled());
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.DEBUG))).thenReturn(levelConfiguration.isDebugEnabled());
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.INFO))).thenReturn(levelConfiguration.isInfoEnabled());
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(levelConfiguration.isWarnEnabled());
+			when(provider.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(levelConfiguration.isErrorEnabled());
 
 			Whitebox.setInternalState(Logger.class, provider);
-			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_TRACE", levelConfiguration.isTraceEnabled());
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_DEBUG", levelConfiguration.isDebugEnabled());
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_INFO", levelConfiguration.isInfoEnabled());
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_WARN", levelConfiguration.isWarnEnabled());
+			Whitebox.setInternalState(Logger.class, "MINIMUM_LEVEL_COVERS_ERROR", levelConfiguration.isErrorEnabled());
 
 			return provider;
 		}
 
 		/**
 		 * Creates a mocked supplier that returns the given value.
-		 * 
+		 *
 		 * @param value
 		 *            Value that should be returned by the created supplier
 		 * @param <T>
@@ -1073,8 +1042,14 @@ public final class LoggerTest {
 		public void untagged() {
 			TaggedLogger logger = Logger.tag(null);
 
-			assertThat(logger).isNotNull().isSameAs(Logger.tag(""));
-			assertThat(Whitebox.<String>getInternalState(logger, "tag")).isNull();
+			assertThat(logger).isNotNull()
+				.isSameAs(Logger.tag(""))
+				.isSameAs(Logger.tags())
+				.isSameAs(Logger.tags(null))
+				.isSameAs(Logger.tags(null, null))
+				.isSameAs(Logger.tags(null, ""))
+				.isSameAs(Logger.tags("", ""));
+			assertThat(Whitebox.<Set<String>>getInternalState(logger, "tags")).hasSize(1).containsOnlyNulls();
 		}
 
 		/**
@@ -1085,10 +1060,45 @@ public final class LoggerTest {
 		public void tagged() {
 			TaggedLogger logger = Logger.tag("test");
 
-			assertThat(logger).isNotNull().isSameAs(Logger.tag("test")).isNotSameAs(Logger.tag("other"));
-			assertThat(Whitebox.<String>getInternalState(logger, "tag")).isEqualTo("test");
+			assertThat(logger).isNotNull().isSameAs(Logger.tag("test")).isSameAs(Logger.tags("test")).isNotSameAs(Logger.tag("other"));
+			assertThat(Whitebox.<Set<String>>getInternalState(logger, "tags")).containsOnly("test");
 		}
 
+		/**
+		 * Verifies that {@link Logger#tags(String...)} returns the same tagged instance of {@link TaggedLogger} for each
+		 * set of tags with more than one tag or if the same tag is repeated multiple times.
+		 */
+		@Test
+		public void taggedMultiple() {
+			TaggedLogger logger = Logger.tags("test", "more", "extra");
+
+			assertThat(logger).isNotNull()
+				.isSameAs(Logger.tags("extra", "more", "test"))
+				.isSameAs(Logger.tags("more", "test", "extra", "more", "extra", "test"))
+				.isNotSameAs(Logger.tag("other"))
+				.isNotSameAs(Logger.tags("test", "more"));
+			assertThat(Whitebox.<Set<String>>getInternalState(logger, "tags")).containsOnly("test", "more", "extra");
+		}
+
+		/**
+		 * Verifies that {@link Logger#tags(String...)} with "untagged" mixed with other tags, returns the same tagged instance of
+		 * {@link TaggedLogger}.
+		 */
+		@Test
+		public void taggedMultipleWithUntagged() {
+			TaggedLogger logger = Logger.tags("test", null, "more");
+
+			assertThat(logger).isNotNull()
+				.isSameAs(Logger.tags(null, "more", "test"))
+				.isSameAs(Logger.tags("", "more", "test"))
+				.isSameAs(Logger.tags("more", "test", null, "more", null, "test"))
+				.isSameAs(Logger.tags("more", "test", null, "more", "", "test"))
+				.isSameAs(Logger.tags("more", "test", "", "more", "", "test"))
+				.isNotSameAs(Logger.tag("other"))
+				.isNotSameAs(Logger.tags("test", "more"))
+				.isNotSameAs(Logger.tag(null));
+			assertThat(Whitebox.<Set<String>>getInternalState(logger, "tags")).containsOnly("test", null, "more");
+		}
 	}
 
 }

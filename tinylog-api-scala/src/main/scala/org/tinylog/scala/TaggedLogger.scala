@@ -16,15 +16,17 @@ package org.tinylog.scala
 import scala.language.experimental.macros
 
 /**
-	* Logger for issuing tagged log entries. Tagged loggers can be received by calling [[org.tinylog.scala.Logger.tag]].
+	* Logger for issuing tagged log entries. Tagged loggers can be received by calling [[org.tinylog.scala.Logger.tag]] or
+	* [[org.tinylog.scala.Logger.tags]].
 	*
-	* @param tag
-	* Case-sensitive tag for logger instance
+	* @param tags
+	* Case-sensitive tags for logger instance
 	* @see org.tinylog.scala.Logger.tag
+	* @see org.tinylog.scala.Logger.tags
 	*/
-final class TaggedLogger private[scala] (private val tag: String) {
+final class TaggedLogger private[scala] (private val tags: Set[String]) {
 
-	private[scala] final val logger = org.tinylog.Logger.tag(tag)
+	private[scala] final val logger = org.tinylog.Logger.tags(tags.toSeq: _*)
 
 	/**
 		* Checks whether log entries at [[https://tinylog.org/v2/javadoc/org/tinylog/Level.html#TRACE TRACE]] will be output.

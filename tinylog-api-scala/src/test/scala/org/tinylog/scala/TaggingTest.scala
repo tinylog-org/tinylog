@@ -39,18 +39,59 @@ final class TaggingTest {
 		*/
 	@Test def untagged(): Unit = {
 		val logger = Logger.tag(null)
-		assertThat(logger).isNotNull.isSameAs(Logger.tag(""))
-		assertThat(Whitebox.getInternalState[String](logger, "tag")).isNull()
+		assertThat(logger).isNotNull
+			.isSameAs(Logger.tag(""))
+			.isSameAs(Logger.tags())
+			.isSameAs(Logger.tags(null))
+			.isSameAs(Logger.tags(null, null))
+			.isSameAs(Logger.tags(null, ""))
+			.isSameAs(Logger.tags("", ""))
+		assertThat(Whitebox.getInternalState[Set[String]](logger, "tags")).isEqualTo(Set(null))
 	}
 
 	/**
-		* Verifies that [[org.tinylog.scala.Logger#tag(String)]] returns the same tagged instance of
+		* Verifies that [[org.tinylog.scala.Logger#tag(String, String*)]] with just one tag returns the same tagged instance of
 		* [[org.tinylog.scala.TaggedLogger]] for each tag.
 		*/
 	@Test def tagged(): Unit = {
 		val logger = Logger.tag("test")
-		assertThat(logger).isNotNull.isSameAs(Logger.tag("test")).isNotSameAs(Logger.tag("other"))
-		assertThat(Whitebox.getInternalState[String](logger, "tag")).isEqualTo("test")
+		assertThat(logger).isNotNull.isSameAs(Logger.tag("test")).isSameAs(Logger.tags("test"))
+			.isNotSameAs(Logger.tag("other"))
+		assertThat(Whitebox.getInternalState[Set[String]](logger, "tags")).isEqualTo(Set("test"))
 	}
 
+	/**
+		* Verifies that [[org.tinylog.scala.Logger#tag(String, String*)]] with more than one tag returns the same tagged instance of
+		* [[org.tinylog.scala.TaggedLogger]] for each tag.
+		*/
+	@Test def taggedMultiple(): Unit = {
+		val logger = Logger.tags("test", "more", "extra")
+
+		assertThat(logger).isNotNull()
+			.isSameAs(Logger.tags("extra", "more", "test"))
+			.isSameAs(Logger.tags("more", "test", "extra", "more", "extra", "test"))
+			.isNotSameAs(Logger.tag("other"))
+			.isNotSameAs(Logger.tags("test", "more"))
+		assertThat(Whitebox.getInternalState[Set[String]](logger, "tags")).isEqualTo(Set("test", "more", "extra"))
+	}
+
+	/**
+		* Verifies that {@link Logger#tags(String...)} with {@code null} tag mixed in returns the same tagged instance of
+		* {@link TaggedLogger} for each set of tags with more than one tag or if the same tag is repeated multiple times.
+		*/
+	@Test
+	def taggedMultipleWithNull(): Unit = {
+		val logger = Logger.tags("test", null, "more");
+
+		assertThat(logger).isNotNull()
+			.isSameAs(Logger.tags(null, "more", "test"))
+			.isSameAs(Logger.tags("", "more", "test"))
+			.isSameAs(Logger.tags("more", "test", null, "more", null, "test"))
+			.isSameAs(Logger.tags("more", "test", null, "more", "", "test"))
+			.isSameAs(Logger.tags("more", "test", "", "more", "", "test"))
+			.isNotSameAs(Logger.tag("other"))
+			.isNotSameAs(Logger.tags("test", "more"))
+			.isNotSameAs(Logger.tag(null))
+		assertThat(Whitebox.getInternalState[Set[String]](logger, "tags")).isEqualTo(Set("test", null, "more"))
+	}
 }
