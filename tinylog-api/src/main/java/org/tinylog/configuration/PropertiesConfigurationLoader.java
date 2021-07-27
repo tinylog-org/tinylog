@@ -70,7 +70,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 				if (URL_DETECTION_PATTERN.matcher(file).matches()) {
 					stream = new URL(file).openStream();
 				} else {
-					stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
+					stream = getClasspathStream(file);
 					if (stream == null) {
 						stream = new FileInputStream(file);
 					}
@@ -79,7 +79,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 			} else {
 				for (String configurationFile : getConfigurationFiles()) {
 					file = configurationFile;
-					stream = RuntimeProvider.getClassLoader().getResourceAsStream(file);
+					stream = getClasspathStream(file);
 					if (stream != null) {
 						load(properties, stream);
 						break;
@@ -100,7 +100,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
 		return properties;
 	}
-	
+
 	/**
 	 * Puts all properties from a stream to an existing properties object. Already existing properties will be
 	 * overridden.
@@ -125,4 +125,23 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 	protected String[] getConfigurationFiles() {
 		return CONFIGURATION_FILES;
 	}
+
+	/**
+	 * Opens a classpath file as {@link InputStream}.
+	 *
+	 * @param fileName
+	 *            The file to open as stream
+	 * @return An opened {@link InputStream} if the passed file name exists in the classpath, {@code null} if not
+	 */
+	private InputStream getClasspathStream(final String fileName) {
+		for (ClassLoader loader : RuntimeProvider.getClassLoaders()) {
+			InputStream stream = loader.getResourceAsStream(fileName);
+			if (stream != null) {
+				return stream;
+			}
+		}
+
+		return null;
+	}
+
 }

@@ -14,6 +14,9 @@
 package org.tinylog.runtime;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import org.tinylog.Level;
@@ -42,18 +45,22 @@ public final class RuntimeProvider {
 	}
 
 	/**
-	 * Gets a valid class loader.
+	 * Gets valid and available class loaders.
 	 *
-	 * @return Valid class loader instance
+	 * @return Valid class loader instances
 	 */
-	public static ClassLoader getClassLoader() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+	public static List<ClassLoader> getClassLoaders() {
+		ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classClassLoader = RuntimeProvider.class.getClassLoader();
 
-		if (classLoader == null) {
-			classLoader = RuntimeProvider.class.getClassLoader();
+		if (threadClassLoader == null || threadClassLoader == classClassLoader) {
+			return Collections.singletonList(classClassLoader);
+		} else {
+			List<ClassLoader> classLoaders = new ArrayList<ClassLoader>();
+			classLoaders.add(threadClassLoader);
+			classLoaders.add(classClassLoader);
+			return classLoaders;
 		}
-
-		return classLoader;
 	}
 
 	/**

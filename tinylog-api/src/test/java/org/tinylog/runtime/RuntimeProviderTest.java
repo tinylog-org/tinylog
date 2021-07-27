@@ -67,7 +67,7 @@ public final class RuntimeProviderTest {
 	}
 
 	/**
-	 * Verifies that the thread context class loader will be returned, if available.
+	 * Verifies that both context class loaders will be returned, if available.
 	 */
 	@Test
 	public void classLoaderFromThread() {
@@ -75,21 +75,22 @@ public final class RuntimeProviderTest {
 		try {
 			ClassLoader mock = mock(ClassLoader.class);
 			Thread.currentThread().setContextClassLoader(mock);
-			assertThat(RuntimeProvider.getClassLoader()).isSameAs(mock);
+			assertThat(RuntimeProvider.getClassLoaders()).containsExactly(mock, RuntimeProvider.class.getClassLoader());
 		} finally {
 			Thread.currentThread().setContextClassLoader(classLoader);
 		}
 	}
 
 	/**
-	 * Verifies that a class loader will be returned, even if there is no thread context class loader.
+	 * Verifies that only the class loader from {@link RuntimeProvider} will be returned, even if there is no thread
+	 * context class loader.
 	 */
 	@Test
 	public void classLoaderNotFromThread() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(null);
-			assertThat(RuntimeProvider.getClassLoader()).isNotNull();
+			assertThat(RuntimeProvider.getClassLoaders()).containsExactly(RuntimeProvider.class.getClassLoader());
 		} finally {
 			Thread.currentThread().setContextClassLoader(classLoader);
 		}

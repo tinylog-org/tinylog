@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -777,7 +778,7 @@ public final class ConfigurationTest {
 	}	
 
 	/**
-	 * Verifies that the Proguard hack works for the configuration loading.
+	 * Verifies that the Proguard hack works for configuration loading.
 	 *
 	 * @throws Exception
 	 *             Failed creating the loader
@@ -785,9 +786,11 @@ public final class ConfigurationTest {
 	@Test
 	@PrepareForTest({Configuration.class, RuntimeProvider.class})	
 	public void checkProguardHack() throws Exception {
+		List<ClassLoader> loaders = Collections.singletonList(Thread.currentThread().getContextClassLoader());
+
 		PowerMockito.mockStatic(RuntimeProvider.class);
 		PowerMockito.spy(Configuration.class);
-		PowerMockito.when(RuntimeProvider.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+		PowerMockito.when(RuntimeProvider.getClassLoaders()).thenReturn(loaders);
 		PowerMockito.when(RuntimeProvider.getProcessId()).thenReturn(Long.MIN_VALUE);
 		Whitebox.invokeMethod(Configuration.class, "load");
 		assertThat(RuntimeProvider.getProcessId()).isEqualTo(Long.MIN_VALUE);

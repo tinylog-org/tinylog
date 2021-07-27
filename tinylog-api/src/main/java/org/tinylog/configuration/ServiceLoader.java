@@ -56,8 +56,19 @@ public final class ServiceLoader<T> {
 	public ServiceLoader(final Class<? extends T> service, final Class<?>... argumentTypes) {
 		this.service = service;
 		this.argumentTypes = argumentTypes;
-		this.classLoader = RuntimeProvider.getClassLoader();
-		this.classes = loadClasses(classLoader, service);
+
+		String fileName = SERVICE_PREFIX + service.getName();
+		for (ClassLoader loader : RuntimeProvider.getClassLoaders()) {
+			Enumeration<URL> serviceFiles = fetchServiceFiles(loader, fileName);
+			if (serviceFiles.hasMoreElements()) {
+				classLoader = loader;
+				classes = loadClasses(loader, service);
+				return;
+			}
+		}
+
+		this.classLoader = null;
+		this.classes = Collections.emptyList();
 	}
 
 	/**
@@ -143,6 +154,15 @@ public final class ServiceLoader<T> {
 		}
 
 		return instances;
+	}
+
+	private static Enumeration<URL> fetchServiceFiles(final ClassLoader classLoader, final String fileName) {
+		try {
+			return classLoader.getResources(fileName);
+		} catch (IOException ex) {
+			InternalLogger.log(Level.ERROR, "Failed loading services from '" + fileName + "'");
+			return Collections.enumeration(Collections.<URL>emptyList());
+		}
 	}
 
 	/**
