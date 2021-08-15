@@ -21,6 +21,8 @@ public class Application {
 }
 ```
 
+Outputting log entries to the console and rolling log files via *tinylog.properties*
+
 ```properties
 level            = INFO
 
