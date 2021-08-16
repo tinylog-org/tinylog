@@ -9,9 +9,9 @@
 	<suppress files="[/\\]src[/\\]main[/\\]java[/\\]org[/\\]apache[/\\]log4j[/\\].*\.java" checks="(Header|AbbreviationAsWordInName)"/>
 
 	<!-- All Test Classes -->
-	<suppress files="[/\\]src[/\\]test[/\\].*\.java" checks="MagicNumber"/>
+	<suppress files="[/\\]src[/\\]test[/\\].*\.java" checks="(MagicNumber|JavadocPackage)"/>
 
 	<!-- JUnit Tests -->
-	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|JavadocPackage|MissingCtor|VisibilityModifier)"/>
+	<suppress files="[/\\]src[/\\]test[/\\].*Test\.java" checks="(AvoidStaticImport|MissingCtor|VisibilityModifier)"/>
 
 </suppressions>
