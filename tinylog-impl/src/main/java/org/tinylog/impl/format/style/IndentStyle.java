@@ -24,8 +24,8 @@ public class IndentStyle extends AbstractStylePlaceholder {
 	protected void apply(StringBuilder builder, int start) {
 		int index = start;
 
-		boolean indentAtStart = (index == 0 && builder.length() > 0)
-			|| (index >= NEW_LINE.length() && NEW_LINE.equals(builder.substring(index - NEW_LINE.length(), index)));
+		boolean indentAtStart = index == 0 && builder.length() > 0
+			|| index >= NEW_LINE.length() && NEW_LINE.equals(builder.substring(index - NEW_LINE.length(), index));
 
 		if (indentAtStart) {
 			index = indent(builder, index);
