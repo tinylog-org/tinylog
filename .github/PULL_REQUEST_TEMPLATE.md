@@ -4,7 +4,7 @@ Linked issue: #000
 
 ### Definition of Done
 
-- [ ] I read [contributing.md](../contributing.md)
+- [ ] I read [contributing.md](https://github.com/tinylog-org/tinylog/blob/v2.4/contributing.md)
 - [ ] There are no TODOs left in the code
 - [ ] Code style follows the tinylog standard
 - [ ] All classes and methods have Javadoc
