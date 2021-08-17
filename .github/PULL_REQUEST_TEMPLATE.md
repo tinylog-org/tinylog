@@ -14,7 +14,7 @@ Linked issue: #000
 
 ### Documentation
 
-Additions or amendments for the [public documentation](https://github.com/pmwmedia/tinylog/wiki/Documentation):
+Additions or amendments for the [public documentation](https://github.com/tinylog-org/tinylog/wiki/Documentation):
 
 ```markdown
 
@@ -22,5 +22,5 @@ Additions or amendments for the [public documentation](https://github.com/pmwmed
 
 ### Agreements
 
-- [ ] I agree that my changes will be published under the terms of the [Apache License 2.0](https://github.com/pmwmedia/tinylog/blob/v2.0/license.txt) (mandatory)
+- [ ] I agree that my changes will be published under the terms of the [Apache License 2.0](https://github.com/tinylog-org/tinylog/blob/v2.0/license.txt) (mandatory)
 - [ ] I agree that my GitHub user name will be published in the release notes (optional)

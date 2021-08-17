@@ -33,9 +33,9 @@
 		<website.url>https://tinylog.org/</website.url>
 		<builder.name>tinylog.org</builder.name>
 
-		<git.url>https://github.com/pmwmedia/tinylog</git.url>
-		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
-		<git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
+		<git.url>https://github.com/tinylog-org/tinylog</git.url>
+		<git.connection>scm:git:github.com/tinylog-org/tinylog.git</git.connection>
+		<git.developerConnection>scm:git:git@github.com:tinylog-org/tinylog.git</git.developerConnection>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Ensure that Eclipse and IntelliJ use Java 9 -->
@@ -117,7 +117,7 @@
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/pmwmedia/tinylog/issues</url>
+		<url>https://github.com/tinylog-org/tinylog/issues</url>
 	</issueManagement>
 
 	<distributionManagement>
