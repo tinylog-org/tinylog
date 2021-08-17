@@ -1,6 +1,7 @@
 package org.tinylog.impl.format.placeholder;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class BundlePlaceholder implements Placeholder {
 	 * @param placeholders Child placeholders
 	 */
 	public BundlePlaceholder(List<Placeholder> placeholders) {
-		this.placeholders = placeholders;
+		this.placeholders = new ArrayList<>(placeholders);
 	}
 
 	@Override

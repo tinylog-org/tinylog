@@ -1,6 +1,7 @@
 package org.tinylog.impl.policy;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public class BundlePolicy implements Policy {
 	 * @param policies The policies to combine
 	 */
 	public BundlePolicy(List<Policy> policies) {
-		this.policies = policies;
+		this.policies = new ArrayList<>(policies);
 	}
 
 	@Override

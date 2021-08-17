@@ -32,7 +32,7 @@ public class WritingThread extends Thread {
 	public WritingThread(Collection<AsyncWriter> writers, int queueSize) {
 		super("tinylog-writing-thread");
 
-		this.writers = writers;
+		this.writers = new ArrayList<>(writers);
 		this.queueSize = queueSize;
 
 		this.mutex = new Object();

@@ -19,7 +19,7 @@ public class JavaTimeFormat implements ValueFormat {
 	 * @param locale Locale for language or country depending format outputs
 	 * @param defaultZone Default zone for {@link Instant Instants}
 	 */
-	public JavaTimeFormat(Locale locale, ZoneId defaultZone) {
+	JavaTimeFormat(Locale locale, ZoneId defaultZone) {
 		this.locale = locale;
 		this.defaultZone = defaultZone;
 	}

@@ -14,7 +14,7 @@ public class NumberFormat implements ValueFormat {
 	/**
 	 * @param locale Locale for language or country depending decimal format symbols
 	 */
-	public NumberFormat(Locale locale) {
+	NumberFormat(Locale locale) {
 		this.symbols = new DecimalFormatSymbols(locale);
 	}
 

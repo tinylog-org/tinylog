@@ -384,6 +384,9 @@
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>4.3.0</version>
+                    <configuration>
+                        <excludeFilterFile>${root.basedir}/configuration/spotbugs-filters.xml</excludeFilterFile>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>verify</id>

@@ -1,5 +1,6 @@
 package org.tinylog.core.backend;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class BundleLoggingBackend implements LoggingBackend {
 			.collect(Collectors.toList());
 
 		this.storage = new BundleContextStorage(storages);
-		this.backends = backends;
+		this.backends = new ArrayList<>(backends);
 	}
 
 	/**
@@ -42,6 +43,7 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
+	@SuppressWarnings("EI_EXPOSE_REP")
 	public ContextStorage getContextStorage() {
 		return storage;
 	}

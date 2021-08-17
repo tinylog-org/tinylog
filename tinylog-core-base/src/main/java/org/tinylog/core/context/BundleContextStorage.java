@@ -1,6 +1,7 @@
 package org.tinylog.core.context;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +19,7 @@ public class BundleContextStorage implements ContextStorage {
 	 * @param storages Context storages to combine
 	 */
 	public BundleContextStorage(List<ContextStorage> storages) {
-		this.storages = storages;
+		this.storages = new ArrayList<>(storages);
 	}
 
 	@Override

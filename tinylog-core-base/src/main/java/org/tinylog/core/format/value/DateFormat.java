@@ -14,7 +14,7 @@ public class DateFormat implements ValueFormat {
 	/**
 	 * @param locale Locale for language or country depending format outputs
 	 */
-	public DateFormat(Locale locale) {
+	DateFormat(Locale locale) {
 		this.locale = locale;
 	}
 
