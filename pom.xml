@@ -115,7 +115,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/pmwmedia/tinylog/issues</url>
+        <url>https://github.com/tinylog-org/tinylog/issues</url>
     </issueManagement>
 
     <dependencyManagement>
