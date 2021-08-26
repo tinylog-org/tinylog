@@ -39,8 +39,11 @@ class WriterConfigurationTest {
 		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.TRACE);
 		assertThat(levelConfiguration.getTaggedLevel("tinylog")).isEqualTo(Level.WARN);
 
-		Writer writer = writerConfiguration.createWriter();
-		assertThat(writer).isInstanceOf(ConsoleWriter.class);
+		Writer firstWriter = writerConfiguration.getOrCreateWriter();
+		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);
+
+		Writer secondWriter = writerConfiguration.getOrCreateWriter();
+		assertThat(secondWriter).isSameAs(firstWriter);
 	}
 
 	/**
@@ -61,8 +64,11 @@ class WriterConfigurationTest {
 		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.DEBUG);
 		assertThat(levelConfiguration.getTaggedLevel("tinylog")).isEqualTo(Level.WARN);
 
-		Writer writer = writerConfiguration.createWriter();
-		assertThat(writer).isInstanceOf(ConsoleWriter.class);
+		Writer firstWriter = writerConfiguration.getOrCreateWriter();
+		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);
+
+		Writer secondWriter = writerConfiguration.getOrCreateWriter();
+		assertThat(secondWriter).isSameAs(firstWriter);
 	}
 
 	/**
@@ -71,7 +77,7 @@ class WriterConfigurationTest {
 	@Test
 	void missingTypeProperty() {
 		WriterConfiguration configuration = new WriterConfiguration(framework, new Configuration());
-		assertThat(configuration.createWriter()).isNull();
+		assertThat(configuration.getOrCreateWriter()).isNull();
 
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -88,7 +94,7 @@ class WriterConfigurationTest {
 		invalidConfiguration.set("type", "foo");
 
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, invalidConfiguration);
-		assertThat(writerConfiguration.createWriter()).isNull();
+		assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -105,7 +111,7 @@ class WriterConfigurationTest {
 		fileWriter.set("type", "file");
 
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, fileWriter);
-		assertThat(writerConfiguration.createWriter()).isNull();
+		assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);

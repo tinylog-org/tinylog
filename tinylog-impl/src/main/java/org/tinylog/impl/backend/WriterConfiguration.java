@@ -20,6 +20,9 @@ class WriterConfiguration {
 	private final Configuration entireConfiguration;
 	private final LevelConfiguration levelConfiguration;
 
+	private Writer writer;
+	private boolean created;
+
 	/**
 	 * @param framework The actual logging framework instance
 	 * @param configuration The writer configuration to parse
@@ -28,6 +31,9 @@ class WriterConfiguration {
 		this.framework = framework;
 		this.entireConfiguration = configuration;
 		this.levelConfiguration = new LevelConfiguration(configuration.getList(LevelConfiguration.KEY));
+
+		this.writer = null;
+		this.created = false;
 	}
 
 	/**
@@ -40,44 +46,51 @@ class WriterConfiguration {
 	}
 
 	/**
-	 * Creates the writer.
+	 * Get or create the writer.
+	 *
+	 * <p>
+	 *     The writer will be created only once to ensure that always the same writer instance is returned.
+	 * </p>
 	 *
 	 * @return The created writer or {@code null} if the creation failed
 	 */
-	public Writer createWriter() {
-		String type = entireConfiguration.getValue(TYPE_KEY);
-		if (type == null) {
-			InternalLogger.error(
-				null,
-				"Missing writer name in property \"{}\"",
-				entireConfiguration.resolveFullKey(TYPE_KEY)
-			);
-			return null;
-		} else {
-			String name = type.toLowerCase(Locale.ENGLISH);
-			WriterBuilder builder = SafeServiceLoader
-				.asList(framework, WriterBuilder.class, "writer builder")
-				.stream()
-				.filter(writerBuilder -> name.equals(writerBuilder.getName()))
-				.findAny()
-				.orElse(null);
+	public Writer getOrCreateWriter() {
+		if (!created) {
+			created = true;
 
-			if (builder == null) {
+			String type = entireConfiguration.getValue(TYPE_KEY);
+			if (type == null) {
 				InternalLogger.error(
 					null,
-					"Could not find any writer builder with the name \"{}\" in the classpath",
-					name
+					"Missing writer name in property \"{}\"",
+					entireConfiguration.resolveFullKey(TYPE_KEY)
 				);
-				return null;
 			} else {
-				try {
-					return builder.create(framework, entireConfiguration);
-				} catch (Exception ex) {
-					InternalLogger.error(ex, "Failed to create writer for \"{}\"", name);
-					return null;
+				String name = type.toLowerCase(Locale.ENGLISH);
+				WriterBuilder builder = SafeServiceLoader
+					.asList(framework, WriterBuilder.class, "writer builder")
+					.stream()
+					.filter(writerBuilder -> name.equals(writerBuilder.getName()))
+					.findAny()
+					.orElse(null);
+
+				if (builder == null) {
+					InternalLogger.error(
+						null,
+						"Could not find any writer builder with the name \"{}\" in the classpath",
+						name
+					);
+				} else {
+					try {
+						writer = builder.create(framework, entireConfiguration);
+					} catch (Exception ex) {
+						InternalLogger.error(ex, "Failed to create writer for \"{}\"", name);
+					}
 				}
 			}
 		}
+
+		return writer;
 	}
 
 }
