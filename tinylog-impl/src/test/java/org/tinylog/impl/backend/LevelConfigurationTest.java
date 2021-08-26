@@ -1,5 +1,6 @@
 package org.tinylog.impl.backend;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
+
+import com.google.common.collect.ImmutableList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +25,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void empty() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of());
+		LevelConfiguration configuration = new LevelConfiguration(Collections.emptyList());
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.TRACE);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.TRACE);
@@ -35,7 +38,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void generalLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("debug"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
@@ -48,7 +51,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void taggedLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("foo@error"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo@error"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -61,7 +64,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void tinylogLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("tinylog@trace"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("tinylog@trace"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -74,7 +77,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void anyPlaceholderLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("*@debug"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("*@debug"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
@@ -87,7 +90,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void plusPlaceholderLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("+@debug"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("+@debug"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
@@ -100,7 +103,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void minusPlaceholderLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("-@debug"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("-@debug"));
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 		assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -113,7 +116,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void multipleLevels() {
-		List<String> levels = List.of("debug", "+@info", "foo@trace", "tinylog@error");
+		List<String> levels = ImmutableList.of("debug", "+@info", "foo@trace", "tinylog@error");
 		LevelConfiguration configuration = new LevelConfiguration(levels);
 		assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
 		assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
@@ -127,7 +130,7 @@ class LevelConfigurationTest {
 	 */
 	@Test
 	void invalidLevel() {
-		LevelConfiguration configuration = new LevelConfiguration(List.of("foo"));
+		LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo"));
 
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
