@@ -18,11 +18,11 @@ import org.tinylog.impl.format.placeholders.ThreadIdPlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.ThreadPlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.TimestampPlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.UptimePlaceholderBuilder;
-import org.tinylog.impl.format.style.IndentStyleBuilder;
-import org.tinylog.impl.format.style.LengthStyleBuilder;
-import org.tinylog.impl.format.style.MaxLengthStyleBuilder;
-import org.tinylog.impl.format.style.MinLengthStyleBuilder;
-import org.tinylog.impl.format.style.StyleBuilder;
+import org.tinylog.impl.format.styles.IndentStyleBuilder;
+import org.tinylog.impl.format.styles.LengthStyleBuilder;
+import org.tinylog.impl.format.styles.MaxLengthStyleBuilder;
+import org.tinylog.impl.format.styles.MinLengthStyleBuilder;
+import org.tinylog.impl.format.styles.StyleBuilder;
 import org.tinylog.impl.policies.PolicyBuilder;
 import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
@@ -77,7 +77,7 @@ module org.tinylog.impl {
 	exports org.tinylog.impl;
 	exports org.tinylog.impl.format;
 	exports org.tinylog.impl.format.placeholders;
-	exports org.tinylog.impl.format.style;
+	exports org.tinylog.impl.format.styles;
 	exports org.tinylog.impl.policies;
 	exports org.tinylog.impl.writers;
 }

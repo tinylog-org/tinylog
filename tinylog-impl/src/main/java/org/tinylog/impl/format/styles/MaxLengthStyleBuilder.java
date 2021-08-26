@@ -1,4 +1,4 @@
-package org.tinylog.impl.format.style;
+package org.tinylog.impl.format.styles;
 
 import org.tinylog.core.Framework;
 import org.tinylog.impl.format.placeholders.ClassPlaceholder;

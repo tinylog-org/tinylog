@@ -19,7 +19,7 @@ import org.tinylog.core.test.service.RegisterService;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.placeholders.Placeholder;
 import org.tinylog.impl.format.placeholders.PlaceholderBuilder;
-import org.tinylog.impl.format.style.StyleBuilder;
+import org.tinylog.impl.format.styles.StyleBuilder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 

@@ -1,4 +1,0 @@
-org.tinylog.impl.format.style.IndentStyleBuilder
-org.tinylog.impl.format.style.LengthStyleBuilder
-org.tinylog.impl.format.style.MaxLengthStyleBuilder
-org.tinylog.impl.format.style.MinLengthStyleBuilder

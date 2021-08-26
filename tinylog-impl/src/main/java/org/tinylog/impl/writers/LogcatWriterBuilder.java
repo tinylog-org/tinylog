@@ -4,7 +4,7 @@ import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.impl.format.FormatPatternParser;
 import org.tinylog.impl.format.placeholders.Placeholder;
-import org.tinylog.impl.format.style.MaxLengthStyleBuilder;
+import org.tinylog.impl.format.styles.MaxLengthStyleBuilder;
 
 /**
  * Builder for creating {@link LogcatWriter LogcatWriters}.

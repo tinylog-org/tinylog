@@ -1,4 +1,4 @@
-package org.tinylog.impl.format.style;
+package org.tinylog.impl.format.styles;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

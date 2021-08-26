@@ -16,7 +16,7 @@ import org.tinylog.impl.format.placeholders.BundlePlaceholder;
 import org.tinylog.impl.format.placeholders.Placeholder;
 import org.tinylog.impl.format.placeholders.PlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.StaticTextPlaceholder;
-import org.tinylog.impl.format.style.StyleBuilder;
+import org.tinylog.impl.format.styles.StyleBuilder;
 
 /**
  * Parser for format patterns with placeholders and plain static text. Placeholders and sub format patterns can be
