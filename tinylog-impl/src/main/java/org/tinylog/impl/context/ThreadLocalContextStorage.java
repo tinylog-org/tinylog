@@ -1,4 +1,4 @@
-package org.tinylog.impl;
+package org.tinylog.impl.context;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class ThreadLocalContextStorage implements ContextStorage {
 
 	/** */
 	public ThreadLocalContextStorage() {
-		threadLocal = new InheritableThreadLocal<Map<String, String>>() {
+		threadLocal = new InheritableThreadLocal<>() {
 
 			@Override
 			protected Map<String, String> initialValue() {
