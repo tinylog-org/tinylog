@@ -18,6 +18,10 @@
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
     </Match>
     <Match>
+        <Class name="org.tinylog.impl.backend.WriterRepository" />
+        <Bug pattern="EI_EXPOSE_REP" />
+    </Match>
+    <Match>
         <Class name="org.tinylog.impl.format.FormatPatternParser" />
         <Bug pattern="EI_EXPOSE_REP2" />
     </Match>
