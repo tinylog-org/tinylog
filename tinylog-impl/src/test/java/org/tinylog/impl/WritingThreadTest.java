@@ -10,7 +10,7 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.writer.AsyncWriter;
+import org.tinylog.impl.writers.AsyncWriter;
 
 import com.google.common.collect.ImmutableList;
 

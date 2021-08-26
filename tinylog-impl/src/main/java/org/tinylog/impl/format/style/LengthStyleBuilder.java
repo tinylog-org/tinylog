@@ -3,7 +3,7 @@ package org.tinylog.impl.format.style;
 import java.util.Locale;
 
 import org.tinylog.core.Framework;
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Builder for applying a {@link MinLengthStyle minimum length style wrapper} and a {@link AbstractMaxLengthStyle

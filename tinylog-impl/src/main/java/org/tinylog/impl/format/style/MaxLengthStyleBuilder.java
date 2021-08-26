@@ -1,9 +1,9 @@
 package org.tinylog.impl.format.style;
 
 import org.tinylog.core.Framework;
-import org.tinylog.impl.format.placeholder.ClassPlaceholder;
-import org.tinylog.impl.format.placeholder.PackagePlaceholder;
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.ClassPlaceholder;
+import org.tinylog.impl.format.placeholders.PackagePlaceholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Builder for creating {@link MaxTextLengthStyle MaxTextLengthStyles},

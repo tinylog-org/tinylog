@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.placeholder.ClassPlaceholder;
-import org.tinylog.impl.format.placeholder.PackagePlaceholder;
-import org.tinylog.impl.format.placeholder.Placeholder;
-import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.format.placeholders.ClassPlaceholder;
+import org.tinylog.impl.format.placeholders.PackagePlaceholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.placeholders.StaticTextPlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 

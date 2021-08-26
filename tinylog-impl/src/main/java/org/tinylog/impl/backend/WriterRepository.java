@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.tinylog.impl.writer.AsyncWriter;
-import org.tinylog.impl.writer.Writer;
+import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 /**
  * Repository for sync and async writers.

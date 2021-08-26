@@ -1,8 +1,8 @@
 package org.tinylog.impl.backend;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.impl.writer.AsyncWriter;
-import org.tinylog.impl.writer.Writer;
+import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 import com.google.common.collect.ImmutableList;
 

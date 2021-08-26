@@ -6,8 +6,8 @@ import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.impl.writer.Writer;
-import org.tinylog.impl.writer.WriterBuilder;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 /**
  * Parser and creator for configured writers.

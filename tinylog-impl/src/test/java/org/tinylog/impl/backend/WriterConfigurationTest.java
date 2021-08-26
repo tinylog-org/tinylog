@@ -8,8 +8,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
-import org.tinylog.impl.writer.ConsoleWriter;
-import org.tinylog.impl.writer.Writer;
+import org.tinylog.impl.writers.ConsoleWriter;
+import org.tinylog.impl.writers.Writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

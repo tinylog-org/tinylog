@@ -6,7 +6,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.SqlRecord;
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Style wrapper for other {@link Placeholder Placerholders}.

@@ -3,7 +3,7 @@ package org.tinylog.impl.format.style;
 import java.util.Arrays;
 
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Styled placeholder wrapper for applying a configurable minimum length.

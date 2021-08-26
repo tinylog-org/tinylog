@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.tinylog.impl.format.placeholder.BundlePlaceholder;
-import org.tinylog.impl.format.placeholder.Placeholder;
-import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.format.placeholders.BundlePlaceholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.placeholders.StaticTextPlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 

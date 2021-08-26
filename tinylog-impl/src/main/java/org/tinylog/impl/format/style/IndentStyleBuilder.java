@@ -3,7 +3,7 @@ package org.tinylog.impl.format.style;
 import java.util.Arrays;
 
 import org.tinylog.core.Framework;
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Builder for creating {@link IndentStyle IndentStyles}.

@@ -1,6 +1,6 @@
 package org.tinylog.impl.format.style;
 
-import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
  * Abstract base style wrapper for applying a configurable maximum length.

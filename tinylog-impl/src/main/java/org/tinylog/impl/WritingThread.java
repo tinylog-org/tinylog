@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.impl.writer.AsyncWriter;
+import org.tinylog.impl.writers.AsyncWriter;
 
 /**
  * Thread for writing log entries asynchronously.

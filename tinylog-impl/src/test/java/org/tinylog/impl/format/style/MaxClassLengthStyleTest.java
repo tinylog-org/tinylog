@@ -3,7 +3,7 @@ package org.tinylog.impl.format.style;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.placeholder.ClassPlaceholder;
+import org.tinylog.impl.format.placeholders.ClassPlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.PlaceholderRenderer;
 

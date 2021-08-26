@@ -12,10 +12,10 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.impl.format.placeholder.BundlePlaceholder;
-import org.tinylog.impl.format.placeholder.Placeholder;
-import org.tinylog.impl.format.placeholder.PlaceholderBuilder;
-import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.format.placeholders.BundlePlaceholder;
+import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.placeholders.PlaceholderBuilder;
+import org.tinylog.impl.format.placeholders.StaticTextPlaceholder;
 import org.tinylog.impl.format.style.StyleBuilder;
 
 /**
