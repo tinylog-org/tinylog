@@ -16,6 +16,11 @@ import org.tinylog.core.internal.InternalLogger;
  */
 class LevelConfiguration {
 
+	/**
+	 * The property name for severity level configurations.
+	 */
+	static final String KEY = "level";
+
 	private static final String ANY_PLACEHOLDER = "*";
 	private static final String UNTAGGED_PLACEHOLDER = "-";
 	private static final String TAGGED_PLACEHOLDER = "+";
