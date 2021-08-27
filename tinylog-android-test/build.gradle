@@ -30,8 +30,8 @@ dependencies {
     androidTestImplementation "org.assertj:assertj-core:3.20.2"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-params:5.7.2"
-    androidTestImplementation "org.mockito:mockito-android:3.5.15"
-    androidTestImplementation "org.mockito:mockito-junit-jupiter:3.5.15"
+    androidTestImplementation "org.mockito:mockito-android:3.12.4"
+    androidTestImplementation "org.mockito:mockito-junit-jupiter:3.12.4"
     androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.2.2"
 }
 
