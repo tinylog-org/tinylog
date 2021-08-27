@@ -155,7 +155,7 @@ class WriterMatrixParserTest {
 	/**
 	 * Verifies that severity levels can be defined for tags.
 	 */
-	@CaptureLogEntries(configuration = {"level=", "writer.type=console", "writer.level=foo@DEBUG"})
+	@CaptureLogEntries(configuration = {"level=", "writer.type=console", "writer.level=DEBUG@foo"})
 	@Test
 	void writerWithTaggedSeverityLevel() {
 		WriterMatrix matrix = new WriterMatrixParser(framework).parse();
@@ -178,7 +178,7 @@ class WriterMatrixParserTest {
 	/**
 	 * Verifies that a generic and custom severity level can be combined.
 	 */
-	@CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG,foo@WARN"})
+	@CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG,WARN@foo"})
 	@Test
 	void writerWithMixedSeverityLevels() {
 		WriterMatrix matrix = new WriterMatrixParser(framework).parse();

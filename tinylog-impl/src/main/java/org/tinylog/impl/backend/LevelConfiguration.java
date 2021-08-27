@@ -40,8 +40,8 @@ class LevelConfiguration {
 
 		for (String element : elements) {
 			int splitIndex = element.indexOf('@');
-			String tag = splitIndex >= 0 ? element.substring(0, splitIndex).trim() : ANY_PLACEHOLDER;
-			String levelName = splitIndex >= 0 ? element.substring(splitIndex + 1).trim() : element;
+			String levelName = splitIndex >= 0 ? element.substring(0, splitIndex).trim() : element;
+			String tag = splitIndex >= 0 ? element.substring(splitIndex + 1).trim() : ANY_PLACEHOLDER;
 
 			Level level;
 			try {

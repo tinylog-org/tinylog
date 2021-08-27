@@ -58,7 +58,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void taggedLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo@error"), false);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@foo"), false);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -71,7 +71,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void anyPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("*@debug"), false);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@*"), false);
 			assertThat(configuration.getTags()).isEmpty();
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
@@ -84,7 +84,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void plusPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("+@error"), false);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@+"), false);
 			assertThat(configuration.getTags()).isEmpty();
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.ERROR);
@@ -97,7 +97,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void minusPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("-@debug"), false);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@-"), false);
 			assertThat(configuration.getTags()).isEmpty();
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -110,7 +110,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void multipleLevels() {
-			List<String> levels = ImmutableList.of("debug", "+@info", "foo@trace", "tinylog@error");
+			List<String> levels = ImmutableList.of("debug", "info@+", "trace@foo", "error@tinylog");
 			LevelConfiguration configuration = new LevelConfiguration(levels, false);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
@@ -177,7 +177,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void taggedLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo@error"), true);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@foo"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -190,7 +190,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void anyPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("*@debug"), true);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@*"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
@@ -203,7 +203,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void plusPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("+@error"), true);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@+"), true);
 			assertThat(configuration.getTags()).isEmpty();
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.OFF);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.ERROR);
@@ -216,7 +216,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void minusPlaceholderLevel() {
-			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("-@debug"), true);
+			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@-"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getDefaultTaggedLevel()).isEqualTo(Level.OFF);
@@ -229,7 +229,7 @@ class LevelConfigurationTest {
 		 */
 		@Test
 		void multipleLevels() {
-			List<String> levels = ImmutableList.of("debug", "+@info", "foo@trace", "tinylog@error");
+			List<String> levels = ImmutableList.of("debug", "info@+", "trace@foo", "error@tinylog");
 			LevelConfiguration configuration = new LevelConfiguration(levels, true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
 			assertThat(configuration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
