@@ -10,8 +10,8 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.2"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.6.2.0"
-        classpath "org.jacoco:org.jacoco.core:0.8.6"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
+        classpath "org.jacoco:org.jacoco.core:0.8.7"
     }
 }
 
