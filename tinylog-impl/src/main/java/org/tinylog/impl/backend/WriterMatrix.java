@@ -65,8 +65,7 @@ class WriterMatrix {
 	 * @return The active writers
 	 */
 	public WriterRepository getTaggedWriters(String tag, Level level) {
-		Map<Level, WriterRepository> map = customTaggedWriters.getOrDefault(tag, defaultTaggedWriters);
-		return map.get(level);
+		return customTaggedWriters.getOrDefault(tag, defaultTaggedWriters).get(level);
 	}
 
 	/**
