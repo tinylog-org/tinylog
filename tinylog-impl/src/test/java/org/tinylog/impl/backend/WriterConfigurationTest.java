@@ -33,11 +33,10 @@ class WriterConfigurationTest {
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, consoleConfiguration);
 
 		LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
-		assertThat(levelConfiguration.getTags()).containsExactlyInAnyOrder("tinylog");
+		assertThat(levelConfiguration.getTags()).isEmpty();
 		assertThat(levelConfiguration.getUntaggedLevel()).isEqualTo(Level.TRACE);
 		assertThat(levelConfiguration.getDefaultTaggedLevel()).isEqualTo(Level.TRACE);
 		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.TRACE);
-		assertThat(levelConfiguration.getTaggedLevel("tinylog")).isEqualTo(Level.WARN);
 
 		Writer firstWriter = writerConfiguration.getOrCreateWriter();
 		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);
@@ -58,11 +57,10 @@ class WriterConfigurationTest {
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, consoleConfiguration);
 
 		LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
-		assertThat(levelConfiguration.getTags()).containsExactlyInAnyOrder("tinylog");
+		assertThat(levelConfiguration.getTags()).isEmpty();
 		assertThat(levelConfiguration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
 		assertThat(levelConfiguration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
 		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.DEBUG);
-		assertThat(levelConfiguration.getTaggedLevel("tinylog")).isEqualTo(Level.WARN);
 
 		Writer firstWriter = writerConfiguration.getOrCreateWriter();
 		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);

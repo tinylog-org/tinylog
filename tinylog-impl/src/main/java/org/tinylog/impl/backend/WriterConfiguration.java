@@ -30,7 +30,10 @@ class WriterConfiguration {
 	WriterConfiguration(Framework framework, Configuration configuration) {
 		this.framework = framework;
 		this.entireConfiguration = configuration;
-		this.levelConfiguration = new LevelConfiguration(configuration.getList(LevelConfiguration.KEY));
+		this.levelConfiguration = new LevelConfiguration(
+			configuration.getList(LevelConfiguration.KEY),
+			false
+		);
 
 		this.writer = null;
 		this.created = false;

@@ -31,9 +31,11 @@ class LevelConfiguration {
 	private final Map<String, Level> levels;
 
 	/**
-	 * @param elements Configured levels (can be tagged or untagged)
+	 * @param elements Configured severity levels (can be tagged or untagged)
+	 * @param addInternalTagImplicitly Flag for activating the severity level {@link Level#WARN WARN} implicitly for the
+	 *                                 {@link InternalLogger#TAG tinylog} tag if not defined in the passed elements
 	 */
-	LevelConfiguration(List<String> elements) {
+	LevelConfiguration(List<String> elements, boolean addInternalTagImplicitly) {
 		levels = new HashMap<>();
 
 		for (String element : elements) {
@@ -62,7 +64,9 @@ class LevelConfiguration {
 			levels.put(TAGGED_PLACEHOLDER, Level.TRACE);
 		}
 
-		if (!getTags().contains(InternalLogger.TAG)) {
+		if (addInternalTagImplicitly
+			&& !getTags().contains(InternalLogger.TAG)
+			&& levels.getOrDefault(TAGGED_PLACEHOLDER, Level.TRACE).ordinal() > Level.WARN.ordinal()) {
 			levels.put(InternalLogger.TAG, Level.WARN);
 		}
 	}
