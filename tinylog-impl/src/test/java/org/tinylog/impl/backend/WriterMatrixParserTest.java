@@ -208,7 +208,10 @@ class WriterMatrixParserTest {
 	void multipleWriters() {
 		WriterMatrix matrix = new WriterMatrixParser(framework).parse();
 
-		assertThat(matrix.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class, LogcatWriter.class);
+		assertThat(matrix.getAllWriters())
+			.hasSize(2)
+			.hasAtLeastOneElementOfType(ConsoleWriter.class)
+			.hasAtLeastOneElementOfType(LogcatWriter.class);
 
 		assertThat(matrix.getUntaggedWriters(Level.TRACE)).isEmpty();
 		assertThat(matrix.getUntaggedWriters(Level.DEBUG)).hasSize(1);
