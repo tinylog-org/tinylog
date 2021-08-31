@@ -37,17 +37,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -60,17 +60,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -83,17 +83,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -106,17 +106,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -129,17 +129,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -162,17 +162,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).isEmpty();
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -185,17 +185,17 @@ class LoggingConfigurationParserTest {
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(1);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.INFO)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
 	}
 
 	/**
@@ -213,17 +213,17 @@ class LoggingConfigurationParserTest {
 			.hasAtLeastOneElementOfType(ConsoleWriter.class)
 			.hasAtLeastOneElementOfType(LogcatWriter.class);
 
-		assertThat(configuration.getUntaggedWriters(Level.TRACE)).isEmpty();
-		assertThat(configuration.getUntaggedWriters(Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.INFO)).hasSize(1);
-		assertThat(configuration.getUntaggedWriters(Level.WARN)).hasSize(2);
-		assertThat(configuration.getUntaggedWriters(Level.ERROR)).hasSize(2);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.WARN)).hasSize(2);
+		assertThat(configuration.getWriters(LevelConfiguration.UNTAGGED_PLACEHOLDER, Level.ERROR)).hasSize(2);
 
-		assertThat(configuration.getTaggedWriters("foo", Level.TRACE)).isEmpty();
-		assertThat(configuration.getTaggedWriters("foo", Level.DEBUG)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.INFO)).hasSize(1);
-		assertThat(configuration.getTaggedWriters("foo", Level.WARN)).hasSize(2);
-		assertThat(configuration.getTaggedWriters("foo", Level.ERROR)).hasSize(2);
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(2);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(2);
 	}
 
 }

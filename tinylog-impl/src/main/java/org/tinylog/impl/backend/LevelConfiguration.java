@@ -21,9 +21,20 @@ class LevelConfiguration {
 	 */
 	static final String KEY = "level";
 
-	private static final String ANY_PLACEHOLDER = "*";
-	private static final String UNTAGGED_PLACEHOLDER = "-";
-	private static final String TAGGED_PLACEHOLDER = "+";
+	/**
+	 * The placeholder for all log entries (tagged and untagged).
+	 */
+	static final String ANY_PLACEHOLDER = "*";
+
+	/**
+	 * The placeholder for untagged log entries.
+	 */
+	static final String UNTAGGED_PLACEHOLDER = "-";
+
+	/**
+	 * The placeholder for all tagged log entries.
+	 */
+	static final String TAGGED_PLACEHOLDER = "+";
 
 	private static final Predicate<String> placeholderFilter = key ->
 		ANY_PLACEHOLDER.equals(key) || UNTAGGED_PLACEHOLDER.equals(key) || TAGGED_PLACEHOLDER.equals(key);

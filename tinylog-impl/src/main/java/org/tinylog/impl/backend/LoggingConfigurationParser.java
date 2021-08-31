@@ -1,6 +1,7 @@
 package org.tinylog.impl.backend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -38,33 +39,26 @@ class LoggingConfigurationParser {
 	 * @return The parsed logging configuration
 	 */
 	public LoggingConfiguration parse() {
-		Set<String> tags = new TreeSet<>();
+		Set<String> tags = new TreeSet<>(Arrays.asList(
+			LevelConfiguration.UNTAGGED_PLACEHOLDER,
+			LevelConfiguration.TAGGED_PLACEHOLDER
+		));
+
 		LevelConfiguration globalLevelConfiguration = getGlobalLevelConfiguration(tags);
 		Collection<WriterConfiguration> writerConfigurations = getWriterConfigurations(tags);
 
-		Map<Level, WriterRepository> untaggedWriters = getWriterRepositories(
-			globalLevelConfiguration,
-			writerConfigurations,
-			LevelConfiguration::getUntaggedLevel
-		);
+		Map<String, Map<Level, WriterRepository>> allWriters = new HashMap<>();
 
-		Map<Level, WriterRepository> defaultTaggedWriters = getWriterRepositories(
-			globalLevelConfiguration,
-			writerConfigurations,
-			LevelConfiguration::getDefaultTaggedLevel
-		);
-
-		Map<String, Map<Level, WriterRepository>> customTaggedWriters = new HashMap<>();
 		for (String tag : tags) {
-			Map<Level, WriterRepository> customTaggedWriter = getWriterRepositories(
+			Map<Level, WriterRepository> taggedWriters = getWriterRepositories(
 				globalLevelConfiguration,
 				writerConfigurations,
 				levelConfiguration -> levelConfiguration.getTaggedLevel(tag)
 			);
-			customTaggedWriters.put(tag, customTaggedWriter);
+			allWriters.put(tag, taggedWriters);
 		}
 
-		return new LoggingConfiguration(untaggedWriters, defaultTaggedWriters, customTaggedWriters);
+		return new LoggingConfiguration(allWriters);
 	}
 
 	/**

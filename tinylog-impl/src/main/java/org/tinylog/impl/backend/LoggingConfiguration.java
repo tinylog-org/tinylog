@@ -1,8 +1,9 @@
 package org.tinylog.impl.backend;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.tinylog.core.Level;
 import org.tinylog.impl.writers.Writer;
@@ -12,49 +13,20 @@ import org.tinylog.impl.writers.Writer;
  */
 class LoggingConfiguration {
 
-	private final Map<Level, WriterRepository> untaggedWriters;
-	private final Map<Level, WriterRepository> defaultTaggedWriters;
-	private final Map<String, Map<Level, WriterRepository>> customTaggedWriters;
-
-	private final Collection<Writer> allWriters;
+	private final Map<String, Map<Level, WriterRepository>> mappedWriters;
+	private final Collection<Writer> unmappedWriters;
+	private final Function<String, Map<Level, WriterRepository>> defaultTaggedWritersGetter;
 
 	/**
-	 * @param untaggedWriters All writers that are active for untagged log entries
-	 * @param defaultTaggedWriters All writers that are active for tagged log entries with unknown tags
-	 * @param customTaggedWriters All writers that are active for tagged log entries with specific tags
+	 * @param writers All writers mapped to the active tags and severity levels
 	 */
-	LoggingConfiguration(
-		Map<Level, WriterRepository> untaggedWriters,
-		Map<Level, WriterRepository> defaultTaggedWriters,
-		Map<String, Map<Level, WriterRepository>> customTaggedWriters
-	) {
-		this.untaggedWriters = untaggedWriters;
-		this.defaultTaggedWriters = defaultTaggedWriters;
-		this.customTaggedWriters = customTaggedWriters;
-		this.allWriters = new HashSet<>();
-
-		untaggedWriters.values().stream()
-			.map(WriterRepository::getAllWriters)
-			.forEach(allWriters::addAll);
-
-		defaultTaggedWriters.values().stream()
-			.map(WriterRepository::getAllWriters)
-			.forEach(allWriters::addAll);
-
-		customTaggedWriters.values().stream()
+	LoggingConfiguration(Map<String, Map<Level, WriterRepository>> writers) {
+		this.mappedWriters = writers;
+		this.unmappedWriters = mappedWriters.values().stream()
 			.flatMap(map -> map.values().stream())
-			.map(WriterRepository::getAllWriters)
-			.forEach(allWriters::addAll);
-	}
-
-	/**
-	 * Gets all active writers for untagged log entries with the passed severity level.
-	 *
-	 * @param level The severity level
-	 * @return The active writers
-	 */
-	public WriterRepository getUntaggedWriters(Level level) {
-		return untaggedWriters.get(level);
+			.flatMap(repository -> repository.getAllWriters().stream())
+			.collect(Collectors.toSet());
+		this.defaultTaggedWritersGetter = tag -> mappedWriters.get(LevelConfiguration.TAGGED_PLACEHOLDER);
 	}
 
 	/**
@@ -64,8 +36,8 @@ class LoggingConfiguration {
 	 * @param level The severity level
 	 * @return The active writers
 	 */
-	public WriterRepository getTaggedWriters(String tag, Level level) {
-		return customTaggedWriters.getOrDefault(tag, defaultTaggedWriters).get(level);
+	public WriterRepository getWriters(String tag, Level level) {
+		return mappedWriters.computeIfAbsent(tag, defaultTaggedWritersGetter).get(level);
 	}
 
 	/**
@@ -74,7 +46,7 @@ class LoggingConfiguration {
 	 * @return All stored writers in any order
 	 */
 	public Collection<Writer> getAllWriters() {
-		return allWriters;
+		return unmappedWriters;
 	}
 
 }
