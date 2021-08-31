@@ -35,6 +35,36 @@ public enum Level {
 	/**
 	 * Trace log entries contain very fine-grained debug information for developers, typically the flow through.
 	 */
-	TRACE
+	TRACE;
+
+	/**
+	 * Calculates the least serve level of two passed severity level.
+	 *
+	 * @param first The first severity level to compare
+	 * @param second The second severity level to compare
+	 * @return The least serve level
+	 */
+	public static Level leastSevereLevel(Level first, Level second) {
+		if (first.ordinal() > second.ordinal()) {
+			return first;
+		} else {
+			return second;
+		}
+	}
+
+	/**
+	 * Calculates the most serve level of two passed severity level.
+	 *
+	 * @param first The first severity level to compare
+	 * @param second The second severity level to compare
+	 * @return The most serve level
+	 */
+	public static Level mostSevereLevel(Level first, Level second) {
+		if (first.ordinal() < second.ordinal()) {
+			return first;
+		} else {
+			return second;
+		}
+	}
 
 }
