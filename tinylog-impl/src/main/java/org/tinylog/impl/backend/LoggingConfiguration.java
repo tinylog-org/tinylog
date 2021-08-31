@@ -10,7 +10,7 @@ import org.tinylog.impl.writers.Writer;
 /**
  * Storage for writers that maps all stored writes to the active severity levels and tags.
  */
-class WriterMatrix {
+class LoggingConfiguration {
 
 	private final Map<Level, WriterRepository> untaggedWriters;
 	private final Map<Level, WriterRepository> defaultTaggedWriters;
@@ -23,7 +23,7 @@ class WriterMatrix {
 	 * @param defaultTaggedWriters All writers that are active for tagged log entries with unknown tags
 	 * @param customTaggedWriters All writers that are active for tagged log entries with specific tags
 	 */
-	WriterMatrix(
+	LoggingConfiguration(
 		Map<Level, WriterRepository> untaggedWriters,
 		Map<Level, WriterRepository> defaultTaggedWriters,
 		Map<String, Map<Level, WriterRepository>> customTaggedWriters

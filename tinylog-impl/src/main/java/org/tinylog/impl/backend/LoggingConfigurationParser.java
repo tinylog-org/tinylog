@@ -17,9 +17,9 @@ import org.tinylog.core.Level;
 import org.tinylog.impl.writers.Writer;
 
 /**
- * Parser for creating a {@link WriterMatrix} from the configuration of a provided {@link Framework}.
+ * Parser for creating a {@link LoggingConfiguration} from the configuration of a provided {@link Framework}.
  */
-class WriterMatrixParser {
+class LoggingConfigurationParser {
 
 	private static final String WRITER_PREFIX = "writer";
 
@@ -28,16 +28,16 @@ class WriterMatrixParser {
 	/**
 	 * @param framework The actual logging framework instance
 	 */
-	WriterMatrixParser(Framework framework) {
+	LoggingConfigurationParser(Framework framework) {
 		this.framework = framework;
 	}
 
 	/**
-	 * Parses the configuration of the stored {@link Framework} and creates a {@link WriterMatrix} based on it.
+	 * Parses the configuration of the stored {@link Framework} and creates a {@link LoggingConfiguration} based on it.
 	 *
-	 * @return The derived writer matrix with all configured writers
+	 * @return The parsed logging configuration
 	 */
-	public WriterMatrix parse() {
+	public LoggingConfiguration parse() {
 		Set<String> tags = new TreeSet<>();
 		LevelConfiguration globalLevelConfiguration = getGlobalLevelConfiguration(tags);
 		Collection<WriterConfiguration> writerConfigurations = getWriterConfigurations(tags);
@@ -64,7 +64,7 @@ class WriterMatrixParser {
 			customTaggedWriters.put(tag, customTaggedWriter);
 		}
 
-		return new WriterMatrix(untaggedWriters, defaultTaggedWriters, customTaggedWriters);
+		return new LoggingConfiguration(untaggedWriters, defaultTaggedWriters, customTaggedWriters);
 	}
 
 	/**
