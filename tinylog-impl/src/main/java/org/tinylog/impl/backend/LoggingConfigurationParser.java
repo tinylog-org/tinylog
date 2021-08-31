@@ -53,7 +53,7 @@ class LoggingConfigurationParser {
 			Map<Level, WriterRepository> taggedWriters = getWriterRepositories(
 				globalLevelConfiguration,
 				writerConfigurations,
-				levelConfiguration -> levelConfiguration.getTaggedLevel(tag)
+				levelConfiguration -> levelConfiguration.getLevel(tag)
 			);
 			allWriters.put(tag, taggedWriters);
 		}

@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
@@ -47,7 +48,60 @@ class LevelConfiguration {
 	 *                                 {@link InternalLogger#TAG tinylog} tag if not defined in the passed elements
 	 */
 	LevelConfiguration(List<String> elements, boolean addInternalTagImplicitly) {
-		levels = new HashMap<>();
+		this(parseLevels(elements, addInternalTagImplicitly));
+	}
+
+	/**
+	 * @param levels The mapping of tags or placeholders and the assigned severity levels
+	 */
+	LevelConfiguration(Map<String, Level> levels) {
+		this.levels = levels;
+	}
+
+	/**
+	 * Gets all custom tags.
+	 *
+	 * @return All tags with custom severity levels
+	 */
+	public Collection<String> getTags() {
+		return levels.keySet().stream().filter(placeholderFilter.negate()).collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets the severity level for a specific tag.
+	 *
+	 * @param tag The tag for which the configured severity level is requested (minus "{@code -}" can be used for
+	 *            getting the configured severity level for untagged log entries)
+	 * @return The severity level for the passed tag
+	 */
+	public Level getLevel(String tag) {
+		if (UNTAGGED_PLACEHOLDER.equals(tag) || TAGGED_PLACEHOLDER.equals(tag)) {
+			return levels.getOrDefault(tag, Level.OFF);
+		} else {
+			return levels.computeIfAbsent(tag, ignore -> getLevel(LevelConfiguration.TAGGED_PLACEHOLDER));
+		}
+	}
+
+	/**
+	 * Gets a stream with all internally stored entries with the tag or placeholder as key and the assigned severity
+	 * level as value.
+	 *
+	 * @return The stream with all internally stored entries
+	 */
+	public Stream<Map.Entry<String, Level>> stream() {
+		return levels.entrySet().stream();
+	}
+
+	/**
+	 * Parses configured severity levels.
+	 *
+	 * @param elements Configured severity levels (can be tagged or untagged)
+	 * @param addInternalTagImplicitly Flag for activating the severity level {@link Level#WARN WARN} implicitly for the
+	 *                                 {@link InternalLogger#TAG tinylog} tag if not defined in the passed elements
+	 * @return The mapping of tags or placeholders and the assigned severity levels
+	 */
+	private static Map<String, Level> parseLevels(List<String> elements, boolean addInternalTagImplicitly) {
+		Map<String, Level> levels = new HashMap<>();
 
 		for (String element : elements) {
 			int splitIndex = element.indexOf('@');
@@ -76,47 +130,12 @@ class LevelConfiguration {
 		}
 
 		if (addInternalTagImplicitly
-			&& !getTags().contains(InternalLogger.TAG)
+			&& !levels.containsKey(InternalLogger.TAG)
 			&& levels.getOrDefault(TAGGED_PLACEHOLDER, Level.TRACE).ordinal() > Level.WARN.ordinal()) {
 			levels.put(InternalLogger.TAG, Level.WARN);
 		}
-	}
 
-	/**
-	 * Gets all custom tags.
-	 *
-	 * @return All tags with custom severity levels
-	 */
-	public Collection<String> getTags() {
-		return levels.keySet().stream().filter(placeholderFilter.negate()).collect(Collectors.toList());
-	}
-
-	/**
-	 * Gets the configured severity level for untagged log entries.
-	 *
-	 * @return The severity level for untagged log entries
-	 */
-	public Level getUntaggedLevel() {
-		return levels.getOrDefault(UNTAGGED_PLACEHOLDER, Level.OFF);
-	}
-
-	/**
-	 * Gets the configured default severity level for tags without custom severity level.
-	 *
-	 * @return The default severity level for tagged log entries
-	 */
-	public Level getDefaultTaggedLevel() {
-		return levels.getOrDefault(TAGGED_PLACEHOLDER, Level.OFF);
-	}
-
-	/**
-	 * Gets the severity level for a specific tag.
-	 *
-	 * @param tag The tag for which the configured severity level is requested
-	 * @return The severity level for the passed tag
-	 */
-	public Level getTaggedLevel(String tag) {
-		return levels.getOrDefault(tag, getDefaultTaggedLevel());
+		return levels;
 	}
 
 }

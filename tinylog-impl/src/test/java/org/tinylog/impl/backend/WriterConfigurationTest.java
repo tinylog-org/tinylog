@@ -34,9 +34,8 @@ class WriterConfigurationTest {
 
 		LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
 		assertThat(levelConfiguration.getTags()).isEmpty();
-		assertThat(levelConfiguration.getUntaggedLevel()).isEqualTo(Level.TRACE);
-		assertThat(levelConfiguration.getDefaultTaggedLevel()).isEqualTo(Level.TRACE);
-		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.TRACE);
+		assertThat(levelConfiguration.getLevel("-")).isEqualTo(Level.TRACE);
+		assertThat(levelConfiguration.getLevel("foo")).isEqualTo(Level.TRACE);
 
 		Writer firstWriter = writerConfiguration.getOrCreateWriter();
 		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);
@@ -58,9 +57,8 @@ class WriterConfigurationTest {
 
 		LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
 		assertThat(levelConfiguration.getTags()).isEmpty();
-		assertThat(levelConfiguration.getUntaggedLevel()).isEqualTo(Level.DEBUG);
-		assertThat(levelConfiguration.getDefaultTaggedLevel()).isEqualTo(Level.DEBUG);
-		assertThat(levelConfiguration.getTaggedLevel("foo")).isEqualTo(Level.DEBUG);
+		assertThat(levelConfiguration.getLevel("-")).isEqualTo(Level.DEBUG);
+		assertThat(levelConfiguration.getLevel("foo")).isEqualTo(Level.DEBUG);
 
 		Writer firstWriter = writerConfiguration.getOrCreateWriter();
 		assertThat(firstWriter).isInstanceOf(ConsoleWriter.class);
