@@ -24,6 +24,15 @@ class LoggingConfigurationParserTest {
 	@Test
 	void emptyConfiguration() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.OFF);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.OFF);
+			});
+
 		assertThat(configuration.getAllWriters()).isEmpty();
 	}
 
@@ -34,6 +43,14 @@ class LoggingConfigurationParserTest {
 	@Test
 	void writerWithoutAnySeverityLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.TRACE);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.TRACE);
+			});
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
@@ -58,6 +75,14 @@ class LoggingConfigurationParserTest {
 	void writerWithGlobalSeverityLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
 
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.INFO);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.INFO);
+			});
+
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
 		assertThat(configuration.getWriters("-", Level.TRACE)).isEmpty();
@@ -74,6 +99,47 @@ class LoggingConfigurationParserTest {
 	}
 
 	/**
+	 * Verifies that specific severity levels can be set for packages and classes.
+	 */
+	@CaptureLogEntries(configuration = {"level=INFO", "level@bar=WARN", "level@bar.Foo=DEBUG", "writer.type=console"})
+	@Test
+	void writerWithPackageAndClassSeverityLevels() {
+		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(3)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.INFO);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.INFO);
+			})
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("bar");
+				assertThat(value.getLevel("-")).isEqualTo(Level.WARN);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.WARN);
+			})
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("bar.Foo");
+				assertThat(value.getLevel("-")).isEqualTo(Level.DEBUG);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.DEBUG);
+			});
+
+		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
+
+		assertThat(configuration.getWriters("-", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("-", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.ERROR)).hasSize(1);
+
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
+	}
+
+	/**
 	 * Verifies that a custom severity level can be defined for a writer.
 	 */
 	@CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG"})
@@ -81,6 +147,14 @@ class LoggingConfigurationParserTest {
 	void writerWithCustomSeverityLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
 
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.DEBUG);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.DEBUG);
+			});
+
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
 		assertThat(configuration.getWriters("-", Level.TRACE)).isEmpty();
@@ -97,12 +171,57 @@ class LoggingConfigurationParserTest {
 	}
 
 	/**
-	 * Verifies that the custom severity level will be used, if it is more restrict than the global severity level.
+	 * Verifies that severity levels of packages and classes are adjusted to the custom severity level of the writer.
+	 */
+	@CaptureLogEntries(configuration = {"level=WARN", "level@bar=DEBUG", "writer.type=console", "writer.level=INFO"})
+	@Test
+	void writerWithCustomAndPackageSeverityLevels() {
+		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(2)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.WARN);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.WARN);
+			})
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("bar");
+				assertThat(value.getLevel("-")).isEqualTo(Level.INFO);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.INFO);
+			});
+
+		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
+
+		assertThat(configuration.getWriters("-", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("-", Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters("-", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.ERROR)).hasSize(1);
+
+		assertThat(configuration.getWriters("foo", Level.TRACE)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).isEmpty();
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
+	}
+
+	/**
+	 * Verifies that the custom severity level of a writer will be used, if it is more severe than the global severity
+	 * level.
 	 */
 	@CaptureLogEntries(configuration = {"level=TRACE", "writer.type=console", "writer.level=DEBUG"})
 	@Test
-	void writerWithHigherCustomSeverityLevel() {
+	void writerWithMoreSevereLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.DEBUG);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.DEBUG);
+			});
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
@@ -120,12 +239,21 @@ class LoggingConfigurationParserTest {
 	}
 
 	/**
-	 * Verifies that the global severity level will be used, if it is more restrict than the custom severity level.
+	 * Verifies that the global severity level will be used, if it is more severe than the custom severity level of
+	 * the writer.
 	 */
 	@CaptureLogEntries(configuration = {"level=INFO", "writer.type=console", "writer.level=DEBUG"})
 	@Test
-	void writerWithLowerCustomSeverityLevel() {
+	void writerWithLessSevereLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.INFO);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.INFO);
+			});
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
@@ -149,6 +277,15 @@ class LoggingConfigurationParserTest {
 	@Test
 	void writerWithDisabledSeverityLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.OFF);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.OFF);
+			});
+
 		assertThat(configuration.getAllWriters()).isEmpty();
 	}
 
@@ -159,6 +296,14 @@ class LoggingConfigurationParserTest {
 	@Test
 	void writerWithTaggedSeverityLevel() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.OFF);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.DEBUG);
+			});
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
@@ -182,6 +327,14 @@ class LoggingConfigurationParserTest {
 	@Test
 	void writerWithMixedSeverityLevels() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.DEBUG);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.WARN);
+			});
 
 		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
 
@@ -207,6 +360,14 @@ class LoggingConfigurationParserTest {
 	@Test
 	void multipleWriters() {
 		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.DEBUG);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.DEBUG);
+			});
 
 		assertThat(configuration.getAllWriters())
 			.hasSize(2)

@@ -18,9 +18,15 @@ import org.tinylog.core.internal.InternalLogger;
 class LevelConfiguration {
 
 	/**
-	 * The property name for severity level configurations.
+	 * The property name for the global severity level configuration.
 	 */
 	static final String KEY = "level";
+
+	/**
+	 * The separator character to use between {@link #KEY} and packages or classes for property names for custom
+	 * severity levels.
+	 */
+	static final char SEPARATOR = '@';
 
 	/**
 	 * The placeholder for all log entries (tagged and untagged).

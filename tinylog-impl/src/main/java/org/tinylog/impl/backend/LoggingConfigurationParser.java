@@ -3,14 +3,12 @@ package org.tinylog.impl.backend;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
@@ -44,35 +42,51 @@ class LoggingConfigurationParser {
 			LevelConfiguration.TAGGED_PLACEHOLDER
 		));
 
-		LevelConfiguration globalLevelConfiguration = getGlobalLevelConfiguration(tags);
+		Map<String, LevelConfiguration> levelConfigurations = getLevelConfigurations(tags);
 		Collection<WriterConfiguration> writerConfigurations = getWriterConfigurations(tags);
 
-		Map<String, Map<Level, WriterRepository>> allWriters = new HashMap<>();
-
+		Map<String, Map<Level, WriterRepository>> writerRepositories = new HashMap<>();
 		for (String tag : tags) {
-			Map<Level, WriterRepository> taggedWriters = getWriterRepositories(
-				globalLevelConfiguration,
-				writerConfigurations,
-				levelConfiguration -> levelConfiguration.getLevel(tag)
+			Map<Level, WriterRepository> taggedWriterRepositories = getWriterRepositories(
+				tag,
+				levelConfigurations,
+				writerConfigurations
 			);
-			allWriters.put(tag, taggedWriters);
+			writerRepositories.put(tag, taggedWriterRepositories);
 		}
 
-		return new LoggingConfiguration(allWriters);
+		return new LoggingConfiguration(levelConfigurations, writerRepositories);
 	}
 
 	/**
-	 * Provides the global severity level configuration while adding all found tags, which are found in the global
-	 * severity configuration, to the passed set.
+	 * Provides the severity level configurations for all packages and classes while adding all found tags, which are
+	 * found in these severity level configurations, to the passed set.
 	 *
 	 * @param tags All found tags will be added to this set
-	 * @return The parsed global severity level configuration
+	 * @return All found severity level configurations
 	 */
-	private LevelConfiguration getGlobalLevelConfiguration(Set<String> tags) {
-		List<String> globalLevels = framework.getConfiguration().getList(LevelConfiguration.KEY);
+	private Map<String, LevelConfiguration> getLevelConfigurations(Set<String> tags) {
+		Map<String, LevelConfiguration> levels = new HashMap<>();
+
+		Configuration configuration = framework.getConfiguration();
+		List<String> globalLevels = configuration.getList(LevelConfiguration.KEY);
 		LevelConfiguration globalLevelConfiguration = new LevelConfiguration(globalLevels, true);
 		tags.addAll(globalLevelConfiguration.getTags());
-		return globalLevelConfiguration;
+		levels.put("", globalLevelConfiguration);
+
+		Configuration subConfiguration = configuration.getSubConfiguration(
+			LevelConfiguration.KEY,
+			LevelConfiguration.SEPARATOR
+		);
+
+		for (String key : subConfiguration.getKeys()) {
+			List<String> customLevels = subConfiguration.getList(key);
+			LevelConfiguration customLevelConfiguration = new LevelConfiguration(customLevels, true);
+			tags.addAll(customLevelConfiguration.getTags());
+			levels.put(key, customLevelConfiguration);
+		}
+
+		return levels;
 	}
 
 	/**
@@ -101,27 +115,27 @@ class LoggingConfigurationParser {
 	/**
 	 * Maps all writers from the passed writer configurations to their enabled severity levels.
 	 *
-	 * @param globalLevelConfiguration The global severity level configuration
+	 * @param tag The tag for which writers should map to their enabled severity levels
+	 * @param levelConfigurations All severity level configurations
 	 * @param writerConfigurations All relevant writer configuration
-	 * @param levelExtractor The function to get the relevant severity level from a writer configuration
 	 * @return A map with the active writers for each severity level
 	 */
 	private Map<Level, WriterRepository> getWriterRepositories(
-		LevelConfiguration globalLevelConfiguration,
-		Collection<WriterConfiguration> writerConfigurations,
-		Function<LevelConfiguration, Level> levelExtractor
+		String tag,
+		Map<String, LevelConfiguration> levelConfigurations,
+		Collection<WriterConfiguration> writerConfigurations
 	) {
 		Map<Level, WriterRepository> writerRepositories = new EnumMap<>(Level.class);
-		Level maxLevel = getEffectiveLevel(globalLevelConfiguration, writerConfigurations, levelExtractor);
+		Level effectiveLevel = getEffectiveLevel(tag, levelConfigurations, writerConfigurations);
 
 		for (Level level : Level.values()) {
 			if (level != Level.OFF) {
 				List<Writer> writers = new ArrayList<>();
 
-				if (level.isAtLeastAsSevereAs(maxLevel)) {
+				if (level.isAtLeastAsSevereAs(effectiveLevel)) {
 					for (WriterConfiguration writerConfiguration : writerConfigurations) {
-						Level configuredLevel = levelExtractor.apply(writerConfiguration.getLevelConfiguration());
-						if (level.isAtLeastAsSevereAs(configuredLevel)) {
+						Level configuredLevel = writerConfiguration.getLevelConfiguration().getLevel(tag);
+						if (configuredLevel.ordinal() >= level.ordinal()) {
 							writers.add(writerConfiguration.getOrCreateWriter());
 						}
 					}
@@ -137,24 +151,28 @@ class LoggingConfigurationParser {
 	/**
 	 * Gets the effective severity level from which log entries can be really output.
 	 *
-	 * @param globalLevelConfiguration The global severity level configuration
+	 * @param tag The tag for which the effective severity level should be returned
+	 * @param levelConfigurations All severity level configurations
 	 * @param writerConfigurations All relevant writer configuration
-	 * @param levelExtractor The function to get the relevant severity level from a writer configuration
 	 * @return The effective severity level from which log entries can be really output
 	 */
 	private Level getEffectiveLevel(
-		LevelConfiguration globalLevelConfiguration,
-		Collection<WriterConfiguration> writerConfigurations,
-		Function<LevelConfiguration, Level> levelExtractor
+		String tag,
+		Map<String, LevelConfiguration> levelConfigurations,
+		Collection<WriterConfiguration> writerConfigurations
 	) {
-		Level maxGlobalLevel = levelExtractor.apply(globalLevelConfiguration);
-		Level maxWriterLevel = writerConfigurations.stream()
+		Level globalLevel = levelConfigurations.values().stream()
+			.map(configuration -> configuration.getLevel(tag))
+			.reduce(Level::leastSevereLevel)
+			.orElse(Level.TRACE);
+
+		Level writerLevel = writerConfigurations.stream()
 			.map(WriterConfiguration::getLevelConfiguration)
-			.map(levelExtractor)
-			.max(Comparator.naturalOrder())
+			.map(configuration -> configuration.getLevel(tag))
+			.reduce(Level::leastSevereLevel)
 			.orElse(Level.OFF);
 
-		return Level.mostSevereLevel(maxGlobalLevel, maxWriterLevel);
+		return Level.mostSevereLevel(globalLevel, writerLevel);
 	}
 
 }
