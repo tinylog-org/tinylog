@@ -154,7 +154,7 @@ class LoggingConfigurationParser {
 			.max(Comparator.naturalOrder())
 			.orElse(Level.OFF);
 
-		return maxGlobalLevel.ordinal() < maxWriterLevel.ordinal() ? maxGlobalLevel : maxWriterLevel;
+		return Level.mostSevereLevel(maxGlobalLevel, maxWriterLevel);
 	}
 
 }

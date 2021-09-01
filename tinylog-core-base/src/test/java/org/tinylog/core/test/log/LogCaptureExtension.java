@@ -51,7 +51,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 		});
 
 		if (lastAnnotation == null || lastAnnotation.autostart()) {
-			log.setMinLevel(minLevel.ordinal() <= Level.WARN.ordinal() ? minLevel : Level.WARN);
+			log.setMinLevel(Level.mostSevereLevel(minLevel, Level.WARN));
 			framework.startUp();
 		}
 
@@ -65,7 +65,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 			Framework framework = get(context, Framework.class);
 			Log log = get(context, Log.class);
 
-			log.setMinLevel(minLevel.ordinal() <= Level.WARN.ordinal() ? minLevel : Level.WARN);
+			log.setMinLevel(Level.mostSevereLevel(minLevel, Level.WARN));
 			framework.shutDown();
 			log.setMinLevel(minLevel);
 
