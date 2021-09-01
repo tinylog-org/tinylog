@@ -7,6 +7,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LevelTest {
 
 	/**
+	 * Verifies that testing if a severity level is at least as severe as another severity level works correctly.
+	 */
+	@Test
+	public void isAtLeastAsSevereAs() {
+		assertThat(Level.INFO.isAtLeastAsSevereAs(Level.WARN)).isFalse();
+		assertThat(Level.INFO.isAtLeastAsSevereAs(Level.INFO)).isTrue();
+		assertThat(Level.INFO.isAtLeastAsSevereAs(Level.DEBUG)).isTrue();
+	}
+
+	/**
 	 * Verifies that the least severe level of two passed severity levels can be determined correctly.
 	 */
 	@Test

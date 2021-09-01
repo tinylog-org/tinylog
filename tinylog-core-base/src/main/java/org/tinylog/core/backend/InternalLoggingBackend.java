@@ -41,13 +41,13 @@ public class InternalLoggingBackend implements LoggingBackend {
 
 	@Override
 	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
-		return Objects.equals(tag, InternalLogger.TAG) && level.ordinal() <= Level.WARN.ordinal();
+		return Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN);
 	}
 
 	@Override
 	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter) {
-		if (Objects.equals(tag, InternalLogger.TAG) && level.ordinal() <= Level.WARN.ordinal()) {
+		if (Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN)) {
 			StringBuilder builder = new StringBuilder();
 
 			builder.append("TINYLOG ");

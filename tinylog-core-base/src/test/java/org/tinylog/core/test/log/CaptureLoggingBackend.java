@@ -34,17 +34,17 @@ class CaptureLoggingBackend implements LoggingBackend {
 	@Override
 	public LevelVisibility getLevelVisibility(String tag) {
 		return new LevelVisibility(
-			Level.TRACE.ordinal() <= visibleLevel.ordinal(),
-			Level.DEBUG.ordinal() <= visibleLevel.ordinal(),
-			Level.INFO.ordinal() <= visibleLevel.ordinal(),
-			Level.WARN.ordinal() <= visibleLevel.ordinal(),
-			Level.ERROR.ordinal() <= visibleLevel.ordinal()
+			Level.TRACE.isAtLeastAsSevereAs(visibleLevel),
+			Level.DEBUG.isAtLeastAsSevereAs(visibleLevel),
+			Level.INFO.isAtLeastAsSevereAs(visibleLevel),
+			Level.WARN.isAtLeastAsSevereAs(visibleLevel),
+			Level.ERROR.isAtLeastAsSevereAs(visibleLevel)
 		);
 	}
 
 	@Override
 	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
-		return level.ordinal() <= log.getMinLevel().ordinal();
+		return level.isAtLeastAsSevereAs(log.getMinLevel());
 	}
 
 	@Override

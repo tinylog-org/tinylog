@@ -38,6 +38,17 @@ public enum Level {
 	TRACE;
 
 	/**
+	 * Tests if this severity level is at least as severe as the passed severity level.
+	 *
+	 * @param other The severity level to compare with
+	 * @return {@code true} if this severity level is same severe as the passed severity level or more severe than it,
+	 *         {@code false} if this severity level is less severe than the passed severity level
+	 */
+	public boolean isAtLeastAsSevereAs(Level other) {
+		return this.ordinal() <= other.ordinal();
+	}
+
+	/**
 	 * Calculates the least serve level of two passed severity level.
 	 *
 	 * @param first The first severity level to compare

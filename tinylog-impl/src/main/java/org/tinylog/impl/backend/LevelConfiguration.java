@@ -131,7 +131,7 @@ class LevelConfiguration {
 
 		if (addInternalTagImplicitly
 			&& !levels.containsKey(InternalLogger.TAG)
-			&& levels.getOrDefault(TAGGED_PLACEHOLDER, Level.TRACE).ordinal() > Level.WARN.ordinal()) {
+			&& !levels.getOrDefault(TAGGED_PLACEHOLDER, Level.TRACE).isAtLeastAsSevereAs(Level.WARN)) {
 			levels.put(InternalLogger.TAG, Level.WARN);
 		}
 

@@ -58,7 +58,7 @@ public class Log {
 	 * @param entry Log entry to append to this log
 	 */
 	void add(LogEntry entry) {
-		if (entry.getLevel().ordinal() <= minLevel.ordinal()) {
+		if (entry.getLevel().isAtLeastAsSevereAs(minLevel)) {
 			entries.add(entry);
 		}
 	}

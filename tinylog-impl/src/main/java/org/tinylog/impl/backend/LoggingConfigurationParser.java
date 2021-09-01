@@ -118,10 +118,10 @@ class LoggingConfigurationParser {
 			if (level != Level.OFF) {
 				List<Writer> writers = new ArrayList<>();
 
-				if (level.ordinal() <= maxLevel.ordinal()) {
+				if (level.isAtLeastAsSevereAs(maxLevel)) {
 					for (WriterConfiguration writerConfiguration : writerConfigurations) {
 						Level configuredLevel = levelExtractor.apply(writerConfiguration.getLevelConfiguration());
-						if (configuredLevel.ordinal() >= level.ordinal()) {
+						if (level.isAtLeastAsSevereAs(configuredLevel)) {
 							writers.add(writerConfiguration.getOrCreateWriter());
 						}
 					}
