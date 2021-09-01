@@ -223,7 +223,23 @@ public class Configuration {
 	 * @return All found properties with keys shortened by the prefix
 	 */
 	public Configuration getSubConfiguration(String prefix) {
-		prefix = prefix + ".";
+		return getSubConfiguration(prefix, '.');
+	}
+
+	/**
+	 * Collects all properties that start with the passed prefix and passed separator character.
+	 *
+	 * <p>
+	 *     For example, the property "foo@bar=42" would be returned as "bar=42" for a prefix "foo" and separator
+	 *     character '@'.
+	 * </p>
+	 *
+	 * @param prefix The prefix of desired property keys
+	 * @param separator The character to use as separator
+	 * @return All found properties with keys shortened by the prefix and separator character
+	 */
+	public Configuration getSubConfiguration(String prefix, char separator) {
+		prefix = prefix + separator;
 
 		Configuration configuration = new Configuration(this, resolveFullKey(prefix));
 		synchronized (properties) {

@@ -293,16 +293,18 @@ class ConfigurationTest {
 		}
 
 		/**
-		 * Verifies that an existing prefixed subset of the configuration can be retrieved.
+		 * Verifies that an existing prefixed subset of the configuration can be retrieved using the default separator
+		 * character ".".
 		 */
 		@Test
-		void getSubConfiguration() {
+		void getDefaultSubConfiguration() {
 			Configuration configuration = new Configuration()
 				.set("bar", "1")
 				.set("foo", "2")
 				.set("foo.alice", "3")
 				.set("foo.bob", "4")
-				.set("foobar", "5")
+				.set("foo@fred", "5")
+				.set("foobar", "6")
 				.getSubConfiguration("foo");
 
 			assertThat(configuration.getKeys()).containsExactly("alice", "bob");
@@ -310,7 +312,26 @@ class ConfigurationTest {
 		}
 
 		/**
-		 * Verifies that all root keys are collected completely and in alphabetical order.
+		 * Verifies that an existing prefixed subset of the configuration can be retrieved using a custom separator
+		 * character.
+		 */
+		@Test
+		void getCustomSubConfiguration() {
+			Configuration configuration = new Configuration()
+				.set("bar", "1")
+				.set("foo", "2")
+				.set("foo@alice", "3")
+				.set("foo@bob", "4")
+				.set("foo.fred", "5")
+				.set("foobar", "6")
+				.getSubConfiguration("foo", '@');
+
+			assertThat(configuration.getKeys()).containsExactly("alice", "bob");
+			assertThat(configuration.isFrozen()).isTrue();
+		}
+
+		/**
+		 * Verifies that all root keys are collected completely and in order.
 		 */
 		@Test
 		void getRootKeys() {
