@@ -19,7 +19,7 @@ class CaptureLoggingBackend implements LoggingBackend {
 
 	/**
 	 * @param log All issued log entries will be stored in this {@link Log}
-	 * @param visibleLevel The minimum visible severity level for {@link #getLevelVisibility(String)}
+	 * @param visibleLevel The least severe visible severity level for {@link #getLevelVisibility(String)}
 	 */
 	CaptureLoggingBackend(Log log, Level visibleLevel) {
 		this.log = log;
@@ -44,7 +44,7 @@ class CaptureLoggingBackend implements LoggingBackend {
 
 	@Override
 	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
-		return level.isAtLeastAsSevereAs(log.getMinLevel());
+		return level.isAtLeastAsSevereAs(log.getLevel());
 	}
 
 	@Override

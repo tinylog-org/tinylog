@@ -10,33 +10,33 @@ import org.tinylog.core.Level;
  */
 public class Log {
 
-	private Level minLevel;
+	private Level level;
 	private List<LogEntry> entries;
 
 	/** */
 	public Log() {
-		minLevel = Level.INFO;
+		level = Level.INFO;
 		entries = new ArrayList<>();
 	}
 
 	/**
-	 * Gets the new minimum severity level. All log entries with a severity level less severe than the minimum level are
+	 * Gets the actual severity level. All log entries with a severity level less severe than this severity level are
 	 * ignored.
 	 *
-	 * @return The actual configured minimum severity level
+	 * @return The actual severity level
 	 */
-	public Level getMinLevel() {
-		return minLevel;
+	public Level getLevel() {
+		return level;
 	}
 
 	/**
-	 * Sets a new minimum severity level. All log entries with a severity level less severe than the minimum level are
+	 * Sets a new severity level. All log entries with a severity level less severe than this severity level are
 	 * ignored.
 	 *
-	 * @param level New minimum severity level
+	 * @param level The new severity level
 	 */
-	public void setMinLevel(Level level) {
-		this.minLevel = level;
+	public void setLevel(Level level) {
+		this.level = level;
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class Log {
 	 * @param entry Log entry to append to this log
 	 */
 	void add(LogEntry entry) {
-		if (entry.getLevel().isAtLeastAsSevereAs(minLevel)) {
+		if (entry.getLevel().isAtLeastAsSevereAs(level)) {
 			entries.add(entry);
 		}
 	}

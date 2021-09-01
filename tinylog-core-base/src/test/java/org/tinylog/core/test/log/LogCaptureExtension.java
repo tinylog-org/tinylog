@@ -31,8 +31,8 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 		List<CaptureLogEntries> annotations = findAnnotations(context, CaptureLogEntries.class);
 		CaptureLogEntries lastAnnotation = annotations.isEmpty() ? null : annotations.get(annotations.size() - 1);
 
-		Level minLevel = lastAnnotation == null ? Level.WARN : lastAnnotation.minLevel();
-		put(context, Level.class, minLevel);
+		Level level = lastAnnotation == null ? Level.WARN : lastAnnotation.level();
+		put(context, Level.class, level);
 
 		Framework framework = getOrCreateFramework(context);
 		injectFields(context, framework);
@@ -51,23 +51,23 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 		});
 
 		if (lastAnnotation == null || lastAnnotation.autostart()) {
-			log.setMinLevel(Level.mostSevereLevel(minLevel, Level.WARN));
+			log.setLevel(Level.mostSevereLevel(level, Level.WARN));
 			framework.startUp();
 		}
 
-		log.setMinLevel(minLevel);
+		log.setLevel(level);
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) {
 		try {
-			Level minLevel = get(context, Level.class);
+			Level level = get(context, Level.class);
 			Framework framework = get(context, Framework.class);
 			Log log = get(context, Log.class);
 
-			log.setMinLevel(Level.mostSevereLevel(minLevel, Level.WARN));
+			log.setLevel(Level.mostSevereLevel(level, Level.WARN));
 			framework.shutDown();
-			log.setMinLevel(minLevel);
+			log.setLevel(level);
 
 			Assertions
 				.assertThat(log.consume())

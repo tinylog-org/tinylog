@@ -32,11 +32,11 @@ public @interface CaptureLogEntries {
 	String[] configuration() default "";
 
 	/**
-	 * All log entries with a severity level less severe than the configured minimum level are ignored.
+	 * All log entries with a severity level less severe than the configured level are ignored.
 	 *
-	 * @return The configured minimum severity level
+	 * @return The configured severity level
 	 */
-	Level minLevel() default Level.WARN;
+	Level level() default Level.WARN;
 
 	/**
 	 * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,

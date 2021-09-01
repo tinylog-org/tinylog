@@ -211,7 +211,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceTextMessage() {
 				logger.trace("Hello World!");
@@ -222,7 +222,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceMessageObject() {
 				logger.trace(42);
@@ -233,7 +233,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceLazyMessage() {
 				logger.trace(() -> "Hello World!");
@@ -244,7 +244,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceFormattedMessageWithArgument() {
 				logger.trace("Hello {}!", "Alice");
@@ -255,7 +255,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceFormattedMessageWithLazyArgument() {
 				logger.trace("Hello {}!", () -> "Alice");
@@ -266,7 +266,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceException() {
 				Exception exception = new Exception();
@@ -278,7 +278,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceExceptionAndTextMessage() {
 				Exception exception = new Exception();
@@ -290,7 +290,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceExceptionAndLazyMessage() {
 				Exception exception = new Exception();
@@ -302,7 +302,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceExceptionAndFormattedMessageWithArgument() {
 				Exception exception = new Exception();
@@ -315,7 +315,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.TRACE)
+			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			void traceExceptionAndFormattedMessageWithLazyArgument() {
 				Exception exception = new Exception();
@@ -327,7 +327,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugTextMessage() {
 				logger.debug("Hello World!");
@@ -338,7 +338,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugMessageObject() {
 				logger.debug(42);
@@ -349,7 +349,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugLazyMessage() {
 				logger.debug(() -> "Hello World!");
@@ -360,7 +360,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugFormattedMessageWithArgument() {
 				logger.debug("Hello {}!", "Alice");
@@ -371,7 +371,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugFormattedMessageWithLazyArgument() {
 				logger.debug("Hello {}!", () -> "Alice");
@@ -382,7 +382,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugException() {
 				Exception exception = new Exception();
@@ -394,7 +394,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugExceptionAndTextMessage() {
 				Exception exception = new Exception();
@@ -406,7 +406,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugExceptionAndLazyMessage() {
 				Exception exception = new Exception();
@@ -418,7 +418,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugExceptionAndFormattedMessageWithArgument() {
 				Exception exception = new Exception();
@@ -431,7 +431,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void debugExceptionAndFormattedMessageWithLazyArgument() {
 				Exception exception = new Exception();
@@ -443,7 +443,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoTextMessage() {
 				logger.info("Hello World!");
@@ -454,7 +454,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoMessageObject() {
 				logger.info(42);
@@ -465,7 +465,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoLazyMessage() {
 				logger.info(() -> "Hello World!");
@@ -476,7 +476,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoFormattedMessageWithArgument() {
 				logger.info("Hello {}!", "Alice");
@@ -487,7 +487,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoFormattedMessageWithLazyArgument() {
 				logger.info("Hello {}!", () -> "Alice");
@@ -498,7 +498,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoException() {
 				Exception exception = new Exception();
@@ -510,7 +510,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoExceptionAndTextMessage() {
 				Exception exception = new Exception();
@@ -522,7 +522,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoExceptionAndLazyMessage() {
 				Exception exception = new Exception();
@@ -534,7 +534,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoExceptionAndFormattedMessageWithArgument() {
 				Exception exception = new Exception();
@@ -547,7 +547,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void infoExceptionAndFormattedMessageWithLazyArgument() {
 				Exception exception = new Exception();
@@ -559,7 +559,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnTextMessage() {
 				logger.warn("Hello World!");
@@ -570,7 +570,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnMessageObject() {
 				logger.warn(42);
@@ -581,7 +581,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnLazyMessage() {
 				logger.warn(() -> "Hello World!");
@@ -592,7 +592,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnFormattedMessageWithArgument() {
 				logger.warn("Hello {}!", "Alice");
@@ -603,7 +603,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnFormattedMessageWithLazyArgument() {
 				logger.warn("Hello {}!", () -> "Alice");
@@ -614,7 +614,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnException() {
 				Exception exception = new Exception();
@@ -626,7 +626,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnExceptionAndTextMessage() {
 				Exception exception = new Exception();
@@ -638,7 +638,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnExceptionAndLazyMessage() {
 				Exception exception = new Exception();
@@ -650,7 +650,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnExceptionAndFormattedMessageWithArgument() {
 				Exception exception = new Exception();
@@ -663,7 +663,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments
 			 * can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void warnExceptionAndFormattedMessageWithLazyArgument() {
 				Exception exception = new Exception();
@@ -675,7 +675,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorTextMessage() {
 				logger.error("Hello World!");
@@ -686,7 +686,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorMessageObject() {
 				logger.error(42);
@@ -697,7 +697,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorLazyMessage() {
 				logger.error(() -> "Hello World!");
@@ -708,7 +708,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorFormattedMessageWithArgument() {
 				logger.error("Hello {}!", "Alice");
@@ -719,7 +719,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorFormattedMessageWithLazyArgument() {
 				logger.error("Hello {}!", () -> "Alice");
@@ -730,7 +730,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorException() {
 				Exception exception = new Exception();
@@ -742,7 +742,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorExceptionAndTextMessage() {
 				Exception exception = new Exception();
@@ -754,7 +754,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorExceptionAndLazyMessage() {
 				Exception exception = new Exception();
@@ -766,7 +766,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorExceptionAndFormattedMessageWithArgument() {
 				Exception exception = new Exception();
@@ -779,7 +779,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void errorExceptionAndFormattedMessageWithLazyArgument() {
 				Exception exception = new Exception();
@@ -812,7 +812,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceTextMessage() {
 				logger.trace("Hello World!");
@@ -822,7 +822,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an object is discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceMessageObject() {
 				logger.trace(42);
@@ -833,7 +833,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with a lazy text message is discarded if the trace severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceLazyMessage() {
 				logger.trace(() -> "Hello World!");
@@ -844,7 +844,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with a message with placeholders is discarded if the trace severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceFormattedMessageWithArgument() {
 				logger.trace("Hello {}!", "Alice");
@@ -855,7 +855,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with a message with placeholders and lazy arguments is discarded if the
 			 * trace severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceFormattedMessageWithLazyArgument() {
 				logger.trace("Hello {}!", () -> "Alice");
@@ -865,7 +865,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception is discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceException() {
 				logger.trace(new Exception());
@@ -876,7 +876,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with an exception and a plain text message is discarded if the trace
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceExceptionAndTextMessage() {
 				logger.trace(new Exception(), "Oops!");
@@ -887,7 +887,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with an exception and a lazy text message is discarded if the trace
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceExceptionAndLazyMessage() {
 				logger.trace(new Exception(), () -> "Oops!");
@@ -898,7 +898,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders is discarded if the
 			 * trace severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceExceptionAndFormattedMessageWithArgument() {
 				logger.trace(new Exception(), "Hello {}!", "Alice");
@@ -909,7 +909,7 @@ class TaggedLoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.DEBUG)
+			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			void traceExceptionAndFormattedMessageWithLazyArgument() {
 				logger.trace(new Exception(), "Hello {}!", () -> "Alice");
@@ -920,7 +920,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with a plain text message is discarded if the trace severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugTextMessage() {
 				logger.debug("Hello World!");
@@ -930,7 +930,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an object is discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugMessageObject() {
 				logger.debug(42);
@@ -941,7 +941,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with a lazy text message is discarded if the debug severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugLazyMessage() {
 				logger.debug(() -> "Hello World!");
@@ -952,7 +952,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with a message with placeholders is discarded if the debug severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugFormattedMessageWithArgument() {
 				logger.debug("Hello {}!", "Alice");
@@ -963,7 +963,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with a message with placeholders and lazy arguments is discarded if the
 			 * debug severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugFormattedMessageWithLazyArgument() {
 				logger.debug("Hello {}!", () -> "Alice");
@@ -973,7 +973,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception is discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugException() {
 				logger.debug(new Exception());
@@ -984,7 +984,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with an exception and a plain text message is discarded if the debug
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugExceptionAndTextMessage() {
 				logger.debug(new Exception(), "Oops!");
@@ -995,7 +995,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with an exception and a lazy text message is discarded if the debug
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugExceptionAndLazyMessage() {
 				logger.debug(new Exception(), () -> "Oops!");
@@ -1006,7 +1006,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders is discarded if the
 			 * debug severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugExceptionAndFormattedMessageWithArgument() {
 				logger.debug(new Exception(), "Hello {}!", "Alice");
@@ -1017,7 +1017,7 @@ class TaggedLoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.INFO)
+			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			void debugExceptionAndFormattedMessageWithLazyArgument() {
 				logger.debug(new Exception(), "Hello {}!", () -> "Alice");
@@ -1028,7 +1028,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with a plain text message is discarded if the info severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoTextMessage() {
 				logger.info("Hello World!");
@@ -1038,7 +1038,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an object is discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoMessageObject() {
 				logger.info(42);
@@ -1049,7 +1049,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with a lazy text message is discarded if the info severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoLazyMessage() {
 				logger.info(() -> "Hello World!");
@@ -1060,7 +1060,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with a message with placeholders is discarded if the info severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoFormattedMessageWithArgument() {
 				logger.info("Hello {}!", "Alice");
@@ -1071,7 +1071,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with a message with placeholders and lazy arguments is discarded if the
 			 * info severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoFormattedMessageWithLazyArgument() {
 				logger.info("Hello {}!", () -> "Alice");
@@ -1081,7 +1081,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception is discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoException() {
 				logger.info(new Exception());
@@ -1092,7 +1092,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with an exception and a plain text message is discarded if the info
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoExceptionAndTextMessage() {
 				logger.info(new Exception(), "Oops!");
@@ -1103,7 +1103,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with an exception and a lazy text message is discarded if the info
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoExceptionAndLazyMessage() {
 				logger.info(new Exception(), () -> "Oops!");
@@ -1114,7 +1114,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders is discarded if the
 			 * info severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoExceptionAndFormattedMessageWithArgument() {
 				logger.info(new Exception(), "Hello {}!", "Alice");
@@ -1125,7 +1125,7 @@ class TaggedLoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.WARN)
+			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			void infoExceptionAndFormattedMessageWithLazyArgument() {
 				logger.info(new Exception(), "Hello {}!", () -> "Alice");
@@ -1136,7 +1136,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with a plain text message is discarded if the warn severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnTextMessage() {
 				logger.warn("Hello World!");
@@ -1146,7 +1146,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an object is discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnMessageObject() {
 				logger.warn(42);
@@ -1157,7 +1157,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with a lazy text message is discarded if the warn severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnLazyMessage() {
 				logger.warn(() -> "Hello World!");
@@ -1168,7 +1168,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with a message with placeholders is discarded if the warn severity
 			 * level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnFormattedMessageWithArgument() {
 				logger.warn("Hello {}!", "Alice");
@@ -1179,7 +1179,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with a message with placeholders and lazy arguments is discarded if the
 			 * warn severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnFormattedMessageWithLazyArgument() {
 				logger.warn("Hello {}!", () -> "Alice");
@@ -1189,7 +1189,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception is discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnException() {
 				logger.warn(new Exception());
@@ -1200,7 +1200,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with an exception and a plain text message is discarded if the warn
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnExceptionAndTextMessage() {
 				logger.warn(new Exception(), "Oops!");
@@ -1211,7 +1211,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with an exception and a lazy text message is discarded if the warn
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnExceptionAndLazyMessage() {
 				logger.warn(new Exception(), () -> "Oops!");
@@ -1222,7 +1222,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders is discarded if the
 			 * warn severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnExceptionAndFormattedMessageWithArgument() {
 				logger.warn(new Exception(), "Hello {}!", "Alice");
@@ -1233,7 +1233,7 @@ class TaggedLoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.ERROR)
+			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			void warnExceptionAndFormattedMessageWithLazyArgument() {
 				logger.warn(new Exception(), "Hello {}!", () -> "Alice");
@@ -1244,7 +1244,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with a plain text message is discarded if the error severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorTextMessage() {
 				logger.error("Hello World!");
@@ -1254,7 +1254,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an object is discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorMessageObject() {
 				logger.error(42);
@@ -1265,7 +1265,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with a lazy text message is discarded if the error severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorLazyMessage() {
 				logger.error(() -> "Hello World!");
@@ -1276,7 +1276,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with a message with placeholders is discarded if the error severity
 			 * level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorFormattedMessageWithArgument() {
 				logger.error("Hello {}!", "Alice");
@@ -1287,7 +1287,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with a message with placeholders and lazy arguments is discarded if the
 			 * error severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorFormattedMessageWithLazyArgument() {
 				logger.error("Hello {}!", () -> "Alice");
@@ -1297,7 +1297,7 @@ class TaggedLoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception is discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorException() {
 				logger.error(new Exception());
@@ -1308,7 +1308,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with an exception and a plain text message is discarded if the error
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorExceptionAndTextMessage() {
 				logger.error(new Exception(), "Oops!");
@@ -1319,7 +1319,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with an exception and a lazy text message is discarded if the error
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorExceptionAndLazyMessage() {
 				logger.error(new Exception(), () -> "Oops!");
@@ -1330,7 +1330,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders is discarded if the
 			 * error severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorExceptionAndFormattedMessageWithArgument() {
 				logger.error(new Exception(), "Hello {}!", "Alice");
@@ -1341,7 +1341,7 @@ class TaggedLoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(minLevel = Level.OFF)
+			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			void errorExceptionAndFormattedMessageWithLazyArgument() {
 				logger.error(new Exception(), "Hello {}!", () -> "Alice");
