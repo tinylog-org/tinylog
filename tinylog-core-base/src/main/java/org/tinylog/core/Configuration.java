@@ -4,6 +4,7 @@ import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -180,9 +181,9 @@ public class Configuration {
 	 *     is "foo". Properties that do not contain a dot are used unchanged as root key.
 	 * </p>
 	 *
-	 * @return Distinct list of all root keys in insert order
+	 * @return Distinct collection of all root keys in insert order
 	 */
-	public List<String> getRootKeys() {
+	public Collection<String> getRootKeys() {
 		List<String> keys = new ArrayList<>();
 
 		synchronized (properties) {
@@ -199,6 +200,15 @@ public class Configuration {
 		}
 
 		return keys;
+	}
+
+	/**
+	 * Gets the keys of all properties that a present in this configuration.
+	 *
+	 * @return All keys in insert order
+	 */
+	public Collection<String> getKeys() {
+		return properties.keySet();
 	}
 
 	/**

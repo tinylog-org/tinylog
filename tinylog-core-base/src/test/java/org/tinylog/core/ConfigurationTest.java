@@ -305,11 +305,7 @@ class ConfigurationTest {
 				.set("foobar", "5")
 				.getSubConfiguration("foo");
 
-			assertThat(configuration.getValue("bar")).isNull();
-			assertThat(configuration.getValue("foo")).isNull();
-			assertThat(configuration.getValue("alice")).isEqualTo("3");
-			assertThat(configuration.getValue("bob")).isEqualTo("4");
-			assertThat(configuration.getValue("foobar")).isNull();
+			assertThat(configuration.getKeys()).containsExactly("alice", "bob");
 			assertThat(configuration.isFrozen()).isTrue();
 		}
 
@@ -326,6 +322,21 @@ class ConfigurationTest {
 				.set("boo", "5");
 
 			assertThat(configuration.getRootKeys()).containsExactly("bar", "foo", "foobar", "boo");
+		}
+
+		/**
+		 * Verifies that all keys are collected completely and in order.
+		 */
+		@Test
+		void getKeys() {
+			Configuration configuration = new Configuration()
+				.set("bar", "1")
+				.set("foo.alice", "2")
+				.set("foo.bob", "3")
+				.set("foobar", "4")
+				.set("boo", "5");
+
+			assertThat(configuration.getKeys()).containsExactly("bar", "foo.alice", "foo.bob", "foobar", "boo");
 		}
 
 		/**
