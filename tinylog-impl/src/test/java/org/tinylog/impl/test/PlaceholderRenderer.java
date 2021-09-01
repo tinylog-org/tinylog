@@ -4,7 +4,7 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Renderer for {@link Placeholder Placeholders}.
+ * Renderer for {@link Placeholder} implementations.
  */
 public class PlaceholderRenderer {
 

@@ -9,7 +9,7 @@ import org.tinylog.impl.format.SqlRecord;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Style wrapper for other {@link Placeholder Placerholders}.
+ * Style wrapper for a {@link Placeholder}.
  */
 public abstract class AbstractStylePlaceholder implements Placeholder {
 

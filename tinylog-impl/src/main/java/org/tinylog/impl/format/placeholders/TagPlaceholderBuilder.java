@@ -3,7 +3,7 @@ package org.tinylog.impl.format.placeholders;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link TagPlaceholder TagPlaceholders}.
+ * Builder for creating an instance of {@link TagPlaceholder}.
  */
 public class TagPlaceholderBuilder implements PlaceholderBuilder {
 

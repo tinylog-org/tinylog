@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper for multiple {@link Policy Policies}.
+ * Wrapper for bundling multiple {@link Policy} instances.
  */
 public class BundlePolicy implements Policy {
 

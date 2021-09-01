@@ -23,7 +23,7 @@ import org.tinylog.impl.format.styles.StyleBuilder;
  * put in curly brackets.
  *
  * <p>
- *     All registered {@link PlaceholderBuilder PlaceholderBuilders} are loaded when creating a new format pattern
+ *     All registered {@link PlaceholderBuilder} implementations are loaded when creating a new format pattern
  *     instance automatically.
  * </p>
  *

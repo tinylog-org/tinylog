@@ -6,7 +6,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link TimestampPlaceholder TimestampPlaceholders}.
+ * Builder for creating an instance of {@link TimestampPlaceholder}.
  */
 public class TimestampPlaceholderBuilder implements PlaceholderBuilder {
 

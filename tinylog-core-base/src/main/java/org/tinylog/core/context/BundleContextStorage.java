@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Wrapper for multiple {@link ContextStorage ContextStorages}.
+ * Wrapper for bundling multiple {@link ContextStorage} instances.
  */
 public class BundleContextStorage implements ContextStorage {
 

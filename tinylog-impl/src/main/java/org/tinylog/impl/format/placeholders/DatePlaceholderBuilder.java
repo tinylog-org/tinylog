@@ -8,7 +8,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link DatePlaceholder DatePlaceholders}.
+ * Builder for creating an instance of {@link DatePlaceholder}.
  */
 public class DatePlaceholderBuilder implements PlaceholderBuilder {
 

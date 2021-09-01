@@ -55,7 +55,7 @@ class NumberFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link BigInteger BigIntegers} can be formatted.
+	 * Verifies that a {@link BigInteger} can be formatted.
 	 */
 	@Test
 	void bigIntegerValue() {
@@ -88,7 +88,7 @@ class NumberFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link BigDecimal BigDecimals} can be formatted.
+	 * Verifies that a {@link BigDecimal} can be formatted.
 	 */
 	@Test
 	void bigDecimalValue() {

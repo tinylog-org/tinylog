@@ -12,7 +12,7 @@ import org.tinylog.impl.format.FormatPatternParser;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Builder for creating {@link FileWriter FileWriters}.
+ * Builder for creating an instance of {@link FileWriter}.
  */
 public class FileWriterBuilder implements WriterBuilder {
 

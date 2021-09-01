@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link ThreadIdPlaceholder ThreadIdPlaceholders}.
+ * Builder for creating an instance of {@link ThreadIdPlaceholder}.
  */
 public class ThreadIdPlaceholderBuilder implements PlaceholderBuilder {
 

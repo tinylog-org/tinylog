@@ -3,7 +3,7 @@ package org.tinylog.impl.format.placeholders;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link UptimePlaceholder UptimePlaceholders}.
+ * Builder for creating a {@link UptimePlaceholder}.
  */
 public class UptimePlaceholderBuilder implements PlaceholderBuilder {
 

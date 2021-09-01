@@ -4,7 +4,7 @@ import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link Writer Writers}.
+ * Builder for creating an instance of a {@link Writer}.
  *
  * <p>
  *     New writer builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.

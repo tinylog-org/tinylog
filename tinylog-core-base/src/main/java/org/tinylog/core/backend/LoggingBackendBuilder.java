@@ -3,7 +3,7 @@ package org.tinylog.core.backend;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link LoggingBackend LoggingBackends}.
+ * Builder for creating an instance of a {@link LoggingBackend}.
  *
  * <p>
  *     This interface must be implemented by all logging backends and provided as

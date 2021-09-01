@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link StartupPolicy StartupPolicies}.
+ * Builder for creating an instance of {@link StartupPolicy}.
  */
 public class StartupPolicyBuilder implements PolicyBuilder {
 

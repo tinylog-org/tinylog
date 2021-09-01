@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link SeverityCodePlaceholder SeverityCodePlaceholders}.
+ * Builder for creating an instance of {@link SeverityCodePlaceholder}.
  */
 public class SeverityCodePlaceholderBuilder implements PlaceholderBuilder {
 

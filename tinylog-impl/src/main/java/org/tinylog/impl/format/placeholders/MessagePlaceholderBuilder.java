@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link MessagePlaceholder MessagePlaceholders}.
+ * Builder for creating an instance of {@link MessagePlaceholder}.
  */
 public class MessagePlaceholderBuilder implements PlaceholderBuilder {
 

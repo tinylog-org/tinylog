@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JavaTimeFormatTest {
 
 	/**
-	 * Verifies that {@link LocalTime LocalTimes} can be formatted.
+	 * Verifies that a {@link LocalTime} can be formatted.
 	 */
 	@Test
 	void localTimeValue() {
@@ -26,7 +26,7 @@ class JavaTimeFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link LocalDate LocalDates} can be formatted.
+	 * Verifies that a {@link LocalDate} can be formatted.
 	 */
 	@Test
 	void localDateValue() {
@@ -37,7 +37,7 @@ class JavaTimeFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link LocalDateTime LocalDateTimes} can be formatted.
+	 * Verifies that a {@link LocalDateTime} can be formatted.
 	 */
 	@Test
 	void localDateTimeValue() {
@@ -48,7 +48,7 @@ class JavaTimeFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link ZonedDateTime ZonedDateTimes} can be formatted.
+	 * Verifies that a {@link ZonedDateTime} can be formatted.
 	 */
 	@Test
 	void zonedDateTimeValue() {
@@ -63,7 +63,7 @@ class JavaTimeFormatTest {
 	}
 
 	/**
-	 * Verifies that {@link Instant Instants} can be formatted.
+	 * Verifies that an {@link Instant} can be formatted.
 	 */
 	@Test
 	void instantValue() {

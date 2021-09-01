@@ -3,7 +3,7 @@ package org.tinylog.core.format.value;
 import java.util.Locale;
 
 /**
- * Builder for creating {@link ValueFormat ValueFormats}.
+ * Builder for creating an instance of a {@link ValueFormat}.
  *
  * <p>
  *     New value format builders can be provided as {@link java.util.ServiceLoader service} in

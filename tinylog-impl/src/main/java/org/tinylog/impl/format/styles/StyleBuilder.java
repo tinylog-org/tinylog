@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Builder for creating style wrapper for {@link Placeholder Placeholders}.
+ * Builder for creating a style wrapper for a {@link Placeholder}.
  *
  * <p>
  *     New style builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.

@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DateFormatTest {
 
 	/**
-	 * Verifies that {@link Date Dates} can be formatted.
+	 * Verifies that a {@link Date} can be formatted.
 	 */
 	@Test
 	void dateValue() {

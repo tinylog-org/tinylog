@@ -3,7 +3,7 @@ package org.tinylog.impl.format.placeholders;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link Placeholder Placeholders}.
+ * Builder for creating an instance of a {@link Placeholder}.
  *
  * <p>
  *     New placeholder builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.

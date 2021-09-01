@@ -20,7 +20,7 @@ import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
- * Storage for {@link Configuration}, {@link Hook Hooks}, and {@link LoggingBackend}.
+ * Storage for {@link Configuration}, registered {@link Hook} instances, and {@link LoggingBackend}.
  */
 public class Framework {
 

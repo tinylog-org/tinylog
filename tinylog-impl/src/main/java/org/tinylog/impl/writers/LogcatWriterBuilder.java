@@ -7,7 +7,7 @@ import org.tinylog.impl.format.placeholders.Placeholder;
 import org.tinylog.impl.format.styles.MaxLengthStyleBuilder;
 
 /**
- * Builder for creating {@link LogcatWriter LogcatWriters}.
+ * Builder for creating an instance of {@link LogcatWriter}.
  */
 public class LogcatWriterBuilder implements WriterBuilder {
 

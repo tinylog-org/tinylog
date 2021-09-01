@@ -6,9 +6,8 @@ import org.tinylog.impl.format.placeholders.PackagePlaceholder;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Builder for creating {@link MaxTextLengthStyle MaxTextLengthStyles},
- * {@link MaxClassLengthStyle MaxClassLengthStyles}, and {@link MaxPackageLengthStyle MaxPackageLengthStyles},
- * depending on the passed placeholder.
+ * Builder for creating  an instance of {@link MaxTextLengthStyle}, {@link MaxClassLengthStyle}, or
+ * {@link MaxPackageLengthStyle}, depending on the passed placeholder.
  */
 public class MaxLengthStyleBuilder implements StyleBuilder {
 

@@ -21,7 +21,7 @@ import org.tinylog.core.internal.SafeServiceLoader;
  * patterns in placeholders.
  *
  * <p>
- *     All registered {@link ValueFormat ValueFormats} can be used to format arguments via patterns. Additionally the
+ *     All registered {@link ValueFormat} instances can be used to format arguments via patterns. Additionally the
  *     {@link ChoiceFormat} syntax is supported for conditional formatting.
  * </p>
  *

@@ -24,7 +24,7 @@ public interface Writer extends AutoCloseable {
 	 * Returns a set with all required log entry properties used by this writer.
 	 *
 	 * <p>
-	 *     For performance optimization, tinylog may not set properties of {@link LogEntry LogEntries} that a writer
+	 *     For performance optimization, tinylog may not set properties of {@link LogEntry} instances that a writer
 	 *     does not define as required.
 	 * </p>
 	 *

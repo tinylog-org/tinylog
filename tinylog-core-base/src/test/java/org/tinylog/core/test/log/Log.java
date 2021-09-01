@@ -6,7 +6,7 @@ import java.util.List;
 import org.tinylog.core.Level;
 
 /**
- * Storage for {@link LogEntry LogEntries}.
+ * Storage for {@link LogEntry log entries}.
  */
 public class Log {
 

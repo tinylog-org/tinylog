@@ -15,7 +15,7 @@ public interface Placeholder {
 	 * Returns a set with all required log entry properties used by this placeholder.
 	 *
 	 * <p>
-	 *     For performance optimization, tinylog may not set properties of {@link LogEntry LogEntries} that a
+	 *     For performance optimization, tinylog may not set properties of {@link LogEntry} instances that a
 	 *     placeholder does not define as required.
 	 * </p>
 	 *

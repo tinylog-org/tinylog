@@ -5,7 +5,7 @@ import java.util.Locale;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link SizePolicy SizePolicies}.
+ * Builder for creating an instance of {@link SizePolicy}.
  */
 public class SizePolicyBuilder implements PolicyBuilder {
 

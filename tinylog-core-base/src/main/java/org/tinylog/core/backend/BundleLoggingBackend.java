@@ -12,7 +12,7 @@ import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
- * Wrapper for multiple {@link LoggingBackend LoggingBackends}.
+ * Wrapper for bundling multiple {@link LoggingBackend} instances.
  */
 public class BundleLoggingBackend implements LoggingBackend {
 

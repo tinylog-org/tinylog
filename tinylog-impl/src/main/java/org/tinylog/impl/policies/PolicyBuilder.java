@@ -3,7 +3,7 @@ package org.tinylog.impl.policies;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link Policy Policies}.
+ * Builder for creating an instance of a {@link Policy}.
  *
  * <p>
  *     New policy builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.

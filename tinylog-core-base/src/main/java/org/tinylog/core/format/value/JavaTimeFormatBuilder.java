@@ -4,7 +4,7 @@ import java.time.ZoneId;
 import java.util.Locale;
 
 /**
- * Builder for creating {@link JavaTimeFormat TemporalAccessorFormats}.
+ * Builder for creating an instance of {@link JavaTimeFormat}.
  */
 public class JavaTimeFormatBuilder implements ValueFormatBuilder {
 

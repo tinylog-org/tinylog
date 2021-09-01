@@ -3,7 +3,7 @@ package org.tinylog.impl.format.placeholders;
 import org.tinylog.core.Framework;
 
 /**
- * Builder for creating {@link ContextPlaceholder ContextPlaceholders}.
+ * Builder for creating an instance of {@link ContextPlaceholder}.
  */
 public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 

@@ -6,7 +6,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.impl.format.placeholders.Placeholder;
 
 /**
- * Builder for creating {@link IndentStyle IndentStyles}.
+ * Builder for creating an instance of {@link IndentStyle}.
  */
 public class IndentStyleBuilder implements StyleBuilder {
 

@@ -9,7 +9,7 @@ import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 
 /**
- * Builder with fluent API for creating {@link LogEntry LogEntries}.
+ * Builder with fluent API for creating an instance of {@link LogEntry}.
  */
 public class LogEntryBuilder {
 

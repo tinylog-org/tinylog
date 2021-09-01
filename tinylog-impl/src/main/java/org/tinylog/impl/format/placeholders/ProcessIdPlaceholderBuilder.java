@@ -4,7 +4,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
- * Builder for creating {@link ProcessIdPlaceholder ProcessIdPlaceholders}.
+ * Builder for creating an instance of {@link ProcessIdPlaceholder}.
  */
 public class ProcessIdPlaceholderBuilder implements PlaceholderBuilder {
 
