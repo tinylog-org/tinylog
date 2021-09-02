@@ -60,7 +60,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human readable service name for logging
+	 * @param name The human-readable service name for logging
 	 * @param action Consumer for found service implementations
 	 * @param <S> The service type
 	 */
