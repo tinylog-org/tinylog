@@ -263,6 +263,7 @@
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
+                            <Import-Package>!android.*,*</Import-Package>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
                             <_exportcontents>!META-INF.versions.9,*</_exportcontents>
                             <_fixupmessages>"*META-INF/versions/9*"</_fixupmessages>
