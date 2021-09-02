@@ -387,4 +387,35 @@ class LoggingConfigurationParserTest {
 		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(2);
 	}
 
+	/**
+	 * Verifies that an incomplete writer is ignored and does not affect other writers.
+	 */
+	@CaptureLogEntries(configuration = {"writer1.file=dummy.log", "writer1.type=console"}, level = Level.OFF)
+	@Test
+	void incompleteWriter() {
+		LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+
+		assertThat(configuration.getSeverityLevels())
+			.hasSize(1)
+			.anySatisfy((key, value) -> {
+				assertThat(key).isEqualTo("");
+				assertThat(value.getLevel("-")).isEqualTo(Level.TRACE);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.TRACE);
+			});
+
+		assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
+
+		assertThat(configuration.getWriters("-", Level.TRACE)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("-", Level.ERROR)).hasSize(1);
+
+		assertThat(configuration.getWriters("foo", Level.TRACE)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.DEBUG)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.INFO)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.WARN)).hasSize(1);
+		assertThat(configuration.getWriters("foo", Level.ERROR)).hasSize(1);
+	}
+
 }

@@ -136,7 +136,10 @@ class LoggingConfigurationParser {
 					for (WriterConfiguration writerConfiguration : writerConfigurations) {
 						Level configuredLevel = writerConfiguration.getLevelConfiguration().getLevel(tag);
 						if (configuredLevel.ordinal() >= level.ordinal()) {
-							writers.add(writerConfiguration.getOrCreateWriter());
+							Writer writer = writerConfiguration.getOrCreateWriter();
+							if (writer != null) {
+								writers.add(writer);
+							}
 						}
 					}
 				}
