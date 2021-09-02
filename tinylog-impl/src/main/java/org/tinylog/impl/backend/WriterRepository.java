@@ -2,8 +2,11 @@ package org.tinylog.impl.backend;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
+import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.writers.AsyncWriter;
 import org.tinylog.impl.writers.Writer;
 
@@ -12,6 +15,7 @@ import org.tinylog.impl.writers.Writer;
  */
 public class WriterRepository {
 
+	private final Set<LogEntryValue> requiredLogEntryValues;
 	private final List<Writer> syncWriters;
 	private final List<AsyncWriter> asyncWriters;
 	private final List<Writer> allWriters;
@@ -20,11 +24,13 @@ public class WriterRepository {
 	 * @param writers The writers to store
 	 */
 	public WriterRepository(Collection<Writer> writers) {
+		requiredLogEntryValues = EnumSet.noneOf(LogEntryValue.class);
 		allWriters = new ArrayList<>();
 		syncWriters = new ArrayList<>();
 		asyncWriters = new ArrayList<>();
 
 		for (Writer writer : writers) {
+			requiredLogEntryValues.addAll(writer.getRequiredLogEntryValues());
 			allWriters.add(writer);
 
 			if (writer instanceof AsyncWriter) {
@@ -33,6 +39,16 @@ public class WriterRepository {
 				syncWriters.add(writer);
 			}
 		}
+	}
+
+	/**
+	 * Gets the required log entry values for all writers in this repository.
+	 *
+	 * @return All required log entry values
+	 * @see Writer#getRequiredLogEntryValues()
+	 */
+	public Set<LogEntryValue> getRequiredLogEntryValues() {
+		return requiredLogEntryValues;
 	}
 
 	/**
