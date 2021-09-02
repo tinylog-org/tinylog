@@ -46,6 +46,9 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <excludeDependencies>tinylog-core-base,tinylog-core-modern</excludeDependencies>
+                    <instructions>
+                        <Include-Resource>META-INF=${project.build.outputDirectory}/META-INF</Include-Resource>
+                    </instructions>
                 </configuration>
             </plugin>
             <plugin>
@@ -90,6 +93,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <directory>${project.parent.basedir}/tinylog-core-base/src/main/resources</directory>
+                        </resource>
+                    </resources>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
