@@ -90,7 +90,7 @@ public class WritingThread extends Thread {
 	 *     wait for the shutdown.
 	 * </p>
 	 */
-	public void shutdown() {
+	public void shutDown() {
 		enqueue(null, null);
 	}
 

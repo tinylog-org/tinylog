@@ -41,7 +41,7 @@ class WritingThreadTest {
 		try {
 			assertThat(thread.isAlive()).isTrue();
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 			thread.join(1000);
 			assertThat(thread.isAlive()).isFalse();
 		}
@@ -65,7 +65,7 @@ class WritingThreadTest {
 			thread.enqueue(writer, secondLogEntry);
 			thread.enqueue(writer, thirdLogEntry);
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 		}
 
 		thread.join();
@@ -98,7 +98,7 @@ class WritingThreadTest {
 				thread.enqueue(writer, internalLogEntry);
 			}
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 		}
 
 		thread.join();
@@ -126,7 +126,7 @@ class WritingThreadTest {
 			thread.enqueue(evilWriter, logEntry);
 			thread.enqueue(goodWriter, logEntry);
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 		}
 
 		thread.join();
@@ -158,7 +158,7 @@ class WritingThreadTest {
 			thread.enqueue(evilWriter, logEntry);
 			thread.enqueue(goodWriter, logEntry);
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 		}
 
 		thread.join();
@@ -184,7 +184,7 @@ class WritingThreadTest {
 			thread.enqueue(evilWriter, logEntry);
 			thread.enqueue(goodWriter, logEntry);
 		} finally {
-			thread.shutdown();
+			thread.shutDown();
 		}
 
 		thread.join();
