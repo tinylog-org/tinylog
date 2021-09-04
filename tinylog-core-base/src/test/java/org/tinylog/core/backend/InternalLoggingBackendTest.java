@@ -2,8 +2,6 @@ package org.tinylog.core.backend;
 
 import javax.inject.Inject;
 
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -32,7 +30,7 @@ class InternalLoggingBackendTest {
 	void contextStorage() {
 		ContextStorage storage = new InternalLoggingBackend().getContextStorage();
 		storage.put("foo", "42");
-		AssertionsForInterfaceTypes.assertThat(storage.getMapping()).isEmpty();
+		assertThat(storage.getMapping()).isEmpty();
 	}
 
 	/**
@@ -43,11 +41,11 @@ class InternalLoggingBackendTest {
 	void untaggedVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
 
-		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isFalse();
+		assertThat(visibility.isTraceEnabled()).isFalse();
+		assertThat(visibility.isDebugEnabled()).isFalse();
+		assertThat(visibility.isInfoEnabled()).isFalse();
+		assertThat(visibility.isWarnEnabled()).isFalse();
+		assertThat(visibility.isErrorEnabled()).isFalse();
 	}
 
 	/**
@@ -58,11 +56,11 @@ class InternalLoggingBackendTest {
 	void tinylogVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
 
-		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isTrue();
-		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isTrue();
+		assertThat(visibility.isTraceEnabled()).isFalse();
+		assertThat(visibility.isDebugEnabled()).isFalse();
+		assertThat(visibility.isInfoEnabled()).isFalse();
+		assertThat(visibility.isWarnEnabled()).isTrue();
+		assertThat(visibility.isErrorEnabled()).isTrue();
 	}
 
 	/**

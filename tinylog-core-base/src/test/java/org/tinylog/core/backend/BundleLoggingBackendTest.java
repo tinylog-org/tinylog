@@ -3,7 +3,6 @@ package org.tinylog.core.backend;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
@@ -73,11 +72,11 @@ class BundleLoggingBackendTest {
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
 		LevelVisibility visibility = backend.getLevelVisibility("foo");
 
-		AssertionsForClassTypes.assertThat(visibility.isTraceEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isDebugEnabled()).isFalse();
-		AssertionsForClassTypes.assertThat(visibility.isInfoEnabled()).isTrue();
-		AssertionsForClassTypes.assertThat(visibility.isWarnEnabled()).isTrue();
-		AssertionsForClassTypes.assertThat(visibility.isErrorEnabled()).isTrue();
+		assertThat(visibility.isTraceEnabled()).isFalse();
+		assertThat(visibility.isDebugEnabled()).isFalse();
+		assertThat(visibility.isInfoEnabled()).isTrue();
+		assertThat(visibility.isWarnEnabled()).isTrue();
+		assertThat(visibility.isErrorEnabled()).isTrue();
 	}
 
 	/**
