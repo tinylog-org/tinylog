@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 class BundleLoggingBackendTest {
 
@@ -70,13 +71,7 @@ class BundleLoggingBackendTest {
 		);
 
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
-		LevelVisibility visibility = backend.getLevelVisibility("foo");
-
-		assertThat(visibility.isTraceEnabled()).isFalse();
-		assertThat(visibility.isDebugEnabled()).isFalse();
-		assertThat(visibility.isInfoEnabled()).isTrue();
-		assertThat(visibility.isWarnEnabled()).isTrue();
-		assertThat(visibility.isErrorEnabled()).isTrue();
+		assertThat(backend.getLevelVisibility("foo")).isEnabledFor(Level.INFO);
 	}
 
 	/**

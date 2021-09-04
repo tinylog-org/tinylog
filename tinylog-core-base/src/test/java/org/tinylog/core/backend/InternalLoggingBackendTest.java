@@ -16,6 +16,7 @@ import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 @CaptureSystemOutput
 class InternalLoggingBackendTest {
@@ -40,27 +41,17 @@ class InternalLoggingBackendTest {
 	@Test
 	void untaggedVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
-
-		assertThat(visibility.isTraceEnabled()).isFalse();
-		assertThat(visibility.isDebugEnabled()).isFalse();
-		assertThat(visibility.isInfoEnabled()).isFalse();
-		assertThat(visibility.isWarnEnabled()).isFalse();
-		assertThat(visibility.isErrorEnabled()).isFalse();
+		assertThat(visibility).isEnabledFor(Level.OFF);
 	}
 
 	/**
-	 * Verifies that only the warn and error severity levels are enabled in the precalculated level visibility object
+	 * Verifies that only the severity levels WARN and ERROR are enabled in the precalculated level visibility object
 	 * for internal tinylog log entries.
 	 */
 	@Test
 	void tinylogVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
-
-		assertThat(visibility.isTraceEnabled()).isFalse();
-		assertThat(visibility.isDebugEnabled()).isFalse();
-		assertThat(visibility.isInfoEnabled()).isFalse();
-		assertThat(visibility.isWarnEnabled()).isTrue();
-		assertThat(visibility.isErrorEnabled()).isTrue();
+		assertThat(visibility).isEnabledFor(Level.WARN);
 	}
 
 	/**

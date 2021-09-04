@@ -1,4 +1,4 @@
 /**
- * Extensions for JUnit tests.
+ * Utility classes for JUnit tests.
  */
 package org.tinylog.core.test;

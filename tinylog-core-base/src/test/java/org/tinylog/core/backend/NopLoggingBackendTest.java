@@ -11,6 +11,7 @@ import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 class NopLoggingBackendTest {
 
@@ -34,12 +35,7 @@ class NopLoggingBackendTest {
 	@ValueSource(strings = {"tinylog", "foo"})
 	void visibility(String tag) {
 		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibility(tag);
-
-		assertThat(visibility.isTraceEnabled()).isFalse();
-		assertThat(visibility.isDebugEnabled()).isFalse();
-		assertThat(visibility.isInfoEnabled()).isFalse();
-		assertThat(visibility.isWarnEnabled()).isFalse();
-		assertThat(visibility.isErrorEnabled()).isFalse();
+		assertThat(visibility).isEnabledFor(Level.OFF);
 	}
 
 	/**
