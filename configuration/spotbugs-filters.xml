@@ -18,6 +18,16 @@
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
     </Match>
     <Match>
+        <Class name="org.tinylog.impl.backend.NativeLoggingBackend" />
+        <Method name="&lt;init&gt;" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="org.tinylog.impl.backend.NativeLoggingBackend" />
+        <Method name="getContextStorage" />
+        <Bug pattern="EI_EXPOSE_REP" />
+    </Match>
+    <Match>
         <Class name="org.tinylog.impl.backend.WriterRepository" />
         <Bug pattern="EI_EXPOSE_REP" />
     </Match>
