@@ -130,12 +130,13 @@ public class Framework {
 		synchronized (mutex) {
 			if (!running) {
 				running = true;
-				loadLoggingBackend();
 
 				for (Hook hook : hooks) {
 					InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
 					SafeServiceLoader.execute(hook, "start", Hook::startUp);
 				}
+
+				loadLoggingBackend();
 
 				InternalLogger.debug(null, "Logging framework is up");
 			}
