@@ -34,16 +34,22 @@ class LifeCycleHook implements Hook {
 
 	@Override
 	public void shutDown() {
+		if (writingThread != null) {
+			writingThread.shutDown();
+
+			try {
+				writingThread.join();
+			} catch (InterruptedException ex) {
+				InternalLogger.error(ex, "Interrupted while waiting for writing thread");
+			}
+		}
+
 		for (Writer writer : writers) {
 			try {
 				writer.close();
 			} catch (Exception ex) {
 				InternalLogger.error(ex, "Failed to close writer");
 			}
-		}
-
-		if (writingThread != null) {
-			writingThread.shutDown();
 		}
 	}
 

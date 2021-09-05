@@ -3,6 +3,8 @@ package org.tinylog.impl.backend;
 import java.io.IOException;
 import java.util.Collections;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Hook;
 import org.tinylog.core.Level;
@@ -18,7 +20,11 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@CaptureLogEntries
 class LifeCycleHookTest {
+
+	@Inject
+	private Log log;
 
 	/**
 	 * Verifies that multiple writers can be closed successfully.
@@ -38,12 +44,9 @@ class LifeCycleHookTest {
 
 	/**
 	 * Verifies that other writers can be closed successfully, if failed closing a writer.
-	 *
-	 * @param log The actual log with logged warnings and errors
 	 */
-	@CaptureLogEntries
 	@Test
-	void shutDownWritersUnsuccessfully(Log log) throws Exception {
+	void shutDownWritersUnsuccessfully() throws Exception {
 		Writer first = mock(Writer.class);
 		Writer second = mock(Writer.class);
 		Writer third = mock(Writer.class);
@@ -76,6 +79,28 @@ class LifeCycleHookTest {
 
 		hook.shutDown();
 		verify(writingThread).shutDown();
+	}
+
+	/**
+	 * Verifies that a writing thread can be interrupted while shutting down.
+	 */
+	@Test
+	void shutDownWritingThreadUnsuccessfully() throws InterruptedException {
+		WritingThread writingThread = mock(WritingThread.class);
+		doThrow(InterruptedException.class).when(writingThread).join();
+
+		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
+
+		hook.startUp();
+		verify(writingThread).start();
+
+		hook.shutDown();
+		verify(writingThread).shutDown();
+
+		assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getThrowable()).isInstanceOf(InterruptedException.class);
+		});
 	}
 
 }
