@@ -15,7 +15,7 @@ public enum LogEntryValue {
 	TIMESTAMP,
 
 	/**
-	 * The passed time since application.
+	 * The passed time since application start.
 	 *
 	 * @see  LogEntry#getUptime()
 	 */
