@@ -105,61 +105,41 @@ class FrameworkTest {
 		}
 
 		/**
-		 * Verifies that a registered hook is called at startup.
+		 * Verifies that a hook, registered before the framework start up, will be correctly started and shut down.
 		 */
 		@Test
-		void registerHookForStartupOnly() {
+		void registerHookBeforeStartUp() {
 			Hook hook = mock(Hook.class);
 			Framework framework = new Framework(false, false);
+
 			framework.registerHook(hook);
+			verify(hook, never()).startUp();
 
 			try {
 				framework.startUp();
-				framework.removeHook(hook);
+				verify(hook).startUp();
 			} finally {
 				framework.shutDown();
+				verify(hook).shutDown();
 			}
-
-			verify(hook).startUp();
-			verify(hook, never()).shutDown();
 		}
 
 		/**
-		 * Verifies that a registered hook is called at shutdown.
+		 * Verifies that a hook, registered after the framework start up, will be correctly started and shut down.
 		 */
 		@Test
-		void registerHookForShutdownOnly() {
+		void registerHookAfterStartUp() {
 			Hook hook = mock(Hook.class);
 			Framework framework = new Framework(false, false);
 
 			try {
 				framework.startUp();
 				framework.registerHook(hook);
+				verify(hook).startUp();
 			} finally {
 				framework.shutDown();
+				verify(hook).shutDown();
 			}
-
-			verify(hook, never()).startUp();
-			verify(hook).shutDown();
-		}
-
-		/**
-		 * Verifies that a registered hook is called at startup.
-		 */
-		@Test
-		void registerHookForStartupAndShutdown() {
-			Hook hook = mock(Hook.class);
-			Framework framework = new Framework(false, false);
-			framework.registerHook(hook);
-
-			try {
-				framework.startUp();
-			} finally {
-				framework.shutDown();
-			}
-
-			verify(hook).startUp();
-			verify(hook).shutDown();
 		}
 
 		/**
@@ -202,6 +182,26 @@ class FrameworkTest {
 				framework.shutDown();
 				verify(hook, never()).shutDown();
 			}
+		}
+
+		/**
+		 * Verifies that a removed hook will be not called while shutting the framework down.
+		 */
+		@Test
+		void removeHookBeforeShutdown() {
+			Hook hook = mock(Hook.class);
+			Framework framework = new Framework(false, false);
+			framework.registerHook(hook);
+
+			try {
+				framework.startUp();
+				framework.removeHook(hook);
+			} finally {
+				framework.shutDown();
+			}
+
+			verify(hook).startUp();
+			verify(hook, never()).shutDown();
 		}
 
 		/**

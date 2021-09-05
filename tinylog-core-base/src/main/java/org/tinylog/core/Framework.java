@@ -104,6 +104,11 @@ public class Framework {
 	public void registerHook(Hook hook) {
 		synchronized (mutex) {
 			hooks.add(hook);
+
+			if (running) {
+				InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
+				SafeServiceLoader.execute(hook, "start", Hook::startUp);
+			}
 		}
 	}
 
