@@ -18,7 +18,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class ShutdownHookTest {
+class LifeCycleHookTest {
 
 	/**
 	 * Verifies that multiple writers can be closed successfully.
@@ -28,7 +28,7 @@ class ShutdownHookTest {
 		Writer first = mock(Writer.class);
 		Writer second = mock(Writer.class);
 
-		Hook hook = new ShutdownHook(ImmutableList.of(first, second), null);
+		Hook hook = new LifeCycleHook(ImmutableList.of(first, second), null);
 		hook.startUp();
 		hook.shutDown();
 
@@ -50,7 +50,7 @@ class ShutdownHookTest {
 
 		doThrow(IOException.class).when(second).close();
 
-		Hook hook = new ShutdownHook(ImmutableList.of(first, second, third), null);
+		Hook hook = new LifeCycleHook(ImmutableList.of(first, second, third), null);
 		hook.startUp();
 		hook.shutDown();
 
@@ -69,11 +69,12 @@ class ShutdownHookTest {
 	@Test
 	void shutDownWritingThreadSuccessfully() {
 		WritingThread writingThread = mock(WritingThread.class);
+		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
 
-		Hook hook = new ShutdownHook(Collections.emptyList(), writingThread);
 		hook.startUp();
-		hook.shutDown();
+		verify(writingThread).start();
 
+		hook.shutDown();
 		verify(writingThread).shutDown();
 	}
 

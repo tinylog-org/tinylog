@@ -8,25 +8,28 @@ import org.tinylog.impl.WritingThread;
 import org.tinylog.impl.writers.Writer;
 
 /**
- * Hook for closing writers and shutting writing thread down.
+ * Hook for closing writers as well as starting a writing thread and shutting it down for the
+ * {@link NativeLoggingBackend}.
  */
-class ShutdownHook implements Hook {
+class LifeCycleHook implements Hook {
 
 	private final Collection<Writer> writers;
 	private final WritingThread writingThread;
 
 	/**
 	 * @param writers All writers to close when the framework ist shutting down
-	 * @param writingThread The optional writing thread to shut down when the framework ist shutting down
+	 * @param writingThread The optional writing thread for handling its start and shutdown
 	 */
-	ShutdownHook(Collection<Writer> writers, WritingThread writingThread) {
+	LifeCycleHook(Collection<Writer> writers, WritingThread writingThread) {
 		this.writers = writers;
 		this.writingThread = writingThread;
 	}
 
 	@Override
 	public void startUp() {
-		// Nothing to do
+		if (writingThread != null) {
+			writingThread.start();
+		}
 	}
 
 	@Override
