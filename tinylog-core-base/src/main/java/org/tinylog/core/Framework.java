@@ -30,7 +30,7 @@ public class Framework {
 	private final Configuration configuration;
 	private final Collection<Hook> hooks;
 
-	private LoggingBackend loggingBackend;
+	private volatile LoggingBackend loggingBackend;
 	private boolean running;
 
 	/**
@@ -138,7 +138,7 @@ public class Framework {
 	}
 
 	/**
-	 * Stops the framework and calls the shut down method on all registered hooks, if the framework is not yet shut
+	 * Stops the framework and calls the shutdown method on all registered hooks, if the framework is not yet shut
 	 * down.
 	 */
 	public void shutDown() {
