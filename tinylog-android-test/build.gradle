@@ -1,4 +1,4 @@
-apply plugin: "com.android.application"
+apply plugin: "com.android.library"
 apply plugin: "jacoco"
 apply plugin: "de.mannodermaus.android-junit5"
 
@@ -51,7 +51,6 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.tinylog.core.android"
         minSdkVersion 26
         targetSdkVersion 30
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
