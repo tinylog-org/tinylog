@@ -71,31 +71,33 @@ class LifeCycleHookTest {
 	 */
 	@Test
 	void shutDownWritingThreadSuccessfully() {
-		WritingThread writingThread = mock(WritingThread.class);
+		WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
 		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
 
-		hook.startUp();
-		verify(writingThread).start();
-
-		hook.shutDown();
-		verify(writingThread).shutDown();
+		try {
+			assertThat(writingThread.getState()).isEqualTo(Thread.State.NEW);
+			hook.startUp();
+			assertThat(writingThread.isAlive()).isTrue();
+		} finally {
+			hook.shutDown();
+			assertThat(writingThread.getState()).isEqualTo(Thread.State.TERMINATED);
+		}
 	}
 
 	/**
-	 * Verifies that a writing thread can be interrupted while shutting down.
+	 * Verifies that the hook can be interrupted while waiting for shutdown of a writing thread.
 	 */
 	@Test
-	void shutDownWritingThreadUnsuccessfully() throws InterruptedException {
-		WritingThread writingThread = mock(WritingThread.class);
-		doThrow(InterruptedException.class).when(writingThread).join();
-
+	void shutDownWritingThreadUnsuccessfully() {
+		WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
 		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
 
-		hook.startUp();
-		verify(writingThread).start();
-
-		hook.shutDown();
-		verify(writingThread).shutDown();
+		try {
+			hook.startUp();
+		} finally {
+			Thread.currentThread().interrupt();
+			hook.shutDown();
+		}
 
 		assertThat(log.consume()).anySatisfy(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
