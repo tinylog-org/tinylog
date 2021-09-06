@@ -1,3 +1,0 @@
-org.tinylog.impl.writers.ConsoleWriterBuilder
-org.tinylog.impl.writers.FileWriterBuilder
-org.tinylog.impl.writers.LogcatWriterBuilder
