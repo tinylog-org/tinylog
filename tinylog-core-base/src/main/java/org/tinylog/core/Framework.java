@@ -16,8 +16,8 @@ import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
+import org.tinylog.core.runtime.RuntimeBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.runtime.RuntimeProvider;
 
 /**
  * Storage for {@link Configuration}, registered {@link Hook} instances, and {@link LoggingBackend}.
@@ -42,7 +42,7 @@ public class Framework {
 	 *                  any hooks
 	 */
 	public Framework(boolean loadConfiguration, boolean loadHooks) {
-		this.runtime = new RuntimeProvider().getRuntime();
+		this.runtime = createRuntime();
 		this.configuration = new Configuration();
 		this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
 
@@ -215,6 +215,21 @@ public class Framework {
 		} else {
 			return new BundleLoggingBackend(backends);
 		}
+	}
+
+	/**
+	 * Finds and creates a supported runtime flavor.
+	 *
+	 * @return An instance of a supported runtime flavor
+	 */
+	private RuntimeFlavor createRuntime() {
+		return SafeServiceLoader
+			.asList(this, RuntimeBuilder.class, "runtime")
+			.stream()
+			.filter(RuntimeBuilder::isSupported)
+			.findAny()
+			.orElseThrow(() -> new IllegalStateException("No supported runtime available"))
+			.create();
 	}
 
 	/**
