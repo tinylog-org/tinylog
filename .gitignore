@@ -1,6 +1,7 @@
 # Files
 
 .*
+*.hprof
 *.iml
 local.properties
 hs_err_pid*
@@ -8,6 +9,5 @@ jacoco.exec
 
 # Folders
 
-*/bin/
-*/build/
+tinylog-android-tests/*/build/
 */target/

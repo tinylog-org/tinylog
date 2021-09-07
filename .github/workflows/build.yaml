@@ -80,8 +80,10 @@ jobs:
         with:
           java-version: 8
       - uses: burrunan/gradle-cache-action@v1
+        with:
+          build-root-directory: tinylog-android-tests
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
+          script: cd ./tinylog-android-tests && chmod +x ./gradlew && ./gradlew createDebugCoverageReport
       - uses: codecov/codecov-action@v1

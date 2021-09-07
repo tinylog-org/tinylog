@@ -62,29 +62,5 @@ subprojects {
             exclude("META-INF/LICENSE*")
             exclude("META-INF/licenses/*")
         }
-
-        android {
-            sourceSets {
-                main {
-                    manifest {
-                        srcFile "src/main/android/AndroidManifest.xml"
-                    }
-
-                    java {
-                        srcDirs += "src/main/android"
-                    }
-                }
-
-                androidTest {
-                    java {
-                        srcDirs += "src/test/java"
-                    }
-
-                    resources {
-                        srcDirs += "src/test/resources"
-                    }
-                }
-            }
-        }
     }
 }

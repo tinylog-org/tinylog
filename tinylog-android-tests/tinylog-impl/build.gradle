@@ -1,0 +1,25 @@
+dependencies {
+    implementation project(":tinylog-core")
+}
+
+android {
+    sourceSets {
+        main {
+            java {
+                srcDirs += "../../tinylog-impl/src/main/java"
+            }
+
+            resources {
+                srcDirs += "../../tinylog-impl/src/main/resources"
+            }
+        }
+
+        androidTest {
+            java {
+                srcDirs += "../../tinylog-core-base/src/test/java"
+                srcDirs += "../../tinylog-impl/src/test/java"
+                exclude "org/tinylog/core/**Test.java"
+            }
+        }
+    }
+}
