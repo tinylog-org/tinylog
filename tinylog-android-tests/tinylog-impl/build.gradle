@@ -18,7 +18,8 @@ android {
             java {
                 srcDirs += "../../tinylog-core-base/src/test/java"
                 srcDirs += "../../tinylog-impl/src/test/java"
-                exclude "org/tinylog/core/**Test.java"
+                exclude "org/tinylog/core/*Test.java"
+                exclude "org/tinylog/core/**/*Test.java"
             }
         }
     }
