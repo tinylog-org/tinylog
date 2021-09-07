@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="org.tinylog.core.android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.tinylog.core.android"
+    >
+    <application android:extractNativeLibs="false" />
 </manifest>
