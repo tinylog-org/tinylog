@@ -1,3 +1,5 @@
+import org.tinylog.core.backend.LoggingBackendBuilder;
+import org.tinylog.impl.backend.NativeLoggingBackendBuilder;
 import org.tinylog.impl.format.placeholders.ClassNamePlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.ClassPlaceholderBuilder;
 import org.tinylog.impl.format.placeholders.ContextPlaceholderBuilder;
@@ -33,6 +35,9 @@ import org.tinylog.impl.writers.LogcatWriterBuilder;
 
 module org.tinylog.impl {
 	requires org.tinylog.core;
+
+	provides LoggingBackendBuilder with
+		NativeLoggingBackendBuilder;
 
 	uses PlaceholderBuilder;
 	provides PlaceholderBuilder with
@@ -75,6 +80,8 @@ module org.tinylog.impl {
 		LogcatWriterBuilder;
 
 	exports org.tinylog.impl;
+	exports org.tinylog.impl.backend;
+	exports org.tinylog.impl.context;
 	exports org.tinylog.impl.format;
 	exports org.tinylog.impl.format.placeholders;
 	exports org.tinylog.impl.format.styles;
