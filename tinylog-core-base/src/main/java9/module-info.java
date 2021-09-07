@@ -8,6 +8,9 @@ import org.tinylog.core.backend.InternalLoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.loader.PropertiesLoader;
+import org.tinylog.core.runtime.AndroidRuntimeBuilder;
+import org.tinylog.core.runtime.JavaRuntimeBuilder;
+import org.tinylog.core.runtime.RuntimeBuilder;
 import org.tinylog.core.variable.EnvironmentVariableResolver;
 import org.tinylog.core.variable.SystemPropertyResolver;
 import org.tinylog.core.variable.VariableResolver;
@@ -36,6 +39,11 @@ module org.tinylog.core {
 	provides VariableResolver with
 		EnvironmentVariableResolver,
 		SystemPropertyResolver;
+
+	uses RuntimeBuilder;
+	provides RuntimeBuilder with
+		AndroidRuntimeBuilder,
+		JavaRuntimeBuilder;
 
 	exports org.tinylog.core;
 	exports org.tinylog.core.backend;
