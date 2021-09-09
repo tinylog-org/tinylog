@@ -19,16 +19,24 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.util.FileSystem;
 
@@ -45,7 +53,7 @@ public final class DailyPolicyTest {
 
 	/**
 	 * Converts a local date and time to epoch milliseconds.
-	 * 
+	 *
 	 * @param date
 	 *            Local date
 	 * @param time
@@ -53,7 +61,22 @@ public final class DailyPolicyTest {
 	 * @return Milliseconds since 1970-01-01T00:00:00Z
 	 */
 	private static long asEpochMilliseconds(final LocalDate date, final LocalTime time) {
-		return ZonedDateTime.of(date, time, ZoneId.systemDefault()).toInstant().toEpochMilli();
+		return asEpochMilliseconds(date, time, ZoneId.systemDefault());
+	}
+
+	/**
+	 * Converts a local date and time to epoch milliseconds.
+	 *
+	 * @param date
+	 *            Local date
+	 * @param time
+	 *            Local time
+	 * @param zone
+	 *            Time zone
+	 * @return Milliseconds since 1970-01-01T00:00:00Z
+	 */
+	private static long asEpochMilliseconds(final LocalDate date, final LocalTime time, final ZoneId zone) {
+		return ZonedDateTime.of(date, time, zone).toInstant().toEpochMilli();
 	}
 
 	/**
@@ -450,6 +473,96 @@ public final class DailyPolicyTest {
 	}
 
 	/**
+	 * Tests for daily policy with custom time zones.
+	 */
+	@RunWith(Parameterized.class)
+	@PrepareForTest(DailyPolicy.class)
+	public static final class CustomTimeZoneTest {
+
+		/**
+		 * Activates PowerMock (alternative to {@link PowerMockRunner}).
+		 */
+		@Rule
+		public PowerMockRule rule = new PowerMockRule();
+
+		private final String zone;
+
+		/**
+		 * @param zone
+		 *            The time zone to test
+		 */
+		public CustomTimeZoneTest(final String zone) {
+			this.zone = zone;
+		}
+
+		/**
+		 * Returns all time zones that should be tested.
+		 *
+		 * @return Each object array contains a single time zone name
+		 */
+		@Parameters(name = "{0}")
+		public static Collection<Object[]> getTimeZones() {
+			List<Object[]> zones = new ArrayList<>();
+
+			zones.add(new Object[] { "UTC" });
+			zones.add(new Object[] { "GMT" });
+			zones.add(new Object[] { "GMT+01:00" });
+			zones.add(new Object[] { "GMT-01:00" });
+			zones.add(new Object[] { "America/New_York" });
+			zones.add(new Object[] { "Europe/Berlin" });
+
+			return zones;
+		}
+
+		/**
+		 * Initialize mocking of {@link System} and {@link Calendar}.
+		 */
+		@Before
+		public void init() {
+			mockStatic(System.class, Calendar.class);
+		}
+
+		/**
+		 * Verifies that an already existing file be discontinued as soon as the configured time is reached.
+		 *
+		 * @throws IOException
+		 *             Failed creating temporary file
+		 */
+		@Test
+		public void continueFile() throws IOException {
+			setTime(LocalDate.of(1985, 6, 3), LocalTime.of(1, 29), ZoneId.of(zone));
+
+			String path = FileSystem.createTemporaryFile();
+			new File(path).setLastModified(System.currentTimeMillis());
+
+			DailyPolicy policy = new DailyPolicy("01:30@" + zone);
+			assertThat(policy.continueExistingFile(path)).isTrue();
+
+			setTime(LocalDate.of(1985, 6, 3), LocalTime.of(1, 30), ZoneId.of(zone));
+			assertThat(policy.continueCurrentFile(new byte[0])).isFalse();
+		}
+
+		/**
+		 * Sets the current date and time as well as a custom time zone.
+		 *
+		 * @param date
+		 *            New current date
+		 * @param time
+		 *            New current time
+		 * @param zone
+		 *            Custom time zone
+		 */
+		private static void setTime(final LocalDate date, final LocalTime time, final ZoneId zone) {
+			long milliseconds = asEpochMilliseconds(date, time, zone);
+			CalendarAnswer answer = new CalendarAnswer(milliseconds, TimeZone.getTimeZone(zone));
+
+			when(System.currentTimeMillis()).thenReturn(milliseconds);
+			when(Calendar.getInstance(TimeZone.getTimeZone(zone))).then(answer);
+		}
+
+	}
+
+	/**
 	 * Tests for daily policy with invalid custom times.
 	 */
 	public static final class InvalidCustomTimeTest {
@@ -469,6 +582,15 @@ public final class DailyPolicyTest {
 		@Test
 		public void delimiterWithoutMinutes() {
 			assertThatThrownBy(() -> new DailyPolicy("01:")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("01:");
+		}
+
+		/**
+		 * Verifies that an illegal argument exception will be thrown if the time argument does contain a non-existing
+		 * time zone.
+		 */
+		@Test
+		public void invalidTimeZone() {
+			assertThatThrownBy(() -> new DailyPolicy("00:00@foo")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("foo");
 		}
 
 	}
@@ -495,18 +617,30 @@ public final class DailyPolicyTest {
 	private static final class CalendarAnswer implements Answer<Calendar> {
 
 		private final long milliseconds;
+		private final TimeZone timeZone;
 
 		/**
 		 * @param milliseconds
 		 *            Milliseconds since 1970-01-01T00:00:00Z
 		 */
 		private CalendarAnswer(final long milliseconds) {
+			this(milliseconds, null);
+		}
+
+		/**
+		 * @param milliseconds
+		 *            Milliseconds since 1970-01-01T00:00:00Z
+		 * @param timeZone
+		 *            Time zone to use
+		 */
+		private CalendarAnswer(final long milliseconds, final TimeZone timeZone) {
 			this.milliseconds = milliseconds;
+			this.timeZone = timeZone;
 		}
 
 		@Override
 		public Calendar answer(final InvocationOnMock invocation) throws Throwable {
-			Calendar calendar = Calendar.getInstance();
+			Calendar calendar = timeZone == null ? Calendar.getInstance() : Calendar.getInstance(timeZone);
 			calendar.setTimeInMillis(milliseconds);
 			return calendar;
 		}

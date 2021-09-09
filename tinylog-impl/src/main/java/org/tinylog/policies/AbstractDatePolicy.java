@@ -15,6 +15,7 @@ package org.tinylog.policies;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +27,14 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractDatePolicy implements Policy {
 
-	/* Regular expression for a time with hours and optional minutes */
-	private static final Pattern TIME_PATTERN = Pattern.compile("^([01]?[0-9]|2[0-3])([^\\d]+([0-5]?[0-9]))?$");
+	/* Regular expression for a time with hours, optional minutes, and optional time zone */
+	private static final Pattern TIME_PATTERN = Pattern.compile(
+		"^([01]?[0-9]|2[0-3])([^\\d]+([0-5]?[0-9]))?(@(.+))?$"
+	);
 
 	private static final int GROUP_HOUR = 1;
 	private static final int GROUP_MINUTE = 3;
+	private static final int GROUP_ZONE = 5;
 
 	private final Calendar calendar;
 
@@ -39,17 +43,29 @@ public abstract class AbstractDatePolicy implements Policy {
 	 *            Human-readable policy name that can be used in error messages
 	 * @param argument
 	 *            Time for starting new log file (e.g. "23:30")
+	 * @throws IllegalArgumentException
+	 *             Invalid time or zone passed in argument
 	 */
 	protected AbstractDatePolicy(final String name, final String argument) {
-		calendar = Calendar.getInstance();
-
 		if (argument == null || argument.isEmpty()) {
+			calendar = Calendar.getInstance();
 			truncate(calendar, 0, 0);
 		} else {
 			Matcher matcher = TIME_PATTERN.matcher(argument);
 			if (matcher.matches()) {
 				String hour = matcher.group(GROUP_HOUR);
 				String minute = matcher.group(GROUP_MINUTE);
+
+				String zoneId = matcher.group(GROUP_ZONE);
+				TimeZone timeZone = zoneId == null ? null : TimeZone.getTimeZone(zoneId);
+				if (timeZone == null) {
+					calendar = Calendar.getInstance();
+				} else if (!timeZone.getID().equals(zoneId)) {
+					throw new IllegalArgumentException("Invalid time zone \"" + zoneId + "\" for " + name);
+				} else {
+					calendar = Calendar.getInstance(timeZone);
+				}
+
 				truncate(calendar, Integer.parseInt(hour), minute == null ? 0 : Integer.parseInt(minute));
 			} else {
 				throw new IllegalArgumentException("Invalid time for " + name + ": " + argument);
