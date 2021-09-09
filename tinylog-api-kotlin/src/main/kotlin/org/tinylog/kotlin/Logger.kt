@@ -68,7 +68,7 @@ object Logger {
 	 * @return Logger instance
 	 */
 	fun tags(vararg tags: String?): TaggedLogger {
-		return if (tags == null || tags.isEmpty()) {
+		return if (tags.isEmpty()) {
 			instance
 		} else {
 			val tagsSet = tags.map { if (it.isNullOrEmpty()) { null } else { it } }.toSet()
