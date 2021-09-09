@@ -16,7 +16,7 @@ package org.tinylog.policies;
 import java.util.Calendar;
 
 /**
- * Policy for triggering a rollover every day at a define time. The default time is 00:00.
+ * Policy for triggering a rollover every day at a defined time. The default time is 00:00.
  */
 public final class DailyPolicy extends AbstractDatePolicy {
 
