@@ -128,7 +128,12 @@ public class Configuration {
 	 */
 	public String getValue(String key) {
 		synchronized (properties) {
-			return properties.get(key);
+			String value = properties.get(key);
+			if (value == null) {
+				return null;
+			} else {
+				return value.trim();
+			}
 		}
 	}
 
@@ -140,8 +145,11 @@ public class Configuration {
 	 * @return The found value or the passed default value if the key does not exist
 	 */
 	public String getValue(String key, String defaultValue) {
-		synchronized (properties) {
-			return properties.getOrDefault(key, defaultValue);
+		String value = getValue(key);
+		if (value == null) {
+			return defaultValue;
+		} else {
+			return value;
 		}
 	}
 

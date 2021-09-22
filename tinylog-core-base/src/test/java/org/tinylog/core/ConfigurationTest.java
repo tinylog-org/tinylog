@@ -239,6 +239,15 @@ class ConfigurationTest {
 		}
 
 		/**
+		 * Verifies that leading and trailing spaces of values are removed.
+		 */
+		@Test
+		void trimStringValueWithoutDefault() {
+			Configuration configuration = new Configuration().set("foo", " bar ");
+			assertThat(configuration.getValue("foo")).isEqualTo("bar");
+		}
+
+		/**
 		 * Verifies that an existing value can be received.
 		 */
 		@Test
@@ -254,6 +263,15 @@ class ConfigurationTest {
 		void getMissingStringValueWithDefault() {
 			Configuration configuration = new Configuration();
 			assertThat(configuration.getValue("foo", "-")).isEqualTo("-");
+		}
+
+		/**
+		 * Verifies that leading and trailing spaces of values are removed.
+		 */
+		@Test
+		void trimStringValueWithDefault() {
+			Configuration configuration = new Configuration().set("foo", " bar ");
+			assertThat(configuration.getValue("foo", "other")).isEqualTo("bar");
 		}
 
 		/**
