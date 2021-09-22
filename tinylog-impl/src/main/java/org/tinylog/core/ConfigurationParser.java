@@ -115,7 +115,7 @@ public final class ConfigurationParser {
 			return defaultValue;
 		} else {
 			try {
-				return Level.valueOf(property.toUpperCase(Locale.ROOT));
+				return Level.valueOf(property.trim().toUpperCase(Locale.ROOT));
 			} catch (IllegalArgumentException ex) {
 				InternalLogger.log(Level.ERROR, "Illegal severity level: " + property);
 				return defaultValue;
