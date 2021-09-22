@@ -68,7 +68,7 @@ public abstract class AbstractFileBasedWriter implements Writer {
 	protected static Charset getCharset(final Map<String, String> properties) {
 		String charsetName = properties.get("charset");
 		try {
-			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
+			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName.trim());
 		} catch (IllegalArgumentException ex) {
 			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
 			return Charset.defaultCharset();
