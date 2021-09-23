@@ -154,7 +154,7 @@ public final class Configuration {
 		if (tag == null) {
 			return Locale.ROOT;
 		} else {
-			String[] splitTag = tag.split("_", MAX_LOCALE_ARGUMENTS);
+			String[] splitTag = tag.trim().split("_", MAX_LOCALE_ARGUMENTS);
 			if (splitTag.length == 1) {
 				return new Locale(splitTag[0]);
 			} else if (splitTag.length == 2) {
@@ -171,7 +171,8 @@ public final class Configuration {
 	 * @return {@code true} if escaping is enabled, otherwise {@code false}
 	 */
 	public static boolean isEscapingEnabled() {
-		return Boolean.parseBoolean(get(ESCAPING_ENABLED_KEY));
+		String enabled = get(ESCAPING_ENABLED_KEY);
+		return enabled != null && Boolean.parseBoolean(enabled.trim());
 	}
 
 	/**

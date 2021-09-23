@@ -89,7 +89,8 @@ public final class ConfigurationParser {
 	 * @return {@code true} if writing thread is explicitly enabled, otherwise {@code false}
 	 */
 	public static boolean isWritingThreadEnabled() {
-		return "true".equalsIgnoreCase(Configuration.get("writingthread"));
+		String enabled = Configuration.get("writingthread");
+		return enabled != null && Boolean.parseBoolean(enabled.trim());
 	}
 
 	/**
@@ -98,7 +99,8 @@ public final class ConfigurationParser {
 	 * @return {@code false} if auto shutdown is explicitly disabled, otherwise {@code true}
 	 */
 	public static boolean isAutoShutdownEnabled() {
-		return !"false".equalsIgnoreCase(Configuration.get("autoshutdown"));
+		String enabled = Configuration.get("autoshutdown");
+		return enabled == null || Boolean.parseBoolean(enabled.trim());
 	}
 
 	/**

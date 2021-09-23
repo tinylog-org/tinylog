@@ -101,7 +101,7 @@ public final class ProviderRegistry {
 		} else if (NOP_PROVIDER_NAME.equalsIgnoreCase(name)) {
 			return new NopLoggingProvider();
 		} else {
-			String[] nameItems = name.split(",");
+			String[] nameItems = name.trim().split(",");
 			Collection<LoggingProvider> providers = new ArrayList<LoggingProvider>(nameItems.length);
 			for (String nameItem : nameItems) {
 				nameItem = nameItem.trim();
