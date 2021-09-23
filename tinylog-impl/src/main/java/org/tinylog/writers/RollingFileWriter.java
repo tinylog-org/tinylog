@@ -77,11 +77,11 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	public RollingFileWriter(final Map<String, String> properties) throws IOException {
 		super(properties);
 
-		path = new DynamicPath(getFileName(properties));
-		policies = createPolicies(properties.get("policies"));
-		converter = createConverter(properties.get("convert"));
-		backups = properties.containsKey("backups") ? Integer.parseInt(properties.get("backups")) : -1;
-		linkToLatest = properties.containsKey("latest") ? new DynamicPath(properties.get("latest")) : null;
+		path = new DynamicPath(getFileName());
+		policies = createPolicies(getStringValue("policies"));
+		converter = createConverter(getStringValue("convert"));
+		backups = properties.containsKey("backups") ? Integer.parseInt(getStringValue("backups")) : -1;
+		linkToLatest = properties.containsKey("latest") ? new DynamicPath(getStringValue("latest")) : null;
 
 		List<FileTuple> files = getAllFileTuplesWithoutLinks(converter.getBackupSuffix());
 		File latestFile = findLatestLogFile(files);
@@ -106,9 +106,9 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 			append = false;
 		}
 
-		charset = getCharset(properties);
-		buffered = Boolean.parseBoolean(properties.get("buffered"));
-		writingThread = Boolean.parseBoolean(properties.get("writingthread"));
+		charset = getCharset();
+		buffered = getBooleanValue("buffered");
+		writingThread = getBooleanValue("writingthread");
 		writer = createByteArrayWriterAndLinkLatest(fileName, append, buffered, charset);
 	}
 

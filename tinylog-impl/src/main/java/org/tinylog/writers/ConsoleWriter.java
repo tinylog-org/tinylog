@@ -51,7 +51,7 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 		Level levelStream = Level.WARN;
 		
 		// Check stream property
-		String stream = properties.get("stream");
+		String stream = getStringValue("stream");
 		if (stream != null) {
 			// Check whether we have the err@LEVEL syntax
 			String[] streams = stream.split("@", 2);

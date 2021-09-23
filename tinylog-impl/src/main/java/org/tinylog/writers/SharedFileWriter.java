@@ -61,10 +61,10 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 	public SharedFileWriter(final Map<String, String> properties) throws IOException {
 		super(properties);
 
-		String fileName = getFileName(properties);
-		boolean append = Boolean.parseBoolean(properties.get("append"));
-		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
-		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
+		String fileName = getFileName();
+		boolean append = getBooleanValue("append");
+		boolean buffered = getBooleanValue("buffered");
+		boolean writingThread = getBooleanValue("writingthread");
 
 		if (append) {
 			lockFile = null;
@@ -87,7 +87,7 @@ public final class SharedFileWriter extends AbstractFormatPatternWriter {
 			}
 		}
 
-		charset = getCharset(properties);
+		charset = getCharset();
 		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, true, charset);
 	}
 

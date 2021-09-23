@@ -38,13 +38,15 @@ public abstract class AbstractFormatPatternWriter extends AbstractFileBasedWrite
 	 *            Configuration for writer
 	 */
 	public AbstractFormatPatternWriter(final Map<String, String> properties) {
-		String pattern = properties.get("format");
+		super(properties);
+
+		String pattern = getStringValue("format");
 		if (pattern == null) {
 			pattern = DEFAULT_FORMAT_PATTERN;
 		}
 
-		token = new FormatPatternParser(properties.get("exception")).parse(pattern + NEW_LINE);
-		builder = Boolean.parseBoolean(properties.get("writingthread")) ? new StringBuilder(BUILDER_CAPACITY) : null;
+		token = new FormatPatternParser(getStringValue("exception")).parse(pattern + NEW_LINE);
+		builder = getBooleanValue("writingthread") ? new StringBuilder(BUILDER_CAPACITY) : null;
 	}
 
 	/**

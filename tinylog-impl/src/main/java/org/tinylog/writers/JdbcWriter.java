@@ -38,9 +38,9 @@ import org.tinylog.pattern.Token;
 import org.tinylog.provider.InternalLogger;
 
 /**
- * Writer for inserting log entries into a SQL database table.
+ * Writer for inserting log entries into an SQL database table.
  */
-public final class JdbcWriter implements Writer {
+public final class JdbcWriter extends AbstractWriter {
 
 	private static final String FIELD_PREFIX = "field.";
 	private static final long MAX_BATCH_SIZE = 100;
@@ -82,13 +82,15 @@ public final class JdbcWriter implements Writer {
 	 *             Database connection cannot be established
 	 */
 	public JdbcWriter(final Map<String, String> properties) throws NamingException, SQLException {
-		url = getUrl(properties);
-		user = properties.get("user");
-		password = properties.get("password");
-		reconnect = Boolean.parseBoolean(properties.get("reconnect"));
-		batch = Boolean.parseBoolean(properties.get("batch"));
+		super(properties);
 
-		mutex = Boolean.parseBoolean(properties.get("writingthread")) ? null : new Object();
+		url = getUrl();
+		user = getStringValue("user");
+		password = getStringValue("password");
+		reconnect = getBooleanValue("reconnect");
+		batch = getBooleanValue("batch");
+
+		mutex = getBooleanValue("writingthread") ? null : new Object();
 
 		connection = connect(url, user, password);
 		sql = renderSql(properties, connection.getMetaData().getIdentifierQuoteString());
@@ -323,15 +325,13 @@ public final class JdbcWriter implements Writer {
 	/**
 	 * Extracts the URL to database or data source from configuration.
 	 *
-	 * @param properties
-	 *            Configuration for writer
 	 * @return Connection URL
 	 *
 	 * @throws IllegalArgumentException
 	 *             URL is not defined in configuration
 	 */
-	private static String getUrl(final Map<String, String> properties) {
-		String url = properties.get("url");
+	private String getUrl() {
+		String url = getStringValue("url");
 		if (url == null) {
 			throw new IllegalArgumentException("URL is missing for JDBC writer");
 		} else {

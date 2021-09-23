@@ -30,7 +30,7 @@ import org.tinylog.provider.InternalLogger;
 /**
  * Writer for redirecting log entries to Android's logcat.
  */
-public final class LogcatWriter implements Writer {
+public final class LogcatWriter extends AbstractWriter {
 
 	private static final String DEFAULT_TAG_FORMAT_PATTERN = "{class-name}";
 	private static final String DEFAULT_MESSAGE_FORMAT_PATTERN = "{message}";
@@ -55,10 +55,12 @@ public final class LogcatWriter implements Writer {
 	 *            Configuration for writer
 	 */
 	public LogcatWriter(final Map<String, String> properties) {
-		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
-		boolean hasWritingThread = Boolean.parseBoolean(properties.get("writingthread"));
+		super(properties);
 
-		String tagPattern = properties.get("tagname");
+		FormatPatternParser parser = new FormatPatternParser(getStringValue("exception"));
+		boolean hasWritingThread = getBooleanValue("writingthread");
+
+		String tagPattern = getStringValue("tagname");
 		if (tagPattern == null) {
 			tagPattern = DEFAULT_TAG_FORMAT_PATTERN;
 		}
@@ -130,7 +132,7 @@ public final class LogcatWriter implements Writer {
 	 *            Log entry for rendering tag
 	 * @return Rendered tag
 	 */
-	protected String renderTag(final LogEntry logEntry) {
+	private String renderTag(final LogEntry logEntry) {
 		StringBuilder builder = reuseOrCreate(tagBuilder, TAG_MAX_LENGTH);
 		tagToken.render(logEntry, builder);
 
@@ -148,7 +150,7 @@ public final class LogcatWriter implements Writer {
 	 *            Log entry for rendering log message
 	 * @return Rendered log message
 	 */
-	protected String renderMessage(final LogEntry logEntry) {
+	private String renderMessage(final LogEntry logEntry) {
 		StringBuilder builder = reuseOrCreate(messageBuilder, MESSAGE_BUILDER_CAPACITY);
 		messageToken.render(logEntry, builder);
 		return builder.toString();

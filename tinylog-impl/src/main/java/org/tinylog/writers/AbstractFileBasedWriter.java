@@ -33,23 +33,25 @@ import org.tinylog.writers.raw.SynchronizedWriterDecorator;
 /**
  * Base writer for outputting log entries into files.
  */
-public abstract class AbstractFileBasedWriter implements Writer {
+public abstract class AbstractFileBasedWriter extends AbstractWriter {
 
-	/** */
-	protected AbstractFileBasedWriter() {
+	/**
+	 * @param properties
+	 *            Configuration for writer
+	 */
+	protected AbstractFileBasedWriter(final Map<String, String> properties) {
+		super(properties);
 	}
 
 	/**
 	 * Extracts the log file name from configuration.
 	 *
-	 * @param properties
-	 *            Configuration for writer
 	 * @return Log file name
 	 * @throws IllegalArgumentException
 	 *             Log file is not defined in configuration
 	 */
-	protected static String getFileName(final Map<String, String> properties) {
-		String fileName = properties.get("file");
+	protected String getFileName() {
+		String fileName = getStringValue("file");
 		if (fileName == null) {
 			throw new IllegalArgumentException("File name is missing for writer");
 		} else {
@@ -61,14 +63,12 @@ public abstract class AbstractFileBasedWriter implements Writer {
 	 * Extracts the charset from configuration. The default charset will be returned, if no charset is defined or the
 	 * defined charset doesn't exist.
 	 *
-	 * @param properties
-	 *            Configuration for writer
 	 * @return Configured charset
 	 */
-	protected static Charset getCharset(final Map<String, String> properties) {
-		String charsetName = properties.get("charset");
+	protected Charset getCharset() {
+		String charsetName = getStringValue("charset");
 		try {
-			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName.trim());
+			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);
 		} catch (IllegalArgumentException ex) {
 			InternalLogger.log(Level.ERROR, "Invalid charset: " + charsetName);
 			return Charset.defaultCharset();

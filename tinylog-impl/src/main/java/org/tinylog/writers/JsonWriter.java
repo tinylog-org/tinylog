@@ -63,12 +63,14 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	 * @throws IllegalArgumentException Log file is not defined in configuration
 	 */
 	public JsonWriter(final Map<String, String> properties) throws IOException {
-		String fileName = getFileName(properties);
-		boolean append = Boolean.parseBoolean(properties.get("append"));
-		boolean buffered = Boolean.parseBoolean(properties.get("buffered"));
-		boolean writingThread = Boolean.parseBoolean(properties.get("writingthread"));
+		super(properties);
 
-		charset = getCharset(properties);
+		String fileName = getFileName();
+		boolean append = getBooleanValue("append");
+		boolean buffered = getBooleanValue("buffered");
+		boolean writingThread = getBooleanValue("writingthread");
+
+		charset = getCharset();
 		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false, charset);
 
 		byte[] charsetHeader = getCharsetHeader(charset);
