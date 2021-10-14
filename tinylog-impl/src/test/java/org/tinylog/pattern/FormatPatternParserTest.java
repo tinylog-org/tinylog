@@ -424,6 +424,16 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that {@code {{any}:|size=X}} can be parsed and the returned token will apply both maximum and minimum size.
+	 */
+	@Test
+	public void size() {
+		String pattern = "{level} {message|size=7}";
+		assertThat(render(pattern, LogEntryBuilder.empty().message("short").level(Level.INFO).create())).isEqualTo("INFO short  ");
+		assertThat(render(pattern, LogEntryBuilder.empty().message("veryverylong").level(Level.INFO).create())).isEqualTo("INFO erylong");
+	}
+
+	/**
 	 * Verifies that invalid minimum size values will produce an error.
 	 */
 	@Test
