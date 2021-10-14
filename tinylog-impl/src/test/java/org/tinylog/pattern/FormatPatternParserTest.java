@@ -378,11 +378,49 @@ public final class FormatPatternParserTest {
 	}
 
 	/**
+	 * Verifies that {@code {any | max-size=X}} can be parsed and the returned token will apply maximum size.
+	 */
+	@Test
+	public void maximumSize() {
+		assertThat(render("{level | max-size=3}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("NFO");
+	}
+
+	/**
 	 * Verifies that {@code {{any}:|min-size=X}} can be parsed and the returned token will apply minimum size.
 	 */
 	@Test
 	public void nestedMinimumSize() {
 		assertThat(render("{{level}:|min-size=6}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO: ");
+	}
+
+	/**
+	 * Verifies that {@code {{any}:|max-size=X}} can be parsed and the returned token will apply maximum size.
+	 */
+	@Test
+	public void nestedMaximumSize() {
+		assertThat(render("{{level}:|max-size=3}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("FO:");
+	}
+
+	/**
+	 * Verifies that {@code {{any}:|min-size=X,max-size=X}} can be parsed and the returned token will apply both minimum and maximum size.
+	 * This and the next test verify that min and max size can be applied in any order.
+	 */
+	@Test
+	public void minimumAndMaximumSize() {
+		String pattern = "{level} {message|min-size=7,max-size=7}";
+		assertThat(render(pattern, LogEntryBuilder.empty().message("short").level(Level.INFO).create())).isEqualTo("INFO short  ");
+		assertThat(render(pattern, LogEntryBuilder.empty().message("veryverylong").level(Level.INFO).create())).isEqualTo("INFO erylong");
+	}
+
+	/**
+	 * Verifies that {@code {{any}:|max-size=X,min-size=X}} can be parsed and the returned token will apply both maximum and minimum size.
+	 * This and the previous test verify that min and max size can be applied in any order.
+	 */
+	@Test
+	public void maximumAndMinimumSize() {
+		String pattern = "{level} {message|max-size=7,min-size=7}";
+		assertThat(render(pattern, LogEntryBuilder.empty().message("short").level(Level.INFO).create())).isEqualTo("INFO short  ");
+		assertThat(render(pattern, LogEntryBuilder.empty().message("veryverylong").level(Level.INFO).create())).isEqualTo("INFO erylong");
 	}
 
 	/**
@@ -394,6 +432,18 @@ public final class FormatPatternParserTest {
 		assertThat(systemStream.consumeErrorOutput())
 			.containsOnlyOnce("ERROR")
 			.containsOnlyOnce("min-size")
+			.containsOnlyOnce("-1");
+	}
+
+	/**
+	 * Verifies that invalid maximum size values will produce an error.
+	 */
+	@Test
+	public void invalidMaximumSize() {
+		assertThat(render("{level | max-size=-1}", LogEntryBuilder.empty().level(Level.INFO).create())).isEqualTo("INFO");
+		assertThat(systemStream.consumeErrorOutput())
+			.containsOnlyOnce("ERROR")
+			.containsOnlyOnce("max-size")
 			.containsOnlyOnce("-1");
 	}
 
