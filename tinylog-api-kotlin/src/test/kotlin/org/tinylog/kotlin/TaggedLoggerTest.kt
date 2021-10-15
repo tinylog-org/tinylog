@@ -13,14 +13,14 @@
 
 package org.tinylog.kotlin
 
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import io.mockk.verify
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +46,7 @@ import org.tinylog.rules.SystemStreamCollector
 class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, private val tag2Configuration: LevelConfiguration?) {
 
 	companion object {
+
 		/**
 		 * Returns all different combinations of logging levels for up two tags for the tests.
 		 *
@@ -65,6 +66,16 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 
 			return levels
 		}
+
+		/**
+		 * Undoes mocking of [ProviderRegistry].
+		 */
+		@JvmStatic
+		@AfterClass
+		fun unmockProviderRegistry() {
+			unmockkStatic(ProviderRegistry::class)
+		}
+
 	}
 
 	/**
@@ -77,10 +88,11 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	private val tag1 = "test"
 	private val tag2 = "other tag"
 	private val loggingProvider = mockk<LoggingProvider>()
-	private var logger: TaggedLogger? = null
+
+	private lateinit var logger: TaggedLogger
 
 	/**
-	 * Applies the mocked logging provider and overrides all depending fields.
+	 * Applies the mocked logging provider and overrides all dependent fields.
 	 */
 	@Before
 	fun applyLoggingProvider() {
@@ -113,20 +125,11 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	}
 
 	/**
-	 * Resets the mocks and the state of the logger.
-	 */
-	@After
-	fun resetState() {
-		Whitebox.setProperty(logger!!, LoggingProvider::class, ProviderRegistry.getLoggingProvider())
-		clearAllMocks()
-	}
-
-	/**
 	 * Verifies evaluating whether [TRACE][Level.TRACE] level is enabled.
 	 */
 	@Test
 	fun isTraceEnabled() {
-		assertThat(logger!!.isTraceEnabled()).isEqualTo(
+		assertThat(logger.isTraceEnabled()).isEqualTo(
 			if (tag2Configuration == null) {
 				tag1Configuration.traceEnabled
 			} else {
@@ -140,7 +143,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun traceObject() {
-		logger!!.trace(42)
+		logger.trace(42)
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, 42) }
@@ -160,7 +163,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun traceString() {
-		logger!!.trace("Hello World!")
+		logger.trace("Hello World!")
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, "Hello World!") }
@@ -180,7 +183,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun traceLazyMessage() {
-		logger!!.trace { "Hello World!" }
+		logger.trace { "Hello World!" }
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, null, null, match(provide("Hello World!"))) }
@@ -200,7 +203,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun traceMessageAndArguments() {
-		logger!!.trace("Hello {}!", "World")
+		logger.trace("Hello {}!", "World")
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) {
@@ -241,7 +244,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun traceMessageAndLazyArguments() {
-		logger!!.trace("The number is {}", { 42 })
+		logger.trace("The number is {}", { 42 })
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) {
@@ -283,7 +286,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun traceException() {
 		val exception = NullPointerException()
 
-		logger!!.trace(exception)
+		logger.trace(exception)
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, null) }
@@ -305,7 +308,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun traceExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger!!.trace(exception, "Hello World!")
+		logger.trace(exception, "Hello World!")
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, "Hello World!") }
@@ -327,7 +330,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun traceExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger!!.trace(exception) { "Hello World!" }
+		logger.trace(exception) { "Hello World!" }
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.TRACE, exception, null, match(provide("Hello World!"))) }
@@ -349,7 +352,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun traceExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger!!.trace(exception, "Hello {}!", "World")
+		logger.trace(exception, "Hello {}!", "World")
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) {
@@ -392,7 +395,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun traceExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger!!.trace(exception, "The number is {}", { 42 })
+		logger.trace(exception, "The number is {}", { 42 })
 
 		if (tag1Configuration.traceEnabled) {
 			verify(exactly = 1) {
@@ -432,7 +435,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun isDebugEnabled() {
-		assertThat(logger!!.isDebugEnabled()).isEqualTo(
+		assertThat(logger.isDebugEnabled()).isEqualTo(
 			if (tag2Configuration == null) {
 				tag1Configuration.debugEnabled
 			} else {
@@ -446,7 +449,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun debugObject() {
-		logger!!.debug(42)
+		logger.debug(42)
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, 42) }
@@ -466,7 +469,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun debugString() {
-		logger!!.debug("Hello World!")
+		logger.debug("Hello World!")
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, "Hello World!") }
@@ -486,7 +489,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun debugLazyMessage() {
-		logger!!.debug { "Hello World!" }
+		logger.debug { "Hello World!" }
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, null, null, match(provide("Hello World!"))) }
@@ -506,7 +509,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun debugMessageAndArguments() {
-		logger!!.debug("Hello {}!", "World")
+		logger.debug("Hello {}!", "World")
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) {
@@ -547,7 +550,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun debugMessageAndLazyArguments() {
-		logger!!.debug("The number is {}", { 42 })
+		logger.debug("The number is {}", { 42 })
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) {
@@ -589,7 +592,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun debugException() {
 		val exception = NullPointerException()
 
-		logger!!.debug(exception)
+		logger.debug(exception)
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, null) }
@@ -611,7 +614,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun debugExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger!!.debug(exception, "Hello World!")
+		logger.debug(exception, "Hello World!")
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, "Hello World!") }
@@ -633,7 +636,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun debugExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger!!.debug(exception) { "Hello World!" }
+		logger.debug(exception) { "Hello World!" }
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.DEBUG, exception, null, match(provide("Hello World!"))) }
@@ -655,7 +658,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun debugExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger!!.debug(exception, "Hello {}!", "World")
+		logger.debug(exception, "Hello {}!", "World")
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) {
@@ -698,7 +701,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun debugExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger!!.debug(exception, "The number is {}", { 42 })
+		logger.debug(exception, "The number is {}", { 42 })
 
 		if (tag1Configuration.debugEnabled) {
 			verify(exactly = 1) {
@@ -738,7 +741,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun isInfoEnabled() {
-		assertThat(logger!!.isInfoEnabled()).isEqualTo(
+		assertThat(logger.isInfoEnabled()).isEqualTo(
 			if (tag2Configuration == null) {
 				tag1Configuration.infoEnabled
 			} else {
@@ -752,7 +755,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun infoObject() {
-		logger!!.info(42)
+		logger.info(42)
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, 42) }
@@ -772,7 +775,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun infoString() {
-		logger!!.info("Hello World!")
+		logger.info("Hello World!")
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, "Hello World!") }
@@ -792,7 +795,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun infoLazyMessage() {
-		logger!!.info { "Hello World!" }
+		logger.info { "Hello World!" }
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, null, null, match(provide("Hello World!"))) }
@@ -812,7 +815,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun infoMessageAndArguments() {
-		logger!!.info("Hello {}!", "World")
+		logger.info("Hello {}!", "World")
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) {
@@ -853,7 +856,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun infoMessageAndLazyArguments() {
-		logger!!.info("The number is {}", { 42 })
+		logger.info("The number is {}", { 42 })
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) {
@@ -895,7 +898,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun infoException() {
 		val exception = NullPointerException()
 
-		logger!!.info(exception)
+		logger.info(exception)
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, null) }
@@ -917,7 +920,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun infoExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger!!.info(exception, "Hello World!")
+		logger.info(exception, "Hello World!")
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, "Hello World!") }
@@ -939,7 +942,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun infoExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger!!.info(exception) { "Hello World!" }
+		logger.info(exception) { "Hello World!" }
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.INFO, exception, null, match(provide("Hello World!"))) }
@@ -961,7 +964,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun infoExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger!!.info(exception, "Hello {}!", "World")
+		logger.info(exception, "Hello {}!", "World")
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) {
@@ -1004,7 +1007,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun infoExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger!!.info(exception, "The number is {}", { 42 })
+		logger.info(exception, "The number is {}", { 42 })
 
 		if (tag1Configuration.infoEnabled) {
 			verify(exactly = 1) {
@@ -1044,7 +1047,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun isWarnEnabled() {
-		assertThat(logger!!.isWarnEnabled()).isEqualTo(
+		assertThat(logger.isWarnEnabled()).isEqualTo(
 			if (tag2Configuration == null) {
 				tag1Configuration.warnEnabled
 			} else {
@@ -1058,7 +1061,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun warnObject() {
-		logger!!.warn(42)
+		logger.warn(42)
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, 42) }
@@ -1078,7 +1081,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun warnString() {
-		logger!!.warn("Hello World!")
+		logger.warn("Hello World!")
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, "Hello World!") }
@@ -1098,7 +1101,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun warnLazyMessage() {
-		logger!!.warn { "Hello World!" }
+		logger.warn { "Hello World!" }
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, null, null, match(provide("Hello World!"))) }
@@ -1118,7 +1121,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun warnMessageAndArguments() {
-		logger!!.warn("Hello {}!", "World")
+		logger.warn("Hello {}!", "World")
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) {
@@ -1159,7 +1162,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun warnMessageAndLazyArguments() {
-		logger!!.warn("The number is {}", { 42 })
+		logger.warn("The number is {}", { 42 })
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) {
@@ -1201,7 +1204,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun warnException() {
 		val exception = NullPointerException()
 
-		logger!!.warn(exception)
+		logger.warn(exception)
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, null) }
@@ -1223,7 +1226,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun warnExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger!!.warn(exception, "Hello World!")
+		logger.warn(exception, "Hello World!")
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, "Hello World!") }
@@ -1245,7 +1248,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun warnExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger!!.warn(exception) { "Hello World!" }
+		logger.warn(exception) { "Hello World!" }
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.WARN, exception, null, match(provide("Hello World!"))) }
@@ -1267,7 +1270,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun warnExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger!!.warn(exception, "Hello {}!", "World")
+		logger.warn(exception, "Hello {}!", "World")
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) {
@@ -1310,7 +1313,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun warnExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger!!.warn(exception, "The number is {}", { 42 })
+		logger.warn(exception, "The number is {}", { 42 })
 
 		if (tag1Configuration.warnEnabled) {
 			verify(exactly = 1) {
@@ -1350,7 +1353,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun isErrorEnabled() {
-		assertThat(logger!!.isErrorEnabled()).isEqualTo(
+		assertThat(logger.isErrorEnabled()).isEqualTo(
 			if (tag2Configuration == null) {
 				tag1Configuration.errorEnabled
 			} else {
@@ -1364,7 +1367,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun errorObject() {
-		logger!!.error(42)
+		logger.error(42)
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, 42) }
@@ -1384,7 +1387,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun errorString() {
-		logger!!.error("Hello World!")
+		logger.error("Hello World!")
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, "Hello World!") }
@@ -1404,7 +1407,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun errorLazyMessage() {
-		logger!!.error { "Hello World!" }
+		logger.error { "Hello World!" }
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, null, null, match(provide("Hello World!"))) }
@@ -1424,7 +1427,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun errorMessageAndArguments() {
-		logger!!.error("Hello {}!", "World")
+		logger.error("Hello {}!", "World")
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) {
@@ -1465,7 +1468,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	 */
 	@Test
 	fun errorMessageAndLazyArguments() {
-		logger!!.error("The number is {}", { 42 })
+		logger.error("The number is {}", { 42 })
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) {
@@ -1507,7 +1510,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun errorException() {
 		val exception = NullPointerException()
 
-		logger!!.error(exception)
+		logger.error(exception)
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, null) }
@@ -1529,7 +1532,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun errorExceptionWithMessage() {
 		val exception = NullPointerException()
 
-		logger!!.error(exception, "Hello World!")
+		logger.error(exception, "Hello World!")
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, "Hello World!") }
@@ -1551,7 +1554,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun errorExceptionWithLazyMessage() {
 		val exception = NullPointerException()
 
-		logger!!.error(exception) { "Hello World!" }
+		logger.error(exception) { "Hello World!" }
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) { loggingProvider.log(2, tag1, Level.ERROR, exception, null, match(provide("Hello World!"))) }
@@ -1573,7 +1576,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun errorExceptionWithMessageAndArguments() {
 		val exception = NullPointerException()
 
-		logger!!.error(exception, "Hello {}!", "World")
+		logger.error(exception, "Hello {}!", "World")
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) {
@@ -1616,7 +1619,7 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 	fun errorExceptionWithMessageAndLazyArguments() {
 		val exception = NullPointerException()
 
-		logger!!.error(exception, "The number is {}", { 42 })
+		logger.error(exception, "The number is {}", { 42 })
 
 		if (tag1Configuration.errorEnabled) {
 			verify(exactly = 1) {
