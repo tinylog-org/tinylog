@@ -254,6 +254,10 @@ public final class FormatPatternParser {
 
 				if ("min-size".equals(key)) {
 					styledToken = new MinimumSizeToken(styledToken, number);
+				} else if ("max-size".equals(key)) {
+					styledToken = new MaximumSizeToken(styledToken, number);
+				} else if ("size".equals(key)) {
+					styledToken = new SizeToken(styledToken, number);
 				} else if ("indent".equals(key)) {
 					styledToken = new IndentationToken(styledToken, number);
 				} else {
