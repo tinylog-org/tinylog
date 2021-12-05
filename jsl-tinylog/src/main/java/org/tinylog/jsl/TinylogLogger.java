@@ -78,7 +78,7 @@ public class TinylogLogger implements System.Logger {
 
 		if (isLoggable(level)) {
 			LOGGING_PROVIDER.log(
-				STACKTRACE_DEPTH, null, translate(level), null, null, msgSupplier.get(), (Object[]) null
+				STACKTRACE_DEPTH, null, translate(level), null, null, msgSupplier, (Object[]) null
 			);
 		}
 	}
@@ -108,7 +108,7 @@ public class TinylogLogger implements System.Logger {
 		Objects.requireNonNull(msgSupplier);
 
 		if (isLoggable(level)) {
-			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), thrown, null, msgSupplier.get(), (Object[]) null);
+			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), thrown, null, msgSupplier, (Object[]) null);
 		}
 	}
 
