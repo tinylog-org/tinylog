@@ -175,6 +175,7 @@ public final class TinylogLoggerTest {
 		assertThat(logger.isLoggable(System.Logger.Level.INFO)).isEqualTo(infoEnabled);
 		assertThat(logger.isLoggable(System.Logger.Level.WARNING)).isEqualTo(warnEnabled);
 		assertThat(logger.isLoggable(System.Logger.Level.ERROR)).isEqualTo(errorEnabled);
+		assertThat(logger.isLoggable(System.Logger.Level.OFF)).isFalse();
 	}
 
 	/**

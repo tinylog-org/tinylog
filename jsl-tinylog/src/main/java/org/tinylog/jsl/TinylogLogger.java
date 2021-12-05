@@ -53,7 +53,13 @@ public class TinylogLogger implements System.Logger {
 	@Override
 	public boolean isLoggable(final Level level) {
 		Objects.requireNonNull(level);
-		return LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, translate(level));
+
+		// Setting the log level of a message to OFF makes little sense and should result in the message not being logged.
+		if (level == Level.OFF) {
+			return false;
+		} else {
+			return LOGGING_PROVIDER.isEnabled(STACKTRACE_DEPTH, null, translate(level));
+		}
 	}
 
 	@Override
