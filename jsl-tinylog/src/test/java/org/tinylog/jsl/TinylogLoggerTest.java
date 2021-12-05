@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +36,7 @@ import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -113,7 +115,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Mocks the underlying logging provider.
+	 * Mocks the underlying logging provider and a resource bundle.
 	 */
 	@Before
 	public void init() {
@@ -142,6 +144,24 @@ public final class TinylogLoggerTest {
 	@After
 	public void reset() {
 		Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+	}
+
+	/**
+	 * Verifies that null is never allowed als log level.
+	 */
+	@Test
+	public void nullNotAllowedAsLogLevel() {
+		assertThatNullPointerException().isThrownBy(() -> logger.isLoggable(null));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, "Hello World!"));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, () -> "Hello" + " " + "World!"));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, 42));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, "fatal error", new RuntimeException()));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, () -> "fatal" + " " + "error", new RuntimeException()));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(null, "Hello {0}!", "World"));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			null, resourceBundle, "localized_message_key", new RuntimeException()));
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			null, resourceBundle, "localized_format_key", "Hello World"));
 	}
 
 	/**
@@ -186,6 +206,14 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceNullNotAllowedAsMsgSupplier() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.TRACE, (Supplier<String>) null));
+	}
+
+	/**
 	 * Verifies that an object as message will be logged correctly at {@link Level#TRACE TRACE} level.
 	 */
 	@Test
@@ -197,6 +225,14 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as the message object ist not allowed at {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceNullAsMsgObjectNotAllowed() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.TRACE, (Object) null));
 	}
 
 	/**
@@ -230,6 +266,16 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#TRACE TRACE} level.
+	 */
+	@Test
+	public void traceNullNotAllowedAsMsgSupplierWithException() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			System.Logger.Level.TRACE, (Supplier<String>) null, new RuntimeException())
+		);
 	}
 
 	/**
@@ -407,6 +453,14 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugNullNotAllowedAsMsgSupplier() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.DEBUG, (Supplier<String>) null));
+	}
+
+	/**
 	 * Verifies that an object as message will be logged correctly at {@link Level#DEBUG DEBUG} level.
 	 */
 	@Test
@@ -418,6 +472,14 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as the message object ist not allowed at {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugNullAsMsgObjectNotAllowed() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.DEBUG, (Object) null));
 	}
 
 	/**
@@ -451,6 +513,16 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#DEBUG DEBUG} level.
+	 */
+	@Test
+	public void debugNullNotAllowedAsMsgSupplierWithException() {
+		assertThatNullPointerException().isThrownBy(() ->
+			logger.log(System.Logger.Level.DEBUG, (Supplier<String>) null, new RuntimeException())
+		);
 	}
 
 	/**
@@ -628,6 +700,14 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#INFO INFO} level.
+	 */
+	@Test
+	public void infoNullNotAllowedAsMsgSupplier() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.INFO, (Supplier<String>) null));
+	}
+
+	/**
 	 * Verifies that an object as message will be logged correctly at {@link Level#INFO INFO} level.
 	 */
 	@Test
@@ -639,6 +719,14 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as the message object ist not allowed at {@link Level#INFO INFO} level.
+	 */
+	@Test
+	public void infoNullAsMsgObjectNotAllowed() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.INFO, (Object) null));
 	}
 
 	/**
@@ -673,6 +761,16 @@ public final class TinylogLoggerTest {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
 	}
+
+	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#INFO INFO} level.
+	 */
+	@Test
+	public void infoNullNotAllowedAsMsgSupplierWithException() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			System.Logger.Level.INFO, (Supplier<String>) null, new RuntimeException()));
+	}
+
 
 	/**
 	 * Verifies that a formatted message with a single argument will be logged correctly at {@link Level#INFO INFO} level.
@@ -849,6 +947,14 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#WARN WARN} level.
+	 */
+	@Test
+	public void warnNullNotAllowedAsMsgSupplier() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.WARNING, (Supplier<String>) null));
+	}
+
+	/**
 	 * Verifies that an object as message will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
@@ -860,6 +966,14 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as the message object ist not allowed at {@link Level#WARN WARN} level.
+	 */
+	@Test
+	public void warnNullAsMsgObjectNotAllowed() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.WARNING, (Object) null));
 	}
 
 	/**
@@ -894,6 +1008,16 @@ public final class TinylogLoggerTest {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
 	}
+
+	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#WARN WARN} level.
+	 */
+	@Test
+	public void warnNullNotAllowedAsMsgSupplierWithException() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			System.Logger.Level.WARNING, (Supplier<String>) null, new RuntimeException()));
+	}
+
 
 	/**
 	 * Verifies that a formatted message with a single argument will be logged correctly at {@link Level#WARN WARN} level.
@@ -1070,6 +1194,14 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorNullNotAllowedAsMsgSupplier() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.ERROR, (Supplier<String>) null));
+	}
+
+	/**
 	 * Verifies that an object as message will be logged correctly at {@link Level#ERROR ERROR} level.
 	 */
 	@Test
@@ -1081,6 +1213,14 @@ public final class TinylogLoggerTest {
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
+	}
+
+	/**
+	 * Verifies that null as the message object ist not allowed at {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorNullAsMsgObjectNotAllowed() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(System.Logger.Level.ERROR, (Object) null));
 	}
 
 	/**
@@ -1115,6 +1255,16 @@ public final class TinylogLoggerTest {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
 	}
+
+	/**
+	 * Verifies that null as a message supplier is not allowed at {@link Level#ERROR ERROR} level.
+	 */
+	@Test
+	public void errorNullNotAllowedAsMsgSupplierWithException() {
+		assertThatNullPointerException().isThrownBy(() -> logger.log(
+			System.Logger.Level.ERROR, (Supplier<String>) null, new RuntimeException()));
+	}
+
 
 	/**
 	 * Verifies that a formatted message with a single argument will be logged correctly at {@link Level#ERROR ERROR} level.
