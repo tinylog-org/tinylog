@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class TinylogLoggerFinder extends System.LoggerFinder {
 
-	private final ConcurrentMap<String, TinylogLogger> loggers = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, TinylogLogger> loggers = new ConcurrentHashMap<String, TinylogLogger>();
 
 	public TinylogLoggerFinder() {
 		super();
