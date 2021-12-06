@@ -29,6 +29,13 @@ public class TinylogLoggerFinder extends System.LoggerFinder {
 
 	@Override
 	public System.Logger getLogger(final String name, final Module module) {
-		return loggers.computeIfAbsent(name, TinylogLogger::new);
+		TinylogLogger logger = loggers.get(name);
+		if (logger == null) {
+			TinylogLogger newLogger = new TinylogLogger(name);
+			TinylogLogger existingLogger = loggers.putIfAbsent(name, newLogger);
+			return existingLogger == null ? newLogger : existingLogger;
+		} else {
+			return logger;
+		}
 	}
 }
