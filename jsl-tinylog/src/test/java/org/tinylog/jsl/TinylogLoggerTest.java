@@ -127,7 +127,7 @@ public final class TinylogLoggerTest {
 		when(provider.isEnabled(anyInt(), eq(null), eq(Level.WARN))).thenReturn(warnEnabled);
 		when(provider.isEnabled(anyInt(), eq(null), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-		logger = new TinylogLogger(TinylogLoggerTest.class.getName(), TinylogLoggerTest.class.getModule());
+		logger = new TinylogLogger(TinylogLoggerTest.class.getName());
 		Whitebox.setInternalState(TinylogLogger.class, provider);
 
 		resourceBundle = PowerMockito.mock(ResourceBundle.class);

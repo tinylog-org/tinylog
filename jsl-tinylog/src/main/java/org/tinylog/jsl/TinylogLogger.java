@@ -34,15 +34,12 @@ public class TinylogLogger implements System.Logger {
 	private static final LoggingProvider LOGGING_PROVIDER = ProviderRegistry.getLoggingProvider();
 
 	private final String name;
-	private final Module module;
 
 	/**
 	 * @param name   the name of the logger
-	 * @param module the module for which the logger is being created
 	 */
-	public TinylogLogger(final String name, final Module module) {
+	public TinylogLogger(final String name) {
 		this.name = Objects.requireNonNull(name);
-		this.module = Objects.requireNonNull(module);
 	}
 
 	@Override

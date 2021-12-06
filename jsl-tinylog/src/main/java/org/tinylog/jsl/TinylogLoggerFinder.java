@@ -29,12 +29,9 @@ public class TinylogLoggerFinder extends System.LoggerFinder {
 
 	@Override
 	public System.Logger getLogger(final String name, final Module module) {
-		// How to handle modules as required by getLogger()?
-		// Should we check if there is an existing logger instance for name and module instead of just checking the name?
-
 		TinylogLogger logger = loggers.get(name);
 		if (logger == null) {
-			TinylogLogger newLogger = new TinylogLogger(name, module);
+			TinylogLogger newLogger = new TinylogLogger(name);
 			TinylogLogger existingLogger = loggers.putIfAbsent(name, newLogger);
 			return existingLogger == null ? newLogger : existingLogger;
 		} else {
