@@ -197,10 +197,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void traceSupplierStringMessage() {
-		logger.log(System.Logger.Level.TRACE, () -> "Hello" + " " + "World!");
+		Supplier<String> msgSupplier = () -> "Hello" + " " + "World!";
+
+		logger.log(System.Logger.Level.TRACE, msgSupplier);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, null, null, "Hello World!", (Object[]) null);
+			verify(provider).log(2, null, Level.TRACE, null, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -237,7 +239,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message with exception will be loged correctly at {@link Level#TRACE TRACE} level.
+	 * Verifies that a message with exception will be logged correctly at {@link Level#TRACE TRACE} level.
 	 */
 	@Test
 	public void traceMessageWithException() {
@@ -253,17 +255,18 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message produced by a supplier function combined with an exception will be loged correctly at
+	 * Verifies that a message produced by a supplier function combined with an exception will be logged correctly at
 	 * {@link Level#TRACE TRACE} level.
 	 */
 	@Test
 	public void traceSupplierStringMessageWithException() {
 		RuntimeException exception = new RuntimeException();
+		Supplier<String> msgSupplier = () -> "fatal" + " " + "error";
 
-		logger.log(System.Logger.Level.TRACE, () -> "fatal" + " " + "error", exception);
+		logger.log(System.Logger.Level.TRACE, msgSupplier, exception);
 
 		if (traceEnabled) {
-			verify(provider).log(2, null, Level.TRACE, exception, null, "fatal error", (Object[]) null);
+			verify(provider).log(2, null, Level.TRACE, exception, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -444,10 +447,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void debugSupplierStringMessage() {
-		logger.log(System.Logger.Level.DEBUG, () -> "Hello" + " " + "World!");
+		Supplier<String> msgSupplier = () -> "Hello" + " " + "World!";
+
+		logger.log(System.Logger.Level.DEBUG, msgSupplier);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, null, null, "Hello World!", (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, null, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -484,7 +489,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message with exception will be loged correctly at {@link Level#DEBUG DEBUG} level.
+	 * Verifies that a message with exception will be logged correctly at {@link Level#DEBUG DEBUG} level.
 	 */
 	@Test
 	public void debugMessageWithException() {
@@ -500,17 +505,18 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message produced by a supplier function combined with an exception will be loged correctly at
+	 * Verifies that a message produced by a supplier function combined with an exception will be logged correctly at
 	 * {@link Level#DEBUG DEBUG} level.
 	 */
 	@Test
 	public void debugSupplierStringMessageWithException() {
 		RuntimeException exception = new RuntimeException();
+		Supplier<String> msgSupplier = () -> "fatal" + " " + "error";
 
-		logger.log(System.Logger.Level.DEBUG, () -> "fatal" + " " + "error", exception);
+		logger.log(System.Logger.Level.DEBUG, msgSupplier, exception);
 
 		if (debugEnabled) {
-			verify(provider).log(2, null, Level.DEBUG, exception, null, "fatal error", (Object[]) null);
+			verify(provider).log(2, null, Level.DEBUG, exception, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -691,10 +697,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void infoSupplierStringMessage() {
-		logger.log(System.Logger.Level.INFO, () -> "Hello" + " " + "World!");
+		Supplier<String> msgSupplier = () -> "Hello" + " " + "World!";
+
+		logger.log(System.Logger.Level.INFO, msgSupplier);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, null, null, "Hello World!", (Object[]) null);
+			verify(provider).log(2, null, Level.INFO, null, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -731,7 +739,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message with exception will be loged correctly at {@link Level#INFO INFO} level.
+	 * Verifies that a message with exception will be logged correctly at {@link Level#INFO INFO} level.
 	 */
 	@Test
 	public void infoMessageWithException() {
@@ -747,17 +755,18 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message produced by a supplier function combined with an exception will be loged correctly at
+	 * Verifies that a message produced by a supplier function combined with an exception will be logged correctly at
 	 * {@link Level#INFO INFO} level.
 	 */
 	@Test
 	public void infoSupplierStringMessageWithException() {
 		RuntimeException exception = new RuntimeException();
+		Supplier<String> msgSupplier = () -> "fatal" + " " + "error";
 
-		logger.log(System.Logger.Level.INFO, () -> "fatal" + " " + "error", exception);
+		logger.log(System.Logger.Level.INFO, msgSupplier, exception);
 
 		if (infoEnabled) {
-			verify(provider).log(2, null, Level.INFO, exception, null, "fatal error", (Object[]) null);
+			verify(provider).log(2, null, Level.INFO, exception, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -938,10 +947,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void warnSupplierStringMessage() {
-		logger.log(System.Logger.Level.WARNING, () -> "Hello" + " " + "World!");
+		Supplier<String> msgSupplier = () -> "Hello" + " " + "World!";
+
+		logger.log(System.Logger.Level.WARNING, msgSupplier);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, null, null, "Hello World!", (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, null, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -978,7 +989,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message with exception will be loged correctly at {@link Level#WARN WARN} level.
+	 * Verifies that a message with exception will be logged correctly at {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnMessageWithException() {
@@ -994,17 +1005,18 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message produced by a supplier function combined with an exception will be loged correctly at
+	 * Verifies that a message produced by a supplier function combined with an exception will be logged correctly at
 	 * {@link Level#WARN WARN} level.
 	 */
 	@Test
 	public void warnSupplierStringMessageWithException() {
 		RuntimeException exception = new RuntimeException();
+		Supplier<String> msgSupplier = () -> "fatal" + " " + "error";
 
-		logger.log(System.Logger.Level.WARNING, () -> "fatal" + " " + "error", exception);
+		logger.log(System.Logger.Level.WARNING, msgSupplier, exception);
 
 		if (warnEnabled) {
-			verify(provider).log(2, null, Level.WARN, exception, null, "fatal error", (Object[]) null);
+			verify(provider).log(2, null, Level.WARN, exception, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -1185,10 +1197,12 @@ public final class TinylogLoggerTest {
 	 */
 	@Test
 	public void errorSupplierStringMessage() {
-		logger.log(System.Logger.Level.ERROR, () -> "Hello" + " " + "World!");
+		Supplier<String> msgSupplier = () -> "Hello" + " " + "World!";
+
+		logger.log(System.Logger.Level.ERROR, msgSupplier);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, null, null, "Hello World!", (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, null, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
@@ -1225,7 +1239,7 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message with exception will be loged correctly at {@link Level#ERROR ERROR} level.
+	 * Verifies that a message with exception will be logged correctly at {@link Level#ERROR ERROR} level.
 	 */
 	@Test
 	public void errorMessageWithException() {
@@ -1241,17 +1255,18 @@ public final class TinylogLoggerTest {
 	}
 
 	/**
-	 * Verifies that a message produced by a supplier function combined with an exception will be loged correctly at
+	 * Verifies that a message produced by a supplier function combined with an exception will be logged correctly at
 	 * {@link Level#ERROR ERROR} level.
 	 */
 	@Test
 	public void errorSupplierStringMessageWithException() {
 		RuntimeException exception = new RuntimeException();
+		Supplier<String> msgSupplier = () -> "fatal" + " " + "error";
 
-		logger.log(System.Logger.Level.ERROR, () -> "fatal" + " " + "error", exception);
+		logger.log(System.Logger.Level.ERROR, msgSupplier, exception);
 
 		if (errorEnabled) {
-			verify(provider).log(2, null, Level.ERROR, exception, null, "fatal error", (Object[]) null);
+			verify(provider).log(2, null, Level.ERROR, exception, null, msgSupplier, (Object[]) null);
 		} else {
 			verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), anyString(), any());
 		}
