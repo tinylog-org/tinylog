@@ -20,14 +20,14 @@ import org.slf4j.spi.MDCAdapter;
 import org.slf4j.spi.SLF4JServiceProvider;
 
 /**
- * SPI implementation for SLF4j 1.8+. Replacement mechanism for {@link org.slf4j.impl.StaticLoggerBinder}.
+ * SPI implementation for SLF4J 2.0+. Replacement mechanism for {@link org.slf4j.impl.StaticLoggerBinder}.
  */
 public class TinylogSlf4jServiceProvider implements SLF4JServiceProvider {
 
 	/**
-	 * SLF4J API 1.8 and newer is supported.
+	 * SLF4J API 2.0 and newer is supported.
 	 */
-	public static final String REQUESTED_API_VERSION = "1.8";
+	public static final String REQUESTED_API_VERSION = "2.0";
 
 	private ILoggerFactory loggerFactory;
 	private IMarkerFactory markerFactory;
