@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class TinylogLoggerFinder extends System.LoggerFinder {
 
-	private final ConcurrentMap<String, TinylogLogger> loggers = new ConcurrentHashMap<String, TinylogLogger>();
+	private final ConcurrentMap<String, TinylogLogger> loggers = new ConcurrentHashMap<>();
 
 	public TinylogLoggerFinder() {
 		super();
@@ -29,13 +29,6 @@ public class TinylogLoggerFinder extends System.LoggerFinder {
 
 	@Override
 	public System.Logger getLogger(final String name, final Module module) {
-		TinylogLogger logger = loggers.get(name);
-		if (logger == null) {
-			TinylogLogger newLogger = new TinylogLogger(name);
-			TinylogLogger existingLogger = loggers.putIfAbsent(name, newLogger);
-			return existingLogger == null ? newLogger : existingLogger;
-		} else {
-			return logger;
-		}
+		return loggers.computeIfAbsent(name, TinylogLogger::new);
 	}
 }

@@ -23,6 +23,12 @@
         <developerConnection>${git.developerConnection}</developerConnection>
     </scm>
 
+    <properties>
+        <!-- We can use Java 9 instead of 6 for release, because System.Logger is only available since this Java version -->
+        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>9</maven.compiler.target>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.tinylog</groupId>
