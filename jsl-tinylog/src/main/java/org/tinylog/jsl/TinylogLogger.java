@@ -29,6 +29,7 @@ import org.tinylog.provider.ProviderRegistry;
 public class TinylogLogger implements System.Logger {
 
 	private static final int STACKTRACE_DEPTH = 2;
+	private static final int ENABLED_STACKTRACE_DEPTH = 3;
 
 	private static final MessageFormatter MESSAGE_FORMATTER = new JavaTextMessageFormatFormatter(Configuration.getLocale());
 	private static final LoggingProvider LOGGING_PROVIDER = ProviderRegistry.getLoggingProvider();
@@ -36,7 +37,7 @@ public class TinylogLogger implements System.Logger {
 	private final String name;
 
 	/**
-	 * @param name   the name of the logger
+	 * @param name the name of the logger
 	 */
 	public TinylogLogger(final String name) {
 		this.name = Objects.requireNonNull(name);
@@ -63,7 +64,7 @@ public class TinylogLogger implements System.Logger {
 	public void log(final Level level, final String msg) {
 		Objects.requireNonNull(level);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), null, null, msg, (Object[]) null);
 		}
 	}
@@ -73,7 +74,7 @@ public class TinylogLogger implements System.Logger {
 		Objects.requireNonNull(level);
 		Objects.requireNonNull(msgSupplier);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(
 				STACKTRACE_DEPTH, null, translate(level), null, null, msgSupplier, (Object[]) null
 			);
@@ -85,7 +86,7 @@ public class TinylogLogger implements System.Logger {
 		Objects.requireNonNull(level);
 		Objects.requireNonNull(obj);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), null, null, obj, (Object[]) null);
 		}
 	}
@@ -94,7 +95,7 @@ public class TinylogLogger implements System.Logger {
 	public void log(final Level level, final String msg, final Throwable thrown) {
 		Objects.requireNonNull(level);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), thrown, null, msg, (Object[]) null);
 		}
 	}
@@ -104,7 +105,7 @@ public class TinylogLogger implements System.Logger {
 		Objects.requireNonNull(level);
 		Objects.requireNonNull(msgSupplier);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), thrown, null, msgSupplier, (Object[]) null);
 		}
 	}
@@ -113,7 +114,7 @@ public class TinylogLogger implements System.Logger {
 	public void log(final Level level, final String format, final Object... params) {
 		Objects.requireNonNull(level);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			LOGGING_PROVIDER.log(STACKTRACE_DEPTH, null, translate(level), null, MESSAGE_FORMATTER, format, params);
 		}
 	}
@@ -122,7 +123,7 @@ public class TinylogLogger implements System.Logger {
 	public void log(final Level level, final ResourceBundle bundle, final String msg, final Throwable thrown) {
 		Objects.requireNonNull(level);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			if (bundle != null && msg != null) {
 				LOGGING_PROVIDER.log(
 					STACKTRACE_DEPTH, null, translate(level), thrown, null, bundle.getString(msg), (Object[]) null);
@@ -137,7 +138,7 @@ public class TinylogLogger implements System.Logger {
 	public void log(final Level level, final ResourceBundle bundle, final String format, final Object... params) {
 		Objects.requireNonNull(level);
 
-		if (isLoggable(level)) {
+		if (enabled(level)) {
 			if (bundle != null && format != null) {
 				LOGGING_PROVIDER.log(
 					STACKTRACE_DEPTH, null, translate(level), null, MESSAGE_FORMATTER, bundle.getString(format), params);
@@ -146,6 +147,17 @@ public class TinylogLogger implements System.Logger {
 					STACKTRACE_DEPTH, null, translate(level), null, MESSAGE_FORMATTER, format, params);
 			}
 		}
+	}
+
+	/**
+	 * Checks if a message of the given level would be logged by this logger <br> This method differs from {@link #isLoggable(Level)} in
+	 * that a different {@link #ENABLED_STACKTRACE_DEPTH stacktrace depth} is required.
+	 *
+	 * @param level Severity level from Java System.Logger
+	 * @return {@code true} if the given log message level is currently being logged
+	 */
+	private boolean enabled(final Level level) {
+		return level != Level.OFF && LOGGING_PROVIDER.isEnabled(ENABLED_STACKTRACE_DEPTH, null, translate(level));
 	}
 
 	/**
