@@ -21,6 +21,7 @@
 		<module>tinylog-api-scala</module>
 		<module>jboss-tinylog</module>
 		<module>jcl-tinylog</module>
+		<module>jsl-tinylog</module>
 		<module>jul-tinylog</module>
 		<module>log4j1.2-api</module>
 		<module>slf4j-tinylog</module>
