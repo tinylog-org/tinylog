@@ -6,7 +6,7 @@
 	<suppress files="[/\\]target[/\\]generated\-sources[/\\].*\.java" checks=".*"/>
 
 	<!-- Original Apache Log4j 1.2 Files -->
-	<suppress files="[/\\]src[/\\]main[/\\]java[/\\]org[/\\]apache[/\\]log4j[/\\].*\.java" checks="(Header|AbbreviationAsWordInName)"/>
+	<suppress files="[/\\]src[/\\]main[/\\]java[/\\]org[/\\]apache[/\\]log4j[/\\].*\.java" checks="(Header|AbbreviationAsWordInName|AtclauseOrder)"/>
 
 	<!-- All Test Classes -->
 	<suppress files="[/\\]src[/\\]test[/\\].*\.java" checks="(MagicNumber|JavadocPackage)"/>

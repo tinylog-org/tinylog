@@ -38,6 +38,8 @@ public final class DynamicPath {
 	/**
 	 * @param path
 	 *            Path with patterns
+	 * @throws IllegalArgumentException
+	 *             Path contains invalid or incomplete patterns
 	 */
 	public DynamicPath(final String path) {
 		String normalizedPath = path.replace('/', File.separatorChar);
@@ -255,6 +257,8 @@ public final class DynamicPath {
 	 * @param token
 	 *            Token from a pattern
 	 * @return Created segment that represents the passed token
+	 * @throws IllegalArgumentException
+	 *             Token is unknown or contains an unexpected parameter
 	 */
 	private static Segment parseSegment(final String path, final String token) {
 		int separator = token.indexOf(':');

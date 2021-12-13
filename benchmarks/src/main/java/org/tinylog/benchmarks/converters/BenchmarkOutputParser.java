@@ -114,6 +114,8 @@ public final class BenchmarkOutputParser {
 	 * @param file
 	 *            Filename of resource
 	 * @return Stream of given file
+	 * @throws FileNotFoundException
+	 *             Resource does not exist
 	 * @throws IOException
 	 *             Failed to open resource
 	 */
