@@ -44,7 +44,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	private StringBuilder builder;
 	private boolean firstEntry;
 	private int truncateSize;
-	private final Map<String, Token> jsonProperties;
+	private final Map<String, Token> fields;
 
 	private final byte[] lineFeedBytes;
 	private final byte[] carriageReturnBytes;
@@ -83,7 +83,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 		byte[] charsetHeader = getCharsetHeader(charset);
 
-		jsonProperties = createTokens(properties);
+		fields = createTokens(properties);
 		lineFeedBytes = removeHeader("\n".getBytes(charset), charsetHeader.length);
 		carriageReturnBytes = removeHeader("\r".getBytes(charset), charsetHeader.length);
 		newLineBytes = removeHeader(NEW_LINE.getBytes(charset), charsetHeader.length);
@@ -149,7 +149,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	@Override
 	public Collection<LogEntryValue> getRequiredLogEntryValues() {
 		Collection<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
-		for (Token token : jsonProperties.values()) {
+		for (Token token : fields.values()) {
 			values.addAll(token.getRequiredLogEntryValues());
 		}
 		return values;
@@ -166,8 +166,8 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		builder.append('\t');
 		builder.append("{").append(NEW_LINE);
 
-		Token[] tokenEntries = jsonProperties.values().toArray(new Token[0]);
-		String[] fields = jsonProperties.keySet().toArray(new String[0]);
+		Token[] tokenEntries = fields.values().toArray(new Token[0]);
+		String[] fields = this.fields.keySet().toArray(new String[0]);
 
 		for (int i = 0; i < tokenEntries.length; i++) {
 			builder.append("\t\t\"").append(fields[i]).append("\" : \"");
@@ -187,7 +187,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 			builder.append("\" ");
 
-			if (i + 1 < jsonProperties.size()) {
+			if (i + 1 < this.fields.size()) {
 				builder.append(",").append(NEW_LINE);
 			}
 		}
@@ -244,17 +244,34 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		writer.close();
 	}
 
-	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder,
+	/**
+	 * Replaces a character by its replacement everywhere in a string builder, starting at the given index.
+	 *
+	 * @param character The character to replace
+	 * @param replacement The replacement for the given character
+	 * @param builder The string builder to change
+	 * @param startIndex The index in the string builder to start at
+	 */
+	private void escapeCharacter(final String character, final String replacement, final StringBuilder builder,
 			final int startIndex) {
 		for (
-			int index = stringBuilder.indexOf(character, startIndex);
+			int index = builder.indexOf(character, startIndex);
 			index != -1;
-			index = stringBuilder.indexOf(character, index + escapeWith.length())
+			index = builder.indexOf(character, index + replacement.length())
 		) {
-			stringBuilder.replace(index, index + character.length(), escapeWith);
+			builder.replace(index, index + character.length(), replacement);
 		}
 	}
 
+	/**
+	 * Checks if the passed byte array contains at the passed index a new line "\n", carriage return "\r", space " ", or
+	 * tabulator "\t".
+	 *
+	 * @param data The byte array that contains the character to check
+	 * @param index The index of the character to check
+	 * @return {@code true} if the bytes at the passed index represents one of the four whitespace characters, otherwise
+	 *         {@code false}
+	 */
 	private boolean isWhitespace(final byte[] data, final int index) {
 		return isPresent(data, index, lineFeedBytes)
 			|| isPresent(data, index, carriageReturnBytes)
@@ -262,6 +279,14 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 			|| isPresent(data, index, tabulatorBytes);
 	}
 
+	/**
+	 * Checks if the passed byte array contains at the passed index a give character.
+	 *
+	 * @param data The byte array that contains the character to check
+	 * @param index The index of the character to check
+	 * @param character The byte representation of the expected character
+	 * @return {@code true} if the bytes at the passed index represents the given character, otherwise {@code false}
+	 */
 	private boolean isPresent(final byte[] data, final int index, final byte[] character) {
 		if (index < 0 || index + character.length >= data.length) {
 			return false;
@@ -276,7 +301,13 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		return true;
 	}
 
-	private boolean prepareFile() throws IOException, IllegalArgumentException {
+	/**
+	 * Preparse the content of the JSON file for writing log entries.
+	 *
+	 * @return {@code true} if the JSON file is empty, {@code false} if it contains already log entries
+	 * @throws IOException Failed to access the JSON file
+	 */
+	private boolean prepareFile() throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 
@@ -297,20 +328,32 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 				}
 			}
 
-			throw new IllegalArgumentException(
-				"Invalid JSON file. The file is missing a closing bracket for the array.");
+			throw new IOException("Invalid JSON file. The file is missing a closing bracket for the array.");
 		} else {
 			writer.write(bracketOpenBytes, 0, bracketOpenBytes.length);
 			return true;
 		}
 	}
 
+	/**
+	 * Removes potential charset header (like BOM) from a byte array.
+	 *
+	 * @param bytes The source byte array
+	 * @param length The charset header length in bytes
+	 * @return Copy of the source byte array without charset header
+	 */
 	private static byte[] removeHeader(final byte[] bytes, final int length) {
 		byte[] result = new byte[bytes.length - length];
 		System.arraycopy(bytes, length, result, 0, result.length);
 		return result;
 	}
 
+	/**
+	 * Creates the token for all fields.
+	 *
+	 * @param properties The configuration for the {@link JsonWriter}
+	 * @return All field names mapped to their tokens
+	 */
 	private static Map<String, Token> createTokens(final Map<String, String> properties) {
 		FormatPatternParser parser = new FormatPatternParser(properties.get("exception"));
 

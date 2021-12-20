@@ -34,6 +34,7 @@ import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @RunWith(Parameterized.class)
 public final class JsonWriterTest {
@@ -351,10 +352,10 @@ public final class JsonWriterTest {
 	/**
 	 * Verifies that an exception is thrown when there is an invalid JSON file
 	 * (currently only missing closing bracket).
-	 * 
-	 * @throws IOException Failed writing to file
+	 *
+	 * @throws IOException Failed creating the file
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void handlesInvalidJsonFile() throws IOException {
 		String file = FileSystem.createTemporaryFile("[{}");
 		Map<String, String> properties = new HashMap<>();
@@ -363,7 +364,9 @@ public final class JsonWriterTest {
 		properties.put("append", "true");
 		properties.put("field.message", "message");
 
-		new JsonWriter(properties);
+		assertThatCode(() -> new JsonWriter(properties))
+			.isInstanceOf(IOException.class)
+			.hasMessageContainingAll("JSON", "closing bracket");
 	}
 
 	/**
