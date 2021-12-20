@@ -288,10 +288,6 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	 * @return {@code true} if the bytes at the passed index represents the given character, otherwise {@code false}
 	 */
 	private boolean isPresent(final byte[] data, final int index, final byte[] character) {
-		if (index < 0 || index + character.length >= data.length) {
-			return false;
-		}
-
 		for (int i = 0; i < character.length; ++i) {
 			if (data[index + i] != character[i]) {
 				return false;
