@@ -15,6 +15,7 @@ package org.tinylog.writers;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,8 @@ import java.util.regex.Pattern;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.core.TinylogLoggingProviderTest.LogEntryValues;
@@ -32,6 +35,7 @@ import org.tinylog.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(Parameterized.class)
 public final class JsonWriterTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
@@ -41,6 +45,29 @@ public final class JsonWriterTest {
 	 */
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	private final boolean writingThread;
+
+	/**
+	 * @param writingThread {@code true} to simulate an active writing thread, {@code false} to simulate the absence of
+	 *                      a writing thread
+	 */
+	public JsonWriterTest(final boolean writingThread) {
+		this.writingThread = writingThread;
+	}
+
+	/**
+	 * Returns both writing thread states ({@code true} and {@code false}) that should be tested.
+	 *
+	 * @return Each object array contains a single boolean
+	 */
+	@Parameterized.Parameters(name = "{0}")
+	public static Collection<Object[]> getSizes() {
+		List<Object[]> sizes = new ArrayList<>();
+		sizes.add(new Object[] { false });
+		sizes.add(new Object[] { true });
+		return sizes;
+	}
 
 	/**
 	 * Verifies that with no logging, an empty array is created.
@@ -53,6 +80,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
 
@@ -76,6 +104,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
 		properties.put("field.level", "level");
@@ -114,6 +143,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "true");
 		properties.put("field.level", "level");
@@ -152,6 +182,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
 
@@ -183,6 +214,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "true");
 
@@ -213,6 +245,7 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("field.msg", "message");
 		properties.put("field.lvl", "level");
 
@@ -234,7 +267,8 @@ public final class JsonWriterTest {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
-		properties.put("writingthread", "true");
+		properties.put("writingthread", Boolean.toString(writingThread));
+		properties.put("buffered", "true");
 		properties.put("field.msg", "message");
 
 		JsonWriter writer = new JsonWriter(properties);
@@ -261,7 +295,6 @@ public final class JsonWriterTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void expectsFilename() throws IOException {
 		Map<String, String> properties = new HashMap<>();
-
 		new JsonWriter(properties);
 	}
 
@@ -275,6 +308,7 @@ public final class JsonWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("field.message", "message");
 		properties.put("charset", "asdf");
 
@@ -299,6 +333,7 @@ public final class JsonWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("field.message", "message");
 
 		JsonWriter writer = new JsonWriter(properties);
@@ -324,6 +359,7 @@ public final class JsonWriterTest {
 		String file = FileSystem.createTemporaryFile("[{}");
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("append", "true");
 		properties.put("field.message", "message");
 
@@ -340,6 +376,7 @@ public final class JsonWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
+		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("append", "true");
 		properties.put("field.message", "message");
 		properties.put("field.date", "date");

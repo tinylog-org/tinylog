@@ -42,13 +42,20 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	private final ByteArrayWriter writer;
 
 	private StringBuilder builder;
-	private boolean preProcessRequired;
+	private boolean firstEntry;
+	private int truncateSize;
 	private final Map<String, Token> jsonProperties;
 
+	private final byte[] lineFeedBytes;
+	private final byte[] carriageReturnBytes;
 	private final byte[] newLineBytes;
+	private final byte[] spaceBytes;
+	private final byte[] tabulatorBytes;
 	private final byte[] commaBytes;
 	private final byte[] bracketOpenBytes;
 	private final byte[] bracketCloseBytes;
+
+	private final int characterSize;
 
 	/**
 	 * @throws IOException              File not found or couldn't access file
@@ -72,59 +79,71 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		boolean writingThread = getBooleanValue("writingthread");
 
 		charset = getCharset();
-		writer = createByteArrayWriter(fileName, append, buffered, !writingThread, false, charset);
+		writer = createByteArrayWriter(fileName, append, buffered, false, false, charset);
 
 		byte[] charsetHeader = getCharsetHeader(charset);
 
 		jsonProperties = createTokens(properties);
+		lineFeedBytes = removeHeader("\n".getBytes(charset), charsetHeader.length);
+		carriageReturnBytes = removeHeader("\r".getBytes(charset), charsetHeader.length);
 		newLineBytes = removeHeader(NEW_LINE.getBytes(charset), charsetHeader.length);
+		spaceBytes = removeHeader(" ".getBytes(charset), charsetHeader.length);
+		tabulatorBytes = removeHeader("\t".getBytes(charset), charsetHeader.length);
 		commaBytes = removeHeader(",".getBytes(charset), charsetHeader.length);
 		bracketOpenBytes = removeHeader("[".getBytes(charset), charsetHeader.length);
 		bracketCloseBytes = removeHeader("]".getBytes(charset), charsetHeader.length);
+
+		characterSize = lineFeedBytes.length;
+		if (characterSize != carriageReturnBytes.length || characterSize != spaceBytes.length
+			|| characterSize != tabulatorBytes.length || characterSize != commaBytes.length
+			|| characterSize != bracketOpenBytes.length || characterSize != bracketCloseBytes.length) {
+			throw new IllegalArgumentException("Invalid charset " + charset.displayName() + ". All ASCII characters"
+				+ " must have the same number of bytes.");
+		}
 
 		if (writingThread) {
 			builder = new StringBuilder();
 		}
 
-		preProcessFile();
-		preProcessRequired = false;
+		firstEntry = prepareFile();
+		truncateSize = 0;
 	}
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		if (preProcessRequired) {
-			preProcessFile();
-			preProcessRequired = false;
-		}
-
-		StringBuilder builder;
-		if (this.builder == null) {
-			builder = new StringBuilder();
+		if (builder == null) {
+			StringBuilder builder = new StringBuilder();
+			addJsonObject(logEntry, builder);
+			synchronized (writer) {
+				internalWrite(builder.toString().getBytes(charset));
+			}
 		} else {
-			builder = this.builder;
 			builder.setLength(0);
+			addJsonObject(logEntry, builder);
+			internalWrite(builder.toString().getBytes(charset));
 		}
-
-		addJsonObject(logEntry, builder);
-
-		byte[] data = builder.toString().getBytes(charset);
-		writer.write(data, 0, data.length);
 	}
 
 	@Override
 	public void flush() throws IOException {
-		writer.flush();
-
-		if (!preProcessRequired) {
-			postProcessFile();
-			preProcessRequired = true;
+		if (builder == null) {
+			synchronized (writer) {
+				internalFlush();
+			}
+		} else {
+			internalFlush();
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
-		flush();
-		writer.close();
+		if (builder == null) {
+			synchronized (writer) {
+				internalClose();
+			}
+		} else {
+			internalClose();
+		}
 	}
 
 	@Override
@@ -137,7 +156,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	}
 
 	/**
-	 * Prepares and adds a Json Object. Also escapes special characters.
+	 * Prepares and adds a Json Object. Special characters will be escaped.
 	 *
 	 * @param logEntry LogEntry with information for token
 	 * @param builder  Target for the created the JSON object
@@ -172,7 +191,57 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 				builder.append(",").append(NEW_LINE);
 			}
 		}
-		builder.append(NEW_LINE).append("\t},");
+		builder.append(NEW_LINE).append("\t}");
+	}
+
+	/**
+	 * Outputs a passed byte array unsynchronized.
+	 *
+	 * <p>
+	 *     A comma will be added if there are already other log entries.
+	 * </p>
+	 *
+	 * @param data
+	 *            Byte array to output
+	 * @throws IOException
+	 *             Writing failed
+	 */
+	private void internalWrite(final byte[] data) throws IOException {
+		if (truncateSize > 0) {
+			writer.truncate(truncateSize);
+			truncateSize = 0;
+		}
+
+		if (firstEntry) {
+			firstEntry = false;
+		} else {
+			writer.write(commaBytes, 0, commaBytes.length);
+		}
+
+		writer.write(data, 0, data.length);
+	}
+
+	/**
+	 * Outputs buffered log entries immediately and close the JSON array unsynchronized.
+	 *
+	 * @throws IOException Closing failed
+	 */
+	private void internalFlush() throws IOException {
+		writer.write(newLineBytes, 0, newLineBytes.length);
+		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
+		writer.flush();
+
+		truncateSize = newLineBytes.length + bracketCloseBytes.length;
+	}
+
+	/**
+	 * Closes the writer unsynchronized.
+	 *
+	 * @throws IOException Closing failed
+	 */
+	private void internalClose() throws IOException {
+		internalFlush();
+		writer.close();
 	}
 
 	private void escapeCharacter(final String character, final String escapeWith, final StringBuilder stringBuilder,
@@ -186,64 +255,54 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		}
 	}
 
-	private boolean isWhitespace(final byte character) {
-		return character == '\n' || character == '\r' || character == ' ';
+	private boolean isWhitespace(final byte[] data, final int index) {
+		return isPresent(data, index, lineFeedBytes)
+			|| isPresent(data, index, carriageReturnBytes)
+			|| isPresent(data, index, spaceBytes)
+			|| isPresent(data, index, tabulatorBytes);
 	}
 
-	/**
-	 * Pre-processes the JSON file.
-	 *
-	 * @throws IOException              Error reading or writing file
-	 * @throws IllegalArgumentException Invalid file format
-	 */
-	private void preProcessFile() throws IOException, IllegalArgumentException {
+	private boolean isPresent(final byte[] data, final int index, final byte[] character) {
+		if (index < 0 || index + character.length >= data.length) {
+			return false;
+		}
+
+		for (int i = 0; i < character.length; ++i) {
+			if (data[index + i] != character[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean prepareFile() throws IOException, IllegalArgumentException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 
 		if (numberOfBytes > 0) {
-			int sizeToTruncate = 0;
+			int whitespaceIndex = numberOfBytes;
 			boolean foundClosingBracket = false;
 
-			for (int i = numberOfBytes - 1; i >= 0; i--) {
-				byte letter = bytes[i];
-				sizeToTruncate += 1;
-
-				if (letter == ']') {
+			for (int i = numberOfBytes - characterSize; i >= 0; i -= characterSize) {
+				if (isPresent(bytes, i, bracketCloseBytes)) {
 					foundClosingBracket = true;
-				} else if (foundClosingBracket && !isWhitespace(letter)) {
-					sizeToTruncate -= 1;
-					break;
+				} else if (foundClosingBracket) {
+					if (isWhitespace(bytes, i)) {
+						whitespaceIndex = i;
+					} else {
+						writer.truncate(numberOfBytes - whitespaceIndex);
+						return isPresent(bytes, i, bracketOpenBytes);
+					}
 				}
 			}
 
-			if (!foundClosingBracket) {
-				throw new IllegalArgumentException(
-						"Invalid JSON file. The file is missing a closing bracket for the array.");
-			}
-
-			writer.truncate(sizeToTruncate);
-			writer.write(commaBytes, 0, commaBytes.length);
+			throw new IllegalArgumentException(
+				"Invalid JSON file. The file is missing a closing bracket for the array.");
 		} else {
 			writer.write(bracketOpenBytes, 0, bracketOpenBytes.length);
+			return true;
 		}
-	}
-
-	/**
-	 * Post-processes the JSON file. Attempts to delete the trailing comma and
-	 * appends closing bracket which were handled in {@link #preProcessFile()}.
-	 *
-	 * @throws IOException Error writing to file
-	 */
-	private void postProcessFile() throws IOException {
-		byte[] bytes = new byte[BUFFER_SIZE];
-		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
-
-		if (numberOfBytes > 0 && bytes[numberOfBytes - 1] == ',') {
-			writer.truncate(1);
-		}
-
-		writer.write(newLineBytes, 0, newLineBytes.length);
-		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
 	}
 
 	private static byte[] removeHeader(final byte[] bytes, final int length) {
