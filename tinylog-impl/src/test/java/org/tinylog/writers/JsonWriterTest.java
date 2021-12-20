@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +34,7 @@ import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.core.TinylogLoggingProviderTest.LogEntryValues;
 import org.tinylog.rules.SystemStreamCollector;
+import org.tinylog.util.CustomTestCharsetProvider;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
 
@@ -440,6 +442,52 @@ public final class JsonWriterTest {
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("charset")
 					.containsOnlyOnce("asdf");
 			assertThat(resultingEntry).contains(givenLogEntry.getMessage());
+		}
+
+	}
+
+	/**
+	 * Tests for illegal charset validation.
+	 */
+	@RunWith(Parameterized.class)
+	public static class IllegalCharsetTest {
+
+		/**
+		 * Redirects and collects system output streams.
+		 */
+		@Rule
+		public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+		private final Charset charset;
+
+		/**
+		 * @param charset The illegal charset to validate
+		 */
+		public IllegalCharsetTest(final Charset charset) {
+			this.charset = charset;
+		}
+
+		/**
+		 * Returns illegal charsets that should be tested.
+		 *
+		 * @return Each object array contains a single charset
+		 */
+		@Parameterized.Parameters(name = "{0}")
+		public static Collection<Object[]> getSizes() {
+			return CustomTestCharsetProvider.CHARSETS.stream()
+				.map(charset -> new Object[] {charset})
+				.collect(Collectors.toList());
+		}
+
+		@Test
+		public void validateCharset() throws IOException {
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", FileSystem.createTemporaryFile());
+			properties.put("charset", charset.name());
+
+			assertThatCode(() -> new JsonWriter(properties))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining(charset.name());
 		}
 
 	}

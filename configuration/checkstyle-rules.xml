@@ -169,7 +169,9 @@
 
 		<!-- Size Violations -->
 
-		<module name=" AnonInnerLength " />
+		<module name=" AnonInnerLength">
+			<property name="max" value="25" />
+		</module>
 		<module name="MethodLength">
 			<property name="max" value="200" />
 		</module>
