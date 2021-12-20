@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -314,10 +315,11 @@ public final class JsonWriterTest {
 	 * 
 	 * @throws IOException Failed writing to file
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void expectsFilename() throws IOException {
-		Map<String, String> properties = new HashMap<>();
-		new JsonWriter(properties);
+		assertThatCode(() -> new JsonWriter(Collections.emptyMap()))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessageContainingAll("File name", "missing");
 	}
 
 	/**
