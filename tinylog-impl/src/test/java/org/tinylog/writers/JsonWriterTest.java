@@ -15,6 +15,7 @@ package org.tinylog.writers;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,26 +48,39 @@ public final class JsonWriterTest {
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
+	private final Charset charset;
 	private final boolean writingThread;
 
 	/**
+	 * @param charset The charset to use for JSON generation
 	 * @param writingThread {@code true} to simulate an active writing thread, {@code false} to simulate the absence of
 	 *                      a writing thread
 	 */
-	public JsonWriterTest(final boolean writingThread) {
+	public JsonWriterTest(final Charset charset, final boolean writingThread) {
+		this.charset = charset;
 		this.writingThread = writingThread;
 	}
 
 	/**
-	 * Returns both writing thread states ({@code true} and {@code false}) that should be tested.
+	 * Returns sample charsets and both writing thread states ({@code true} and {@code false}) that should be tested.
 	 *
-	 * @return Each object array contains a single boolean
+	 * @return Each object array contains a single charset and a single boolean
 	 */
 	@Parameterized.Parameters(name = "{0}")
 	public static Collection<Object[]> getSizes() {
 		List<Object[]> sizes = new ArrayList<>();
-		sizes.add(new Object[] { false });
-		sizes.add(new Object[] { true });
+		sizes.add(new Object[] { StandardCharsets.US_ASCII, false });
+		sizes.add(new Object[] { StandardCharsets.US_ASCII, true });
+		sizes.add(new Object[] { StandardCharsets.ISO_8859_1, false });
+		sizes.add(new Object[] { StandardCharsets.ISO_8859_1, true });
+		sizes.add(new Object[] { StandardCharsets.UTF_8, false });
+		sizes.add(new Object[] { StandardCharsets.UTF_8, true });
+		sizes.add(new Object[] { StandardCharsets.UTF_16, false });
+		sizes.add(new Object[] { StandardCharsets.UTF_16, true });
+		sizes.add(new Object[] { StandardCharsets.UTF_16BE, false });
+		sizes.add(new Object[] { StandardCharsets.UTF_16BE, true });
+		sizes.add(new Object[] { StandardCharsets.UTF_16LE, false });
+		sizes.add(new Object[] { StandardCharsets.UTF_16LE, true });
 		return sizes;
 	}
 
@@ -84,12 +98,13 @@ public final class JsonWriterTest {
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
+		properties.put("charset", charset.name());
 
 		JsonWriter writer = new JsonWriter(properties);
 		writer.close();
 
 		String expectedFileContent = "[" + NEW_LINE + "]";
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		assertThat(resultingEntry).isEqualTo(expectedFileContent);
 	}
@@ -108,6 +123,7 @@ public final class JsonWriterTest {
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
+		properties.put("charset", charset.name());
 		properties.put("field.level", "level");
 		properties.put("field.message", "message");
 
@@ -125,7 +141,7 @@ public final class JsonWriterTest {
 
 		String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
 		String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
 		int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
@@ -147,6 +163,7 @@ public final class JsonWriterTest {
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "true");
+		properties.put("charset", charset.name());
 		properties.put("field.level", "level");
 		properties.put("field.message", "message");
 
@@ -164,7 +181,7 @@ public final class JsonWriterTest {
 
 		String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
 		String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
 		int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
@@ -186,6 +203,7 @@ public final class JsonWriterTest {
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "false");
+		properties.put("charset", charset.name());
 
 		JsonWriter writer;
 		writer = new JsonWriter(properties);
@@ -193,7 +211,7 @@ public final class JsonWriterTest {
 		writer.write(givenLogEntry);
 		writer.close();
 
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		int indexOfOpeningArray = resultingEntry.indexOf("[");
 		int indexOfOpeningJsonObject = resultingEntry.indexOf("{");
@@ -218,6 +236,7 @@ public final class JsonWriterTest {
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("buffered", "false");
 		properties.put("append", "true");
+		properties.put("charset", charset.name());
 
 		JsonWriter writer;
 		writer = new JsonWriter(properties);
@@ -226,7 +245,7 @@ public final class JsonWriterTest {
 		writer.write(givenLogEntry);
 		writer.close();
 
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		int indexOfClosingFirstJsonObject = resultingEntry.indexOf("}");
 		int indexOfOpeningSecondJsonObject = resultingEntry.indexOf("{", indexOfClosingFirstJsonObject);
@@ -247,6 +266,7 @@ public final class JsonWriterTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
+		properties.put("charset", charset.name());
 		properties.put("field.msg", "message");
 		properties.put("field.lvl", "level");
 
@@ -258,7 +278,7 @@ public final class JsonWriterTest {
 
 		String expectedMessageField = String.format("\"msg\" : \"%s\"", givenLogEntry.getMessage());
 		String expectedLevelField = String.format("\"lvl\" : \"%s\"", givenLogEntry.getLevel());
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 		assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
 	}
 
@@ -269,6 +289,7 @@ public final class JsonWriterTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
+		properties.put("charset", charset.name());
 		properties.put("buffered", "true");
 		properties.put("field.msg", "message");
 
@@ -278,13 +299,13 @@ public final class JsonWriterTest {
 		writer.write(LogEntryBuilder.empty().message("2").create());
 		writer.flush();
 
-		assertThat(FileSystem.readFile(file))
+		assertThat(FileSystem.readFile(file, charset))
 			.isEqualToIgnoringWhitespace("[{\"msg\": \"1\"}, {\"msg\": \"2\"}]");
 
 		writer.write(LogEntryBuilder.empty().message("3").create());
 		writer.close();
 
-		assertThat(FileSystem.readFile(file))
+		assertThat(FileSystem.readFile(file, charset))
 			.isEqualToIgnoringWhitespace("[{\"msg\": \"1\"}, {\"msg\": \"2\"}, {\"msg\": \"3\"}]");
 	}
 
@@ -310,8 +331,8 @@ public final class JsonWriterTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
-		properties.put("field.message", "message");
 		properties.put("charset", "asdf");
+		properties.put("field.message", "message");
 
 		JsonWriter writer = new JsonWriter(properties);
 		LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
@@ -335,6 +356,7 @@ public final class JsonWriterTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
+		properties.put("charset", charset.name());
 		properties.put("field.message", "message");
 
 		JsonWriter writer = new JsonWriter(properties);
@@ -344,7 +366,7 @@ public final class JsonWriterTest {
 		writer.close();
 
 		String expectedMessage = "Hello World!\\n\\t\\t\\n\\\"\\f\\b";
-		String resultingEntry = FileSystem.readFile(file);
+		String resultingEntry = FileSystem.readFile(file, charset);
 
 		assertThat(resultingEntry).contains(expectedMessage);
 	}
@@ -362,6 +384,7 @@ public final class JsonWriterTest {
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("append", "true");
+		properties.put("charset", charset.name());
 		properties.put("field.message", "message");
 
 		assertThatCode(() -> new JsonWriter(properties))
@@ -381,6 +404,7 @@ public final class JsonWriterTest {
 		properties.put("file", file);
 		properties.put("writingthread", Boolean.toString(writingThread));
 		properties.put("append", "true");
+		properties.put("charset", charset.name());
 		properties.put("field.message", "message");
 		properties.put("field.date", "date");
 		properties.put("field.line", "line");

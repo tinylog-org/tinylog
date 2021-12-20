@@ -46,6 +46,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	private int truncateSize;
 	private final Map<String, Token> fields;
 
+	private final byte[] charsetHeaderBytes;
 	private final byte[] lineFeedBytes;
 	private final byte[] carriageReturnBytes;
 	private final byte[] newLineBytes;
@@ -80,18 +81,17 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 		charset = getCharset();
 		writer = createByteArrayWriter(fileName, append, buffered, false, false, charset);
-
-		byte[] charsetHeader = getCharsetHeader(charset);
-
 		fields = createTokens(properties);
-		lineFeedBytes = removeHeader("\n".getBytes(charset), charsetHeader.length);
-		carriageReturnBytes = removeHeader("\r".getBytes(charset), charsetHeader.length);
-		newLineBytes = removeHeader(NEW_LINE.getBytes(charset), charsetHeader.length);
-		spaceBytes = removeHeader(" ".getBytes(charset), charsetHeader.length);
-		tabulatorBytes = removeHeader("\t".getBytes(charset), charsetHeader.length);
-		commaBytes = removeHeader(",".getBytes(charset), charsetHeader.length);
-		bracketOpenBytes = removeHeader("[".getBytes(charset), charsetHeader.length);
-		bracketCloseBytes = removeHeader("]".getBytes(charset), charsetHeader.length);
+
+		charsetHeaderBytes = getCharsetHeader(charset);
+		lineFeedBytes = removeHeader("\n".getBytes(charset), charsetHeaderBytes.length);
+		carriageReturnBytes = removeHeader("\r".getBytes(charset), charsetHeaderBytes.length);
+		newLineBytes = removeHeader(NEW_LINE.getBytes(charset), charsetHeaderBytes.length);
+		spaceBytes = removeHeader(" ".getBytes(charset), charsetHeaderBytes.length);
+		tabulatorBytes = removeHeader("\t".getBytes(charset), charsetHeaderBytes.length);
+		commaBytes = removeHeader(",".getBytes(charset), charsetHeaderBytes.length);
+		bracketOpenBytes = removeHeader("[".getBytes(charset), charsetHeaderBytes.length);
+		bracketCloseBytes = removeHeader("]".getBytes(charset), charsetHeaderBytes.length);
 
 		characterSize = lineFeedBytes.length;
 		if (characterSize != carriageReturnBytes.length || characterSize != spaceBytes.length
@@ -311,11 +311,11 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 
-		if (numberOfBytes > 0) {
+		if (numberOfBytes > charsetHeaderBytes.length) {
 			int whitespaceIndex = numberOfBytes;
 			boolean foundClosingBracket = false;
 
-			for (int i = numberOfBytes - characterSize; i >= 0; i -= characterSize) {
+			for (int i = numberOfBytes - characterSize; i >= charsetHeaderBytes.length; i -= characterSize) {
 				if (isPresent(bytes, i, bracketCloseBytes)) {
 					foundClosingBracket = true;
 				} else if (foundClosingBracket) {
