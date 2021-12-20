@@ -228,6 +228,31 @@ public final class JsonWriterTest {
 		assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
 	}
 
+	@Test
+	public void validJsonAfterFlushingOrClosing() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("writingthread", "true");
+		properties.put("field.msg", "message");
+
+		JsonWriter writer = new JsonWriter(properties);
+
+		writer.write(LogEntryBuilder.empty().message("1").create());
+		writer.write(LogEntryBuilder.empty().message("2").create());
+		writer.flush();
+
+		assertThat(FileSystem.readFile(file))
+			.isEqualToIgnoringWhitespace("[{\"msg\": \"1\"}, {\"msg\": \"2\"}]");
+
+		writer.write(LogEntryBuilder.empty().message("3").create());
+		writer.close();
+
+		assertThat(FileSystem.readFile(file))
+			.isEqualToIgnoringWhitespace("[{\"msg\": \"1\"}, {\"msg\": \"2\"}, {\"msg\": \"3\"}]");
+	}
+
 	/**
 	 * Verifies that exception is thrown when there is no file name.
 	 * 

@@ -42,6 +42,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	private final ByteArrayWriter writer;
 
 	private StringBuilder builder;
+	private boolean preProcessRequired;
 	private final Map<String, Token> jsonProperties;
 
 	private final byte[] newLineBytes;
@@ -86,10 +87,16 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		}
 
 		preProcessFile();
+		preProcessRequired = false;
 	}
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
+		if (preProcessRequired) {
+			preProcessFile();
+			preProcessRequired = false;
+		}
+
 		StringBuilder builder;
 		if (this.builder == null) {
 			builder = new StringBuilder();
@@ -107,12 +114,16 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	@Override
 	public void flush() throws IOException {
 		writer.flush();
+
+		if (!preProcessRequired) {
+			postProcessFile();
+			preProcessRequired = true;
+		}
 	}
 
 	@Override
 	public void close() throws IOException {
-		writer.flush();
-		postProcessFile();
+		flush();
 		writer.close();
 	}
 
