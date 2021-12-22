@@ -1,4 +1,5 @@
 org.tinylog.policies.DailyPolicy
+org.tinylog.policies.DynamicNamePolicy
 org.tinylog.policies.MonthlyPolicy
 org.tinylog.policies.StartupPolicy
 org.tinylog.policies.SizePolicy

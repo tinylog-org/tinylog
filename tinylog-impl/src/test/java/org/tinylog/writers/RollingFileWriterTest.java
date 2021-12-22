@@ -26,6 +26,7 @@ import org.powermock.reflect.Whitebox;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.converters.FileConverter;
 import org.tinylog.core.LogEntryValue;
+import org.tinylog.path.DynamicNameSegment;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
@@ -507,6 +508,33 @@ public final class RollingFileWriterTest {
 		String file = FileSystem.createTemporaryFile();
 		Writer writer = new ServiceLoader<>(Writer.class, Map.class).create("rolling file", singletonMap("file", file));
 		assertThat(writer).isInstanceOf(RollingFileWriter.class);
+	}
+
+	/**
+	 * Verifies that the logfile can be changed using {@code {dynamic name}}.
+	 *
+	 * @throws IOException
+	 *             Failed opening file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
+	 */
+	@Test
+	public void dynamicName() throws IOException, InterruptedException {
+		String fooFile = FileSystem.createTemporaryFile();
+		String barFile = FileSystem.createTemporaryFile();
+
+		RollingFileWriter writer = new RollingFileWriter(tripletonMap(
+				"file", "{dynamic name}",
+				"format", "{message}",
+				"policies", "dynamic name"));
+		DynamicNameSegment.setDynamicName(fooFile);
+		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+		DynamicNameSegment.setDynamicName(barFile);
+		writer.write(LogEntryBuilder.empty().message("Goodbye!").create());
+		writer.close();
+
+		assertThat(FileSystem.readFile(fooFile)).isEqualTo("Hello World!" + NEW_LINE);
+		assertThat(FileSystem.readFile(barFile)).isEqualTo("Goodbye!" + NEW_LINE);
 	}
 
 	/**
