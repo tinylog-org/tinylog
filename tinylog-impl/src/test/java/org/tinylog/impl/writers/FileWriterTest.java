@@ -86,7 +86,7 @@ class FileWriterTest {
 	 * Verifies that multiple short strings (smaller than the used buffer) are written to the log file.
 	 */
 	@Test
-	void writeMultipleShortMessage() throws IOException {
+	void writeMultipleShortMessages() throws IOException {
 		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
@@ -120,7 +120,7 @@ class FileWriterTest {
 	 * Verifies that multiple long string (larger than the used buffer) are written to the log file.
 	 */
 	@Test
-	void writeMultipleLongMessage() throws IOException {
+	void writeMultipleLongMessages() throws IOException {
 		String first = "<";
 
 		StringBuilder builder = new StringBuilder();
