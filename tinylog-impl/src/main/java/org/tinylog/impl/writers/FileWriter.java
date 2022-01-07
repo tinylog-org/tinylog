@@ -10,6 +10,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.writers.output.ByteBuffer;
 
 /**
  * Asynchronous writer for writing log entries to a file.

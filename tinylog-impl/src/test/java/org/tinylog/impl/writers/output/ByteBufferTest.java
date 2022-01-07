@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.output;
 
 import java.io.DataOutput;
 import java.io.IOException;
