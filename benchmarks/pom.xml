@@ -19,7 +19,21 @@
 
     <properties>
         <root.basedir>${project.parent.basedir}</root.basedir>
+        <benchmark.forks>10</benchmark.forks>
+        <benchmark.warmups>10</benchmark.warmups>
+        <benchmark.iterations>10</benchmark.iterations>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>quick-benchmarks</id>
+            <properties>
+                <benchmark.forks>1</benchmark.forks>
+                <benchmark.warmups>0</benchmark.warmups>
+                <benchmark.iterations>1</benchmark.iterations>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -30,6 +44,25 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <arguments>
+                        <argument>-Dfile.encoding=UTF-8</argument>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>org.openjdk.jmh.Main</argument>
+                        <argument>org\.tinylog\.benchmarks\.(.*)Benchmark</argument>
+                        <argument>-f</argument>
+                        <argument>${benchmark.forks}</argument>
+                        <argument>-wi</argument>
+                        <argument>${benchmark.warmups}</argument>
+                        <argument>-i</argument>
+                        <argument>${benchmark.iterations}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -79,14 +112,14 @@
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-        </plugins>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+            </plugin>
+       </plugins>
     </build>
 
 </project>
