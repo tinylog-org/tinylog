@@ -16,15 +16,15 @@ import org.tinylog.impl.format.placeholders.Placeholder;
  */
 public class FileWriter implements AsyncWriter {
 
+	private static final int BYTE_BUFFER_CAPACITY = 65536;
 	private static final int BUILDER_START_CAPACITY = 1024;
 	private static final int BUILDER_MAX_CAPACITY = 65536;
-	private static final int CHUNK_CAPACITY = 65536;
 
 	private final Placeholder placeholder;
 	private final RandomAccessFile file;
 	private final Charset charset;
 
-	private final ByteChunk chunk;
+	private final ByteBuffer buffer;
 	private StringBuilder builder;
 
 	/**
@@ -43,7 +43,7 @@ public class FileWriter implements AsyncWriter {
 		this.file = new RandomAccessFile(file.toString(), "rw");
 		this.charset = charset;
 
-		this.chunk = new ByteChunk(CHUNK_CAPACITY, (int) (this.file.length() % CHUNK_CAPACITY));
+		this.buffer = new ByteBuffer(BYTE_BUFFER_CAPACITY, (int) (this.file.length() % BYTE_BUFFER_CAPACITY));
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 
 		this.file.seek(this.file.length());
@@ -66,9 +66,9 @@ public class FileWriter implements AsyncWriter {
 
 	@Override
 	public void flush() throws IOException {
-		if (!chunk.isEmpty()) {
-			int bytes = chunk.writeTo(file);
-			chunk.reset(bytes == CHUNK_CAPACITY ? CHUNK_CAPACITY : CHUNK_CAPACITY - bytes);
+		if (!buffer.isEmpty()) {
+			int bytes = buffer.writeTo(file);
+			buffer.reset(bytes == BYTE_BUFFER_CAPACITY ? BYTE_BUFFER_CAPACITY : BYTE_BUFFER_CAPACITY - bytes);
 		}
 	}
 
@@ -88,21 +88,21 @@ public class FileWriter implements AsyncWriter {
 	 */
 	private void storeStringBuilder() throws IOException {
 		byte[] data = builder.toString().getBytes(charset);
-		int bytes = chunk.store(data, 0);
+		int bytes = buffer.store(data, 0);
 
-		if (chunk.isFull()) {
-			chunk.writeTo(file);
-			chunk.reset(CHUNK_CAPACITY);
+		if (buffer.isFull()) {
+			buffer.writeTo(file);
+			buffer.reset(BYTE_BUFFER_CAPACITY);
 
-			int remainingChunks = (data.length - bytes) / CHUNK_CAPACITY;
+			int remainingChunks = (data.length - bytes) / BYTE_BUFFER_CAPACITY;
 			if (remainingChunks > 0) {
-				int length = remainingChunks * CHUNK_CAPACITY;
+				int length = remainingChunks * BYTE_BUFFER_CAPACITY;
 				file.write(data, bytes, length);
 				bytes += length;
 			}
 
 			if (bytes < data.length) {
-				chunk.store(data, bytes);
+				buffer.store(data, bytes);
 			}
 		}
 	}

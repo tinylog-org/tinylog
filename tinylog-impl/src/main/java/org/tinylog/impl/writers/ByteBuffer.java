@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 /**
  * Byte array buffer for {@link FileWriter}.
  */
-public final class ByteChunk {
+public final class ByteBuffer {
 
 	private final byte[] data;
 	private int maxSize;
@@ -17,29 +17,29 @@ public final class ByteChunk {
 	 * @param capacity The capacity for the internal byte array
 	 * @param maxSize The initial maximum number of bytes to accept
 	 */
-	public ByteChunk(int capacity, int maxSize) {
+	public ByteBuffer(int capacity, int maxSize) {
 		this.data = new byte[capacity];
 		this.maxSize = maxSize;
 		this.currentSize = 0;
 	}
 
 	/**
-	 * Checks if the byte chunk is empty.
+	 * Checks if the byte buffer is empty.
 	 *
-	 * @return {@code true} if the byte chunk is empty, {@code false} if one or more bytes are stored
+	 * @return {@code true} if the byte buffer is empty, {@code false} if one or more bytes are stored
 	 */
 	public boolean isEmpty() {
 		return currentSize == 0;
 	}
 
 	/**
-	 * Checks if the byte chunk is full.
+	 * Checks if the byte buffer is full.
 	 *
 	 * <p>
-	 *     A byte chunk can store as many bytes as defined by the current maximum size.
+	 *     A byte buffer can store as many bytes as defined by the current maximum size.
 	 * </p>
 	 *
-	 * @return {@code true} if the byte chunk is full, {@code false} if there is still available space for one or more
+	 * @return {@code true} if the byte buffer is full, {@code false} if there is still available space for one or more
 	 *         bytes
 	 */
 	public boolean isFull() {
@@ -47,11 +47,11 @@ public final class ByteChunk {
 	}
 
 	/**
-	 * Copies bytes from a passed byte array into this byte chunk.
+	 * Copies bytes from a passed byte array into this byte buffer.
 	 *
 	 * <p>
 	 *     This method will copy the bytes from the passed byte array, starting at the passed position, until either all
-	 *     bytes are copied or this byte chunk is full.
+	 *     bytes are copied or this byte buffer is full.
 	 * </p>
 	 *
 	 * @param data The source byte array
@@ -78,7 +78,7 @@ public final class ByteChunk {
 	}
 
 	/**
-	 * Resets the data chunk for making it ready for new content.
+	 * Resets the data buffer for making it ready for new content.
 	 *
 	 * @param maxSize The new maximum number of bytes to accept
 	 */

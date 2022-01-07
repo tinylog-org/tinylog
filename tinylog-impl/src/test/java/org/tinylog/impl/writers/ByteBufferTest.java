@@ -13,41 +13,41 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class ByteChunkTest {
+class ByteBufferTest {
 
 	@Mock
 	private DataOutput output;
 
 	/**
-	 * Verifies that multiple small byte arrays can be stored in the same byte chunk.
+	 * Verifies that multiple small byte arrays can be stored in the same byte buffer.
 	 */
 	@Test
 	void storeMultipleValues() throws IOException {
-		ByteChunk chunk = new ByteChunk(8, 8);
+		ByteBuffer buffer = new ByteBuffer(8, 8);
 
-		int first = chunk.store(new byte[] {0, 1, 2, 3}, 0);
+		int first = buffer.store(new byte[] {0, 1, 2, 3}, 0);
 		assertThat(first).isEqualTo(4);
 
-		int second = chunk.store(new byte[] {4, 5}, 0);
+		int second = buffer.store(new byte[] {4, 5}, 0);
 		assertThat(second).isEqualTo(2);
 
-		int total = chunk.writeTo(output);
+		int total = buffer.writeTo(output);
 		assertThat(total).isEqualTo(6);
 
 		verify(output).write(eq(new byte[] {0, 1, 2, 3, 4, 5, 0, 0}), eq(0), eq(6));
 	}
 
 	/**
-	 * Verifies that a big byte array can be stored partly in a byte chunk.
+	 * Verifies that a big byte array can be stored partly in a byte buffer.
 	 */
 	@Test
 	void storePartialValue() throws IOException {
-		ByteChunk chunk = new ByteChunk(2, 2);
+		ByteBuffer buffer = new ByteBuffer(2, 2);
 
-		int count = chunk.store(new byte[] {0, 1, 2, 3}, 1);
+		int count = buffer.store(new byte[] {0, 1, 2, 3}, 1);
 		assertThat(count).isEqualTo(2);
 
-		int total = chunk.writeTo(output);
+		int total = buffer.writeTo(output);
 		assertThat(total).isEqualTo(2);
 
 		verify(output).write(eq(new byte[] {1, 2}), eq(0), eq(2));
@@ -58,14 +58,14 @@ class ByteChunkTest {
 	 */
 	@Test
 	void isEmpty() {
-		ByteChunk chunk = new ByteChunk(2, 2);
-		assertThat(chunk.isEmpty()).isTrue();
+		ByteBuffer buffer = new ByteBuffer(2, 2);
+		assertThat(buffer.isEmpty()).isTrue();
 
-		chunk.store(new byte[] {1}, 0);
-		assertThat(chunk.isEmpty()).isFalse();
+		buffer.store(new byte[] {1}, 0);
+		assertThat(buffer.isEmpty()).isFalse();
 
-		chunk.reset(2);
-		assertThat(chunk.isEmpty()).isTrue();
+		buffer.reset(2);
+		assertThat(buffer.isEmpty()).isTrue();
 	}
 
 	/**
@@ -73,17 +73,17 @@ class ByteChunkTest {
 	 */
 	@Test
 	void isFull() {
-		ByteChunk chunk = new ByteChunk(2, 2);
-		assertThat(chunk.isFull()).isFalse();
+		ByteBuffer buffer = new ByteBuffer(2, 2);
+		assertThat(buffer.isFull()).isFalse();
 
-		chunk.store(new byte[] {1}, 0);
-		assertThat(chunk.isFull()).isFalse();
+		buffer.store(new byte[] {1}, 0);
+		assertThat(buffer.isFull()).isFalse();
 
-		chunk.store(new byte[] {2}, 0);
-		assertThat(chunk.isFull()).isTrue();
+		buffer.store(new byte[] {2}, 0);
+		assertThat(buffer.isFull()).isTrue();
 
-		chunk.reset(2);
-		assertThat(chunk.isFull()).isFalse();
+		buffer.reset(2);
+		assertThat(buffer.isFull()).isFalse();
 	}
 
 	/**
@@ -91,14 +91,14 @@ class ByteChunkTest {
 	 */
 	@Test
 	void resetMaxSize() {
-		ByteChunk chunk = new ByteChunk(4, 2);
+		ByteBuffer buffer = new ByteBuffer(4, 2);
 
-		int first = chunk.store(new byte[] {0, 1, 2, 3}, 0);
+		int first = buffer.store(new byte[] {0, 1, 2, 3}, 0);
 		assertThat(first).isEqualTo(2);
 
-		chunk.reset(3);
+		buffer.reset(3);
 
-		int second = chunk.store(new byte[] {0, 1, 2, 3}, 0);
+		int second = buffer.store(new byte[] {0, 1, 2, 3}, 0);
 		assertThat(second).isEqualTo(3);
 	}
 
