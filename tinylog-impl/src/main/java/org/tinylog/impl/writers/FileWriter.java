@@ -2,11 +2,7 @@ package org.tinylog.impl.writers;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -26,13 +22,10 @@ public class FileWriter implements AsyncWriter {
 
 	private final Placeholder placeholder;
 	private final RandomAccessFile file;
-	private final CharsetEncoder encoder;
+	private final Charset charset;
 
+	private final ByteChunk chunk;
 	private StringBuilder builder;
-
-	private final byte[] chunk;
-	private int chunkMaxSize;
-	private int chunkSize;
 
 	/**
 	 * @param placeholder The placeholder for formatting log entries
@@ -48,15 +41,10 @@ public class FileWriter implements AsyncWriter {
 
 		this.placeholder = placeholder;
 		this.file = new RandomAccessFile(file.toString(), "rw");
-		this.encoder = charset.newEncoder()
-			.onUnmappableCharacter(CodingErrorAction.REPLACE)
-			.onMalformedInput(CodingErrorAction.REPLACE);
+		this.charset = charset;
 
+		this.chunk = new ByteChunk(CHUNK_CAPACITY, (int) (this.file.length() % CHUNK_CAPACITY));
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
-
-		this.chunk = new byte[CHUNK_CAPACITY];
-		this.chunkMaxSize = CHUNK_CAPACITY - (int) (this.file.length() % CHUNK_CAPACITY);
-		this.chunkSize = 0;
 
 		this.file.seek(this.file.length());
 	}
@@ -78,10 +66,9 @@ public class FileWriter implements AsyncWriter {
 
 	@Override
 	public void flush() throws IOException {
-		if (chunkSize > 0) {
-			file.write(chunk, 0, chunkSize);
-			chunkMaxSize = CHUNK_CAPACITY == chunkSize ? CHUNK_CAPACITY : CHUNK_CAPACITY - chunkSize;
-			chunkSize = 0;
+		if (!chunk.isEmpty()) {
+			int bytes = chunk.writeTo(file);
+			chunk.reset(bytes == CHUNK_CAPACITY ? CHUNK_CAPACITY : CHUNK_CAPACITY - bytes);
 		}
 	}
 
@@ -100,25 +87,23 @@ public class FileWriter implements AsyncWriter {
 	 * @throws IOException Failed to encode the log entry or to write it to the target file
 	 */
 	private void storeStringBuilder() throws IOException {
-		ByteBuffer buffer = encoder.encode(CharBuffer.wrap(builder));
-		byte[] data = buffer.array();
-		int dataLength = buffer.limit();
+		byte[] data = builder.toString().getBytes(charset);
+		int bytes = chunk.store(data, 0);
 
-		int length = Math.min(dataLength, CHUNK_CAPACITY - chunkSize);
-		System.arraycopy(data, 0, chunk, chunkSize, length);
-		chunkSize += length;
+		if (chunk.isFull()) {
+			chunk.writeTo(file);
+			chunk.reset(CHUNK_CAPACITY);
 
-		if (chunkSize >= chunkMaxSize) {
-			flush();
+			int remainingChunks = (data.length - bytes) / CHUNK_CAPACITY;
+			if (remainingChunks > 0) {
+				int length = remainingChunks * CHUNK_CAPACITY;
+				file.write(data, bytes, length);
+				bytes += length;
+			}
 
-			int index = length;
-			length = ((buffer.limit() - index) / CHUNK_CAPACITY) * CHUNK_CAPACITY;
-			file.write(data, index, length);
-
-			index += length;
-			length = dataLength - index;
-			System.arraycopy(data, index, chunk, 0, length);
-			chunkSize = length;
+			if (bytes < data.length) {
+				chunk.store(data, bytes);
+			}
 		}
 	}
 
