@@ -7,35 +7,6 @@
         <Package name="org.tinylog.benchmarks.jmh_generated" />
     </Match>
     <Match>
-        <Class name="org.tinylog.core.Tinylog" />
-        <Method name="getFramework" />
-        <Bug pattern="MS_EXPOSE_REP" />
-    </Match>
-    <Match>
-        <Package name="org.tinylog.core.backend" />
-        <Method name="getContextStorage" />
-        <Bug pattern="EI_EXPOSE_REP" />
-    </Match>
-    <Match>
-        <Class name="org.tinylog.impl.LogEntry" />
-        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
-    </Match>
-    <Match>
-        <Class name="org.tinylog.impl.backend.NativeLoggingBackend" />
-        <Method name="&lt;init&gt;" />
-        <Bug pattern="EI_EXPOSE_REP2" />
-    </Match>
-    <Match>
-        <Class name="org.tinylog.impl.backend.NativeLoggingBackend" />
-        <Method name="getContextStorage" />
-        <Bug pattern="EI_EXPOSE_REP" />
-    </Match>
-    <Match>
-        <Class name="org.tinylog.impl.backend.WriterRepository" />
-        <Bug pattern="EI_EXPOSE_REP" />
-    </Match>
-    <Match>
-        <Class name="org.tinylog.impl.format.FormatPatternParser" />
-        <Bug pattern="EI_EXPOSE_REP2" />
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2, MS_EXPOSE_REP" />
     </Match>
 </FindBugsFilter>
