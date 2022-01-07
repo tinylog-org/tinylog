@@ -46,7 +46,7 @@
                         <path>
                             <groupId>org.openjdk.jmh</groupId>
                             <artifactId>jmh-generator-annprocess</artifactId>
-                            <version>1.28</version>
+                            <version>1.33</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
