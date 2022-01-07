@@ -20,6 +20,12 @@
 		id="javadocMethodDefault"
 	/>
 
+	<!-- JMH Benchmarks -->
+	<suppress
+			files="[/\\]benchmarks[/\\].*State\.java"
+			checks="VisibilityModifier"
+	/>
+
 	<!-- Generated Source Files -->
 	<suppress
 		files="[/\\]target[/\\]generated\-sources[/\\].*\.java"
