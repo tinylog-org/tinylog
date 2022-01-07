@@ -43,10 +43,13 @@ public class FileWriter implements AsyncWriter {
 		this.file = new RandomAccessFile(file.toString(), "rw");
 		this.charset = charset;
 
-		this.buffer = new ByteBuffer(BYTE_BUFFER_CAPACITY, (int) (this.file.length() % BYTE_BUFFER_CAPACITY));
+		long fileLength = this.file.length();
+		long maxBufferSize = BYTE_BUFFER_CAPACITY - (fileLength % BYTE_BUFFER_CAPACITY);
+
+		this.buffer = new ByteBuffer(BYTE_BUFFER_CAPACITY, (int) maxBufferSize);
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 
-		this.file.seek(this.file.length());
+		this.file.seek(fileLength);
 	}
 
 	@Override
@@ -115,7 +118,6 @@ public class FileWriter implements AsyncWriter {
 			builder = new StringBuilder(BUILDER_START_CAPACITY);
 		} else {
 			builder.setLength(0);
-			builder.ensureCapacity(0);
 		}
 	}
 
