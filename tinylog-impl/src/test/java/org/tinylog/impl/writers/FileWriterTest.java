@@ -52,6 +52,22 @@ class FileWriterTest {
 	}
 
 	/**
+	 * Verifies that multiple log entries can be written to the same log file.
+	 */
+	@Test
+	void writeMultipleMessages() throws IOException {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
+			writer.log(entry);
+
+			entry = new LogEntryBuilder().message("Goodbye.").create();
+			writer.log(entry);
+		}
+
+		assertThat(logFile).hasContent("Hello World!Goodbye.");
+	}
+
+	/**
 	 * Verifies that an already existing file is continued and not overwritten.
 	 */
 	@Test
@@ -69,90 +85,6 @@ class FileWriterTest {
 		assertThat(logFile).hasContent("Hello World!Goodbye.");
 	}
 
-	/**
-	 * Verifies that a single short string (smaller than the used buffer) is written to the log file.
-	 */
-	@Test
-	void writeSingleShortMessage() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
-			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
-			writer.log(entry);
-		}
-
-		assertThat(logFile).hasContent("Hello World!");
-	}
-
-	/**
-	 * Verifies that multiple short strings (smaller than the used buffer) are written to the log file.
-	 */
-	@Test
-	void writeMultipleShortMessages() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
-			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
-			writer.log(entry);
-
-			entry = new LogEntryBuilder().message("Goodbye.").create();
-			writer.log(entry);
-		}
-
-		assertThat(logFile).hasContent("Hello World!Goodbye.");
-	}
-
-	/**
-	 * Verifies that a long string (larger than the used buffer) is written to the log file.
-	 */
-	@Test
-	void writeSingleLongMessage() throws IOException {
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < 256 * 1024; ++i) {
-			builder.append(i % 10);
-		}
-
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
-			LogEntry entry = new LogEntryBuilder().message(builder.toString()).create();
-			writer.log(entry);
-		}
-
-		assertThat(logFile).hasContent(builder.toString());
-	}
-
-	/**
-	 * Verifies that multiple long string (larger than the used buffer) are written to the log file.
-	 */
-	@Test
-	void writeMultipleLongMessages() throws IOException {
-		String first = "<";
-
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < 128 * 1024; ++i) {
-			builder.append(i % 10);
-		}
-		String second = builder.toString();
-
-		builder = new StringBuilder();
-		for (int i = 0; i < 128 * 1024; ++i) {
-			builder.append(('a' + i) % 26);
-		}
-		String third = builder.toString();
-
-		String fourth = ">";
-
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
-			LogEntry entry = new LogEntryBuilder().message(first).create();
-			writer.log(entry);
-
-			entry = new LogEntryBuilder().message(second).create();
-			writer.log(entry);
-
-			entry = new LogEntryBuilder().message(third).create();
-			writer.log(entry);
-
-			entry = new LogEntryBuilder().message(fourth).create();
-			writer.log(entry);
-		}
-
-		assertThat(logFile).hasContent(first + second + third + fourth);
-	}
 
 	/**
 	 * Verifies that a character that is not supported by the passed charset is replaced by a question mark ("?").

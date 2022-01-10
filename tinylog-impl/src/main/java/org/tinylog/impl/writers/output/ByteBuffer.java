@@ -71,12 +71,12 @@ public class ByteBuffer {
 	 * Writes all stored bytes to any {@link DataOutput} (e.g. {@link RandomAccessFile}).
 	 *
 	 * @param output The destination for writing the stored bytes
-	 * @return The number of written bytes
+	 * @return The remaining space in bytes (max size - current size)
 	 * @throws IOException Failed to write to the passed data output
 	 */
 	public int writeTo(DataOutput output) throws IOException {
 		output.write(data, 0, currentSize);
-		return currentSize;
+		return maxSize - currentSize;
 	}
 
 	/**

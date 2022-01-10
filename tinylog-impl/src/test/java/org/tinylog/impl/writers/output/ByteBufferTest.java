@@ -31,8 +31,8 @@ class ByteBufferTest {
 		int second = buffer.store(new byte[] {4, 5}, 0);
 		assertThat(second).isEqualTo(2);
 
-		int total = buffer.writeTo(output);
-		assertThat(total).isEqualTo(6);
+		int remaining = buffer.writeTo(output);
+		assertThat(remaining).isEqualTo(2);
 
 		verify(output).write(eq(new byte[] {0, 1, 2, 3, 4, 5, 0, 0}), eq(0), eq(6));
 	}
@@ -47,8 +47,8 @@ class ByteBufferTest {
 		int count = buffer.store(new byte[] {0, 1, 2, 3}, 1);
 		assertThat(count).isEqualTo(2);
 
-		int total = buffer.writeTo(output);
-		assertThat(total).isEqualTo(2);
+		int remaining = buffer.writeTo(output);
+		assertThat(remaining).isEqualTo(0);
 
 		verify(output).write(eq(new byte[] {1, 2}), eq(0), eq(2));
 	}
