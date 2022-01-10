@@ -83,6 +83,7 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.backend;
 	exports org.tinylog.impl.context;
 	exports org.tinylog.impl.format;
+	exports org.tinylog.impl.format.json;
 	exports org.tinylog.impl.format.pattern;
 	exports org.tinylog.impl.format.pattern.placeholders;
 	exports org.tinylog.impl.format.pattern.styles;
