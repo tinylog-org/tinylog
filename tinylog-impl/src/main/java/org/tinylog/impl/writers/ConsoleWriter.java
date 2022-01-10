@@ -7,7 +7,7 @@ import java.util.Set;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.OutputFormat;
 
 /**
  * Synchronous writer that outputs formatted log entries to {@link System#out} and {@link System#err} respectively.
@@ -16,24 +16,24 @@ public class ConsoleWriter implements Writer {
 
 	private static final int BUILDER_CAPACITY = 1024;
 
-	private final Placeholder placeholder;
+	private final OutputFormat format;
 	private final int threshold;
 
 	/**
-	 * @param placeholder The placeholder for formatting log entries
+	 * @param format The output format for log entries
 	 * @param threshold Log entries with a severity less than this threshold are output to {@link System#out}. Log
 	 *                  entries with a severity greater than or equal to this threshold are output to
 	 *                  {@link System#err}.
 	 */
-	public ConsoleWriter(Placeholder placeholder, Level threshold) {
-		this.placeholder = placeholder;
+	public ConsoleWriter(OutputFormat format, Level threshold) {
+		this.format = format;
 		this.threshold = threshold.ordinal();
 	}
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
 		Set<LogEntryValue> values = EnumSet.noneOf(LogEntryValue.class);
-		values.addAll(placeholder.getRequiredLogEntryValues());
+		values.addAll(format.getRequiredLogEntryValues());
 		values.add(LogEntryValue.LEVEL);
 		return values;
 	}
@@ -41,7 +41,7 @@ public class ConsoleWriter implements Writer {
 	@Override
 	public void log(LogEntry entry) {
 		StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
-		placeholder.render(builder, entry);
+		format.render(builder, entry);
 
 		PrintStream stream = entry.getSeverityLevel().ordinal() <= threshold ? System.err : System.out;
 		stream.print(builder.toString());

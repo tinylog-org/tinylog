@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.writers.output.ByteBuffer;
 
 /**
@@ -21,7 +21,7 @@ public class FileWriter implements AsyncWriter {
 	private static final int BUILDER_START_CAPACITY = 1024;
 	private static final int BUILDER_MAX_CAPACITY = 65536;
 
-	private final Placeholder placeholder;
+	private final OutputFormat format;
 	private final RandomAccessFile file;
 	private final Charset charset;
 
@@ -29,18 +29,18 @@ public class FileWriter implements AsyncWriter {
 	private StringBuilder builder;
 
 	/**
-	 * @param placeholder The placeholder for formatting log entries
+	 * @param format The output format for log entries
 	 * @param file The path to the target log file
 	 * @param charset The charset to use for writing strings to the target file
 	 * @throws IOException Failed to access the target log file
 	 */
-	public FileWriter(Placeholder placeholder, Path file, Charset charset) throws IOException {
+	public FileWriter(OutputFormat format, Path file, Charset charset) throws IOException {
 		Path parent = file.toAbsolutePath().getParent();
 		if (parent != null) {
 			Files.createDirectories(parent);
 		}
 
-		this.placeholder = placeholder;
+		this.format = format;
 		this.file = new RandomAccessFile(file.toString(), "rw");
 		this.charset = charset;
 
@@ -55,13 +55,13 @@ public class FileWriter implements AsyncWriter {
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return placeholder.getRequiredLogEntryValues();
+		return format.getRequiredLogEntryValues();
 	}
 
 	@Override
 	public void log(LogEntry entry) throws IOException {
 		try {
-			placeholder.render(builder, entry);
+			format.render(builder, entry);
 			storeStringBuilder();
 		} finally {
 			resetStringBuilder();
