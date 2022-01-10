@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.logcat;
 
 import java.io.IOException;
 import java.util.regex.Pattern;

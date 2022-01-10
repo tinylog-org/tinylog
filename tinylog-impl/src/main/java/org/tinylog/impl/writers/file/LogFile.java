@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers.output;
+package org.tinylog.impl.writers.file;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Buffered text file writer.
  */
-public class LogFile implements Closeable {
+class LogFile implements Closeable {
 
 	/**
 	 * The buffer size.
@@ -26,7 +26,7 @@ public class LogFile implements Closeable {
 	 * @param charset The charset to use for wring strings
 	 * @throws IOException Failed to open the log file
 	 */
-	public LogFile(String fileName, Charset charset) throws IOException {
+	LogFile(String fileName, Charset charset) throws IOException {
 		this.file = new RandomAccessFile(fileName, "rw");
 		this.charset = charset;
 		this.bom = createBom(charset);

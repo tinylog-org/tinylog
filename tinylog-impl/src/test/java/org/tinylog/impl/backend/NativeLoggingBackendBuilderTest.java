@@ -12,8 +12,8 @@ import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.runtime.StackTraceLocation;
-import org.tinylog.impl.writers.ConsoleWriter;
-import org.tinylog.impl.writers.FileWriter;
+import org.tinylog.impl.writers.console.ConsoleWriter;
+import org.tinylog.impl.writers.file.FileWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

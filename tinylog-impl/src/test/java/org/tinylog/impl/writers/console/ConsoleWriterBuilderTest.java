@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.console;
 
 import java.io.PrintStream;
 import java.time.Instant;
@@ -6,6 +6,7 @@ import java.util.ServiceLoader;
 
 import javax.inject.Inject;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -155,7 +158,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+		Assertions.assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(ConsoleWriterBuilder.class);
 			assertThat(builder.getName()).isEqualTo("console");
 		});

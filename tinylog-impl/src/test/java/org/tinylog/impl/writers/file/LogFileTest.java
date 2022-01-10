@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers.output;
+package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

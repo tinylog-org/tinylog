@@ -1,15 +1,13 @@
-package org.tinylog.impl.writers.output;
+package org.tinylog.impl.writers.file;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.tinylog.impl.writers.FileWriter;
-
 /**
  * Byte array buffer for {@link FileWriter}.
  */
-public class ByteBuffer {
+class ByteBuffer {
 
 	private final byte[] data;
 	private int maxSize;
@@ -19,7 +17,7 @@ public class ByteBuffer {
 	 * @param capacity The capacity for the internal byte array
 	 * @param maxSize The initial maximum number of bytes to accept
 	 */
-	public ByteBuffer(int capacity, int maxSize) {
+	ByteBuffer(int capacity, int maxSize) {
 		this.data = new byte[capacity];
 		this.maxSize = maxSize;
 		this.currentSize = 0;

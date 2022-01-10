@@ -1,10 +1,12 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.logcat;
 
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 /**
  * Builder for creating an instance of {@link LogcatWriter}.

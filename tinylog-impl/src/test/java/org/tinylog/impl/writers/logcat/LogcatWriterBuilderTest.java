@@ -1,10 +1,11 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.logcat;
 
 import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.test.Logcat;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 import android.util.Log;
 
@@ -36,7 +39,7 @@ class LogcatWriterBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+		Assertions.assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(LogcatWriterBuilder.class);
 			assertThat(builder.getName()).isEqualTo("logcat");
 		});

@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.console;
 
 import java.io.PrintStream;
 

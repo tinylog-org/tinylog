@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.logcat;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -7,6 +7,7 @@ import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.writers.Writer;
 
 import android.util.Log;
 

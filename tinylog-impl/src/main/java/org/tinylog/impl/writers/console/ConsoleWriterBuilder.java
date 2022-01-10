@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.console;
 
 import java.util.Locale;
 
@@ -8,6 +8,8 @@ import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 /**
  * Builder for creating an instance of {@link ConsoleWriter}.

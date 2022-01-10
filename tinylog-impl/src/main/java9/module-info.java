@@ -29,9 +29,9 @@ import org.tinylog.impl.policies.PolicyBuilder;
 import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
 import org.tinylog.impl.writers.WriterBuilder;
-import org.tinylog.impl.writers.ConsoleWriterBuilder;
-import org.tinylog.impl.writers.FileWriterBuilder;
-import org.tinylog.impl.writers.LogcatWriterBuilder;
+import org.tinylog.impl.writers.console.ConsoleWriterBuilder;
+import org.tinylog.impl.writers.file.FileWriterBuilder;
+import org.tinylog.impl.writers.logcat.LogcatWriterBuilder;
 
 module org.tinylog.impl {
 	requires org.tinylog.core;
@@ -89,4 +89,7 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.format.pattern.styles;
 	exports org.tinylog.impl.policies;
 	exports org.tinylog.impl.writers;
+	exports org.tinylog.impl.writers.console;
+	exports org.tinylog.impl.writers.file;
+	exports org.tinylog.impl.writers.logcat;
 }

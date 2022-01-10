@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.impl.writers.ConsoleWriter;
-import org.tinylog.impl.writers.LogcatWriter;
+import org.tinylog.impl.writers.console.ConsoleWriter;
+import org.tinylog.impl.writers.logcat.LogcatWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.tinylog.impl.test.InternalAssertions.assertThat;

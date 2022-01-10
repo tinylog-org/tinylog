@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -10,6 +10,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.writers.Writer;
+import org.tinylog.impl.writers.WriterBuilder;
 
 /**
  * Builder for creating an instance of {@link FileWriter}.

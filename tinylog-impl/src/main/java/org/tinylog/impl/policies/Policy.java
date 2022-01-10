@@ -2,7 +2,7 @@ package org.tinylog.impl.policies;
 
 import java.nio.file.Path;
 
-import org.tinylog.impl.writers.FileWriter;
+import org.tinylog.impl.writers.file.FileWriter;
 
 /**
  * Policy interface for triggering rollover events for {@link FileWriter}.

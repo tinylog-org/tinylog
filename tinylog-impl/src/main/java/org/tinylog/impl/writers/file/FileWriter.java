@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers;
+package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -9,7 +9,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.writers.output.LogFile;
+import org.tinylog.impl.writers.AsyncWriter;
 
 /**
  * Asynchronous writer for writing log entries to a file.
