@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,7 @@ class FilePlaceholderTest {
 	 */
 	@Test
 	void renderWithSourceFileName() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new FilePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new FilePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().fileName("foo.java").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo.java");
 	}
@@ -37,7 +37,7 @@ class FilePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutSourceFileName() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new FilePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new FilePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<file unknown>");
 	}

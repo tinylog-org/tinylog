@@ -10,8 +10,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -29,7 +29,7 @@ class IndentStyleBuilderTest {
 	void defaultIndentationByTab() {
 		Placeholder placeholder = new StaticTextPlaceholder("foo");
 		Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, null);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("\tfoo");
@@ -42,7 +42,7 @@ class IndentStyleBuilderTest {
 	void customIndentationBySpaces() {
 		Placeholder placeholder = new StaticTextPlaceholder("foo");
 		Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, "2");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("  foo");
@@ -55,7 +55,7 @@ class IndentStyleBuilderTest {
 	void noneIndentation() {
 		Placeholder placeholder = new StaticTextPlaceholder("\tfoo");
 		Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, "0");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo");

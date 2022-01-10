@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class MessageOnlyPlaceholderTest {
 	 */
 	@Test
 	void renderWithMessage() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessageOnlyPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessageOnlyPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Hello World!");
 	}
@@ -38,7 +38,7 @@ class MessageOnlyPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutMessage() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessageOnlyPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessageOnlyPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("");
 	}

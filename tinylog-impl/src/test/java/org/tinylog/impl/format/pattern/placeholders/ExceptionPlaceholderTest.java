@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ class ExceptionPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutException() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ExceptionPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ExceptionPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEmpty();
 	}
@@ -43,7 +43,7 @@ class ExceptionPlaceholderTest {
 	void renderExceptionWithoutMessage() {
 		RuntimeException exception = new RuntimeException();
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ExceptionPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ExceptionPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(print(exception));
 	}
@@ -55,7 +55,7 @@ class ExceptionPlaceholderTest {
 	void renderExceptionWithMessage() {
 		RuntimeException exception = new RuntimeException("Oops!");
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ExceptionPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ExceptionPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(print(exception));
 	}
@@ -68,7 +68,7 @@ class ExceptionPlaceholderTest {
 		RuntimeException exception = new RuntimeException();
 		exception.addSuppressed(new IllegalAccessException());
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ExceptionPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ExceptionPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(print(exception));
 	}
@@ -81,7 +81,7 @@ class ExceptionPlaceholderTest {
 		IllegalAccessException cause = new IllegalAccessException();
 		RuntimeException exception = new RuntimeException(cause);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ExceptionPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ExceptionPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(print(exception));
 	}

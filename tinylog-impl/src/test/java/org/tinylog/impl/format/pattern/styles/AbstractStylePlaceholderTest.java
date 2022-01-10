@@ -12,8 +12,8 @@ import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,7 +37,7 @@ class AbstractStylePlaceholderTest {
 	@Test
 	void renderVarCharPlaceholder() {
 		Placeholder styled = new StylePlaceholder(new FilePlaceholder());
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().fileName("Foo.java").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("[Foo.java]");
@@ -52,7 +52,7 @@ class AbstractStylePlaceholderTest {
 	@Test
 	void renderLongVarCharPlaceholder() {
 		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("[Hello World!]");
@@ -67,7 +67,7 @@ class AbstractStylePlaceholderTest {
 	@Test
 	void renderNumericPlaceholder() {
 		Placeholder styled = new StylePlaceholder(new LinePlaceholder());
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().lineNumber(42).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("[42]");
@@ -83,7 +83,8 @@ class AbstractStylePlaceholderTest {
 	void renderBundledPlaceholder() {
 		Placeholder prefix = new StaticTextPlaceholder("foo:");
 		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new BundlePlaceholder(ImmutableList.of(prefix, styled)));
+		Placeholder bundle = new BundlePlaceholder(ImmutableList.of(prefix, styled));
+		FormatOutputRenderer renderer = new FormatOutputRenderer(bundle);
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo:[Hello World!]");

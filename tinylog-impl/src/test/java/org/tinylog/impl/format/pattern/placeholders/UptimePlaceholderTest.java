@@ -14,8 +14,8 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ class UptimePlaceholderTest {
 	@ArgumentsSource(FormatPatternsProvider.class)
 	void renderWithUptime(Duration uptime, String pattern, String expected) {
 		UptimePlaceholder placeholder = new UptimePlaceholder(pattern, false);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().uptime(uptime).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(expected);
 	}
@@ -52,7 +52,7 @@ class UptimePlaceholderTest {
 	@Test
 	void renderWithoutUptime() {
 		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", false);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<uptime unknown>");
 	}

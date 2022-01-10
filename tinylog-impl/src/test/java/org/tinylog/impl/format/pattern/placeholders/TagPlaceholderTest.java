@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class TagPlaceholderTest {
 	@Test
 	void renderWithTag() {
 		TagPlaceholder placeholder = new TagPlaceholder("-", null);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo");
 	}
@@ -39,7 +39,7 @@ class TagPlaceholderTest {
 	@Test
 	void renderWithoutTag() {
 		TagPlaceholder placeholder = new TagPlaceholder("-", null);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("-");
 	}

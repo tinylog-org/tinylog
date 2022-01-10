@@ -10,8 +10,8 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -31,7 +31,7 @@ class MinLengthStyleBuilderTest {
 	@Test
 	void creationWithMinLengthOnly() {
 		Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo  ");
 	}
@@ -42,7 +42,7 @@ class MinLengthStyleBuilderTest {
 	@Test
 	void creationWithMinLengthAndPosition() {
 		Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5,center");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo(" foo ");
 	}

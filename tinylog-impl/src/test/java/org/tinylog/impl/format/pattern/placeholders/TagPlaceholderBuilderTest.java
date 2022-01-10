@@ -10,8 +10,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +32,7 @@ class TagPlaceholderBuilderTest {
 		Placeholder placeholder = new TagPlaceholderBuilder().create(framework, null);
 		assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<untagged>");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("foo");
 
@@ -53,7 +53,7 @@ class TagPlaceholderBuilderTest {
 		Placeholder placeholder = new TagPlaceholderBuilder().create(framework, "none");
 		assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("none");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("foo");
 

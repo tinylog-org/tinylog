@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +29,7 @@ class TimestampPlaceholderTest {
 	 */
 	@Test
 	void renderWithTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new TimestampPlaceholder(Instant::toEpochMilli));
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new TimestampPlaceholder(Instant::toEpochMilli));
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.ofEpochMilli(1000)).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1000");
 	}
@@ -39,7 +39,7 @@ class TimestampPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new TimestampPlaceholder(Instant::toEpochMilli));
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new TimestampPlaceholder(Instant::toEpochMilli));
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<timestamp unknown>");
 	}

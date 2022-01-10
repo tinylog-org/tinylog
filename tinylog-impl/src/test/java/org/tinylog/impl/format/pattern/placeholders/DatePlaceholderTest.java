@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ class DatePlaceholderTest {
 	 */
 	@Test
 	void renderWithTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter, false));
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01T00:00:00Z");
 	}
@@ -43,7 +43,7 @@ class DatePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutTimestamp() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new DatePlaceholder(formatter, false));
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<timestamp unknown>");
 	}

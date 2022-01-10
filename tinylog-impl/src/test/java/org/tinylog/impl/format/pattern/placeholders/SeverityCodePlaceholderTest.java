@@ -7,8 +7,8 @@ import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +29,7 @@ class SeverityCodePlaceholderTest {
 	 */
 	@Test
 	void renderWithSeverityLevel() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new SeverityCodePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new SeverityCodePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("3");
 	}
@@ -39,7 +39,7 @@ class SeverityCodePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutSeverityLevel() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new SeverityCodePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new SeverityCodePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("?");
 	}

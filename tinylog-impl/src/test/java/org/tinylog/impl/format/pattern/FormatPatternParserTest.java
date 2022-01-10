@@ -20,8 +20,8 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.PlaceholderBuilder;
 import org.tinylog.impl.format.pattern.styles.StyleBuilder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -211,7 +211,7 @@ class FormatPatternParserTest {
 	 */
 	private String format(String pattern, LogEntry logEntry) {
 		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
-		return new PlaceholderRenderer(placeholder).render(logEntry);
+		return new FormatOutputRenderer(placeholder).render(logEntry);
 	}
 
 	/**

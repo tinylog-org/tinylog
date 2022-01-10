@@ -11,8 +11,8 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ class DatePlaceholderBuilderTest {
 		Placeholder placeholder = new DatePlaceholderBuilder().create(framework, null);
 		assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01 01:00:00");
 	}
@@ -47,7 +47,7 @@ class DatePlaceholderBuilderTest {
 		Placeholder placeholder = new DatePlaceholderBuilder().create(framework, null);
 		assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01 12:00:00");
 	}
@@ -61,7 +61,7 @@ class DatePlaceholderBuilderTest {
 		Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "d. MMMM y - HH:mm");
 		assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1. Januar 1970 - 01:00");
 	}
@@ -75,7 +75,7 @@ class DatePlaceholderBuilderTest {
 		Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "d MMMM y - h.mm a");
 		assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).matches("1 January 1970 - 12\\.00 (pm|PM)");
 	}
@@ -89,7 +89,7 @@ class DatePlaceholderBuilderTest {
 		Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "INVALID <{|#|}>");
 		assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01 00:00:00");
 		assertThat(log.consume()).anySatisfy(entry -> {

@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +29,7 @@ class ContextPlaceholderTest {
 	@Test
 	void renderWithContextValue() {
 		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("bar");
 	}
@@ -40,7 +40,7 @@ class ContextPlaceholderTest {
 	@Test
 	void renderWithoutContextValue() {
 		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("-");
 	}

@@ -12,8 +12,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ class UptimePlaceholderBuilderTest {
 
 		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(logEntry)).isEqualTo("01:59:30");
 
 		assertThat(placeholder.resolve(logEntry))
@@ -51,7 +51,7 @@ class UptimePlaceholderBuilderTest {
 
 		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(logEntry)).isEqualTo("7170.000");
 
 		assertThat(placeholder.resolve(logEntry))

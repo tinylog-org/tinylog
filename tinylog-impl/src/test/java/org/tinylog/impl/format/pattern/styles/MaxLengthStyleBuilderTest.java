@@ -12,8 +12,8 @@ import org.tinylog.impl.format.pattern.placeholders.ClassPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.PackagePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -34,7 +34,7 @@ class MaxLengthStyleBuilderTest {
 		Placeholder textPlaceholder = new StaticTextPlaceholder("foo");
 		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, textPlaceholder, "2");
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("fo");
 	}
@@ -48,7 +48,7 @@ class MaxLengthStyleBuilderTest {
 		Placeholder classPlaceholder = new ClassPlaceholder();
 		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, classPlaceholder, "11");
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("o.f.MyClass");
 	}
@@ -62,7 +62,7 @@ class MaxLengthStyleBuilderTest {
 		Placeholder packagePlaceholder = new PackagePlaceholder();
 		Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, packagePlaceholder, "5");
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(stylePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("o.foo");
 	}

@@ -7,8 +7,8 @@ import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class LevelPlaceholderTest {
 	 */
 	@Test
 	void renderWithSeverityLevel() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new LevelPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("INFO");
 	}
@@ -38,7 +38,7 @@ class LevelPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutSeverityLevel() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new LevelPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<level unknown>");
 	}

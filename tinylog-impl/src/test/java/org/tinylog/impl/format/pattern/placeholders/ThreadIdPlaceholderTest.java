@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class ThreadIdPlaceholderTest {
 	 */
 	@Test
 	void renderWithSourceThread() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ThreadIdPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ThreadIdPlaceholder());
 		Thread thread = new Thread(() -> { });
 		LogEntry logEntry = new LogEntryBuilder().thread(thread).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(Long.toString(thread.getId()));
@@ -39,7 +39,7 @@ class ThreadIdPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutSourceThread() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new ThreadIdPlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new ThreadIdPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("?");
 	}

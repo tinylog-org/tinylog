@@ -14,8 +14,8 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ class TimestampPlaceholderBuilderTest {
 		Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
 		assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.ofEpochMilli(1234)).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1");
 	}
@@ -58,7 +58,7 @@ class TimestampPlaceholderBuilderTest {
 		Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
 		assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.ofEpochMilli(1234)).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1234");
 	}
@@ -79,7 +79,7 @@ class TimestampPlaceholderBuilderTest {
 			assertThat(entry.getMessage()).contains(configurationValue);
 		});
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.ofEpochMilli(1234)).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1");
 	}

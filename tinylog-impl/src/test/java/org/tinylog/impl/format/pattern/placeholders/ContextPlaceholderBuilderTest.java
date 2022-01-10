@@ -10,8 +10,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,7 +44,7 @@ class ContextPlaceholderBuilderTest {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<foo not set>");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
 
@@ -65,7 +65,7 @@ class ContextPlaceholderBuilderTest {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo,bar");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("bar");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
 

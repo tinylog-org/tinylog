@@ -13,8 +13,8 @@ import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.PackagePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -33,7 +33,7 @@ class LengthStyleBuilderTest {
 	void creationForPText() {
 		Placeholder placeholder = new MessageOnlyPlaceholder();
 		Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "10");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Hello W...");
@@ -50,7 +50,7 @@ class LengthStyleBuilderTest {
 	void creationForClass() {
 		Placeholder placeholder = new ClassPlaceholder();
 		Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "12");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("o.f.MyClass ");
@@ -64,7 +64,7 @@ class LengthStyleBuilderTest {
 	void creationForPackage() {
 		Placeholder placeholder = new PackagePlaceholder();
 		Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "4");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("o.f ");
@@ -77,7 +77,7 @@ class LengthStyleBuilderTest {
 	void creationWithCustomPosition() {
 		Placeholder placeholder = new StaticTextPlaceholder("foo");
 		Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "5,right");
-		PlaceholderRenderer renderer = new PlaceholderRenderer(styled);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("  foo");

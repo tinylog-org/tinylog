@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,7 @@ class PackagePlaceholderTest {
 	 */
 	@Test
 	void renderWithDefaultPackage() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new PackagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new PackagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().className("MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("MyClass");
 	}
@@ -38,7 +38,7 @@ class PackagePlaceholderTest {
 	 */
 	@Test
 	void renderWithFullyQualifiedPackage() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new PackagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new PackagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("org.foo");
 	}
@@ -48,7 +48,7 @@ class PackagePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutPackage() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new PackagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new PackagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<package unknown>");
 	}

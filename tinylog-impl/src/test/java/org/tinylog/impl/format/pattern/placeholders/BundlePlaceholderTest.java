@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +38,7 @@ class BundlePlaceholderTest {
 		ClassPlaceholder secondChild = new ClassPlaceholder();
 		BundlePlaceholder bundlePlaceholder = new BundlePlaceholder(Arrays.asList(firstChild, secondChild));
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(bundlePlaceholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(bundlePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Class: foo.MyClass");
 	}

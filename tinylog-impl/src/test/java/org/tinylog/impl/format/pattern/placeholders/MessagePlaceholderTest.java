@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ class MessagePlaceholderTest {
 	 */
 	@Test
 	void renderWithoutMessageOrException() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("");
 	}
@@ -41,7 +41,7 @@ class MessagePlaceholderTest {
 	 */
 	@Test
 	void renderWithMessageOnly() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Hello World!");
 	}
@@ -51,7 +51,7 @@ class MessagePlaceholderTest {
 	 */
 	@Test
 	void renderWithExceptionOnly() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessagePlaceholder());
 		Exception exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo(print(exception));
@@ -62,7 +62,7 @@ class MessagePlaceholderTest {
 	 */
 	@Test
 	void renderWithMessageAndException() {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(new MessagePlaceholder());
+		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessagePlaceholder());
 		Exception exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().message("Oops").exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Oops: " + print(exception));

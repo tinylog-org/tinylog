@@ -10,8 +10,8 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +34,7 @@ class ProcessIdPlaceholderBuilderTest {
 		assertThat(placeholder).isInstanceOf(ProcessIdPlaceholder.class);
 		assertThat(log.consume()).isEmpty();
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo(Long.toString(framework.getRuntime().getProcessId()));
 	}
@@ -52,7 +52,7 @@ class ProcessIdPlaceholderBuilderTest {
 			assertThat(entry.getMessage()).contains("foo");
 		});
 
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo(Long.toString(framework.getRuntime().getProcessId()));
 	}

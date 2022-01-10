@@ -7,8 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.tinylog.impl.format.pattern.placeholders.BundlePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.test.PlaceholderRenderer;
 
 import com.google.common.collect.ImmutableList;
 
@@ -78,7 +78,7 @@ class IndentStyleTest {
 	 * @return The output of the passed placeholder
 	 */
 	private static String render(Placeholder placeholder) {
-		PlaceholderRenderer renderer = new PlaceholderRenderer(placeholder);
+		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		return renderer.render(new LogEntryBuilder().create());
 	}
 
