@@ -2,9 +2,9 @@ package org.tinylog.impl.writers;
 
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
-import org.tinylog.impl.format.FormatPatternParser;
-import org.tinylog.impl.format.placeholders.Placeholder;
-import org.tinylog.impl.format.styles.MaxLengthStyleBuilder;
+import org.tinylog.impl.format.pattern.FormatPatternParser;
+import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
 
 /**
  * Builder for creating an instance of {@link LogcatWriter}.

@@ -7,6 +7,7 @@ import java.util.ServiceLoader;
 
 import javax.inject.Inject;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,7 @@ class SizePolicyBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
+		Assertions.assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(SizePolicyBuilder.class);
 			assertThat(builder.getName()).isEqualTo("size");
 		});

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.placeholders.MessagePlaceholder;
+import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;

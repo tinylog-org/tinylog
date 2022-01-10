@@ -1,7 +1,7 @@
 package org.tinylog.impl.test;
 
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
  * Renderer for {@link Placeholder} implementations.

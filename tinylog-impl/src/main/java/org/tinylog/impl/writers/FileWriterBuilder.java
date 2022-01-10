@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.impl.format.FormatPatternParser;
-import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.pattern.FormatPatternParser;
+import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
  * Builder for creating an instance of {@link FileWriter}.

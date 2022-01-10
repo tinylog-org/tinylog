@@ -6,7 +6,7 @@ import java.util.Set;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.placeholders.Placeholder;
+import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 import android.util.Log;
 

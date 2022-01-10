@@ -4,6 +4,7 @@ import java.util.ServiceLoader;
 
 import javax.inject.Inject;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -50,7 +51,7 @@ class StartupPolicyBuilderTest {
 	 */
 	@Test
 	void service() {
-		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
+		Assertions.assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(StartupPolicyBuilder.class);
 			assertThat(builder.getName()).isEqualTo("startup");
 		});
