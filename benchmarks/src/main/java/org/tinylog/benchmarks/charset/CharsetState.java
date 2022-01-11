@@ -1,4 +1,4 @@
-package org.tinylog.benchmarks;
+package org.tinylog.benchmarks.charset;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

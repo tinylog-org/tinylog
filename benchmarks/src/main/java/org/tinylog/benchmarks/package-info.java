@@ -1,4 +1,4 @@
 /**
- * JMH performance benchmark.
+ * JMH performance benchmarks.
  */
 package org.tinylog.benchmarks;
