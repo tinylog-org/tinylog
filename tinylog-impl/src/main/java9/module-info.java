@@ -36,6 +36,7 @@ import org.tinylog.impl.writers.file.FileWriterBuilder;
 import org.tinylog.impl.writers.logcat.LogcatWriterBuilder;
 
 module org.tinylog.impl {
+
 	requires org.tinylog.core;
 
 	provides LoggingBackendBuilder with
@@ -97,4 +98,5 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.writers.console;
 	exports org.tinylog.impl.writers.file;
 	exports org.tinylog.impl.writers.logcat;
+
 }

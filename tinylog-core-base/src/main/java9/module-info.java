@@ -16,6 +16,7 @@ import org.tinylog.core.variable.SystemPropertyResolver;
 import org.tinylog.core.variable.VariableResolver;
 
 module org.tinylog.core {
+
 	requires java.management;
 
 	uses Hook;
@@ -54,4 +55,5 @@ module org.tinylog.core {
 	exports org.tinylog.core.loader;
 	exports org.tinylog.core.runtime;
 	exports org.tinylog.core.variable;
+
 }
