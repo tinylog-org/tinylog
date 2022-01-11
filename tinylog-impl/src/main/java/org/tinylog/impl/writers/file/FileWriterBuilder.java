@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.impl.format.pattern.FormatPatternParser;
-import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.OutputFormat;
+import org.tinylog.impl.format.pattern.FormatPatternBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 
@@ -18,10 +18,6 @@ import org.tinylog.impl.writers.WriterBuilder;
  */
 public class FileWriterBuilder implements WriterBuilder {
 
-	private static final String DEFAULT_PATTERN =
-		"{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
-
-	private static final String PATTERN_KEY = "pattern";
 	private static final String FILE_KEY = "file";
 	private static final String CHARSET_KEY = "charset";
 
@@ -36,8 +32,7 @@ public class FileWriterBuilder implements WriterBuilder {
 
 	@Override
 	public Writer create(Framework framework, Configuration configuration) throws IOException {
-		String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
-		Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
+		OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
 
 		String fileName = configuration.getValue(FILE_KEY);
 		if (fileName == null) {
@@ -60,7 +55,7 @@ public class FileWriterBuilder implements WriterBuilder {
 			}
 		}
 
-		return new FileWriter(placeholder, Paths.get(fileName), charset);
+		return new FileWriter(format, Paths.get(fileName), charset);
 	}
 
 }
