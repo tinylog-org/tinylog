@@ -51,11 +51,11 @@ class LogFileTest {
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
 	void continueLogFile(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
 			file.write("foo");
 		}
 
-		try (LogFile file = new LogFile(path.toString(), charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
 			file.write("bar");
 		}
 
@@ -67,16 +67,16 @@ class LogFileTest {
 	 */
 	@Test
 	void writingUntilBufferCapacity() throws IOException {
-		Files.write(path, new byte[LogFile.BYTE_BUFFER_CAPACITY - 2]);
+		Files.write(path, new byte[6]);
 
-		try (LogFile file = new LogFile(path.toString(), StandardCharsets.US_ASCII)) {
-			assertThat(path).hasSize(LogFile.BYTE_BUFFER_CAPACITY - 2);
+		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII)) {
+			assertThat(path).hasSize(6);
 			file.write("\0");
 
-			assertThat(path).hasSize(LogFile.BYTE_BUFFER_CAPACITY - 2);
+			assertThat(path).hasSize(6);
 			file.write("\0");
 
-			assertThat(path).hasSize(LogFile.BYTE_BUFFER_CAPACITY);
+			assertThat(path).hasSize(8);
 		}
 	}
 
@@ -85,12 +85,12 @@ class LogFileTest {
 	 */
 	@Test
 	void writingOversizedString() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), StandardCharsets.US_ASCII)) {
-			file.write(new String(new char[LogFile.BYTE_BUFFER_CAPACITY * 2 + 1]));
-			assertThat(path).hasSize(LogFile.BYTE_BUFFER_CAPACITY * 2);
+		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII)) {
+			file.write(new String(new char[16 + 1]));
+			assertThat(path).hasSize(16);
 		}
 
-		assertThat(path).hasSize(LogFile.BYTE_BUFFER_CAPACITY * 2 + 1);
+		assertThat(path).hasSize(16 + 1);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class LogFileTest {
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
 	void flushing(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
 			file.write("foo");
 			assertThat(path).usingCharset(charset).isEmptyFile();
 

@@ -9,32 +9,31 @@ import java.util.Arrays;
 /**
  * Buffered text file writer.
  */
-class LogFile implements Closeable {
-
-	/**
-	 * The buffer size.
-	 */
-	protected static final int BYTE_BUFFER_CAPACITY = 64 * 1024; // 64 KB
+public class LogFile implements Closeable {
 
 	private final RandomAccessFile file;
 	private final Charset charset;
 	private final byte[] bom;
+
+	private final int bufferCapacity;
 	private final ByteBuffer buffer;
 
 	/**
 	 * @param fileName The path to the log file
+	 * @param bufferCapacity The capacity for the byte buffer (must be greater than 0)
 	 * @param charset The charset to use for wring strings
 	 * @throws IOException Failed to open the log file
 	 */
-	LogFile(String fileName, Charset charset) throws IOException {
+	public LogFile(String fileName, int bufferCapacity, Charset charset) throws IOException {
 		this.file = new RandomAccessFile(fileName, "rw");
 		this.charset = charset;
 		this.bom = createBom(charset);
 
 		long fileLength = this.file.length();
-		long maxBufferSize = BYTE_BUFFER_CAPACITY - (fileLength % BYTE_BUFFER_CAPACITY);
+		long maxBufferSize = bufferCapacity - (fileLength % bufferCapacity);
 
-		this.buffer = new ByteBuffer(BYTE_BUFFER_CAPACITY, (int) maxBufferSize);
+		this.buffer = new ByteBuffer(bufferCapacity, (int) maxBufferSize);
+		this.bufferCapacity = bufferCapacity;
 
 		if (fileLength > 0) {
 			this.file.seek(fileLength);
@@ -55,11 +54,11 @@ class LogFile implements Closeable {
 
 		if (buffer.isFull()) {
 			buffer.writeTo(file);
-			buffer.reset(BYTE_BUFFER_CAPACITY);
+			buffer.reset(bufferCapacity);
 
-			int remainingChunks = (data.length - bytes) / BYTE_BUFFER_CAPACITY;
+			int remainingChunks = (data.length - bytes) / bufferCapacity;
 			if (remainingChunks > 0) {
-				int length = remainingChunks * BYTE_BUFFER_CAPACITY;
+				int length = remainingChunks * bufferCapacity;
 				file.write(data, bytes, length);
 				bytes += length;
 			}
@@ -78,7 +77,7 @@ class LogFile implements Closeable {
 	public void flush() throws IOException {
 		if (!buffer.isEmpty()) {
 			int remaining = buffer.writeTo(file);
-			buffer.reset(remaining == 0 ? BYTE_BUFFER_CAPACITY : remaining);
+			buffer.reset(remaining == 0 ? bufferCapacity : remaining);
 		}
 	}
 

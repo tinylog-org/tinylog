@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 /**
  * Byte array buffer for {@link FileWriter}.
  */
-class ByteBuffer {
+public class ByteBuffer {
 
 	private final byte[] data;
 	private int maxSize;
@@ -17,7 +17,7 @@ class ByteBuffer {
 	 * @param capacity The capacity for the internal byte array
 	 * @param maxSize The initial maximum number of bytes to accept
 	 */
-	ByteBuffer(int capacity, int maxSize) {
+	public ByteBuffer(int capacity, int maxSize) {
 		this.data = new byte[capacity];
 		this.maxSize = maxSize;
 		this.currentSize = 0;

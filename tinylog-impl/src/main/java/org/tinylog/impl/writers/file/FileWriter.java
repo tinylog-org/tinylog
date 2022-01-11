@@ -16,8 +16,9 @@ import org.tinylog.impl.writers.AsyncWriter;
  */
 public class FileWriter implements AsyncWriter {
 
-	private static final int BUILDER_START_CAPACITY = 1024;
-	private static final int BUILDER_MAX_CAPACITY = 65536;
+	private static final int BYTE_BUFFER_CAPACITY = 64 * 1024; // 64 KB
+	private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB
+	private static final int BUILDER_MAX_CAPACITY = 64 * 1024; // 64 KB
 
 	private final OutputFormat format;
 	private final LogFile file;
@@ -36,7 +37,7 @@ public class FileWriter implements AsyncWriter {
 		}
 
 		this.format = format;
-		this.file = new LogFile(file.toString(), charset);
+		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, charset);
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 	}
 
