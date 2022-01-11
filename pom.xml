@@ -30,6 +30,7 @@
     <modules>
         <module>benchmarks</module>
         <module>tinylog-api</module>
+        <module>tinylog-api-kotlin</module>
         <module>tinylog-core</module>
         <module>tinylog-core-base</module>
         <module>tinylog-core-modern</module>
@@ -140,6 +141,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>3.22.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>1.6.10</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -265,6 +271,45 @@
                             <id>create-report</id>
                             <goals>
                                 <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>1.6.10</version>
+                    <configuration>
+                        <apiVersion>1.6</apiVersion>
+                        <languageVersion>1.6</languageVersion>
+                        <jvmTarget>1.8</jvmTarget>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.gantsign.maven</groupId>
+                    <artifactId>ktlint-maven-plugin</artifactId>
+                    <version>1.11.2</version>
+                    <executions>
+                        <execution>
+                            <id>check</id>
+                            <goals>
+                                <goal>check</goal>
                             </goals>
                         </execution>
                     </executions>
