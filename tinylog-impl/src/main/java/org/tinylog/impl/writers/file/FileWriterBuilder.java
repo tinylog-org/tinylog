@@ -9,14 +9,13 @@ import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.format.pattern.FormatPatternBuilder;
+import org.tinylog.impl.writers.AbstractFormattableWriterBuilder;
 import org.tinylog.impl.writers.Writer;
-import org.tinylog.impl.writers.WriterBuilder;
 
 /**
  * Builder for creating an instance of {@link FileWriter}.
  */
-public class FileWriterBuilder implements WriterBuilder {
+public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
 
 	private static final String FILE_KEY = "file";
 	private static final String CHARSET_KEY = "charset";
@@ -31,9 +30,7 @@ public class FileWriterBuilder implements WriterBuilder {
 	}
 
 	@Override
-	public Writer create(Framework framework, Configuration configuration) throws IOException {
-		OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
-
+	public Writer create(Framework framework, Configuration configuration, OutputFormat format) throws IOException {
 		String fileName = configuration.getValue(FILE_KEY);
 		if (fileName == null) {
 			String fullKey = configuration.resolveFullKey(FILE_KEY);

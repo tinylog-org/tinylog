@@ -21,6 +21,7 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
+import org.tinylog.impl.format.json.LineDelimitedJson;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
@@ -69,6 +70,57 @@ class FileWriterBuilderTest {
 		Configuration configuration = new Configuration().set("file", logFile.toString());
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			LogEntry logEntry = new LogEntryBuilder()
+				.timestamp(Instant.EPOCH)
+				.thread(new Thread(() -> { }, "main"))
+				.severityLevel(Level.INFO)
+				.className("org.MyClass")
+				.methodName("foo")
+				.message("Hello World!")
+				.create();
+
+			writer.log(logEntry);
+		}
+
+		assertThat(logFile)
+			.hasContent("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that custom output formats like {@link LineDelimitedJson} are supported.
+	 */
+	@Test
+	void customJsonFormat() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("file", logFile.toString())
+			.set("format", "ld-json")
+			.set("fields.msg", "message");
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
+			writer.log(logEntry);
+		}
+
+		assertThat(logFile).hasContent("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that illegal output formats are reported and the writer will use the default pattern output format
+	 * instead.
+	 */
+	@Test
+	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+	void illegalOutputFormat() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("file", logFile.toString())
+			.set("format", "foo");
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			assertThat(log.consume()).anySatisfy(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+				assertThat(entry.getMessage()).contains("format", "foo");
+			});
+
 			LogEntry logEntry = new LogEntryBuilder()
 				.timestamp(Instant.EPOCH)
 				.thread(new Thread(() -> { }, "main"))
