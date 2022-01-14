@@ -30,8 +30,10 @@ public final class DynamicNameSegmentTest {
 	public void doesHaveStaticText() {
 		DynamicNameSegment segment = new DynamicNameSegment("test");
 		assertThat(segment.getStaticText()).isEqualTo("test");
+
 		DynamicNameSegment.setDynamicName("foo");
 		assertThat(segment.getStaticText()).isEqualTo("foo");
+
 		DynamicNameSegment.setDynamicName("bar");
 		assertThat(segment.getStaticText()).isEqualTo("bar");
 	}
@@ -44,8 +46,10 @@ public final class DynamicNameSegmentTest {
 	public void createToken() {
 		DynamicNameSegment segment = new DynamicNameSegment("test");
 		assertThat(segment.createToken(null, null)).isEqualTo("test");
+
 		DynamicNameSegment.setDynamicName("foo");
 		assertThat(segment.getStaticText()).isEqualTo("foo");
+
 		DynamicNameSegment.setDynamicName("bar");
 		assertThat(segment.getStaticText()).isEqualTo("bar");
 	}
@@ -58,6 +62,7 @@ public final class DynamicNameSegmentTest {
 		DynamicNameSegment segment = new DynamicNameSegment("test");
 		assertThat(segment.validateToken("test")).isTrue();
 		assertThat(segment.validateToken("foo")).isFalse();
+
 		DynamicNameSegment.setDynamicName("foo");
 		assertThat(segment.validateToken("test")).isFalse();
 		assertThat(segment.validateToken("foo")).isTrue();

@@ -35,7 +35,7 @@ public final class DynamicNamePolicyTest {
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
-	 * Verifies that an existing log file will be never continued.
+	 * Verifies that an existing log file can be continued until triggering a manual reset.
 	 * 
 	 * @throws IOException
 	 *             Failed creating temporary file
@@ -43,23 +43,27 @@ public final class DynamicNamePolicyTest {
 	@Test
 	public void discontinueExistingFile() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		final DynamicNamePolicy policy = new DynamicNamePolicy(null);
+		DynamicNamePolicy policy = new DynamicNamePolicy(null);
 		assertThat(policy.continueExistingFile(file)).isTrue();
+
 		DynamicNamePolicy.setReset();
 		assertThat(policy.continueExistingFile(file)).isFalse();
+
 		policy.reset();
 		assertThat(policy.continueExistingFile(file)).isTrue();
 	}
 
 	/**
-	 * Verifies that the current log file will be always continued.
+	 * Verifies that the current log file will always be continued until triggering a manual reset.
 	 */
 	@Test
 	public void continueCurrentFile() {
-		final DynamicNamePolicy policy = new DynamicNamePolicy(null);
+		DynamicNamePolicy policy = new DynamicNamePolicy(null);
 		assertThat(policy.continueCurrentFile(new byte[0])).isTrue();
+
 		DynamicNamePolicy.setReset();
 		assertThat(policy.continueCurrentFile(new byte[0])).isFalse();
+
 		policy.reset();
 		assertThat(policy.continueCurrentFile(new byte[0])).isTrue();
 	}
