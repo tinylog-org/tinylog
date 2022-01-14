@@ -1,6 +1,7 @@
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.impl.backend.NativeLoggingBackendBuilder;
 import org.tinylog.impl.format.OutputFormatBuilder;
+import org.tinylog.impl.format.json.LineDelimitedJsonBuilder;
 import org.tinylog.impl.format.pattern.FormatPatternBuilder;
 import org.tinylog.impl.format.pattern.placeholders.ClassNamePlaceholderBuilder;
 import org.tinylog.impl.format.pattern.placeholders.ClassPlaceholderBuilder;
@@ -43,6 +44,7 @@ module org.tinylog.impl {
 		NativeLoggingBackendBuilder;
 
 	provides OutputFormatBuilder with
+		LineDelimitedJsonBuilder,
 		FormatPatternBuilder;
 
 	uses PlaceholderBuilder;

@@ -1,1 +1,2 @@
 org.tinylog.impl.format.pattern.FormatPatternBuilder
+org.tinylog.impl.format.json.LineDelimitedJsonBuilder

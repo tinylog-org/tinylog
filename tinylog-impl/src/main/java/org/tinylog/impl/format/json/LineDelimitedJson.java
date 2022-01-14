@@ -14,7 +14,7 @@ import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
- * Output format for rendering log entries as line delimited JSON.
+ * Output format for rendering log entries as line-delimited JSON.
  */
 public class LineDelimitedJson implements OutputFormat {
 
