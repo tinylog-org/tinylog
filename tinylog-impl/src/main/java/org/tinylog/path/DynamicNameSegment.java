@@ -23,7 +23,11 @@ import org.tinylog.runtime.Timestamp;
 public class DynamicNameSegment implements Segment {
 
 	private static String dynamicName;
+	private static final Object mutex = new Object();
 
+	/**
+	 * @param defaultValue Initial value for dynamic name
+	 */
 	DynamicNameSegment(final String defaultValue) {
 		setDynamicName(defaultValue);
 	}
@@ -34,23 +38,29 @@ public class DynamicNameSegment implements Segment {
 	 * @return Dynamic name
 	 */
 	public static String getDynamicName() {
-		return dynamicName;
+		synchronized (mutex) {
+			return dynamicName;
+		}
 	}
 
 	/**
 	 * Sets a new dynamic name.
 	 *
-	 * <p>When used together with {@link DynamicNamePolicy} and the dynamic name differs from the current one,
-	 * a {@linkplain Policy#reset() reset} is triggered.</p>
+	 * <p>
+	 *     When used together with {@link DynamicNamePolicy} and the dynamic name differs from the current one,
+	 *     a {@linkplain Policy#reset() reset} is triggered.
+	 * </p>
 	 *
 	 * @param newDynamicName Dynamic name to set
 	 */
 	public static void setDynamicName(final String newDynamicName) {
-		if (dynamicName != null && dynamicName.equals(newDynamicName)) {
-			return;
+		synchronized (mutex) {
+			if (dynamicName != null && dynamicName.equals(newDynamicName)) {
+				return;
+			}
+			dynamicName = newDynamicName;
+			DynamicNamePolicy.setReset();
 		}
-		dynamicName = newDynamicName;
-		DynamicNamePolicy.setReset();
 	}
 
 	@Override
@@ -60,11 +70,14 @@ public class DynamicNameSegment implements Segment {
 
 	@Override
 	public boolean validateToken(final String token) {
-		return dynamicName != null && dynamicName.equals(token);
+		synchronized (mutex) {
+			return dynamicName != null && dynamicName.equals(token);
+		}
 	}
 
 	@Override
 	public String createToken(final String prefix, final Timestamp timestamp) {
 		return getDynamicName();
 	}
+
 }

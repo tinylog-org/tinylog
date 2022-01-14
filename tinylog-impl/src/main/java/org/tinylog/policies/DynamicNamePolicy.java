@@ -23,11 +23,9 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class DynamicNamePolicy implements Policy {
 
-	private static boolean reset;
+	private static volatile boolean reset;
 
-	/**
-	 *
-	 */
+	/** */
 	public DynamicNamePolicy() {
 		this(null);
 	}
@@ -62,4 +60,5 @@ public final class DynamicNamePolicy implements Policy {
 	public static void setReset() {
 		reset = true;
 	}
+
 }
