@@ -28,7 +28,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human readable service name for logging
+	 * @param name The human-readable service name for logging
 	 * @param <S> The service type
 	 * @return All found service implementations in the current classpath
 	 */
@@ -43,7 +43,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human readable service name for logging
+	 * @param name The human-readable service name for logging
 	 * @param mapper The mapping function to apply for found service implementations
 	 * @param <S> The service type
 	 * @param <R> The mapped type
@@ -84,7 +84,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param target The target collection to add the result to
 	 * @param implementation The service implementation to execute
-	 * @param activity The human readable activity as verb for logging
+	 * @param activity The human-readable activity as verb for logging
 	 * @param mapper The mapping function to apply for the passed service implementations
 	 * @param <S> The service type
 	 * @param <R> The result type
@@ -97,7 +97,7 @@ public final class SafeServiceLoader {
 	 * Executes a service implementation.
 	 *
 	 * @param implementation The service implementation to execute
-	 * @param activity The human readable activity as verb for logging
+	 * @param activity The human-readable activity as verb for logging
 	 * @param action The action to execute for the passed service implementation
 	 * @param <S> The service type
 	 */
