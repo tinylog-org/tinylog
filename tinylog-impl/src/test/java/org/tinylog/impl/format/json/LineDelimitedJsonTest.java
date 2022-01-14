@@ -33,7 +33,8 @@ class LineDelimitedJsonTest {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-		assertThat(renderer.render(logEntry)).isEqualTo("{}");
+		assertThat(renderer.render(logEntry))
+			.isEqualTo("{}" + System.lineSeparator());
 	}
 
 	/**
@@ -50,7 +51,7 @@ class LineDelimitedJsonTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
 		assertThat(renderer.render(logEntry))
-			.isEqualTo("{\"message\": \"Hello World!\"}");
+			.isEqualTo("{\"message\": \"Hello World!\"}" + System.lineSeparator());
 	}
 
 	/**
@@ -70,7 +71,7 @@ class LineDelimitedJsonTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
 		assertThat(renderer.render(logEntry))
-			.isEqualTo("{\"level\": \"INFO\", \"message\": \"Hello World!\"}");
+			.isEqualTo("{\"level\": \"INFO\", \"message\": \"Hello World!\"}" + System.lineSeparator());
 	}
 
 	/**
@@ -102,7 +103,8 @@ class LineDelimitedJsonTest {
 		LogEntry logEntry = new LogEntryBuilder().message("foo").create();
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-		assertThat(renderer.render(logEntry)).isEqualTo("{\"%s\": \"foo\"}", escapedName);
+		assertThat(renderer.render(logEntry))
+			.isEqualTo("{\"%s\": \"foo\"}" + System.lineSeparator(), escapedName);
 	}
 
 	/**
@@ -134,7 +136,8 @@ class LineDelimitedJsonTest {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-		assertThat(renderer.render(logEntry)).isEqualTo("{\"foo\": \"%s\"}", escapedValue);
+		assertThat(renderer.render(logEntry))
+			.isEqualTo("{\"foo\": \"%s\"}" + System.lineSeparator(), escapedValue);
 	}
 
 }

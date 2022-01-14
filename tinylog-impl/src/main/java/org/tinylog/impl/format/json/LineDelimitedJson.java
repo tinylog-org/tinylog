@@ -57,6 +57,7 @@ public class LineDelimitedJson implements OutputFormat {
 		}
 
 		builder.append("}");
+		builder.append(System.lineSeparator());
 	}
 
 	/**

@@ -43,7 +43,8 @@ class LineDelimitedJsonBuilderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 		LogEntry logEntry = new LogEntryBuilder().create();
 
-		assertThat(renderer.render(logEntry)).isEqualTo("{}");
+		assertThat(renderer.render(logEntry))
+			.isEqualTo("{}" + System.lineSeparator());
 	}
 
 	/**
@@ -57,7 +58,8 @@ class LineDelimitedJsonBuilderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
 
-		assertThat(renderer.render(logEntry)).isEqualTo("{\"level\": \"INFO\"}");
+		assertThat(renderer.render(logEntry))
+			.isEqualTo("{\"level\": \"INFO\"}" + System.lineSeparator());
 	}
 
 	/**
@@ -79,7 +81,7 @@ class LineDelimitedJsonBuilderTest {
 			.create();
 
 		assertThat(renderer.render(logEntry))
-			.isEqualTo("{\"level\": \"INFO\", \"foo\": \"bar\", \"msg\": \"Hello World!\"}");
+			.isEqualTo("{\"level\": \"INFO\", \"foo\": \"bar\", \"msg\": \"Hello World!\"}" + System.lineSeparator());
 	}
 
 	/**
