@@ -36,6 +36,8 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				Class<?> clazz;
 				try {
 					clazz = (Class<?>) callerClassGetter.invoke(i + 1);
+				} catch (IndexOutOfBoundsException ex) {
+					return null;
 				} catch (Throwable ex) {
 					InternalLogger.error(ex, "Failed to extract caller class name from stack trace");
 					return null;
@@ -65,6 +67,8 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				StackTraceElement element;
 				try {
 					element = (StackTraceElement) stackTraceElementGetter.invoke(throwable, i);
+				} catch (IndexOutOfBoundsException ex) {
+					return null;
 				} catch (Throwable ex) {
 					InternalLogger.error(ex, "Failed to extract caller stack trace element from stack trace");
 					return null;

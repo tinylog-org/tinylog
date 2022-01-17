@@ -28,13 +28,14 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 			if (index >= 0 && index < trace.length) {
 				return trace[index].getClassName();
 			} else {
-				InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
 				return null;
 			}
 		} else {
 			try {
 				Class<?> clazz = (Class<?>) callerClassGetter.invoke(index + 1);
-				return clazz.getName();
+				return clazz == null ? null : clazz.getName();
+			} catch (IndexOutOfBoundsException ex) {
+				return null;
 			} catch (Throwable ex) {
 				InternalLogger.error(ex, "Failed to extract class name at the stack trace depth of {}", index);
 				return null;
@@ -48,7 +49,6 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 		if (index >= 0 && index < trace.length) {
 			return trace[index];
 		} else {
-			InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
 			return null;
 		}
 	}

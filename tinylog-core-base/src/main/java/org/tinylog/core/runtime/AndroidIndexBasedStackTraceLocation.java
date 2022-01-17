@@ -45,8 +45,6 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 			StackTraceElement[] trace = new Throwable().getStackTrace();
 			if (index >= 0 && index < trace.length) {
 				return trace[index].getClassName();
-			} else {
-				InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
 			}
 		} else {
 			try {
@@ -69,8 +67,6 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 			StackTraceElement[] trace = new Throwable().getStackTrace();
 			if (index >= 0 && index < trace.length) {
 				return trace[index];
-			} else {
-				InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
 			}
 		} else {
 			try {
