@@ -53,7 +53,9 @@
             <property name="format" value="^([a-z][a-zA-Z0-9]+|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*)$"/>
         </module>
         <module name="CovariantEquals"/>
-        <module name="CyclomaticComplexity"/>
+        <module name="CyclomaticComplexity">
+            <property name="max" value="12"/>
+        </module>
         <module name="DeclarationOrder"/>
         <module name="DefaultComesLast"/>
         <module name="DescendantToken"/>
