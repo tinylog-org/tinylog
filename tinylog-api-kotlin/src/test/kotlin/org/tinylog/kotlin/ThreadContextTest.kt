@@ -32,7 +32,7 @@ internal class ThreadContextTest {
 		fun create() {
 			storage = mock()
 
-			backend = mock() {
+			backend = mock {
 				on { contextStorage } doReturn storage
 			}
 
