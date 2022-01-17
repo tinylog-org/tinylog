@@ -23,21 +23,22 @@ public class JavaIndexBasedStackTraceLocation extends AbstractJavaStackTraceLoca
 
 	@Override
 	public String getCallerClassName() {
-		if (callerClassGetter != null) {
+		if (callerClassGetter == null) {
+			StackTraceElement[] trace = new Throwable().getStackTrace();
+			if (index >= 0 && index < trace.length) {
+				return trace[index].getClassName();
+			} else {
+				InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
+				return null;
+			}
+		} else {
 			try {
 				Class<?> clazz = (Class<?>) callerClassGetter.invoke(index + 1);
 				return clazz.getName();
 			} catch (Throwable ex) {
 				InternalLogger.error(ex, "Failed to extract class name at the stack trace depth of {}", index);
+				return null;
 			}
-		}
-
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		if (index >= 0 && index < trace.length) {
-			return trace[index].getClassName();
-		} else {
-			InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
-			return null;
 		}
 	}
 

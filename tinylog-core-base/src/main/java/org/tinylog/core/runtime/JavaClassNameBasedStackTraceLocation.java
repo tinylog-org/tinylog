@@ -26,7 +26,10 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 
 	@Override
 	public String getCallerClassName() {
-		if (callerClassGetter != null) {
+		if (callerClassGetter == null) {
+			StackTraceElement element = findCallerInStackTrace(new Throwable().getStackTrace());
+			return element == null ? null : element.getClassName();
+		} else {
 			boolean foundClassName = false;
 
 			for (int i = offset; ; ++i) {
@@ -35,7 +38,7 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 					clazz = (Class<?>) callerClassGetter.invoke(i + 1);
 				} catch (Throwable ex) {
 					InternalLogger.error(ex, "Failed to extract caller class name from stack trace");
-					break;
+					return null;
 				}
 
 				if (clazz == null) {
@@ -47,27 +50,24 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				}
 			}
 		}
-
-		StackTraceElement element = findCallerInStackTrace(new Throwable().getStackTrace());
-		return element == null ? null : element.getClassName();
 	}
 
 	@Override
 	public StackTraceElement getCallerStackTraceElement() {
 		Throwable throwable = new Throwable();
 
-		if (stackTraceElementGetter != null) {
+		if (stackTraceElementGetter == null) {
+			return findCallerInStackTrace(throwable.getStackTrace());
+		} else {
 			boolean foundClassName = false;
 
 			for (int i = offset; ; ++i) {
 				StackTraceElement element;
 				try {
 					element = (StackTraceElement) stackTraceElementGetter.invoke(throwable, i);
-				} catch (IndexOutOfBoundsException ex) {
-					return null;
 				} catch (Throwable ex) {
 					InternalLogger.error(ex, "Failed to extract caller stack trace element from stack trace");
-					break;
+					return null;
 				}
 
 				if (foundClassName && !className.equals(element.getClassName())) {
@@ -77,8 +77,6 @@ public class JavaClassNameBasedStackTraceLocation extends AbstractJavaStackTrace
 				}
 			}
 		}
-
-		return findCallerInStackTrace(throwable.getStackTrace());
 	}
 
 	/**

@@ -41,7 +41,14 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 
 	@Override
 	public String getCallerClassName() {
-		if (fillStackTraceElements != null) {
+		if (fillStackTraceElements == null) {
+			StackTraceElement[] trace = new Throwable().getStackTrace();
+			if (index >= 0 && index < trace.length) {
+				return trace[index].getClassName();
+			} else {
+				InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
+			}
+		} else {
 			try {
 				StackTraceElement[] trace = new StackTraceElement[index + offset + 1];
 				fillStackTraceElements.invoke(Thread.currentThread(), trace);
@@ -53,18 +60,19 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 			}
 		}
 
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		if (index >= 0 && index < trace.length) {
-			return trace[index].getClassName();
-		} else {
-			InternalLogger.error(null, "There is no class name at the stack trace depth of {}", index);
-			return null;
-		}
+		return null;
 	}
 
 	@Override
 	public StackTraceElement getCallerStackTraceElement() {
-		if (fillStackTraceElements != null) {
+		if (fillStackTraceElements == null) {
+			StackTraceElement[] trace = new Throwable().getStackTrace();
+			if (index >= 0 && index < trace.length) {
+				return trace[index];
+			} else {
+				InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
+			}
+		} else {
 			try {
 				StackTraceElement[] trace = new StackTraceElement[index + offset + 1];
 				fillStackTraceElements.invoke(Thread.currentThread(), trace);
@@ -76,13 +84,7 @@ public class AndroidIndexBasedStackTraceLocation implements StackTraceLocation {
 			}
 		}
 
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		if (index >= 0 && index < trace.length) {
-			return trace[index];
-		} else {
-			InternalLogger.error(null, "There is no stack trace element at the depth of {}", index);
-			return null;
-		}
+		return null;
 	}
 
 }
