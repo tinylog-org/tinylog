@@ -182,14 +182,14 @@
                 <version>4.2.0</version>
             </dependency>
             <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-lambda</artifactId>
-                <version>1.2.1</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>31.0.1-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>1.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
