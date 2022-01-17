@@ -57,7 +57,7 @@ class JavaRuntimeTest {
 
 			long pid = new JavaRuntime().getProcessId();
 			assertThat(pid).isEqualTo(-1);
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains(runtimeName);
 			});

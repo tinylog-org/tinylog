@@ -575,7 +575,7 @@ class NativeLoggingBackendTest {
 		verify(otherWriter).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).isInstanceOf(IOException.class);
 		});

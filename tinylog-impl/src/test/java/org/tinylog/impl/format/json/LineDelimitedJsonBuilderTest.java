@@ -35,7 +35,7 @@ class LineDelimitedJsonBuilderTest {
 		Configuration configuration = new Configuration();
 		OutputFormat format = new LineDelimitedJsonBuilder().create(framework, configuration);
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("fields");
 		});

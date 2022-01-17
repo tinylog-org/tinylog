@@ -57,7 +57,7 @@ class LifeCycleHookTest {
 		hook.startUp();
 		hook.shutDown();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).isInstanceOf(IOException.class);
 		});
@@ -99,7 +99,7 @@ class LifeCycleHookTest {
 			hook.shutDown();
 		}
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).isInstanceOf(InterruptedException.class);
 		});

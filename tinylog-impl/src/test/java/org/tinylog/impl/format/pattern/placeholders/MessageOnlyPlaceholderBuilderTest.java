@@ -40,7 +40,7 @@ class MessageOnlyPlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		MessageOnlyPlaceholderBuilder builder = new MessageOnlyPlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(MessageOnlyPlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

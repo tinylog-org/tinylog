@@ -185,7 +185,7 @@ class ConfigurationTest {
 		void getInvalidZone() {
 			Configuration configuration = new Configuration().set("zone", "Invalid/Foo");
 			assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("Invalid/Foo");
 			});

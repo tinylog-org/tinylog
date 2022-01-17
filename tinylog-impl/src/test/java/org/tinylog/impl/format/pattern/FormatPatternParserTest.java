@@ -146,7 +146,7 @@ class FormatPatternParserTest {
 	void resolveNonInstantiablePlaceholder() {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(format("evil", logEntry)).isEqualTo("evil");
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("evil");
 			assertThat(entry.getThrowable()).isInstanceOf(UnsupportedOperationException.class);
@@ -181,7 +181,7 @@ class FormatPatternParserTest {
 	void reportNonExistentStyle() {
 		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
 		assertThat(format("message | foo", logEntry)).isEqualTo("Hello!");
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("foo");
 		});
@@ -195,7 +195,7 @@ class FormatPatternParserTest {
 	void reportNonInstantiableStyle() {
 		LogEntry logEntry = new LogEntryBuilder().message("Hello!").create();
 		assertThat(format("message | evil", logEntry)).isEqualTo("Hello!");
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("evil");
 			assertThat(entry.getThrowable()).isInstanceOf(UnsupportedOperationException.class);

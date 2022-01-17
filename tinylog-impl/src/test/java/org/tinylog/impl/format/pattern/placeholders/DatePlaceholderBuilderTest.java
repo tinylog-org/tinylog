@@ -92,7 +92,7 @@ class DatePlaceholderBuilderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("1970-01-01 00:00:00");
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("INVALID <{|#|}>");
 		});

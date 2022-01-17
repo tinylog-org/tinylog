@@ -134,7 +134,7 @@ class WritingThreadTest {
 		verify(evilWriter).log(logEntry);
 		verify(goodWriter).log(logEntry);
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
 			assertThat(entry.getMessage()).contains("log entry");
@@ -192,7 +192,7 @@ class WritingThreadTest {
 		verify(evilWriter).flush();
 		verify(goodWriter).flush();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
 			assertThat(entry.getMessage()).contains("flush");

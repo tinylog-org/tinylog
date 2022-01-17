@@ -116,7 +116,7 @@ class FileWriterBuilderTest {
 			.set("format", "foo");
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("format", "foo");
 			});
@@ -226,7 +226,7 @@ class FileWriterBuilderTest {
 
 		assertThat(logFile).hasContent("Hello World!" + System.lineSeparator());
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("charset", "dummy");
 		});

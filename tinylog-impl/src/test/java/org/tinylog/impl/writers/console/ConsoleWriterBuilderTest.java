@@ -116,7 +116,7 @@ class ConsoleWriterBuilderTest {
 	void illegalOutputFormat() throws Exception {
 		Configuration configuration = new Configuration().set("format", "foo");
 		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("format", "foo");
 			});
@@ -194,7 +194,7 @@ class ConsoleWriterBuilderTest {
 			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
 		}
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("foo");
 		});

@@ -75,7 +75,7 @@ class WriterConfigurationTest {
 		WriterConfiguration configuration = new WriterConfiguration(framework, new Configuration());
 		assertThat(configuration.getOrCreateWriter()).isNull();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("type");
 		});
@@ -92,7 +92,7 @@ class WriterConfigurationTest {
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, invalidConfiguration);
 		assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("foo");
 		});
@@ -109,7 +109,7 @@ class WriterConfigurationTest {
 		WriterConfiguration writerConfiguration = new WriterConfiguration(framework, fileWriter);
 		assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("file");
 		});

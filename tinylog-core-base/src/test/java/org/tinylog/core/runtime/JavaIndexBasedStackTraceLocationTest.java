@@ -40,7 +40,7 @@ class JavaIndexBasedStackTraceLocationTest {
 		String caller = location.getCallerClassName();
 
 		assertThat(caller).isNull();
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains(Integer.toString(depth));
 		});
@@ -75,7 +75,7 @@ class JavaIndexBasedStackTraceLocationTest {
 
 		assertThat(caller).isNull();
 
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains(Integer.toString(depth));
 		});

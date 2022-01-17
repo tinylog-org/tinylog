@@ -40,7 +40,7 @@ class FilePlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		FilePlaceholderBuilder builder = new FilePlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(FilePlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

@@ -47,7 +47,7 @@ class ProcessIdPlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		Placeholder placeholder = new ProcessIdPlaceholderBuilder().create(framework, "foo");
 		assertThat(placeholder).isInstanceOf(ProcessIdPlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

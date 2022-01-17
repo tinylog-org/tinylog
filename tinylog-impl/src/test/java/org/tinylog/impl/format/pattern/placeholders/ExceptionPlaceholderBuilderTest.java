@@ -40,7 +40,7 @@ class ExceptionPlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		ExceptionPlaceholderBuilder builder = new ExceptionPlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(ExceptionPlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

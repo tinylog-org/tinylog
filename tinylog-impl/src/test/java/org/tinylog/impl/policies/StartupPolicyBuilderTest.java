@@ -40,7 +40,7 @@ class StartupPolicyBuilderTest {
 	void creationWithConfigurationValue() {
 		StartupPolicyBuilder builder = new StartupPolicyBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(StartupPolicy.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

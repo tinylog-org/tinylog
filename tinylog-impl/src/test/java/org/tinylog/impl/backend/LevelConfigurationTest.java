@@ -126,7 +126,7 @@ class LevelConfigurationTest {
 		void invalidLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo"), false);
 
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("foo");
 			});
@@ -245,7 +245,7 @@ class LevelConfigurationTest {
 		void invalidLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("foo"), true);
 
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains("foo");
 			});

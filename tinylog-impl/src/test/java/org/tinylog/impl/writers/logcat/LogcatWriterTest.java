@@ -160,7 +160,7 @@ class LogcatWriterTest {
 				logMock.verifyNoInteractions();
 			}
 
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains(Level.OFF.toString());
 			});
@@ -248,7 +248,7 @@ class LogcatWriterTest {
 
 			assertThat(logcat.fetchOutput()).noneSatisfy(line -> assertThat(line).contains("Hello Hell!"));
 
-			assertThat(log.consume()).anySatisfy(entry -> {
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 				assertThat(entry.getMessage()).contains(Level.OFF.toString());
 			});

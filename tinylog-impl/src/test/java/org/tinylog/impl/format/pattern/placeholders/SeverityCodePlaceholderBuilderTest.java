@@ -40,7 +40,7 @@ class SeverityCodePlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		SeverityCodePlaceholderBuilder builder = new SeverityCodePlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(SeverityCodePlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

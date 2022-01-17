@@ -40,7 +40,7 @@ class LinePlaceholderBuilderTest {
 	void creationWithConfigurationValue() {
 		LinePlaceholderBuilder builder = new LinePlaceholderBuilder();
 		assertThat(builder.create(framework, "foo")).isInstanceOf(LinePlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains("foo");
 		});

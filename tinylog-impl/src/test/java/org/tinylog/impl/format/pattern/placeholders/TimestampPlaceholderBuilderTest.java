@@ -74,7 +74,7 @@ class TimestampPlaceholderBuilderTest {
 	void creationWithUnsupportedTimeUnit(String configurationValue) {
 		Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
 		assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
-		assertThat(log.consume()).anySatisfy(entry -> {
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
 			assertThat(entry.getMessage()).contains(configurationValue);
 		});
