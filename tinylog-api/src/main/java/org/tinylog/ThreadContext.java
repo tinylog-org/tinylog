@@ -8,7 +8,7 @@ import org.tinylog.core.context.ContextStorage;
 /**
  * Thread context stores additional thread-based context values for issued log entries. A stored context value is added
  * to all log entries issued by the same thread where the context value was set. In web applications for example, the IP
- * address or the user name are typical context values to store. The output of context values can be configured via
+ * address or the username are typical context values to store. The output of context values can be configured via
  * format patterns and writers.
  *
  * <p>

@@ -73,7 +73,7 @@ class ThreadContextTest {
 	}
 
 	/**
-	 * Verifies that a value can be receive by its associated key.
+	 * Verifies that a value can be received by its associated key.
 	 */
 	@Test
 	void receiveValue() {
