@@ -9,6 +9,7 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.mockito.MockedStatic;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 
 @CaptureLogEntries
+@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 class JndiValueResolverTest {
 
 	@Inject
@@ -47,7 +49,7 @@ class JndiValueResolverTest {
 	@Test
 	void resolveJndiStringValue() throws NamingException {
 		try (MockedStatic<InitialContext> mock = mockStatic(InitialContext.class)) {
-			mock.when(InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
+			mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
 
 			JndiValueResolver resolver = new JndiValueResolver();
 			assertThat(resolver.resolve("foo")).isEqualTo("bar");
@@ -60,7 +62,7 @@ class JndiValueResolverTest {
 	@Test
 	void resolveJndiNullValue() throws NamingException {
 		try (MockedStatic<InitialContext> mock = mockStatic(InitialContext.class)) {
-			mock.when(InitialContext.doLookup("java:comp/env/foo")).thenReturn(null);
+			mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenReturn(null);
 
 			JndiValueResolver resolver = new JndiValueResolver();
 			assertThat(resolver.resolve("foo")).isNull();
@@ -73,7 +75,7 @@ class JndiValueResolverTest {
 	@Test
 	void resolveMissingJndiName() throws NamingException {
 		try (MockedStatic<InitialContext> mock = mockStatic(InitialContext.class)) {
-			mock.when(InitialContext.doLookup("java:comp/env/foo")).thenThrow(NameNotFoundException.class);
+			mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenThrow(NameNotFoundException.class);
 
 			JndiValueResolver resolver = new JndiValueResolver();
 			assertThat(resolver.resolve("foo")).isNull();
@@ -87,7 +89,7 @@ class JndiValueResolverTest {
 	@Test
 	void failResolvingInvalidJndiName() throws NamingException {
 		try (MockedStatic<InitialContext> mock = mockStatic(InitialContext.class)) {
-			mock.when(InitialContext.doLookup("java:comp/env/foo")).thenThrow(InvalidNameException.class);
+			mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenThrow(InvalidNameException.class);
 
 			JndiValueResolver resolver = new JndiValueResolver();
 			assertThat(resolver.resolve("foo")).isNull();
