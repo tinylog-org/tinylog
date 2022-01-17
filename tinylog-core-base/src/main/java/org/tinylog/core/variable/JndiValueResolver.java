@@ -11,7 +11,7 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class JndiValueResolver implements VariableResolver {
 
-	public static final String DEFAULT_PREFIX = "java:comp/env/";
+	private static final String DEFAULT_PREFIX = "java:comp/env/";
 
 	/** */
 	public JndiValueResolver() {
