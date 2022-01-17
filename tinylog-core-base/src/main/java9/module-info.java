@@ -12,6 +12,7 @@ import org.tinylog.core.runtime.AndroidRuntimeBuilder;
 import org.tinylog.core.runtime.JavaRuntimeBuilder;
 import org.tinylog.core.runtime.RuntimeBuilder;
 import org.tinylog.core.variable.EnvironmentVariableResolver;
+import org.tinylog.core.variable.JndiValueResolver;
 import org.tinylog.core.variable.SystemPropertyResolver;
 import org.tinylog.core.variable.VariableResolver;
 
@@ -39,6 +40,7 @@ module org.tinylog.core {
 	uses VariableResolver;
 	provides VariableResolver with
 		EnvironmentVariableResolver,
+		JndiValueResolver,
 		SystemPropertyResolver;
 
 	uses RuntimeBuilder;

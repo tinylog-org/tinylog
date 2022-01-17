@@ -1,2 +1,3 @@
 org.tinylog.core.variable.EnvironmentVariableResolver
+org.tinylog.core.variable.JndiValueResolver
 org.tinylog.core.variable.SystemPropertyResolver
