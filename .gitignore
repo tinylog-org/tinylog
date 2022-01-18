@@ -9,5 +9,6 @@ jacoco.exec
 
 # Folders
 
-tinylog-android-tests/*/build/
 */target/
+benchmarks/*/target/
+tinylog-android-tests/*/build/
