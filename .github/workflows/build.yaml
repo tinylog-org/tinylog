@@ -1,92 +1,92 @@
 name: Build
 
 on:
-  - push
-  - pull_request
+	- push
+	- pull_request
 
 jobs:
 
-  development-build:
-    name: Development build with JDK 9
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 9
-      - uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: restore
-      - run: mvn --batch-mode --update-snapshots verify
-      - uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: save
-      - uses: codecov/codecov-action@v1
+	development-build:
+		name: Development build with JDK 9
+		runs-on: ubuntu-20.04
+		steps:
+			- uses: actions/checkout@v2
+			- uses: actions/setup-java@v1
+				with:
+					java-version: 9
+			- uses: skjolber/maven-cache-github-action@v1
+				with:
+					step: restore
+			- run: mvn --batch-mode --update-snapshots verify
+			- uses: skjolber/maven-cache-github-action@v1
+				with:
+					step: save
+			- uses: codecov/codecov-action@v1
 
-  release-build:
-    name: Release build with JDK 8 + 11
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - run: echo "JAVA11_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 8
-      - run: echo "JAVA8_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-      - name: Set up Toolchain
-        shell: bash
-        run: |
-          mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
-          <?xml version="1.0" encoding="UTF8"?>
-          <toolchains>
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>11</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
-              </configuration>
-            </toolchain>
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>8</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
-              </configuration>
-            </toolchain>
-          </toolchains>
-          EOF
-      - uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: restore
-      - run: mvn -P release --batch-mode --update-snapshots verify
-      - uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: save
-      - uses: codecov/codecov-action@v1
+	release-build:
+		name: Release build with JDK 8 + 11
+		runs-on: ubuntu-20.04
+		steps:
+			- uses: actions/checkout@v2
+			- uses: actions/setup-java@v1
+				with:
+					java-version: 11
+			- run: echo "JAVA11_HOME=${JAVA_HOME}" >> $GITHUB_ENV
+			- uses: actions/setup-java@v1
+				with:
+					java-version: 8
+			- run: echo "JAVA8_HOME=${JAVA_HOME}" >> $GITHUB_ENV
+			- name: Set up Toolchain
+				shell: bash
+				run: |
+					mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
+					<?xml version="1.0" encoding="UTF8"?>
+					<toolchains>
+						<toolchain>
+							<type>jdk</type>
+							<provides>
+								<version>11</version>
+							</provides>
+							<configuration>
+								<jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
+							</configuration>
+						</toolchain>
+						<toolchain>
+							<type>jdk</type>
+							<provides>
+								<version>8</version>
+							</provides>
+							<configuration>
+								<jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
+							</configuration>
+						</toolchain>
+					</toolchains>
+					EOF
+			- uses: skjolber/maven-cache-github-action@v1
+				with:
+					step: restore
+			- run: mvn -P release --batch-mode --update-snapshots verify
+			- uses: skjolber/maven-cache-github-action@v1
+				with:
+					step: save
+			- uses: codecov/codecov-action@v1
 
-  android-tests:
-    name: Tests on Android (API level ${{ matrix.api-level }})
-    runs-on: macos-10.15
-    strategy:
-      matrix:
-        api-level: [26, 29]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        with:
-          build-root-directory: tinylog-android-tests
-      - uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          script: cd ./tinylog-android-tests && chmod +x ./gradlew && ./gradlew createDebugCoverageReport
-      - uses: codecov/codecov-action@v1
+	android-tests:
+		name: Tests on Android (API level ${{ matrix.api-level }})
+		runs-on: macos-10.15
+		strategy:
+			matrix:
+				api-level: [26, 29]
+		steps:
+			- uses: actions/checkout@v2
+			- uses: actions/setup-java@v1
+				with:
+					java-version: 11
+			- uses: burrunan/gradle-cache-action@v1
+				with:
+					build-root-directory: tinylog-android-tests
+			- uses: reactivecircus/android-emulator-runner@v2
+				with:
+					api-level: ${{ matrix.api-level }}
+					script: cd ./tinylog-android-tests && chmod +x ./gradlew && ./gradlew createDebugCoverageReport
+			- uses: codecov/codecov-action@v1
