@@ -5,17 +5,17 @@ package java.lang.management;
  */
 public class ManagementFactory {
 
-    /** */
-    private ManagementFactory() {
-    }
+	/** */
+	private ManagementFactory() {
+	}
 
-    /**
-     * Gets an instance the runtime MX bean.
-     *
-     * @return Runtime MX bean instance
-     */
-    public static RuntimeMXBean getRuntimeMXBean() {
-        return new RuntimeMXBean();
-    }
+	/**
+	 * Gets an instance the runtime MX bean.
+	 *
+	 * @return Runtime MX bean instance
+	 */
+	public static RuntimeMXBean getRuntimeMXBean() {
+		return new RuntimeMXBean();
+	}
 
 }
