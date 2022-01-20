@@ -11,4 +11,5 @@ jacoco.exec
 
 */target/
 benchmarks/*/target/
+benchmarks/benchmark-logging/*/target/
 tinylog-android-tests/*/build/
