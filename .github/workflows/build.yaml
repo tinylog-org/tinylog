@@ -94,5 +94,5 @@ jobs:
               with:
                   api-level: ${{ matrix.api-level }}
                   working-directory: ./tinylog-android-tests
-                  script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport -Dorg.gradle.jvmargs=-Xmx128m
+                  script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
             - uses: codecov/codecov-action@v1
