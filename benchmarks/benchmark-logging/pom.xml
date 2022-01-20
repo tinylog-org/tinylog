@@ -21,4 +21,8 @@
 		<root.basedir>${project.parent.parent.basedir}</root.basedir>
 	</properties>
 
+	<modules>
+		<module>benchmark-tinylog3</module>
+	</modules>
+
 </project>
