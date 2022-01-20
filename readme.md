@@ -47,7 +47,7 @@ For building tinylog or contributing to this project, please take a look at [con
 License
 -------
 
-Copyright 2016-2021 Martin Winandy
+Copyright 2016-2022 Martin Winandy
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
