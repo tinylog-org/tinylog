@@ -9,4 +9,10 @@
 	<Match>
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2, MS_EXPOSE_REP" />
 	</Match>
+	<Match>
+		<Class name="org.tinylog.core.loader.PropertiesLoader" />
+		<Method name="load" />
+		<Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE, RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" />
+		<!-- Can be removed when https://github.com/spotbugs/spotbugs/issues/1338 is fixed -->
+	</Match>
 </FindBugsFilter>

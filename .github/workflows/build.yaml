@@ -7,13 +7,17 @@ on:
 jobs:
 
     development-build:
-        name: Development build with JDK 9
+        name: Development build with JDK ${{ matrix.jdk }}
         runs-on: ubuntu-20.04
+        strategy:
+            fail-fast: false
+            matrix:
+                jdk: [ 9, 11, 17 ]
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-java@v1
               with:
-                  java-version: 9
+                  java-version: ${{ matrix.jdk }}
             - uses: skjolber/maven-cache-github-action@v1
               with:
                   step: restore
@@ -75,6 +79,7 @@ jobs:
         name: Tests on Android (API level ${{ matrix.api-level }})
         runs-on: macos-10.15
         strategy:
+            fail-fast: false
             matrix:
                 api-level: [26, 29]
         steps:
