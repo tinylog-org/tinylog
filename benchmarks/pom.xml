@@ -46,25 +46,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>exec-maven-plugin</artifactId>
-					<configuration>
-						<arguments>
-							<argument>-Dfile.encoding=UTF-8</argument>
-							<argument>-classpath</argument>
-							<classpath />
-							<argument>org.openjdk.jmh.Main</argument>
-							<argument>org\.tinylog\.benchmarks\.(.*)Benchmark</argument>
-							<argument>-f</argument>
-							<argument>${benchmark.forks}</argument>
-							<argument>-wi</argument>
-							<argument>${benchmark.warmups}</argument>
-							<argument>-i</argument>
-							<argument>${benchmark.iterations}</argument>
-						</arguments>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
@@ -86,6 +67,28 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+					<arguments>
+						<argument>-Dfile.encoding=UTF-8</argument>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>org.openjdk.jmh.Main</argument>
+						<argument>org\.tinylog\.benchmarks\.(.*)Benchmark</argument>
+						<argument>-f</argument>
+						<argument>${benchmark.forks}</argument>
+						<argument>-wi</argument>
+						<argument>${benchmark.warmups}</argument>
+						<argument>-i</argument>
+						<argument>${benchmark.iterations}</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>
