@@ -1,6 +1,6 @@
 # Contributing to tinylog
 
-[Pull requests](https://github.com/tinylog-org/tinylog/pulls) are always welcome :) This document should help to build tinylog on your local machine. If you have any build problem nevertheless, please feel free to report a [Github issue](https://github.com/tinylog-org/tinylog/issues/new?assignees=&labels=question&template=question.md&title=).
+[Pull requests](https://github.com/tinylog-org/tinylog/pulls) are always welcome :) This document should help to build tinylog on your local machine. If you have any build problem nevertheless, please feel free to report a [GitHub issue](https://github.com/tinylog-org/tinylog/issues/new?assignees=&labels=question&template=question.md&title=).
 
 ## Building tinylog
 
@@ -22,7 +22,7 @@ In general, tinylog uses standard Java source code style and Checkstyle will rep
 
 ## Commits
 
-When committing to tinylog, the subject line of the commit message should start with a verb, not end with any punctuation, and be no longer than 72 characters. If a more detailed message description is useful, it can be put after the subject line, separated by a blank line. For the optional detailed message description, there is no line length limit and it may contain one or more sentences. The associated issue or pull request can either be in parentheses at the end of the subject line or be part of the description body.
+When committing to tinylog, the subject line of the commit message should start with a verb, not end with any punctuation, and be no longer than 72 characters. If a more detailed message description is useful, it can be put after the subject line, separated by a blank line. For the optional detailed message description, there is no line length limit, and it may contain one or more sentences. The associated issue or pull request can either be in parentheses at the end of the subject line or be part of the description body.
 
 Good examples for commit messages:
 
