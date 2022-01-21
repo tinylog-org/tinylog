@@ -108,12 +108,12 @@ public class PropertiesLoader implements ConfigurationLoader {
 				String value = entry.getValue();
 				if (value.contains(prefix)) {
 					Matcher matcher = pattern.matcher(value);
-					StringBuilder builder = new StringBuilder();
+					StringBuffer buffer = new StringBuffer();
 					while (matcher.find()) {
-						matcher.appendReplacement(builder, resolveVariable(matcher, resolver));
+						matcher.appendReplacement(buffer, resolveVariable(matcher, resolver));
 					}
-					matcher.appendTail(builder);
-					map.put(entry.getKey(), builder.toString());
+					matcher.appendTail(buffer);
+					map.put(entry.getKey(), buffer.toString());
 				}
 			}
 		}
