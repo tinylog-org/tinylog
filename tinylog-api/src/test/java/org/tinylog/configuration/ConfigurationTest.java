@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.naming.InitialContext;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,12 +42,15 @@ import org.tinylog.util.FileSystem;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.tinylog.util.Maps.doubletonMap;
 
 /**
  * Tests for {@link Configuration}.
  */
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(InitialContext.class)
 public final class ConfigurationTest {
 
 	private static final String PROPERTIES_PREFIX = "tinylog.";
@@ -422,6 +427,21 @@ public final class ConfigurationTest {
 		loadProperties(FileSystem.createTemporaryFile("test = JRE #{java.version} from #{java.vendor}"));
 		assertThat(Configuration.get("test"))
 			.isEqualTo("JRE " + System.getProperty("java.version") + " from " + System.getProperty("java.vendor"));
+	}
+
+	/**
+	 * Verifies that JNDI values will be resolved.
+	 *
+	 * @throws Exception
+	 *             Failed creating temporary file or invoking private method {@link Configuration#load()}
+	 */
+	@Test
+	public void resolveJndiValue() throws Exception {
+		mockStatic(InitialContext.class);
+		when(InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
+
+		loadProperties(FileSystem.createTemporaryFile("test = @{foo}"));
+		assertThat(Configuration.get("test")).isEqualTo("bar");
 	}
 
 	/**

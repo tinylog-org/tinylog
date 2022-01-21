@@ -64,7 +64,13 @@ public final class Configuration {
 	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private static final Properties properties = load();
 	private static boolean frozen;
-	
+
+	private static final Resolver[] resolvers = {
+		EnvironmentVariableResolver.INSTANCE,
+		JndiValueResolver.INSTANCE,
+		SystemPropertyResolver.INSTANCE
+	};
+
 	/** */
 	private Configuration() {
 	}
@@ -112,10 +118,10 @@ public final class Configuration {
 				loader = internalLoader;
 			}
 		}
-		
+
 		Properties currentProps = load(loader);
 		mergeSystemProperties(currentProps);
-		resolveProperties(currentProps, EnvironmentVariableResolver.INSTANCE, SystemPropertyResolver.INSTANCE);
+		resolveProperties(currentProps, resolvers);
 		return currentProps;
 	}
 	
