@@ -95,6 +95,7 @@ class JndiValueResolverTest {
 			assertThat(resolver.resolve("foo")).isNull();
 			assertThat(log.consume()).singleElement().satisfies(entry -> {
 				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+				assertThat(entry.getThrowable()).isInstanceOf(InvalidNameException.class);
 				assertThat(entry.getMessage()).contains("java:comp/env/foo");
 			});
 		}
