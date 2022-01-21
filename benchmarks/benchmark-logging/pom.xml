@@ -22,9 +22,20 @@
 	</properties>
 
 	<modules>
+		<module>benchmark-core</module>
 		<module>benchmark-noop</module>
 		<module>benchmark-tinylog2</module>
 		<module>benchmark-tinylog3</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.tinylog</groupId>
+				<artifactId>benchmark-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>

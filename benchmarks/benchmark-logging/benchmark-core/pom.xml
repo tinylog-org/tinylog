@@ -6,9 +6,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>jar</packaging>
-	<artifactId>benchmark-tinylog3</artifactId>
+	<artifactId>benchmark-core</artifactId>
 
-	<description>Performance benchmarks for logging into files with tinylog 3</description>
+	<description>Core benchmark artifact for logging benchmarks</description>
 	<url>${website.url}</url>
 
 	<parent>
@@ -21,45 +21,11 @@
 		<root.basedir>${project.parent.parent.parent.basedir}</root.basedir>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>benchmark-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>tinylog-api</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>tinylog-core-modern</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>tinylog-core-base</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.tinylog</groupId>
-			<artifactId>tinylog-impl</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<configuration>
-					<skip>false</skip>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
