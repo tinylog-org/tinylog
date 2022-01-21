@@ -82,7 +82,7 @@
 		<checkstyle.version>8.45.1</checkstyle.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-logging.version>1.2</commons-logging.version>
-		<h2.version>2.0.206</h2.version>
+		<h2.version>2.1.210</h2.version>
 		<java16.version>1.1</java16.version>
 		<jboss-logging.version>3.4.2.Final</jboss-logging.version>
 		<jmh.version>1.33</jmh.version>
