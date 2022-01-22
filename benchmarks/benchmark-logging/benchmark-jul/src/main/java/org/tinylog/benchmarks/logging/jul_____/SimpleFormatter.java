@@ -2,8 +2,8 @@ package org.tinylog.benchmarks.logging.jul_____;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -19,22 +19,24 @@ public class SimpleFormatter extends Formatter {
 	private static final String SEPARATOR = " - ";
 
 	private final LocationInfo locationInfo;
-	private final DateTimeFormatter formatter;
+	private final SimpleDateFormat formatter;
 
 	/**
 	 * @param locationInfo The location information to output
 	 */
 	public SimpleFormatter(final LocationInfo locationInfo) {
 		this.locationInfo = locationInfo;
-		this.formatter = DateTimeFormatter
-			.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.US)
-			.withZone(ZoneId.systemDefault());
+		this.formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 	}
 
 	@Override
 	public String format(final LogRecord record) {
 		StringBuilder builder = new StringBuilder();
-		formatter.formatTo(record.getInstant(), builder);
+
+		synchronized (formatter) {
+			builder.append(formatter.format(new Date(record.getMillis())));
+		}
+
 		builder.append(SEPARATOR);
 		builder.append(Thread.currentThread().getName());
 
