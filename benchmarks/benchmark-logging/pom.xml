@@ -24,6 +24,7 @@
 	<modules>
 		<module>benchmark-core</module>
 		<module>benchmark-jul</module>
+		<module>benchmark-log4j2</module>
 		<module>benchmark-logback</module>
 		<module>benchmark-noop</module>
 		<module>benchmark-tinylog2</module>
