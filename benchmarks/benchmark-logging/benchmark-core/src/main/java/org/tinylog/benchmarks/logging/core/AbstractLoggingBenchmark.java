@@ -25,6 +25,13 @@ public abstract class AbstractLoggingBenchmark {
 	public abstract void configure() throws Exception;
 
 	/**
+	 * Shuts the logging framework gracefully down.
+	 *
+	 * @throws Exception Failed to shut the logging framework gracefully down
+	 */
+	public abstract void shutdown() throws Exception;
+
+	/**
 	 * Issues debug log entries, which will be discarded and not written into the log file.
 	 */
 	public abstract void discard();

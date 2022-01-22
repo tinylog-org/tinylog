@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.tinylog.Logger;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
@@ -48,6 +49,12 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 		configuration.set("writer.type", "file");
 		configuration.set("writer.file", createLogFile("tinylog3"));
 		configuration.set("writer.pattern", formatPattern.toString());
+	}
+
+	@TearDown(Level.Trial)
+	@Override
+	public void shutdown() {
+		Tinylog.shutDown();
 	}
 
 	@Benchmark

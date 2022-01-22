@@ -16,6 +16,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
 
@@ -44,6 +45,12 @@ public class Log4j2__Benchmark extends AbstractLoggingBenchmark {
 		Configurator.initialize(null, source);
 
 		logger = LogManager.getLogger(Log4j2__Benchmark.class);
+	}
+
+	@TearDown(Level.Trial)
+	@Override
+	public void shutdown() {
+		LogManager.shutdown();
 	}
 
 	@Benchmark

@@ -13,6 +13,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
 
@@ -25,6 +26,7 @@ public class Jul_____Benchmark extends AbstractLoggingBenchmark {
 	@Param
 	private LocationInfo locationInfo;
 
+	private Handler handler;
 	private Logger logger;
 
 	/** */
@@ -34,13 +36,20 @@ public class Jul_____Benchmark extends AbstractLoggingBenchmark {
 	@Setup(Level.Trial)
 	@Override
 	public void configure() throws IOException {
-		Handler handler = new FileHandler(createLogFile("jul"), false);
+		handler = new FileHandler(createLogFile("jul"), false);
 		handler.setFormatter(new SimpleFormatter(locationInfo));
 
 		logger = Logger.getLogger(Jul_____Benchmark.class.getName());
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
 		logger.setLevel(java.util.logging.Level.INFO);
+	}
+
+	@TearDown(Level.Trial)
+	@Override
+	public void shutdown() {
+		handler.close();
+		logger.removeHandler(handler);
 	}
 
 	@Benchmark

@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
@@ -50,6 +51,13 @@ public class Logback_Benchmark extends AbstractLoggingBenchmark {
 		configurator.doConfigure(new ByteArrayInputStream(configuration));
 
 		logger = LoggerFactory.getLogger(Logback_Benchmark.class);
+	}
+
+	@TearDown(Level.Trial)
+	@Override
+	public void shutdown() {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+		context.stop();
 	}
 
 	@Benchmark

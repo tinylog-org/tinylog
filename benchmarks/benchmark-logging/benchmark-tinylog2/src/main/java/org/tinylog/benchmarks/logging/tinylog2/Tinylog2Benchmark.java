@@ -10,10 +10,12 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.tinylog.Logger;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
 import org.tinylog.configuration.Configuration;
+import org.tinylog.provider.ProviderRegistry;
 
 /**
  * Benchmark for issuing log entries with tinylog 2.
@@ -46,6 +48,12 @@ public class Tinylog2Benchmark extends AbstractLoggingBenchmark {
 		Configuration.set("writer", "file");
 		Configuration.set("writer.file", createLogFile("tinylog2"));
 		Configuration.set("writer.format", formatPattern.toString());
+	}
+
+	@TearDown(Level.Trial)
+	@Override
+	public void shutdown() throws InterruptedException {
+		ProviderRegistry.getLoggingProvider().shutdown();
 	}
 
 	@Benchmark
