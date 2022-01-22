@@ -63,6 +63,7 @@ public class Logback_State extends AbstractLoggingState {
 
 		xml.append("<appender name=\"FILE\" class=\"ch.qos.logback.core.FileAppender\">");
 		xml.append("<file>").append(file).append("</file>");
+		xml.append("<immediateFlush>false</immediateFlush>");
 		xml.append("<encoder><pattern>");
 		if (locationInfo == LocationInfo.FULL) {
 			xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %class.%method\\(\\) - %level: %message%n");
