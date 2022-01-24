@@ -24,6 +24,13 @@ public class LogFileState extends AbstractState<LogFile> {
 	public LogFileState() {
 	}
 
+	/**
+	 * @param bufferSize The buffer size in bytes
+	 */
+	public LogFileState(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
 	@Override
 	public void write(String content) throws IOException {
 		instance.write(content);

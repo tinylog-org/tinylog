@@ -26,6 +26,13 @@ public class OutputStreamState extends AbstractState<OutputStream> {
 	public OutputStreamState() {
 	}
 
+	/**
+	 * @param bufferSize The buffer size in bytes
+	 */
+	public OutputStreamState(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
 	@Override
 	public void write(String content) throws IOException {
 		instance.write(content.getBytes(CHARSET));

@@ -19,7 +19,7 @@ public class RandomAccessFileState extends AbstractState<RandomAccessFile> {
 
 	@Override
 	public void write(String content) throws IOException {
-		instance.writeUTF(content);
+		instance.write(content.getBytes(CHARSET));
 	}
 
 	@Override

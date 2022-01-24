@@ -15,10 +15,19 @@ import org.tinylog.impl.writers.file.LogFile;
  */
 public class FileOutputBenchmark {
 
-	private static final String content = "Hello World! I'm an example for a short log entry. Goodbye";
+	private static final String CONTENT = "Hello World! I'm an example for a short log entry. Goodbye";
 
 	/** */
 	public FileOutputBenchmark() {
+	}
+
+	/**
+	 * Gets the text that should be written.
+	 *
+	 * @return The text to be written
+	 */
+	public String getContent() {
+		return CONTENT;
 	}
 
 	/**
@@ -30,7 +39,7 @@ public class FileOutputBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void logFile(LogFileState state) throws IOException {
-		state.write(content);
+		state.write(CONTENT);
 	}
 
 	/**
@@ -42,7 +51,7 @@ public class FileOutputBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void outputStream(OutputStreamState state) throws IOException {
-		state.write(content);
+		state.write(CONTENT);
 	}
 
 	/**
@@ -54,7 +63,7 @@ public class FileOutputBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void randomAccessFile(RandomAccessFileState state) throws IOException {
-		state.write(content);
+		state.write(CONTENT);
 	}
 
 	/**
@@ -66,7 +75,7 @@ public class FileOutputBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public void writer(WriterState state) throws IOException {
-		state.write(content);
+		state.write(CONTENT);
 	}
 
 }

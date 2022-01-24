@@ -17,7 +17,7 @@ import org.openjdk.jmh.annotations.TearDown;
  * @param <T> The class to use for writing
  */
 @SuppressWarnings("JmhInspections")
-public abstract class AbstractState<T extends Closeable> {
+public abstract class AbstractState<T extends Closeable> implements Closeable {
 
 	/**
 	 * The charset to use for encoding strings as byte arrays.
@@ -33,6 +33,15 @@ public abstract class AbstractState<T extends Closeable> {
 
 	/** */
 	public AbstractState() {
+	}
+
+	/**
+	 * Gets the path to the file.
+	 *
+	 * @return The path to the file
+	 */
+	public Path getPath() {
+		return path;
 	}
 
 	/**
@@ -55,8 +64,18 @@ public abstract class AbstractState<T extends Closeable> {
 	 */
 	@TearDown(Level.Iteration)
 	public void dispose() throws IOException {
-		instance.close();
+		close();
 		Files.deleteIfExists(path);
+	}
+
+	/**
+	 * Closes the temporary file.
+	 *
+	 * @throws IOException Failed to close the file properly.
+	 */
+	@Override
+	public void close() throws IOException {
+		instance.close();
 	}
 
 	/**

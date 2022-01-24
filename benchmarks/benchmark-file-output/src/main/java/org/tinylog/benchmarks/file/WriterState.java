@@ -27,6 +27,13 @@ public class WriterState extends AbstractState<Writer> {
 	public WriterState() {
 	}
 
+	/**
+	 * @param bufferSize The buffer size in bytes
+	 */
+	public WriterState(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
 	@Override
 	public void write(String content) throws IOException {
 		instance.write(content);
