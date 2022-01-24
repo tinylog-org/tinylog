@@ -27,8 +27,6 @@ import static org.mockito.Mockito.when;
 
 class TaggedLoggerTest {
 
-	private static final int CALLER_STACK_TRACE_DEPTH = 2;
-
 	/**
 	 * Tests for category tags.
 	 */
@@ -44,7 +42,7 @@ class TaggedLoggerTest {
 		 */
 		@Test
 		void stringTag() {
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "dummy", framework);
+			TaggedLogger logger = new TaggedLogger("dummy", framework);
 			assertThat(logger.getTag()).isEqualTo("dummy");
 		}
 
@@ -53,7 +51,7 @@ class TaggedLoggerTest {
 		 */
 		@Test
 		void nullTag() {
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, null, framework);
+			TaggedLogger logger = new TaggedLogger(null, framework);
 			assertThat(logger.getTag()).isNull();
 		}
 
@@ -93,7 +91,7 @@ class TaggedLoggerTest {
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
 
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "test", framework);
+			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isTraceEnabled()).isEqualTo(visible && enabled);
 		}
 
@@ -112,7 +110,7 @@ class TaggedLoggerTest {
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
 
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "test", framework);
+			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isDebugEnabled()).isEqualTo(visible && enabled);
 		}
 
@@ -131,7 +129,7 @@ class TaggedLoggerTest {
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
 
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "test", framework);
+			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isInfoEnabled()).isEqualTo(visible && enabled);
 		}
 
@@ -150,7 +148,7 @@ class TaggedLoggerTest {
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
 
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "test", framework);
+			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isWarnEnabled()).isEqualTo(visible && enabled);
 		}
 
@@ -169,7 +167,7 @@ class TaggedLoggerTest {
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
 
-			TaggedLogger logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, "test", framework);
+			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isErrorEnabled()).isEqualTo(visible && enabled);
 		}
 
@@ -197,7 +195,7 @@ class TaggedLoggerTest {
 		 */
 		@BeforeEach
 		void init() {
-			logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH, TAG, framework);
+			logger = new TaggedLogger(TAG, framework);
 			assertThat(log.consume())
 				.allSatisfy(entry -> assertThat(entry.getLevel()).isGreaterThanOrEqualTo(Level.DEBUG));
 		}

@@ -5,7 +5,14 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import org.tinylog.core.Framework;
+import org.tinylog.core.Level;
 import org.tinylog.core.Tinylog;
+import org.tinylog.core.backend.LevelVisibility;
+import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.format.message.EnhancedMessageFormatter;
+import org.tinylog.core.format.message.MessageFormatter;
+import org.tinylog.core.runtime.RuntimeFlavor;
+import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
  * Static logger for issuing log entries.
@@ -14,22 +21,20 @@ public final class Logger {
 
 	private static final int CALLER_STACK_TRACE_DEPTH = 2;
 
-	private static final Framework framework;
-	private static final ConcurrentMap<String, TaggedLogger> taggedLoggers;
-	private static final TaggedLogger logger;
+	private static final Framework framework = Tinylog.getFramework();
+	private static final RuntimeFlavor runtime = framework.getRuntime();
+	private static final LoggingBackend backend = framework.getLoggingBackend();
+	private static final LevelVisibility visibility = backend.getLevelVisibility(null);
+	private static final MessageFormatter formatter = new EnhancedMessageFormatter(framework);
 
-	static {
-		framework = Tinylog.getFramework();
-		taggedLoggers = new ConcurrentHashMap<>();
-		logger = new TaggedLogger(CALLER_STACK_TRACE_DEPTH + 1, null, framework);
-	}
+	private static final ConcurrentMap<String, TaggedLogger> taggedLoggers = new ConcurrentHashMap<>();
 
 	/** */
 	private Logger() {
 	}
 
 	/**
-	 * Retrieves a tagged logger instance. Category tags are case-sensitive. If a tagged logger does not yet exists for
+	 * Retrieves a tagged logger instance. Category tags are case-sensitive. If a tagged logger does not yet exist for
 	 * the passed tag, a new logger will be created. This method always returns the same logger instance for the same
 	 * tag.
 	 *
@@ -41,12 +46,12 @@ public final class Logger {
 		if (tag == null || tag.isEmpty()) {
 			return taggedLoggers.computeIfAbsent(
 				"",
-				key -> new TaggedLogger(CALLER_STACK_TRACE_DEPTH, null, framework)
+				key -> new TaggedLogger(null, framework)
 			);
 		} else {
 			return taggedLoggers.computeIfAbsent(
 				tag,
-				key -> new TaggedLogger(CALLER_STACK_TRACE_DEPTH, key, framework)
+				key -> new TaggedLogger(key, framework)
 			);
 		}
 	}
@@ -62,7 +67,8 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isTraceEnabled() {
-		return logger.isTraceEnabled();
+		return visibility.isTraceEnabled()
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.TRACE);
 	}
 
 	/**
@@ -81,7 +87,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void trace(Object message) {
-		logger.trace(message);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, null, message, null, null);
+		}
 	}
 
 	/**
@@ -101,7 +110,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void trace(Supplier<?> message) {
-		logger.trace(message);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, null, message, null, null);
+		}
 	}
 
 	/**
@@ -122,7 +134,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void trace(String message, Object... arguments) {
-		logger.trace(message, arguments);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -144,7 +159,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void trace(String message, Supplier<?>... arguments) {
-		logger.trace(message, arguments);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -158,7 +176,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void trace(Throwable exception) {
-		logger.trace(exception);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, exception, null, null, null);
+		}
 	}
 
 	/**
@@ -174,7 +195,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void trace(Throwable exception, String message) {
-		logger.trace(exception, message);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -195,7 +219,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void trace(Throwable exception, Supplier<String> message) {
-		logger.trace(exception, message);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -218,7 +245,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void trace(Throwable exception, String message, Object... arguments) {
-		logger.trace(exception, message, arguments);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -242,7 +272,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void trace(Throwable exception, String message, Supplier<?>... arguments) {
-		logger.trace(exception, message, arguments);
+		if (visibility.isTraceEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.TRACE, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -256,7 +289,8 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isDebugEnabled() {
-		return logger.isDebugEnabled();
+		return visibility.isDebugEnabled()
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.DEBUG);
 	}
 
 	/**
@@ -275,7 +309,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void debug(Object message) {
-		logger.debug(message);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, null, message, null, null);
+		}
 	}
 
 	/**
@@ -295,7 +332,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void debug(Supplier<?> message) {
-		logger.debug(message);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, null, message, null, null);
+		}
 	}
 
 	/**
@@ -316,7 +356,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void debug(String message, Object... arguments) {
-		logger.debug(message, arguments);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -338,7 +381,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void debug(String message, Supplier<?>... arguments) {
-		logger.debug(message, arguments);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -352,7 +398,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void debug(Throwable exception) {
-		logger.debug(exception);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, exception, null, null, null);
+		}
 	}
 
 	/**
@@ -368,7 +417,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void debug(Throwable exception, String message) {
-		logger.debug(exception, message);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -389,7 +441,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void debug(Throwable exception, Supplier<String> message) {
-		logger.debug(exception, message);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -412,7 +467,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void debug(Throwable exception, String message, Object... arguments) {
-		logger.debug(exception, message, arguments);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -436,7 +494,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void debug(Throwable exception, String message, Supplier<?>... arguments) {
-		logger.debug(exception, message, arguments);
+		if (visibility.isDebugEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.DEBUG, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -450,7 +511,8 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isInfoEnabled() {
-		return logger.isInfoEnabled();
+		return visibility.isInfoEnabled()
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.INFO);
 	}
 
 	/**
@@ -469,7 +531,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void info(Object message) {
-		logger.info(message);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, null, message, null, null);
+		}
 	}
 
 	/**
@@ -489,7 +554,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void info(Supplier<?> message) {
-		logger.info(message);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, null, message, null, null);
+		}
 	}
 
 	/**
@@ -510,7 +578,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void info(String message, Object... arguments) {
-		logger.info(message, arguments);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -532,7 +603,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void info(String message, Supplier<?>... arguments) {
-		logger.info(message, arguments);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -546,7 +620,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void info(Throwable exception) {
-		logger.info(exception);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, exception, null, null, null);
+		}
 	}
 
 	/**
@@ -562,7 +639,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void info(Throwable exception, String message) {
-		logger.info(exception, message);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -583,7 +663,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void info(Throwable exception, Supplier<String> message) {
-		logger.info(exception, message);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -606,7 +689,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void info(Throwable exception, String message, Object... arguments) {
-		logger.info(exception, message, arguments);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -630,7 +716,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void info(Throwable exception, String message, Supplier<?>... arguments) {
-		logger.info(exception, message, arguments);
+		if (visibility.isInfoEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.INFO, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -644,7 +733,8 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isWarnEnabled() {
-		return logger.isWarnEnabled();
+		return visibility.isWarnEnabled()
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.WARN);
 	}
 
 	/**
@@ -663,7 +753,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void warn(Object message) {
-		logger.warn(message);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, null, message, null, null);
+		}
 	}
 
 	/**
@@ -683,7 +776,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void warn(Supplier<?> message) {
-		logger.warn(message);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, null, message, null, null);
+		}
 	}
 
 	/**
@@ -704,7 +800,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void warn(String message, Object... arguments) {
-		logger.warn(message, arguments);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -726,7 +825,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void warn(String message, Supplier<?>... arguments) {
-		logger.warn(message, arguments);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -740,7 +842,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void warn(Throwable exception) {
-		logger.warn(exception);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, exception, null, null, null);
+		}
 	}
 
 	/**
@@ -756,7 +861,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void warn(Throwable exception, String message) {
-		logger.warn(exception, message);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -777,7 +885,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void warn(Throwable exception, Supplier<String> message) {
-		logger.warn(exception, message);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -800,7 +911,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void warn(Throwable exception, String message, Object... arguments) {
-		logger.warn(exception, message, arguments);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -824,7 +938,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void warn(Throwable exception, String message, Supplier<?>... arguments) {
-		logger.warn(exception, message, arguments);
+		if (visibility.isWarnEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.WARN, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -838,7 +955,8 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isErrorEnabled() {
-		return logger.isErrorEnabled();
+		return visibility.isErrorEnabled()
+			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.ERROR);
 	}
 
 	/**
@@ -857,7 +975,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void error(Object message) {
-		logger.error(message);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, null, message, null, null);
+		}
 	}
 
 	/**
@@ -877,7 +998,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void error(Supplier<?> message) {
-		logger.error(message);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, null, message, null, null);
+		}
 	}
 
 	/**
@@ -898,7 +1022,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void error(String message, Object... arguments) {
-		logger.error(message, arguments);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -920,7 +1047,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void error(String message, Supplier<?>... arguments) {
-		logger.error(message, arguments);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, null, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -934,7 +1064,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void error(Throwable exception) {
-		logger.error(exception);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, exception, null, null, null);
+		}
 	}
 
 	/**
@@ -950,7 +1083,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void error(Throwable exception, String message) {
-		logger.error(exception, message);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -971,7 +1107,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void error(Throwable exception, Supplier<String> message) {
-		logger.error(exception, message);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, exception, message, null, null);
+		}
 	}
 
 	/**
@@ -994,7 +1133,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void error(Throwable exception, String message, Object... arguments) {
-		logger.error(exception, message, arguments);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, exception, message, arguments, formatter);
+		}
 	}
 
 	/**
@@ -1018,7 +1160,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void error(Throwable exception, String message, Supplier<?>... arguments) {
-		logger.error(exception, message, arguments);
+		if (visibility.isErrorEnabled()) {
+			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
+			backend.log(location, null, Level.ERROR, exception, message, arguments, formatter);
+		}
 	}
 
 }

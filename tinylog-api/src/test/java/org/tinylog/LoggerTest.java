@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,21 +56,7 @@ class LoggerTest {
 				return backend;
 			}
 		});
-	}
 
-	/**
-	 * Restores the mocked tinylog class.
-	 */
-	@AfterAll
-	static void dispose() {
-		tinylogMock.close();
-	}
-
-	/**
-	 * Initializes the logging backend mock.
-	 */
-	@BeforeEach
-	void init() {
 		when(backend.getLevelVisibility(null)).thenReturn(visibility);
 	}
 
@@ -81,6 +66,14 @@ class LoggerTest {
 	@AfterEach
 	void reset() {
 		Mockito.reset(backend, visibility);
+	}
+
+	/**
+	 * Restores the mocked tinylog class.
+	 */
+	@AfterAll
+	static void dispose() {
+		tinylogMock.close();
 	}
 
 	/**
