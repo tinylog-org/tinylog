@@ -26,6 +26,7 @@
 	</properties>
 
 	<modules>
+		<module>benchmark-caller</module>
 		<module>benchmark-charset-encoding</module>
 		<module>benchmark-file-output</module>
 		<module>benchmark-logging</module>
