@@ -21,23 +21,46 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Thread)
 public class CharsetEncodingBenchmark {
 
-	/**
-	 * The name of the charset.
-	 */
-	@Param({ "US-ASCII", "ISO-8859-1", "UTF-8", "UTF-16" })
-	public String charsetName;
-
 	private static final int MAX_BYTES_PER_CHAR = 4;
+
 	private static final String CONTENT = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy"
 		+ " eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam"
 		+ " et justo duo dolores.";
 
-	public Charset charset;
-	public CharsetEncoder encoder;
-	public ByteBuffer buffer;
+	@Param({ "US-ASCII", "ISO-8859-1", "UTF-8", "UTF-16" })
+	private String charsetName;
+
+	private Charset charset;
+	private CharsetEncoder encoder;
+	private ByteBuffer buffer;
 
 	/** */
 	public CharsetEncodingBenchmark() {
+	}
+
+	/**
+	 * @param charsetName The name of the charset to use for encoding
+	 */
+	public CharsetEncodingBenchmark(String charsetName) {
+		this.charsetName = charsetName;
+	}
+
+	/**
+	 * Gets the text that is used for encoding.
+	 *
+	 * @return The text to encode
+	 */
+	public String getContent() {
+		return CONTENT;
+	}
+
+	/**
+	 * Gets the buffer that is used by {@link #encode()} for storing the encoded text.
+	 *
+	 * @return The buffer for encoded text
+	 */
+	public ByteBuffer getBuffer() {
+		return buffer;
 	}
 
 	/**
@@ -69,9 +92,8 @@ public class CharsetEncodingBenchmark {
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
 	public CoderResult encode() {
-		CoderResult result = encoder.encode(CharBuffer.wrap(CONTENT), buffer, true);
 		buffer.rewind();
-		return result;
+		return encoder.encode(CharBuffer.wrap(CONTENT), buffer, true);
 	}
 
 }
