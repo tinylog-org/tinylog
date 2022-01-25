@@ -205,7 +205,7 @@ class ConsoleWriterBuilderTest {
 	 */
 	@Test
 	void service() {
-		Assertions.assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(ConsoleWriterBuilder.class);
 			assertThat(builder.getName()).isEqualTo("console");
 		});

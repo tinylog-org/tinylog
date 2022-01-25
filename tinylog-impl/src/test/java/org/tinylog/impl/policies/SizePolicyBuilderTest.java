@@ -117,7 +117,7 @@ class SizePolicyBuilderTest {
 	 */
 	@Test
 	void service() {
-		Assertions.assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
+		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(SizePolicyBuilder.class);
 			assertThat(builder.getName()).isEqualTo("size");
 		});

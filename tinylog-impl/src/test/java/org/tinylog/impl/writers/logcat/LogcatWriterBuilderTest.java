@@ -39,7 +39,7 @@ class LogcatWriterBuilderTest {
 	 */
 	@Test
 	void service() {
-		Assertions.assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(LogcatWriterBuilder.class);
 			assertThat(builder.getName()).isEqualTo("logcat");
 		});

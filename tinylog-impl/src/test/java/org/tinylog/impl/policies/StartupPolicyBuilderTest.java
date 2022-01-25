@@ -51,7 +51,7 @@ class StartupPolicyBuilderTest {
 	 */
 	@Test
 	void service() {
-		Assertions.assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
+		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(StartupPolicyBuilder.class);
 			assertThat(builder.getName()).isEqualTo("startup");
 		});

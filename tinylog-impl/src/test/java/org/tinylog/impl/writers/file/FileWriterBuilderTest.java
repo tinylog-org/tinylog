@@ -237,7 +237,7 @@ class FileWriterBuilderTest {
 	 */
 	@Test
 	void service() {
-		Assertions.assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
 			assertThat(builder).isInstanceOf(FileWriterBuilder.class);
 			assertThat(builder.getName()).isEqualTo("file");
 		});
