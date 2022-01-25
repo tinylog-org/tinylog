@@ -9,6 +9,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -19,12 +20,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.LevelVisibility;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.runtime.StackTraceLocation;
@@ -42,6 +46,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
+import static java.util.Arrays.asList;
+import static java.util.EnumSet.complementOf;
+import static java.util.EnumSet.noneOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +57,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 @CaptureLogEntries
 @ExtendWith(MockitoExtension.class)
@@ -75,24 +81,55 @@ class NativeLoggingBackendTest {
 	}
 
 	/**
-	 * Verifies that the correct level visibility is derived from the enabled severity level.
+	 * Verifies that the expected {@link OutputDetails} are provided by the {@link LevelVisibility} for given required
+	 * log entry values at a used tag.
 	 *
-	 * @param enabledTag The enabled tag to test (can be {@code null} for being untagged)
-	 * @param disabledTag The disabled tag to test (can be {@code null} for being untagged)
-	 * @param severityLevel The severity level to test
+	 * @param tag The enabled tag to test
+	 * @param requiredLogEntryValues The required log entry values to test
+	 * @param outputDetails The expected output details to assert
 	 */
-	@ParameterizedTest(name = "Enabled Tag: <{0}>, Disabled Tag: <{1}>, Severity Level: <{2}>")
+	@ParameterizedTest
 	@MethodSource("getVisibilityArguments")
-	void getLevelVisibility(String enabledTag, String disabledTag, Level severityLevel) {
-		String writerTag = enabledTag == null ? "-" : enabledTag;
+	void getLevelVisibilityForEnabledTags(
+		String tag,
+		Set<LogEntryValue> requiredLogEntryValues,
+		OutputDetails outputDetails
+	) {
+		when(writer.getRequiredLogEntryValues()).thenReturn(requiredLogEntryValues);
 
 		NativeLoggingBackend backend = new Builder()
-			.rootLevel(severityLevel)
-			.writers(writerTag, severityLevel, writer)
+			.rootLevel(Level.INFO)
+			.writers(tag, Level.INFO, writer)
 			.create();
 
-		assertThat(backend.getLevelVisibility(enabledTag)).isEnabledFor(severityLevel);
-		assertThat(backend.getLevelVisibility(disabledTag)).isEnabledFor(Level.OFF);
+		LevelVisibility visibility = backend.getLevelVisibility(tag);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(outputDetails);
+		assertThat(visibility.getWarn()).isEqualTo(outputDetails);
+		assertThat(visibility.getError()).isEqualTo(outputDetails);
+	}
+
+	/**
+	 * Verifies that the {@link LevelVisibility} for an unused tag will return {@link OutputDetails#DISABLED} for every
+	 * severity level.
+	 *
+	 * @param tag The category tag to test
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"-", "foo", "tinylog"})
+	void getLevelVisibilityForDisabledTags(String tag) {
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.TRACE)
+			.writers("other", Level.TRACE, writer)
+			.create();
+
+		LevelVisibility visibility = backend.getLevelVisibility(tag);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
 	}
 
 	/**
@@ -612,14 +649,15 @@ class NativeLoggingBackendTest {
 	}
 
 	/**
-	 * Creates the arguments for the parameterized test {@link #getLevelVisibility(String, String, Level)}.
+	 * Creates the arguments for the parameterized test
+	 * {@link #getLevelVisibilityForEnabledTags(String, Set, OutputDetails)}.
 	 *
 	 * <p>
 	 *     Arguments:
 	 *     <ul>
 	 *         <li>The enabled tag to test</li>
-	 *         <li>The disabled tag to test</li>
-	 *         <li>The severity level to test</li>
+	 *         <li>The required log entry values to test</li>
+	 *         <li>The expected output details to assert</li>
 	 *     </ul>
 	 * </p>
 	 *
@@ -627,11 +665,39 @@ class NativeLoggingBackendTest {
 	 */
 	private static Collection<Arguments> getVisibilityArguments() {
 		Collection<Arguments> arguments = new ArrayList<>();
-		for (Level level : Level.values()) {
-			if (level != Level.OFF) {
-				arguments.add(Arguments.of(null, "foo", level));
-				arguments.add(Arguments.of("foo", null, level));
-			}
+		for (String tag : asList("-", "foo", "tinylog")) {
+			arguments.add(Arguments.of(
+				tag,
+				noneOf(LogEntryValue.class),
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				tag,
+				complementOf(
+					EnumSet.of(LogEntryValue.CLASS, LogEntryValue.FILE, LogEntryValue.METHOD, LogEntryValue.LINE)
+				),
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				tag,
+				EnumSet.of(LogEntryValue.CLASS),
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+			);
+			arguments.add(Arguments.of(
+				tag,
+				EnumSet.of(LogEntryValue.FILE),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				tag,
+				EnumSet.of(LogEntryValue.METHOD),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				tag,
+				EnumSet.of(LogEntryValue.LINE),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
 		}
 		return arguments;
 	}

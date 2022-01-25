@@ -18,8 +18,21 @@ public class InternalLoggingBackend implements LoggingBackend {
 
 	private static final ContextStorage STORAGE = new NopContextStorage();
 
-	private static final LevelVisibility TAGGED = new LevelVisibility(false, false, false, true, true);
-	private static final LevelVisibility DEFAULT = new LevelVisibility(false, false, false, false, false);
+	private static final LevelVisibility TAGGED = new LevelVisibility(
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+		OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
+	);
+
+	private static final LevelVisibility DEFAULT = new LevelVisibility(
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED
+	);
 
 	/** */
 	public InternalLoggingBackend() {

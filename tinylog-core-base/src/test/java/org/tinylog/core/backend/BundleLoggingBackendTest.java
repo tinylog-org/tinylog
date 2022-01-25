@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -20,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 class BundleLoggingBackendTest {
 
@@ -56,22 +58,43 @@ class BundleLoggingBackendTest {
 	}
 
 	/**
-	 * Verifies that the level visibility of all child logging backends is included.
+	 * Verifies that the level visibilities of all child logging backends are correctly merged.
+	 *
+	 * @param tag The category tag to test
 	 */
-	@Test
-	void visibility() {
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"tinylog", "foo"})
+	void visibility(String tag) {
 		LoggingBackend first = mock(LoggingBackend.class);
-		when(first.getLevelVisibility("foo")).thenReturn(
-			new LevelVisibility(false, false, false, true, true)
+		when(first.getLevelVisibility(tag)).thenReturn(
+			new LevelVisibility(
+				OutputDetails.DISABLED,
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+			)
 		);
 
 		LoggingBackend second = mock(LoggingBackend.class);
-		when(second.getLevelVisibility("foo")).thenReturn(
-			new LevelVisibility(false, false, true, true, true)
+		when(second.getLevelVisibility(tag)).thenReturn(
+			new LevelVisibility(
+				OutputDetails.DISABLED,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+			)
 		);
 
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
-		assertThat(backend.getLevelVisibility("foo")).isEnabledFor(Level.INFO);
+		LevelVisibility visibility = backend.getLevelVisibility(tag);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION);
 	}
 
 	/**

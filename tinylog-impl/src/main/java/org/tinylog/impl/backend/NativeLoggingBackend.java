@@ -9,6 +9,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
@@ -57,11 +58,11 @@ public class NativeLoggingBackend implements LoggingBackend {
 		}
 
 		return new LevelVisibility(
-			configuration.getWriters(tag, Level.TRACE).getAllWriters().size() > 0,
-			configuration.getWriters(tag, Level.DEBUG).getAllWriters().size() > 0,
-			configuration.getWriters(tag, Level.INFO).getAllWriters().size() > 0,
-			configuration.getWriters(tag, Level.WARN).getAllWriters().size() > 0,
-			configuration.getWriters(tag, Level.ERROR).getAllWriters().size() > 0
+			getOutputDetails(tag, Level.TRACE),
+			getOutputDetails(tag, Level.DEBUG),
+			getOutputDetails(tag, Level.INFO),
+			getOutputDetails(tag, Level.WARN),
+			getOutputDetails(tag, Level.ERROR)
 		);
 	}
 
@@ -108,6 +109,30 @@ public class NativeLoggingBackend implements LoggingBackend {
 			for (AsyncWriter writer : repository.getAsyncWriters()) {
 				writingThread.enqueue(writer, logEntry);
 			}
+		}
+	}
+
+	/**
+	 * Gets the configured output details for the passed tag and severity level.
+	 *
+	 * @param tag The category tag
+	 * @param level The severity level
+	 * @return The configured output details
+	 */
+	private OutputDetails getOutputDetails(String tag, Level level) {
+		WriterRepository repository = configuration.getWriters(tag, level);
+		if (repository.getAllWriters().isEmpty()) {
+			return OutputDetails.DISABLED;
+		}
+
+		Set<LogEntryValue> values = repository.getRequiredLogEntryValues();
+		if (values.contains(LogEntryValue.FILE) || values.contains(LogEntryValue.METHOD)
+			|| values.contains(LogEntryValue.LINE)) {
+			return OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION;
+		} else if (values.contains(LogEntryValue.CLASS)) {
+			return OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME;
+		} else {
+			return OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION;
 		}
 	}
 

@@ -13,7 +13,13 @@ public class NopLoggingBackend implements LoggingBackend {
 
 	private static final ContextStorage STORAGE = new NopContextStorage();
 
-	private static final LevelVisibility VISIBILITY = new LevelVisibility(false, false, false, false, false);
+	private static final LevelVisibility VISIBILITY = new LevelVisibility(
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED
+	);
 
 	/** */
 	public NopLoggingBackend() {

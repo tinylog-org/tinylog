@@ -7,6 +7,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.RuntimeFlavor;
@@ -73,7 +74,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void trace(Throwable ex, String message) {
-		if (state.visibility.isTraceEnabled()) {
+		if (state.visibility.getTrace() != OutputDetails.DISABLED) {
 			log(Level.TRACE, ex, message, null);
 		}
 	}
@@ -86,7 +87,7 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void trace(Throwable ex, String message, Object... arguments) {
-		if (state.visibility.isTraceEnabled()) {
+		if (state.visibility.getTrace() != OutputDetails.DISABLED) {
 			log(Level.TRACE, ex, message, arguments);
 		}
 	}
@@ -98,7 +99,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void debug(Throwable ex, String message) {
-		if (state.visibility.isDebugEnabled()) {
+		if (state.visibility.getDebug() != OutputDetails.DISABLED) {
 			log(Level.DEBUG, ex, message, null);
 		}
 	}
@@ -111,7 +112,7 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void debug(Throwable ex, String message, Object... arguments) {
-		if (state.visibility.isDebugEnabled()) {
+		if (state.visibility.getDebug() != OutputDetails.DISABLED) {
 			log(Level.DEBUG, ex, message, arguments);
 		}
 	}
@@ -123,7 +124,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void info(Throwable ex, String message) {
-		if (state.visibility.isInfoEnabled()) {
+		if (state.visibility.getInfo() != OutputDetails.DISABLED) {
 			log(Level.INFO, ex, message, null);
 		}
 	}
@@ -136,7 +137,7 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void info(Throwable ex, String message, Object... arguments) {
-		if (state.visibility.isInfoEnabled()) {
+		if (state.visibility.getInfo() != OutputDetails.DISABLED) {
 			log(Level.INFO, ex, message, arguments);
 		}
 	}
@@ -148,7 +149,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void warn(Throwable ex, String message) {
-		if (state.visibility.isWarnEnabled()) {
+		if (state.visibility.getWarn() != OutputDetails.DISABLED) {
 			log(Level.WARN, ex, message, null);
 		}
 	}
@@ -161,7 +162,7 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void warn(Throwable ex, String message, Object... arguments) {
-		if (state.visibility.isWarnEnabled()) {
+		if (state.visibility.getWarn() != OutputDetails.DISABLED) {
 			log(Level.WARN, ex, message, arguments);
 		}
 	}
@@ -173,7 +174,7 @@ public final class InternalLogger {
 	 * @param message Human-readable text message
 	 */
 	public static void error(Throwable ex, String message) {
-		if (state.visibility.isErrorEnabled()) {
+		if (state.visibility.getError() != OutputDetails.DISABLED) {
 			log(Level.ERROR, ex, message, null);
 		}
 	}
@@ -186,7 +187,7 @@ public final class InternalLogger {
 	 * @param arguments Argument values for placeholders in the text message
 	 */
 	public static void error(Throwable ex, String message, Object... arguments) {
-		if (state.visibility.isErrorEnabled()) {
+		if (state.visibility.getError() != OutputDetails.DISABLED) {
 			log(Level.ERROR, ex, message, arguments);
 		}
 	}
@@ -238,7 +239,13 @@ public final class InternalLogger {
 			this.formatter = formatter;
 
 			if (backend == null) {
-				visibility = new LevelVisibility(true, true, true, true, true);
+				visibility = new LevelVisibility(
+					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
+				);
 			} else {
 				visibility = backend.getLevelVisibility(TAG);
 			}

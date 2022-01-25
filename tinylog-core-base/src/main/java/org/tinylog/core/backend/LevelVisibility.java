@@ -1,80 +1,75 @@
 package org.tinylog.core.backend;
 
 /**
- *  Visibility of all severity levels.
+ *  Output requirement details of all severity levels.
  */
 public final class LevelVisibility {
 
-	private final boolean traceEnabled;
-	private final boolean debugEnabled;
-	private final boolean infoEnabled;
-	private final boolean warnEnabled;
-	private final boolean errorEnabled;
+	private final OutputDetails trace;
+	private final OutputDetails debug;
+	private final OutputDetails info;
+	private final OutputDetails warn;
+	private final OutputDetails error;
 
 	/**
-	 * @param traceEnabled {@code true} if trace log entries can be output, {@code false} if completely deactivated
-	 * @param debugEnabled {@code true} if debug log entries can be output, {@code false} if completely deactivated
-	 * @param infoEnabled {@code true} if info log entries can be output, {@code false} if completely deactivated
-	 * @param warnEnabled {@code true} if warn log entries can be output, {@code false} if completely deactivated
-	 * @param errorEnabled {@code true} if error log entries can be output, {@code false} if completely deactivated
+	 * @param trace Output requirement details for trace log entries
+	 * @param debug Output requirement details for debug log entries
+	 * @param info Output requirement details for info log entries
+	 * @param warn Output requirement details for warn log entries
+	 * @param error Output requirement details for error log entries
 	 */
-	public LevelVisibility(boolean traceEnabled, boolean debugEnabled, boolean infoEnabled, boolean warnEnabled,
-			boolean errorEnabled) {
-		this.traceEnabled = traceEnabled;
-		this.debugEnabled = debugEnabled;
-		this.infoEnabled = infoEnabled;
-		this.warnEnabled = warnEnabled;
-		this.errorEnabled = errorEnabled;
+	public LevelVisibility(OutputDetails trace, OutputDetails debug, OutputDetails info, OutputDetails warn,
+			OutputDetails error) {
+		this.trace = trace;
+		this.debug = debug;
+		this.info = info;
+		this.warn = warn;
+		this.error = error;
 	}
 
 	/**
-	 * Retrieves whether trace log entries can be output.
+	 * Gets the output requirement details for trace log entries.
 	 *
-	 * @return {@code true} if trace log entries can be output, {@code false} if this severity level is completely
-	 *         deactivated
+	 * @return Output requirement details for trace log entries
 	 */
-	public boolean isTraceEnabled() {
-		return traceEnabled;
+	public OutputDetails getTrace() {
+		return trace;
 	}
 
 	/**
-	 * Retrieves whether debug log entries can be output.
+	 * Gets the output requirement details for debug log entries.
 	 *
-	 * @return {@code true} if debug log entries can be output, {@code false} if this severity level is completely
-	 *         deactivated
+	 * @return Output requirement details for debug log entries
 	 */
-	public boolean isDebugEnabled() {
-		return debugEnabled;
+	public OutputDetails getDebug() {
+		return debug;
 	}
 
 	/**
-	 * Retrieves whether info log entries can be output.
+	 * Gets the output requirement details for info log entries.
 	 *
-	 * @return {@code true} if info log entries can be output, {@code false} if this severity level is completely
-	 *         deactivated
+	 * @return Output requirement details for info log entries
 	 */
-	public boolean isInfoEnabled() {
-		return infoEnabled;
+	public OutputDetails getInfo() {
+		return info;
 	}
 
 	/**
-	 * Retrieves whether warn log entries can be output.
+	 * Gets the output requirement details for warn log entries.
 	 *
-	 * @return {@code true} if warn log entries can be output, {@code false} if this severity level is completely
-	 *         deactivated
+	 * @return Output requirement details for warn log entries
 	 */
-	public boolean isWarnEnabled() {
-		return warnEnabled;
+	public OutputDetails getWarn() {
+		return warn;
 	}
 
 	/**
-	 * Retrieves whether error log entries can be output.
+	 * Gets the output requirement details for error log entries.
 	 *
-	 * @return {@code true} if error log entries can be output, {@code false} if this severity level is completely
-	 *         deactivated
+	 * @return Output requirement details for error log entries
 	 */
-	public boolean isErrorEnabled() {
-		return errorEnabled;
+	public OutputDetails getError() {
+		return error;
 	}
 
 }

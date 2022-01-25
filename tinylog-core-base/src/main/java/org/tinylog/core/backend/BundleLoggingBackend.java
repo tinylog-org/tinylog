@@ -16,7 +16,13 @@ import org.tinylog.core.runtime.StackTraceLocation;
  */
 public class BundleLoggingBackend implements LoggingBackend {
 
-	private static final LevelVisibility INVISIBLE = new LevelVisibility(false, false, false, false, false);
+	private static final LevelVisibility INVISIBLE = new LevelVisibility(
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED,
+		OutputDetails.DISABLED
+	);
 
 	private final List<LoggingBackend> backends;
 	private final ContextStorage storage;
@@ -43,7 +49,6 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	@SuppressWarnings("EI_EXPOSE_REP")
 	public ContextStorage getContextStorage() {
 		return storage;
 	}
@@ -53,11 +58,11 @@ public class BundleLoggingBackend implements LoggingBackend {
 		return backends.stream()
 			.map(backend -> backend.getLevelVisibility(tag))
 			.reduce((first, second) -> new LevelVisibility(
-				first.isTraceEnabled() || second.isTraceEnabled(),
-				first.isDebugEnabled() || second.isDebugEnabled(),
-				first.isInfoEnabled() || second.isInfoEnabled(),
-				first.isWarnEnabled() || second.isWarnEnabled(),
-				first.isErrorEnabled() || second.isErrorEnabled()
+				max(first.getTrace(), second.getTrace()),
+				max(first.getDebug(), second.getDebug()),
+				max(first.getInfo(), second.getInfo()),
+				max(first.getWarn(), second.getWarn()),
+				max(first.getError(), second.getError())
 			))
 			.orElse(INVISIBLE);
 	}
@@ -81,6 +86,17 @@ public class BundleLoggingBackend implements LoggingBackend {
 		for (LoggingBackend backend : backends) {
 			backend.log(childLocation, tag, level, throwable, message, arguments, formatter);
 		}
+	}
+
+	/**
+	 * Gets the most detailed output details of two candidates.
+	 *
+	 * @param first The first output details candidate
+	 * @param second The second output details candidate
+	 * @return The most detailed output details of both candidates
+	 */
+	private OutputDetails max(OutputDetails first, OutputDetails second) {
+		return first.ordinal() >= second.ordinal() ? first : second;
 	}
 
 }

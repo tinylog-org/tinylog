@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.StackTraceLocation;
@@ -34,11 +35,16 @@ class CaptureLoggingBackend implements LoggingBackend {
 	@Override
 	public LevelVisibility getLevelVisibility(String tag) {
 		return new LevelVisibility(
-			Level.TRACE.isAtLeastAsSevereAs(visibleLevel),
-			Level.DEBUG.isAtLeastAsSevereAs(visibleLevel),
-			Level.INFO.isAtLeastAsSevereAs(visibleLevel),
-			Level.WARN.isAtLeastAsSevereAs(visibleLevel),
+			Level.TRACE.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.DEBUG.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.INFO.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.WARN.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
 			Level.ERROR.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED
 		);
 	}
 

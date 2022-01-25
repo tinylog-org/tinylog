@@ -14,6 +14,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
@@ -79,96 +80,171 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isTraceEnabled()} method.
 		 *
-		 * @param visible The value for {@link LevelVisibility#isTraceEnabled()}
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param outputDetails The value for {@link LevelVisibility#getTrace()}
 		 */
 		@ParameterizedTest
-		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
-		void isTraceEnabled(boolean visible, boolean enabled) {
+		@CsvSource({
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		})
+		void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(backend.getLevelVisibility("test")).thenReturn(
-				new LevelVisibility(visible, false, false, false, false)
+				new LevelVisibility(
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			);
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
-			assertThat(logger.isTraceEnabled()).isEqualTo(visible && enabled);
+			assertThat(logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
 
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isDebugEnabled()} method.
 		 *
-		 * @param visible The value for {@link LevelVisibility#isDebugEnabled()}
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param outputDetails The value for {@link LevelVisibility#getDebug()}
 		 */
 		@ParameterizedTest
-		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
-		void isDebugEnabled(boolean visible, boolean enabled) {
+		@CsvSource({
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		})
+		void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(backend.getLevelVisibility("test")).thenReturn(
-				new LevelVisibility(true, visible, false, false, false)
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			);
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
-			assertThat(logger.isDebugEnabled()).isEqualTo(visible && enabled);
+			assertThat(logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
 
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isInfoEnabled()} method.
 		 *
-		 * @param visible The value for {@link LevelVisibility#isInfoEnabled()}
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param outputDetails The value for {@link LevelVisibility#getInfo()}
 		 */
 		@ParameterizedTest
-		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
-		void isInfoEnabled(boolean visible, boolean enabled) {
+		@CsvSource({
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		})
+		void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(backend.getLevelVisibility("test")).thenReturn(
-				new LevelVisibility(true, true, visible, false, false)
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			);
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
-			assertThat(logger.isInfoEnabled()).isEqualTo(visible && enabled);
+			assertThat(logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
 
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isWarnEnabled()} method.
 		 *
-		 * @param visible The value for {@link LevelVisibility#isWarnEnabled()}
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param outputDetails The value for {@link LevelVisibility#getWarn()}
 		 */
 		@ParameterizedTest
-		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
-		void isWarnEnabled(boolean visible, boolean enabled) {
+		@CsvSource({
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		})
+		void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(backend.getLevelVisibility("test")).thenReturn(
-				new LevelVisibility(true, true, true, visible, false)
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED
+				)
 			);
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
-			assertThat(logger.isWarnEnabled()).isEqualTo(visible && enabled);
+			assertThat(logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
 
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isErrorEnabled()} method.
 		 *
-		 * @param visible The value for {@link LevelVisibility#isErrorEnabled()}
 		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param outputDetails The value for {@link LevelVisibility#getError()}
 		 */
 		@ParameterizedTest
-		@CsvSource({"false,false", "false,true", "true,false", "true,true"})
-		void isErrorEnabled(boolean visible, boolean enabled) {
+		@CsvSource({
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		})
+		void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(backend.getLevelVisibility("test")).thenReturn(
-				new LevelVisibility(true, true, true, true, visible)
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails
+				)
 			);
 
 			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
-			assertThat(logger.isErrorEnabled()).isEqualTo(visible && enabled);
+			assertThat(logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
 
 	}

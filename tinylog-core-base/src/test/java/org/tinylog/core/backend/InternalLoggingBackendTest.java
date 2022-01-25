@@ -16,7 +16,6 @@ import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.tinylog.core.test.InternalAssertions.assertThat;
 
 @CaptureSystemOutput
 class InternalLoggingBackendTest {
@@ -41,17 +40,39 @@ class InternalLoggingBackendTest {
 	@Test
 	void untaggedVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
-		assertThat(visibility).isEnabledFor(Level.OFF);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
 	}
 
 	/**
-	 * Verifies that only the severity levels WARN and ERROR are enabled in the precalculated level visibility object
-	 * for internal tinylog log entries.
+	 * Verifies that all severity levels are disabled in the precalculated level visibility object for log entries with
+	 * another tag than "tinylog".
+	 */
+	@Test
+	void unknownTaggedVisibility() {
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("foo");
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+	}
+
+	/**
+	 * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
+	 * information) in the precalculated level visibility object for internal tinylog log entries.
 	 */
 	@Test
 	void tinylogVisibility() {
 		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
-		assertThat(visibility).isEnabledFor(Level.WARN);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
 	}
 
 	/**

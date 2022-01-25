@@ -16,6 +16,7 @@ import org.tinylog.core.Framework
 import org.tinylog.core.Level
 import org.tinylog.core.backend.LevelVisibility
 import org.tinylog.core.backend.LoggingBackend
+import org.tinylog.core.backend.OutputDetails
 import org.tinylog.core.test.log.CaptureLogEntries
 import org.tinylog.core.test.log.Log
 import org.tinylog.core.test.log.LogEntry
@@ -69,96 +70,171 @@ internal class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the [TaggedLogger.isTraceEnabled] method.
 		 *
-		 * @param visible The value for [LevelVisibility.isTraceEnabled]
 		 * @param enabled The value for [LoggingBackend.isEnabled]
+		 * @param outputDetails The value for [LevelVisibility.getTrace]
 		 */
 		@ParameterizedTest
-		@CsvSource("false,false", "false,true", "true,false", "true,true")
-		fun isTraceEnabled(visible: Boolean, enabled: Boolean) {
+		@CsvSource(
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		)
+		fun isTraceEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(backend.getLevelVisibility("test")).thenReturn(
-				LevelVisibility(visible, false, false, false, false)
+				LevelVisibility(
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			)
-
+	
 			whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled)
 
 			val logger = TaggedLogger("test", framework)
-			assertThat(logger.isTraceEnabled()).isEqualTo(visible && enabled)
+			assertThat(logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
 		}
 
 		/**
 		 * Verifies the results of the [TaggedLogger.isDebugEnabled] method.
 		 *
-		 * @param visible The value for [LevelVisibility.isDebugEnabled]
 		 * @param enabled The value for [LoggingBackend.isEnabled]
+		 * @param outputDetails The value for [LevelVisibility.getDebug]
 		 */
 		@ParameterizedTest
-		@CsvSource("false,false", "false,true", "true,false", "true,true")
-		fun isDebugEnabled(visible: Boolean, enabled: Boolean) {
+		@CsvSource(
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		)
+		fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(backend.getLevelVisibility("test")).thenReturn(
-				LevelVisibility(true, visible, false, false, false)
+				LevelVisibility(
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			)
 
 			whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled)
 
 			val logger = TaggedLogger("test", framework)
-			assertThat(logger.isDebugEnabled()).isEqualTo(visible && enabled)
+			assertThat(logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
 		}
 
 		/**
 		 * Verifies the results of the [TaggedLogger.isInfoEnabled] method.
 		 *
-		 * @param visible The value for [LevelVisibility.isInfoEnabled]
 		 * @param enabled The value for [LoggingBackend.isEnabled]
+		 * @param outputDetails The value for [LevelVisibility.getInfo]
 		 */
 		@ParameterizedTest
-		@CsvSource("false,false", "false,true", "true,false", "true,true")
-		fun isInfoEnabled(visible: Boolean, enabled: Boolean) {
+		@CsvSource(
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		)
+		fun isInfoEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(backend.getLevelVisibility("test")).thenReturn(
-				LevelVisibility(true, true, visible, false, false)
+				LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
 			)
 
 			whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled)
 
 			val logger = TaggedLogger("test", framework)
-			assertThat(logger.isInfoEnabled()).isEqualTo(visible && enabled)
+			assertThat(logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
 		}
 
 		/**
 		 * Verifies the results of the [TaggedLogger.isWarnEnabled] method.
 		 *
-		 * @param visible The value for [LevelVisibility.isWarnEnabled]
 		 * @param enabled The value for [LoggingBackend.isEnabled]
+		 * @param outputDetails The value for [LevelVisibility.getWarn]
 		 */
 		@ParameterizedTest
-		@CsvSource("false,false", "false,true", "true,false", "true,true")
-		fun isWarnEnabled(visible: Boolean, enabled: Boolean) {
+		@CsvSource(
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		)
+		fun isWarnEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(backend.getLevelVisibility("test")).thenReturn(
-				LevelVisibility(true, true, true, visible, false)
+				LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails,
+					OutputDetails.DISABLED
+				)
 			)
 
 			whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled)
 
 			val logger = TaggedLogger("test", framework)
-			assertThat(logger.isWarnEnabled()).isEqualTo(visible && enabled)
+			assertThat(logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
 		}
 
 		/**
 		 * Verifies the results of the [TaggedLogger.isErrorEnabled] method.
 		 *
-		 * @param visible The value for [LevelVisibility.isErrorEnabled]
 		 * @param enabled The value for [LoggingBackend.isEnabled]
+		 * @param outputDetails The value for [LevelVisibility.getError]
 		 */
 		@ParameterizedTest
-		@CsvSource("false,false", "false,true", "true,false", "true,true")
-		fun isErrorEnabled(visible: Boolean, enabled: Boolean) {
+		@CsvSource(
+			"false, DISABLED                              ",
+			"true , DISABLED                              ",
+			"false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
+			"false, ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"true , ENABLED_WITH_CALLER_CLASS_NAME        ",
+			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
+			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+		)
+		fun isErrorEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(backend.getLevelVisibility("test")).thenReturn(
-				LevelVisibility(true, true, true, true, visible)
+				LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					outputDetails
+				)
 			)
 
 			whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled)
 
 			val logger = TaggedLogger("test", framework)
-			assertThat(logger.isErrorEnabled()).isEqualTo(visible && enabled)
+			assertThat(logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
 		}
 	}
 
