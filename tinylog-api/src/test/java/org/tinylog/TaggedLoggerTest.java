@@ -222,7 +222,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.TRACE)
 			@Test
-			void traceMessageObject() {
+			void traceObjectMessage() {
 				logger.trace(42);
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.TRACE, null, "42"));
@@ -338,7 +338,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
-			void debugMessageObject() {
+			void debugObjectMessage() {
 				logger.debug(42);
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.DEBUG, null, "42"));
@@ -454,7 +454,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.INFO)
 			@Test
-			void infoMessageObject() {
+			void infoObjectMessage() {
 				logger.info(42);
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.INFO, null, "42"));
@@ -570,7 +570,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.WARN)
 			@Test
-			void warnMessageObject() {
+			void warnObjectMessage() {
 				logger.warn(42);
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.WARN, null, "42"));
@@ -686,7 +686,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.ERROR)
 			@Test
-			void errorMessageObject() {
+			void errorObjectMessage() {
 				logger.error(42);
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.ERROR, null, "42"));
@@ -822,7 +822,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
-			void traceMessageObject() {
+			void traceObjectMessage() {
 				logger.trace(42);
 				assertThat(log.consume()).isEmpty();
 			}
@@ -930,7 +930,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.INFO)
 			@Test
-			void debugMessageObject() {
+			void debugObjectMessage() {
 				logger.debug(42);
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1038,7 +1038,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.WARN)
 			@Test
-			void infoMessageObject() {
+			void infoObjectMessage() {
 				logger.info(42);
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1146,7 +1146,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.ERROR)
 			@Test
-			void warnMessageObject() {
+			void warnObjectMessage() {
 				logger.warn(42);
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1254,7 +1254,7 @@ class TaggedLoggerTest {
 			 */
 			@CaptureLogEntries(level = Level.OFF)
 			@Test
-			void errorMessageObject() {
+			void errorObjectMessage() {
 				logger.error(42);
 				assertThat(log.consume()).isEmpty();
 			}
