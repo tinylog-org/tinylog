@@ -93,6 +93,8 @@ jobs:
             - uses: reactivecircus/android-emulator-runner@v2
               with:
                   api-level: ${{ matrix.api-level }}
+                  arch: x86_64
+                  target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
                   working-directory: ./tinylog-android-tests
                   script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
             - uses: codecov/codecov-action@v1
