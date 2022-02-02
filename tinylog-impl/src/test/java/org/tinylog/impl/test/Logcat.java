@@ -36,7 +36,7 @@ public final class Logcat {
 	 * @throws IOException Failed to read output of logcat
 	 */
 	public List<String> fetchOutput() throws IOException {
-		Process process = Runtime.getRuntime().exec("logcat -d");
+		Process process = Runtime.getRuntime().exec("logcat -d -v threadtime");
 		try (InputStream stream = process.getInputStream()) {
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
 				return reader.lines()
