@@ -18,8 +18,6 @@ import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
-import org.tinylog.core.runtime.JavaIndexBasedStackTraceLocation;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -133,7 +131,7 @@ class LoggerTest {
 		/**
 		 * Verifies the results of the {@link Logger#isTraceEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getTrace()}
 		 */
 		@ParameterizedTest
@@ -157,7 +155,7 @@ class LoggerTest {
 		/**
 		 * Verifies the results of the {@link Logger#isDebugEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getDebug()}
 		 */
 		@ParameterizedTest
@@ -181,7 +179,7 @@ class LoggerTest {
 		/**
 		 * Verifies the results of the {@link Logger#isInfoEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getInfo()}
 		 */
 		@ParameterizedTest
@@ -205,7 +203,7 @@ class LoggerTest {
 		/**
 		 * Verifies the results of the {@link Logger#isWarnEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getWarn()}
 		 */
 		@ParameterizedTest
@@ -229,7 +227,7 @@ class LoggerTest {
 		/**
 		 * Verifies the results of the {@link Logger#isErrorEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getError()}
 		 */
 		@ParameterizedTest
@@ -269,7 +267,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceTextMessage() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.trace("Hello World!");
 
@@ -281,7 +279,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceMessageObject() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.trace(42);
 
@@ -293,7 +291,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceLazyMessage() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Hello World!";
 				Logger.trace(supplier);
@@ -306,7 +304,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceFormattedMessageWithArgument() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.trace("Hello {}!", "Alice");
 
@@ -318,7 +316,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceFormattedMessageWithLazyArgument() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Alice";
 				Logger.trace("Hello {}!", supplier);
@@ -331,7 +329,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceException() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.trace(exception);
@@ -344,7 +342,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceExceptionAndTextMessage() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.trace(exception, "Oops!");
@@ -357,7 +355,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceExceptionAndLazyMessage() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Oops!";
@@ -371,7 +369,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceExceptionAndFormattedMessageWithArgument() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.trace(exception, "Hello {}!", "Alice");
@@ -385,7 +383,7 @@ class LoggerTest {
 			 */
 			@Test
 			void traceExceptionAndFormattedMessageWithLazyArgument() {
-				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Alice";
@@ -399,7 +397,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugTextMessage() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.debug("Hello World!");
 
@@ -411,7 +409,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugMessageObject() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.debug(42);
 
@@ -423,7 +421,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugLazyMessage() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Hello World!";
 				Logger.debug(supplier);
@@ -436,7 +434,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugFormattedMessageWithArgument() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.debug("Hello {}!", "Alice");
 
@@ -448,7 +446,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugFormattedMessageWithLazyArgument() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Alice";
 				Logger.debug("Hello {}!", supplier);
@@ -461,7 +459,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugException() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.debug(exception);
@@ -474,7 +472,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugExceptionAndTextMessage() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.debug(exception, "Oops!");
@@ -487,7 +485,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugExceptionAndLazyMessage() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Oops!";
@@ -501,7 +499,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugExceptionAndFormattedMessageWithArgument() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.debug(exception, "Hello {}!", "Alice");
@@ -515,7 +513,7 @@ class LoggerTest {
 			 */
 			@Test
 			void debugExceptionAndFormattedMessageWithLazyArgument() {
-				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Alice";
@@ -529,7 +527,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoTextMessage() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.info("Hello World!");
 
@@ -541,7 +539,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoMessageObject() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.info(42);
 
@@ -553,7 +551,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoLazyMessage() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Hello World!";
 				Logger.info(supplier);
@@ -566,7 +564,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoFormattedMessageWithArgument() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.info("Hello {}!", "Alice");
 
@@ -578,7 +576,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoFormattedMessageWithLazyArgument() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Alice";
 				Logger.info("Hello {}!", supplier);
@@ -591,7 +589,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoException() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.info(exception);
@@ -604,7 +602,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoExceptionAndTextMessage() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.info(exception, "Oops!");
@@ -617,7 +615,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoExceptionAndLazyMessage() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Oops!";
@@ -631,7 +629,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoExceptionAndFormattedMessageWithArgument() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.info(exception, "Hello {}!", "Alice");
@@ -645,7 +643,7 @@ class LoggerTest {
 			 */
 			@Test
 			void infoExceptionAndFormattedMessageWithLazyArgument() {
-				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Alice";
@@ -659,7 +657,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnTextMessage() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.warn("Hello World!");
 
@@ -671,7 +669,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnMessageObject() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.warn(42);
 
@@ -683,7 +681,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnLazyMessage() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Hello World!";
 				Logger.warn(supplier);
@@ -696,7 +694,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnFormattedMessageWithArgument() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.warn("Hello {}!", "Alice");
 
@@ -708,7 +706,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnFormattedMessageWithLazyArgument() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Alice";
 				Logger.warn("Hello {}!", supplier);
@@ -721,7 +719,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnException() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.warn(exception);
@@ -734,7 +732,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnExceptionAndTextMessage() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.warn(exception, "Oops!");
@@ -747,7 +745,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnExceptionAndLazyMessage() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Oops!";
@@ -761,7 +759,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnExceptionAndFormattedMessageWithArgument() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.warn(exception, "Hello {}!", "Alice");
@@ -775,7 +773,7 @@ class LoggerTest {
 			 */
 			@Test
 			void warnExceptionAndFormattedMessageWithLazyArgument() {
-				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Alice";
@@ -789,7 +787,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorTextMessage() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.error("Hello World!");
 
@@ -801,7 +799,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorMessageObject() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.error(42);
 
@@ -813,7 +811,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorLazyMessage() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Hello World!";
 				Logger.error(supplier);
@@ -826,7 +824,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorFormattedMessageWithArgument() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Logger.error("Hello {}!", "Alice");
 
@@ -838,7 +836,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorFormattedMessageWithLazyArgument() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Supplier<String> supplier = () -> "Alice";
 				Logger.error("Hello {}!", supplier);
@@ -851,7 +849,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorException() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.error(exception);
@@ -864,7 +862,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorExceptionAndTextMessage() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.error(exception, "Oops!");
@@ -877,7 +875,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorExceptionAndLazyMessage() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Oops!";
@@ -891,7 +889,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorExceptionAndFormattedMessageWithArgument() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Logger.error(exception, "Hello {}!", "Alice");
@@ -905,7 +903,7 @@ class LoggerTest {
 			 */
 			@Test
 			void errorExceptionAndFormattedMessageWithLazyArgument() {
-				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+				when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
 				Exception exception = new Exception();
 				Supplier<String> supplier = () -> "Alice";
@@ -926,7 +924,7 @@ class LoggerTest {
 				verify(backend, atMostOnce()).getLevelVisibility(null);
 
 				verify(backend).log(
-					isA(JavaIndexBasedStackTraceLocation.class),
+					eq(Enabled.class),
 					isNull(),
 					same(level),
 					same(exception),

@@ -1,5 +1,7 @@
 package org.tinylog.core.backend;
 
+import org.tinylog.core.Level;
+
 /**
  *  Output requirement details of all severity levels.
  */
@@ -70,6 +72,30 @@ public final class LevelVisibility {
 	 */
 	public OutputDetails getError() {
 		return error;
+	}
+
+	/**
+	 * Gets the output requirement details for log entries with the passed severity level.
+	 *
+	 * @param level The severity level
+	 * @return Output requirement details for log entries with the passed severity level
+	 * @throws IllegalArgumentException This exception will be thrown for the severity level {@link Level#OFF}
+	 */
+	public OutputDetails get(Level level) {
+		switch (level) {
+			case ERROR:
+				return getError();
+			case WARN:
+				return getWarn();
+			case INFO:
+				return getInfo();
+			case DEBUG:
+				return getDebug();
+			case TRACE:
+				return getTrace();
+			default:
+				throw new IllegalArgumentException("Illegal severity level: " + level);
+		}
 	}
 
 }

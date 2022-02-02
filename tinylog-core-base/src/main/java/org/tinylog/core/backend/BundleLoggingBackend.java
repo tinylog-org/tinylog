@@ -9,7 +9,6 @@ import org.tinylog.core.Level;
 import org.tinylog.core.context.BundleContextStorage;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
  * Wrapper for bundling multiple {@link LoggingBackend} instances.
@@ -68,10 +67,9 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
-		StackTraceLocation childLocation = location.push();
+	public boolean isEnabled(Object location, String tag, Level level) {
 		for (LoggingBackend backend : backends) {
-			if (backend.isEnabled(childLocation, tag, level)) {
+			if (backend.isEnabled(location, tag, level)) {
 				return true;
 			}
 		}
@@ -80,11 +78,10 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
-			Object[] arguments, MessageFormatter formatter) {
-		StackTraceLocation childLocation = location.push();
+	public void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
+			MessageFormatter formatter) {
 		for (LoggingBackend backend : backends) {
-			backend.log(childLocation, tag, level, throwable, message, arguments, formatter);
+			backend.log(location, tag, level, throwable, message, arguments, formatter);
 		}
 	}
 

@@ -10,12 +10,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 import com.google.common.collect.ImmutableMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.any;
@@ -98,8 +96,8 @@ class BundleLoggingBackendTest {
 	}
 
 	/**
-	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code false}, if
-	 * all logging is disabled for all child logging backends.
+	 * Verifies that {@link NopLoggingBackend#isEnabled(Object, String, Level)} returns {@code false}, if logging
+	 * is disabled for all child logging backends.
 	 */
 	@Test
 	void allDisabled() {
@@ -109,18 +107,16 @@ class BundleLoggingBackendTest {
 		LoggingBackend second = mock(LoggingBackend.class);
 		when(second.isEnabled(any(), any(), any())).thenReturn(false);
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
-		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isFalse();
+		assertThat(parent.isEnabled("org.tinylog.Foo", "TEST", Level.INFO)).isFalse();
 
-		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
-		verify(second).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(first).isEnabled(eq("org.tinylog.Foo"), eq("TEST"), eq(Level.INFO));
+		verify(second).isEnabled(eq("org.tinylog.Foo"), eq("TEST"), eq(Level.INFO));
 	}
 
 	/**
-	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code true}, if
-	 * all logging is enabled for at least one child logging backend.
+	 * Verifies that {@link NopLoggingBackend#isEnabled(Object, String, Level)} returns {@code true}, if logging
+	 * is enabled for at least one child logging backend.
 	 */
 	@Test
 	void partlyEnabled() {
@@ -130,18 +126,16 @@ class BundleLoggingBackendTest {
 		LoggingBackend second = mock(LoggingBackend.class);
 		when(second.isEnabled(any(), any(), any())).thenReturn(true);
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
-		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isTrue();
+		assertThat(parent.isEnabled("org.tinylog.Foo", "TEST", Level.INFO)).isTrue();
 
-		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
-		verify(second).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(first).isEnabled(eq("org.tinylog.Foo"), eq("TEST"), eq(Level.INFO));
+		verify(second).isEnabled(eq("org.tinylog.Foo"), eq("TEST"), eq(Level.INFO));
 	}
 
 	/**
-	 * Verifies that {@link NopLoggingBackend#isEnabled(StackTraceLocation, String, Level)} returns {@code true}, if
-	 * all logging is enabled for all child logging backends.
+	 * Verifies that {@link NopLoggingBackend#isEnabled(Object, String, Level)} returns {@code true}, if logging
+	 * is enabled for all child logging backends.
 	 */
 	@Test
 	void allEnabled() {
@@ -151,12 +145,10 @@ class BundleLoggingBackendTest {
 		LoggingBackend second = mock(LoggingBackend.class);
 		when(second.isEnabled(any(), any(), any())).thenReturn(true);
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-
 		BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
-		assertThat(parent.isEnabled(location, "TEST", Level.INFO)).isTrue();
+		assertThat(parent.isEnabled("org.tinylog.Foo", "TEST", Level.INFO)).isTrue();
 
-		verify(first).isEnabled(not(same(location)), eq("TEST"), eq(Level.INFO));
+		verify(first).isEnabled(eq("org.tinylog.Foo"), eq("TEST"), eq(Level.INFO));
 		verify(second, never()).isEnabled(any(), any(), any());
 	}
 
@@ -169,14 +161,13 @@ class BundleLoggingBackendTest {
 		LoggingBackend second = mock(LoggingBackend.class);
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
 		Throwable throwable = new Throwable();
 		Object[] arguments = {"world"};
 		MessageFormatter formatter = mock(MessageFormatter.class);
-		backend.log(location, "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
+		backend.log("org.tinylog.Foo", "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
 
 		verify(first).log(
-			not(same(location)),
+			eq("org.tinylog.Foo"),
 			eq("TEST"),
 			eq(Level.INFO),
 			same(throwable),
@@ -186,7 +177,7 @@ class BundleLoggingBackendTest {
 		);
 
 		verify(second).log(
-			not(same(location)),
+			eq("org.tinylog.Foo"),
 			eq("TEST"),
 			eq(Level.INFO),
 			same(throwable),
@@ -194,8 +185,6 @@ class BundleLoggingBackendTest {
 			same(arguments),
 			same(formatter)
 		);
-
-		verify(location).push();
 	}
 
 }

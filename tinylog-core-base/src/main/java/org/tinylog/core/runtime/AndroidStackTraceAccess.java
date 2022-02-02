@@ -7,25 +7,27 @@ import java.lang.invoke.MethodHandle;
  */
 class AndroidStackTraceAccess extends BaseStackTraceAccess {
 
-	private static final int STACK_TRACE_SIZE = 32;
-
-	private int offset = -1;
+	private static final int STACK_TRACE_DEPTH = 4;
 
 	/** */
 	AndroidStackTraceAccess() {
 	}
 
 	/**
-	 * Gets the offset in filled stack traces to the caller.
+	 * Creates a method handle for {@code dalvik.system.VMStack.getStackClass2()}.
 	 *
-	 * <p>
-	 *     The method {@link #AndroidStackTraceAccess()} must be called at least once before getting a valid offset.
-	 * </p>
-	 *
-	 * @return The offset to the caller
+	 * @return Valid getter instance if the method is available, otherwise {@code null}
 	 */
-	int getOffset() {
-		return offset;
+	MethodHandle getCallerClassGetter() {
+		FailableCheck<MethodHandle> check = new FailableCheck<MethodHandle>() {
+			@Override
+			public boolean test(MethodHandle handle) throws Throwable {
+				Class<?> caller = (Class<?>) handle.invoke();
+				return BaseStackTraceAccess.class.equals(caller);
+			}
+		};
+
+		return getMethod(check, "dalvik.system.VMStack", "getStackClass2");
 	}
 
 	/**
@@ -34,18 +36,15 @@ class AndroidStackTraceAccess extends BaseStackTraceAccess {
 	 * @return Valid filler instance if the method is available, otherwise {@code null}
 	 */
 	MethodHandle getStackTraceElementsFiller() {
-		FailableCheck<MethodHandle> check = handle -> {
-			StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_SIZE];
-			int count = (Integer) handle.invoke(Thread.currentThread(), trace);
-			for (int i = 0; i < count; ++i) {
-				StackTraceElement element = trace[i];
-				if (element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
-					&& element.getMethodName().contains("getStackTraceElementsFiller")) {
-					offset = i;
-					return true;
-				}
+		FailableCheck<MethodHandle> check = new FailableCheck<MethodHandle>() {
+			@Override
+			public boolean test(MethodHandle handle) throws Throwable {
+				StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_DEPTH + 1];
+				handle.invoke(Thread.currentThread(), trace);
+				StackTraceElement element = trace[STACK_TRACE_DEPTH];
+				return element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
+						&& element.getMethodName().contains("getStackTraceElementsFiller");
 			}
-			return false;
 		};
 
 		return getMethod(check, "dalvik.system.VMStack", "fillStackTraceElements", Thread.class,

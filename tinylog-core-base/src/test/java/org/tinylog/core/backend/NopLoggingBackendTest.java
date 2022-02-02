@@ -7,10 +7,8 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.mock;
 
 class NopLoggingBackendTest {
 
@@ -50,7 +48,7 @@ class NopLoggingBackendTest {
 	@EnumSource(Level.class)
 	void allLevelsDisabled(Level level) {
 		NopLoggingBackend backend = new NopLoggingBackend();
-		assertThat(backend.isEnabled(mock(StackTraceLocation.class), null, level)).isFalse();
+		assertThat(backend.isEnabled(null, null, level)).isFalse();
 	}
 
 	/**
@@ -59,7 +57,7 @@ class NopLoggingBackendTest {
 	@Test
 	void acceptLogEntries() {
 		new NopLoggingBackend().log(
-			mock(StackTraceLocation.class), null, Level.TRACE, null, "Hello world!", null, null
+			null, null, Level.TRACE, null, "Hello world!", null, null
 		);
 	}
 

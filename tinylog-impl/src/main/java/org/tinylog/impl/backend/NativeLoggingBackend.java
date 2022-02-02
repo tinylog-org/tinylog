@@ -13,7 +13,6 @@ import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.WritingThread;
@@ -25,6 +24,13 @@ import org.tinylog.impl.writers.Writer;
  * Native logging backend for tinylog.
  */
 public class NativeLoggingBackend implements LoggingBackend {
+
+	private static final StackTraceElement EMPTY_STACK_TRACE_ELEMENT = new StackTraceElement(
+		"<unknown>",
+		"<unknown>",
+		null,
+		-1
+	);
 
 	private final Framework framework;
 	private final ContextStorage contextStorage;
@@ -67,26 +73,26 @@ public class NativeLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+	public boolean isEnabled(Object location, String tag, Level level) {
 		if (tag == null) {
 			tag = LevelConfiguration.UNTAGGED_PLACEHOLDER;
 		}
 
-		Level effectiveLevel = getLevelConfiguration(location.push()).getLevel(tag);
+		Level effectiveLevel = getLevelConfiguration(location).getLevel(tag);
 		return level.isAtLeastAsSevereAs(effectiveLevel);
 	}
 
 	@Override
-	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
-					Object[] arguments, MessageFormatter formatter) {
+	public void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
+			MessageFormatter formatter) {
 		String internalTag = tag == null ? LevelConfiguration.UNTAGGED_PLACEHOLDER : tag;
-		Level effectiveLevel = getLevelConfiguration(location.push()).getLevel(internalTag);
+		Level effectiveLevel = getLevelConfiguration(location).getLevel(internalTag);
 
 		if (level.isAtLeastAsSevereAs(effectiveLevel)) {
 			WriterRepository repository = configuration.getWriters(internalTag, level);
 
 			LogEntry logEntry = createLogEntry(
-				location.push(),
+				location,
 				tag,
 				level,
 				throwable,
@@ -143,16 +149,26 @@ public class NativeLoggingBackend implements LoggingBackend {
 	 *     The level configuration can depend on the actual package or class name.
 	 * </p>
 	 *
-	 * @param location The stack trace location of the caller
+	 * @param location The location information of the caller
 	 * @return The assigned level configuration
 	 */
-	private LevelConfiguration getLevelConfiguration(StackTraceLocation location) {
-		Map<String, LevelConfiguration> severityLevels = configuration.getSeverityLevels();
+	private LevelConfiguration getLevelConfiguration(Object location) {
+		String caller;
+		if (location instanceof StackTraceElement) {
+			caller = ((StackTraceElement) location).getClassName();
+		} else if (location instanceof Class) {
+			caller = ((Class<?>) location).getName();
+		} else if (location instanceof String) {
+			caller = (String) location;
+		} else {
+			caller = "";
+		}
 
+		Map<String, LevelConfiguration> severityLevels = configuration.getSeverityLevels();
 		if (severityLevels.size() == 1) {
 			return severityLevels.get("");
 		} else {
-			String packageOrClass = location.getCallerClassName();
+			String packageOrClass = caller;
 			while (true) {
 				LevelConfiguration levelConfiguration = severityLevels.get(packageOrClass);
 				if (levelConfiguration == null) {
@@ -191,7 +207,7 @@ public class NativeLoggingBackend implements LoggingBackend {
 	/**
 	 * Creates a log entry.
 	 *
-	 * @param location The stack trace location of the caller
+	 * @param location The location information of the caller
 	 * @param tag The assigned tag
 	 * @param level The severity level
 	 * @param throwable The logged exception or any other kind of throwable
@@ -201,51 +217,38 @@ public class NativeLoggingBackend implements LoggingBackend {
 	 * @param logEntryValues Only log entry values in this set have to be filled with real data
 	 * @return The created log entry
 	 */
-	private LogEntry createLogEntry(StackTraceLocation location, String tag, Level level, Throwable throwable,
-									Object message, Object[] arguments, MessageFormatter formatter,
-									Set<LogEntryValue> logEntryValues) {
-		StackTraceElement stackTraceElement = null;
-		String className = null;
-
-		if (logEntryValues.contains(LogEntryValue.METHOD)
-			|| logEntryValues.contains(LogEntryValue.FILE)
-			|| logEntryValues.contains(LogEntryValue.LINE)) {
-			stackTraceElement = location.getCallerStackTraceElement();
-		} else if (logEntryValues.contains(LogEntryValue.CLASS)) {
-			className = location.getCallerClassName();
+	private LogEntry createLogEntry(Object location, String tag, Level level, Throwable throwable, Object message,
+			Object[] arguments, MessageFormatter formatter, Set<LogEntryValue> logEntryValues) {
+		StackTraceElement stackTraceElement;
+		if (location instanceof StackTraceElement) {
+			stackTraceElement = (StackTraceElement) location;
+		} else if (location instanceof Class) {
+			stackTraceElement = new StackTraceElement(
+				((Class<?>) location).getName(),
+				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
+				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
+				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
+			);
+		} else if (location instanceof String) {
+			stackTraceElement = new StackTraceElement(
+				(String) location,
+				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
+				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
+				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
+			);
+		} else {
+			stackTraceElement = EMPTY_STACK_TRACE_ELEMENT;
 		}
 
-		return createLogEntry(
-			stackTraceElement, className, tag, level, throwable, message, arguments, formatter, logEntryValues
-		);
-	}
-
-	/**
-	 * Creates a log entry.
-	 *
-	 * @param stackTraceElement The stack trace element of the caller
-	 * @param className The class name of the caller
-	 * @param tag The assigned tag
-	 * @param level The severity level
-	 * @param throwable The logged exception or any other kind of throwable
-	 * @param message The logged text message
-	 * @param arguments The argument values for all placeholders in the text message
-	 * @param formatter The message formatter for replacing placeholder with the provided arguments
-	 * @param logEntryValues Only log entry values in this set have to be filled with real data
-	 * @return The created log entry
-	 */
-	private LogEntry createLogEntry(StackTraceElement stackTraceElement, String className, String tag, Level level,
-									Throwable throwable, Object message, Object[] arguments, MessageFormatter formatter,
-									Set<LogEntryValue> logEntryValues) {
 		return new LogEntry(
 			logEntryValues.contains(LogEntryValue.TIMESTAMP) ? Instant.now() : null,
 			logEntryValues.contains(LogEntryValue.UPTIME) ? framework.getRuntime().getUptime() : null,
 			logEntryValues.contains(LogEntryValue.THREAD) ? Thread.currentThread() : null,
 			contextStorage.getMapping(),
-			stackTraceElement == null ? className : stackTraceElement.getClassName(),
-			stackTraceElement == null ? null : stackTraceElement.getMethodName(),
-			stackTraceElement == null ? null : stackTraceElement.getFileName(),
-			stackTraceElement == null ? -1 : stackTraceElement.getLineNumber(),
+			stackTraceElement.getClassName(),
+			stackTraceElement.getMethodName(),
+			stackTraceElement.getFileName(),
+			stackTraceElement.getLineNumber(),
 			tag,
 			level,
 			formatter == null

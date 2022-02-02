@@ -13,14 +13,11 @@ import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
  * Static logger for issuing log entries.
  */
 public final class Logger {
-
-	private static final int CALLER_STACK_TRACE_DEPTH = 2;
 
 	private static final Framework framework = Tinylog.getFramework();
 	private static final RuntimeFlavor runtime = framework.getRuntime();
@@ -68,8 +65,9 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isTraceEnabled() {
-		return visibility.getTrace() != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.TRACE);
+		OutputDetails outputDetails = visibility.getTrace();
+		return outputDetails != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.TRACE);
 	}
 
 	/**
@@ -88,9 +86,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void trace(Object message) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, null, message, null, null);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, null, message, null, null);
 		}
 	}
 
@@ -111,9 +110,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void trace(Supplier<?> message) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, null, message, null, null);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, null, message, null, null);
 		}
 	}
 
@@ -135,9 +135,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void trace(String message, Object... arguments) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
 
@@ -160,9 +161,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void trace(String message, Supplier<?>... arguments) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
 
@@ -177,9 +179,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void trace(Throwable exception) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, exception, null, null, null);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, exception, null, null, null);
 		}
 	}
 
@@ -196,9 +199,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void trace(Throwable exception, String message) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, exception, message, null, null);
 		}
 	}
 
@@ -220,9 +224,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void trace(Throwable exception, Supplier<String> message) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, exception, message, null, null);
 		}
 	}
 
@@ -246,9 +251,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void trace(Throwable exception, String message, Object... arguments) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
 
@@ -273,9 +279,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void trace(Throwable exception, String message, Supplier<?>... arguments) {
-		if (visibility.getTrace() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.TRACE, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getTrace();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
 
@@ -290,8 +297,9 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isDebugEnabled() {
-		return visibility.getDebug() != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.DEBUG);
+		OutputDetails outputDetails = visibility.getDebug();
+		return outputDetails != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.DEBUG);
 	}
 
 	/**
@@ -310,9 +318,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void debug(Object message) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, null, message, null, null);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, null, message, null, null);
 		}
 	}
 
@@ -333,9 +342,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void debug(Supplier<?> message) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, null, message, null, null);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, null, message, null, null);
 		}
 	}
 
@@ -357,9 +367,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void debug(String message, Object... arguments) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
 
@@ -382,9 +393,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void debug(String message, Supplier<?>... arguments) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
 
@@ -399,9 +411,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void debug(Throwable exception) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, exception, null, null, null);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, exception, null, null, null);
 		}
 	}
 
@@ -418,9 +431,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void debug(Throwable exception, String message) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, exception, message, null, null);
 		}
 	}
 
@@ -442,9 +456,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void debug(Throwable exception, Supplier<String> message) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, exception, message, null, null);
 		}
 	}
 
@@ -468,9 +483,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void debug(Throwable exception, String message, Object... arguments) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
 
@@ -495,9 +511,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void debug(Throwable exception, String message, Supplier<?>... arguments) {
-		if (visibility.getDebug() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.DEBUG, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getDebug();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
 
@@ -512,8 +529,9 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isInfoEnabled() {
-		return visibility.getInfo() != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.INFO);
+		OutputDetails outputDetails = visibility.getInfo();
+		return outputDetails != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.INFO);
 	}
 
 	/**
@@ -532,9 +550,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void info(Object message) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, null, message, null, null);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, null, message, null, null);
 		}
 	}
 
@@ -555,9 +574,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void info(Supplier<?> message) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, null, message, null, null);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, null, message, null, null);
 		}
 	}
 
@@ -579,9 +599,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void info(String message, Object... arguments) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, null, message, arguments, formatter);
 		}
 	}
 
@@ -604,9 +625,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void info(String message, Supplier<?>... arguments) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, null, message, arguments, formatter);
 		}
 	}
 
@@ -621,9 +643,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void info(Throwable exception) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, exception, null, null, null);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, exception, null, null, null);
 		}
 	}
 
@@ -640,9 +663,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void info(Throwable exception, String message) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, exception, message, null, null);
 		}
 	}
 
@@ -664,9 +688,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void info(Throwable exception, Supplier<String> message) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, exception, message, null, null);
 		}
 	}
 
@@ -690,9 +715,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void info(Throwable exception, String message, Object... arguments) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
 
@@ -717,9 +743,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void info(Throwable exception, String message, Supplier<?>... arguments) {
-		if (visibility.getInfo() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.INFO, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getInfo();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
 
@@ -734,8 +761,9 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isWarnEnabled() {
-		return visibility.getWarn() != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.WARN);
+		OutputDetails outputDetails = visibility.getWarn();
+		return outputDetails != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.WARN);
 	}
 
 	/**
@@ -754,9 +782,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void warn(Object message) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, null, message, null, null);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, null, message, null, null);
 		}
 	}
 
@@ -777,9 +806,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void warn(Supplier<?> message) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, null, message, null, null);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, null, message, null, null);
 		}
 	}
 
@@ -801,9 +831,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void warn(String message, Object... arguments) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, null, message, arguments, formatter);
 		}
 	}
 
@@ -826,9 +857,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void warn(String message, Supplier<?>... arguments) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, null, message, arguments, formatter);
 		}
 	}
 
@@ -843,9 +875,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void warn(Throwable exception) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, exception, null, null, null);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, exception, null, null, null);
 		}
 	}
 
@@ -862,9 +895,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void warn(Throwable exception, String message) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, exception, message, null, null);
 		}
 	}
 
@@ -886,9 +920,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void warn(Throwable exception, Supplier<String> message) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, exception, message, null, null);
 		}
 	}
 
@@ -912,9 +947,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void warn(Throwable exception, String message, Object... arguments) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
 
@@ -939,9 +975,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void warn(Throwable exception, String message, Supplier<?>... arguments) {
-		if (visibility.getWarn() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.WARN, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getWarn();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
 
@@ -956,8 +993,9 @@ public final class Logger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public static boolean isErrorEnabled() {
-		return visibility.getError() != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), null, Level.ERROR);
+		OutputDetails outputDetails = visibility.getError();
+		return outputDetails != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.ERROR);
 	}
 
 	/**
@@ -976,9 +1014,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void error(Object message) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, null, message, null, null);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, null, message, null, null);
 		}
 	}
 
@@ -999,9 +1038,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void error(Supplier<?> message) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, null, message, null, null);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, null, message, null, null);
 		}
 	}
 
@@ -1023,9 +1063,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void error(String message, Object... arguments) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
 
@@ -1048,9 +1089,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void error(String message, Supplier<?>... arguments) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, null, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
 
@@ -1065,9 +1107,10 @@ public final class Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public static void error(Throwable exception) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, exception, null, null, null);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, exception, null, null, null);
 		}
 	}
 
@@ -1084,9 +1127,10 @@ public final class Logger {
 	 * @param message The message to log
 	 */
 	public static void error(Throwable exception, String message) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, exception, message, null, null);
 		}
 	}
 
@@ -1108,9 +1152,10 @@ public final class Logger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public static void error(Throwable exception, Supplier<String> message) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, exception, message, null, null);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, exception, message, null, null);
 		}
 	}
 
@@ -1134,9 +1179,10 @@ public final class Logger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public static void error(Throwable exception, String message, Object... arguments) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}
 
@@ -1161,9 +1207,10 @@ public final class Logger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public static void error(Throwable exception, String message, Supplier<?>... arguments) {
-		if (visibility.getError() != OutputDetails.DISABLED) {
-			StackTraceLocation location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH);
-			backend.log(location, null, Level.ERROR, exception, message, arguments, formatter);
+		OutputDetails outputDetails = visibility.getError();
+		if (outputDetails != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+			backend.log(location.get(), null, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}
 

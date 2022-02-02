@@ -11,7 +11,6 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
-import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.impl.writers.console.ConsoleWriter;
 import org.tinylog.impl.writers.file.FileWriter;
 
@@ -42,9 +41,8 @@ class NativeLoggingBackendBuilderTest {
 				LoggingBackend backend = framework.getLoggingBackend();
 				assertThat(backend).isInstanceOf(NativeLoggingBackend.class);
 
-				StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-				backend.log(location.push(), null, Level.DEBUG, null, "Hello World!", null, null);
-				backend.log(location.push(), null, Level.INFO, null, "Hello World!", null, null);
+				backend.log(null, null, Level.DEBUG, null, "Hello World!", null, null);
+				backend.log(null, null, Level.INFO, null, "Hello World!", null, null);
 			} finally {
 				framework.shutDown();
 			}
@@ -76,9 +74,8 @@ class NativeLoggingBackendBuilderTest {
 				LoggingBackend backend = framework.getLoggingBackend();
 				assertThat(backend).isInstanceOf(NativeLoggingBackend.class);
 
-				StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-				backend.log(location.push(), null, Level.DEBUG, null, "Hello World!", null, null);
-				backend.log(location.push(), null, Level.INFO, null, "Hello World!", null, null);
+				backend.log(null, null, Level.DEBUG, null, "Hello World!", null, null);
+				backend.log(null, null, Level.INFO, null, "Hello World!", null, null);
 			} finally {
 				framework.shutDown();
 			}

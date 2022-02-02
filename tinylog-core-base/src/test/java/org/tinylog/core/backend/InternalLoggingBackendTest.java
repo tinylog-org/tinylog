@@ -10,12 +10,10 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
-import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.system.CaptureSystemOutput;
 import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @CaptureSystemOutput
 class InternalLoggingBackendTest {
@@ -84,7 +82,7 @@ class InternalLoggingBackendTest {
 	@EnumSource(Level.class)
 	void untaggedLogEntriesDisabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(mock(StackTraceLocation.class), null, level)).isFalse();
+		assertThat(backend.isEnabled(null, null, level)).isFalse();
 	}
 
 	/**
@@ -96,7 +94,7 @@ class InternalLoggingBackendTest {
 	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
 	void tinylogLogEntriesDisabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isFalse();
+		assertThat(backend.isEnabled(null, "tinylog", level)).isFalse();
 	}
 
 	/**
@@ -108,7 +106,7 @@ class InternalLoggingBackendTest {
 	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
 	void tinylogLogEntriesEnabled(Level level) {
 		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(mock(StackTraceLocation.class), "tinylog", level)).isTrue();
+		assertThat(backend.isEnabled(null, "tinylog", level)).isTrue();
 	}
 
 	/**

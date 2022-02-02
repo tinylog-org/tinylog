@@ -11,6 +11,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AndroidStackTraceAccessTest {
 
 	/**
+	 * Verifies that {@code dalvik.system.VMStack.getStackClass2()} is available on Android.
+	 */
+	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	@Test
+	void getCallClassAvailable() throws Throwable {
+		AndroidStackTraceAccess access = new AndroidStackTraceAccess();
+		MethodHandle getCallerClass = access.getCallerClassGetter();
+		assertThat(getCallerClass).isNotNull();
+
+		Callee callee = getCallerClass::invoke;
+		assertThat(callee.execute()).isEqualTo(AndroidStackTraceAccessTest.class);
+	}
+
+	/**
+	 * Verifies that {@code dalvik.system.VMStack.getStackClass2()} is not available on standard Java.
+	 */
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	@Test
+	void getCallerClassUnavailable() {
+		assertThat(new AndroidStackTraceAccess().getCallerClassGetter()).isNull();
+	}
+
+	/**
 	 * Verifies that {@code dalvik.system.VMStack.fillStackTraceElements(Thread, StackTraceElement[])} is available on
 	 * Android.
 	 */
@@ -21,13 +44,13 @@ class AndroidStackTraceAccessTest {
 		MethodHandle fillStackTraceElements = access.getStackTraceElementsFiller();
 		assertThat(fillStackTraceElements).isNotNull();
 
-		StackTraceElement[] trace = new StackTraceElement[access.getOffset() + 1];
+		StackTraceElement[] trace = new StackTraceElement[2];
 		fillStackTraceElements.invoke(Thread.currentThread(), trace);
-		assertThat(trace[trace.length - 1]).isEqualTo(new StackTraceElement(
+		assertThat(trace[1]).isEqualTo(new StackTraceElement(
 			AndroidStackTraceAccessTest.class.getName(),
 			"fillStackTraceElementsAvailable",
 			AndroidStackTraceAccessTest.class.getSimpleName() + ".java",
-			25
+			48
 		));
 	}
 
@@ -39,6 +62,22 @@ class AndroidStackTraceAccessTest {
 	@Test
 	void fillStackTraceElementsUnavailable() {
 		assertThat(new AndroidStackTraceAccess().getStackTraceElementsFiller()).isNull();
+	}
+
+	/**
+	 * Functional interface for simulating a callee.
+	 */
+	@FunctionalInterface
+	private interface Callee {
+
+		/**
+		 * Executes the callee.
+		 *
+		 * @return The produced result
+		 * @throws Throwable Failed to execute the implemented code
+		 */
+		Object execute() throws Throwable;
+
 	}
 
 }

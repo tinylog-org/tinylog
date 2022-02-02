@@ -31,7 +31,6 @@ import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -54,7 +53,6 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -143,17 +141,11 @@ class NativeLoggingBackendTest {
 			.writers(Level.INFO, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-
-		assertThat(backend.isEnabled(location.push(), null, Level.TRACE)).isFalse();
-		assertThat(backend.isEnabled(location.push(), null, Level.DEBUG)).isFalse();
-		assertThat(backend.isEnabled(location.push(), null, Level.INFO)).isTrue();
-		assertThat(backend.isEnabled(location.push(), null, Level.WARN)).isTrue();
-		assertThat(backend.isEnabled(location.push(), null, Level.ERROR)).isTrue();
-
-		verify(location, never()).getCallerClassName();
-		verify(location, never()).getCallerStackTraceElement();
+		assertThat(backend.isEnabled(null, null, Level.TRACE)).isFalse();
+		assertThat(backend.isEnabled(null, null, Level.DEBUG)).isFalse();
+		assertThat(backend.isEnabled(null, null, Level.INFO)).isTrue();
+		assertThat(backend.isEnabled(null, null, Level.WARN)).isTrue();
+		assertThat(backend.isEnabled(null, null, Level.ERROR)).isTrue();
 	}
 
 	/**
@@ -188,34 +180,48 @@ class NativeLoggingBackendTest {
 			.writers(Level.DEBUG, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerClassName()).thenReturn(className);
-
-		assertThat(backend.isEnabled(location.push(), null, Level.TRACE)).isEqualTo(traceEnabled);
-		assertThat(backend.isEnabled(location.push(), null, Level.DEBUG)).isEqualTo(debugEnabled);
-		assertThat(backend.isEnabled(location.push(), null, Level.INFO)).isEqualTo(infoEnabled);
-		assertThat(backend.isEnabled(location.push(), null, Level.WARN)).isEqualTo(warnEnabled);
-		assertThat(backend.isEnabled(location.push(), null, Level.ERROR)).isEqualTo(errorEnabled);
+		assertThat(backend.isEnabled(className, null, Level.TRACE)).isEqualTo(traceEnabled);
+		assertThat(backend.isEnabled(className, null, Level.DEBUG)).isEqualTo(debugEnabled);
+		assertThat(backend.isEnabled(className, null, Level.INFO)).isEqualTo(infoEnabled);
+		assertThat(backend.isEnabled(className, null, Level.WARN)).isEqualTo(warnEnabled);
+		assertThat(backend.isEnabled(className, null, Level.ERROR)).isEqualTo(errorEnabled);
 	}
 
 	/**
-	 * Verifies that the enabled state can be correctly determined for a real (not mocked) stack trace location.
+	 * Verifies that the enabled state can be correctly determined for a {@link Class}.
 	 */
 	@Test
-	void isEnabledForActualStackTrace() {
+	void isEnabledForClass() {
 		NativeLoggingBackend backend = new Builder()
 			.rootLevel(Level.OFF)
 			.customLevel(NativeLoggingBackendTest.class.getName(), Level.INFO)
 			.writers(Level.INFO, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		assertThat(backend.isEnabled(location.push(), null, Level.TRACE)).isFalse();
-		assertThat(backend.isEnabled(location.push(), null, Level.DEBUG)).isFalse();
-		assertThat(backend.isEnabled(location.push(), null, Level.INFO)).isTrue();
-		assertThat(backend.isEnabled(location.push(), null, Level.WARN)).isTrue();
-		assertThat(backend.isEnabled(location.push(), null, Level.ERROR)).isTrue();
+		assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.TRACE)).isFalse();
+		assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.DEBUG)).isFalse();
+		assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.INFO)).isTrue();
+		assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.WARN)).isTrue();
+		assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.ERROR)).isTrue();
+	}
+
+	/**
+	 * Verifies that the enabled state can be correctly determined for a {@link StackTraceElement}.
+	 */
+	@Test
+	void isEnabledForStackTraceElement() {
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.OFF)
+			.customLevel(NativeLoggingBackendTest.class.getName(), Level.INFO)
+			.writers(Level.INFO, writer)
+			.create();
+
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		assertThat(backend.isEnabled(stackTraceElement, null, Level.TRACE)).isFalse();
+		assertThat(backend.isEnabled(stackTraceElement, null, Level.DEBUG)).isFalse();
+		assertThat(backend.isEnabled(stackTraceElement, null, Level.INFO)).isTrue();
+		assertThat(backend.isEnabled(stackTraceElement, null, Level.WARN)).isTrue();
+		assertThat(backend.isEnabled(stackTraceElement, null, Level.ERROR)).isTrue();
 	}
 
 	/**
@@ -230,9 +236,9 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
 		Instant minTimestamp = Instant.now();
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 		Instant maxTimestamp = Instant.now();
 
 		verify(writer).log(logEntryCaptor.capture());
@@ -251,9 +257,9 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
 		Duration minUptime = framework.getRuntime().getUptime();
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 		Duration maxUptime = framework.getRuntime().getUptime();
 
 		verify(writer).log(logEntryCaptor.capture());
@@ -272,8 +278,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getThread()).isSameAs(Thread.currentThread());
@@ -292,8 +298,8 @@ class NativeLoggingBackendTest {
 			.create();
 
 		backend.getContextStorage().put("foo", "bar");
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 		backend.getContextStorage().clear();
 
 		verify(writer).log(logEntryCaptor.capture());
@@ -312,10 +318,7 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerClassName()).thenReturn("Foo");
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		backend.log("Foo", null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getClassName()).isEqualTo("Foo");
@@ -333,11 +336,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerStackTraceElement())
-			.thenReturn(new StackTraceElement("Foo", "bar", "Foo.java", 42));
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMethodName()).isEqualTo("bar");
@@ -355,11 +355,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerStackTraceElement())
-			.thenReturn(new StackTraceElement("Foo", "bar", "Foo.java", 42));
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getFileName()).isEqualTo("Foo.java");
@@ -377,11 +374,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerStackTraceElement())
-			.thenReturn(new StackTraceElement("Bar", "foo", "Bar.java", 42));
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getLineNumber()).isEqualTo(42);
@@ -399,8 +393,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), "foo", Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, "foo", Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getTag()).isEqualTo("foo");
@@ -418,8 +412,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(Level.INFO);
@@ -437,8 +431,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, "Hello World!", null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
@@ -456,9 +450,9 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
 		backend.log(
-			location.push(),
+			stackTraceElement,
 			null,
 			Level.INFO,
 			null,
@@ -483,8 +477,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, 42, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, 42, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("42");
@@ -502,9 +496,9 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
 		Exception exception = new Exception();
-		backend.log(location.push(), null, Level.INFO, exception, null, null, null);
+		backend.log(stackTraceElement, null, Level.INFO, exception, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getException()).isSameAs(exception);
@@ -532,12 +526,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.DEBUG, writer)
 			.create();
 
-		StackTraceLocation location = mock(StackTraceLocation.class);
-		when(location.push()).thenReturn(location);
-		when(location.getCallerClassName()).thenReturn(className);
-
-		backend.log(location.push(), null, disabledLevel, null, null, null, null);
-		backend.log(location.push(), null, enabledLevel, null, null, null, null);
+		backend.log(className, null, disabledLevel, null, null, null, null);
+		backend.log(className, null, enabledLevel, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(enabledLevel);
@@ -556,9 +546,9 @@ class NativeLoggingBackendTest {
 			.writers(Level.INFO, writer)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.DEBUG, null, null, null, null);
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.DEBUG, null, null, null, null);
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(Level.INFO);
@@ -576,8 +566,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.TRACE, asyncWriter)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, null, null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
 		Thread.currentThread().join(100);
 
@@ -603,8 +593,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.INFO, writer, otherWriter)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), null, Level.INFO, null, "Hello World!", null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
@@ -636,8 +626,8 @@ class NativeLoggingBackendTest {
 			.writers(Level.INFO, writer, otherWriter)
 			.create();
 
-		StackTraceLocation location = framework.getRuntime().getStackTraceLocationAtIndex(0);
-		backend.log(location.push(), "tinylog", Level.WARN, null, "Hello tinylog!", null, null);
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(stackTraceElement, "tinylog", Level.WARN, null, "Hello tinylog!", null, null);
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello tinylog!");

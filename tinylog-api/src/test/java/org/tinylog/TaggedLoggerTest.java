@@ -15,7 +15,6 @@ import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
-import org.tinylog.core.runtime.StackTraceLocation;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.log.LogEntry;
@@ -80,7 +79,7 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isTraceEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getTrace()}
 		 */
 		@ParameterizedTest
@@ -114,7 +113,7 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isDebugEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getDebug()}
 		 */
 		@ParameterizedTest
@@ -148,7 +147,7 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isInfoEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getInfo()}
 		 */
 		@ParameterizedTest
@@ -182,7 +181,7 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isWarnEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getWarn()}
 		 */
 		@ParameterizedTest
@@ -216,7 +215,7 @@ class TaggedLoggerTest {
 		/**
 		 * Verifies the results of the {@link TaggedLogger#isErrorEnabled()} method.
 		 *
-		 * @param enabled The value for {@link LoggingBackend#isEnabled(StackTraceLocation, String, Level)}
+		 * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
 		 * @param outputDetails The value for {@link LevelVisibility#getError()}
 		 */
 		@ParameterizedTest

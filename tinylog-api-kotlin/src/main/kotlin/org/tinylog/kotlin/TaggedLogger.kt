@@ -12,10 +12,6 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter
  * @param framework The actual framework instance
  */
 class TaggedLogger(val tag: String?, framework: Framework) {
-	companion object {
-		private const val CALLER_STACK_TRACE_DEPTH = 2
-	}
-
 	private var runtime = framework.runtime
 	private var backend = framework.loggingBackend
 	private var visibility = backend.getLevelVisibility(tag)
@@ -30,8 +26,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @return `true` if enabled, otherwise `false`
 	 */
 	fun isTraceEnabled(): Boolean {
-		return visibility.trace != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.TRACE)
+		val outputDetails = visibility.trace
+		return outputDetails != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.TRACE)
 	}
 
 	/**
@@ -47,9 +44,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun trace(message: Any?) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, null, message, null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, null, message, null, null)
 		}
 	}
 
@@ -63,9 +61,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun trace(message: String) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, null, message, null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, null, message, null, null)
 		}
 	}
 
@@ -83,9 +82,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun trace(message: () -> Any?) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, null, message.asSupplier(), null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, null, message.asSupplier(), null, null)
 		}
 	}
 
@@ -108,9 +108,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun trace(message: String, vararg arguments: Any?) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, null, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -124,9 +125,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	fun trace(exception: Throwable) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, exception, null, null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, exception, null, null, null)
 		}
 	}
 
@@ -142,9 +144,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun trace(exception: Throwable, message: String) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, exception, message, null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, exception, message, null, null)
 		}
 	}
 
@@ -163,9 +166,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun trace(exception: Throwable, message: () -> String) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, exception, message.asSupplier(), null, null)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, exception, message.asSupplier(), null, null)
 		}
 	}
 
@@ -190,9 +194,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun trace(exception: Throwable, message: String?, vararg arguments: Any?) {
-		if (visibility.trace != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.TRACE, exception, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.trace
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.TRACE, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -205,8 +210,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @return `true` if enabled, otherwise `false`
 	 */
 	fun isDebugEnabled(): Boolean {
-		return visibility.debug != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.DEBUG)
+		val outputDetails = visibility.debug
+		return outputDetails != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.DEBUG)
 	}
 
 	/**
@@ -222,9 +228,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun debug(message: Any?) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, null, message, null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, null, message, null, null)
 		}
 	}
 
@@ -238,9 +245,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun debug(message: String) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, null, message, null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, null, message, null, null)
 		}
 	}
 
@@ -258,9 +266,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun debug(message: () -> Any?) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, null, message.asSupplier(), null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, null, message.asSupplier(), null, null)
 		}
 	}
 
@@ -283,9 +292,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun debug(message: String, vararg arguments: Any?) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, null, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -299,9 +309,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	fun debug(exception: Throwable) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, exception, null, null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, exception, null, null, null)
 		}
 	}
 
@@ -317,9 +328,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun debug(exception: Throwable, message: String) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, exception, message, null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, exception, message, null, null)
 		}
 	}
 
@@ -338,9 +350,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun debug(exception: Throwable, message: () -> String) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, exception, message.asSupplier(), null, null)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, exception, message.asSupplier(), null, null)
 		}
 	}
 
@@ -365,9 +378,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun debug(exception: Throwable, message: String?, vararg arguments: Any?) {
-		if (visibility.debug != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.DEBUG, exception, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.debug
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.DEBUG, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -380,8 +394,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @return `true` if enabled, otherwise `false`
 	 */
 	fun isInfoEnabled(): Boolean {
-		return visibility.info != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.INFO)
+		val outputDetails = visibility.info
+		return outputDetails != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.INFO)
 	}
 
 	/**
@@ -397,9 +412,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun info(message: Any?) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, null, message, null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, null, message, null, null)
 		}
 	}
 
@@ -413,9 +429,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun info(message: String) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, null, message, null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, null, message, null, null)
 		}
 	}
 
@@ -433,9 +450,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun info(message: () -> Any?) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, null, message.asSupplier(), null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, null, message.asSupplier(), null, null)
 		}
 	}
 
@@ -458,9 +476,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun info(message: String, vararg arguments: Any?) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, null, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -474,9 +493,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	fun info(exception: Throwable) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, exception, null, null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, exception, null, null, null)
 		}
 	}
 
@@ -492,9 +512,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun info(exception: Throwable, message: String) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, exception, message, null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, exception, message, null, null)
 		}
 	}
 
@@ -513,9 +534,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun info(exception: Throwable, message: () -> String) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, exception, message.asSupplier(), null, null)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, exception, message.asSupplier(), null, null)
 		}
 	}
 
@@ -540,9 +562,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun info(exception: Throwable, message: String?, vararg arguments: Any?) {
-		if (visibility.info != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.INFO, exception, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.info
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.INFO, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -555,8 +578,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @return `true` if enabled, otherwise `false`
 	 */
 	fun isWarnEnabled(): Boolean {
-		return visibility.warn != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.WARN)
+		val outputDetails = visibility.warn
+		return outputDetails != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.WARN)
 	}
 
 	/**
@@ -572,9 +596,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun warn(message: Any?) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, null, message, null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, null, message, null, null)
 		}
 	}
 
@@ -588,9 +613,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun warn(message: String) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, null, message, null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, null, message, null, null)
 		}
 	}
 
@@ -608,9 +634,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun warn(message: () -> Any?) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, null, message.asSupplier(), null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, null, message.asSupplier(), null, null)
 		}
 	}
 
@@ -633,9 +660,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun warn(message: String, vararg arguments: Any?) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, null, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -649,9 +677,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	fun warn(exception: Throwable) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, exception, null, null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, exception, null, null, null)
 		}
 	}
 
@@ -667,9 +696,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun warn(exception: Throwable, message: String) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, exception, message, null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, exception, message, null, null)
 		}
 	}
 
@@ -688,9 +718,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun warn(exception: Throwable, message: () -> String) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, exception, message.asSupplier(), null, null)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, exception, message.asSupplier(), null, null)
 		}
 	}
 
@@ -715,9 +746,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun warn(exception: Throwable, message: String?, vararg arguments: Any?) {
-		if (visibility.warn != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.WARN, exception, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.warn
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.WARN, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -730,8 +762,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @return `true` if enabled, otherwise `false`
 	 */
 	fun isErrorEnabled(): Boolean {
-		return visibility.error != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH), tag, Level.ERROR)
+		val outputDetails = visibility.error
+		return outputDetails != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.ERROR)
 	}
 
 	/**
@@ -747,9 +780,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun error(message: Any?) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, null, message, null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, null, message, null, null)
 		}
 	}
 
@@ -763,9 +797,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun error(message: String) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, null, message, null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, null, message, null, null)
 		}
 	}
 
@@ -783,9 +818,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun error(message: () -> Any?) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, null, message.asSupplier(), null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, null, message.asSupplier(), null, null)
 		}
 	}
 
@@ -808,9 +844,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun error(message: String, vararg arguments: Any?) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, null, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
 
@@ -824,9 +861,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	fun error(exception: Throwable) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, exception, null, null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, exception, null, null, null)
 		}
 	}
 
@@ -842,9 +880,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The message to log
 	 */
 	fun error(exception: Throwable, message: String) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, exception, message, null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, exception, message, null, null)
 		}
 	}
 
@@ -863,9 +902,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	fun error(exception: Throwable, message: () -> String) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, exception, message.asSupplier(), null, null)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, exception, message.asSupplier(), null, null)
 		}
 	}
 
@@ -890,9 +930,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
 	fun error(exception: Throwable, message: String?, vararg arguments: Any?) {
-		if (visibility.error != OutputDetails.DISABLED) {
-			val location = runtime.getStackTraceLocationAtIndex(CALLER_STACK_TRACE_DEPTH)
-			backend.log(location, tag, Level.ERROR, exception, message, arguments.withSuppliers(), formatter)
+		val outputDetails = visibility.error
+		if (outputDetails != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(outputDetails)
+			backend.log(location.get(), tag, Level.ERROR, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
 }

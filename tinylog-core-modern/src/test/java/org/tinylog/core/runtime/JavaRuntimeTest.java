@@ -1,9 +1,19 @@
 package org.tinylog.core.runtime;
 
 import java.time.Duration;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.tinylog.core.Level;
+import org.tinylog.core.backend.OutputDetails;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,39 +45,174 @@ class JavaRuntimeTest {
 	}
 
 	/**
-	 * Verifies that a valid stack location can be extracted from a defined index.
+	 * Tests for {@link JavaRuntime#getDirectCaller(OutputDetails)}.
 	 */
-	@Test
-	void stackTraceLocationAtIndex() {
-		StackTraceLocation location = new JavaRuntime().getStackTraceLocationAtIndex(0);
-		assertThat(location).isInstanceOf(JavaIndexBasedStackTraceLocation.class);
-		assertThat(location.getCallerClassName()).isEqualTo(JavaRuntimeTest.class.getName());
+	@Nested
+	@CaptureLogEntries
+	class DirectCaller {
+
+		/**
+		 * Verifies that the expected {@link StackTraceElement} is returned for
+		 * {@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFORMATION}.
+		 */
+		@Test
+		void getFullLocationInformation() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Supplier<?> supplier = runtime.getDirectCaller(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION);
+			Object result = Callee.execute(supplier);
+
+			assertThat(result).isInstanceOfSatisfying(StackTraceElement.class, element -> {
+				assertThat(element.getClassName()).isEqualTo(DirectCaller.class.getName());
+				assertThat(element.getMethodName()).isEqualTo("getFullLocationInformation");
+				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
+				assertThat(element.getLineNumber()).isEqualTo(63);
+			});
+		}
+
+		/**
+		 * Verifies that the expected caller class is returned for
+		 * {@link OutputDetails#ENABLED_WITH_CALLER_CLASS_NAME}.
+		 */
+		@Test
+		void getCallerClass() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Supplier<?> supplier = runtime.getDirectCaller(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+			Object result = Callee.execute(supplier);
+
+			assertThat(result).isEqualTo(DirectCaller.class);
+		}
+
+		/**
+		 * Verifies that {@code null} is returned for {@link OutputDetails#DISABLED} and
+		 * {@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}.
+		 *
+		 * @param outputDetails {@link OutputDetails#DISABLED} or
+		 *                      {@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}
+		 */
+		@ParameterizedTest
+		@EnumSource(value = OutputDetails.class, names = {"DISABLED", "ENABLED_WITHOUT_LOCATION_INFORMATION"})
+		void getDisabledOrWithoutLocationInformation(OutputDetails outputDetails) {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Supplier<?> supplier = runtime.getDirectCaller(outputDetails);
+			Object result = Callee.execute(supplier);
+
+			assertThat(result).isNull();
+		}
+
 	}
 
 	/**
-	 * Verifies that a valid stack location can be extracted via a passed callee class name.
+	 * Tests for {@link JavaRuntime#getRelativeCaller(OutputDetails)}.
 	 */
-	@Test
-	void stackTraceLocationAfterClass() {
-		StackTraceLocation location = new JavaRuntime().getStackTraceLocationAfterClass(Callee.class.getName());
-		assertThat(location).isInstanceOf(JavaClassNameBasedStackTraceLocation.class);
+	@Nested
+	@CaptureLogEntries
+	class RelativeCaller {
 
-		String className = Callee.execute(() -> getCallerClassName(location.push()));
-		assertThat(className).isEqualTo(JavaRuntimeTest.class.getName());
+		@Inject
+		private Log log;
+
+		/**
+		 * Verifies that the expected {@link StackTraceElement} is returned for
+		 * {@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFORMATION} if a class
+		 * name is passed that actually exists in the stack trace.
+		 */
+		@Test
+		void getValidFullLocationInformation() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Function<String, ?> function = runtime.getRelativeCaller(
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+			);
+			Object result = Callee.execute(function, Callee.class.getName());
+
+			assertThat(result).isInstanceOfSatisfying(StackTraceElement.class, element -> {
+				assertThat(element.getClassName()).isEqualTo(RelativeCaller.class.getName());
+				assertThat(element.getMethodName()).isEqualTo("getValidFullLocationInformation");
+				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
+				assertThat(element.getLineNumber()).isEqualTo(129);
+			});
+		}
+
+		/**
+		 * Verifies that {@code null} is returned and a warning log entry is logged for
+		 * {@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFORMATION} if a class name
+		 * is passed that does not exist in the stack trace.
+		 */
+		@Test
+		void getInvalidFullLocationInformation() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Function<String, ?> function = runtime.getRelativeCaller(
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+			);
+			Object result = Callee.execute(function, "org.tinylog.invalid.Foo");
+
+			assertThat(result).isNull();
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+				assertThat(entry.getMessage()).contains("org.tinylog.invalid.Foo");
+			});
+		}
+
+		/**
+		 * Verifies that the expected fully-qualified caller class name is returned for
+		 * {@link OutputDetails#ENABLED_WITH_CALLER_CLASS_NAME} if a class name is passed
+		 * that actually exists in the stack trace.
+		 */
+		@Test
+		void getValidCallerClassName() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Function<String, ?> function = runtime.getRelativeCaller(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+			Object result = Callee.execute(function, Callee.class.getName());
+
+			assertThat(result).isEqualTo(RelativeCaller.class.getName());
+		}
+
+		/**
+		 * Verifies that {@code null} is returned and a warning log entry is logged for
+		 * {@link OutputDetails#ENABLED_WITH_CALLER_CLASS_NAME} if a class name is passed
+		 * that does not exist in the stack trace.
+		 */
+		@Test
+		void getInvalidCallerClassName() {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Function<String, ?> function = runtime.getRelativeCaller(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+			Object result = Callee.execute(function, "org.tinylog.invalid.Foo");
+
+			assertThat(result).isNull();
+			assertThat(log.consume()).singleElement().satisfies(entry -> {
+				assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+				assertThat(entry.getMessage()).contains("org.tinylog.invalid.Foo");
+			});
+		}
+
+		/**
+		 * Verifies that {@code null} is returned for {@link OutputDetails#DISABLED} and
+		 * {@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}.
+		 *
+		 * @param outputDetails {@link OutputDetails#DISABLED} or
+		 *                      {@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}
+		 */
+		@ParameterizedTest
+		@EnumSource(value = OutputDetails.class, names = {"DISABLED", "ENABLED_WITHOUT_LOCATION_INFORMATION"})
+		void getDisabledOrWithoutLocationInformation(OutputDetails outputDetails) {
+			JavaRuntime runtime = new JavaRuntime();
+
+			Function<String, ?> function = runtime.getRelativeCaller(outputDetails);
+			Object result = Callee.execute(function, Callee.class.getName());
+
+			assertThat(result).isNull();
+		}
+
 	}
 
 	/**
-	 * Retrieves the caller class name from the passed stack trace location.
-	 *
-	 * @param location The stack trace location from which the caller is to be received
-	 * @return The received caller class name
-	 */
-	private String getCallerClassName(StackTraceLocation location) {
-		return location.getCallerClassName();
-	}
-
-	/**
-	 * Helper class to simulate a callee.
+	 * Helper class for simulating a callee.
 	 */
 	private static final class Callee {
 
@@ -80,6 +225,19 @@ class JavaRuntimeTest {
 		 */
 		static <T> T execute(Supplier<T> supplier) {
 			return supplier.get();
+		}
+
+		/**
+		 * Executes the passed {@link Function}.
+		 *
+		 * @param function The function to execute
+		 * @param argument The argument for the passed function
+		 * @param <T> Argument type
+		 * @param <R> Return type
+		 * @return The produced value from the passed function
+		 */
+		static <T, R> R execute(Function<T, R> function, T argument) {
+			return function.apply(argument);
 		}
 
 	}

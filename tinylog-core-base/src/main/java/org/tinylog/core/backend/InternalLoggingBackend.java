@@ -9,7 +9,6 @@ import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.context.NopContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.runtime.StackTraceLocation;
 
 /**
  * Internal logging backend that prints internal tinylog errors and warnings to {@link System#err}.
@@ -53,13 +52,13 @@ public class InternalLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public boolean isEnabled(StackTraceLocation location, String tag, Level level) {
+	public boolean isEnabled(Object location, String tag, Level level) {
 		return Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN);
 	}
 
 	@Override
-	public void log(StackTraceLocation location, String tag, Level level, Throwable throwable, Object message,
-			Object[] arguments, MessageFormatter formatter) {
+	public void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
+			MessageFormatter formatter) {
 		if (Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN)) {
 			StringBuilder builder = new StringBuilder();
 
