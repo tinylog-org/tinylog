@@ -29,22 +29,36 @@ public class Log4j2__Benchmark extends AbstractLoggingBenchmark {
 	@Param
 	private LocationInfo locationInfo;
 
+	private String logFile;
 	private Logger logger;
 
 	/** */
 	public Log4j2__Benchmark() {
 	}
 
+	/**
+	 * @param locationInfo The location information details to log
+	 */
+	public Log4j2__Benchmark(LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
+	}
+
 	@Setup(Level.Trial)
 	@Override
 	public void configure() throws IOException {
-		String file = createLogFile("log4j");
-		byte[] configuration = createConfiguration(file).getBytes(Charset.defaultCharset());
+		logFile = createLogFile("log4j");
+
+		byte[] configuration = createConfiguration(logFile).getBytes(Charset.defaultCharset());
 		ByteArrayInputStream stream = new ByteArrayInputStream(configuration);
 		ConfigurationSource source = new ConfigurationSource(stream);
 		Configurator.initialize(null, source);
 
 		logger = LogManager.getLogger(Log4j2__Benchmark.class);
+	}
+
+	@Override
+	public String getLogFile() {
+		return logFile;
 	}
 
 	@TearDown(Level.Trial)

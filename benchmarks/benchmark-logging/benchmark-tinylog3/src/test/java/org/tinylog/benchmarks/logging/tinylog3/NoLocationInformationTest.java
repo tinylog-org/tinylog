@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
-import org.tinylog.core.Tinylog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,10 +50,10 @@ class NoLocationInformationTest {
 		benchmark.discard();
 		Thread.sleep(10);
 
-		String filename = Tinylog.getConfiguration().getValue("writer.file");
-		assertThat(filename).isNotNull();
+		String logFile = benchmark.getLogFile();
+		assertThat(logFile).isNotNull();
 
-		Path path = Paths.get(filename);
+		Path path = Paths.get(logFile);
 		assertThat(path).isEmptyFile();
 	}
 
@@ -67,10 +66,10 @@ class NoLocationInformationTest {
 		benchmark.output();
 		Thread.sleep(10);
 
-		String filename = Tinylog.getConfiguration().getValue("writer.file");
-		assertThat(filename).isNotNull();
+		String logFile = benchmark.getLogFile();
+		assertThat(logFile).isNotNull();
 
-		Path path = Paths.get(filename);
+		Path path = Paths.get(logFile);
 		assertThat(path)
 			.content(StandardCharsets.UTF_8)
 			.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} - main - INFO: Hello 42!" + NEW_LINE);

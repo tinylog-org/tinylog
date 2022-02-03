@@ -26,6 +26,7 @@ public class Jul_____Benchmark extends AbstractLoggingBenchmark {
 	@Param
 	private LocationInfo locationInfo;
 
+	private String logFile;
 	private Handler handler;
 	private Logger logger;
 
@@ -33,16 +34,30 @@ public class Jul_____Benchmark extends AbstractLoggingBenchmark {
 	public Jul_____Benchmark() {
 	}
 
+	/**
+	 * @param locationInfo The location information details to log
+	 */
+	public Jul_____Benchmark(LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
+	}
+
 	@Setup(Level.Trial)
 	@Override
 	public void configure() throws IOException {
-		handler = new FileHandler(createLogFile("jul"), false);
+		logFile = createLogFile("jul");
+
+		handler = new FileHandler(logFile, false);
 		handler.setFormatter(new SimpleFormatter(locationInfo));
 
 		logger = Logger.getLogger(Jul_____Benchmark.class.getName());
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
 		logger.setLevel(java.util.logging.Level.INFO);
+	}
+
+	@Override
+	public String getLogFile() {
+		return logFile;
 	}
 
 	@TearDown(Level.Trial)

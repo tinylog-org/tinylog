@@ -31,10 +31,18 @@ public class Logback_Benchmark extends AbstractLoggingBenchmark {
 	@Param
 	private LocationInfo locationInfo;
 
+	private String logFile;
 	private Logger logger;
 
 	/** */
 	public Logback_Benchmark() {
+	}
+
+	/**
+	 * @param locationInfo The location information details to log
+	 */
+	public Logback_Benchmark(LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
 	}
 
 	@Setup(Level.Trial)
@@ -43,14 +51,19 @@ public class Logback_Benchmark extends AbstractLoggingBenchmark {
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 		context.reset();
 
-		String file = createLogFile("logback");
-		byte[] configuration = createConfiguration(file).getBytes(Charset.defaultCharset());
+		logFile = createLogFile("logback");
+		byte[] configuration = createConfiguration(logFile).getBytes(Charset.defaultCharset());
 
 		JoranConfigurator configurator = new JoranConfigurator();
 		configurator.setContext(context);
 		configurator.doConfigure(new ByteArrayInputStream(configuration));
 
 		logger = LoggerFactory.getLogger(Logback_Benchmark.class);
+	}
+
+	@Override
+	public String getLogFile() {
+		return logFile;
 	}
 
 	@TearDown(Level.Trial)

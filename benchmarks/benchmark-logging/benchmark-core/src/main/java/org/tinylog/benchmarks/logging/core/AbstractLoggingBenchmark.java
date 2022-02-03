@@ -25,6 +25,13 @@ public abstract class AbstractLoggingBenchmark {
 	public abstract void configure() throws Exception;
 
 	/**
+	 * Gets the current log file.
+	 *
+	 * @return The current log file
+	 */
+	public abstract String getLogFile();
+
+	/**
 	 * Shuts the logging framework gracefully down.
 	 *
 	 * @throws Exception Failed to shut the logging framework gracefully down

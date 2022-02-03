@@ -26,6 +26,8 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 	@Param
 	private LocationInfo locationInfo;
 
+	private String logFile;
+
 	/** */
 	public Tinylog3Benchmark() {
 	}
@@ -40,6 +42,8 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 	@Setup(Level.Trial)
 	@Override
 	public void configure() throws IOException {
+		logFile = createLogFile("tinylog3");
+
 		StringBuilder formatPattern = new StringBuilder();
 		formatPattern.append("{date:yyyy-MM-dd HH:mm:ss} - {thread}");
 		if (locationInfo == LocationInfo.FULL) {
@@ -54,8 +58,13 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 		Configuration configuration = Tinylog.getConfiguration();
 		configuration.set("level", "INFO");
 		configuration.set("writer.type", "file");
-		configuration.set("writer.file", createLogFile("tinylog3"));
+		configuration.set("writer.file", logFile);
 		configuration.set("writer.pattern", formatPattern.toString());
+	}
+
+	@Override
+	public String getLogFile() {
+		return logFile;
 	}
 
 	@TearDown(Level.Trial)
