@@ -30,6 +30,13 @@ public class Tinylog2Benchmark extends AbstractLoggingBenchmark {
 	public Tinylog2Benchmark() {
 	}
 
+	/**
+	 * @param locationInfo The location information details to log
+	 */
+	public Tinylog2Benchmark(LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
+	}
+
 	@Setup(Level.Trial)
 	@Override
 	public void configure() throws IOException {
