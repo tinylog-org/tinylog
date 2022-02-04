@@ -18,7 +18,7 @@
 		<module>tinylog-jboss</module>
 		<module>tinylog-jul</module>
 		<module>tinylog-api-kotlin</module>
-		<module>tinylog-api-scala</module>
+		<module>tinylog-api-scala_2.12</module>
 		<module>jboss-tinylog</module>
 		<module>jcl-tinylog</module>
 		<module>jsl-tinylog</module>

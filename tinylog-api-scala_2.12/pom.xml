@@ -14,8 +14,8 @@
 	</parent>
 
 	<artifactId>tinylog-api-scala_2.12</artifactId>
-	<name>tinylog Scala API</name>
-	<description>tinylog logging API for Scala</description>
+	<name>tinylog Scala 2.12 API</name>
+	<description>tinylog logging API for Scala 2.12</description>
 	<url>${website.url}</url>
 
 	<scm>
