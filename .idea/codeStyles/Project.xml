@@ -19,6 +19,7 @@
           <package name="" withSubpackages="true" static="true" />
         </value>
       </option>
+      <option name="ALIGN_MULTILINE_RECORDS" value="false" />
     </JavaCodeStyleSettings>
     <JetCodeStyleSettings>
       <option name="PACKAGES_TO_USE_STAR_IMPORTS">
@@ -31,6 +32,8 @@
     <codeStyleSettings language="JAVA">
       <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <option name="BLANK_LINES_BEFORE_CLASS_END" value="1" />
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+      <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
         <option name="USE_TAB_CHARACTER" value="true" />
