@@ -20,6 +20,7 @@ public class FileWriter implements AsyncWriter {
 	private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB
 	private static final int BUILDER_MAX_CAPACITY = 64 * 1024; // 64 KB
 
+	private final Charset charset;
 	private final OutputFormat format;
 	private final LogFile file;
 	private final StringBuilder builder;
@@ -36,6 +37,7 @@ public class FileWriter implements AsyncWriter {
 			Files.createDirectories(parent);
 		}
 
+		this.charset = charset;
 		this.format = format;
 		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, charset, true);
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
@@ -50,7 +52,9 @@ public class FileWriter implements AsyncWriter {
 	public void log(LogEntry entry) throws IOException {
 		try {
 			format.render(builder, entry);
-			file.write(builder.toString());
+			String content = builder.toString();
+			byte[] data = content.getBytes(charset);
+			file.write(data);
 		} finally {
 			resetStringBuilder();
 		}

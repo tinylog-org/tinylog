@@ -12,7 +12,6 @@ import java.util.Arrays;
 public class LogFile implements Closeable {
 
 	private final RandomAccessFile file;
-	private final Charset charset;
 	private final byte[] bom;
 
 	private final int bufferCapacity;
@@ -21,14 +20,13 @@ public class LogFile implements Closeable {
 	/**
 	 * @param fileName The path to the log file
 	 * @param bufferCapacity The capacity for the byte buffer (must be greater than 0)
-	 * @param charset The charset to use for wring strings
+	 * @param charset The charset for a potential BOM
 	 * @param append {@code true} for appending an already existing file, {@code false} for overwriting an already
 	 *               existing file
 	 * @throws IOException Failed to open the log file
 	 */
 	public LogFile(String fileName, int bufferCapacity, Charset charset, boolean append) throws IOException {
 		this.file = new RandomAccessFile(fileName, "rw");
-		this.charset = charset;
 		this.bom = createBom(charset);
 
 		if (append) {
@@ -53,13 +51,12 @@ public class LogFile implements Closeable {
 	}
 
 	/**
-	 * Writes a string into the log file.
+	 * Writes a byte array into the log file.
 	 *
-	 * @param content The string to write
+	 * @param data The bytes to write
 	 * @throws IOException Failed to write into the log file
 	 */
-	public void write(String content) throws IOException {
-		byte[] data = content.getBytes(charset);
+	public void write(byte[] data) throws IOException {
 		int bytes = buffer.store(data, bom.length);
 
 		if (buffer.isFull()) {

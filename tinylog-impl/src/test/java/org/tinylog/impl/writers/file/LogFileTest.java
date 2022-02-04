@@ -52,11 +52,11 @@ class LogFileTest {
 	@ArgumentsSource(CharsetsProvider.class)
 	void overwriteLogFile(Charset charset) throws IOException {
 		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("foo");
+			file.write("foo".getBytes(charset));
 		}
 
 		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("bar");
+			file.write("bar".getBytes(charset));
 		}
 
 		assertThat(path).usingCharset(charset).hasContent("bar");
@@ -71,11 +71,11 @@ class LogFileTest {
 	@ArgumentsSource(CharsetsProvider.class)
 	void continueLogFile(Charset charset) throws IOException {
 		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
-			file.write("foo");
+			file.write("foo".getBytes(charset));
 		}
 
 		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
-			file.write("bar");
+			file.write("bar".getBytes(charset));
 		}
 
 		assertThat(path).usingCharset(charset).hasContent("foobar");
@@ -90,10 +90,10 @@ class LogFileTest {
 
 		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, true)) {
 			assertThat(path).hasSize(6);
-			file.write("\0");
+			file.write(new byte[1]);
 
 			assertThat(path).hasSize(6);
-			file.write("\0");
+			file.write(new byte[1]);
 
 			assertThat(path).hasSize(8);
 		}
@@ -105,7 +105,7 @@ class LogFileTest {
 	@Test
 	void writingOversizedString() throws IOException {
 		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, false)) {
-			file.write(new String(new char[16 + 1]));
+			file.write(new byte[16 + 1]);
 			assertThat(path).hasSize(16);
 		}
 
@@ -121,7 +121,7 @@ class LogFileTest {
 	@ArgumentsSource(CharsetsProvider.class)
 	void flushing(Charset charset) throws IOException {
 		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("foo");
+			file.write("foo".getBytes(charset));
 			assertThat(path).usingCharset(charset).isEmptyFile();
 
 			file.flush();
