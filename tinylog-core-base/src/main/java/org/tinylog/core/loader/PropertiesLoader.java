@@ -96,7 +96,7 @@ public class PropertiesLoader implements ConfigurationLoader {
 		List<VariableResolver> resolvers = SafeServiceLoader.asList(
 			framework,
 			VariableResolver.class,
-			"variable resolver"
+			"variable resolvers"
 		);
 
 		for (VariableResolver resolver : resolvers) {

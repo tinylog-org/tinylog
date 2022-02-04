@@ -178,7 +178,7 @@ public class Framework {
 		SafeServiceLoader.load(
 			this,
 			LoggingBackendBuilder.class,
-			"logging backend builder",
+			"logging backend builders",
 			builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder)
 		);
 
@@ -224,7 +224,7 @@ public class Framework {
 	 */
 	private RuntimeFlavor createRuntime() {
 		return SafeServiceLoader
-			.asList(this, RuntimeBuilder.class, "runtime")
+			.asList(this, RuntimeBuilder.class, "runtime builders")
 			.stream()
 			.filter(RuntimeBuilder::isSupported)
 			.findAny()
@@ -238,7 +238,7 @@ public class Framework {
 	 * @return All found hooks
 	 */
 	private Collection<Hook> loadHooks() {
-		return SafeServiceLoader.asList(this, Hook.class, "hook");
+		return SafeServiceLoader.asList(this, Hook.class, "hooks");
 	}
 
 	/**

@@ -36,7 +36,7 @@ class SafeServiceLoaderTest {
 		List<FooService> services = SafeServiceLoader.asList(
 			framework,
 			FooService.class,
-			"foo service"
+			"foo services"
 		);
 
 		assertThat(services)
@@ -54,7 +54,7 @@ class SafeServiceLoaderTest {
 		List<String> names = SafeServiceLoader.asList(
 			framework,
 			FooService.class,
-			"foo service",
+			"foo services",
 			FooService::getName
 		);
 

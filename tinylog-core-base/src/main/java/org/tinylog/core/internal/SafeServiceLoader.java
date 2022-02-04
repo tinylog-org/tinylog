@@ -28,7 +28,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human-readable service name for logging
+	 * @param name The human-readable plural service name for logging
 	 * @param <S> The service type
 	 * @return All found service implementations in the current classpath
 	 */
@@ -43,7 +43,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human-readable service name for logging
+	 * @param name The human-readable plural service name for logging
 	 * @param mapper The mapping function to apply for found service implementations
 	 * @param <S> The service type
 	 * @param <R> The mapped type
@@ -60,7 +60,7 @@ public final class SafeServiceLoader {
 	 *
 	 * @param framework The actual logging framework instance
 	 * @param service The interface or abstract class representing the service
-	 * @param name The human-readable service name for logging
+	 * @param name The human-readable plural service name for logging
 	 * @param action Consumer for found service implementations
 	 * @param <S> The service type
 	 */
@@ -70,7 +70,7 @@ public final class SafeServiceLoader {
 
 		InternalLogger.debug(
 			null,
-			"Found {}s: {}",
+			"Found {}: {}",
 			name,
 			stream.map(implementation -> implementation.getClass().getName()).collect(Collectors.toList())
 		);

@@ -318,7 +318,7 @@ public class Configuration {
 				List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
 					framework,
 					ConfigurationLoader.class,
-					"configuration loader"
+					"configuration loaders"
 				);
 
 				if (name != null) {
