@@ -44,6 +44,25 @@ class LogFileTest {
 	}
 
 	/**
+	 * Verifies that an existing log file can be overwritten.
+	 *
+	 * @param charset The charset to use for writing text
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(CharsetsProvider.class)
+	void overwriteLogFile(Charset charset) throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
+			file.write("foo");
+		}
+
+		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
+			file.write("bar");
+		}
+
+		assertThat(path).usingCharset(charset).hasContent("bar");
+	}
+
+	/**
 	 * Verifies that an existing log file can be continued.
 	 *
 	 * @param charset The charset to use for writing text
@@ -51,11 +70,11 @@ class LogFileTest {
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
 	void continueLogFile(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
 			file.write("foo");
 		}
 
-		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
 			file.write("bar");
 		}
 
@@ -69,7 +88,7 @@ class LogFileTest {
 	void writingUntilBufferCapacity() throws IOException {
 		Files.write(path, new byte[6]);
 
-		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII)) {
+		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, true)) {
 			assertThat(path).hasSize(6);
 			file.write("\0");
 
@@ -85,7 +104,7 @@ class LogFileTest {
 	 */
 	@Test
 	void writingOversizedString() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII)) {
+		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, false)) {
 			file.write(new String(new char[16 + 1]));
 			assertThat(path).hasSize(16);
 		}
@@ -101,7 +120,7 @@ class LogFileTest {
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
 	void flushing(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, charset)) {
+		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
 			file.write("foo");
 			assertThat(path).usingCharset(charset).isEmptyFile();
 

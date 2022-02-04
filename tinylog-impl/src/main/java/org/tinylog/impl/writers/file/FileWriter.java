@@ -37,7 +37,7 @@ public class FileWriter implements AsyncWriter {
 		}
 
 		this.format = format;
-		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, charset);
+		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, charset, true);
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 	}
 
