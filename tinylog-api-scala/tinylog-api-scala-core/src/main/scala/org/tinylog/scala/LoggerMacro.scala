@@ -16,12 +16,12 @@ package org.tinylog.scala
 import scala.reflect.macros.blackbox
 
 /**
-	* Macros for transforming calls of [[org.tinylog.scala.TaggedLogger]] into calls of [[org.tinylog.TaggedLogger]].
+	* Macros for transforming calls of [[org.tinylog.scala.Logger]] into calls of [[org.tinylog.Logger]].
 	*/
-private object TaggedLoggerMacro {
+private object LoggerMacro {
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#isTraceEnabled]] to [[org.tinylog.TaggedLogger#isTraceEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isTraceEnabled]] to [[org.tinylog.Logger#isTraceEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -31,13 +31,12 @@ private object TaggedLoggerMacro {
 	                  ()
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.isTraceEnabled()"
+		q"org.tinylog.Logger.isTraceEnabled()"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(message:Any)]] and [[org.tinylog.scala.TaggedLogger#trace(message:String)]]
-		* to [[org.tinylog.TaggedLogger#trace(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:Any)]] and [[org.tinylog.scala.Logger#trace(message:String)]]
+		* to [[org.tinylog.Logger#trace(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -49,17 +48,16 @@ private object TaggedLoggerMacro {
 	                     (message: context.Expr[Any])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.trace($message.asInstanceOf[Any])"
+			q"org.tinylog.Logger.trace($message.asInstanceOf[Any])"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#trace(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:()=>String)]] to
+		* [[org.tinylog.Logger#trace(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -71,13 +69,12 @@ private object TaggedLoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#trace(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#trace(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -91,13 +88,12 @@ private object TaggedLoggerMacro {
 	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.trace($message, ..$arguments)"
+		q"org.tinylog.Logger.trace($message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#trace(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#trace(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -111,14 +107,13 @@ private object TaggedLoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.trace($message, ..$suppliers)"
+		q"org.tinylog.Logger.trace($message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(exception:Throwable)]] to
-		* [[org.tinylog.TaggedLogger#trace(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -130,13 +125,12 @@ private object TaggedLoggerMacro {
 	                  (exception: context.Expr[Throwable])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.trace($exception)"
+		q"org.tinylog.Logger.trace($exception)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(exception:Throwable,message:String)]] to
-		* [[org.tinylog.TaggedLogger#trace(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -150,17 +144,16 @@ private object TaggedLoggerMacro {
 	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.trace($exception, $message)"
+			q"org.tinylog.Logger.trace($exception, $message)"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#trace(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -174,13 +167,12 @@ private object TaggedLoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#trace(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -196,13 +188,12 @@ private object TaggedLoggerMacro {
 	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.trace($exception, $message, ..$arguments)"
+		q"org.tinylog.Logger.trace($exception, $message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#trace(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#trace(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#trace(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -218,13 +209,12 @@ private object TaggedLoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.trace($exception, $message, ..$suppliers)"
+		q"org.tinylog.Logger.trace($exception, $message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#isDebugEnabled]] to [[org.tinylog.TaggedLogger#isDebugEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isDebugEnabled]] to [[org.tinylog.Logger#isDebugEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -234,13 +224,12 @@ private object TaggedLoggerMacro {
 	                  ()
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.isDebugEnabled()"
+		q"org.tinylog.Logger.isDebugEnabled()"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(message:Any)]] and [[org.tinylog.scala.TaggedLogger#debug(message:String)]]
-		* to [[org.tinylog.TaggedLogger#debug(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:Any)]] and [[org.tinylog.scala.Logger#debug(message:String)]]
+		* to [[org.tinylog.Logger#debug(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -252,17 +241,16 @@ private object TaggedLoggerMacro {
 	                     (message: context.Expr[Any])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.debug($message.asInstanceOf[Any])"
+			q"org.tinylog.Logger.debug($message.asInstanceOf[Any])"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#debug(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:()=>String)]] to
+		* [[org.tinylog.Logger#debug(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -274,13 +262,12 @@ private object TaggedLoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#debug(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#debug(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -294,13 +281,12 @@ private object TaggedLoggerMacro {
 	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.debug($message, ..$arguments)"
+		q"org.tinylog.Logger.debug($message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#debug(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#debug(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -314,14 +300,13 @@ private object TaggedLoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.debug($message, ..$suppliers)"
+		q"org.tinylog.Logger.debug($message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(exception:Throwable)]] to
-		* [[org.tinylog.TaggedLogger#debug(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -333,13 +318,12 @@ private object TaggedLoggerMacro {
 	                  (exception: context.Expr[Throwable])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.debug($exception)"
+		q"org.tinylog.Logger.debug($exception)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(exception:Throwable,message:String)]] to
-		* [[org.tinylog.TaggedLogger#debug(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -353,17 +337,16 @@ private object TaggedLoggerMacro {
 	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.debug($exception, $message)"
+			q"org.tinylog.Logger.debug($exception, $message)"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#debug(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -377,13 +360,12 @@ private object TaggedLoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#debug(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -399,13 +381,12 @@ private object TaggedLoggerMacro {
 	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.debug($exception, $message, ..$arguments)"
+		q"org.tinylog.Logger.debug($exception, $message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#debug(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#debug(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#debug(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -421,13 +402,12 @@ private object TaggedLoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.debug($exception, $message, ..$suppliers)"
+		q"org.tinylog.Logger.debug($exception, $message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#isInfoEnabled]] to [[org.tinylog.TaggedLogger#isInfoEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isInfoEnabled]] to [[org.tinylog.Logger#isInfoEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -437,13 +417,12 @@ private object TaggedLoggerMacro {
 	                  ()
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.isInfoEnabled()"
+		q"org.tinylog.Logger.isInfoEnabled()"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(message:Any)]] and [[org.tinylog.scala.TaggedLogger#info(message:String)]]
-		* to [[org.tinylog.TaggedLogger#info(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:Any)]] and [[org.tinylog.scala.Logger#info(message:String)]]
+		* to [[org.tinylog.Logger#info(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -455,17 +434,16 @@ private object TaggedLoggerMacro {
 	                     (message: context.Expr[Any])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.info($message.asInstanceOf[Any])"
+			q"org.tinylog.Logger.info($message.asInstanceOf[Any])"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#info(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:()=>String)]] to
+		* [[org.tinylog.Logger#info(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -477,13 +455,12 @@ private object TaggedLoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#info(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#info(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -497,13 +474,12 @@ private object TaggedLoggerMacro {
 	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.info($message, ..$arguments)"
+		q"org.tinylog.Logger.info($message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#info(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#info(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -517,14 +493,13 @@ private object TaggedLoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.info($message, ..$suppliers)"
+		q"org.tinylog.Logger.info($message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(exception:Throwable)]] to
-		* [[org.tinylog.TaggedLogger#info(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -536,13 +511,12 @@ private object TaggedLoggerMacro {
 	                  (exception: context.Expr[Throwable])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.info($exception)"
+		q"org.tinylog.Logger.info($exception)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(exception:Throwable,message:String)]] to
-		* [[org.tinylog.TaggedLogger#info(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -556,17 +530,16 @@ private object TaggedLoggerMacro {
 	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.info($exception, $message)"
+			q"org.tinylog.Logger.info($exception, $message)"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#info(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -580,13 +553,12 @@ private object TaggedLoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#info(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -602,13 +574,12 @@ private object TaggedLoggerMacro {
 	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.info($exception, $message, ..$arguments)"
+		q"org.tinylog.Logger.info($exception, $message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#info(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#info(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#info(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -624,13 +595,12 @@ private object TaggedLoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.info($exception, $message, ..$suppliers)"
+		q"org.tinylog.Logger.info($exception, $message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#isWarnEnabled]] to [[org.tinylog.TaggedLogger#isWarnEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isWarnEnabled]] to [[org.tinylog.Logger#isWarnEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -640,13 +610,12 @@ private object TaggedLoggerMacro {
 	                  ()
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.isWarnEnabled()"
+		q"org.tinylog.Logger.isWarnEnabled()"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(message:Any)]] and [[org.tinylog.scala.TaggedLogger#warn(message:String)]]
-		* to [[org.tinylog.TaggedLogger#warn(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:Any)]] and [[org.tinylog.scala.Logger#warn(message:String)]]
+		* to [[org.tinylog.Logger#warn(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -658,17 +627,16 @@ private object TaggedLoggerMacro {
 	                     (message: context.Expr[Any])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.warn($message.asInstanceOf[Any])"
+			q"org.tinylog.Logger.warn($message.asInstanceOf[Any])"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#warn(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:()=>String)]] to
+		* [[org.tinylog.Logger#warn(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -680,13 +648,12 @@ private object TaggedLoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#warn(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#warn(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -700,13 +667,12 @@ private object TaggedLoggerMacro {
 	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.warn($message, ..$arguments)"
+		q"org.tinylog.Logger.warn($message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#warn(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#warn(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -720,14 +686,13 @@ private object TaggedLoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.warn($message, ..$suppliers)"
+		q"org.tinylog.Logger.warn($message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(exception:Throwable)]] to
-		* [[org.tinylog.TaggedLogger#warn(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -739,13 +704,12 @@ private object TaggedLoggerMacro {
 	                  (exception: context.Expr[Throwable])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.warn($exception)"
+		q"org.tinylog.Logger.warn($exception)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(exception:Throwable,message:String)]] to
-		* [[org.tinylog.TaggedLogger#warn(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -759,17 +723,16 @@ private object TaggedLoggerMacro {
 	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.warn($exception, $message)"
+			q"org.tinylog.Logger.warn($exception, $message)"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#warn(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -783,13 +746,12 @@ private object TaggedLoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#warn(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -805,13 +767,12 @@ private object TaggedLoggerMacro {
 	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.warn($exception, $message, ..$arguments)"
+		q"org.tinylog.Logger.warn($exception, $message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#warn(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#warn(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#warn(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -827,13 +788,12 @@ private object TaggedLoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.warn($exception, $message, ..$suppliers)"
+		q"org.tinylog.Logger.warn($exception, $message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#isErrorEnabled]] to [[org.tinylog.TaggedLogger#isErrorEnabled]].
+		* Redirects [[org.tinylog.scala.Logger#isErrorEnabled]] to [[org.tinylog.Logger#isErrorEnabled]].
 		*
 		* @param context
 		* Macro context
@@ -843,13 +803,12 @@ private object TaggedLoggerMacro {
 	                  ()
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.isErrorEnabled()"
+		q"org.tinylog.Logger.isErrorEnabled()"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(message:Any)]] and [[org.tinylog.scala.TaggedLogger#error(message:String)]]
-		* to [[org.tinylog.TaggedLogger#error(message:Any)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:Any)]] and [[org.tinylog.scala.Logger#error(message:String)]]
+		* to [[org.tinylog.Logger#error(message:Any)]].
 		*
 		* @param context
 		* Macro context
@@ -861,17 +820,16 @@ private object TaggedLoggerMacro {
 	                     (message: context.Expr[Any])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.error($message.asInstanceOf[Any])"
+			q"org.tinylog.Logger.error($message.asInstanceOf[Any])"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#error(message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:()=>String)]] to
+		* [[org.tinylog.Logger#error(message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -883,13 +841,12 @@ private object TaggedLoggerMacro {
 	                    (message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#error(message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#error(message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -903,13 +860,12 @@ private object TaggedLoggerMacro {
 	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.error($message, ..$arguments)"
+		q"org.tinylog.Logger.error($message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#error(message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#error(message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -923,14 +879,13 @@ private object TaggedLoggerMacro {
 	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.error($message, ..$suppliers)"
+		q"org.tinylog.Logger.error($message, ..$suppliers)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(exception:Throwable)]] to
-		* [[org.tinylog.TaggedLogger#error(exception:Throwable)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable)]].
 		*
 		* @param context
 		* Macro context
@@ -942,13 +897,12 @@ private object TaggedLoggerMacro {
 	                  (exception: context.Expr[Throwable])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.error($exception)"
+		q"org.tinylog.Logger.error($exception)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(exception:Throwable,message:String)]] to
-		* [[org.tinylog.TaggedLogger#error(exception:Throwable,message:String)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String)]].
 		*
 		* @param context
 		* Macro context
@@ -962,17 +916,16 @@ private object TaggedLoggerMacro {
 	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		if (message.tree.toString().contains("scala.StringContext")) {
-			q"$logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
+			q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
 		} else {
-			q"$logger.error($exception, $message)"
+			q"org.tinylog.Logger.error($exception, $message)"
 		}
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(exception:Throwable,message:()=>String)]] to
-		* [[org.tinylog.TaggedLogger#error(exception:Throwable,message:org.tinylog.Supplier)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:()=>String)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:org.tinylog.Supplier)]].
 		*
 		* @param context
 		* Macro context
@@ -986,13 +939,12 @@ private object TaggedLoggerMacro {
 	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
+		q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(exception:Throwable,message:String,arguments:Any*)]] to
-		* [[org.tinylog.TaggedLogger#error(exception:Throwable,message:String,arguments:Any*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:Any*)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String,arguments:Any*)]].
 		*
 		* @param context
 		* Macro context
@@ -1008,13 +960,12 @@ private object TaggedLoggerMacro {
 	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
-		q"$logger.error($exception, $message, ..$arguments)"
+		q"org.tinylog.Logger.error($exception, $message, ..$arguments)"
 	}
 
 	/**
-		* Redirects [[org.tinylog.scala.TaggedLogger#error(exception:Throwable,message:String,arguments:()=>Any*)]] to
-		* [[org.tinylog.TaggedLogger#error(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
+		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:()=>Any*)]] to
+		* [[org.tinylog.Logger#error(exception:Throwable,message:String,arguments:org.tinylog.Supplier*)]].
 		*
 		* @param context
 		* Macro context
@@ -1030,9 +981,8 @@ private object TaggedLoggerMacro {
 	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
 	: context.universe.Tree = {
 		import context.universe._
-		val logger = q"${context.prefix}.logger"
 		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"$logger.error($exception, $message, ..$suppliers)"
+		q"org.tinylog.Logger.error($exception, $message, ..$suppliers)"
 	}
 
 }

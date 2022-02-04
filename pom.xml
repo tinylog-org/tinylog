@@ -18,7 +18,7 @@
 		<module>tinylog-jboss</module>
 		<module>tinylog-jul</module>
 		<module>tinylog-api-kotlin</module>
-		<module>tinylog-api-scala_2.12</module>
+		<module>tinylog-api-scala</module>
 		<module>jboss-tinylog</module>
 		<module>jcl-tinylog</module>
 		<module>jsl-tinylog</module>
@@ -51,6 +51,7 @@
 		<animal.sniffer.skip>true</animal.sniffer.skip>
 
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<kotlin-maven-plugin.version>1.5.32</kotlin-maven-plugin.version>
@@ -91,7 +92,7 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.12.1</mockk.version>
 		<powermock.version>2.0.9</powermock.version>
-		<scala.version>2.12.13</scala.version>
+		<scala.version>2.13.8</scala.version>
 		<slf4j.version>2.0.0-alpha5</slf4j.version>
 
 	</properties>
@@ -327,6 +328,11 @@
 					<version>${maven-clean-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>${build-helper-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>${maven-resources-plugin.version}</version>
@@ -398,6 +404,8 @@
 					<configuration>
 						<args>
 							<arg>-g:line</arg>
+							<arg>-deprecation</arg>
+							<arg>-feature</arg>
 						</args>
 					</configuration>
 					<executions>
@@ -771,6 +779,10 @@
 							</artifact>
 							<artifact>
 								<id>org.tinylog:tinylog-api-scala_2.12:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
+								<id>org.tinylog:tinylog-api-scala_2.13:${project.version}</id>
 								<source>true</source>
 							</artifact>
 							<artifact>

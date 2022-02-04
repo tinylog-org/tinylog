@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>org.tinylog</groupId>
+		<artifactId>parent</artifactId>
+		<version>2.5-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>tinylog-api-scala-parent</artifactId>
+	<name>tinylog Scala API Parent</name>
+	<description>Parent POM for tinylog logging API for Scala</description>
+	<url>${website.url}</url>
+
+	<scm>
+		<url>${git.url}</url>
+		<connection>${git.connection}</connection>
+		<developerConnection>${git.developerConnection}</developerConnection>
+	</scm>
+
+	<modules>
+		<module>tinylog-api-scala-core</module>
+		<module>tinylog-api-scala_2.12</module>
+		<module>tinylog-api-scala_2.13</module>
+	</modules>
+
+	<properties>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+
+</project>

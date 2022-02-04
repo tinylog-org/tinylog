@@ -14,14 +14,11 @@
 package org.tinylog.scala
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import org.junit.{After, Before, Rule, Test}
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.{any, anyInt, argThat, isNull, same, eq => eqTo}
 import org.mockito.Mockito.{mock, never, verify, when}
-import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.rule.PowerMockRule
 import org.powermock.reflect.Whitebox
 import org.tinylog.format.MessageFormatter
@@ -30,14 +27,11 @@ import org.tinylog.rules.SystemStreamCollector
 import org.tinylog.{Level, Supplier}
 
 import java.util
-import scala.collection.JavaConverters
 
 /**
 	* Tests for logging methods of [[org.tinylog.scala.Logger]].
 	*/
-@RunWith(classOf[Parameterized])
-@PrepareForTest(Array(classOf[org.tinylog.TaggedLogger]))
-final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2Configuration: LevelConfiguration) {
+abstract class AbstractTaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2Configuration: LevelConfiguration) {
 
 	private val TAG1 = "test"
 
@@ -82,9 +76,9 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		*/
 	@Test def isTraceEnabled(): Unit = {
 		if (tag2Configuration != null) {
-			assertThat(logger.isTraceEnabled).isEqualTo(tag1Configuration.traceEnabled || tag2Configuration.traceEnabled)
+			assertThat(logger.isTraceEnabled()).isEqualTo(tag1Configuration.traceEnabled || tag2Configuration.traceEnabled)
 		} else {
-			assertThat(logger.isTraceEnabled).isEqualTo(tag1Configuration.traceEnabled)
+			assertThat(logger.isTraceEnabled()).isEqualTo(tag1Configuration.traceEnabled)
 		}
 	}
 
@@ -257,9 +251,9 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		*/
 	@Test def isDebugEnabled(): Unit = {
 		if (tag2Configuration != null) {
-			assertThat(logger.isDebugEnabled)isEqualTo(tag1Configuration.debugEnabled || tag2Configuration.debugEnabled)
+			assertThat(logger.isDebugEnabled())isEqualTo(tag1Configuration.debugEnabled || tag2Configuration.debugEnabled)
 		} else {
-			assertThat(logger.isDebugEnabled).isEqualTo(tag1Configuration.debugEnabled)
+			assertThat(logger.isDebugEnabled()).isEqualTo(tag1Configuration.debugEnabled)
 		}
 	}
 
@@ -432,9 +426,9 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		*/
 	@Test def isInfoEnabled(): Unit = {
 		if (tag2Configuration != null) {
-			assertThat(logger.isInfoEnabled).isEqualTo(tag1Configuration.infoEnabled || tag2Configuration.infoEnabled)
+			assertThat(logger.isInfoEnabled()).isEqualTo(tag1Configuration.infoEnabled || tag2Configuration.infoEnabled)
 		} else {
-			assertThat(logger.isInfoEnabled).isEqualTo(tag1Configuration.infoEnabled)
+			assertThat(logger.isInfoEnabled()).isEqualTo(tag1Configuration.infoEnabled)
 		}
 	}
 
@@ -607,9 +601,9 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		*/
 	@Test def isWarnEnabled(): Unit = {
 		if (tag2Configuration != null) {
-			assertThat(logger.isWarnEnabled).isEqualTo(tag1Configuration.warnEnabled || tag2Configuration.warnEnabled)
+			assertThat(logger.isWarnEnabled()).isEqualTo(tag1Configuration.warnEnabled || tag2Configuration.warnEnabled)
 		} else {
-			assertThat(logger.isWarnEnabled).isEqualTo(tag1Configuration.warnEnabled)
+			assertThat(logger.isWarnEnabled()).isEqualTo(tag1Configuration.warnEnabled)
 		}
 	}
 
@@ -782,9 +776,9 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		*/
 	@Test def isErrorEnabled(): Unit = {
 		if (tag2Configuration != null) {
-		  assertThat(logger.isErrorEnabled).isEqualTo(tag1Configuration.errorEnabled || tag2Configuration.errorEnabled)
+		  assertThat(logger.isErrorEnabled()).isEqualTo(tag1Configuration.errorEnabled || tag2Configuration.errorEnabled)
 		} else {
-			assertThat(logger.isErrorEnabled).isEqualTo(tag1Configuration.errorEnabled)
+			assertThat(logger.isErrorEnabled()).isEqualTo(tag1Configuration.errorEnabled)
 		}
 	}
 
@@ -953,6 +947,14 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 	}
 
 	/**
+		* Converts a Scala set into a Java set.
+		*
+		* @param set Scala set to convert
+		* @return Java set with the same content as in the passed Scala set
+		*/
+	protected def convertIntoJavaSet(set: Set[String]): java.util.Set[String]
+
+	/**
 		* Mocks the logging provider for [[org.tinylog.TaggedLogger]] and overrides all depending fields.
 		*
 		* @return Mock instance for logging provider
@@ -984,7 +986,7 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		}
 
 		Whitebox.setInternalState(classOf[org.tinylog.TaggedLogger], provider)
-		return provider
+		provider
 	}
 
 	/**
@@ -1019,8 +1021,8 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 		* Severity level to check
 		* @return `true` if given severity level is covered, otherwise `false`
 		*/
-	private def getCoveredTags(level: Level): java.util.Set[String] = {
-		Whitebox.invokeMethod(classOf[org.tinylog.TaggedLogger], "getCoveredTags", JavaConverters.setAsJavaSet(tags), level)
+	private def getCoveredTags(level: Level): util.Set[String] = {
+		Whitebox.invokeMethod(classOf[org.tinylog.TaggedLogger], "getCoveredTags", convertIntoJavaSet(tags), level)
 	}
 
 	/**
@@ -1042,7 +1044,7 @@ final class TaggedLoggerTest(val tag1Configuration: LevelConfiguration, val tag2
 /**
 	* Parameters for testing logging.
 	*/
-object TaggedLoggerTest {
+object AbstractTaggedLoggerTest {
 
 	/**
 		* Returns all different combinations of logging levels for up two tags for the tests.

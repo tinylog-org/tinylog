@@ -25,7 +25,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.parent.basedir}/tinylog-api/target</directory>
+			<directory>${project.parent.basedir}/tinylog-api-scala_2.12/target</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>*-${project.version}.jar</include>
@@ -35,7 +35,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.parent.basedir}/tinylog-impl/target</directory>
+			<directory>${project.parent.parent.basedir}/tinylog-api/target</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>*-${project.version}.jar</include>
@@ -45,7 +45,17 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.parent.basedir}</directory>
+			<directory>${project.parent.parent.basedir}/tinylog-impl/target</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>*-${project.version}.jar</include>
+				<include>*-${project.version}-javadoc.jar</include>
+				<include>*-${project.version}-sources.jar</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.parent.parent.basedir}</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>license.txt</include>
@@ -53,7 +63,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}</directory>
+			<directory>${project.parent.basedir}</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>readme.txt</include>

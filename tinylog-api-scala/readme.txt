@@ -15,7 +15,7 @@ specific language governing permissions and limitations under the License.
    Using tinylog in Scala
 ---------------------------
 
-Add tinylog-api.jar, tinylog-api-scala.jar, and an implementation such as
+Add tinylog-api.jar, tinylog-api-scala_2.*.jar, and an implementation such as
 tinylog-impl.jar to the classpath for using tinylog as a logging framework in
 Scala.
 
