@@ -33,7 +33,7 @@ public class LogFileState extends AbstractState<LogFile> {
 
 	@Override
 	public void write(String content) throws IOException {
-		instance.write(content);
+		instance.write(content.getBytes(CHARSET));
 	}
 
 	@Override
