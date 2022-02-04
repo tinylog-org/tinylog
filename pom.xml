@@ -746,6 +746,10 @@
 								<source>true</source>
 							</artifact>
 							<artifact>
+								<id>org.tinylog:jsl-tinylog:${project.version}</id>
+								<source>true</source>
+							</artifact>
+							<artifact>
 								<id>org.tinylog:jul-tinylog:${project.version}</id>
 								<source>true</source>
 							</artifact>
