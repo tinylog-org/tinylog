@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
@@ -21,6 +22,7 @@ public class FileWriter implements AsyncWriter {
 	private static final int BUILDER_MAX_CAPACITY = 64 * 1024; // 64 KB
 
 	private final Charset charset;
+	private final byte[] bom;
 	private final OutputFormat format;
 	private final LogFile file;
 	private final StringBuilder builder;
@@ -38,9 +40,14 @@ public class FileWriter implements AsyncWriter {
 		}
 
 		this.charset = charset;
+		this.bom = createBom(charset);
 		this.format = format;
-		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, charset, true);
+		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, true);
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
+
+		if (this.file.isNewFile()) {
+			this.file.write(bom, bom.length);
+		}
 	}
 
 	@Override
@@ -54,7 +61,7 @@ public class FileWriter implements AsyncWriter {
 			format.render(builder, entry);
 			String content = builder.toString();
 			byte[] data = content.getBytes(charset);
-			file.write(data);
+			file.write(data, bom.length);
 		} finally {
 			resetStringBuilder();
 		}
@@ -80,6 +87,18 @@ public class FileWriter implements AsyncWriter {
 		}
 
 		builder.setLength(0);
+	}
+
+	/**
+	 * Creates the BOM for a charset.
+	 *
+	 * @param charset The charset for which the BOM should be created
+	 * @return The BOM or an empty byte array if the passed charset does not have a BOM
+	 */
+	private static byte[] createBom(Charset charset) {
+		byte[] singleSpace = " ".getBytes(charset);
+		byte[] doubleSpaces = "  ".getBytes(charset);
+		return Arrays.copyOf(doubleSpaces, singleSpace.length * 2 - doubleSpaces.length);
 	}
 
 }

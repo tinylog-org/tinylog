@@ -3,8 +3,6 @@ package org.tinylog.impl.writers.file;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 
 /**
  * Buffered text file writer.
@@ -12,7 +10,7 @@ import java.util.Arrays;
 public class LogFile implements Closeable {
 
 	private final RandomAccessFile file;
-	private final byte[] bom;
+	private final boolean newFile;
 
 	private final int bufferCapacity;
 	private final ByteBuffer buffer;
@@ -20,14 +18,12 @@ public class LogFile implements Closeable {
 	/**
 	 * @param fileName The path to the log file
 	 * @param bufferCapacity The capacity for the byte buffer (must be greater than 0)
-	 * @param charset The charset for a potential BOM
 	 * @param append {@code true} for appending an already existing file, {@code false} for overwriting an already
 	 *               existing file
 	 * @throws IOException Failed to open the log file
 	 */
-	public LogFile(String fileName, int bufferCapacity, Charset charset, boolean append) throws IOException {
+	public LogFile(String fileName, int bufferCapacity, boolean append) throws IOException {
 		this.file = new RandomAccessFile(fileName, "rw");
-		this.bom = createBom(charset);
 
 		if (append) {
 			long fileLength = this.file.length();
@@ -36,41 +32,53 @@ public class LogFile implements Closeable {
 			this.buffer = new ByteBuffer(bufferCapacity, (int) maxBufferSize);
 			this.bufferCapacity = bufferCapacity;
 
-			if (fileLength > 0) {
-				this.file.seek(fileLength);
+			if (fileLength == 0) {
+				this.newFile = true;
 			} else {
-				this.buffer.store(bom, 0);
+				this.newFile = false;
+				this.file.seek(fileLength);
 			}
 		} else {
+			this.newFile = true;
 			this.file.setLength(0);
 
 			this.buffer = new ByteBuffer(bufferCapacity, bufferCapacity);
 			this.bufferCapacity = bufferCapacity;
-			this.buffer.store(bom, 0);
 		}
+	}
+
+	/**
+	 * Checks if this log file has started as a new empty file or is appending an already existing file.
+	 *
+	 * @return {@code true} if this log file has started as a new empty file or {@code false} if it is appending an
+	 *         already existing file
+	 */
+	public boolean isNewFile() {
+		return newFile;
 	}
 
 	/**
 	 * Writes a byte array into the log file.
 	 *
 	 * @param data The bytes to write
+	 * @param start The starting position in the passed source byte array
 	 * @throws IOException Failed to write into the log file
 	 */
-	public void write(byte[] data) throws IOException {
-		int bytes = buffer.store(data, bom.length);
+	public void write(byte[] data, int start) throws IOException {
+		int bytes = buffer.store(data, start);
 
 		if (buffer.isFull()) {
 			buffer.writeTo(file);
 			buffer.reset(bufferCapacity);
 
-			int remainingChunks = (data.length - bytes) / bufferCapacity;
+			int remainingChunks = (data.length - start - bytes) / bufferCapacity;
 			if (remainingChunks > 0) {
 				int length = remainingChunks * bufferCapacity;
 				file.write(data, bytes, length);
 				bytes += length;
 			}
 
-			if (bytes < data.length) {
+			if (bytes < data.length - start) {
 				buffer.store(data, bytes);
 			}
 		}
@@ -100,18 +108,6 @@ public class LogFile implements Closeable {
 		} finally {
 			file.close();
 		}
-	}
-
-	/**
-	 * Creates the BOM for a charset.
-	 *
-	 * @param charset The charset for which the BOM should be created
-	 * @return The BOM or an empty byte array if the passed charset does not have a BOM
-	 */
-	private static byte[] createBom(Charset charset) {
-		byte[] singleSpace = " ".getBytes(charset);
-		byte[] doubleSpaces = "  ".getBytes(charset);
-		return Arrays.copyOf(doubleSpaces, singleSpace.length * 2 - doubleSpaces.length);
 	}
 
 }

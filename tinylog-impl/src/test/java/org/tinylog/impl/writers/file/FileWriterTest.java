@@ -1,23 +1,32 @@
 package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FileWriterTest {
 
-	private Path logFile;
+	private Path file;
 
 	/**
 	 * Creates a temporary log file.
@@ -26,8 +35,8 @@ class FileWriterTest {
 	 */
 	@BeforeEach
 	void init() throws IOException {
-		logFile = Files.createTempFile("tinylog", ".log");
-		logFile.toFile().deleteOnExit();
+		file = Files.createTempFile("tinylog", ".log");
+		file.toFile().deleteOnExit();
 	}
 
 	/**
@@ -37,7 +46,7 @@ class FileWriterTest {
 	 */
 	@AfterEach
 	void release() throws IOException {
-		Files.deleteIfExists(logFile);
+		Files.deleteIfExists(file);
 	}
 
 	/**
@@ -45,7 +54,7 @@ class FileWriterTest {
 	 */
 	@Test
 	void requiredLogEntryValues() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, UTF_8)) {
 			assertThat(writer.getRequiredLogEntryValues())
 				.containsExactlyInAnyOrder(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 		}
@@ -53,10 +62,13 @@ class FileWriterTest {
 
 	/**
 	 * Verifies that multiple log entries can be written to the same log file.
+	 *
+	 * @param charset The charset to use for writing string
 	 */
-	@Test
-	void writeMultipleMessages() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+	@ParameterizedTest
+	@ArgumentsSource(CharsetsProvider.class)
+	void writeMultipleMessages(Charset charset) throws IOException {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
 
@@ -64,25 +76,28 @@ class FileWriterTest {
 			writer.log(entry);
 		}
 
-		assertThat(logFile).hasContent("Hello World!Goodbye.");
+		assertThat(file).usingCharset(charset).hasContent("Hello World!Goodbye.");
 	}
 
 	/**
 	 * Verifies that an already existing file is continued and not overwritten.
+	 *
+	 * @param charset The charset to use for writing string
 	 */
-	@Test
-	void appendExistingFile() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+	@ParameterizedTest
+	@ArgumentsSource(CharsetsProvider.class)
+	void appendExistingFile(Charset charset) throws IOException {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
 		}
 
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.UTF_8)) {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Goodbye.").create();
 			writer.log(entry);
 		}
 
-		assertThat(logFile).hasContent("Hello World!Goodbye.");
+		assertThat(file).usingCharset(charset).hasContent("Hello World!Goodbye.");
 	}
 
 
@@ -91,12 +106,33 @@ class FileWriterTest {
 	 */
 	@Test
 	void writeUnsupportedCharacter() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), logFile, StandardCharsets.US_ASCII)) {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, US_ASCII)) {
 			LogEntry entry = new LogEntryBuilder().message("<ä>").create();
 			writer.log(entry);
 		}
 
-		assertThat(logFile).hasContent("<?>");
+		assertThat(file).usingCharset(US_ASCII).hasContent("<?>");
+	}
+
+	/**
+	 * Provider for all charsets to test.
+	 */
+	private static final class CharsetsProvider implements ArgumentsProvider {
+
+		/** */
+		private CharsetsProvider() {
+		}
+
+		@Override
+		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+			return Stream.of(
+				Arguments.of(US_ASCII),
+				Arguments.of(StandardCharsets.ISO_8859_1),
+				Arguments.of(UTF_8),
+				Arguments.of(StandardCharsets.UTF_16)
+			);
+		}
+
 	}
 
 }

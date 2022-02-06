@@ -1,20 +1,13 @@
 package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,40 +38,50 @@ class LogFileTest {
 
 	/**
 	 * Verifies that an existing log file can be overwritten.
-	 *
-	 * @param charset The charset to use for writing text
 	 */
-	@ParameterizedTest
-	@ArgumentsSource(CharsetsProvider.class)
-	void overwriteLogFile(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("foo".getBytes(charset));
+	@Test
+	void overwriteLogFile() throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+			assertThat(file.isNewFile()).isTrue();
+			file.write(new byte[] {'f', 'o', 'o'}, 0);
 		}
 
-		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("bar".getBytes(charset));
+		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+			assertThat(file.isNewFile()).isTrue();
+			file.write(new byte[] {'b', 'a', 'r'}, 0);
 		}
 
-		assertThat(path).usingCharset(charset).hasContent("bar");
+		assertThat(path).usingCharset(StandardCharsets.US_ASCII).hasContent("bar");
 	}
 
 	/**
 	 * Verifies that an existing log file can be continued.
-	 *
-	 * @param charset The charset to use for writing text
 	 */
-	@ParameterizedTest
-	@ArgumentsSource(CharsetsProvider.class)
-	void continueLogFile(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
-			file.write("foo".getBytes(charset));
+	@Test
+	void continueLogFile() throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 64, true)) {
+			assertThat(file.isNewFile()).isTrue();
+			file.write(new byte[] {'f', 'o', 'o'}, 0);
 		}
 
-		try (LogFile file = new LogFile(path.toString(), 64, charset, true)) {
-			file.write("bar".getBytes(charset));
+		try (LogFile file = new LogFile(path.toString(), 64, true)) {
+			assertThat(file.isNewFile()).isFalse();
+			file.write(new byte[] {'b', 'a', 'r'}, 0);
 		}
 
-		assertThat(path).usingCharset(charset).hasContent("foobar");
+		assertThat(path).usingCharset(StandardCharsets.US_ASCII).hasContent("foobar");
+	}
+
+	/**
+	 * Verifies that the first bytes of a byte array can be omitted from writing.
+	 */
+	@Test
+	void writingPartially() throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 8, true)) {
+			file.write(new byte[] {'f', 'o', 'o'}, 1);
+		}
+
+		assertThat(path).usingCharset(StandardCharsets.US_ASCII).hasContent("oo");
 	}
 
 	/**
@@ -88,24 +91,24 @@ class LogFileTest {
 	void writingUntilBufferCapacity() throws IOException {
 		Files.write(path, new byte[6]);
 
-		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, true)) {
+		try (LogFile file = new LogFile(path.toString(), 8, true)) {
 			assertThat(path).hasSize(6);
-			file.write(new byte[1]);
+			file.write(new byte[1], 0);
 
 			assertThat(path).hasSize(6);
-			file.write(new byte[1]);
+			file.write(new byte[1], 0);
 
 			assertThat(path).hasSize(8);
 		}
 	}
 
 	/**
-	 * Verifies that strings can be written that are larger than the buffer size.
+	 * Verifies that byte arrays can be written, even if they are larger than the buffer size.
 	 */
 	@Test
-	void writingOversizedString() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 8, StandardCharsets.US_ASCII, false)) {
-			file.write(new byte[16 + 1]);
+	void writingOversizedByteArray() throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 8, false)) {
+			file.write(new byte[16 + 1], 0);
 			assertThat(path).hasSize(16);
 		}
 
@@ -114,40 +117,16 @@ class LogFileTest {
 
 	/**
 	 * Verifies that the buffer will be written into the file when flushing.
-	 *
-	 * @param charset The charset to use for writing text
 	 */
-	@ParameterizedTest
-	@ArgumentsSource(CharsetsProvider.class)
-	void flushing(Charset charset) throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, charset, false)) {
-			file.write("foo".getBytes(charset));
-			assertThat(path).usingCharset(charset).isEmptyFile();
+	@Test
+	void flushing() throws IOException {
+		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+			file.write(new byte[] {'f', 'o', 'o'}, 0);
+			assertThat(path).isEmptyFile();
 
 			file.flush();
-			assertThat(path).usingCharset(charset).hasContent("foo");
+			assertThat(path).usingCharset(StandardCharsets.US_ASCII).hasContent("foo");
 		}
-	}
-
-	/**
-	 * Provider for all charsets to test.
-	 */
-	private static final class CharsetsProvider implements ArgumentsProvider {
-
-		/** */
-		private CharsetsProvider() {
-		}
-
-		@Override
-		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-			return Stream.of(
-				Arguments.of(StandardCharsets.US_ASCII),
-				Arguments.of(StandardCharsets.ISO_8859_1),
-				Arguments.of(StandardCharsets.UTF_8),
-				Arguments.of(StandardCharsets.UTF_16)
-			);
-		}
-
 	}
 
 }

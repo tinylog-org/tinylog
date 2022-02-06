@@ -33,12 +33,12 @@ public class LogFileState extends AbstractState<LogFile> {
 
 	@Override
 	public void write(String content) throws IOException {
-		instance.write(content.getBytes(CHARSET));
+		instance.write(content.getBytes(CHARSET), 0);
 	}
 
 	@Override
 	protected LogFile create(Path path) throws IOException {
-		return new LogFile(path.toString(), bufferSize, CHARSET, false);
+		return new LogFile(path.toString(), bufferSize, false);
 	}
 
 }
