@@ -46,7 +46,7 @@ public class FileWriter implements AsyncWriter {
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 
 		if (this.file.isNewFile()) {
-			this.file.write(bom, bom.length);
+			this.file.write(bom, 0);
 		}
 	}
 
