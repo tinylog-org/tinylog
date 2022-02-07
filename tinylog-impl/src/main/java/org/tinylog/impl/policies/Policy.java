@@ -22,7 +22,8 @@ public interface Policy {
 	 * Initializes this policy for the current log file.
 	 *
 	 * <p>
-	 *     This method is called before any calls of {@link #canContinueFile(Path)}.
+	 *     This method is called after opening a log file and before the first call of {@link #canAcceptLogEntry(int)}
+	 *     for the current log file.
 	 * </p>
 	 *
 	 * @param file The current log file
