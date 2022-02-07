@@ -3,6 +3,7 @@ package org.tinylog.impl.writers.file;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -24,28 +25,20 @@ public class LogFile implements Closeable {
 	 * @throws IOException Failed to open the log file
 	 */
 	public LogFile(Path path, int bufferCapacity, boolean append) throws IOException {
-		this.file = new RandomAccessFile(path.toString(), "rw");
-
-		if (append) {
-			long fileLength = this.file.length();
-			long maxBufferSize = bufferCapacity - (fileLength % bufferCapacity);
-
-			this.buffer = new ByteBuffer(bufferCapacity, (int) maxBufferSize);
-			this.bufferCapacity = bufferCapacity;
-
-			if (fileLength == 0) {
-				this.newFile = true;
-			} else {
-				this.newFile = false;
-				this.file.seek(fileLength);
-			}
-		} else {
-			this.newFile = true;
-			this.file.setLength(0);
-
-			this.buffer = new ByteBuffer(bufferCapacity, bufferCapacity);
-			this.bufferCapacity = bufferCapacity;
+		if (!append) {
+			Files.deleteIfExists(path);
 		}
+
+		this.file = new RandomAccessFile(path.toFile(), "rw");
+
+		long fileLength = this.file.length();
+		long maxBufferSize = bufferCapacity - (fileLength % bufferCapacity);
+
+		this.buffer = new ByteBuffer(bufferCapacity, (int) maxBufferSize);
+		this.bufferCapacity = bufferCapacity;
+
+		this.newFile = fileLength == 0;
+		this.file.seek(fileLength);
 	}
 
 	/**
