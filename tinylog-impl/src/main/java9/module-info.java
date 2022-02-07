@@ -28,6 +28,7 @@ import org.tinylog.impl.format.pattern.styles.LengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.MinLengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.StyleBuilder;
+import org.tinylog.impl.policies.DailyPolicyBuilder;
 import org.tinylog.impl.policies.PolicyBuilder;
 import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
@@ -78,6 +79,7 @@ module org.tinylog.impl {
 
 	uses PolicyBuilder;
 	provides PolicyBuilder with
+		DailyPolicyBuilder,
 		SizePolicyBuilder,
 		StartupPolicyBuilder;
 
