@@ -10,6 +10,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
+import org.tinylog.impl.policies.Policy;
 import org.tinylog.impl.writers.AsyncWriter;
 
 /**
@@ -21,33 +22,36 @@ public class FileWriter implements AsyncWriter {
 	private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB
 	private static final int BUILDER_MAX_CAPACITY = 64 * 1024; // 64 KB
 
+	private final Path path;
 	private final Charset charset;
 	private final byte[] bom;
 	private final OutputFormat format;
-	private final LogFile file;
+	private final Policy policy;
 	private final StringBuilder builder;
+
+	private LogFile logFile;
 
 	/**
 	 * @param format The output format for log entries
+	 * @param policy The policy for starting new log files
 	 * @param file The path to the target log file
 	 * @param charset The charset to use for writing strings to the target file
-	 * @throws IOException Failed to access the target log file
+	 * @throws Exception Failed to access the target log file
 	 */
-	public FileWriter(OutputFormat format, Path file, Charset charset) throws IOException {
+	public FileWriter(OutputFormat format, Policy policy, Path file, Charset charset) throws Exception {
 		Path parent = file.toAbsolutePath().getParent();
 		if (parent != null) {
 			Files.createDirectories(parent);
 		}
 
+		this.path = file;
 		this.charset = charset;
 		this.bom = createBom(charset);
 		this.format = format;
-		this.file = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, true);
+		this.policy = policy;
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
 
-		if (this.file.isNewFile()) {
-			this.file.write(bom, 0);
-		}
+		this.logFile = createLogFile(file, bom, policy.canContinueFile(file), policy);
 	}
 
 	@Override
@@ -56,12 +60,18 @@ public class FileWriter implements AsyncWriter {
 	}
 
 	@Override
-	public void log(LogEntry entry) throws IOException {
+	public void log(LogEntry entry) throws Exception {
 		try {
 			format.render(builder, entry);
 			String content = builder.toString();
 			byte[] data = content.getBytes(charset);
-			file.write(data, bom.length);
+
+			if (!policy.canAcceptLogEntry(data.length - bom.length)) {
+				close();
+				logFile = createLogFile(path, bom, false, policy);
+			}
+
+			logFile.write(data, bom.length);
 		} finally {
 			resetStringBuilder();
 		}
@@ -69,12 +79,12 @@ public class FileWriter implements AsyncWriter {
 
 	@Override
 	public void flush() throws IOException {
-		file.flush();
+		logFile.flush();
 	}
 
 	@Override
 	public void close() throws IOException {
-		file.close();
+		logFile.close();
 	}
 
 	/**
@@ -99,6 +109,29 @@ public class FileWriter implements AsyncWriter {
 		byte[] singleSpace = " ".getBytes(charset);
 		byte[] doubleSpaces = "  ".getBytes(charset);
 		return Arrays.copyOf(doubleSpaces, singleSpace.length * 2 - doubleSpaces.length);
+	}
+
+	/**
+	 * Creates a new log file.
+	 *
+	 * @param file The full path to the log file
+	 * @param bom The BOM for the start of the log file
+	 * @param append {@code true} for appending an already existing file, {@code false} for overwriting an already
+	 *               existing file
+	 * @param policy The policy to initialize with the new log file
+	 * @return The created and opened log file
+	 * @throws Exception Failed to create the log file or to initialize the policy
+	 */
+	private static LogFile createLogFile(Path file, byte[] bom, boolean append, Policy policy) throws Exception {
+		LogFile logFile = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, append);
+		policy.init(file);
+
+		if (logFile.isNewFile() && bom.length > 0) {
+			policy.canAcceptLogEntry(bom.length);
+			logFile.write(bom, 0);
+		}
+
+		return logFile;
 	}
 
 }

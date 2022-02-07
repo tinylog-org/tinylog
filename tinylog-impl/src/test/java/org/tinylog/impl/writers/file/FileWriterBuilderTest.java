@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -37,7 +38,7 @@ class FileWriterBuilderTest {
 	@Inject
 	private Log log;
 
-	private Path logFile;
+	private Path file;
 
 	/**
 	 * Creates a temporary log file.
@@ -46,8 +47,8 @@ class FileWriterBuilderTest {
 	 */
 	@BeforeEach
 	void init() throws IOException {
-		logFile = Files.createTempFile("tinylog", ".log");
-		logFile.toFile().deleteOnExit();
+		file = Files.createTempFile("tinylog", ".log");
+		file.toFile().deleteOnExit();
 	}
 
 	/**
@@ -57,7 +58,7 @@ class FileWriterBuilderTest {
 	 */
 	@AfterEach
 	void release() throws IOException {
-		Files.deleteIfExists(logFile);
+		Files.deleteIfExists(file);
 	}
 
 	/**
@@ -66,7 +67,7 @@ class FileWriterBuilderTest {
 	@Test
 	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 	void defaultPattern() throws Exception {
-		Configuration configuration = new Configuration().set("file", logFile.toString());
+		Configuration configuration = new Configuration().set("file", file.toString());
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			LogEntry logEntry = new LogEntryBuilder()
@@ -81,7 +82,7 @@ class FileWriterBuilderTest {
 			writer.log(logEntry);
 		}
 
-		assertThat(logFile)
+		assertThat(file)
 			.hasContent("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
 	}
 
@@ -91,7 +92,7 @@ class FileWriterBuilderTest {
 	@Test
 	void customJsonFormat() throws Exception {
 		Configuration configuration = new Configuration()
-			.set("file", logFile.toString())
+			.set("file", file.toString())
 			.set("format", "ld-json")
 			.set("fields.msg", "message");
 
@@ -100,7 +101,7 @@ class FileWriterBuilderTest {
 			writer.log(logEntry);
 		}
 
-		assertThat(logFile).hasContent("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
+		assertThat(file).hasContent("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
 	}
 
 	/**
@@ -111,7 +112,7 @@ class FileWriterBuilderTest {
 	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 	void illegalOutputFormat() throws Exception {
 		Configuration configuration = new Configuration()
-			.set("file", logFile.toString())
+			.set("file", file.toString())
 			.set("format", "foo");
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
@@ -132,7 +133,7 @@ class FileWriterBuilderTest {
 			writer.log(logEntry);
 		}
 
-		assertThat(logFile)
+		assertThat(file)
 			.hasContent("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
 	}
 
@@ -143,13 +144,13 @@ class FileWriterBuilderTest {
 	void appendNewLineToCustomPattern() throws Exception {
 		Configuration configuration = new Configuration()
 			.set("pattern", "{message}")
-			.set("file", logFile.toString());
+			.set("file", file.toString());
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("Hello World!").create());
 		}
 
-		assertThat(logFile).hasContent("Hello World!" + System.lineSeparator());
+		assertThat(file).hasContent("Hello World!" + System.lineSeparator());
 	}
 
 	/**
@@ -174,14 +175,14 @@ class FileWriterBuilderTest {
 	void utf8Charset(String charsetName) throws Exception {
 		Configuration configuration = new Configuration()
 			.set("pattern", "{message}")
-			.set("file", logFile.toString())
+			.set("file", file.toString())
 			.set("charset", charsetName);
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
 		}
 
-		assertThat(logFile)
+		assertThat(file)
 			.usingCharset(StandardCharsets.UTF_8)
 			.hasContent("abc - äöüß - áéíóúüñ - 한글" + System.lineSeparator());
 	}
@@ -196,14 +197,14 @@ class FileWriterBuilderTest {
 	void asciiCharset(String charsetName) throws Exception {
 		Configuration configuration = new Configuration()
 			.set("pattern", "{message}")
-			.set("file", logFile.toString())
+			.set("file", file.toString())
 			.set("charset", charsetName);
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
 		}
 
-		assertThat(logFile)
+		assertThat(file)
 			.usingCharset(StandardCharsets.US_ASCII)
 			.hasContent("abc - ???? - ??????? - ??" + System.lineSeparator());
 	}
@@ -216,18 +217,130 @@ class FileWriterBuilderTest {
 	void invalidCharset() throws Exception {
 		Configuration configuration = new Configuration()
 			.set("pattern", "{message}")
-			.set("file", logFile.toString())
+			.set("file", file.toString())
 			.set("charset", "dummy");
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
 			writer.log(new LogEntryBuilder().message("Hello World!").create());
 		}
 
-		assertThat(logFile).hasContent("Hello World!" + System.lineSeparator());
+		assertThat(file).hasContent("Hello World!" + System.lineSeparator());
 
 		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("charset", "dummy");
+		});
+	}
+
+	/**
+	 * Verifies that a file writer can be created without defining a policy.
+	 */
+	@Test
+	void noPolicy() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", file.toString())
+			.set("chatset", StandardCharsets.US_ASCII.name());
+
+		Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			writer.log(new LogEntryBuilder().message("bar").create());
+		}
+
+		assertThat(file).hasContent("foo" + System.lineSeparator() + "bar" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a file writer can be created with a single policy.
+	 */
+	@Test
+	void singlePolicy() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", file.toString())
+			.set("chatset", StandardCharsets.US_ASCII.name())
+			.set("policies", "startup");
+
+		Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			writer.log(new LogEntryBuilder().message("bar").create());
+		}
+
+		assertThat(file).hasContent("bar" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a file writer can be created with multiple policies.
+	 */
+	@Test
+	void multiplePolicies() throws Exception {
+		int size = (1 + System.lineSeparator().length()) * 2; // two lines (letter + line separator)
+
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", file.toString())
+			.set("chatset", StandardCharsets.US_ASCII.name())
+			.set("policies", "startup, size: " + size);
+
+		Files.write(file, Collections.singleton("a"), StandardCharsets.US_ASCII);
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			writer.log(new LogEntryBuilder().message("b").create());
+			writer.log(new LogEntryBuilder().message("c").create());
+			writer.log(new LogEntryBuilder().message("d").create());
+		}
+
+		assertThat(file).usingCharset(StandardCharsets.US_ASCII).hasContent("d" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that unknown policies are reported, but other known policies work nevertheless.
+	 */
+	@Test
+	void reportUnknownPolicy() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", file.toString())
+			.set("chatset", StandardCharsets.US_ASCII.name())
+			.set("policies", "foo, startup");
+
+		Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			writer.log(new LogEntryBuilder().message("bar").create());
+		}
+
+		assertThat(file).hasContent("bar" + System.lineSeparator());
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("foo");
+		});
+	}
+
+	/**
+	 * Verifies that invalid configured policies are reported, but other valid configured policies work nevertheless.
+	 */
+	@Test
+	void reportInvalidPolicy() throws Exception {
+		Configuration configuration = new Configuration()
+			.set("pattern", "{message}")
+			.set("file", file.toString())
+			.set("chatset", StandardCharsets.US_ASCII.name())
+			.set("policies", "size: AB, startup");
+
+		Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+
+		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+			writer.log(new LogEntryBuilder().message("bar").create());
+		}
+
+		assertThat(file).hasContent("bar" + System.lineSeparator());
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+			assertThat(entry.getMessage()).contains("size");
+			assertThat(entry.getThrowable()).hasMessageContaining("AB");
 		});
 	}
 

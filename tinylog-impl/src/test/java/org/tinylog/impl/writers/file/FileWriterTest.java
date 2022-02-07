@@ -18,6 +18,9 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
+import org.tinylog.impl.policies.EndlessPolicy;
+import org.tinylog.impl.policies.SizePolicy;
+import org.tinylog.impl.policies.StartupPolicy;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -53,8 +56,8 @@ class FileWriterTest {
 	 * Verifies that the file writer requires only log entry values from the passed placeholder.
 	 */
 	@Test
-	void requiredLogEntryValues() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, UTF_8)) {
+	void requiredLogEntryValues() throws Exception {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), file, UTF_8)) {
 			assertThat(writer.getRequiredLogEntryValues())
 				.containsExactlyInAnyOrder(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
 		}
@@ -67,8 +70,8 @@ class FileWriterTest {
 	 */
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
-	void writeMultipleMessages(Charset charset) throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
+	void writeMultipleMessages(Charset charset) throws Exception {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
 
@@ -80,19 +83,19 @@ class FileWriterTest {
 	}
 
 	/**
-	 * Verifies that an already existing file is continued and not overwritten.
+	 * Verifies that an already existing file is continued can be continued.
 	 *
 	 * @param charset The charset to use for writing string
 	 */
 	@ParameterizedTest
 	@ArgumentsSource(CharsetsProvider.class)
-	void appendExistingFile(Charset charset) throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
+	void continueExistingFile(Charset charset) throws Exception {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
 			writer.log(entry);
 		}
 
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, charset)) {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), file, charset)) {
 			LogEntry entry = new LogEntryBuilder().message("Goodbye.").create();
 			writer.log(entry);
 		}
@@ -100,13 +103,56 @@ class FileWriterTest {
 		assertThat(file).usingCharset(charset).hasContent("Hello World!Goodbye.");
 	}
 
+	/**
+	 * Verifies that an already existing file can be overwritten.
+	 *
+	 * @param charset The charset to use for writing string
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(CharsetsProvider.class)
+	void overwriteExistingFile(Charset charset) throws Exception {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new StartupPolicy(), file, charset)) {
+			LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
+			writer.log(entry);
+		}
+
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new StartupPolicy(), file, charset)) {
+			LogEntry entry = new LogEntryBuilder().message("Goodbye.").create();
+			writer.log(entry);
+		}
+
+		assertThat(file).usingCharset(charset).hasContent("Goodbye.");
+	}
+
+	/**
+	 * Verifies that a new log file can be started via policy.
+	 *
+	 * @param charset The charset to use for writing string
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(CharsetsProvider.class)
+	void rollingExistingFile(Charset charset) throws Exception {
+		int size = "ab".getBytes(charset).length;
+
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new SizePolicy(size), file, charset)) {
+			LogEntry entry = new LogEntryBuilder().message("a").create();
+			writer.log(entry);
+		}
+		assertThat(file).usingCharset(charset).hasContent("a");
+
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new SizePolicy(size), file, charset)) {
+			LogEntry entry = new LogEntryBuilder().message("bc").create();
+			writer.log(entry);
+		}
+		assertThat(file).usingCharset(charset).hasContent("bc");
+	}
 
 	/**
 	 * Verifies that a character that is not supported by the passed charset is replaced by a question mark ("?").
 	 */
 	@Test
-	void writeUnsupportedCharacter() throws IOException {
-		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), file, US_ASCII)) {
+	void writeUnsupportedCharacter() throws Exception {
+		try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), file, US_ASCII)) {
 			LogEntry entry = new LogEntryBuilder().message("<ä>").create();
 			writer.log(entry);
 		}
