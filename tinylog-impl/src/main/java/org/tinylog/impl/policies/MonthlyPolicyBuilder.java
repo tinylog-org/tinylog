@@ -4,22 +4,22 @@ import java.time.Clock;
 import java.time.LocalTime;
 
 /**
- * Builder for creating an instance of {@link DailyPolicy}.
+ * Builder for creating an instance of {@link MonthlyPolicy}.
  */
-public class DailyPolicyBuilder extends AbstractDatePolicyBuilder {
+public class MonthlyPolicyBuilder extends AbstractDatePolicyBuilder {
 
 	/** */
-	public DailyPolicyBuilder() {
+	public MonthlyPolicyBuilder() {
 	}
 
 	@Override
 	public String getName() {
-		return "daily";
+		return "monthly";
 	}
 
 	@Override
 	protected AbstractDatePolicy createPolicy(Clock clock, LocalTime time) {
-		return new DailyPolicy(clock, time);
+		return new MonthlyPolicy(clock, time);
 	}
 
 }

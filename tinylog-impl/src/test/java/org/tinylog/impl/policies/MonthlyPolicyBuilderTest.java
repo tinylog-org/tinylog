@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
 @ExtendWith(MockitoExtension.class)
-class DailyPolicyBuilderTest {
+class MonthlyPolicyBuilderTest {
 
 	@Inject
 	private Framework framework;
@@ -35,7 +35,8 @@ class DailyPolicyBuilderTest {
 	private Clock clock;
 
 	/**
-	 * Verifies that the created daily policy will trigger a rollover event at midnight at the system default time zone.
+	 * Verifies that the created monthly policy will trigger a rollover event on the first day of the month at midnight
+	 * at the system default time zone.
 	 */
 	@Test
 	void defaultOnMidnightWithSystemZone() throws Exception {
@@ -44,7 +45,7 @@ class DailyPolicyBuilderTest {
 			when(clock.getZone()).thenReturn(ZoneId.of("UTC-1"));
 			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T00:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, null);
+			Policy policy = new MonthlyPolicyBuilder().create(framework, null);
 			policy.init(null);
 			assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -54,7 +55,7 @@ class DailyPolicyBuilderTest {
 	}
 
 	/**
-	 * Verifies that a custom time for daily rollover events can be configured without defining a time zone.
+	 * Verifies that a custom time for monthly rollover events can be configured without defining a time zone.
 	 */
 	@Test
 	void customTimeWithSystemZone() throws Exception {
@@ -63,7 +64,7 @@ class DailyPolicyBuilderTest {
 			when(clock.getZone()).thenReturn(ZoneOffset.UTC);
 			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, "04:00");
+			Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00");
 			policy.init(null);
 			assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -73,7 +74,7 @@ class DailyPolicyBuilderTest {
 	}
 
 	/**
-	 * Verifies that a custom time and custom zone can be configured for daily rollover events.
+	 * Verifies that a custom time and custom zone can be configured for monthly rollover events.
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@Test
@@ -83,7 +84,7 @@ class DailyPolicyBuilderTest {
 			when(clock.getZone()).thenReturn(ZoneId.of("CET"));
 			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T02:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, "04:00@CET");
+			Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00@CET");
 			policy.init(null);
 			assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -96,12 +97,12 @@ class DailyPolicyBuilderTest {
 	 * Verifies that an exception with a meaningful message will be thrown, if the configuration value contains an
 	 * invalid time or zone.
 	 *
-	 * @param configurationValue The configuration value with an invalid value for the daily policy
+	 * @param configurationValue The configuration value with an invalid value for the monthly policy
 	 */
 	@ParameterizedTest
 	@ValueSource(strings = {"foo", "foo@UTC", "00:00@FOO"})
 	void invalidConfiguration(String configurationValue) {
-		Throwable throwable = catchThrowable(() -> new DailyPolicyBuilder().create(framework, configurationValue));
+		Throwable throwable = catchThrowable(() -> new MonthlyPolicyBuilder().create(framework, configurationValue));
 		assertThat(throwable)
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessageContaining(configurationValue)
@@ -114,8 +115,8 @@ class DailyPolicyBuilderTest {
 	@Test
 	void service() {
 		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
-			assertThat(builder).isInstanceOf(DailyPolicyBuilder.class);
-			assertThat(builder.getName()).isEqualTo("daily");
+			assertThat(builder).isInstanceOf(MonthlyPolicyBuilder.class);
+			assertThat(builder.getName()).isEqualTo("monthly");
 		});
 	}
 
