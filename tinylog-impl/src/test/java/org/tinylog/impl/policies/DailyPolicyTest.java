@@ -3,6 +3,7 @@ package org.tinylog.impl.policies;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.time.Clock;
 import java.time.Instant;
@@ -46,7 +47,7 @@ class DailyPolicyTest {
 		@Test
 		void eldestContinuableFile() throws IOException {
 			Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
-			Files.setAttribute(file, "creationTime", FileTime.from(Instant.parse("1999-12-31T03:00:00Z")));
+			applyFileTime(file, Instant.parse("1999-12-31T03:00:00Z"));
 
 			DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
 			assertThat(policy.canContinueFile(file)).isTrue();
@@ -58,7 +59,7 @@ class DailyPolicyTest {
 		@Test
 		void youngestNotContinuableFile() throws IOException {
 			Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
-			Files.setAttribute(file, "creationTime", FileTime.from(Instant.parse("1999-12-31T02:59:59Z")));
+			applyFileTime(file, Instant.parse("1999-12-31T02:59:59Z"));
 
 			DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
 			assertThat(policy.canContinueFile(file)).isFalse();
@@ -70,7 +71,7 @@ class DailyPolicyTest {
 		@Test
 		void sameDateTime() throws IOException {
 			Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
-			Files.setAttribute(file, "creationTime", FileTime.from(Instant.parse("2000-01-01T03:00:00Z")));
+			applyFileTime(file, Instant.parse("2000-01-01T03:00:00Z"));
 
 			DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
 			assertThat(policy.canContinueFile(file)).isTrue();
@@ -82,10 +83,22 @@ class DailyPolicyTest {
 		@Test
 		void futureDateTime() throws IOException {
 			Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
-			Files.setAttribute(file, "creationTime", FileTime.from(Instant.parse("2100-12-31T23:59:59Z")));
+			applyFileTime(file, Instant.parse("2100-12-31T23:59:59Z"));
 
 			DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
 			assertThat(policy.canContinueFile(file)).isTrue();
+		}
+
+		/**
+		 * Sets the passed instant as create time and last modified time for the passed file.
+		 *
+		 * @param file The file to update
+		 * @param instant The new create time and last modified time
+		 * @throws IOException Failed to update create time and last modified time
+		 */
+		void applyFileTime(Path file, Instant instant) throws IOException {
+			FileTime fileTime = FileTime.from(instant);
+			Files.getFileAttributeView(file, BasicFileAttributeView.class).setTimes(fileTime, null, fileTime);
 		}
 
 	}
