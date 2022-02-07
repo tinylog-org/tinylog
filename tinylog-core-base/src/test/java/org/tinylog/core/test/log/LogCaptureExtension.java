@@ -1,5 +1,6 @@
 package org.tinylog.core.test.log;
 
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,6 +37,9 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 
 		Framework framework = getOrCreateFramework(context);
 		injectFields(context, framework);
+
+		TestClock clock = getOrCreateClock(context);
+		injectFields(context, clock);
 
 		Log log = getOrCreateLog(context);
 		injectFields(context, log);
@@ -75,6 +79,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 				.isEmpty();
 		} finally {
 			remove(context, Level.class);
+			remove(context, TestClock.class);
 			remove(context, Framework.class);
 			remove(context, CaptureLoggingBackend.class);
 			remove(context, Log.class);
@@ -94,10 +99,30 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
 			Framework.class,
 			() -> new Framework(false, false) {
 				@Override
+				public Clock getClock() {
+					return getOrCreateClock(context);
+				}
+
+				@Override
 				protected LoggingBackend createLoggingBackend() {
 					return getOrCreateLoggingBackend(context);
 				}
 			}
+		);
+	}
+
+	/**
+	 * Gets the actual {@link TestClock} instance from the store. If there is no {@link TestClock} present in the store,
+	 * a new {@link TestClock} will be created and added to the store.
+	 *
+	 * @param context The current extension context
+	 * @return The {@link TestClock} instance from the store
+	 */
+	private TestClock getOrCreateClock(ExtensionContext context) {
+		return getOrCreate(
+			context,
+			TestClock.class,
+			() -> new TestClock(Clock.systemDefaultZone())
 		);
 	}
 

@@ -1,6 +1,5 @@
 package org.tinylog.impl.policies;
 
-import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -10,47 +9,38 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.TestClock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
-@ExtendWith(MockitoExtension.class)
 class DailyPolicyBuilderTest {
 
 	@Inject
 	private Framework framework;
 
-	@Mock
-	private Clock clock;
+	@Inject
+	private TestClock clock;
 
 	/**
 	 * Verifies that the created daily policy will trigger a rollover event at midnight at the system default time zone.
 	 */
 	@Test
 	void defaultOnMidnightWithSystemZone() throws Exception {
-		try (MockedStatic<Clock> staticClockMock = mockStatic(Clock.class)) {
-			staticClockMock.when(Clock::systemDefaultZone).thenReturn(clock);
-			when(clock.getZone()).thenReturn(ZoneId.of("UTC-1"));
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T00:59:59Z"));
+		clock.setZone(ZoneId.of("UTC-1"));
+		clock.setInstant(Instant.parse("2000-01-01T00:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, null);
-			policy.init(null);
-			assertThat(policy.canAcceptLogEntry(0)).isTrue();
+		Policy policy = new DailyPolicyBuilder().create(framework, null);
+		policy.init(null);
+		assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T01:00:00Z"));
-			assertThat(policy.canAcceptLogEntry(0)).isFalse();
-		}
+		clock.setInstant(Instant.parse("2000-01-01T01:00:00Z"));
+		assertThat(policy.canAcceptLogEntry(0)).isFalse();
 	}
 
 	/**
@@ -58,38 +48,31 @@ class DailyPolicyBuilderTest {
 	 */
 	@Test
 	void customTimeWithSystemZone() throws Exception {
-		try (MockedStatic<Clock> staticClockMock = mockStatic(Clock.class)) {
-			staticClockMock.when(Clock::systemDefaultZone).thenReturn(clock);
-			when(clock.getZone()).thenReturn(ZoneOffset.UTC);
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:59:59Z"));
+		clock.setZone(ZoneOffset.UTC);
+		clock.setInstant(Instant.parse("2000-01-01T03:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, "04:00");
-			policy.init(null);
-			assertThat(policy.canAcceptLogEntry(0)).isTrue();
+		Policy policy = new DailyPolicyBuilder().create(framework, "04:00");
+		policy.init(null);
+		assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T04:00:00Z"));
-			assertThat(policy.canAcceptLogEntry(0)).isFalse();
-		}
+		clock.setInstant(Instant.parse("2000-01-01T04:00:00Z"));
+		assertThat(policy.canAcceptLogEntry(0)).isFalse();
 	}
 
 	/**
 	 * Verifies that a custom time and custom zone can be configured for daily rollover events.
 	 */
-	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@Test
 	void customTimeAndZone() throws Exception {
-		try (MockedStatic<Clock> staticClockMock = mockStatic(Clock.class)) {
-			staticClockMock.when(() -> Clock.system(ZoneId.of("CET"))).thenReturn(clock);
-			when(clock.getZone()).thenReturn(ZoneId.of("CET"));
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T02:59:59Z"));
+		clock.setZone(ZoneOffset.UTC);
+		clock.setInstant(Instant.parse("2000-01-01T02:59:59Z"));
 
-			Policy policy = new DailyPolicyBuilder().create(framework, "04:00@CET");
-			policy.init(null);
-			assertThat(policy.canAcceptLogEntry(0)).isTrue();
+		Policy policy = new DailyPolicyBuilder().create(framework, "04:00@CET");
+		policy.init(null);
+		assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-			when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
-			assertThat(policy.canAcceptLogEntry(0)).isFalse();
-		}
+		clock.setInstant(Instant.parse("2000-01-01T03:00:00Z"));
+		assertThat(policy.canAcceptLogEntry(0)).isFalse();
 	}
 
 	/**

@@ -18,7 +18,7 @@ public abstract class AbstractDatePolicyBuilder implements PolicyBuilder {
 
 	@Override
 	public Policy create(Framework framework, String value) {
-		Clock clock = Clock.systemDefaultZone();
+		Clock clock = framework.getClock();
 		LocalTime time = LocalTime.MIDNIGHT;
 
 		if (value != null) {
@@ -26,7 +26,7 @@ public abstract class AbstractDatePolicyBuilder implements PolicyBuilder {
 				int splitIndex = value.indexOf('@');
 				if (splitIndex >= 0) {
 					ZoneId zone = ZoneId.of(value.substring(splitIndex + 1));
-					clock = Clock.system(zone);
+					clock = clock.withZone(zone);
 					time = LocalTime.parse(value.substring(0, splitIndex));
 				} else {
 					time = LocalTime.parse(value);

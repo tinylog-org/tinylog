@@ -1,5 +1,6 @@
 package org.tinylog.core;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +60,15 @@ public class Framework {
 	public ClassLoader getClassLoader() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		return classLoader == null ? Framework.class.getClassLoader() : classLoader;
+	}
+
+	/**
+	 * Gets the clock for getting the current date, time, and zone.
+	 *
+	 * @return A working clock
+	 */
+	public Clock getClock() {
+		return Clock.systemDefaultZone();
 	}
 
 	/**

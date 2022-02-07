@@ -1,5 +1,8 @@
 package org.tinylog.core;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -35,6 +38,20 @@ class FrameworkTest {
 	@Test
 	void runtime() {
 		assertThat(new Framework(false, false).getRuntime()).isNotNull();
+	}
+
+	/**
+	 * Verifies that a working {@link Clock} with the default time zone is provided.
+	 */
+	@Test
+	void clock() {
+		Clock clock = new Framework(false, false).getClock();
+		assertThat(clock.getZone()).isEqualTo(ZoneId.systemDefault());
+
+		Instant before = Clock.systemDefaultZone().instant();
+		Instant instant = clock.instant();
+		Instant after = Clock.systemDefaultZone().instant();
+		assertThat(instant).isBetween(before, after);
 	}
 
 	/**
