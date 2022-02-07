@@ -38,7 +38,7 @@ public class LogFileState extends AbstractState<LogFile> {
 
 	@Override
 	protected LogFile create(Path path) throws IOException {
-		return new LogFile(path.toString(), bufferSize, false);
+		return new LogFile(path, bufferSize, false);
 	}
 
 }

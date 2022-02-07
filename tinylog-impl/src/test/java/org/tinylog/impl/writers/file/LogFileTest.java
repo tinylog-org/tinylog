@@ -41,12 +41,12 @@ class LogFileTest {
 	 */
 	@Test
 	void overwriteLogFile() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+		try (LogFile file = new LogFile(path, 64, false)) {
 			assertThat(file.isNewFile()).isTrue();
 			file.write(new byte[] {'f', 'o', 'o'}, 0);
 		}
 
-		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+		try (LogFile file = new LogFile(path, 64, false)) {
 			assertThat(file.isNewFile()).isTrue();
 			file.write(new byte[] {'b', 'a', 'r'}, 0);
 		}
@@ -59,12 +59,12 @@ class LogFileTest {
 	 */
 	@Test
 	void continueLogFile() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, true)) {
+		try (LogFile file = new LogFile(path, 64, true)) {
 			assertThat(file.isNewFile()).isTrue();
 			file.write(new byte[] {'f', 'o', 'o'}, 0);
 		}
 
-		try (LogFile file = new LogFile(path.toString(), 64, true)) {
+		try (LogFile file = new LogFile(path, 64, true)) {
 			assertThat(file.isNewFile()).isFalse();
 			file.write(new byte[] {'b', 'a', 'r'}, 0);
 		}
@@ -77,7 +77,7 @@ class LogFileTest {
 	 */
 	@Test
 	void writingPartially() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 8, true)) {
+		try (LogFile file = new LogFile(path, 8, true)) {
 			file.write(new byte[] {'f', 'o', 'o'}, 1);
 		}
 
@@ -91,7 +91,7 @@ class LogFileTest {
 	void writingUntilBufferCapacity() throws IOException {
 		Files.write(path, new byte[6]);
 
-		try (LogFile file = new LogFile(path.toString(), 8, true)) {
+		try (LogFile file = new LogFile(path, 8, true)) {
 			assertThat(path).hasSize(6);
 			file.write(new byte[1], 0);
 
@@ -107,7 +107,7 @@ class LogFileTest {
 	 */
 	@Test
 	void writingOversizedByteArray() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 8, false)) {
+		try (LogFile file = new LogFile(path, 8, false)) {
 			file.write(new byte[16 + 1], 0);
 			assertThat(path).hasSize(16);
 		}
@@ -120,7 +120,7 @@ class LogFileTest {
 	 */
 	@Test
 	void flushing() throws IOException {
-		try (LogFile file = new LogFile(path.toString(), 64, false)) {
+		try (LogFile file = new LogFile(path, 64, false)) {
 			file.write(new byte[] {'f', 'o', 'o'}, 0);
 			assertThat(path).isEmptyFile();
 

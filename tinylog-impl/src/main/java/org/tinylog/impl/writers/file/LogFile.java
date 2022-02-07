@@ -3,6 +3,7 @@ package org.tinylog.impl.writers.file;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 
 /**
  * Buffered text file writer.
@@ -16,14 +17,14 @@ public class LogFile implements Closeable {
 	private final ByteBuffer buffer;
 
 	/**
-	 * @param fileName The path to the log file
+	 * @param path The path to the log file
 	 * @param bufferCapacity The capacity for the byte buffer (must be greater than 0)
 	 * @param append {@code true} for appending an already existing file, {@code false} for overwriting an already
 	 *               existing file
 	 * @throws IOException Failed to open the log file
 	 */
-	public LogFile(String fileName, int bufferCapacity, boolean append) throws IOException {
-		this.file = new RandomAccessFile(fileName, "rw");
+	public LogFile(Path path, int bufferCapacity, boolean append) throws IOException {
+		this.file = new RandomAccessFile(path.toString(), "rw");
 
 		if (append) {
 			long fileLength = this.file.length();

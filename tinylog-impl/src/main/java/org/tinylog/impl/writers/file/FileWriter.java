@@ -123,7 +123,7 @@ public class FileWriter implements AsyncWriter {
 	 * @throws Exception Failed to create the log file or to initialize the policy
 	 */
 	private static LogFile createLogFile(Path file, byte[] bom, boolean append, Policy policy) throws Exception {
-		LogFile logFile = new LogFile(file.toString(), BYTE_BUFFER_CAPACITY, append);
+		LogFile logFile = new LogFile(file, BYTE_BUFFER_CAPACITY, append);
 		policy.init(file);
 
 		if (logFile.isNewFile() && bom.length > 0) {
