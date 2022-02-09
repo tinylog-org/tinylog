@@ -142,7 +142,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			LogEntry logEntry = TinylogLoggingConfiguration.createLogEntry(stackTraceElement, tag, level, exception, formatter, 
-					obj, arguments, requiredLogEntryValues[tagIndex], context);
+					obj, arguments, requiredLogEntryValues[tagIndex], getContextProvider());
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
@@ -174,7 +174,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 
 		if (activeLevel.ordinal() <= level.ordinal()) {
 			LogEntry logEntry = TinylogLoggingConfiguration.createLogEntry(stackTraceElement, tag, level, exception, formatter,  
-					obj, arguments, requiredLogEntryValues[tagIndex], context);
+					obj, arguments, requiredLogEntryValues[tagIndex], getContextProvider());
 			output(logEntry, writers[tagIndex][logEntry.getLevel().ordinal()]);
 		}
 	}
