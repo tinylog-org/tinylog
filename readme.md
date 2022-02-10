@@ -26,10 +26,10 @@ Outputting log entries to the console and into a log file via *tinylog.propertie
 ```properties
 level           = INFO
 
-writer1         = console
+writer1.type    = console
 writer1.pattern = {date: HH:mm:ss.SSS} {class}.{method}() {level}: {message}
 
-writer2         = file
+writer2.type    = file
 writer2.file    = logs/myapp.log
 writer2.pattern = {date: HH:mm:ss} [{thread}] {level}: {message}
 ```
