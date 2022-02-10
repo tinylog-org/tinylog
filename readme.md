@@ -24,14 +24,15 @@ public class Application {
 Outputting log entries to the console and into a log file via *tinylog.properties*
 
 ```properties
-level           = INFO
+level            = INFO
 
-writer1.type    = console
-writer1.pattern = {date: HH:mm:ss.SSS} {class}.{method}() {level}: {message}
+writer1.type     = console
+writer1.pattern  = {date: HH:mm:ss.SSS} {class}.{method}() {level}: {message}
 
-writer2.type    = file
-writer2.file    = logs/myapp.log
-writer2.pattern = {date: HH:mm:ss} [{thread}] {level}: {message}
+writer2.type     = file
+writer2.file     = logs/myapp.log
+writer2.policies = startup, daily: 03:00
+writer2.pattern  = {date: HH:mm:ss} [{thread}] {level}: {message}
 ```
 
 Contributing
