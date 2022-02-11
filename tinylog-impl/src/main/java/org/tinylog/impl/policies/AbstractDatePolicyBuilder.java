@@ -1,11 +1,11 @@
 package org.tinylog.impl.policies;
 
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.LocalTime;
-import java.time.ZoneId;
-
-import org.tinylog.core.Framework;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
+import java.time.temporal.TemporalQuery;
+import java.util.Locale;
 
 /**
  * Abstract builder for creating instances of {@link AbstractDatePolicy}.
@@ -16,39 +16,41 @@ public abstract class AbstractDatePolicyBuilder implements PolicyBuilder {
 	public AbstractDatePolicyBuilder() {
 	}
 
-	@Override
-	public Policy create(Framework framework, String value) {
-		Clock clock = framework.getClock();
-		LocalTime time = LocalTime.MIDNIGHT;
-
-		if (value != null) {
+	/**
+	 * Parses a text by a given {@link DateTimeFormatter date-time pattern}.
+	 *
+	 * @param pattern The date-time pattern to use for parsing
+	 * @param value The text value to parse (can be {@code null})
+	 * @return The parsed date-time object or {@code null} if the passed value is {@code null}
+	 * @throws IllegalArgumentException Failed to parse the text value by the given date-time pattern
+	 */
+	protected TemporalAccessor parse(String pattern, String value) throws IllegalArgumentException {
+		if (value == null) {
+			return null;
+		} else {
 			try {
-				int splitIndex = value.indexOf('@');
-				if (splitIndex >= 0) {
-					ZoneId zone = ZoneId.of(value.substring(splitIndex + 1));
-					clock = clock.withZone(zone);
-					time = LocalTime.parse(value.substring(0, splitIndex));
-				} else {
-					time = LocalTime.parse(value);
-				}
-			} catch (DateTimeException ex) {
+				return DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH).parse(value);
+			} catch (DateTimeParseException ex) {
 				throw new IllegalArgumentException(
 					"Invalid configuration \"" + value + "\" for " + getName() + " policy",
 					ex
 				);
 			}
 		}
-
-		return createPolicy(clock, time);
 	}
 
 	/**
-	 * Creates a new instance of the date policy.
+	 * Extracts date-time information from a {@link TemporalAccessor}.
 	 *
-	 * @param clock The clock for receiving the current date, time, and zone
-	 * @param time The time on which a rollover event should be triggered
-	 * @return New instance of the date policy
+	 * @param accessor The parsed date-time object from {@link #parse(String, String)}
+	 * @param query A query from {@link TemporalQueries} (must support {@code null} results)
+	 * @param defaultValue The default value to use if the passed query returns {@code null}
+	 * @param <T> The result type
+	 * @return The extracted value or the default value if not present in the passed temporal accessor
 	 */
-	protected abstract AbstractDatePolicy createPolicy(Clock clock, LocalTime time);
+	protected <T> T getOrDefault(TemporalAccessor accessor, TemporalQuery<T> query, T defaultValue) {
+		T value = accessor == null ? null : accessor.query(query);
+		return value == null ? defaultValue : value;
+	}
 
 }
