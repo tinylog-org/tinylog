@@ -1,6 +1,7 @@
 package org.tinylog.impl.policies;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
@@ -29,7 +30,11 @@ public abstract class AbstractDatePolicyBuilder implements PolicyBuilder {
 			return null;
 		} else {
 			try {
-				return DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH).parse(value);
+				return new DateTimeFormatterBuilder()
+					.parseCaseInsensitive()
+					.appendPattern(pattern)
+					.toFormatter(Locale.ENGLISH)
+					.parse(value);
 			} catch (DateTimeParseException ex) {
 				throw new IllegalArgumentException(
 					"Invalid configuration \"" + value + "\" for " + getName() + " policy",
