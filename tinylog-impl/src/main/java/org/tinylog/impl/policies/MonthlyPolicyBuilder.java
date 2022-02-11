@@ -26,7 +26,7 @@ public class MonthlyPolicyBuilder extends AbstractDatePolicyBuilder {
 	public Policy create(Framework framework, String value) {
 		Clock clock = framework.getClock();
 
-		TemporalAccessor accessor = parse("HH:mm[ z]", value);
+		TemporalAccessor accessor = parse("H:mm[ z]", value);
 		LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
 		ZoneId zone = getOrDefault(accessor, TemporalQueries.zone(), clock.getZone());
 
