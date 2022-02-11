@@ -68,7 +68,7 @@ class MonthlyPolicyBuilderTest {
 		clock.setZone(ZoneOffset.UTC);
 		clock.setInstant(Instant.parse("2000-01-01T02:59:59Z"));
 
-		Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00@CET");
+		Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00 CET");
 		policy.init(null);
 		assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -83,7 +83,7 @@ class MonthlyPolicyBuilderTest {
 	 * @param configurationValue The configuration value with an invalid value for the monthly policy
 	 */
 	@ParameterizedTest
-	@ValueSource(strings = {"foo", "foo@UTC", "00:00@FOO"})
+	@ValueSource(strings = {"foo", "foo UTC", "00:00 FOO"})
 	void invalidConfiguration(String configurationValue) {
 		Throwable throwable = catchThrowable(() -> new MonthlyPolicyBuilder().create(framework, configurationValue));
 		assertThat(throwable)
