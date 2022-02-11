@@ -43,7 +43,10 @@ public class WeeklyPolicy extends AbstractDatePolicy {
 		if (today.getValue() == day.getValue() && now.toLocalTime().isBefore(time)) {
 			return now.with(time);
 		} else {
-			int days = DAYS_PER_WEEK - (today.getValue() - day.getValue()) % DAYS_PER_WEEK;
+			int days = (day.getValue() - today.getValue()) % DAYS_PER_WEEK;
+			if (days <= 0) {
+				days += DAYS_PER_WEEK;
+			}
 			return now.plusDays(days).with(time);
 		}
 	}
