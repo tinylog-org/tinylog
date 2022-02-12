@@ -29,6 +29,7 @@ import org.tinylog.Supplier;
 import org.tinylog.configuration.Configuration;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.format.MessageFormatter;
+import org.tinylog.provider.ContextProvider;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.runtime.Timestamp;
 import org.tinylog.writers.Writer;
@@ -270,7 +271,7 @@ public class TinylogLoggingConfiguration {
 	public static LogEntry createLogEntry(final StackTraceElement stackTraceElement, final String tag, 
 		final Level level, final Throwable exception, final MessageFormatter formatter, final Object obj,
 		final Object[] arguments, final Collection<LogEntryValue>[] requiredLogEntryValues, 
-		final TinylogContextProvider contextProvider) {
+		final ContextProvider contextProvider) {
 		Collection<LogEntryValue> required = requiredLogEntryValues[level.ordinal()];
 
 		Timestamp timestamp = RuntimeProvider.createTimestamp();

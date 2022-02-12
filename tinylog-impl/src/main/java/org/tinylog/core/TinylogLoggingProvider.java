@@ -33,7 +33,7 @@ import org.tinylog.writers.Writer;
  */
 public class TinylogLoggingProvider implements LoggingProvider {
 
-	private final TinylogContextProvider context;
+	private final ContextProvider context;
 	private final Level globalLevel;
 	private final Map<String, Level> customLevels;
 	private final List<String> knownTags;
@@ -44,8 +44,15 @@ public class TinylogLoggingProvider implements LoggingProvider {
 
 	/** */
 	public TinylogLoggingProvider() {
+		this(new TinylogContextProvider());
+	}
+
+	/**
+	 * @param contextProvider Context provider to use for thread-based mapped diagnostic context
+	 */
+	protected TinylogLoggingProvider(final ContextProvider contextProvider) {
 		TinylogLoggingConfiguration config = new TinylogLoggingConfiguration();
-		context = new TinylogContextProvider();
+		context = contextProvider;
 		globalLevel = ConfigurationParser.getGlobalLevel();
 		customLevels = ConfigurationParser.getCustomLevels();
 		knownTags = ConfigurationParser.getTags();
