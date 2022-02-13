@@ -35,6 +35,7 @@ import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
 import org.tinylog.impl.policies.WeeklyPolicyBuilder;
 import org.tinylog.impl.segments.PathSegmentBuilder;
+import org.tinylog.impl.segments.ProcessIdSegmentBuilder;
 import org.tinylog.impl.writers.WriterBuilder;
 import org.tinylog.impl.writers.console.ConsoleWriterBuilder;
 import org.tinylog.impl.writers.file.FileWriterBuilder;
@@ -89,6 +90,8 @@ module org.tinylog.impl {
 		WeeklyPolicyBuilder;
 
 	uses PathSegmentBuilder;
+	provides PathSegmentBuilder with
+		ProcessIdSegmentBuilder;
 
 	uses WriterBuilder;
 	provides WriterBuilder with
