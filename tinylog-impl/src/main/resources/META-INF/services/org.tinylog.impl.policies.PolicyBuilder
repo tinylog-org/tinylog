@@ -2,3 +2,4 @@ org.tinylog.impl.policies.DailyPolicyBuilder
 org.tinylog.impl.policies.MonthlyPolicyBuilder
 org.tinylog.impl.policies.SizePolicyBuilder
 org.tinylog.impl.policies.StartupPolicyBuilder
+org.tinylog.impl.policies.WeeklyPolicyBuilder

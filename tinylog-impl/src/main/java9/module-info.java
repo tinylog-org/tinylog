@@ -33,6 +33,7 @@ import org.tinylog.impl.policies.MonthlyPolicyBuilder;
 import org.tinylog.impl.policies.PolicyBuilder;
 import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
+import org.tinylog.impl.policies.WeeklyPolicyBuilder;
 import org.tinylog.impl.writers.WriterBuilder;
 import org.tinylog.impl.writers.console.ConsoleWriterBuilder;
 import org.tinylog.impl.writers.file.FileWriterBuilder;
@@ -83,7 +84,8 @@ module org.tinylog.impl {
 		DailyPolicyBuilder,
 		MonthlyPolicyBuilder,
 		SizePolicyBuilder,
-		StartupPolicyBuilder;
+		StartupPolicyBuilder,
+		WeeklyPolicyBuilder;
 
 	uses WriterBuilder;
 	provides WriterBuilder with
