@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StaticPathSegmentTest {
 
 	/**
-	 * Verifies that the static path segments appends the stored text data to the passed string builder.
+	 * Verifies that the static path segment appends the stored text data to the passed string builder.
 	 */
 	@Test
 	void resolve() {
