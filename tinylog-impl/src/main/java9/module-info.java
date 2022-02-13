@@ -34,6 +34,7 @@ import org.tinylog.impl.policies.PolicyBuilder;
 import org.tinylog.impl.policies.SizePolicyBuilder;
 import org.tinylog.impl.policies.StartupPolicyBuilder;
 import org.tinylog.impl.policies.WeeklyPolicyBuilder;
+import org.tinylog.impl.segments.PathSegmentBuilder;
 import org.tinylog.impl.writers.WriterBuilder;
 import org.tinylog.impl.writers.console.ConsoleWriterBuilder;
 import org.tinylog.impl.writers.file.FileWriterBuilder;
@@ -87,6 +88,8 @@ module org.tinylog.impl {
 		StartupPolicyBuilder,
 		WeeklyPolicyBuilder;
 
+	uses PathSegmentBuilder;
+
 	uses WriterBuilder;
 	provides WriterBuilder with
 		ConsoleWriterBuilder,
@@ -102,6 +105,7 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.format.pattern.placeholders;
 	exports org.tinylog.impl.format.pattern.styles;
 	exports org.tinylog.impl.policies;
+	exports org.tinylog.impl.segments;
 	exports org.tinylog.impl.writers;
 	exports org.tinylog.impl.writers.console;
 	exports org.tinylog.impl.writers.file;
