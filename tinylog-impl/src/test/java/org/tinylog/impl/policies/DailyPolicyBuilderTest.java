@@ -44,7 +44,7 @@ class DailyPolicyBuilderTest {
 	}
 
 	/**
-	 * Verifies that a custom time for daily rollover events can be configured without defining a time zone.
+	 * Verifies that a custom time can be configured for daily rollover events without defining a time zone.
 	 */
 	@Test
 	void customTimeWithSystemZone() throws Exception {
