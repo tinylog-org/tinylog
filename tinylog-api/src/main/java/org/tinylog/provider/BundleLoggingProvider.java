@@ -24,7 +24,7 @@ import org.tinylog.format.MessageFormatter;
 /**
  * Logging provider that combines multiple logging providers into one.
  */
-final class BundleLoggingProvider implements LoggingProvider {
+public final class BundleLoggingProvider implements LoggingProvider {
 
 	private final LoggingProvider[] loggingProviders;
 	private final ContextProvider contextProvider;

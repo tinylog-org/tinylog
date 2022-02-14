@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Context provider that combines multiple context providers into one.
  */
-final class BundleContextProvider implements ContextProvider {
+public final class BundleContextProvider implements ContextProvider {
 
 	private final ContextProvider[] providers;
 
