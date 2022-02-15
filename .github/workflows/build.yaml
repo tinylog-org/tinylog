@@ -90,11 +90,31 @@ jobs:
             - uses: burrunan/gradle-cache-action@v1
               with:
                   build-root-directory: tinylog-android-tests
+            - uses: actions/cache@v2
+              id: avd-cache
+              with:
+                  path: |
+                      ~/.android/avd/*
+                      ~/.android/adb*
+                  key: avd-${{ matrix.api-level }}
+            - uses: reactivecircus/android-emulator-runner@v2
+              if: steps.avd-cache.outputs.cache-hit != 'true'
+              with:
+                  api-level: ${{ matrix.api-level }}
+                  arch: x86_64
+                  target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+                  force-avd-creation: false
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: false
+                  script: echo "Generated AVD snapshot for caching."
             - uses: reactivecircus/android-emulator-runner@v2
               with:
                   api-level: ${{ matrix.api-level }}
                   arch: x86_64
                   target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+                  force-avd-creation: false
+                  emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: true
                   working-directory: ./tinylog-android-tests
                   script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
             - uses: codecov/codecov-action@v1
