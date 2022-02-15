@@ -23,7 +23,7 @@ jobs:
                   path: ~/.m2/repository
                   key: maven-dev${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
                   restore-keys: |
-                      maven-${{ matrix.jdk }}-
+                      maven-dev${{ matrix.jdk }}-
             - run: mvn --batch-mode --update-snapshots verify
             - uses: codecov/codecov-action@v1
 
@@ -101,7 +101,7 @@ jobs:
                   path: |
                       ~/.android/avd/*
                       ~/.android/adb*
-                  key: avd-${{ matrix.api-level }}
+                  key: avd-android${{ matrix.api-level }}
             - uses: reactivecircus/android-emulator-runner@v2
               if: steps.avd-cache.outputs.cache-hit != 'true'
               with:
