@@ -65,7 +65,7 @@ public final class JdbcWriterTest {
 	private static final String SCHEMA_NAME = "MONITORING";
 
 	/**
-	 * Tests related to login to database.
+	 * Tests related to log in to database.
 	 */
 	public static final class Login extends AbstractTest {
 
@@ -88,13 +88,11 @@ public final class JdbcWriterTest {
 		/**
 		 * Verifies that login with invalid user credentials will fail for a JDBC connection URL.
 		 *
-		 * @throws NamingException
-		 *             Failed to find data source
 		 * @throws SQLException
 		 *             Failed to access database
 		 */
 		@Test
-		public void jdbcWithInvalidPassword() throws NamingException, SQLException {
+		public void jdbcWithInvalidPassword() throws SQLException {
 			createTable();
 			executeSql("CREATE USER BOB PASSWORD '123' ADMIN");
 
@@ -494,9 +492,7 @@ public final class JdbcWriterTest {
 
 			shutdownDatabase();
 
-			assertThatThrownBy(() -> {
-				writer.flush();
-			}).isInstanceOf(SQLException.class);
+			assertThatThrownBy(writer::flush).isInstanceOf(SQLException.class);
 
 			writer.write(LogEntryBuilder.empty().message("Two").create());
 
@@ -556,9 +552,7 @@ public final class JdbcWriterTest {
 
 			shutdownDatabase();
 
-			assertThatThrownBy(() -> {
-				writer.close();
-			}).isInstanceOf(SQLException.class);
+			assertThatThrownBy(writer::close).isInstanceOf(SQLException.class);
 
 			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("1");
 		}
@@ -623,13 +617,11 @@ public final class JdbcWriterTest {
 		 * Verifies that an exception will be thrown, if no connection URL has been defined. The message of the thrown
 		 * exception should contain "URL" or "url".
 		 *
-		 * @throws NamingException
-		 *             Failed to find data source
 		 * @throws SQLException
 		 *             Failed to access database
 		 */
 		@Test
-		public void missingConnectionUrl() throws NamingException, SQLException {
+		public void missingConnectionUrl() throws SQLException {
 			createTable();
 
 			assertThatThrownBy(() -> {
@@ -640,13 +632,11 @@ public final class JdbcWriterTest {
 		/**
 		 * Verifies that a {@link SQLException} will be thrown, if a JDBC connection URL cannot be resolved.
 		 *
-		 * @throws NamingException
-		 *             Failed to find data source
 		 * @throws SQLException
 		 *             Failed to access database
 		 */
 		@Test
-		public void invalidJdbcConnectionUrl() throws NamingException, SQLException {
+		public void invalidJdbcConnectionUrl() throws SQLException {
 			createTable();
 
 			assertThatThrownBy(() -> {
@@ -676,13 +666,11 @@ public final class JdbcWriterTest {
 		 * Verifies that an exception will be thrown, if no database table has been defined. The message of the thrown
 		 * exception should contain "table".
 		 *
-		 * @throws NamingException
-		 *             Failed to find data source
 		 * @throws SQLException
 		 *             Failed to access database
 		 */
 		@Test
-		public void missingTableName() throws NamingException, SQLException {
+		public void missingTableName() throws SQLException {
 			createTable();
 
 			assertThatThrownBy(() -> {
@@ -737,7 +725,7 @@ public final class JdbcWriterTest {
 		 *             Failed to call {@link JdbcWriter#append(StringBuilder, String, String)}
 		 */
 		@Test
-		public void accpetIdentifiersWithLegalLetters() throws Exception {
+		public void acceptIdentifiersWithLegalLetters() throws Exception {
 			StringBuilder builder = new StringBuilder();
 			Whitebox.invokeMethod(JdbcWriter.class, "append", builder, "@TEXT_MESSAGE@", " ");
 			assertThat(builder.toString()).isEqualTo("@TEXT_MESSAGE@");
@@ -806,7 +794,7 @@ public final class JdbcWriterTest {
 		 * Shutdowns the in-memory database after each test.
 		 *
 		 * @throws SQLException
-		 *             Failed to shutdown database
+		 *             Failed to shut down database
 		 */
 		@After
 		public void shutdownDatabase() throws SQLException {
