@@ -2,6 +2,7 @@ package org.tinylog.impl.policies;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 /**
@@ -21,12 +22,20 @@ public class SizePolicy implements Policy {
 
 	@Override
 	public boolean canContinueFile(Path file) throws IOException {
-		return Files.size(file) < maxSize;
+		try {
+			return Files.size(file) < maxSize;
+		} catch (NoSuchFileException ex) {
+			return false;
+		}
 	}
 
 	@Override
 	public void init(Path file) throws IOException {
-		currentSize = Files.size(file);
+		try {
+			currentSize = Files.size(file);
+		} catch (NoSuchFileException ex) {
+			currentSize = 0;
+		}
 	}
 
 	@Override

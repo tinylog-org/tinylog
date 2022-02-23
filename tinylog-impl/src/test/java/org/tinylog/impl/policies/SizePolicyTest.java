@@ -74,10 +74,36 @@ class SizePolicyTest {
 	}
 
 	/**
+	 * Verifies that the current log file has to be discontinued, if the file does not exist on the file system.
+	 */
+	@Test
+	void discontinueNonExistentFile() throws IOException {
+		Files.deleteIfExists(logFile);
+
+		SizePolicy policy = new SizePolicy(10);
+		assertThat(policy.canContinueFile(logFile)).isFalse();
+	}
+
+	/**
+	 * Verifies that new log entries are accepted until the defined maximum file size is reached.
+	 */
+	@Test
+	void acceptNewLogEntriesUntilMaxSize() throws IOException {
+		Files.deleteIfExists(logFile);
+
+		SizePolicy policy = new SizePolicy(10);
+		policy.init(logFile);
+
+		assertThat(policy.canAcceptLogEntry(1)).isTrue();
+		assertThat(policy.canAcceptLogEntry(9)).isTrue();
+		assertThat(policy.canAcceptLogEntry(1)).isFalse();
+	}
+
+	/**
 	 * Verifies that additional log entries are accepted until the defined maximum file size is reached.
 	 */
 	@Test
-	void acceptLogEntriesUntilMaxSize() throws IOException {
+	void acceptAdditionalLogEntriesUntilMaxSize() throws IOException {
 		increaseSizeOfLogFile(2);
 
 		SizePolicy policy = new SizePolicy(10);
