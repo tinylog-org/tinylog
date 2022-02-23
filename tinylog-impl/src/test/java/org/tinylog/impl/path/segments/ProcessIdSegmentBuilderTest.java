@@ -1,4 +1,4 @@
-package org.tinylog.impl.segments;
+package org.tinylog.impl.path.segments;
 
 import java.util.ServiceLoader;
 

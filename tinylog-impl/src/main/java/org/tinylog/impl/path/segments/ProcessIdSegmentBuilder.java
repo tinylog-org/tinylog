@@ -1,4 +1,4 @@
-package org.tinylog.impl.segments;
+package org.tinylog.impl.path.segments;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;

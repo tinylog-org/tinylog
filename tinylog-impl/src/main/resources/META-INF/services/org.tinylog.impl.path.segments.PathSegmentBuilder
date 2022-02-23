@@ -1,0 +1,2 @@
+org.tinylog.impl.path.segments.DateTimeSegmentBuilder
+org.tinylog.impl.path.segments.ProcessIdSegmentBuilder
