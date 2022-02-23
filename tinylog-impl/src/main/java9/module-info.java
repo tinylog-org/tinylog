@@ -109,6 +109,7 @@ module org.tinylog.impl {
 	exports org.tinylog.impl.format.pattern;
 	exports org.tinylog.impl.format.pattern.placeholders;
 	exports org.tinylog.impl.format.pattern.styles;
+	exports org.tinylog.impl.path;
 	exports org.tinylog.impl.path.segments;
 	exports org.tinylog.impl.policies;
 	exports org.tinylog.impl.writers;
