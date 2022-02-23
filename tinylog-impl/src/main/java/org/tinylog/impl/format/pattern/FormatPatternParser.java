@@ -23,8 +23,8 @@ import org.tinylog.impl.format.pattern.styles.StyleBuilder;
  * put in curly brackets.
  *
  * <p>
- *     All registered {@link PlaceholderBuilder} implementations are loaded when creating a new format pattern
- *     instance automatically.
+ *     All registered {@link PlaceholderBuilder} implementations are loaded automatically when creating a new format
+ *     pattern instance.
  * </p>
  *
  * <p>
@@ -164,7 +164,7 @@ public class FormatPatternParser extends AbstractPatternParser {
 	 * Applies styles to a placeholder.
 	 *
 	 * @param placeholder The placeholder to style
-	 * @param styles All styles to be apply (list can be empty)
+	 * @param styles All styles to be applied (list can be empty)
 	 * @return The styled placeholder
 	 */
 	private Placeholder applyStyles(Placeholder placeholder, List<String> styles) {
