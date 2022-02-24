@@ -28,6 +28,7 @@ import org.tinylog.impl.format.pattern.styles.LengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.MinLengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.StyleBuilder;
+import org.tinylog.impl.path.segments.CountSegmentBuilder;
 import org.tinylog.impl.path.segments.DateTimeSegmentBuilder;
 import org.tinylog.impl.path.segments.PathSegmentBuilder;
 import org.tinylog.impl.path.segments.ProcessIdSegmentBuilder;
@@ -92,6 +93,7 @@ module org.tinylog.impl {
 
 	uses PathSegmentBuilder;
 	provides PathSegmentBuilder with
+		CountSegmentBuilder,
 		DateTimeSegmentBuilder,
 		ProcessIdSegmentBuilder;
 
