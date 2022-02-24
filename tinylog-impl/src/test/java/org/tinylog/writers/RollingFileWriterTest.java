@@ -26,7 +26,7 @@ import org.powermock.reflect.Whitebox;
 import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.converters.FileConverter;
 import org.tinylog.core.LogEntryValue;
-import org.tinylog.path.DynamicNameSegment;
+import org.tinylog.path.DynamicSegment;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
@@ -511,7 +511,7 @@ public final class RollingFileWriterTest {
 	}
 
 	/**
-	 * Verifies that the logfile can be changed using {@code {dynamic name}}.
+	 * Verifies that the logfile can be changed using {@code {dynamic}}.
 	 *
 	 * @throws IOException
 	 *             Failed opening file
@@ -519,17 +519,17 @@ public final class RollingFileWriterTest {
 	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void dynamicName() throws IOException, InterruptedException {
+	public void dynamicText() throws IOException, InterruptedException {
 		String fooFile = FileSystem.createTemporaryFile();
 		String barFile = FileSystem.createTemporaryFile();
 
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap(
-				"file", "{dynamic name}",
+				"file", "{dynamic}",
 				"format", "{message}",
-				"policies", "dynamic name"));
-		DynamicNameSegment.setDynamicName(fooFile);
+				"policies", "dynamic"));
+		DynamicSegment.setText(fooFile);
 		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
-		DynamicNameSegment.setDynamicName(barFile);
+		DynamicSegment.setText(barFile);
 		writer.write(LogEntryBuilder.empty().message("Goodbye!").create());
 		writer.close();
 

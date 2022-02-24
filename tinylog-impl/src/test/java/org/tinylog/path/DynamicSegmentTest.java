@@ -18,52 +18,52 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link DynamicNameSegment}.
+ * Tests for {@link DynamicSegment}.
  */
-public final class DynamicNameSegmentTest {
+public final class DynamicSegmentTest {
 
 	/**
-	 * Verifies that the passed initial dynamic name text as well as the dynamic name set via
-	 * {@link DynamicNameSegment#setDynamicName(String)} will be returned as static text.
+	 * Verifies that the passed initial dynamic text as well as the dynamic text set via
+	 * {@link DynamicSegment#setText(String)} will be returned as static text.
 	 */
 	@Test
 	public void doesHaveStaticText() {
-		DynamicNameSegment segment = new DynamicNameSegment("test");
+		DynamicSegment segment = new DynamicSegment("test");
 		assertThat(segment.getStaticText()).isEqualTo("test");
 
-		DynamicNameSegment.setDynamicName("foo");
+		DynamicSegment.setText("foo");
 		assertThat(segment.getStaticText()).isEqualTo("foo");
 
-		DynamicNameSegment.setDynamicName("bar");
+		DynamicSegment.setText("bar");
 		assertThat(segment.getStaticText()).isEqualTo("bar");
 	}
 
 	/**
-	 * Verifies that the passed initial dynamic name text as well as the dynamic name set via
-	 * {@link DynamicNameSegment#setDynamicName(String)} will be returned as generated token.
+	 * Verifies that the passed initial dynamic text as well as the dynamic text set via
+	 * {@link DynamicSegment#setText(String)} will be returned as generated token.
 	 */
 	@Test
 	public void createToken() {
-		DynamicNameSegment segment = new DynamicNameSegment("test");
+		DynamicSegment segment = new DynamicSegment("test");
 		assertThat(segment.createToken(null, null)).isEqualTo("test");
 
-		DynamicNameSegment.setDynamicName("foo");
+		DynamicSegment.setText("foo");
 		assertThat(segment.getStaticText()).isEqualTo("foo");
 
-		DynamicNameSegment.setDynamicName("bar");
+		DynamicSegment.setText("bar");
 		assertThat(segment.getStaticText()).isEqualTo("bar");
 	}
 
 	/**
-	 * Verifies that the dynamic name text will be accepted as valid token.
+	 * Verifies that the dynamic text will be accepted as valid token.
 	 */
 	@Test
 	public void validateValidToken() {
-		DynamicNameSegment segment = new DynamicNameSegment("test");
+		DynamicSegment segment = new DynamicSegment("test");
 		assertThat(segment.validateToken("test")).isTrue();
 		assertThat(segment.validateToken("foo")).isFalse();
 
-		DynamicNameSegment.setDynamicName("foo");
+		DynamicSegment.setText("foo");
 		assertThat(segment.validateToken("test")).isFalse();
 		assertThat(segment.validateToken("foo")).isTrue();
 	}

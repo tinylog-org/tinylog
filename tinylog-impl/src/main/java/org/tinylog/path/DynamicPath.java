@@ -281,8 +281,8 @@ public final class DynamicPath {
 			return new CountSegment();
 		} else if ("pid".equals(name) && parameter == null) {
 			return new ProcessIdSegment();
-		} else if ("dynamic name".equals(name)) {
-			return new DynamicNameSegment(parameter == null ? DEFAULT_LOG_FILENAME : parameter);
+		} else if ("dynamic".equals(name)) {
+			return new DynamicSegment(parameter == null ? DEFAULT_LOG_FILENAME : parameter);
 		} else {
 			throw new IllegalArgumentException("Invalid token '" + token + "' in '" + path + "'");
 		}

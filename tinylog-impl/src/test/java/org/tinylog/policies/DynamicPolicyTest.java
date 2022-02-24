@@ -24,9 +24,9 @@ import org.tinylog.util.FileSystem;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link DynamicNamePolicy}.
+ * Tests for {@link DynamicPolicy}.
  */
-public final class DynamicNamePolicyTest {
+public final class DynamicPolicyTest {
 
 	/**
 	 * Redirects and collects system output streams.
@@ -43,10 +43,10 @@ public final class DynamicNamePolicyTest {
 	@Test
 	public void discontinueExistingFile() throws IOException {
 		String file = FileSystem.createTemporaryFile();
-		DynamicNamePolicy policy = new DynamicNamePolicy(null);
+		DynamicPolicy policy = new DynamicPolicy(null);
 		assertThat(policy.continueExistingFile(file)).isTrue();
 
-		DynamicNamePolicy.setReset();
+		DynamicPolicy.setReset();
 		assertThat(policy.continueExistingFile(file)).isFalse();
 
 		policy.reset();
@@ -58,10 +58,10 @@ public final class DynamicNamePolicyTest {
 	 */
 	@Test
 	public void continueCurrentFile() {
-		DynamicNamePolicy policy = new DynamicNamePolicy(null);
+		DynamicPolicy policy = new DynamicPolicy(null);
 		assertThat(policy.continueCurrentFile(new byte[0])).isTrue();
 
-		DynamicNamePolicy.setReset();
+		DynamicPolicy.setReset();
 		assertThat(policy.continueCurrentFile(new byte[0])).isFalse();
 
 		policy.reset();
@@ -73,7 +73,7 @@ public final class DynamicNamePolicyTest {
 	 */
 	@Test
 	public void resetIsCallable() {
-		new DynamicNamePolicy(null).reset();
+		new DynamicPolicy(null).reset();
 	}
 
 	/**
@@ -81,17 +81,17 @@ public final class DynamicNamePolicyTest {
 	 */
 	@Test
 	public void warnIfArgumentIsSet() {
-		new DynamicNamePolicy("test");
+		new DynamicPolicy("test");
 		assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("WARN").containsOnlyOnce("argument");
 	}
 
 	/**
-	 * Verifies that policy is registered as service under the name "dynamic name".
+	 * Verifies that policy is registered as service under the name "dynamic".
 	 */
 	@Test
 	public void isRegistered() {
-		Policy policy = new ServiceLoader<>(Policy.class, String.class).create("dynamic name", (String) null);
-		assertThat(policy).isInstanceOf(DynamicNamePolicy.class);
+		Policy policy = new ServiceLoader<>(Policy.class, String.class).create("dynamic", (String) null);
+		assertThat(policy).isInstanceOf(DynamicPolicy.class);
 	}
 
 }

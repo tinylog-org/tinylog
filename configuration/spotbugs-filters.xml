@@ -83,9 +83,9 @@
 		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 	</Match>
 	<Match>
-		<!-- Dynamic Name Policy -->
-		<Class name="org.tinylog.policies.DynamicNamePolicy" />
-		<!-- Allow writing to static field org.tinylog.policies.DynamicNamePolicy.reset from instance method org.tinylog.policies.DynamicNamePolicy.reset -->
+		<!-- Dynamic Policy -->
+		<Class name="org.tinylog.policies.DynamicPolicy" />
+		<!-- Allow writing to static field org.tinylog.policies.DynamicPolicy.reset from instance method org.tinylog.policies.DynamicPolicy.reset -->
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
 	</Match>
 </FindBugsFilter>

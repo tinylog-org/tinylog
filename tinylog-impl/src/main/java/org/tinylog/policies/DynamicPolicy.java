@@ -14,28 +14,28 @@
 package org.tinylog.policies;
 
 import org.tinylog.Level;
-import org.tinylog.path.DynamicNameSegment;
+import org.tinylog.path.DynamicSegment;
 import org.tinylog.provider.InternalLogger;
 
 /**
  * Policy for triggering a manual rollover by calling {@link #setReset()}.
- * Might be used together with {@link DynamicNameSegment}.
+ * Might be used together with {@link DynamicSegment}.
  */
-public final class DynamicNamePolicy implements Policy {
+public final class DynamicPolicy implements Policy {
 
 	private static volatile boolean reset;
 
 	/** */
-	public DynamicNamePolicy() {
+	public DynamicPolicy() {
 		this(null);
 	}
 
 	/**
-	 * @param argument Should be always {@code null} as dynamic name policy does not support arguments
+	 * @param argument Should be always {@code null} as dynamic policy does not support arguments
 	 */
-	public DynamicNamePolicy(final String argument) {
+	public DynamicPolicy(final String argument) {
 		if (argument != null) {
-			InternalLogger.log(Level.WARN, "Dynamic name policy does not support arguments");
+			InternalLogger.log(Level.WARN, "Dynamic policy does not support arguments");
 		}
 	}
 

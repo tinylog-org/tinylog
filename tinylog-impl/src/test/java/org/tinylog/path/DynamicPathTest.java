@@ -118,13 +118,13 @@ public final class DynamicPathTest {
 	 * Verifies that a path with a log filename pattern can be resolved.
 	 */
 	@Test
-	public void dynamicName() {
-		String pattern = new File(folder.getRoot(), "{dynamic name}.log").getAbsolutePath();
+	public void dynamicToken() {
+		String pattern = new File(folder.getRoot(), "{dynamic}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
 		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "log.log");
-		DynamicNameSegment.setDynamicName("foo");
+		DynamicSegment.setText("foo");
 		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "foo.log");
-		DynamicNameSegment.setDynamicName("bar");
+		DynamicSegment.setText("bar");
 		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "bar.log");
 	}
 
@@ -132,11 +132,11 @@ public final class DynamicPathTest {
 	 * Verifies that a path with a log filename pattern including initial value can be resolved.
 	 */
 	@Test
-	public void dynamicNameParameter() {
-		String pattern = new File(folder.getRoot(), "{dynamic name: foobar}.log").getAbsolutePath();
+	public void dynamicTokenParameter() {
+		String pattern = new File(folder.getRoot(), "{dynamic: foobar}.log").getAbsolutePath();
 		DynamicPath path = new DynamicPath(pattern);
 		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "foobar.log");
-		DynamicNameSegment.setDynamicName("baz");
+		DynamicSegment.setText("baz");
 		assertThat(path.resolve()).isEqualTo(folder.getRoot() + File.separator + "baz.log");
 	}
 

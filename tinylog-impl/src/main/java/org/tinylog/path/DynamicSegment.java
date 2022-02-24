@@ -13,71 +13,70 @@
 
 package org.tinylog.path;
 
-import org.tinylog.policies.DynamicNamePolicy;
-import org.tinylog.policies.Policy;
+import org.tinylog.policies.DynamicPolicy;
 import org.tinylog.runtime.Timestamp;
 
 /**
  * Path segment that represents a dynamic text.
  */
-public class DynamicNameSegment implements Segment {
+public class DynamicSegment implements Segment {
 
-	private static String dynamicName;
+	private static String text;
 	private static final Object mutex = new Object();
 
 	/**
-	 * @param defaultValue Initial value for dynamic name
+	 * @param defaultValue Initial value for dynamic text
 	 */
-	DynamicNameSegment(final String defaultValue) {
-		setDynamicName(defaultValue);
+	DynamicSegment(final String defaultValue) {
+		setText(defaultValue);
 	}
 
 	/**
-	 * Returns the current dynamic name.
+	 * Returns the current dynamic text.
 	 *
-	 * @return Dynamic name
+	 * @return Dynamic text
 	 */
-	public static String getDynamicName() {
+	public static String getText() {
 		synchronized (mutex) {
-			return dynamicName;
+			return text;
 		}
 	}
 
 	/**
-	 * Sets a new dynamic name.
+	 * Sets a new dynamic text.
 	 *
 	 * <p>
-	 *     When used together with {@link DynamicNamePolicy} and the dynamic name differs from the current one,
-	 *     a {@linkplain Policy#reset() reset} is triggered.
+	 *     When used together with {@link DynamicPolicy} and the dynamic text differs from the current one,
+	 *     a {@linkplain DynamicPolicy#reset() reset} is triggered.
 	 * </p>
 	 *
-	 * @param newDynamicName Dynamic name to set
+	 * @param text Dynamic text to set
 	 */
-	public static void setDynamicName(final String newDynamicName) {
+	public static void setText(final String text) {
 		synchronized (mutex) {
-			if (dynamicName != null && dynamicName.equals(newDynamicName)) {
+			if (DynamicSegment.text != null && DynamicSegment.text.equals(text)) {
 				return;
 			}
-			dynamicName = newDynamicName;
-			DynamicNamePolicy.setReset();
+			DynamicSegment.text = text;
+			DynamicPolicy.setReset();
 		}
 	}
 
 	@Override
 	public String getStaticText() {
-		return getDynamicName();
+		return getText();
 	}
 
 	@Override
 	public boolean validateToken(final String token) {
 		synchronized (mutex) {
-			return dynamicName != null && dynamicName.equals(token);
+			return text != null && text.equals(token);
 		}
 	}
 
 	@Override
 	public String createToken(final String prefix, final Timestamp timestamp) {
-		return getDynamicName();
+		return getText();
 	}
 
 }
