@@ -20,7 +20,8 @@ public interface PathSegment {
 	 * @param pathBuilder This string builder contains the already resolved path and the path data of this path segment
 	 *                    should be appended
 	 * @param date The date-time of the current rollover event
+	 * @throws Exception Failed to resolve the path segment
 	 */
-	void resolve(StringBuilder pathBuilder, ZonedDateTime date);
+	void resolve(StringBuilder pathBuilder, ZonedDateTime date) throws Exception;
 
 }

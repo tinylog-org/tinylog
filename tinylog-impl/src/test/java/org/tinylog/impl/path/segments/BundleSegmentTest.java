@@ -15,7 +15,7 @@ class BundleSegmentTest {
 	 * Verifies that the bundle segment appends the passed child path segments to the passed string builder.
 	 */
 	@Test
-	void resolve() {
+	void resolve() throws Exception {
 		StaticPathSegment fooSegment = new StaticPathSegment("foo");
 		StaticPathSegment barSegment = new StaticPathSegment("bar");
 		BundleSegment segment = new BundleSegment(Arrays.asList(fooSegment, barSegment));

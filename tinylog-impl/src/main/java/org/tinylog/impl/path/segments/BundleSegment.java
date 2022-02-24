@@ -23,7 +23,7 @@ public class BundleSegment implements PathSegment {
 	}
 
 	@Override
-	public void resolve(StringBuilder pathBuilder, ZonedDateTime date) {
+	public void resolve(StringBuilder pathBuilder, ZonedDateTime date) throws Exception {
 		for (PathSegment segment : segments) {
 			segment.resolve(pathBuilder, date);
 		}

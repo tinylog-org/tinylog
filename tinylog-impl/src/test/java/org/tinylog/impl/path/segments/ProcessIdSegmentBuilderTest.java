@@ -26,7 +26,7 @@ class ProcessIdSegmentBuilderTest {
 	 * configuration is empty as expected.
 	 */
 	@Test
-	void creationWithoutConfigurationValue() {
+	void creationWithoutConfigurationValue() throws Exception {
 		StringBuilder builder = new StringBuilder("bar/");
 		new ProcessIdSegmentBuilder().create(framework, null).resolve(builder, null);
 		assertThat(builder).asString().isEqualTo("bar/" + framework.getRuntime().getProcessId());
@@ -39,7 +39,7 @@ class ProcessIdSegmentBuilderTest {
 	 * configuration is unexpectedly not empty.
 	 */
 	@Test
-	void creationWithConfigurationValue() {
+	void creationWithConfigurationValue() throws Exception {
 		StringBuilder builder = new StringBuilder("bar/");
 		new ProcessIdSegmentBuilder().create(framework, "foo").resolve(builder, null);
 		assertThat(builder).asString().isEqualTo("bar/" + framework.getRuntime().getProcessId());
