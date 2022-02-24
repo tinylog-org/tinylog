@@ -325,24 +325,19 @@ public final class JdbcWriterTest {
 		}
 
 		/**
-		 * Verifies that log entries can be written to a {@link DataSource} if the Table is contained in a Schema.
-		 * Does also test if the schema param works.
+		 * Verifies that log entries can be written to table in a custom schema.
 		 *
-		 * @throws NamingException Failed to find data source
-		 * @throws SQLException    Failed to access database
+		 * @throws NamingException
+		 *             Failed to find data source
+		 * @throws SQLException
+		 *             Failed to access database
 		 */
 		@Test
-		public void dataSourceInsertionWithSchema() throws NamingException, SQLException {
+		public void schemaInsertion() throws NamingException, SQLException {
 			createSchema();
 			createTable(true, "MESSAGE CLOB NULL");
-			new InitialContext().bind(DATA_SOURCE_URL, createDataSource());
 
-			Map<String, String> propertyExtras = new HashMap<>();
-			propertyExtras.put("url", DATA_SOURCE_URL);
-			propertyExtras.put("schema", SCHEMA_NAME);
-			propertyExtras.put("table", TABLE_NAME);
-
-			Map<String, String> properties = createProperties(singletonMap("MESSAGE", "{message}"), propertyExtras);
+			Map<String, String> properties = createProperties(singletonMap("MESSAGE", "{message}"), singletonMap("schema", SCHEMA_NAME));
 			JdbcWriter writer = new JdbcWriter(properties);
 			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
 			writer.close();
@@ -844,9 +839,9 @@ public final class JdbcWriterTest {
 		}
 
 		/**
-		 * Creates a schema in the defined default database. The schema name is the defined default table.
+		 * Creates a schema in the defined default database. The schema name is the defined default schema.
 		 *
-		 * @throws SQLException Failed to create table
+		 * @throws SQLException Failed to create schema
 		 */
 		protected void createSchema() throws SQLException {
 			executeSql(String.format("CREATE SCHEMA %s;", SCHEMA_NAME));
