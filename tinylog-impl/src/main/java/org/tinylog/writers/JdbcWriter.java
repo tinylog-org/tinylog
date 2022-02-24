@@ -373,6 +373,10 @@ public final class JdbcWriter extends AbstractWriter {
 	private static String renderSql(final Map<String, String> properties, final String quote) throws SQLException {
 		StringBuilder builder = new StringBuilder();
 		builder.append("INSERT INTO ");
+		if (properties.get("schema") != null) {
+			append(builder, properties.get("schema"), quote);
+			builder.append(".");
+		}
 		append(builder, getTable(properties), quote);
 		builder.append(" (");
 

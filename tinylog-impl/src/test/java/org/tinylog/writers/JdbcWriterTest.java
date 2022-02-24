@@ -62,6 +62,7 @@ public final class JdbcWriterTest {
 	private static final String JDBC_URL = "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1";
 	private static final String DATA_SOURCE_URL = "java:comp/env/jdbc/ExampleDS";
 	private static final String TABLE_NAME = "LOGS";
+	private static final String SCHEMA_NAME = "MONITORING";
 
 	/**
 	 * Tests related to login to database.
@@ -323,6 +324,32 @@ public final class JdbcWriterTest {
 			writer.close();
 
 			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("Hello World!");
+		}
+
+		/**
+		 * Verifies that log entries can be written to a {@link DataSource} if the Table is contained in a Schema.
+		 * Does also test if the schema param works.
+		 *
+		 * @throws NamingException Failed to find data source
+		 * @throws SQLException    Failed to access database
+		 */
+		@Test
+		public void dataSourceInsertionWithSchema() throws NamingException, SQLException {
+			createSchema();
+			createTable(true, "MESSAGE CLOB NULL");
+			new InitialContext().bind(DATA_SOURCE_URL, createDataSource());
+
+			Map<String, String> propertyExtras = new HashMap<>();
+			propertyExtras.put("url", DATA_SOURCE_URL);
+			propertyExtras.put("schema", SCHEMA_NAME);
+			propertyExtras.put("table", TABLE_NAME);
+
+			Map<String, String> properties = createProperties(singletonMap("MESSAGE", "{message}"), propertyExtras);
+			JdbcWriter writer = new JdbcWriter(properties);
+			writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+			writer.close();
+
+			assertThat(fetchTable(SCHEMA_NAME + "." + TABLE_NAME)).column("MESSAGE").containsValues("Hello World!");
 		}
 
 		@Override
@@ -829,17 +856,38 @@ public final class JdbcWriterTest {
 		}
 
 		/**
+		 * Creates a schema in the defined default database. The schema name is the defined default table.
+		 *
+		 * @throws SQLException Failed to create table
+		 */
+		protected void createSchema() throws SQLException {
+			executeSql(String.format("CREATE SCHEMA %s;", SCHEMA_NAME));
+		}
+
+		/**
 		 * Creates a table in the defined default database. The table name is the defined default table.
 		 *
-		 * @param columns
-		 *            Column definitions including name and type
-		 * @throws SQLException
-		 *             Failed to create table
+		 * @param columns Column definitions including name and type
+		 * @throws SQLException Failed to create table
 		 */
 		protected void createTable(final String... columns) throws SQLException {
+			createTable(false, columns);
+		}
+
+		/**
+		 * Creates a table in the defined default database. The table name is the defined default table.
+		 *
+		 * @param columns  Column definitions including name and type
+		 * @param inSchema Defines if the table should be created in the default schema
+		 * @throws SQLException Failed to create table
+		 */
+		protected void createTable(final boolean inSchema, final String... columns) throws SQLException {
 			StringBuilder builder = new StringBuilder();
 
 			builder.append("CREATE TABLE ");
+			if (inSchema) {
+				builder.append(SCHEMA_NAME).append(".");
+			}
 			builder.append(TABLE_NAME);
 			builder.append(" (");
 
