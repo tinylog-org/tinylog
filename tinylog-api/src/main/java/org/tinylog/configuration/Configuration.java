@@ -61,15 +61,15 @@ public final class Configuration {
 	
 	private static final String CONFIGURATION_LOADER_CLASS_PROPERTY = PROPERTIES_PREFIX + "configurationloader";
 
-	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
-	private static final Properties properties = load();
-	private static boolean frozen;
-
 	private static final Resolver[] resolvers = {
 		EnvironmentVariableResolver.INSTANCE,
 		JndiValueResolver.INSTANCE,
 		SystemPropertyResolver.INSTANCE
 	};
+
+	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+	private static final Properties properties = load();
+	private static boolean frozen;
 
 	/** */
 	private Configuration() {
