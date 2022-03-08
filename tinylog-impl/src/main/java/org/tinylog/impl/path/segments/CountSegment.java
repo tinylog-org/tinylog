@@ -18,11 +18,12 @@ public class CountSegment implements PathSegment {
 
 	@Override
 	public void resolve(StringBuilder pathBuilder, ZonedDateTime date) throws IOException {
-		Path expandedPath = Paths.get(pathBuilder + "_"); // Add "_" as dummy to avoid getting the parent directory
+		// Add "_" as dummy to avoid getting the parent directory if path builder ends with a separator like "/" or "\"
+		Path expandedPath = Paths.get(pathBuilder + "_");
 		Path parentPath = expandedPath.getParent();
 
 		String expandedName = expandedPath.getFileName().toString();
-		String namePrefix = expandedName.substring(0, expandedName.length() - 1); // Without the dummy "_"
+		String namePrefix = expandedName.substring(0, expandedName.length() - 1); // Without the appended dummy "_"
 
 		long currentMax;
 		try {
