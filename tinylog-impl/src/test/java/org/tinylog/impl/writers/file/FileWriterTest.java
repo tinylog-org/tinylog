@@ -167,6 +167,25 @@ class FileWriterTest {
 	}
 
 	/**
+	 * Verifies that the content is written when flushing.
+	 */
+	@Test
+	void flushing() throws Exception {
+		Path file = directory.resolve("tinylog.log");
+		PathSegment path = new StaticPathSegment(file.toString());
+
+		try (FileWriter writer = new FileWriter(clock, new MessagePlaceholder(), new EndlessPolicy(), path, UTF_8)) {
+			writer.log(new LogEntryBuilder().message("1").create());
+			writer.log(new LogEntryBuilder().message("2").create());
+			writer.log(new LogEntryBuilder().message("3").create());
+
+			assertThat(file).usingCharset(UTF_8).isEmptyFile();
+			writer.flush();
+			assertThat(file).usingCharset(UTF_8).hasContent("123");
+		}
+	}
+
+	/**
 	 * Verifies that a character that is not supported by the passed charset is replaced by a question mark ("?").
 	 */
 	@Test
