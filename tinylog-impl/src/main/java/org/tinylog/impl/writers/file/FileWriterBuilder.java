@@ -10,8 +10,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.path.PathParser;
-import org.tinylog.impl.path.segments.PathSegment;
+import org.tinylog.impl.path.DynamicPath;
 import org.tinylog.impl.policies.BundlePolicy;
 import org.tinylog.impl.policies.EndlessPolicy;
 import org.tinylog.impl.policies.Policy;
@@ -45,11 +44,11 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
 			throw new IllegalArgumentException("File name is missing in required property \"" + fullKey + "\"");
 		}
 
-		PathSegment path = new PathParser(framework).parse(fileName);
 		Charset charset = getCharset(configuration);
 		Policy policy = getPolicy(framework, configuration);
+		DynamicPath path = new DynamicPath(framework, fileName);
 
-		return new FileWriter(framework.getClock(), format, policy, path, charset);
+		return new FileWriter(format, policy, path, charset);
 	}
 
 	/**

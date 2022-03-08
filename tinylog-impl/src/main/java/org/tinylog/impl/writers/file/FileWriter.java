@@ -2,18 +2,14 @@ package org.tinylog.impl.writers.file;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Clock;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.path.segments.PathSegment;
+import org.tinylog.impl.path.DynamicPath;
 import org.tinylog.impl.policies.Policy;
 import org.tinylog.impl.writers.AsyncWriter;
 
@@ -26,8 +22,7 @@ public class FileWriter implements AsyncWriter {
 	private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB
 	private static final int BUILDER_MAX_CAPACITY = 64 * 1024; // 64 KB
 
-	private final Clock clock;
-	private final PathSegment path;
+	private final DynamicPath path;
 	private final Charset charset;
 	private final byte[] bom;
 	private final OutputFormat format;
@@ -37,25 +32,22 @@ public class FileWriter implements AsyncWriter {
 	private LogFile logFile;
 
 	/**
-	 * @param clock The clock for getting the current time and zone
 	 * @param format The output format for log entries
 	 * @param policy The policy for starting new log files
-	 * @param path The path to the target log file
+	 * @param path The dynamic path to the target log file
 	 * @param charset The charset to use for writing strings to the target file
 	 * @throws Exception Failed to access the target log file
 	 */
-	public FileWriter(Clock clock, OutputFormat format, Policy policy, PathSegment path, Charset charset)
-			throws Exception {
-		this.clock = clock;
+	public FileWriter(OutputFormat format, Policy policy, DynamicPath path, Charset charset) throws Exception {
+		final Path actualPath = path.generateNewPath();
+
 		this.path = path;
 		this.charset = charset;
 		this.bom = createBom(charset);
 		this.format = format;
 		this.policy = policy;
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
-
-		Path file = resolveLogFilePath(clock, path);
-		this.logFile = createLogFile(file, bom, policy.canContinueFile(file), policy);
+		this.logFile = createLogFile(actualPath, bom, policy.canContinueFile(actualPath), policy);
 	}
 
 	@Override
@@ -72,8 +64,7 @@ public class FileWriter implements AsyncWriter {
 
 			if (!policy.canAcceptLogEntry(data.length - bom.length)) {
 				close();
-				Path file = resolveLogFilePath(clock, path);
-				logFile = createLogFile(file, bom, false, policy);
+				logFile = createLogFile(path.generateNewPath(), bom, false, policy);
 			}
 
 			logFile.write(data, bom.length);
@@ -114,26 +105,6 @@ public class FileWriter implements AsyncWriter {
 		byte[] singleSpace = " ".getBytes(charset);
 		byte[] doubleSpaces = "  ".getBytes(charset);
 		return Arrays.copyOf(doubleSpaces, singleSpace.length * 2 - doubleSpaces.length);
-	}
-
-	/**
-	 * Resolves the path to the log file.
-	 *
-	 * @param clock The clock for getting the current time and zone
-	 * @param dynamicPath The dynamic path to the log file
-	 * @return The static path to the current log file
-	 * @throws Exception Failed to resolve or prepare the path to the log file
-	 */
-	private static Path resolveLogFilePath(Clock clock, PathSegment dynamicPath) throws Exception {
-		StringBuilder builder = new StringBuilder();
-		dynamicPath.resolve(builder, ZonedDateTime.now(clock));
-
-		Path staticPath = Paths.get(builder.toString());
-		Path parentPath = staticPath.toAbsolutePath().getParent();
-		if (parentPath != null) {
-			Files.createDirectories(parentPath);
-		}
-		return staticPath;
 	}
 
 	/**
