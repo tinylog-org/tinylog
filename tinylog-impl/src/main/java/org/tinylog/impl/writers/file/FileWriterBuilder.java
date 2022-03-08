@@ -2,7 +2,6 @@ package org.tinylog.impl.writers.file;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,8 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.format.OutputFormat;
+import org.tinylog.impl.path.PathParser;
+import org.tinylog.impl.path.segments.PathSegment;
 import org.tinylog.impl.policies.BundlePolicy;
 import org.tinylog.impl.policies.EndlessPolicy;
 import org.tinylog.impl.policies.Policy;
@@ -44,10 +45,11 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
 			throw new IllegalArgumentException("File name is missing in required property \"" + fullKey + "\"");
 		}
 
+		PathSegment path = new PathParser(framework).parse(fileName);
 		Charset charset = getCharset(configuration);
 		Policy policy = getPolicy(framework, configuration);
 
-		return new FileWriter(format, policy, Paths.get(fileName), charset);
+		return new FileWriter(framework.getClock(), format, policy, path, charset);
 	}
 
 	/**
