@@ -10,7 +10,6 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.impl.path.segments.BundleSegment;
 import org.tinylog.impl.path.segments.PathSegment;
 import org.tinylog.impl.path.segments.PathSegmentBuilder;
 import org.tinylog.impl.path.segments.StaticPathSegment;
@@ -50,9 +49,9 @@ public class PathParser extends AbstractPatternParser {
 	 * Parses the dynamic path to the log file.
 	 *
 	 * @param path The dynamic path with placeholders
-	 * @return Resolvable path
+	 * @return Resolvable path segments
 	 */
-	public PathSegment parse(String path) {
+	public List<PathSegment> parse(String path) {
 		List<PathSegment> segments = new ArrayList<>();
 
 		BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
@@ -75,11 +74,7 @@ public class PathParser extends AbstractPatternParser {
 			segments.add(new StaticPathSegment(builder.toString()));
 		}
 
-		if (segments.size() == 1) {
-			return segments.get(0);
-		} else {
-			return new BundleSegment(segments);
-		}
+		return segments;
 	}
 
 	/**

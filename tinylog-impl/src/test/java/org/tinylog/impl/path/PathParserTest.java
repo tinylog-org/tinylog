@@ -3,6 +3,7 @@ package org.tinylog.impl.path;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -29,8 +30,8 @@ class PathParserTest {
 	 */
 	@Test
 	void empty() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("");
-		assertThat(render(segment)).isEqualTo("");
+		List<PathSegment> segments = new PathParser(framework).parse("");
+		assertThat(render(segments)).isEqualTo("");
 	}
 
 	/**
@@ -38,8 +39,8 @@ class PathParserTest {
 	 */
 	@Test
 	void staticPath() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("foo/log.txt");
-		assertThat(render(segment)).isEqualTo("foo/log.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("foo/log.txt");
+		assertThat(render(segments)).isEqualTo("foo/log.txt");
 	}
 
 	/**
@@ -47,8 +48,8 @@ class PathParserTest {
 	 */
 	@Test
 	void escaped() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("log.'{foo}'.txt");
-		assertThat(render(segment)).isEqualTo("log.{foo}.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("log.'{foo}'.txt");
+		assertThat(render(segments)).isEqualTo("log.{foo}.txt");
 	}
 
 	/**
@@ -56,8 +57,8 @@ class PathParserTest {
 	 */
 	@Test
 	void singlePlaceholderWithoutValue() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("foo/{date}.txt");
-		assertThat(render(segment)).isEqualTo("foo/1970-01-01_00-00-00.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("foo/{date}.txt");
+		assertThat(render(segments)).isEqualTo("foo/1970-01-01_00-00-00.txt");
 	}
 
 	/**
@@ -65,8 +66,8 @@ class PathParserTest {
 	 */
 	@Test
 	void singlePlaceholderWithValue() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("foo/{date: YYYY.MM.DD}.txt");
-		assertThat(render(segment)).isEqualTo("foo/1970.01.01.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("foo/{date: YYYY.MM.DD}.txt");
+		assertThat(render(segments)).isEqualTo("foo/1970.01.01.txt");
 	}
 
 	/**
@@ -74,8 +75,8 @@ class PathParserTest {
 	 */
 	@Test
 	void multiplePlaceholders() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("{process-id}/{date: YYYY.MM.DD}.txt");
-		assertThat(render(segment)).isEqualTo(framework.getRuntime().getProcessId() + "/1970.01.01.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("{process-id}/{date: YYYY.MM.DD}.txt");
+		assertThat(render(segments)).isEqualTo(framework.getRuntime().getProcessId() + "/1970.01.01.txt");
 	}
 
 	/**
@@ -83,8 +84,8 @@ class PathParserTest {
 	 */
 	@Test
 	void unknownPlaceholder() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("log.{foo}.txt");
-		assertThat(render(segment)).isEqualTo("log.undefined.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("log.{foo}.txt");
+		assertThat(render(segments)).isEqualTo("log.undefined.txt");
 		assertThat(log.consume()).singleElement().satisfies(logEntry -> {
 			assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(logEntry.getMessage()).contains("foo");
@@ -96,8 +97,8 @@ class PathParserTest {
 	 */
 	@Test
 	void invalidPlaceholder() throws Exception {
-		PathSegment segment = new PathParser(framework).parse("log.{date: foo}.txt");
-		assertThat(render(segment)).isEqualTo("log.undefined.txt");
+		List<PathSegment> segments = new PathParser(framework).parse("log.{date: foo}.txt");
+		assertThat(render(segments)).isEqualTo("log.undefined.txt");
 		assertThat(log.consume()).singleElement().satisfies(logEntry -> {
 			assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(logEntry.getMessage()).contains("date: foo");
@@ -105,14 +106,17 @@ class PathParserTest {
 	}
 
 	/**
-	 * Resolves a path segment as string.
+	 * Resolves the passed path segments as string.
 	 *
-	 * @param segment The path segment to resolve
+	 * @param segments The path segments to resolve
 	 * @return The resolved path segment
 	 */
-	private String render(PathSegment segment) throws Exception {
+	private String render(List<PathSegment> segments) throws Exception {
+		ZonedDateTime date = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
 		StringBuilder builder = new StringBuilder();
-		segment.resolve(builder, ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC));
+		for (PathSegment segment : segments) {
+			segment.resolve(builder, date);
+		}
 		return builder.toString();
 	}
 
