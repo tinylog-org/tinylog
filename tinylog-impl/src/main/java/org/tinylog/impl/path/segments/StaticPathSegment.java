@@ -19,7 +19,7 @@ public class StaticPathSegment implements PathSegment {
 
 	@Override
 	public String findLatest(Path parentDirectory, String prefix) {
-		return parentDirectory.resolve(prefix + data).toString();
+		return data;
 	}
 
 	@Override

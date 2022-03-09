@@ -60,11 +60,7 @@ public class DateTimeSegment implements PathSegment {
 			.filter(tuple -> tuple.value != null)
 			.max(DateTimeTuple::compare);
 
-		if (latest.isPresent()) {
-			return parentDirectory.resolve(prefix + latest.get().text).toString();
-		} else {
-			return null;
-		}
+		return latest.map(tuple -> tuple.text).orElse(null);
 	}
 
 	@Override

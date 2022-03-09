@@ -51,7 +51,7 @@ class DateTimeSegmentTest {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
 		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
-		assertThat(latest).isEqualTo(folder.resolve("foo_" + sample).toString());
+		assertThat(latest).isEqualTo(sample);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class DateTimeSegmentTest {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
 		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
-		assertThat(latest).isEqualTo(folder.resolve("foo_" + match).toString());
+		assertThat(latest).isEqualTo(match);
 	}
 
 	/**

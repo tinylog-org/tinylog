@@ -18,7 +18,7 @@ class StaticPathSegmentTest {
 	@Test
 	void findLatest() {
 		String latest = new StaticPathSegment("bar").findLatest(folder, "foo");
-		assertThat(latest).isEqualTo(folder.resolve("foobar").toString());
+		assertThat(latest).isEqualTo("bar");
 	}
 
 	/**

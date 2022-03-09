@@ -42,7 +42,7 @@ class CountSegmentTest {
 			Files.createFile(folder.resolve("foo0.log"));
 
 			String latest = new CountSegment().findLatest(folder, "foo");
-			assertThat(latest).isEqualTo(folder.resolve("foo0").toString());
+			assertThat(latest).isEqualTo("0");
 		}
 
 		/**
@@ -55,7 +55,7 @@ class CountSegmentTest {
 			Files.createFile(folder.resolve("foo42.log"));
 
 			String latest = new CountSegment().findLatest(folder, "foo");
-			assertThat(latest).isEqualTo(folder.resolve("foo42").toString());
+			assertThat(latest).isEqualTo("42");
 		}
 
 	}

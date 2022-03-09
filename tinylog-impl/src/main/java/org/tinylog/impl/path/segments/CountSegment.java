@@ -27,7 +27,7 @@ public class CountSegment implements PathSegment {
 			.max();
 
 		if (maxCount.isPresent()) {
-			return parentDirectory.resolve(prefix + maxCount.getAsLong()).toString();
+			return Long.toString(maxCount.getAsLong());
 		} else {
 			return null;
 		}
