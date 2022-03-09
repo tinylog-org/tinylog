@@ -24,6 +24,13 @@ public class DateTimeSegmentBuilder implements PathSegmentBuilder {
 	@Override
 	public PathSegment create(Framework framework, String value) throws Exception {
 		String pattern = value == null ? DEFAULT_PATTERN : value;
+
+		if (pattern.indexOf('[') >= 0) {
+			throw new IllegalArgumentException(
+				"Date-time pattern \" + pattern + \" contains an unsupported optional section"
+			);
+		}
+
 		Locale locale = framework.getConfiguration().getLocale();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
 		return new DateTimeSegment(formatter);
