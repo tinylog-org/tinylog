@@ -29,7 +29,7 @@ writer1.type     = console
 writer1.pattern  = {date: HH:mm:ss.SSS} {class}.{method}() {level}: {message}
 
 writer2.type     = file
-writer2.file     = logs/myapp.log
+writer2.file     = logs/{date: yyyy-MM-dd}/log_{count}.txt
 writer2.policies = startup, daily: 03:00
 writer2.pattern  = {date: HH:mm:ss} [{thread}] {level}: {message}
 ```
