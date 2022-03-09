@@ -6,6 +6,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.OptionalLong;
 
 /**
  * Path segment for a sequential count.
@@ -14,6 +15,22 @@ public class CountSegment implements PathSegment {
 
 	/** */
 	public CountSegment() {
+	}
+
+	@Override
+	public String findLatest(Path parentDirectory, String prefix) throws IOException {
+		OptionalLong maxCount = Files.list(parentDirectory)
+			.map(path -> path.getFileName().toString())
+			.filter(name -> name.startsWith(prefix))
+			.mapToLong(name -> getCount(name, prefix))
+			.filter(number -> number >= 0)
+			.max();
+
+		if (maxCount.isPresent()) {
+			return parentDirectory.resolve(prefix + maxCount.getAsLong()).toString();
+		} else {
+			return null;
+		}
 	}
 
 	@Override

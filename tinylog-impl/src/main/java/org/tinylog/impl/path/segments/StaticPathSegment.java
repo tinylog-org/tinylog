@@ -1,5 +1,6 @@
 package org.tinylog.impl.path.segments;
 
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
 /**
@@ -14,6 +15,11 @@ public class StaticPathSegment implements PathSegment {
 	 */
 	public StaticPathSegment(String data) {
 		this.data = data;
+	}
+
+	@Override
+	public String findLatest(Path parentDirectory, String prefix) {
+		return parentDirectory.resolve(prefix + data).toString();
 	}
 
 	@Override
