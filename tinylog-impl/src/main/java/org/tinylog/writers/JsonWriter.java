@@ -23,10 +23,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.pattern.FormatPatternParser;
 import org.tinylog.pattern.Token;
+import org.tinylog.provider.InternalLogger;
 import org.tinylog.writers.raw.ByteArrayWriter;
 
 /**
@@ -40,11 +42,12 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 	private final Charset charset;
 	private final ByteArrayWriter writer;
+	private final Map<String, Token> fields;
+	private final boolean lineDelimitedJson;
 
 	private StringBuilder builder;
 	private boolean firstEntry;
 	private int truncateSize;
-	private final Map<String, Token> fields;
 
 	private final byte[] charsetHeaderBytes;
 	private final byte[] lineFeedBytes;
@@ -75,6 +78,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		super(properties);
 
 		String fileName = getFileName();
+		String format = getStringValue("format");
 		boolean append = getBooleanValue("append");
 		boolean buffered = getBooleanValue("buffered");
 		boolean writingThread = getBooleanValue("writingthread");
@@ -82,6 +86,15 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 		charset = getCharset();
 		writer = createByteArrayWriter(fileName, append, buffered, false, false, charset);
 		fields = createTokens(properties);
+
+		if (format == null || "JSON".equalsIgnoreCase(format)) {
+			lineDelimitedJson = false;
+		} else if ("LDJSON".equalsIgnoreCase(format)) {
+			lineDelimitedJson = true;
+		} else {
+			lineDelimitedJson = false;
+			InternalLogger.log(Level.WARN, "Illegal format for JSON writer: " + format);
+		}
 
 		charsetHeaderBytes = getCharsetHeader(charset);
 		lineFeedBytes = removeHeader("\n".getBytes(charset), charsetHeaderBytes.length);
@@ -105,7 +118,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 			builder = new StringBuilder();
 		}
 
-		firstEntry = prepareFile();
+		firstEntry = lineDelimitedJson || prepareStandardJsonFile();
 		truncateSize = 0;
 	}
 
@@ -162,15 +175,28 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	 * @param builder  Target for the created the JSON object
 	 */
 	private void addJsonObject(final LogEntry logEntry, final StringBuilder builder) {
-		builder.append(NEW_LINE);
-		builder.append('\t');
-		builder.append("{").append(NEW_LINE);
+		if (!lineDelimitedJson) {
+			builder.append(NEW_LINE);
+			builder.append('\t');
+		}
+
+		builder.append("{");
+
+		if (!lineDelimitedJson) {
+			builder.append(NEW_LINE);
+		}
 
 		Token[] tokenEntries = fields.values().toArray(new Token[0]);
 		String[] fields = this.fields.keySet().toArray(new String[0]);
 
 		for (int i = 0; i < tokenEntries.length; i++) {
-			builder.append("\t\t\"").append(fields[i]).append("\" : \"");
+			if (!lineDelimitedJson) {
+				builder.append("\t\t");
+			}
+
+			builder.append('\"');
+			builder.append(fields[i]);
+			builder.append("\": \"");
 			int start = builder.length();
 
 			Token token = tokenEntries[i];
@@ -185,13 +211,30 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 			escapeCharacter("\n", "\\n", builder, start);
 			escapeCharacter("\r", "\\r", builder, start);
 
-			builder.append("\" ");
+			builder.append('"');
 
 			if (i + 1 < this.fields.size()) {
-				builder.append(",").append(NEW_LINE);
+				builder.append(",");
+
+				if (lineDelimitedJson) {
+					builder.append(' ');
+				} else {
+					builder.append(NEW_LINE);
+				}
 			}
 		}
-		builder.append(NEW_LINE).append("\t}");
+
+		if (lineDelimitedJson) {
+			builder.append(' ');
+		} else {
+			builder.append(NEW_LINE).append('\t');
+		}
+
+		builder.append('}');
+
+		if (lineDelimitedJson) {
+			builder.append(NEW_LINE);
+		}
 	}
 
 	/**
@@ -214,7 +257,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 
 		if (firstEntry) {
 			firstEntry = false;
-		} else {
+		} else if (!lineDelimitedJson) {
 			writer.write(commaBytes, 0, commaBytes.length);
 		}
 
@@ -227,11 +270,14 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	 * @throws IOException Closing failed
 	 */
 	private void internalFlush() throws IOException {
-		writer.write(newLineBytes, 0, newLineBytes.length);
-		writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
+		if (!lineDelimitedJson) {
+			writer.write(newLineBytes, 0, newLineBytes.length);
+			writer.write(bracketCloseBytes, 0, bracketCloseBytes.length);
+		}
+
 		writer.flush();
 
-		truncateSize = newLineBytes.length + bracketCloseBytes.length;
+		truncateSize = lineDelimitedJson ? 0 : newLineBytes.length + bracketCloseBytes.length;
 	}
 
 	/**
@@ -298,12 +344,12 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 	}
 
 	/**
-	 * Preparse the content of the JSON file for writing log entries.
+	 * Preparse the content of a standard JSON file for writing log entries.
 	 *
 	 * @return {@code true} if the JSON file is empty, {@code false} if it contains already log entries
 	 * @throws IOException Failed to access the JSON file
 	 */
-	private boolean prepareFile() throws IOException {
+	private boolean prepareStandardJsonFile() throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int numberOfBytes = writer.readTail(bytes, 0, BUFFER_SIZE);
 

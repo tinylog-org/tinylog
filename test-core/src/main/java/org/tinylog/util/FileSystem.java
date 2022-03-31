@@ -45,8 +45,23 @@ public final class FileSystem {
 	 *             Failed creating file
 	 */
 	public static String createTemporaryFile(final String... lines) throws IOException {
+		return createTemporaryFile(Charset.defaultCharset(), lines);
+	}
+
+	/**
+	 * Creates a new temporary file. The created file will be deleted automatically when the virtual machine terminates.
+	 *
+	 * @param charset
+	 *            Charset for text encoding
+	 * @param lines
+	 *            Text content for created file
+	 * @return Path to created file
+	 * @throws IOException
+	 *             Failed creating file
+	 */
+	public static String createTemporaryFile(final Charset charset, final String... lines) throws IOException {
 		Path path = Files.createTempFile(null, null);
-		Files.write(path, Arrays.asList(lines));
+		Files.write(path, Arrays.asList(lines), charset);
 		path.toFile().deleteOnExit();
 		return path.toString();
 	}

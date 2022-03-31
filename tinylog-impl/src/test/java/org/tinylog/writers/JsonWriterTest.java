@@ -50,10 +50,86 @@ public final class JsonWriterTest {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	/**
-	 * Tests for JSON output.
+	 * Redirects and collects system output streams.
+	 */
+	@Rule
+	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	/**
+	 * Verifies that the required {@link LogEntryValues} are correctly evaluated.
+	 *
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void evaluatesRequiredLogValuesCorrectly() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("field.message", "message");
+		properties.put("field.date", "date");
+		properties.put("field.line", "line");
+
+		Writer writer = new JsonWriter(properties);
+
+		Collection<LogEntryValue> logValues = writer.getRequiredLogEntryValues();
+
+		List<LogEntryValue> expectedValues = List.of(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION, LogEntryValue.DATE,
+				LogEntryValue.LINE);
+
+		assertThat(logValues).containsAll(expectedValues);
+	}
+
+	/**
+	 * Verifies that standard JSON output with JSON array for all log entries is used by default.
+	 *
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void standardJsonByDefault() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("field.level", "level");
+		properties.put("field.message", "message");
+
+		JsonWriter writer = new JsonWriter(properties);
+		writer.close();
+
+		String expectedFileContent = "[" + NEW_LINE + "]";
+		String resultingEntry = FileSystem.readFile(file);
+
+		assertThat(resultingEntry).isEqualTo(expectedFileContent);
+	}
+
+	/**
+	 * Verifies that standard JSON will be used if an invalid JSON format is configured.
+	 *
+	 * @throws IOException Failed writing to file
+	 */
+	@Test
+	public void fallbackToStandardJson() throws IOException {
+		String file = FileSystem.createTemporaryFile();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("file", file);
+		properties.put("format", "FOO");
+		properties.put("field.level", "level");
+		properties.put("field.message", "message");
+
+		JsonWriter writer = new JsonWriter(properties);
+		writer.close();
+
+		String expectedFileContent = "[" + NEW_LINE + "]";
+		String resultingEntry = FileSystem.readFile(file);
+
+		assertThat(resultingEntry).isEqualTo(expectedFileContent);
+		assertThat(systemStream.consumeErrorOutput()).contains("WARN", "format", "FOO");
+	}
+
+	/**
+	 * Tests for standard JSON output with JSON array for all log entries.
 	 */
 	@RunWith(Parameterized.class)
-	public static class JsonOutputTest {
+	public static class StandardJsonOutputTest {
 
 		/**
 		 * Redirects and collects system output streams.
@@ -69,7 +145,7 @@ public final class JsonWriterTest {
 		 * @param writingThread {@code true} to simulate an active writing thread, {@code false} to simulate the absence of
 		 *                      a writing thread
 		 */
-		public JsonOutputTest(final Charset charset, final boolean writingThread) {
+		public StandardJsonOutputTest(final Charset charset, final boolean writingThread) {
 			this.charset = charset;
 			this.writingThread = writingThread;
 		}
@@ -108,6 +184,7 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("buffered", "false");
 			properties.put("append", "false");
@@ -133,6 +210,7 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("buffered", "false");
 			properties.put("append", "false");
@@ -152,8 +230,8 @@ public final class JsonWriterTest {
 			writer.write(givenLogEntry);
 			writer.close();
 
-			String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
-			String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
+			String expectedMessage = String.format("\"message\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevel = String.format("\"level\": \"%s\"", givenLogEntry.getLevel());
 			String resultingEntry = FileSystem.readFile(file, charset);
 
 			int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
@@ -173,6 +251,7 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("buffered", "false");
 			properties.put("append", "true");
@@ -192,8 +271,8 @@ public final class JsonWriterTest {
 			writer.write(givenLogEntry);
 			writer.close();
 
-			String expectedMessage = String.format("\"message\" : \"%s\"", givenLogEntry.getMessage());
-			String expectedLevel = String.format("\"level\" : \"%s\"", givenLogEntry.getLevel());
+			String expectedMessage = String.format("\"message\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevel = String.format("\"level\": \"%s\"", givenLogEntry.getLevel());
 			String resultingEntry = FileSystem.readFile(file, charset);
 
 			int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
@@ -213,13 +292,13 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("buffered", "false");
 			properties.put("append", "false");
 			properties.put("charset", charset.name());
 
-			JsonWriter writer;
-			writer = new JsonWriter(properties);
+			JsonWriter writer = new JsonWriter(properties);
 			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
 			writer.write(givenLogEntry);
 			writer.close();
@@ -246,13 +325,13 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("buffered", "false");
 			properties.put("append", "true");
 			properties.put("charset", charset.name());
 
-			JsonWriter writer;
-			writer = new JsonWriter(properties);
+			JsonWriter writer = new JsonWriter(properties);
 			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
 			writer.write(givenLogEntry);
 			writer.write(givenLogEntry);
@@ -278,19 +357,19 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("charset", charset.name());
 			properties.put("field.msg", "message");
 			properties.put("field.lvl", "level");
 
-			JsonWriter writer;
-			writer = new JsonWriter(properties);
+			JsonWriter writer = new JsonWriter(properties);
 			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
 			writer.write(givenLogEntry);
 			writer.close();
 
-			String expectedMessageField = String.format("\"msg\" : \"%s\"", givenLogEntry.getMessage());
-			String expectedLevelField = String.format("\"lvl\" : \"%s\"", givenLogEntry.getLevel());
+			String expectedMessageField = String.format("\"msg\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevelField = String.format("\"lvl\": \"%s\"", givenLogEntry.getLevel());
 			String resultingEntry = FileSystem.readFile(file, charset);
 			assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
 		}
@@ -301,6 +380,7 @@ public final class JsonWriterTest {
 
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("charset", charset.name());
 			properties.put("buffered", "true");
@@ -332,6 +412,7 @@ public final class JsonWriterTest {
 			String file = FileSystem.createTemporaryFile();
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("charset", charset.name());
 			properties.put("field.message", "message");
@@ -356,9 +437,10 @@ public final class JsonWriterTest {
 		 */
 		@Test
 		public void handlesInvalidJsonFile() throws IOException {
-			String file = FileSystem.createTemporaryFile("[{}");
+			String file = FileSystem.createTemporaryFile(charset, "[{}");
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "JSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("append", "true");
 			properties.put("charset", charset.name());
@@ -369,31 +451,291 @@ public final class JsonWriterTest {
 					.hasMessageContainingAll("JSON", "closing bracket");
 		}
 
+	}
+
+	/**
+	 * Tests for line-delimited JSON output aka LDJSON.
+	 */
+	@RunWith(Parameterized.class)
+	public static class LineDelimitedJsonOutputTest {
+
 		/**
-		 * Verifies that the required {@link LogEntryValues} are correctly evaluated.
+		 * Redirects and collects system output streams.
+		 */
+		@Rule
+		public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+		private final Charset charset;
+		private final boolean writingThread;
+
+		/**
+		 * @param charset       The charset to use for JSON generation
+		 * @param writingThread {@code true} to simulate an active writing thread, {@code false} to simulate the absence of
+		 *                      a writing thread
+		 */
+		public LineDelimitedJsonOutputTest(final Charset charset, final boolean writingThread) {
+			this.charset = charset;
+			this.writingThread = writingThread;
+		}
+
+		/**
+		 * Returns sample charsets and both writing thread states ({@code true} and {@code false}) that should be tested.
+		 *
+		 * @return Each object array contains a single charset and a single boolean
+		 */
+		@Parameterized.Parameters(name = "{0} ({1})")
+		public static Collection<Object[]> getSizes() {
+			List<Object[]> arguments = new ArrayList<>();
+			arguments.add(new Object[] {StandardCharsets.US_ASCII, false});
+			arguments.add(new Object[] {StandardCharsets.US_ASCII, true});
+			arguments.add(new Object[] {StandardCharsets.ISO_8859_1, false});
+			arguments.add(new Object[] {StandardCharsets.ISO_8859_1, true});
+			arguments.add(new Object[] {StandardCharsets.UTF_8, false});
+			arguments.add(new Object[] {StandardCharsets.UTF_8, true});
+			arguments.add(new Object[] {StandardCharsets.UTF_16, false});
+			arguments.add(new Object[] {StandardCharsets.UTF_16, true});
+			arguments.add(new Object[] {StandardCharsets.UTF_16BE, false});
+			arguments.add(new Object[] {StandardCharsets.UTF_16BE, true});
+			arguments.add(new Object[] {StandardCharsets.UTF_16LE, false});
+			arguments.add(new Object[] {StandardCharsets.UTF_16LE, true});
+			return arguments;
+		}
+
+		/**
+		 * Verifies that with no logging, an empty file is created.
 		 *
 		 * @throws IOException Failed writing to file
 		 */
 		@Test
-		public void evaluatesRequiredLogValuesCorrectly() throws IOException {
+		public void noWriting() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("buffered", "false");
+			properties.put("append", "false");
+			properties.put("charset", charset.name());
+
+			JsonWriter writer = new JsonWriter(properties);
+			writer.close();
+
+			String resultingEntry = FileSystem.readFile(file, charset);
+			assertThat(resultingEntry).isEmpty();
+		}
+
+		/**
+		 * Verifies that file is rewritten.
+		 *
+		 * @throws IOException Failed writing to file
+		 */
+		@Test
+		public void unappendingWriting() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("buffered", "false");
+			properties.put("append", "false");
+			properties.put("charset", charset.name());
+			properties.put("field.level", "level");
+			properties.put("field.message", "message");
+
+			JsonWriter writer;
+			writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+			writer.write(givenLogEntry);
+			writer.write(givenLogEntry);
+			writer.close();
+
+			writer = new JsonWriter(properties);
+			writer.write(givenLogEntry);
+			writer.write(givenLogEntry);
+			writer.close();
+
+			String expectedMessage = String.format("\"message\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevel = String.format("\"level\": \"%s\"", givenLogEntry.getLevel());
+			String resultingEntry = FileSystem.readFile(file, charset);
+
+			int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
+			int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
+			assertThat(resultingMessageCount).isEqualTo(2);
+			assertThat(resultingLevelCount).isEqualTo(2);
+		}
+
+		/**
+		 * Verifies that file is appended with new entries.
+		 *
+		 * @throws IOException Failed writing to file
+		 */
+		@Test
+		public void appendingWriting() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("buffered", "false");
+			properties.put("append", "true");
+			properties.put("charset", charset.name());
+			properties.put("field.level", "level");
+			properties.put("field.message", "message");
+
+			JsonWriter writer;
+			writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+			writer.write(givenLogEntry);
+			writer.write(givenLogEntry);
+			writer.close();
+
+			writer = new JsonWriter(properties);
+			writer.write(givenLogEntry);
+			writer.write(givenLogEntry);
+			writer.close();
+
+			String expectedMessage = String.format("\"message\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevel = String.format("\"level\": \"%s\"", givenLogEntry.getLevel());
+			String resultingEntry = FileSystem.readFile(file, charset);
+
+			int resultingMessageCount = resultingEntry.split(Pattern.quote(expectedMessage)).length - 1;
+			int resultingLevelCount = resultingEntry.split(Pattern.quote(expectedLevel)).length - 1;
+			assertThat(resultingMessageCount).isEqualTo(4);
+			assertThat(resultingLevelCount).isEqualTo(4);
+		}
+
+		/**
+		 * Verifies that one line is used per log entry and no array brackets.
+		 *
+		 * @throws IOException Failed writing to file
+		 */
+		@Test
+		public void writesLinesCorrectly() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("buffered", "false");
+			properties.put("append", "false");
+			properties.put("charset", charset.name());
+
+			JsonWriter writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+			writer.write(givenLogEntry);
+			writer.write(givenLogEntry);
+			writer.close();
+
+			String resultingEntry = FileSystem.readFile(file, charset);
+			assertThat(resultingEntry).hasLineCount(2);
+			assertThat(resultingEntry).doesNotContain("[", "]");
+		}
+
+		/**
+		 * Verifies that input fields match output properties in JSON.
+		 *
+		 * @throws IOException Failed writing to file
+		 */
+		@Test
+		public void evaluatesFieldsCorrectly() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("charset", charset.name());
+			properties.put("field.msg", "message");
+			properties.put("field.lvl", "level");
+
+			JsonWriter writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class).create();
+			writer.write(givenLogEntry);
+			writer.close();
+
+			String expectedMessageField = String.format("\"msg\": \"%s\"", givenLogEntry.getMessage());
+			String expectedLevelField = String.format("\"lvl\": \"%s\"", givenLogEntry.getLevel());
+			String resultingEntry = FileSystem.readFile(file, charset);
+			assertThat(resultingEntry).contains(expectedMessageField).contains(expectedLevelField);
+		}
+
+		@Test
+		public void validJsonAfterFlushingOrClosing() throws IOException {
+			String file = FileSystem.createTemporaryFile();
+
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("charset", charset.name());
+			properties.put("buffered", "true");
+			properties.put("field.msg", "message");
+
+			JsonWriter writer = new JsonWriter(properties);
+
+			writer.write(LogEntryBuilder.empty().message("1").create());
+			writer.write(LogEntryBuilder.empty().message("2").create());
+			writer.flush();
+
+			assertThat(FileSystem.readFile(file, charset))
+					.isEqualToIgnoringWhitespace("{\"msg\": \"1\"}\n{\"msg\": \"2\"}");
+
+			writer.write(LogEntryBuilder.empty().message("3").create());
+			writer.close();
+
+			assertThat(FileSystem.readFile(file, charset))
+					.isEqualToIgnoringWhitespace("{\"msg\": \"1\"}\n{\"msg\": \"2\"}\n{\"msg\": \"3\"}");
+		}
+
+		/**
+		 * Verifies that special characters get escaped.
+		 *
+		 * @throws IOException Failed writing to file
+		 */
+		@Test
+		public void escapesCharacters() throws IOException {
 			String file = FileSystem.createTemporaryFile();
 			Map<String, String> properties = new HashMap<>();
 			properties.put("file", file);
+			properties.put("format", "LDJSON");
+			properties.put("writingthread", Boolean.toString(writingThread));
+			properties.put("charset", charset.name());
+			properties.put("field.message", "message");
+
+			JsonWriter writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.prefilled(JsonWriterTest.class)
+					.message("Hello World!" + NEW_LINE + "\t\t" + NEW_LINE + "\"\f\b").create();
+			writer.write(givenLogEntry);
+			writer.close();
+
+			String expectedMessage = "Hello World!\\n\\t\\t\\n\\\"\\f\\b";
+			String resultingEntry = FileSystem.readFile(file, charset);
+
+			assertThat(resultingEntry).contains(expectedMessage);
+		}
+
+		@Test
+		public void handlesInvalidJsonFile() throws IOException {
+			String file = FileSystem.createTemporaryFile(charset, "[{}");
+			Map<String, String> properties = new HashMap<>();
+			properties.put("file", file);
+			properties.put("format", "LDJSON");
 			properties.put("writingthread", Boolean.toString(writingThread));
 			properties.put("append", "true");
 			properties.put("charset", charset.name());
 			properties.put("field.message", "message");
-			properties.put("field.date", "date");
-			properties.put("field.line", "line");
 
-			Writer writer = new JsonWriter(properties);
+			JsonWriter writer = new JsonWriter(properties);
+			LogEntry givenLogEntry = LogEntryBuilder.empty().message("Hello World!").create();
+			writer.write(givenLogEntry);
+			writer.close();
 
-			Collection<LogEntryValue> logValues = writer.getRequiredLogEntryValues();
-
-			List<LogEntryValue> expectedValues = List.of(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION, LogEntryValue.DATE,
-					LogEntryValue.LINE);
-
-			assertThat(logValues).containsAll(expectedValues);
+			assertThat(FileSystem.readFile(file, charset))
+					.isEqualToIgnoringWhitespace("[{}\n{\"message\": \"Hello World!\"}");
 		}
 
 	}
