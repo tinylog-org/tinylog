@@ -6,9 +6,10 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.stream.Stream;
+
+import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -17,13 +18,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.tinylog.core.Level;
+import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureLogEntries
 class DateTimeSegmentTest {
 
 	@TempDir
 	private Path folder;
+
+	@Inject
+	private Log log;
 
 	/**
 	 * Verifies that null is returned if there are no matching files.
@@ -33,8 +41,7 @@ class DateTimeSegmentTest {
 		Files.createFile(folder.resolve("foo_BAR.log"));
 		Files.createFile(folder.resolve("bar_01-01-2000.log"));
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
-		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
+		String latest = new DateTimeSegment("dd-MM-yyyy", Locale.ENGLISH).findLatest(folder, "foo_");
 		assertThat(latest).isNull();
 	}
 
@@ -49,8 +56,7 @@ class DateTimeSegmentTest {
 	void findLatestOfOne(String pattern, String sample) throws IOException {
 		Files.createFile(folder.resolve("foo_" + sample + ".log"));
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
-		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
+		String latest = new DateTimeSegment(pattern, Locale.ENGLISH).findLatest(folder, "foo_");
 		assertThat(latest).isEqualTo(sample);
 	}
 
@@ -69,8 +75,7 @@ class DateTimeSegmentTest {
 		Files.createFile(folder.resolve("foo_" + second + ".log"));
 		Files.createFile(folder.resolve("foo_" + match + ".log"));
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
-		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
+		String latest = new DateTimeSegment(pattern, Locale.ENGLISH).findLatest(folder, "foo_");
 		assertThat(latest).isEqualTo(match);
 	}
 
@@ -82,8 +87,7 @@ class DateTimeSegmentTest {
 		Files.createFile(folder.resolve("foo_Z.log"));
 		Files.createFile(folder.resolve("foo_+01.log"));
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("X", Locale.ENGLISH);
-		String latest = new DateTimeSegment(formatter).findLatest(folder, "foo_");
+		String latest = new DateTimeSegment("X", Locale.ENGLISH).findLatest(folder, "foo_");
 		assertThat(latest).isNull();
 	}
 
@@ -92,13 +96,44 @@ class DateTimeSegmentTest {
 	 * provided date-time formatter.
 	 */
 	@Test
-	void resolve() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm", Locale.ENGLISH);
+	void resolveValidPattern() {
 		ZonedDateTime date = ZonedDateTime.ofInstant(Instant.parse("2000-01-01T12:00:00Z"), ZoneOffset.UTC);
-
 		StringBuilder builder = new StringBuilder("bar/");
-		new DateTimeSegment(formatter).resolve(builder, date);
+		new DateTimeSegment("yyyy-MM-dd_HH-mm", Locale.ENGLISH).resolve(builder, date);
+
 		assertThat(builder).asString().isEqualTo("bar/2000-01-01_12-00");
+	}
+
+	/**
+	 * Verifies that a date-time segment containing POSIX file separators is appended but a warning is logged.
+	 */
+	@Test
+	void resolvePatternWithPosixSeparators() {
+		ZonedDateTime date = ZonedDateTime.ofInstant(Instant.parse("2000-01-01T12:00:00Z"), ZoneOffset.UTC);
+		StringBuilder builder = new StringBuilder("bar/");
+		new DateTimeSegment("MM/dd/yyyy", Locale.ENGLISH).resolve(builder, date);
+
+		assertThat(builder).asString().isEqualTo("bar/01/01/2000");
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+			assertThat(entry.getMessage()).contains("file separator", "MM/dd/yyyy");
+		});
+	}
+
+	/**
+	 * Verifies that a date-time segment containing Windows file separators is appended but a warning is logged.
+	 */
+	@Test
+	void resolvePatternWithWindowsSeparators() {
+		ZonedDateTime date = ZonedDateTime.ofInstant(Instant.parse("2000-01-01T12:00:00Z"), ZoneOffset.UTC);
+		StringBuilder builder = new StringBuilder("bar/");
+		new DateTimeSegment("MM\\dd\\yyyy", Locale.ENGLISH).resolve(builder, date);
+
+		assertThat(builder).asString().isEqualTo("bar/01\\01\\2000");
+		assertThat(log.consume()).singleElement().satisfies(entry -> {
+			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+			assertThat(entry.getMessage()).contains("file separator", "MM\\dd\\yyyy");
+		});
 	}
 
 	/**

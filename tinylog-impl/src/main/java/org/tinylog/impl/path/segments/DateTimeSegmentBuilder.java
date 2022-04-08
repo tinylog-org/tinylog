@@ -1,6 +1,5 @@
 package org.tinylog.impl.path.segments;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import org.tinylog.core.Framework;
@@ -24,6 +23,7 @@ public class DateTimeSegmentBuilder implements PathSegmentBuilder {
 	@Override
 	public PathSegment create(Framework framework, String value) throws Exception {
 		String pattern = value == null ? DEFAULT_PATTERN : value;
+		Locale locale = framework.getConfiguration().getLocale();
 
 		if (pattern.indexOf('[') >= 0) {
 			throw new IllegalArgumentException(
@@ -31,9 +31,7 @@ public class DateTimeSegmentBuilder implements PathSegmentBuilder {
 			);
 		}
 
-		Locale locale = framework.getConfiguration().getLocale();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
-		return new DateTimeSegment(formatter);
+		return new DateTimeSegment(pattern, locale);
 	}
 
 }

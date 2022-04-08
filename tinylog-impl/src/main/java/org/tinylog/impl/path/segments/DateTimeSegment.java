@@ -21,7 +21,10 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQuery;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+
+import org.tinylog.core.internal.InternalLogger;
 
 /**
  * Path segment for the date-time.
@@ -43,12 +46,15 @@ public class DateTimeSegment implements PathSegment {
 	);
 
 	private final DateTimeFormatter formatter;
+	private final String pattern;
 
 	/**
-	 * @param formatter The formatter to use for formatting the date-time of the rollover event
+	 * @param pattern The pattern to use for formatting date-times
+	 * @param locale The locale to use for formatting date-times
 	 */
-	public DateTimeSegment(DateTimeFormatter formatter) {
-		this.formatter = formatter;
+	public DateTimeSegment(String pattern, Locale locale) {
+		this.formatter = DateTimeFormatter.ofPattern(pattern, locale);
+		this.pattern = pattern;
 	}
 
 	@Override
@@ -65,7 +71,19 @@ public class DateTimeSegment implements PathSegment {
 
 	@Override
 	public void resolve(StringBuilder pathBuilder, ZonedDateTime date) {
+		int start = pathBuilder.length();
 		formatter.formatTo(date, pathBuilder);
+
+		boolean containsPosixFileSeparator = pathBuilder.indexOf("/", start) >= 0;
+		boolean containsWindowsFileSeparator = pathBuilder.indexOf("\\", start) >= 0;
+		if (containsPosixFileSeparator || containsWindowsFileSeparator) {
+			InternalLogger.warn(
+				null,
+				"Date-time pattern \"{}\" must not contain a file separator, but resolves to \"{}\"",
+				pattern,
+				pathBuilder.substring(start)
+			);
+		}
 	}
 
 	/**
