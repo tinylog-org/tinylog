@@ -39,14 +39,18 @@ public class FileWriter implements AsyncWriter {
 	 * @throws Exception Failed to access the target log file
 	 */
 	public FileWriter(OutputFormat format, Policy policy, DynamicPath path, Charset charset) throws Exception {
-		final Path actualPath = path.generateNewPath();
-
 		this.path = path;
 		this.charset = charset;
 		this.bom = createBom(charset);
 		this.format = format;
 		this.policy = policy;
 		this.builder = new StringBuilder(BUILDER_START_CAPACITY);
+
+		Path actualPath = path.getLatestPath();
+		if (actualPath == null) {
+			actualPath = path.generateNewPath();
+		}
+
 		this.logFile = createLogFile(actualPath, bom, policy.canContinueFile(actualPath), policy);
 	}
 

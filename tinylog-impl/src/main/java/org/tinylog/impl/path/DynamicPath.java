@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import org.tinylog.core.Framework;
 import org.tinylog.impl.path.segments.PathSegment;
@@ -16,7 +15,7 @@ import org.tinylog.impl.path.segments.PathSegment;
 public class DynamicPath {
 
 	private final Clock clock;
-	private final List<PathSegment> pathSegments;
+	private final PathSegment[] pathSegments;
 
 	/**
 	 * @param framework The actual logging framework instance
@@ -24,7 +23,43 @@ public class DynamicPath {
 	 */
 	public DynamicPath(Framework framework, String path) {
 		this.clock = framework.getClock();
-		this.pathSegments = new PathParser(framework).parse(path);
+		this.pathSegments = new PathParser(framework).parse(path).toArray(new PathSegment[0]);
+	}
+
+	/**
+	 * Gets the latest existing path by resolving all static and dynamic path segments.
+	 *
+	 * @return The latest existing path or {@code null} if none exist
+	 * @throws Exception Failed to resolve the latest path
+	 */
+	public Path getLatestPath() throws Exception {
+		Path parentDirectory = Paths.get("");
+		String prefix = "";
+
+		for (int i = 0; i < pathSegments.length; ++i) {
+			String result = pathSegments[i].findLatest(parentDirectory, prefix);
+			if (result == null) {
+				return null;
+			}
+
+			Path path = parentDirectory.resolve(prefix + result);
+			if (i == pathSegments.length - 1) {
+				return Files.isRegularFile(path) ? path : null;
+			}
+
+			String normalizedResult = path.normalize().toString();
+			String separator = parentDirectory.getFileSystem().getSeparator();
+			int separatorIndex = normalizedResult.lastIndexOf(separator);
+			if (separatorIndex >= 0) {
+				parentDirectory = Paths.get(normalizedResult.substring(0, separatorIndex));
+				prefix = normalizedResult.substring(separatorIndex + 1);
+			} else {
+				parentDirectory = Paths.get(normalizedResult);
+				prefix = "";
+			}
+		}
+
+		return null;
 	}
 
 	/**
