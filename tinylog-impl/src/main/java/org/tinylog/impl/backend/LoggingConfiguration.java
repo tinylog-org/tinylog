@@ -3,7 +3,9 @@ package org.tinylog.impl.backend;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,7 +57,7 @@ class LoggingConfiguration {
 	/**
 	 * Gets all active writers for log entries with the passed tag and severity level.
 	 *
-	 * @param tag The tag
+	 * @param tag The category tag
 	 * @param level The severity level
 	 * @return The active writers
 	 */
@@ -96,10 +98,14 @@ class LoggingConfiguration {
 		Map<String, LevelConfiguration> adjustedConfigurations = new HashMap<>();
 
 		for (Map.Entry<String, LevelConfiguration> configurationEntry : severityLevels.entrySet()) {
-			Map<String, Level> adjustedLevels = configurationEntry.getValue().stream()
-				.map(entry -> new AbstractMap.SimpleEntry<>(
-					entry.getKey(),
-					Level.mostSevereLevel(entry.getValue(), effectiveLevels.get(entry.getKey()))
+			Set<String> tags = new HashSet<>();
+			tags.addAll(configurationEntry.getValue().getTags());
+			tags.addAll(effectiveLevels.keySet());
+
+			Map<String, Level> adjustedLevels = tags.stream()
+				.map(tag -> new AbstractMap.SimpleEntry<>(
+					tag,
+					Level.mostSevereLevel(configurationEntry.getValue().getLevel(tag), effectiveLevels.get(tag))
 				))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 

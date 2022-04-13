@@ -56,16 +56,16 @@ class BundleLoggingBackendTest {
 	}
 
 	/**
-	 * Verifies that the level visibilities of all child logging backends are correctly merged.
+	 * Verifies that the level visibilities of all child logging backends are correctly merged for fully-qualified
+	 * class names.
 	 *
-	 * @param tag The category tag to test
+	 * @param className The fully-qualified class name to test
 	 */
 	@ParameterizedTest
-	@NullSource
-	@ValueSource(strings = {"tinylog", "foo"})
-	void visibility(String tag) {
+	@ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.BundleLoggingBackend"})
+	void classesVisibility(String className) {
 		LoggingBackend first = mock(LoggingBackend.class);
-		when(first.getLevelVisibility(tag)).thenReturn(
+		when(first.getLevelVisibilityByClass(className)).thenReturn(
 			new LevelVisibility(
 				OutputDetails.DISABLED,
 				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
@@ -76,7 +76,7 @@ class BundleLoggingBackendTest {
 		);
 
 		LoggingBackend second = mock(LoggingBackend.class);
-		when(second.getLevelVisibility(tag)).thenReturn(
+		when(second.getLevelVisibilityByClass(className)).thenReturn(
 			new LevelVisibility(
 				OutputDetails.DISABLED,
 				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
@@ -87,7 +87,47 @@ class BundleLoggingBackendTest {
 		);
 
 		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
-		LevelVisibility visibility = backend.getLevelVisibility(tag);
+		LevelVisibility visibility = backend.getLevelVisibilityByClass(className);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION);
+	}
+
+	/**
+	 * Verifies that the level visibilities of all child logging backends are correctly merged for tags.
+	 *
+	 * @param tag The category tag to test
+	 */
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"tinylog", "foo"})
+	void tagsVisibility(String tag) {
+		LoggingBackend first = mock(LoggingBackend.class);
+		when(first.getLevelVisibilityByTag(tag)).thenReturn(
+			new LevelVisibility(
+				OutputDetails.DISABLED,
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+			)
+		);
+
+		LoggingBackend second = mock(LoggingBackend.class);
+		when(second.getLevelVisibilityByTag(tag)).thenReturn(
+			new LevelVisibility(
+				OutputDetails.DISABLED,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+			)
+		);
+
+		BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
+		LevelVisibility visibility = backend.getLevelVisibilityByTag(tag);
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);

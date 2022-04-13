@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
@@ -32,12 +33,29 @@ class InternalLoggingBackendTest {
 	}
 
 	/**
+	 * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
+	 * information) in the precalculated level visibility object for all classes.
+	 *
+	 * @param className The fully-qualified class name to test
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
+	void classesVisibility(String className) {
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByClass(className);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+	}
+
+	/**
 	 * Verifies that all severity levels are disabled in the precalculated level visibility object for untagged log
 	 * entries.
 	 */
 	@Test
 	void untaggedVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility(null);
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag(null);
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
@@ -51,7 +69,7 @@ class InternalLoggingBackendTest {
 	 */
 	@Test
 	void unknownTaggedVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("foo");
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("foo");
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
@@ -64,8 +82,8 @@ class InternalLoggingBackendTest {
 	 * information) in the precalculated level visibility object for internal tinylog log entries.
 	 */
 	@Test
-	void tinylogVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibility("tinylog");
+	void tinylogTaggedVisibility() {
+		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("tinylog");
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);

@@ -21,13 +21,23 @@ public interface LoggingBackend {
 	ContextStorage getContextStorage();
 
 	/**
+	 * Retrieves the visibility of all severity levels for a fully-qualified class name. Log entries whose severity
+	 * levels are set to {@link OutputDetails#DISABLED} do not need to be passed to this logging backend since they are
+	 * never output.
+	 *
+	 * @param className The fully-qualified class name for which the visibility of severity levels is requested
+	 * @return The visibilities of all severity levels
+	 */
+	LevelVisibility getLevelVisibilityByClass(String className);
+
+	/**
 	 * Retrieves the visibility of all severity levels for a category tag. Log entries whose severity levels are set to
-	 * {@code false} do not need to be passed to this logging backend since they are never output.
+	 * {@link OutputDetails#DISABLED} do not need to be passed to this logging backend since they are never output.
 	 *
 	 * @param tag The category tag for which the visibility of severity levels is requested
 	 * @return The visibilities of all severity levels
 	 */
-	LevelVisibility getLevelVisibility(String tag);
+	LevelVisibility getLevelVisibilityByTag(String tag);
 
 	/**
 	 * Checks if a severity level is enabled for outputting log entries.

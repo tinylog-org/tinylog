@@ -30,7 +30,7 @@ public final class TaggedLogger {
 		this.tag = tag;
 		this.runtime = framework.getRuntime();
 		this.backend = framework.getLoggingBackend();
-		this.visibility = backend.getLevelVisibility(tag);
+		this.visibility = backend.getLevelVisibilityByTag(tag);
 		this.formatter = new EnhancedMessageFormatter(framework);
 	}
 

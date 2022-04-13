@@ -1,6 +1,8 @@
 package org.tinylog.impl.backend;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -58,7 +60,22 @@ public class NativeLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public LevelVisibility getLevelVisibility(String tag) {
+	public LevelVisibility getLevelVisibilityByClass(String className) {
+		Collection<String> tags = new ArrayList<>();
+		tags.add(LevelConfiguration.ANY_PLACEHOLDER);
+		tags.addAll(getLevelConfiguration(className).getTags());
+
+		return new LevelVisibility(
+			getOutputDetails(tags, Level.TRACE),
+			getOutputDetails(tags, Level.DEBUG),
+			getOutputDetails(tags, Level.INFO),
+			getOutputDetails(tags, Level.WARN),
+			getOutputDetails(tags, Level.ERROR)
+		);
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibilityByTag(String tag) {
 		if (tag == null) {
 			tag = LevelConfiguration.UNTAGGED_PLACEHOLDER;
 		}
@@ -140,6 +157,20 @@ public class NativeLoggingBackend implements LoggingBackend {
 		} else {
 			return OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION;
 		}
+	}
+
+	/**
+	 * Gets the configured output details for all passed tags and the passed severity level.
+	 *
+	 * @param tags The category tags including placeholders
+	 * @param level The severity level
+	 * @return The configured output details
+	 */
+	private OutputDetails getOutputDetails(Collection<String> tags, Level level) {
+		return tags.stream()
+			.map(tag -> getOutputDetails(tag, level))
+			.max(OutputDetails::compareTo)
+			.orElse(OutputDetails.DISABLED);
 	}
 
 	/**

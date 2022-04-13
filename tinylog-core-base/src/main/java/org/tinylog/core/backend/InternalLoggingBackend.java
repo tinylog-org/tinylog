@@ -17,7 +17,7 @@ public class InternalLoggingBackend implements LoggingBackend {
 
 	private static final ContextStorage STORAGE = new NopContextStorage();
 
-	private static final LevelVisibility TAGGED = new LevelVisibility(
+	private static final LevelVisibility VISIBLE = new LevelVisibility(
 		OutputDetails.DISABLED,
 		OutputDetails.DISABLED,
 		OutputDetails.DISABLED,
@@ -25,7 +25,7 @@ public class InternalLoggingBackend implements LoggingBackend {
 		OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
 	);
 
-	private static final LevelVisibility DEFAULT = new LevelVisibility(
+	private static final LevelVisibility INVISIBLE = new LevelVisibility(
 		OutputDetails.DISABLED,
 		OutputDetails.DISABLED,
 		OutputDetails.DISABLED,
@@ -43,11 +43,16 @@ public class InternalLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public LevelVisibility getLevelVisibility(String tag) {
+	public LevelVisibility getLevelVisibilityByClass(String className) {
+		return VISIBLE;
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibilityByTag(String tag) {
 		if (InternalLogger.TAG.equals(tag)) {
-			return TAGGED;
+			return VISIBLE;
 		} else {
-			return DEFAULT;
+			return INVISIBLE;
 		}
 	}
 

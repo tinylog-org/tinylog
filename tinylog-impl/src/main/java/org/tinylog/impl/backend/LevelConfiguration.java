@@ -61,7 +61,7 @@ class LevelConfiguration {
 	 * @param levels The mapping of tags or placeholders and the assigned severity levels
 	 */
 	LevelConfiguration(Map<String, Level> levels) {
-		this.levels = levels;
+		this.levels = new HashMap<>(levels);
 	}
 
 	/**

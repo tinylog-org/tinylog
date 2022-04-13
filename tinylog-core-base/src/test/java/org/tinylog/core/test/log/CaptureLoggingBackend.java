@@ -19,7 +19,8 @@ class CaptureLoggingBackend implements LoggingBackend {
 
 	/**
 	 * @param log All issued log entries will be stored in this {@link Log}
-	 * @param visibleLevel The least severe visible severity level for {@link #getLevelVisibility(String)}
+	 * @param visibleLevel The least severe visible severity level for {@link #getLevelVisibilityByClass(String)} and
+	 *                     {@link #getLevelVisibilityByTag(String)}
 	 */
 	CaptureLoggingBackend(Log log, Level visibleLevel) {
 		this.log = log;
@@ -32,19 +33,13 @@ class CaptureLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public LevelVisibility getLevelVisibility(String tag) {
-		return new LevelVisibility(
-			Level.TRACE.isAtLeastAsSevereAs(visibleLevel)
-				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
-			Level.DEBUG.isAtLeastAsSevereAs(visibleLevel)
-				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
-			Level.INFO.isAtLeastAsSevereAs(visibleLevel)
-				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
-			Level.WARN.isAtLeastAsSevereAs(visibleLevel)
-				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
-			Level.ERROR.isAtLeastAsSevereAs(visibleLevel)
-				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED
-		);
+	public LevelVisibility getLevelVisibilityByClass(String className) {
+		return getLevelVisibility();
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibilityByTag(String tag) {
+		return getLevelVisibility();
 	}
 
 	@Override
@@ -80,6 +75,26 @@ class CaptureLoggingBackend implements LoggingBackend {
 		}
 
 		log.add(new LogEntry(caller, tag, level, throwable, output));
+	}
+
+	/**
+	 * Retrieves the visibility of all severity levels.
+	 *
+	 * @return The visibilities of all severity levels
+	 */
+	private LevelVisibility getLevelVisibility() {
+		return new LevelVisibility(
+			Level.TRACE.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.DEBUG.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.INFO.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.WARN.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED,
+			Level.ERROR.isAtLeastAsSevereAs(visibleLevel)
+				? OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME : OutputDetails.DISABLED
+		);
 	}
 
 }

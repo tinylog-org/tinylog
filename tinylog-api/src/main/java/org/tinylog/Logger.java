@@ -22,7 +22,7 @@ public final class Logger {
 	private static final Framework framework = Tinylog.getFramework();
 	private static final RuntimeFlavor runtime = framework.getRuntime();
 	private static final LoggingBackend backend = framework.getLoggingBackend();
-	private static final LevelVisibility visibility = backend.getLevelVisibility(null);
+	private static final LevelVisibility visibility = backend.getLevelVisibilityByTag(null);
 	private static final MessageFormatter formatter = new EnhancedMessageFormatter(framework);
 
 	private static final ConcurrentMap<String, TaggedLogger> taggedLoggers = new ConcurrentHashMap<>();

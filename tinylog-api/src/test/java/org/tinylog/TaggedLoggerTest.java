@@ -94,7 +94,7 @@ class TaggedLoggerTest {
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		})
 		void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
-			when(backend.getLevelVisibility("test")).thenReturn(
+			when(backend.getLevelVisibilityByTag("test")).thenReturn(
 				new LevelVisibility(
 					outputDetails,
 					OutputDetails.DISABLED,
@@ -128,7 +128,7 @@ class TaggedLoggerTest {
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		})
 		void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
-			when(backend.getLevelVisibility("test")).thenReturn(
+			when(backend.getLevelVisibilityByTag("test")).thenReturn(
 				new LevelVisibility(
 					OutputDetails.DISABLED,
 					outputDetails,
@@ -162,7 +162,7 @@ class TaggedLoggerTest {
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		})
 		void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
-			when(backend.getLevelVisibility("test")).thenReturn(
+			when(backend.getLevelVisibilityByTag("test")).thenReturn(
 				new LevelVisibility(
 					OutputDetails.DISABLED,
 					OutputDetails.DISABLED,
@@ -196,7 +196,7 @@ class TaggedLoggerTest {
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		})
 		void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
-			when(backend.getLevelVisibility("test")).thenReturn(
+			when(backend.getLevelVisibilityByTag("test")).thenReturn(
 				new LevelVisibility(
 					OutputDetails.DISABLED,
 					OutputDetails.DISABLED,
@@ -230,7 +230,7 @@ class TaggedLoggerTest {
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		})
 		void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
-			when(backend.getLevelVisibility("test")).thenReturn(
+			when(backend.getLevelVisibilityByTag("test")).thenReturn(
 				new LevelVisibility(
 					OutputDetails.DISABLED,
 					OutputDetails.DISABLED,

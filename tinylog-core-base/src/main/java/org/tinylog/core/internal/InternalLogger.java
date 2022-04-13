@@ -290,7 +290,7 @@ public final class InternalLogger {
 					OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
 				);
 			} else {
-				visibility = backend.getLevelVisibility(TAG);
+				visibility = backend.getLevelVisibilityByTag(TAG);
 			}
 		}
 

@@ -23,15 +23,31 @@ class NopLoggingBackendTest {
 	}
 
 	/**
-	 * Verifies that all severity levels are disabled in the precalculated level visibility object.
+	 * Verifies that all severity levels are disabled in the precalculated level visibility object for all classes.
+	 *
+	 * @param className The fully-qualified class name
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.NopLoggingBackend"})
+	void classVisibility(String className) {
+		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibilityByClass(className);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+	}
+
+	/**
+	 * Verifies that all severity levels are disabled in the precalculated level visibility object for all tags.
 	 *
 	 * @param tag The category tag to test
 	 */
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {"tinylog", "foo"})
-	void visibility(String tag) {
-		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibility(tag);
+	void tagVisibility(String tag) {
+		LevelVisibility visibility = new NopLoggingBackend().getLevelVisibilityByTag(tag);
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);

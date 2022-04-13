@@ -79,6 +79,60 @@ class NativeLoggingBackendTest {
 	}
 
 	/**
+	 * Verifies that the expected {@link OutputDetails} are provided by the {@link LevelVisibility} for given
+	 * fully-qualified class name.
+	 *
+	 * @param className The fully-qualified class name to test
+	 * @param requiredLogEntryValues The required log entry values to test
+	 * @param outputDetails The expected output details to assert
+	 */
+	@ParameterizedTest
+	@MethodSource("getVisibilityClassArguments")
+	void getLevelVisibilityForEnabledClasses(
+		String className,
+		Set<LogEntryValue> requiredLogEntryValues,
+		OutputDetails outputDetails
+	) {
+		when(writer.getRequiredLogEntryValues()).thenReturn(requiredLogEntryValues);
+
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.OFF)
+			.customLevel(className, Level.TRACE)
+			.writers("foo", Level.INFO, writer)
+			.create();
+
+		LevelVisibility visibility = backend.getLevelVisibilityByClass(className);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(outputDetails);
+		assertThat(visibility.getWarn()).isEqualTo(outputDetails);
+		assertThat(visibility.getError()).isEqualTo(outputDetails);
+	}
+
+	/**
+	 * Verifies that the {@link LevelVisibility} for a disabled class will return {@link OutputDetails#DISABLED} for
+	 * every severity level.
+	 *
+	 * @param className The fully-qualified class name to test
+	 */
+	@ParameterizedTest
+	@ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
+	void getLevelVisibilityForDisabledClasses(String className) {
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.TRACE)
+			.customLevel(className, Level.OFF)
+			.writers("*", Level.TRACE, writer)
+			.create();
+
+		LevelVisibility visibility = backend.getLevelVisibilityByTag(className);
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+	}
+
+	/**
 	 * Verifies that the expected {@link OutputDetails} are provided by the {@link LevelVisibility} for given required
 	 * log entry values at a used tag.
 	 *
@@ -87,7 +141,7 @@ class NativeLoggingBackendTest {
 	 * @param outputDetails The expected output details to assert
 	 */
 	@ParameterizedTest
-	@MethodSource("getVisibilityArguments")
+	@MethodSource("getVisibilityTagArguments")
 	void getLevelVisibilityForEnabledTags(
 		String tag,
 		Set<LogEntryValue> requiredLogEntryValues,
@@ -100,34 +154,12 @@ class NativeLoggingBackendTest {
 			.writers(tag, Level.INFO, writer)
 			.create();
 
-		LevelVisibility visibility = backend.getLevelVisibility(tag);
+		LevelVisibility visibility = backend.getLevelVisibilityByTag(tag);
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(outputDetails);
 		assertThat(visibility.getWarn()).isEqualTo(outputDetails);
 		assertThat(visibility.getError()).isEqualTo(outputDetails);
-	}
-
-	/**
-	 * Verifies that the {@link LevelVisibility} for an unused tag will return {@link OutputDetails#DISABLED} for every
-	 * severity level.
-	 *
-	 * @param tag The category tag to test
-	 */
-	@ParameterizedTest
-	@ValueSource(strings = {"-", "foo", "tinylog"})
-	void getLevelVisibilityForDisabledTags(String tag) {
-		NativeLoggingBackend backend = new Builder()
-			.rootLevel(Level.TRACE)
-			.writers("other", Level.TRACE, writer)
-			.create();
-
-		LevelVisibility visibility = backend.getLevelVisibility(tag);
-		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
 	}
 
 	/**
@@ -640,6 +672,60 @@ class NativeLoggingBackendTest {
 
 	/**
 	 * Creates the arguments for the parameterized test
+	 * {@link #getLevelVisibilityForDisabledClasses(String)} (String, Set, OutputDetails)}.
+	 *
+	 * <p>
+	 *     Arguments:
+	 *     <ul>
+	 *         <li>The fully-qualified class name to test</li>
+	 *         <li>The required log entry values to test</li>
+	 *         <li>The expected output details to assert</li>
+	 *     </ul>
+	 * </p>
+	 *
+	 * @return All arguments to test
+	 */
+	private static Collection<Arguments> getVisibilityClassArguments() {
+		Collection<Arguments> arguments = new ArrayList<>();
+		for (String className : asList("Foo", "example.Foo", "org.tinylog.impl.backend.NativeLoggingBackend")) {
+			arguments.add(Arguments.of(
+				className,
+				noneOf(LogEntryValue.class),
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				className,
+				complementOf(
+					EnumSet.of(LogEntryValue.CLASS, LogEntryValue.FILE, LogEntryValue.METHOD, LogEntryValue.LINE)
+				),
+				OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				className,
+				EnumSet.of(LogEntryValue.CLASS),
+				OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+			);
+			arguments.add(Arguments.of(
+				className,
+				EnumSet.of(LogEntryValue.FILE),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				className,
+				EnumSet.of(LogEntryValue.METHOD),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
+			arguments.add(Arguments.of(
+				className,
+				EnumSet.of(LogEntryValue.LINE),
+				OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION)
+			);
+		}
+		return arguments;
+	}
+
+	/**
+	 * Creates the arguments for the parameterized test
 	 * {@link #getLevelVisibilityForEnabledTags(String, Set, OutputDetails)}.
 	 *
 	 * <p>
@@ -653,7 +739,7 @@ class NativeLoggingBackendTest {
 	 *
 	 * @return All arguments to test
 	 */
-	private static Collection<Arguments> getVisibilityArguments() {
+	private static Collection<Arguments> getVisibilityTagArguments() {
 		Collection<Arguments> arguments = new ArrayList<>();
 		for (String tag : asList("-", "foo", "tinylog")) {
 			arguments.add(Arguments.of(

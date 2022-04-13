@@ -30,7 +30,12 @@ public class NopLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public LevelVisibility getLevelVisibility(String tag) {
+	public LevelVisibility getLevelVisibilityByClass(String className) {
+		return VISIBILITY;
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibilityByTag(String tag) {
 		return VISIBILITY;
 	}
 

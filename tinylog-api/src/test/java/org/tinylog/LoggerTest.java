@@ -56,7 +56,7 @@ class LoggerTest {
 			}
 		});
 
-		when(backend.getLevelVisibility(null)).thenReturn(visibility);
+		when(backend.getLevelVisibilityByTag(null)).thenReturn(visibility);
 	}
 
 	/**
@@ -921,7 +921,7 @@ class LoggerTest {
 			 * @param arguments Optional arguments
 			 */
 			private void verifyLogEntry(Level level, Throwable exception, Object message, Object... arguments) {
-				verify(backend, atMostOnce()).getLevelVisibility(null);
+				verify(backend, atMostOnce()).getLevelVisibilityByTag(null);
 
 				verify(backend).log(
 					eq(Enabled.class),
@@ -1536,7 +1536,7 @@ class LoggerTest {
 			 * Verifies no invocations of logging methods for mocked backend.
 			 */
 			private void verifyNoLogEntry() {
-				verify(backend, atMostOnce()).getLevelVisibility(null);
+				verify(backend, atMostOnce()).getLevelVisibilityByTag(null);
 				verifyNoMoreInteractions(backend);
 			}
 

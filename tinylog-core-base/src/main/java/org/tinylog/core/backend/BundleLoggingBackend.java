@@ -53,9 +53,23 @@ public class BundleLoggingBackend implements LoggingBackend {
 	}
 
 	@Override
-	public LevelVisibility getLevelVisibility(String tag) {
+	public LevelVisibility getLevelVisibilityByClass(String className) {
 		return backends.stream()
-			.map(backend -> backend.getLevelVisibility(tag))
+			.map(backend -> backend.getLevelVisibilityByClass(className))
+			.reduce((first, second) -> new LevelVisibility(
+				max(first.getTrace(), second.getTrace()),
+				max(first.getDebug(), second.getDebug()),
+				max(first.getInfo(), second.getInfo()),
+				max(first.getWarn(), second.getWarn()),
+				max(first.getError(), second.getError())
+			))
+			.orElse(INVISIBLE);
+	}
+
+	@Override
+	public LevelVisibility getLevelVisibilityByTag(String tag) {
+		return backends.stream()
+			.map(backend -> backend.getLevelVisibilityByTag(tag))
 			.reduce((first, second) -> new LevelVisibility(
 				max(first.getTrace(), second.getTrace()),
 				max(first.getDebug(), second.getDebug()),
