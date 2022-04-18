@@ -59,7 +59,7 @@ public class DateTimeSegment implements PathSegment {
 
 	@Override
 	public String findLatest(Path parentDirectory, String prefix) throws IOException {
-		if(!Files.exists(parentDirectory)) {
+		if (!Files.exists(parentDirectory)) {
 			return null;
 		}
 
