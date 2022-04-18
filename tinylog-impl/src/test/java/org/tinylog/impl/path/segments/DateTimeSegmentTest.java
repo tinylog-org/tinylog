@@ -34,6 +34,17 @@ class DateTimeSegmentTest {
 	private Log log;
 
 	/**
+	 * Verifies that null is returned if the folder does not exist.
+	 */
+	@Test
+	void findLatestOfNoneExisting() throws IOException {
+		Path nonExistingFolder = folder.resolve("non-existing");
+
+		String latest = new DateTimeSegment("dd-MM-yyyy", Locale.ENGLISH).findLatest(nonExistingFolder, "foo_");
+		assertThat(latest).isNull();
+	}
+
+	/**
 	 * Verifies that null is returned if there are no matching files.
 	 */
 	@Test
