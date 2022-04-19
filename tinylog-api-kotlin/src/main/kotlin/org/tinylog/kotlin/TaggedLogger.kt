@@ -12,10 +12,10 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter
  * @param framework The actual framework instance
  */
 class TaggedLogger(val tag: String?, framework: Framework) {
-	private var runtime = framework.runtime
-	private var backend = framework.loggingBackend
-	private var visibility = backend.getLevelVisibilityByTag(tag)
-	private var formatter = EnhancedMessageFormatter(framework)
+	private val runtime = framework.runtime
+	private val backend = framework.loggingBackend
+	private val visibility = backend.getLevelVisibilityByTag(tag)
+	private val formatter = EnhancedMessageFormatter(framework)
 
 	/**
 	 * Checks if the trace severity level is enabled for the actual class and tag.
