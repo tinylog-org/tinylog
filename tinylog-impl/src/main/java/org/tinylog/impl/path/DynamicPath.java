@@ -37,6 +37,10 @@ public class DynamicPath {
 		String prefix = "";
 
 		for (int i = 0; i < pathSegments.length; ++i) {
+			if (!Files.exists(parentDirectory)) {
+				return null;
+			}
+
 			String result = pathSegments[i].findLatest(parentDirectory, prefix);
 			if (result == null) {
 				return null;
