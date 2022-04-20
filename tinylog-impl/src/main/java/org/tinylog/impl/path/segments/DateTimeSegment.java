@@ -59,10 +59,6 @@ public class DateTimeSegment implements PathSegment {
 
 	@Override
 	public String findLatest(Path parentDirectory, String prefix) throws IOException {
-		if (!Files.exists(parentDirectory)) {
-			return null;
-		}
-
 		Optional<DateTimeTuple> latest = Files.list(parentDirectory)
 			.map(path -> path.getFileName().toString())
 			.filter(name -> name.startsWith(prefix))
