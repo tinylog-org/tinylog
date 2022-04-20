@@ -45,6 +45,15 @@ class DynamicPathTest {
 		}
 
 		/**
+		 * Verifies that no latest path is resolved for a dynamic path whose parent directory doesn't exist.
+		 */
+		@Test
+		void findNonExisingPath() throws Exception {
+			DynamicPath path = new DynamicPath(framework, directory + "/foo/file_{count}.log");
+			assertThat(path.getLatestPath()).isNull();
+		}
+
+		/**
 		 * Verifies that an existing file is resolved for a static dynamic path without placeholders.
 		 */
 		@Test
