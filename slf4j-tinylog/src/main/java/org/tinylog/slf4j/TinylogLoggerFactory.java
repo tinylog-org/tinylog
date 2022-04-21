@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.ILoggerFactory;
 import org.tinylog.core.Framework;
-import org.tinylog.core.Tinylog;
 
 /**
  * Logger factory implementation for providing {@link TinylogLogger} instances.
