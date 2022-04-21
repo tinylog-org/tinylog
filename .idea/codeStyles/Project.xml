@@ -34,6 +34,7 @@
       <option name="BLANK_LINES_BEFORE_CLASS_END" value="1" />
       <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+      <option name="WRAP_COMMENTS" value="true" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
         <option name="USE_TAB_CHARACTER" value="true" />
