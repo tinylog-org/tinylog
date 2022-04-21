@@ -76,6 +76,11 @@
 			<classifier>tests</classifier>
 			<type>test-jar</type>
 		</dependency>
+		<dependency>
+			<groupId>org.tinylog</groupId>
+			<artifactId>tinylog-impl</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
