@@ -47,7 +47,7 @@ public final class DynamicPolicyTest {
 		assertThat(policy.continueExistingFile(file)).isTrue();
 
 		DynamicPolicy.setReset();
-		assertThat(policy.continueExistingFile(file)).isFalse();
+		assertThat(policy.continueExistingFile(file)).isTrue();
 
 		policy.reset();
 		assertThat(policy.continueExistingFile(file)).isTrue();
