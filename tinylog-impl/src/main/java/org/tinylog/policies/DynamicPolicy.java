@@ -41,7 +41,7 @@ public final class DynamicPolicy implements Policy {
 
 	@Override
 	public boolean continueExistingFile(final String path) {
-		return !reset;
+		return true;
 	}
 
 	@Override

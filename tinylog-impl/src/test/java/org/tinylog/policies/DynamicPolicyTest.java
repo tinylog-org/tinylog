@@ -35,19 +35,19 @@ public final class DynamicPolicyTest {
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
 
 	/**
-	 * Verifies that an existing log file can be continued until triggering a manual reset.
+	 * Verifies that an existing log file will always be continued.
 	 * 
 	 * @throws IOException
 	 *             Failed creating temporary file
 	 */
 	@Test
-	public void discontinueExistingFile() throws IOException {
+	public void continueExistingFile() throws IOException {
 		String file = FileSystem.createTemporaryFile();
 		DynamicPolicy policy = new DynamicPolicy(null);
 		assertThat(policy.continueExistingFile(file)).isTrue();
 
 		DynamicPolicy.setReset();
-		assertThat(policy.continueExistingFile(file)).isFalse();
+		assertThat(policy.continueExistingFile(file)).isTrue();
 
 		policy.reset();
 		assertThat(policy.continueExistingFile(file)).isTrue();
