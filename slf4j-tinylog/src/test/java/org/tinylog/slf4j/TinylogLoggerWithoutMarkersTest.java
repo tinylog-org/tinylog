@@ -26,7 +26,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.tinylog.core.test.mockito.MockitoMatchers.isStackTraceElement;
 
 class TinylogLoggerWithoutMarkersTest {
 
@@ -370,7 +372,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.TRACE_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -471,7 +473,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.DEBUG_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -572,7 +574,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.INFO_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -673,7 +675,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.WARN_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -774,7 +776,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.ERROR_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -893,7 +895,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.TRACE_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -991,7 +993,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.DEBUG_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -1089,7 +1091,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.INFO_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -1187,7 +1189,7 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.WARN_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
@@ -1285,13 +1287,178 @@ class TinylogLoggerWithoutMarkersTest {
 					TinylogLogger.class.getName(),
 					LocationAwareLogger.ERROR_INT,
 					"Oops {} and {}!",
-					new Object[]{"Alice", "Bob"},
+					new Object[] {"Alice", "Bob"},
 					exception
 				);
 
 				assertThat(log.consume()).isEmpty();
 			}
 
+		}
+
+	}
+
+	/**
+	 * Tests for providing the expected stack trace information.
+	 */
+	@ExtendWith(MockitoExtension.class)
+	@Nested
+	class StackTraceInformation {
+
+		@Mock
+		private LoggingBackend backend;
+
+		private final Framework framework = new Framework(false, false) {
+
+			@Override
+			public LoggingBackend getLoggingBackend() {
+				return backend;
+			}
+
+		};
+
+		/**
+		 * Verifies that only the category name is passed as location object, if the severity level is enabled and
+		 * requires the caller class name.
+		 */
+		@Test
+		void infoLogWithCategoryOnly() {
+			when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			TinylogLogger logger = new TinylogLogger("Foo", framework);
+			logger.info("Hello World!");
+
+			verify(backend).log(
+				"Foo",
+				null,
+				Level.INFO,
+				null,
+				"Hello World!",
+				null,
+				null
+			);
+		}
+
+		/**
+		 * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
+		 * and requires the full location information.
+		 */
+		@Test
+		void infoLogWithFullStackTraceInformation() {
+			when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			TinylogLogger logger = new TinylogLogger(StackTraceInformation.class.getName(), framework);
+			logger.info("Hello World!");
+
+			verify(backend).log(
+				isStackTraceElement(
+					StackTraceInformation.class.getName(),
+					"infoLogWithFullStackTraceInformation",
+					TinylogLoggerWithoutMarkersTest.class.getSimpleName() + ".java",
+					1367
+				),
+				isNull(),
+				eq(Level.INFO),
+				isNull(),
+				eq("Hello World!"),
+				isNull(),
+				isNull()
+			);
+		}
+
+		/**
+		 * Verifies that only the category name is passed as location object, if the severity level is enabled and
+		 * requires the caller class name.
+		 */
+		@Test
+		void genericLogWithCategoryOnly() {
+			when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			TinylogLogger logger = new TinylogLogger("Foo", framework);
+			logger.log(
+				null,
+				StackTraceInformation.class.getName(),
+				LocationAwareLogger.INFO_INT,
+				"Hello World!",
+				null,
+				null
+			);
+
+			verify(backend).log(
+				"Foo",
+				null,
+				Level.INFO,
+				null,
+				"Hello World!",
+				null,
+				null
+			);
+		}
+
+		/**
+		 * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
+		 * and requires the full location information.
+		 */
+		@Test
+		void genericLogWithFullStackTraceInformation() {
+			when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			TinylogLogger logger = new TinylogLogger(StackTraceInformation.class.getName(), framework);
+			logger.log(
+				null,
+				StackTraceInformation.class.getName(),
+				LocationAwareLogger.INFO_INT,
+				"Hello World!",
+				null,
+				null
+			);
+
+			verify(backend).log(
+				isStackTraceElement(
+					StackTraceInformation.class.getName(),
+					"genericLogWithFullStackTraceInformation",
+					TinylogLoggerWithoutMarkersTest.class.getSimpleName() + ".java",
+					1439
+				),
+				isNull(),
+				eq(Level.INFO),
+				isNull(),
+				eq("Hello World!"),
+				isNull(),
+				isNull()
+			);
 		}
 
 	}
