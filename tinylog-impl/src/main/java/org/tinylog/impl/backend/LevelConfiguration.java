@@ -65,6 +65,15 @@ class LevelConfiguration {
 	}
 
 	/**
+	 * Gets the least severe configured severity level.
+	 *
+	 * @return The least severe configured severity leve
+	 */
+	public Level getLeastSevereLevel() {
+		return levels.values().stream().reduce(Level.OFF, Level::leastSevereLevel);
+	}
+
+	/**
 	 * Gets all custom tags.
 	 *
 	 * @return All tags with custom severity levels

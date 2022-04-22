@@ -34,6 +34,7 @@ class LevelConfigurationTest {
 		void empty() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.emptyList(), false);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.TRACE);
@@ -47,6 +48,7 @@ class LevelConfigurationTest {
 		void generalLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug"), false);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.DEBUG);
@@ -60,6 +62,7 @@ class LevelConfigurationTest {
 		void taggedLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@foo"), false);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.OFF);
@@ -73,6 +76,7 @@ class LevelConfigurationTest {
 		void anyPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@*"), false);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.DEBUG);
@@ -86,6 +90,7 @@ class LevelConfigurationTest {
 		void plusPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@+"), false);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.ERROR);
@@ -99,6 +104,7 @@ class LevelConfigurationTest {
 		void minusPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@-"), false);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.OFF);
@@ -113,6 +119,7 @@ class LevelConfigurationTest {
 			List<String> levels = ImmutableList.of("debug", "info@+", "trace@foo", "error@tinylog");
 			LevelConfiguration configuration = new LevelConfiguration(levels, false);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.INFO);
@@ -132,6 +139,7 @@ class LevelConfigurationTest {
 			});
 
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.TRACE);
@@ -153,6 +161,7 @@ class LevelConfigurationTest {
 		void empty() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.emptyList(), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.TRACE);
@@ -166,6 +175,7 @@ class LevelConfigurationTest {
 		void generalLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.DEBUG);
@@ -179,6 +189,7 @@ class LevelConfigurationTest {
 		void taggedLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@foo"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.WARN);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.OFF);
@@ -192,6 +203,7 @@ class LevelConfigurationTest {
 		void anyPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@*"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.DEBUG);
@@ -205,6 +217,7 @@ class LevelConfigurationTest {
 		void plusPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("error@+"), true);
 			assertThat(configuration.getTags()).isEmpty();
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.ERROR);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.ERROR);
@@ -218,6 +231,7 @@ class LevelConfigurationTest {
 		void minusPlaceholderLevel() {
 			LevelConfiguration configuration = new LevelConfiguration(Collections.singletonList("debug@-"), true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.OFF);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.OFF);
@@ -232,6 +246,7 @@ class LevelConfigurationTest {
 			List<String> levels = ImmutableList.of("debug", "info@+", "trace@foo", "error@tinylog");
 			LevelConfiguration configuration = new LevelConfiguration(levels, true);
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("foo", "tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.DEBUG);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.INFO);
@@ -251,6 +266,7 @@ class LevelConfigurationTest {
 			});
 
 			assertThat(configuration.getTags()).containsExactlyInAnyOrder("tinylog");
+			assertThat(configuration.getLeastSevereLevel()).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("-")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("foo")).isEqualTo(Level.TRACE);
 			assertThat(configuration.getLevel("bar")).isEqualTo(Level.TRACE);
