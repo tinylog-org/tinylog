@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -23,11 +22,33 @@ class ContextPlaceholderTest {
 	}
 
 	/**
+	 * Verifies that a thread context value of a log entry will be resolved, if present.
+	 */
+	@Test
+	void resolveWithContextValue() {
+		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+		LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
+	}
+
+	/**
+	 * Verifies that the default value will be resolved, if a thread context value is not present.
+	 */
+	@Test
+	void resolveWithoutContextValue() {
+		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("-");
+	}
+
+	/**
 	 * Verifies that a thread context value of a log entry will be output, if present.
 	 */
 	@Test
 	void renderWithContextValue() {
-		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+		ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("bar");
@@ -38,34 +59,10 @@ class ContextPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutContextValue() {
-		ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+		ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("-");
-	}
-
-	/**
-	 * Verifies that a thread context value of a log entry will be resolved, if present.
-	 */
-	@Test
-	void resolveWithContextValue() {
-		ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
-		LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "bar"));
-	}
-
-	/**
-	 * Verifies that the default value will be resolved, if a thread context value is not present.
-	 */
-	@Test
-	void resolveWithoutContextValue() {
-		ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
-		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "-"));
 	}
 
 }

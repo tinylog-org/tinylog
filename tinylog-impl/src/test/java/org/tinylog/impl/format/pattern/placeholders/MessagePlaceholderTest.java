@@ -6,8 +6,7 @@ import java.io.StringWriter;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -24,6 +23,56 @@ class MessagePlaceholderTest {
 		MessagePlaceholder placeholder = new MessagePlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues())
 			.containsExactlyInAnyOrder(LogEntryValue.MESSAGE, LogEntryValue.EXCEPTION);
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if neither a log message nor an exception is set.
+	 */
+	@Test
+	void resolveWithoutMessageOrException() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that the log message will be correctly resolved, if the log message is set but not an exception.
+	 */
+	@Test
+	void resolveWithMessageOnly() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that the exception will be correctly resolved, if the exception is set but not a log message.
+	 */
+	@Test
+	void resolveWithExceptionOnly() {
+		Exception exception = new RuntimeException();
+		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(print(exception));
+	}
+
+	/**
+	 * Verifies that the log message and the exception will be correctly resolved, if both are set.
+	 */
+	@Test
+	void resolveWithMessageAndException() {
+		Exception exception = new RuntimeException();
+		LogEntry logEntry = new LogEntryBuilder().message("Oops").exception(exception).create();
+
+		MessagePlaceholder placeholder = new MessagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("Oops: " + print(exception));
 	}
 
 	/**
@@ -66,60 +115,6 @@ class MessagePlaceholderTest {
 		Exception exception = new RuntimeException();
 		LogEntry logEntry = new LogEntryBuilder().message("Oops").exception(exception).create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Oops: " + print(exception));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if neither a log message nor an exception is set.
-	 */
-	@Test
-	void resolveWithoutMessageOrException() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-
-		MessagePlaceholder placeholder = new MessagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
-	}
-
-	/**
-	 * Verifies that the log message will be correctly resolved, if the log message is set but not an exception.
-	 */
-	@Test
-	void resolveWithMessageOnly() {
-		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-
-		MessagePlaceholder placeholder = new MessagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Hello World!"));
-	}
-
-	/**
-	 * Verifies that the exception will be correctly resolved, if the exception is set but not a log message.
-	 */
-	@Test
-	void resolveWithExceptionOnly() {
-		Exception exception = new RuntimeException();
-		LogEntry logEntry = new LogEntryBuilder().exception(exception).create();
-
-		MessagePlaceholder placeholder = new MessagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, print(exception)));
-	}
-
-	/**
-	 * Verifies that the log message and the exception will be correctly resolved, if both are set.
-	 */
-	@Test
-	void resolveWithMessageAndException() {
-		Exception exception = new RuntimeException();
-		LogEntry logEntry = new LogEntryBuilder().message("Oops").exception(exception).create();
-
-		MessagePlaceholder placeholder = new MessagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Oops: " + print(exception)));
 	}
 
 	/**

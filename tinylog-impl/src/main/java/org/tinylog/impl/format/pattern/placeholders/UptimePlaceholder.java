@@ -11,8 +11,7 @@ import java.util.function.ToLongFunction;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the passed time since application start when a log entry was issued.
@@ -31,21 +30,43 @@ public class UptimePlaceholder implements Placeholder {
 	private static final int DAY_IN_SECONDS = MAX_HOUR * HOUR_IN_SECONDS;
 
 	private final List<BiConsumer<StringBuilder, Duration>> segments;
-	private final boolean formatForSql;
+	private final boolean formatAlways;
 
 	/**
 	 * @param pattern The format pattern to use for formatting the uptime
-	 * @param formatForSql The uptime will be applied as formatted string to prepared SQL statements if set to
-	 *                     {@code true}, otherwise it will be applied as {@link BigDecimal SQL NUMERIC}
+	 * @param formatAlways The uptime will be returned as formatted string by the value getter if {@code true},
+	 *                        otherwise it will be returned as {@link BigDecimal}
 	 */
-	public UptimePlaceholder(String pattern, boolean formatForSql) {
+	public UptimePlaceholder(String pattern, boolean formatAlways) {
 		this.segments = parse(pattern);
-		this.formatForSql = formatForSql;
+		this.formatAlways = formatAlways;
 	}
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
 		return EnumSet.of(LogEntryValue.UPTIME);
+	}
+
+	@Override
+	public ValueType getType() {
+		return formatAlways ? ValueType.STRING : ValueType.DECIMAL;
+	}
+
+	@Override
+	public Object getValue(LogEntry entry) {
+		Duration duration = entry.getUptime();
+
+		if (duration == null) {
+			return null;
+		} else if (formatAlways) {
+			StringBuilder builder = new StringBuilder();
+			format(builder, duration);
+			return builder.toString();
+		} else {
+			BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds());
+			BigDecimal nanos = BigDecimal.valueOf(duration.getNano(), NANOS_SCALE);
+			return seconds.add(nanos);
+		}
 	}
 
 	@Override
@@ -56,29 +77,6 @@ public class UptimePlaceholder implements Placeholder {
 			builder.append("<uptime unknown>");
 		} else {
 			format(builder, duration);
-		}
-	}
-
-	@Override
-	public SqlRecord<?> resolve(LogEntry entry) {
-		Duration duration = entry.getUptime();
-
-		if (formatForSql) {
-			if (duration == null) {
-				return new SqlRecord<>(SqlType.STRING, null);
-			} else {
-				StringBuilder builder = new StringBuilder();
-				format(builder, duration);
-				return new SqlRecord<>(SqlType.STRING, builder);
-			}
-		} else {
-			if (duration == null) {
-				return new SqlRecord<>(SqlType.DECIMAL, null);
-			} else {
-				BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds());
-				BigDecimal nanos = BigDecimal.valueOf(duration.getNano(), NANOS_SCALE);
-				return new SqlRecord<>(SqlType.DECIMAL, seconds.add(nanos));
-			}
 		}
 	}
 

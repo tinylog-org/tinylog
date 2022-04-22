@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the simple class name without package prefix for a log entry.
@@ -23,14 +22,19 @@ public class ClassNamePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String simpleClassName = extractSimpleClassName(entry.getClassName());
-		builder.append(simpleClassName == null ? "<class unknown>" : simpleClassName);
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		return new SqlRecord<>(SqlType.STRING, extractSimpleClassName(entry.getClassName()));
+	public String getValue(LogEntry entry) {
+		return extractSimpleClassName(entry.getClassName());
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		String simpleClassName = extractSimpleClassName(entry.getClassName());
+		builder.append(simpleClassName == null ? "<class unknown>" : simpleClassName);
 	}
 
 	/**

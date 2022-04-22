@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the source method name for a log entry.
@@ -23,14 +22,19 @@ public class MethodPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String methodName = entry.getMethodName();
-		builder.append(methodName == null ? "<method unknown>" : methodName);
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		return new SqlRecord<>(SqlType.STRING, entry.getMethodName());
+	public String getValue(LogEntry entry) {
+		return entry.getMethodName();
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		String methodName = entry.getMethodName();
+		builder.append(methodName == null ? "<method unknown>" : methodName);
 	}
 
 }

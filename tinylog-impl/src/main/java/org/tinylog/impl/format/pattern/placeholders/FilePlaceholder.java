@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the source file name of a log entry.
@@ -23,14 +22,19 @@ public class FilePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String fileName = entry.getFileName();
-		builder.append(fileName == null ? "<file unknown>" : fileName);
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		return new SqlRecord<>(SqlType.STRING, entry.getFileName());
+	public String getValue(LogEntry entry) {
+		return entry.getFileName();
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		String fileName = entry.getFileName();
+		builder.append(fileName == null ? "<file unknown>" : fileName);
 	}
 
 }

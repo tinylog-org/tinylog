@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the process ID of the current process.
@@ -28,13 +27,18 @@ public class ProcessIdPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		builder.append(processId);
+	public ValueType getType() {
+		return ValueType.LONG;
 	}
 
 	@Override
-	public SqlRecord<? extends Number> resolve(LogEntry entry) {
-		return new SqlRecord<>(SqlType.LONG, processId);
+	public Long getValue(LogEntry entry) {
+		return processId;
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		builder.append(processId);
 	}
 
 }

@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -22,13 +21,47 @@ class PackagePlaceholderTest {
 	}
 
 	/**
+	 * Verifies that {@code null} will be resolved, if a class name without package information is set.
+	 */
+	@Test
+	void resolveWithDefaultPackage() {
+		LogEntry logEntry = new LogEntryBuilder().className("MyClass").create();
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that the package name of a log entry will be resolved, if a fully-qualified class name with package
+	 * information is set.
+	 */
+	@Test
+	void resolveWithFullyQualifiedPackage() {
+		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("org.foo");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the source class name is not set.
+	 */
+	@Test
+	void resolveWithoutPackage() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		PackagePlaceholder placeholder = new PackagePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
+	}
+
+	/**
 	 * Verifies that an empty string will be output, if a class name with default package is set.
 	 */
 	@Test
 	void renderWithDefaultPackage() {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new PackagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().className("MyClass").create();
-		assertThat(renderer.render(logEntry)).isEqualTo("MyClass");
+		assertThat(renderer.render(logEntry)).isEqualTo("");
 	}
 
 	/**
@@ -50,44 +83,6 @@ class PackagePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new PackagePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<package unknown>");
-	}
-
-	/**
-	 * Verifies that an string will be resolved, if a fully-qualified class name with
-	 * package information is set.
-	 */
-	@Test
-	void resolveWithDefaultPackage() {
-		LogEntry logEntry = new LogEntryBuilder().className("MyClass").create();
-		PackagePlaceholder placeholder = new PackagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "MyClass"));
-	}
-
-	/**
-	 * Verifies that the package name of a log entry will be resolved, if a fully-qualified class name with package
-	 * information is set.
-	 */
-	@Test
-	void resolveWithFullyQualifiedPackage() {
-		LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
-		PackagePlaceholder placeholder = new PackagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "org.foo"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the source class name is not set.
-	 */
-	@Test
-	void resolveWithoutPackage() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		PackagePlaceholder placeholder = new PackagePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

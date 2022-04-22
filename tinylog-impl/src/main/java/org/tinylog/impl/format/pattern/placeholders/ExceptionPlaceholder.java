@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for printing the exception including its stack trace for a log entry.
@@ -25,24 +24,29 @@ public class ExceptionPlaceholder implements Placeholder {
 	}
 
 	@Override
+	public ValueType getType() {
+		return ValueType.STRING;
+	}
+
+	@Override
+	public String getValue(LogEntry entry) {
+		Throwable throwable = entry.getException();
+
+		if (throwable == null) {
+			return null;
+		} else {
+			StringBuilder builder = new StringBuilder();
+			appendThrowable(builder, "", throwable, EMPTY_STACK_TRACE);
+			return builder.toString();
+		}
+	}
+
+	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		Throwable throwable = entry.getException();
 
 		if (throwable != null) {
 			appendThrowable(builder, "", throwable, EMPTY_STACK_TRACE);
-		}
-	}
-
-	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		Throwable throwable = entry.getException();
-
-		if (throwable == null) {
-			return new SqlRecord<>(SqlType.STRING, null);
-		} else {
-			StringBuilder builder = new StringBuilder();
-			appendThrowable(builder, "", throwable, EMPTY_STACK_TRACE);
-			return new SqlRecord<>(SqlType.STRING, builder);
 		}
 	}
 

@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the source thread ID of a log entry.
@@ -23,20 +22,20 @@ public class ThreadIdPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Thread thread = entry.getThread();
-		builder.append(thread == null ? "?" : thread.getId());
+	public ValueType getType() {
+		return ValueType.LONG;
 	}
 
 	@Override
-	public SqlRecord<? extends Number> resolve(LogEntry entry) {
+	public Long getValue(LogEntry entry) {
 		Thread thread = entry.getThread();
+		return thread == null ? null : thread.getId();
+	}
 
-		if (thread == null) {
-			return new SqlRecord<>(SqlType.LONG, null);
-		} else {
-			return new SqlRecord<>(SqlType.LONG, thread.getId());
-		}
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		Thread thread = entry.getThread();
+		builder.append(thread == null ? "?" : thread.getId());
 	}
 
 }

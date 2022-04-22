@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -19,6 +18,28 @@ class TagPlaceholderTest {
 	void requiredLogEntryValues() {
 		TagPlaceholder placeholder = new TagPlaceholder(null, null);
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TAG);
+	}
+
+	/**
+	 * Verifies that the assigned tag of tagged log entries is resolved.
+	 */
+	@Test
+	void resolveWithTag() {
+		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
+		LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("foo");
+	}
+
+	/**
+	 * Verifies that the default value is resolved for untagged log entries.
+	 */
+	@Test
+	void resolveWithoutTag() {
+		TagPlaceholder placeholder = new TagPlaceholder("-", null);
+		LogEntry logEntry = new LogEntryBuilder().create();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("-");
 	}
 
 	/**
@@ -37,34 +58,10 @@ class TagPlaceholderTest {
 	 */
 	@Test
 	void renderWithoutTag() {
-		TagPlaceholder placeholder = new TagPlaceholder("-", null);
+		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("-");
-	}
-
-	/**
-	 * Verifies that the assigned tag of tagged log entries is resolved.
-	 */
-	@Test
-	void resolveWithTag() {
-		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
-		LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo"));
-	}
-
-	/**
-	 * Verifies that the default value is resolved for untagged log entries.
-	 */
-	@Test
-	void resolveWithoutTag() {
-		TagPlaceholder placeholder = new TagPlaceholder(null, "-");
-		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "-"));
 	}
 
 }

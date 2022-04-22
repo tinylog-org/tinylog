@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the package of the source class for a log entry.
@@ -23,15 +22,27 @@ public class PackagePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String className = entry.getClassName();
-		builder.append(className == null ? "<package unknown>" : extractPackageName(className));
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
+	public String getValue(LogEntry entry) {
 		String className = entry.getClassName();
-		return new SqlRecord<>(SqlType.STRING, className == null ? null : extractPackageName(className));
+		return className == null ? null : extractPackageName(className);
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		String className = entry.getClassName();
+		if (className == null) {
+			builder.append("<package unknown>");
+		} else {
+			String packageName = extractPackageName(className);
+			if (packageName != null) {
+				builder.append(packageName);
+			}
+		}
 	}
 
 	/**
@@ -43,7 +54,7 @@ public class PackagePlaceholder implements Placeholder {
 	private static String extractPackageName(String fullyQualifiedClassName) {
 		int lastDot = fullyQualifiedClassName.lastIndexOf('.');
 		if (lastDot < 0) {
-			return fullyQualifiedClassName;
+			return null;
 		} else {
 			return fullyQualifiedClassName.substring(0, lastDot);
 		}

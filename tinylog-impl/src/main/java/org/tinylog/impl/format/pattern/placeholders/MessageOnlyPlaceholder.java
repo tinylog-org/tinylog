@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for printing the log message without potential exception of a log entry.
@@ -23,17 +22,22 @@ public class MessageOnlyPlaceholder implements Placeholder {
 	}
 
 	@Override
+	public ValueType getType() {
+		return ValueType.STRING;
+	}
+
+	@Override
+	public String getValue(LogEntry entry) {
+		return entry.getMessage();
+	}
+
+	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		String message = entry.getMessage();
 
 		if (message != null) {
 			builder.append(message);
 		}
-	}
-
-	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		return new SqlRecord<>(SqlType.STRING, entry.getMessage());
 	}
 
 }

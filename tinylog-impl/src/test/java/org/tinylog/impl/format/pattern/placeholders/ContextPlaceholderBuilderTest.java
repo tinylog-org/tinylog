@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -43,18 +41,12 @@ class ContextPlaceholderBuilderTest {
 	void creationWithKeyOnly() {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+		assertThat(placeholder.getValue(emptyLogEntry)).isNull();
+		assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("<foo not set>");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
-
-		assertThat(placeholder.resolve(emptyLogEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
-
-		assertThat(placeholder.resolve(filledLogEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "boo"));
 	}
 
 	/**
@@ -64,18 +56,12 @@ class ContextPlaceholderBuilderTest {
 	void creationWithKeyAndDefaultValue() {
 		Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo,bar");
 		assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+		assertThat(placeholder.getValue(emptyLogEntry)).isEqualTo("bar");
+		assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(emptyLogEntry)).isEqualTo("bar");
 		assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
-
-		assertThat(placeholder.resolve(emptyLogEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "bar"));
-
-		assertThat(placeholder.resolve(filledLogEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "boo"));
 	}
 
 	/**

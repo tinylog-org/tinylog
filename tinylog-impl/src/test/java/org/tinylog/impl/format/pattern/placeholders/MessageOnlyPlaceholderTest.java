@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -20,6 +19,28 @@ class MessageOnlyPlaceholderTest {
 	void requiredLogEntryValues() {
 		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.MESSAGE);
+	}
+
+	/**
+	 * Verifies that the log message of a log entry will be resolved, if set.
+	 */
+	@Test
+	void resolveWithMessage() {
+		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
+		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("Hello World!");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the log message is not set.
+	 */
+	@Test
+	void resolveWithoutMessage() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -40,30 +61,6 @@ class MessageOnlyPlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new MessageOnlyPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("");
-	}
-
-	/**
-	 * Verifies that the log message of a log entry will be resolved, if set.
-	 */
-	@Test
-	void resolveWithMessage() {
-		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Hello World!"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the log message is not set.
-	 */
-	@Test
-	void resolveWithoutMessage() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		MessageOnlyPlaceholder placeholder = new MessageOnlyPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

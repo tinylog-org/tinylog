@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -32,13 +30,10 @@ class UptimePlaceholderBuilderTest {
 		assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
 		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(new BigDecimal("7170.000000000"));
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(logEntry)).isEqualTo("01:59:30");
-
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, new BigDecimal("7170.000000000")));
 	}
 
 	/**
@@ -50,13 +45,11 @@ class UptimePlaceholderBuilderTest {
 		assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
 		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("7170.000");
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		assertThat(renderer.render(logEntry)).isEqualTo("7170.000");
 
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "7170.000"));
 	}
 
 	/**

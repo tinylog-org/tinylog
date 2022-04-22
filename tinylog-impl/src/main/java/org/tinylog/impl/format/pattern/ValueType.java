@@ -3,16 +3,14 @@ package org.tinylog.impl.format.pattern;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
- * Supported SQL types for SQL records of placeholders.
+ * Supported value types for placeholders.
  *
- * @see SqlRecord
- * @see Placeholder#resolve(LogEntry)
+ * @see Placeholder#getType()
  */
-public enum SqlType {
+public enum ValueType {
 
 	/**
 	 * Value type is an {@code int} or {@link Integer}.

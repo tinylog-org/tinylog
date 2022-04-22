@@ -6,8 +6,7 @@ import java.util.Set;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the {@link Level severity level} of a log entry.
@@ -24,15 +23,20 @@ public class LevelPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Level level = entry.getSeverityLevel();
-		builder.append(level == null ? "<level unknown>" : level.toString());
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
+	public String getValue(LogEntry entry) {
 		Level level = entry.getSeverityLevel();
-		return new SqlRecord<>(SqlType.STRING, level == null ? null : level.toString());
+		return level == null ? null : level.toString();
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		Level level = entry.getSeverityLevel();
+		builder.append(level == null ? "<level unknown>" : level.toString());
 	}
 
 }

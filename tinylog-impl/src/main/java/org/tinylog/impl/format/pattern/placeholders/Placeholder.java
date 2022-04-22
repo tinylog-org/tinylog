@@ -5,7 +5,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementations resolve the real values for placeholders in format patterns.
@@ -30,6 +30,25 @@ public interface Placeholder extends OutputFormat {
 	Set<LogEntryValue> getRequiredLogEntryValues();
 
 	/**
+	 * Gets the type for the stored value.
+	 *
+	 * @return The type of the stored value
+	 */
+	ValueType getType();
+
+	/**
+	 * Gets the nullable placeholder value from the passed log entry.
+	 *
+	 * <p>
+	 *     The type of the returned value must match with the {@link ValueType} of {@link #getType()}.
+	 * </p>
+	 *
+	 * @param entry The log entry for extracting the value from
+	 * @return The extracted value
+	 */
+	Object getValue(LogEntry entry);
+
+	/**
 	 * Renders this placeholder for a passed log entry.
 	 *
 	 * <p>
@@ -40,13 +59,5 @@ public interface Placeholder extends OutputFormat {
 	 * @param entry The log entry to render
 	 */
 	void render(StringBuilder builder, LogEntry entry);
-
-	/**
-	 * Resolves the {@link SqlRecord} for a passed log entry.
-	 *
-	 * @param entry The log entry to resolve
-	 * @return The resolved typed SQL value to insert or update into an SQL table
-	 */
-	SqlRecord<?> resolve(LogEntry entry);
 
 }

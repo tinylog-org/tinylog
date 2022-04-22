@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -19,6 +18,28 @@ class MethodPlaceholderTest {
 	void requiredLogEntryValues() {
 		MethodPlaceholder placeholder = new MethodPlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.METHOD);
+	}
+
+	/**
+	 * Verifies that the source method name of a log entry will be resolved, if set.
+	 */
+	@Test
+	void resolveWithSourceMethodName() {
+		LogEntry logEntry = new LogEntryBuilder().methodName("foo").create();
+		MethodPlaceholder placeholder = new MethodPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("foo");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the source method name is not set.
+	 */
+	@Test
+	void resolveWithoutSourceMethodName() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		MethodPlaceholder placeholder = new MethodPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -39,30 +60,6 @@ class MethodPlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new MethodPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<method unknown>");
-	}
-
-	/**
-	 * Verifies that the source method name of a log entry will be resolved, if set.
-	 */
-	@Test
-	void resolveWithSourceMethodName() {
-		LogEntry logEntry = new LogEntryBuilder().methodName("foo").create();
-		MethodPlaceholder placeholder = new MethodPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the source method name is not set.
-	 */
-	@Test
-	void resolveWithoutSourceMethodName() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		MethodPlaceholder placeholder = new MethodPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

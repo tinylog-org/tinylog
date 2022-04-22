@@ -12,8 +12,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -28,6 +27,61 @@ class UptimePlaceholderTest {
 	void requiredLogEntryValues() {
 		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", false);
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.UPTIME);
+	}
+
+	/**
+	 * Verifies that the uptime will be formatted and resolved as expected for all provided examples, if formatting is
+	 * enabled for SQL.
+	 *
+	 * @param uptime The uptime as {@link Duration} to test
+	 * @param pattern The format pattern for formatting the passed uptime
+	 * @param expected The expected formatted uptime
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(FormatPatternsProvider.class)
+	void resolveStringWithUptime(Duration uptime, String pattern, String expected) {
+		LogEntry logEntry = new LogEntryBuilder().uptime(uptime).create();
+		UptimePlaceholder placeholder = new UptimePlaceholder(pattern, true);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(expected);
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the uptime is not set.
+	 */
+	@Test
+	void resolveStringWithoutUptime() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", true);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that the uptime will be converted into a {@link BigDecimal} and resolved as expected for all provided
+	 * examples, if formatting is disabled for SQL.
+	 *
+	 * @param uptime The uptime as {@link Duration} to test
+	 * @param expected The expected generated {@link BigDecimal}
+	 */
+	@ParameterizedTest
+	@ArgumentsSource(BigDecimalsProvider.class)
+	void resolveBigDecimalWithUptime(Duration uptime, BigDecimal expected) {
+		LogEntry logEntry = new LogEntryBuilder().uptime(uptime).create();
+		UptimePlaceholder placeholder = new UptimePlaceholder("s", false);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.DECIMAL);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(expected);
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the uptime is not set.
+	 */
+	@Test
+	void resolveBigDecimalWithoutUptime() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", false);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.DECIMAL);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -55,65 +109,6 @@ class UptimePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<uptime unknown>");
-	}
-
-	/**
-	 * Verifies that the uptime will be formatted and resolved as expected for all provided examples, if formatting is
-	 * enabled for SQL.
-	 *
-	 * @param uptime The uptime as {@link Duration} to test
-	 * @param pattern The format pattern for formatting the passed uptime
-	 * @param expected The expected formatted uptime
-	 */
-	@ParameterizedTest
-	@ArgumentsSource(FormatPatternsProvider.class)
-	void resolveStringWithUptime(Duration uptime, String pattern, String expected) {
-		LogEntry logEntry = new LogEntryBuilder().uptime(uptime).create();
-		UptimePlaceholder placeholder = new UptimePlaceholder(pattern, true);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, expected));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the uptime is not set.
-	 */
-	@Test
-	void resolveStringWithoutUptime() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", true);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
-	}
-
-	/**
-	 * Verifies that the uptime will be converted into a {@link BigDecimal} and resolved as expected for all provided
-	 * examples, if formatting is disabled for SQL.
-	 *
-	 * @param uptime The uptime as {@link Duration} to test
-	 * @param expected The expected generated {@link BigDecimal}
-	 */
-	@ParameterizedTest
-	@ArgumentsSource(BigDecimalsProvider.class)
-	void resolveBigDecimalWithUptime(Duration uptime, BigDecimal expected) {
-		LogEntry logEntry = new LogEntryBuilder().uptime(uptime).create();
-		UptimePlaceholder placeholder = new UptimePlaceholder("s", false);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, expected));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the uptime is not set.
-	 */
-	@Test
-	void resolveBigDecimalWithoutUptime() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", false);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, null));
 	}
 
 	/**

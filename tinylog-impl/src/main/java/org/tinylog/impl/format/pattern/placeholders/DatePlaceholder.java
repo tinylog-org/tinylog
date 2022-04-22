@@ -8,8 +8,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the date and time of issue for a log entry.
@@ -19,21 +18,41 @@ public class DatePlaceholder implements Placeholder {
 	private static final long MILLIS_PER_SECOND = 1_000;
 
 	private final DateTimeFormatter formatter;
-	private final boolean formatForSql;
+	private final boolean formatAlways;
 
 	/**
 	 * @param formatter The formatter to use for formatting the date and time of issue
-	 * @param formatForSql The date and time of issue will be applied as formatted string to prepared SQL statements if
-	 *                     set to {@code true}, otherwise it will be applied as {@link Timestamp SQL timestamp}
+	 * @param formatAlways The date and time of issue will be returned as formatted string by the value getter, if
+	 *                     {@code true}, otherwise it will be returned as {@link Timestamp SQL timestamp}
 	 */
-	public DatePlaceholder(DateTimeFormatter formatter, boolean formatForSql) {
+	public DatePlaceholder(DateTimeFormatter formatter, boolean formatAlways) {
 		this.formatter = formatter;
-		this.formatForSql = formatForSql;
+		this.formatAlways = formatAlways;
 	}
 
 	@Override
 	public Set<LogEntryValue> getRequiredLogEntryValues() {
 		return EnumSet.of(LogEntryValue.TIMESTAMP);
+	}
+
+	@Override
+	public ValueType getType() {
+		return formatAlways ? ValueType.STRING : ValueType.TIMESTAMP;
+	}
+
+	@Override
+	public Object getValue(LogEntry entry) {
+		Instant instant = entry.getTimestamp();
+
+		if (instant == null) {
+			return null;
+		} else if (formatAlways) {
+			return formatter.format(instant);
+		} else {
+			Timestamp timestamp = new Timestamp(instant.getEpochSecond() * MILLIS_PER_SECOND);
+			timestamp.setNanos(instant.getNano());
+			return timestamp;
+		}
 	}
 
 	@Override
@@ -43,21 +62,6 @@ public class DatePlaceholder implements Placeholder {
 			builder.append("<timestamp unknown>");
 		} else {
 			formatter.formatTo(instant, builder);
-		}
-	}
-
-	@Override
-	public SqlRecord<?> resolve(LogEntry entry) {
-		Instant instant = entry.getTimestamp();
-
-		if (formatForSql) {
-			return new SqlRecord<>(SqlType.STRING, instant == null ? null : formatter.format(instant));
-		} else if (instant == null) {
-			return new SqlRecord<>(SqlType.TIMESTAMP, null);
-		} else {
-			Timestamp timestamp = new Timestamp(instant.getEpochSecond() * MILLIS_PER_SECOND);
-			timestamp.setNanos(instant.getNano());
-			return new SqlRecord<>(SqlType.TIMESTAMP, timestamp);
 		}
 	}
 

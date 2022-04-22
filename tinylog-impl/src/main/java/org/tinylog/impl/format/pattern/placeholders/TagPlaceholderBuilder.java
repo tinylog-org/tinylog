@@ -19,7 +19,7 @@ public class TagPlaceholderBuilder implements PlaceholderBuilder {
 	@Override
 	public Placeholder create(Framework framework, String value) {
 		if (value == null) {
-			return new TagPlaceholder("<untagged>", null);
+			return new TagPlaceholder(null, "<untagged>");
 		} else {
 			return new TagPlaceholder(value, value);
 		}

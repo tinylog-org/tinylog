@@ -6,8 +6,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -30,6 +29,20 @@ class BundlePlaceholderTest {
 	}
 
 	/**
+	 * Verifies that all child placeholders are resolved as a combined char sequence in the expected order.
+	 */
+	@Test
+	void resolve() {
+		StaticTextPlaceholder firstChild = new StaticTextPlaceholder("Class: ");
+		ClassPlaceholder secondChild = new ClassPlaceholder();
+		BundlePlaceholder bundlePlaceholder = new BundlePlaceholder(Arrays.asList(firstChild, secondChild));
+
+		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
+		assertThat(bundlePlaceholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(bundlePlaceholder.getValue(logEntry)).isEqualTo("Class: foo.MyClass");
+	}
+
+	/**
 	 * Verifies that all child placeholders are rendered correctly and in the expected order.
 	 */
 	@Test
@@ -41,21 +54,6 @@ class BundlePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(bundlePlaceholder);
 		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
 		assertThat(renderer.render(logEntry)).isEqualTo("Class: foo.MyClass");
-	}
-
-	/**
-	 * Verifies that all child placeholders are resolved as a combined char sequence in the expected order.
-	 */
-	@Test
-	void resolve() {
-		StaticTextPlaceholder firstChild = new StaticTextPlaceholder("Class: ");
-		ClassPlaceholder secondChild = new ClassPlaceholder();
-		BundlePlaceholder bundlePlaceholder = new BundlePlaceholder(Arrays.asList(firstChild, secondChild));
-
-		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
-		assertThat(bundlePlaceholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Class: foo.MyClass"));
 	}
 
 }

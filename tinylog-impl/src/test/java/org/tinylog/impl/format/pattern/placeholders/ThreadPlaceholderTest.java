@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -19,6 +18,31 @@ class ThreadPlaceholderTest {
 	void requiredLogEntryValues() {
 		ThreadPlaceholder placeholder = new ThreadPlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.THREAD);
+	}
+
+	/**
+	 * Verifies that the source thread name of a log entry will be resolved, if the thread object is present.
+	 */
+	@Test
+	void resolveWithSourceThread() {
+		Thread thread = new Thread(() -> { }, "foo");
+		LogEntry logEntry = new LogEntryBuilder().thread(thread).create();
+
+		ThreadPlaceholder placeholder = new ThreadPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("foo");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the thread object is not present.
+	 */
+	@Test
+	void resolveWithoutSourceThread() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+
+		ThreadPlaceholder placeholder = new ThreadPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -40,33 +64,6 @@ class ThreadPlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new ThreadPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<thread unknown>");
-	}
-
-	/**
-	 * Verifies that the source thread name of a log entry will be resolved, if the thread object is present.
-	 */
-	@Test
-	void resolveWithSourceThread() {
-		Thread thread = new Thread(() -> { }, "foo");
-		LogEntry logEntry = new LogEntryBuilder().thread(thread).create();
-
-		ThreadPlaceholder placeholder = new ThreadPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the thread object is not present.
-	 */
-	@Test
-	void resolveWithoutSourceThread() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-
-		ThreadPlaceholder placeholder = new ThreadPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

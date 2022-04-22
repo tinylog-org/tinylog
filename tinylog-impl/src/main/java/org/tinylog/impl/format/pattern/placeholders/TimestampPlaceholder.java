@@ -7,8 +7,7 @@ import java.util.function.ToLongFunction;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the Unix timestamp of issue for a log entry.
@@ -31,20 +30,20 @@ public class TimestampPlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Instant instant = entry.getTimestamp();
-		builder.append(instant == null ? "<timestamp unknown>" : timestampMapper.applyAsLong(instant));
+	public ValueType getType() {
+		return ValueType.LONG;
 	}
 
 	@Override
-	public SqlRecord<? extends Number> resolve(LogEntry entry) {
+	public Long getValue(LogEntry entry) {
 		Instant timestamp = entry.getTimestamp();
+		return timestamp == null ? null : timestampMapper.applyAsLong(timestamp);
+	}
 
-		if (timestamp == null) {
-			return new SqlRecord<>(SqlType.LONG, null);
-		} else {
-			return new SqlRecord<>(SqlType.LONG, timestampMapper.applyAsLong(timestamp));
-		}
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		Instant instant = entry.getTimestamp();
+		builder.append(instant == null ? "<timestamp unknown>" : timestampMapper.applyAsLong(instant));
 	}
 
 }

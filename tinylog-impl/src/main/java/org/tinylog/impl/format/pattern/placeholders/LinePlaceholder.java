@@ -5,8 +5,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Placeholder implementation for resolving the line number of a log entry in the source file.
@@ -23,6 +22,17 @@ public class LinePlaceholder implements Placeholder {
 	}
 
 	@Override
+	public ValueType getType() {
+		return ValueType.INTEGER;
+	}
+
+	@Override
+	public Integer getValue(LogEntry entry) {
+		int lineNumber = entry.getLineNumber();
+		return lineNumber < 0 ? null : lineNumber;
+	}
+
+	@Override
 	public void render(StringBuilder builder, LogEntry entry) {
 		int lineNumber = entry.getLineNumber();
 		if (lineNumber < 0) {
@@ -30,12 +40,6 @@ public class LinePlaceholder implements Placeholder {
 		} else {
 			builder.append(lineNumber);
 		}
-	}
-
-	@Override
-	public SqlRecord<? extends Number> resolve(LogEntry entry) {
-		int lineNumber = entry.getLineNumber();
-		return new SqlRecord<>(SqlType.INTEGER, lineNumber < 0 ? null : lineNumber);
 	}
 
 }

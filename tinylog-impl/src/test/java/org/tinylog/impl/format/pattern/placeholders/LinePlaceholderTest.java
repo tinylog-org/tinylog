@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -19,6 +18,28 @@ class LinePlaceholderTest {
 	void requiredLogEntryValues() {
 		LinePlaceholder placeholder = new LinePlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LINE);
+	}
+
+	/**
+	 * Verifies that the line number of a log entry in the source file will be resolved, if set.
+	 */
+	@Test
+	void resolveWithSourceLineName() {
+		LogEntry logEntry = new LogEntryBuilder().lineNumber(100).create();
+		LinePlaceholder placeholder = new LinePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.INTEGER);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(100);
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the line number in the source file is not set.
+	 */
+	@Test
+	void resolveWithoutSourceLineName() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		LinePlaceholder placeholder = new LinePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.INTEGER);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -39,30 +60,6 @@ class LinePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new LinePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("?");
-	}
-
-	/**
-	 * Verifies that the line number of a log entry in the source file will be resolved, if set.
-	 */
-	@Test
-	void resolveWithSourceLineName() {
-		LogEntry logEntry = new LogEntryBuilder().lineNumber(100).create();
-		LinePlaceholder placeholder = new LinePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.INTEGER, 100));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the line number in the source file is not set.
-	 */
-	@Test
-	void resolveWithoutSourceLineName() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		LinePlaceholder placeholder = new LinePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.INTEGER, null));
 	}
 
 }

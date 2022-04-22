@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -20,6 +19,28 @@ class LevelPlaceholderTest {
 	void requiredLogEntryValues() {
 		LevelPlaceholder placeholder = new LevelPlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LEVEL);
+	}
+
+	/**
+	 * Verifies that the severity level of a log entry will be resolved, if set.
+	 */
+	@Test
+	void resolveWithSeverityLevel() {
+		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
+		LevelPlaceholder placeholder = new LevelPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("INFO");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the severity level is not set.
+	 */
+	@Test
+	void resolveWithoutSeverityLevel() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		LevelPlaceholder placeholder = new LevelPlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -40,30 +61,6 @@ class LevelPlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<level unknown>");
-	}
-
-	/**
-	 * Verifies that the severity level of a log entry will be resolved, if set.
-	 */
-	@Test
-	void resolveWithSeverityLevel() {
-		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
-		LevelPlaceholder placeholder = new LevelPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "INFO"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the severity level is not set.
-	 */
-	@Test
-	void resolveWithoutSeverityLevel() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		LevelPlaceholder placeholder = new LevelPlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

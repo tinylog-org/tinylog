@@ -2,8 +2,7 @@ package org.tinylog.impl.format.pattern.styles;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.format.pattern.placeholders.BundlePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.LinePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
@@ -30,7 +29,54 @@ class AbstractStylePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that a {@link SqlType#STRING} placeholder is rendered correctly.
+	 * Verifies that a {@link ValueType#STRING} placeholder is resolved correctly.
+	 */
+	@Test
+	void resolveStringPlaceholder() {
+		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
+		assertThat(styled.getType()).isEqualTo(ValueType.STRING);
+
+		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
+		assertThat(styled.getValue(logEntry)).isEqualTo("[Hello World!]");
+
+		logEntry = new LogEntryBuilder().create();
+		assertThat(styled.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that a non-string placeholder is resolved as {@link ValueType#STRING}.
+	 */
+	@Test
+	void resolveNumericPlaceholder() {
+		Placeholder styled = new StylePlaceholder(new LinePlaceholder());
+		assertThat(styled.getType()).isEqualTo(ValueType.STRING);
+
+		LogEntry logEntry = new LogEntryBuilder().lineNumber(42).create();
+		assertThat(styled.getValue(logEntry)).isEqualTo("[42]");
+
+		logEntry = new LogEntryBuilder().create();
+		assertThat(styled.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that a bundled placeholder is resolved as {@link ValueType#STRING}.
+	 */
+	@Test
+	void resolveBundledPlaceholder() {
+		Placeholder prefix = new StaticTextPlaceholder("foo:");
+		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
+		Placeholder bundle = new BundlePlaceholder(ImmutableList.of(prefix, styled));
+		assertThat(bundle.getType()).isEqualTo(ValueType.STRING);
+
+		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
+		assertThat(bundle.getValue(logEntry)).isEqualTo("foo:[Hello World!]");
+
+		logEntry = new LogEntryBuilder().create();
+		assertThat(bundle.getValue(logEntry)).isEqualTo("foo:[]");
+	}
+
+	/**
+	 * Verifies that a {@link ValueType#STRING} placeholder is rendered correctly.
 	 */
 	@Test
 	void renderStringPlaceholder() {
@@ -74,62 +120,6 @@ class AbstractStylePlaceholderTest {
 
 		logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("foo:[]");
-	}
-
-	/**
-	 * Verifies that a {@link SqlType#STRING} placeholder is resolved correctly.
-	 */
-	@Test
-	void resolveStringPlaceholder() {
-		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
-
-		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "[Hello World!]"));
-
-		logEntry = new LogEntryBuilder().create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
-	}
-
-	/**
-	 * Verifies that a non-string placeholder is resolved as {@link SqlType#STRING}.
-	 */
-	@Test
-	void resolveNumericPlaceholder() {
-		Placeholder styled = new StylePlaceholder(new LinePlaceholder());
-
-		LogEntry logEntry = new LogEntryBuilder().lineNumber(42).create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "[42]"));
-
-		logEntry = new LogEntryBuilder().create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
-	}
-
-	/**
-	 * Verifies that a bundled placeholder is resolved as {@link SqlType#STRING}.
-	 */
-	@Test
-	void resolveBundledPlaceholder() {
-		Placeholder prefix = new StaticTextPlaceholder("foo:");
-		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
-		Placeholder bundle = new BundlePlaceholder(ImmutableList.of(prefix, styled));
-
-		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
-		assertThat(bundle.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo:[Hello World!]"));
-
-		logEntry = new LogEntryBuilder().create();
-		assertThat(bundle.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo:"));
 	}
 
 	/**

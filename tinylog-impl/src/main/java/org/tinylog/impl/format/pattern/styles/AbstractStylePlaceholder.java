@@ -4,8 +4,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -28,24 +27,21 @@ public abstract class AbstractStylePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		int start = builder.length();
-		placeholder.render(builder, entry);
-		apply(builder, start);
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<?> resolve(LogEntry entry) {
-		SqlRecord<?> record = placeholder.resolve(entry);
-		SqlType originType = record.getType();
-		Object originValue = record.getValue();
+	public String getValue(LogEntry entry) {
+		ValueType originType = placeholder.getType();
+		Object originValue = placeholder.getValue(entry);
 
 		if (originValue == null) {
-			return new SqlRecord<>(SqlType.STRING, null);
+			return null;
 		} else {
 			StringBuilder builder = new StringBuilder();
 
-			if (originType == SqlType.STRING) {
+			if (originType == ValueType.STRING) {
 				builder.append(originValue);
 			} else {
 				placeholder.render(builder, entry);
@@ -53,8 +49,15 @@ public abstract class AbstractStylePlaceholder implements Placeholder {
 
 			apply(builder, 0);
 
-			return new SqlRecord<>(SqlType.STRING, builder);
+			return builder.toString();
 		}
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		int start = builder.length();
+		placeholder.render(builder, entry);
+		apply(builder, start);
 	}
 
 	/**

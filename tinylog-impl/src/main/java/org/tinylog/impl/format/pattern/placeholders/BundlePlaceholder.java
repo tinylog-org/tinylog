@@ -7,8 +7,7 @@ import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 
 /**
  * Bundle of multiple child placeholders.
@@ -37,15 +36,20 @@ public class BundlePlaceholder implements Placeholder {
 	}
 
 	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		placeholders.forEach(placeholder -> placeholder.render(builder, entry));
+	public ValueType getType() {
+		return ValueType.STRING;
 	}
 
 	@Override
-	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
+	public String getValue(LogEntry entry) {
 		StringBuilder builder = new StringBuilder();
 		render(builder, entry);
-		return new SqlRecord<>(SqlType.STRING, builder);
+		return builder.toString();
+	}
+
+	@Override
+	public void render(StringBuilder builder, LogEntry entry) {
+		placeholders.forEach(placeholder -> placeholder.render(builder, entry));
 	}
 
 }

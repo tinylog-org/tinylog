@@ -8,8 +8,7 @@ import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -26,6 +25,53 @@ class DatePlaceholderTest {
 	void requiredLogEntryValues() {
 		DatePlaceholder placeholder = new DatePlaceholder(DateTimeFormatter.ISO_INSTANT, false);
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+	}
+
+	/**
+	 * Verifies that the date and time of a log entry will be resolved as a {@link Timestamp}, if the date and time of
+	 * issue is set.
+	 */
+	@Test
+	void resolveUnformattedWithTimestamp() {
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.TIMESTAMP);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo(new Timestamp(0));
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the date and time of issue is not
+	 * set.
+	 */
+	@Test
+	void resolveUnformattedWithoutTimestamp() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.TIMESTAMP);
+		assertThat(placeholder.getValue(logEntry)).isNull();
+	}
+
+	/**
+	 * Verifies that the date and time of a log entry will be resolved as formatted string, if the date and time of
+	 * issue is set.
+	 */
+	@Test
+	void resolveFormattedWithTimestamp() {
+		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("1970-01-01T00:00:00Z");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the date and time of issue is not set.
+	 */
+	@Test
+	void resolveFormattedWithoutTimestamp() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -46,57 +92,6 @@ class DatePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new DatePlaceholder(formatter, false));
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<timestamp unknown>");
-	}
-
-	/**
-	 * Verifies that the date and time of a log entry will be resolved as a {@link Timestamp}, if the date and time of
-	 * issue is set.
-	 */
-	@Test
-	void resolveUnformattedWithTimestamp() {
-		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.TIMESTAMP, new Timestamp(0)));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the date and time of issue is not
-	 * set.
-	 */
-	@Test
-	void resolveUnformattedWithoutTimestamp() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.TIMESTAMP, null));
-	}
-
-	/**
-	 * Verifies that the date and time of a log entry will be resolved as formatted string, if the date and time of
-	 * issue is set.
-	 */
-	@Test
-	void resolveFormattedWithTimestamp() {
-		LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "1970-01-01T00:00:00Z"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the date and time of issue is not set.
-	 */
-	@Test
-	void resolveFormattedWithoutTimestamp() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

@@ -3,8 +3,7 @@ package org.tinylog.impl.format.pattern.placeholders;
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.SqlRecord;
-import org.tinylog.impl.format.pattern.SqlType;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -19,6 +18,28 @@ class FilePlaceholderTest {
 	void requiredLogEntryValues() {
 		FilePlaceholder placeholder = new FilePlaceholder();
 		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.FILE);
+	}
+
+	/**
+	 * Verifies that the source file name of a log entry will be resolved, if set.
+	 */
+	@Test
+	void resolveWithSourceFileName() {
+		LogEntry logEntry = new LogEntryBuilder().fileName("foo.java").create();
+		FilePlaceholder placeholder = new FilePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isEqualTo("foo.java");
+	}
+
+	/**
+	 * Verifies that {@code null} will be resolved, if the source file name is not set.
+	 */
+	@Test
+	void resolveWithoutSourceFileName() {
+		LogEntry logEntry = new LogEntryBuilder().create();
+		FilePlaceholder placeholder = new FilePlaceholder();
+		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+		assertThat(placeholder.getValue(logEntry)).isNull();
 	}
 
 	/**
@@ -39,30 +60,6 @@ class FilePlaceholderTest {
 		FormatOutputRenderer renderer = new FormatOutputRenderer(new FilePlaceholder());
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(renderer.render(logEntry)).isEqualTo("<file unknown>");
-	}
-
-	/**
-	 * Verifies that the source file name of a log entry will be resolved, if set.
-	 */
-	@Test
-	void resolveWithSourceFileName() {
-		LogEntry logEntry = new LogEntryBuilder().fileName("foo.java").create();
-		FilePlaceholder placeholder = new FilePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo.java"));
-	}
-
-	/**
-	 * Verifies that {@code null} will be resolved, if the source file name is not set.
-	 */
-	@Test
-	void resolveWithoutSourceFileName() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		FilePlaceholder placeholder = new FilePlaceholder();
-		assertThat(placeholder.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }
