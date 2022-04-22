@@ -1,7 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -58,7 +58,7 @@ class DatePlaceholderTest {
 		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.TIMESTAMP, new Timestamp(0)));
+			.isEqualTo(new SqlRecord<>(SqlType.TIMESTAMP, new Timestamp(0)));
 	}
 
 	/**
@@ -71,7 +71,7 @@ class DatePlaceholderTest {
 		DatePlaceholder placeholder = new DatePlaceholder(formatter, false);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.TIMESTAMP, null));
+			.isEqualTo(new SqlRecord<>(SqlType.TIMESTAMP, null));
 	}
 
 	/**
@@ -84,7 +84,7 @@ class DatePlaceholderTest {
 		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "1970-01-01T00:00:00Z"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "1970-01-01T00:00:00Z"));
 	}
 
 	/**
@@ -96,7 +96,7 @@ class DatePlaceholderTest {
 		DatePlaceholder placeholder = new DatePlaceholder(formatter, true);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

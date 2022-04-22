@@ -1,7 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
 import java.math.BigDecimal;
-import java.sql.Types;
 import java.time.Duration;
 import java.util.stream.Stream;
 
@@ -14,6 +13,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -72,7 +72,7 @@ class UptimePlaceholderTest {
 		UptimePlaceholder placeholder = new UptimePlaceholder(pattern, true);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, expected));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, expected));
 	}
 
 	/**
@@ -84,7 +84,7 @@ class UptimePlaceholderTest {
 		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", true);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 	/**
@@ -101,7 +101,7 @@ class UptimePlaceholderTest {
 		UptimePlaceholder placeholder = new UptimePlaceholder("s", false);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.NUMERIC, expected));
+			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, expected));
 	}
 
 	/**
@@ -113,7 +113,7 @@ class UptimePlaceholderTest {
 		UptimePlaceholder placeholder = new UptimePlaceholder("HH:mm", false);
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.NUMERIC, null));
+			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, null));
 	}
 
 	/**

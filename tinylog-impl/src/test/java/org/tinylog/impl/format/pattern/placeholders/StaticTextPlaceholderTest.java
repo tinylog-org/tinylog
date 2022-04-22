@@ -1,10 +1,9 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -40,7 +39,7 @@ class StaticTextPlaceholderTest {
 		StaticTextPlaceholder placeholder = new StaticTextPlaceholder("Hello World!");
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "Hello World!"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Hello World!"));
 	}
 
 }

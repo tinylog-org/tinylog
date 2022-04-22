@@ -1,6 +1,5 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Bundle of multiple child placeholders.
@@ -45,7 +45,7 @@ public class BundlePlaceholder implements Placeholder {
 	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		StringBuilder builder = new StringBuilder();
 		render(builder, entry);
-		return new SqlRecord<>(Types.LONGVARCHAR, builder);
+		return new SqlRecord<>(SqlType.STRING, builder);
 	}
 
 }

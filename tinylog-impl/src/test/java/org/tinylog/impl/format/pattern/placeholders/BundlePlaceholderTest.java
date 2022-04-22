@@ -1,6 +1,5 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -55,7 +55,7 @@ class BundlePlaceholderTest {
 		LogEntry logEntry = new LogEntryBuilder().className("foo.MyClass").create();
 		assertThat(bundlePlaceholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "Class: foo.MyClass"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "Class: foo.MyClass"));
 	}
 
 }

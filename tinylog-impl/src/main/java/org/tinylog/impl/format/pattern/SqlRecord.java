@@ -1,7 +1,5 @@
 package org.tinylog.impl.format.pattern;
 
-import java.sql.Types;
-
 /**
  * SQL record represents a typed value to insert or update into an SQL table.
  *
@@ -9,14 +7,14 @@ import java.sql.Types;
  */
 public class SqlRecord<T> {
 
-	private final int type;
+	private final SqlType type;
 	private final T value;
 
 	/**
-	 * @param type The SQL type from {@link Types}
+	 * @param type The SQL type of the value
 	 * @param value The value to store
 	 */
-	public SqlRecord(int type, T value) {
+	public SqlRecord(SqlType type, T value) {
 		this.type = type;
 		this.value = value;
 	}
@@ -24,9 +22,9 @@ public class SqlRecord<T> {
 	/**
 	 * Gets the SQL type for the stored value.
 	 *
-	 * @return SQL type from {@link Types}
+	 * @return The SQL type of the stored value
 	 */
-	public int getType() {
+	public SqlType getType() {
 		return type;
 	}
 

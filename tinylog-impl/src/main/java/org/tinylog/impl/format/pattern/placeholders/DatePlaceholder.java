@@ -1,7 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
@@ -10,6 +9,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving the date and time of issue for a log entry.
@@ -51,13 +51,13 @@ public class DatePlaceholder implements Placeholder {
 		Instant instant = entry.getTimestamp();
 
 		if (formatForSql) {
-			return new SqlRecord<>(Types.VARCHAR, instant == null ? null : formatter.format(instant));
+			return new SqlRecord<>(SqlType.STRING, instant == null ? null : formatter.format(instant));
 		} else if (instant == null) {
-			return new SqlRecord<>(Types.TIMESTAMP, null);
+			return new SqlRecord<>(SqlType.TIMESTAMP, null);
 		} else {
 			Timestamp timestamp = new Timestamp(instant.getEpochSecond() * MILLIS_PER_SECOND);
 			timestamp.setNanos(instant.getNano());
-			return new SqlRecord<>(Types.TIMESTAMP, timestamp);
+			return new SqlRecord<>(SqlType.TIMESTAMP, timestamp);
 		}
 	}
 

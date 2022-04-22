@@ -1,11 +1,11 @@
 package org.tinylog.impl.format.pattern.styles;
 
-import java.sql.Types;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -37,16 +37,15 @@ public abstract class AbstractStylePlaceholder implements Placeholder {
 	@Override
 	public SqlRecord<?> resolve(LogEntry entry) {
 		SqlRecord<?> record = placeholder.resolve(entry);
-		int originType = record.getType();
-		int newType = originType == Types.LONGVARCHAR ? Types.LONGVARCHAR : Types.VARCHAR;
+		SqlType originType = record.getType();
 		Object originValue = record.getValue();
 
 		if (originValue == null) {
-			return new SqlRecord<>(newType, null);
+			return new SqlRecord<>(SqlType.STRING, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
 
-			if (originType == Types.LONGVARCHAR || originType == Types.VARCHAR) {
+			if (originType == SqlType.STRING) {
 				builder.append(originValue);
 			} else {
 				placeholder.render(builder, entry);
@@ -54,7 +53,7 @@ public abstract class AbstractStylePlaceholder implements Placeholder {
 
 			apply(builder, 0);
 
-			return new SqlRecord<>(newType, builder);
+			return new SqlRecord<>(SqlType.STRING, builder);
 		}
 	}
 

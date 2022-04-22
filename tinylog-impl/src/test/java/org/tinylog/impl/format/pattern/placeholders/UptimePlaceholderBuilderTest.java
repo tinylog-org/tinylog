@@ -1,7 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
 import java.math.BigDecimal;
-import java.sql.Types;
 import java.time.Duration;
 import java.util.ServiceLoader;
 
@@ -12,6 +11,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -38,7 +38,7 @@ class UptimePlaceholderBuilderTest {
 
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.NUMERIC, new BigDecimal("7170.000000000")));
+			.isEqualTo(new SqlRecord<>(SqlType.DECIMAL, new BigDecimal("7170.000000000")));
 	}
 
 	/**
@@ -56,7 +56,7 @@ class UptimePlaceholderBuilderTest {
 
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "7170.000"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "7170.000"));
 	}
 
 	/**

@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for printing the log message and exception of a log entry.
@@ -51,11 +51,11 @@ public class MessagePlaceholder implements Placeholder {
 		Throwable exception = entry.getException();
 
 		if (message == null && exception == null) {
-			return new SqlRecord<>(Types.LONGVARCHAR, null);
+			return new SqlRecord<>(SqlType.STRING, null);
 		} else {
 			StringBuilder builder = new StringBuilder();
 			render(builder, entry);
-			return new SqlRecord<>(Types.LONGVARCHAR, builder);
+			return new SqlRecord<>(SqlType.STRING, builder);
 		}
 	}
 

@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving thread context values for a log entry.
@@ -44,7 +44,7 @@ public class ContextPlaceholder implements Placeholder {
 	@Override
 	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
 		String value = entry.getContext().getOrDefault(key, defaultApplyValue);
-		return new SqlRecord<>(Types.VARCHAR, value);
+		return new SqlRecord<>(SqlType.STRING, value);
 	}
 
 }

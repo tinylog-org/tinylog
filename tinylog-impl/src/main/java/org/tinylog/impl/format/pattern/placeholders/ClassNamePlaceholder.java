@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving the simple class name without package prefix for a log entry.
@@ -30,7 +30,7 @@ public class ClassNamePlaceholder implements Placeholder {
 
 	@Override
 	public SqlRecord<? extends CharSequence> resolve(LogEntry entry) {
-		return new SqlRecord<>(Types.VARCHAR, extractSimpleClassName(entry.getClassName()));
+		return new SqlRecord<>(SqlType.STRING, extractSimpleClassName(entry.getClassName()));
 	}
 
 	/**

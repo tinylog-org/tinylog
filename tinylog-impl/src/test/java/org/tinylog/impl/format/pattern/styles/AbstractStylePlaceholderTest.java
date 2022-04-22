@@ -1,12 +1,10 @@
 package org.tinylog.impl.format.pattern.styles;
 
-import java.sql.Types;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.format.pattern.placeholders.BundlePlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.FilePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.LinePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
@@ -32,25 +30,10 @@ class AbstractStylePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that a {@link Types#VARCHAR} placeholder is rendered correctly.
+	 * Verifies that a {@link SqlType#STRING} placeholder is rendered correctly.
 	 */
 	@Test
-	void renderVarCharPlaceholder() {
-		Placeholder styled = new StylePlaceholder(new FilePlaceholder());
-		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
-
-		LogEntry logEntry = new LogEntryBuilder().fileName("Foo.java").create();
-		assertThat(renderer.render(logEntry)).isEqualTo("[Foo.java]");
-
-		logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo("[<file unknown>]");
-	}
-
-	/**
-	 * Verifies that a {@link Types#LONGVARCHAR} placeholder is rendered correctly.
-	 */
-	@Test
-	void renderLongVarCharPlaceholder() {
+	void renderStringPlaceholder() {
 		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
 		FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
@@ -94,43 +77,25 @@ class AbstractStylePlaceholderTest {
 	}
 
 	/**
-	 * Verifies that a {@link Types#VARCHAR} placeholder is resolved correctly.
+	 * Verifies that a {@link SqlType#STRING} placeholder is resolved correctly.
 	 */
 	@Test
-	void resolveVarCharPlaceholder() {
-		Placeholder styled = new StylePlaceholder(new FilePlaceholder());
-
-		LogEntry logEntry = new LogEntryBuilder().fileName("Foo.java").create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "[Foo.java]"));
-
-		logEntry = new LogEntryBuilder().create();
-		assertThat(styled.resolve(logEntry))
-			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
-	}
-
-	/**
-	 * Verifies that a {@link Types#LONGVARCHAR} placeholder is resolved correctly.
-	 */
-	@Test
-	void resolveLongCharPlaceholder() {
+	void resolveStringPlaceholder() {
 		Placeholder styled = new StylePlaceholder(new MessageOnlyPlaceholder());
 
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(styled.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "[Hello World!]"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "[Hello World!]"));
 
 		logEntry = new LogEntryBuilder().create();
 		assertThat(styled.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 	/**
-	 * Verifies that a non-string placeholder is resolved as {@link Types#VARCHAR}.
+	 * Verifies that a non-string placeholder is resolved as {@link SqlType#STRING}.
 	 */
 	@Test
 	void resolveNumericPlaceholder() {
@@ -139,16 +104,16 @@ class AbstractStylePlaceholderTest {
 		LogEntry logEntry = new LogEntryBuilder().lineNumber(42).create();
 		assertThat(styled.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "[42]"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "[42]"));
 
 		logEntry = new LogEntryBuilder().create();
 		assertThat(styled.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 	/**
-	 * Verifies that a bundled placeholder is resolved as {@link Types#LONGVARCHAR}.
+	 * Verifies that a bundled placeholder is resolved as {@link SqlType#STRING}.
 	 */
 	@Test
 	void resolveBundledPlaceholder() {
@@ -159,12 +124,12 @@ class AbstractStylePlaceholderTest {
 		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		assertThat(bundle.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "foo:[Hello World!]"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo:[Hello World!]"));
 
 		logEntry = new LogEntryBuilder().create();
 		assertThat(bundle.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, "foo:"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo:"));
 	}
 
 	/**

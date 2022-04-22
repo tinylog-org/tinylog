@@ -1,6 +1,5 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -10,6 +9,7 @@ import org.tinylog.core.Framework;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -38,11 +38,11 @@ class TagPlaceholderBuilderTest {
 
 		assertThat(placeholder.resolve(emptyLogEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 
 		assertThat(placeholder.resolve(filledLogEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "foo"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo"));
 	}
 
 	/**
@@ -59,11 +59,11 @@ class TagPlaceholderBuilderTest {
 
 		assertThat(placeholder.resolve(emptyLogEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "none"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "none"));
 
 		assertThat(placeholder.resolve(filledLogEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "foo"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "foo"));
 	}
 
 	/**

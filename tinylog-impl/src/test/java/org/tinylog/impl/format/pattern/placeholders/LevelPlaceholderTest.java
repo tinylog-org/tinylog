@@ -1,12 +1,11 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -52,7 +51,7 @@ class LevelPlaceholderTest {
 		LevelPlaceholder placeholder = new LevelPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "INFO"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "INFO"));
 	}
 
 	/**
@@ -64,7 +63,7 @@ class LevelPlaceholderTest {
 		LevelPlaceholder placeholder = new LevelPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 }

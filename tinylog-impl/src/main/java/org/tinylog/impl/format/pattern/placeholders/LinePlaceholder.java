@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving the line number of a log entry in the source file.
@@ -35,7 +35,7 @@ public class LinePlaceholder implements Placeholder {
 	@Override
 	public SqlRecord<? extends Number> resolve(LogEntry entry) {
 		int lineNumber = entry.getLineNumber();
-		return new SqlRecord<>(Types.INTEGER, lineNumber < 0 ? null : lineNumber);
+		return new SqlRecord<>(SqlType.INTEGER, lineNumber < 0 ? null : lineNumber);
 	}
 
 }

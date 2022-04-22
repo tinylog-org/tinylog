@@ -1,11 +1,10 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -54,7 +53,7 @@ class ThreadIdPlaceholderTest {
 		ThreadIdPlaceholder placeholder = new ThreadIdPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.BIGINT, thread.getId()));
+			.isEqualTo(new SqlRecord<>(SqlType.LONG, thread.getId()));
 	}
 
 	/**
@@ -66,7 +65,7 @@ class ThreadIdPlaceholderTest {
 		ThreadIdPlaceholder placeholder = new ThreadIdPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.BIGINT, null));
+			.isEqualTo(new SqlRecord<>(SqlType.LONG, null));
 	}
 
 }

@@ -1,11 +1,10 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -54,7 +53,7 @@ class ContextPlaceholderTest {
 		LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "bar"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "bar"));
 	}
 
 	/**
@@ -66,7 +65,7 @@ class ContextPlaceholderTest {
 		LogEntry logEntry = new LogEntryBuilder().create();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.VARCHAR, "-"));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, "-"));
 	}
 
 }

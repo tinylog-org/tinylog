@@ -1,6 +1,5 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
@@ -9,6 +8,7 @@ import java.util.function.ToLongFunction;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving the Unix timestamp of issue for a log entry.
@@ -41,9 +41,9 @@ public class TimestampPlaceholder implements Placeholder {
 		Instant timestamp = entry.getTimestamp();
 
 		if (timestamp == null) {
-			return new SqlRecord<>(Types.BIGINT, null);
+			return new SqlRecord<>(SqlType.LONG, null);
 		} else {
-			return new SqlRecord<>(Types.BIGINT, timestampMapper.applyAsLong(timestamp));
+			return new SqlRecord<>(SqlType.LONG, timestampMapper.applyAsLong(timestamp));
 		}
 	}
 

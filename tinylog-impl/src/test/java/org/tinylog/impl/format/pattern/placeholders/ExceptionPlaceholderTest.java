@@ -2,12 +2,12 @@ package org.tinylog.impl.format.pattern.placeholders;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Types;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
@@ -97,7 +97,7 @@ class ExceptionPlaceholderTest {
 		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, null));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, null));
 	}
 
 	/**
@@ -111,7 +111,7 @@ class ExceptionPlaceholderTest {
 		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, print(exception)));
 	}
 
 	/**
@@ -125,7 +125,7 @@ class ExceptionPlaceholderTest {
 		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, print(exception)));
 	}
 
 	/**
@@ -140,7 +140,7 @@ class ExceptionPlaceholderTest {
 		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, print(exception)));
 	}
 
 	/**
@@ -155,7 +155,7 @@ class ExceptionPlaceholderTest {
 		ExceptionPlaceholder placeholder = new ExceptionPlaceholder();
 		assertThat(placeholder.resolve(logEntry))
 			.usingRecursiveComparison()
-			.isEqualTo(new SqlRecord<>(Types.LONGVARCHAR, print(exception)));
+			.isEqualTo(new SqlRecord<>(SqlType.STRING, print(exception)));
 	}
 
 	/**

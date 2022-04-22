@@ -1,12 +1,12 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import java.sql.Types;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.SqlRecord;
+import org.tinylog.impl.format.pattern.SqlType;
 
 /**
  * Placeholder implementation for resolving the process ID of the current process.
@@ -34,7 +34,7 @@ public class ProcessIdPlaceholder implements Placeholder {
 
 	@Override
 	public SqlRecord<? extends Number> resolve(LogEntry entry) {
-		return new SqlRecord<>(Types.BIGINT, processId);
+		return new SqlRecord<>(SqlType.LONG, processId);
 	}
 
 }
