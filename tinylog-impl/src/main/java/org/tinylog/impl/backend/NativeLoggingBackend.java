@@ -1,8 +1,7 @@
 package org.tinylog.impl.backend;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,16 +60,14 @@ public class NativeLoggingBackend implements LoggingBackend {
 
 	@Override
 	public LevelVisibility getLevelVisibilityByClass(String className) {
-		Collection<String> tags = new ArrayList<>();
-		tags.add(LevelConfiguration.ANY_PLACEHOLDER);
-		tags.addAll(getLevelConfiguration(className).getTags());
+		LevelConfiguration levelConfiguration = getLevelConfiguration(className);
 
 		return new LevelVisibility(
-			getOutputDetails(tags, Level.TRACE),
-			getOutputDetails(tags, Level.DEBUG),
-			getOutputDetails(tags, Level.INFO),
-			getOutputDetails(tags, Level.WARN),
-			getOutputDetails(tags, Level.ERROR)
+			getOutputDetails(levelConfiguration, Level.TRACE),
+			getOutputDetails(levelConfiguration, Level.DEBUG),
+			getOutputDetails(levelConfiguration, Level.INFO),
+			getOutputDetails(levelConfiguration, Level.WARN),
+			getOutputDetails(levelConfiguration, Level.ERROR)
 		);
 	}
 
@@ -160,17 +157,26 @@ public class NativeLoggingBackend implements LoggingBackend {
 	}
 
 	/**
-	 * Gets the configured output details for all passed tags and the passed severity level.
+	 * Gets the configured output details for the passed level configuration and severity level.
 	 *
-	 * @param tags The category tags including placeholders
+	 * @param configuration The level configuration
 	 * @param level The severity level
 	 * @return The configured output details
 	 */
-	private OutputDetails getOutputDetails(Collection<String> tags, Level level) {
-		return tags.stream()
-			.map(tag -> getOutputDetails(tag, level))
-			.max(OutputDetails::compareTo)
-			.orElse(OutputDetails.DISABLED);
+	private OutputDetails getOutputDetails(LevelConfiguration configuration, Level level) {
+		if (level.isAtLeastAsSevereAs(configuration.getLeastSevereLevel())) {
+			Set<String> tags = new HashSet<>(configuration.getTags());
+			tags.add(LevelConfiguration.UNTAGGED_PLACEHOLDER);
+			tags.add(LevelConfiguration.TAGGED_PLACEHOLDER);
+
+			return tags.stream()
+				.filter(tag -> level.isAtLeastAsSevereAs(configuration.getLevel(tag)))
+				.map(tag -> getOutputDetails(tag, level))
+				.max(OutputDetails::compareTo)
+				.orElse(OutputDetails.DISABLED);
+		} else {
+			return OutputDetails.DISABLED;
+		}
 	}
 
 	/**

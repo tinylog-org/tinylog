@@ -121,15 +121,42 @@ class NativeLoggingBackendTest {
 		NativeLoggingBackend backend = new Builder()
 			.rootLevel(Level.TRACE)
 			.customLevel(className, Level.OFF)
-			.writers("*", Level.TRACE, writer)
+			.writers(Level.TRACE, writer)
 			.create();
 
-		LevelVisibility visibility = backend.getLevelVisibilityByTag(className);
+		LevelVisibility visibility = backend.getLevelVisibilityByClass(className);
 		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
 		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+	}
+
+	/**
+	 * Verifies that the correct {@link LevelVisibility} is provided for the root level and a custom package level
+	 * respectively.
+	 */
+	@Test
+	void getDifferentLevelVisibilityForDifferentClasses() {
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.INFO)
+			.customLevel("example", Level.DEBUG)
+			.writers(Level.TRACE, writer)
+			.create();
+
+		LevelVisibility visibility = backend.getLevelVisibilityByClass("Main");
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+
+		visibility = backend.getLevelVisibilityByClass("example.Foo");
+		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
 	}
 
 	/**
