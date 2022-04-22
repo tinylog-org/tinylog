@@ -81,6 +81,7 @@
 			<artifactId>tinylog-core-base</artifactId>
 			<classifier>tests</classifier>
 			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
