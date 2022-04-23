@@ -1,6 +1,10 @@
 package org.tinylog.impl.format.json;
 
-import java.util.Collections;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,15 +12,21 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.tinylog.core.Level;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
+import org.tinylog.impl.format.pattern.placeholders.DatePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.LevelPlaceholder;
+import org.tinylog.impl.format.pattern.placeholders.LinePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
+import org.tinylog.impl.format.pattern.placeholders.TimestampPlaceholder;
+import org.tinylog.impl.format.pattern.placeholders.UptimePlaceholder;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import com.google.common.collect.ImmutableMap;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LineDelimitedJsonTest {
@@ -26,7 +36,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithoutFields() {
-		LineDelimitedJson format = new LineDelimitedJson(Collections.emptyMap());
+		LineDelimitedJson format = new LineDelimitedJson(emptyMap());
 
 		assertThat(format.getRequiredLogEntryValues()).isEmpty();
 
@@ -38,20 +48,106 @@ class LineDelimitedJsonTest {
 	}
 
 	/**
-	 * Verifies that a JSON with a single field is correctly rendered.
+	 * Verifies that a JSON with an integer field is correctly rendered.
 	 */
 	@Test
-	void renderWithSingleField() {
-		LineDelimitedJson format = new LineDelimitedJson(Collections.singletonMap("message", new MessagePlaceholder()));
+	void renderWithIntegerField() {
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap("line", new LinePlaceholder()));
+		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LINE);
 
+		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
+
+		LogEntry filledLogEntry = new LogEntryBuilder().lineNumber(42).create();
+		assertThat(renderer.render(filledLogEntry))
+			.isEqualTo("{\"line\": 42}" + System.lineSeparator());
+
+		LogEntry emptyLogEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(emptyLogEntry))
+			.isEqualTo("{\"line\": null}" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a JSON with a long field is correctly rendered.
+	 */
+	@Test
+	void renderWithLongField() {
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap("timestamp", new TimestampPlaceholder(
+			Instant::getEpochSecond
+		)));
+		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+
+		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
+
+		LogEntry filledLogEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		assertThat(renderer.render(filledLogEntry))
+			.isEqualTo("{\"timestamp\": 0}" + System.lineSeparator());
+
+		LogEntry emptyLogEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(emptyLogEntry))
+			.isEqualTo("{\"timestamp\": null}" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a JSON with a decimal field is correctly rendered.
+	 */
+	@Test
+	void renderWithDecimalField() {
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap("uptime", new UptimePlaceholder(
+			"S", false
+		)));
+		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.UPTIME);
+
+		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
+
+		LogEntry filledLogEntry = new LogEntryBuilder().uptime(Duration.ofMillis(42)).create();
+		assertThat(renderer.render(filledLogEntry))
+			.isEqualTo("{\"uptime\": 0.042000000}" + System.lineSeparator());
+
+		LogEntry emptyLogEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(emptyLogEntry))
+			.isEqualTo("{\"uptime\": null}" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a JSON with a timestamp field is correctly rendered.
+	 */
+	@Test
+	void renderWithTimestampField() {
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap("date", new DatePlaceholder(
+			DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).withZone(ZoneOffset.UTC),
+			false
+		)));
+		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+
+		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
+
+		LogEntry filledLogEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+		assertThat(renderer.render(filledLogEntry))
+			.isEqualTo("{\"date\": \"1970-01-01\"}" + System.lineSeparator());
+
+		LogEntry emptyLogEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(emptyLogEntry))
+			.isEqualTo("{\"date\": null}" + System.lineSeparator());
+	}
+
+	/**
+	 * Verifies that a JSON with a string field is correctly rendered.
+	 */
+	@Test
+	void renderWithStringField() {
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap("message", new MessagePlaceholder()));
 		assertThat(format.getRequiredLogEntryValues())
 			.containsExactlyInAnyOrder(LogEntryValue.EXCEPTION, LogEntryValue.MESSAGE);
 
-		LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-		assertThat(renderer.render(logEntry))
+		LogEntry filledLogEntry = new LogEntryBuilder().message("Hello World!").create();
+		assertThat(renderer.render(filledLogEntry))
 			.isEqualTo("{\"message\": \"Hello World!\"}" + System.lineSeparator());
+
+		LogEntry emptyLogEntry = new LogEntryBuilder().create();
+		assertThat(renderer.render(emptyLogEntry))
+			.isEqualTo("{\"message\": null}" + System.lineSeparator());
 	}
 
 	/**
@@ -96,7 +192,7 @@ class LineDelimitedJsonTest {
 		" _\237_ , _\\u009F_"
 	})
 	void escapeFieldName(String originalName, String escapedName) {
-		LineDelimitedJson format = new LineDelimitedJson(Collections.singletonMap(
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap(
 			originalName, new MessageOnlyPlaceholder()
 		));
 
@@ -108,7 +204,7 @@ class LineDelimitedJsonTest {
 	}
 
 	/**
-	 * Verifies that illegal characters in field values are escaped.
+	 * Verifies that illegal characters in string field values are escaped.
 	 *
 	 * @param originalValue The original field value including an illegal character
 	 * @param escapedValue The converted field value with correctly escaped character
@@ -129,7 +225,7 @@ class LineDelimitedJsonTest {
 		" _\237_ , _\\u009F_"
 	})
 	void escapeFieldValue(String originalValue, String escapedValue) {
-		LineDelimitedJson format = new LineDelimitedJson(Collections.singletonMap(
+		LineDelimitedJson format = new LineDelimitedJson(singletonMap(
 			"foo", new StaticTextPlaceholder(originalValue)
 		));
 

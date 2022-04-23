@@ -11,6 +11,7 @@ import java.util.Set;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
+import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -51,9 +52,8 @@ public class LineDelimitedJson implements OutputFormat {
 
 			builder.append("\"");
 			appendEscaped(builder, field.getKey());
-			builder.append("\": \"");
-			renderEscaped(builder, field.getValue(), entry);
-			builder.append("\"");
+			builder.append("\": ");
+			renderValue(builder, entry, field.getValue());
 		}
 
 		builder.append("}");
@@ -71,7 +71,7 @@ public class LineDelimitedJson implements OutputFormat {
 
 		for (int i = 0; i < text.length(); ++i) {
 			char character = text.charAt(i);
-			String escaped = escape(character);
+			String escaped = escapeCharacter(character);
 
 			if (escaped == null) {
 				builder.append(character);
@@ -82,19 +82,43 @@ public class LineDelimitedJson implements OutputFormat {
 	}
 
 	/**
-	 * Renders a {@link Placeholder} and add its result as escaped JSON string to a string builder.
+	 * Renders a {@link Placeholder} as JSON value to a string builder.
 	 *
-	 * @param builder The escaped JSON string result will be added to this string builder
-	 * @param placeholder The placeholder to render
+	 * @param builder The JSON value will be added to this string builder
 	 * @param entry The log entry to render by the passed placeholder
+	 * @param placeholder The placeholder value to render
 	 */
-	private void renderEscaped(StringBuilder builder, Placeholder placeholder, LogEntry entry) {
-		int start = builder.length();
-		placeholder.render(builder, entry);
+	private void renderValue(StringBuilder builder, LogEntry entry, Placeholder placeholder) {
+		ValueType type = placeholder.getType();
+		Object value = placeholder.getValue(entry);
 
+		if (value == null || type == ValueType.INTEGER || type == ValueType.LONG || type == ValueType.DECIMAL) {
+			builder.append(value);
+		} else {
+			builder.append('"');
+
+			int start = builder.length();
+			if (type == ValueType.STRING) {
+				builder.append(value);
+			} else {
+				placeholder.render(builder, entry);
+			}
+			escapeSection(builder, start);
+
+			builder.append('"');
+		}
+	}
+
+	/**
+	 * Escapes a section of the passed string builder.
+	 *
+	 * @param builder The string builder with the section to escape
+	 * @param start All characters starting with this index will be escaped if required
+	 */
+	private void escapeSection(StringBuilder builder, int start) {
 		for (int i = start; i < builder.length(); ++i) {
 			char character = builder.charAt(i);
-			String escaped = escape(character);
+			String escaped = escapeCharacter(character);
 
 			if (escaped != null) {
 				String remaining = builder.substring(i + 1);
@@ -112,7 +136,7 @@ public class LineDelimitedJson implements OutputFormat {
 	 * @param character Any character
 	 * @return The escaped JSON string representation or {@code null} if no escaping is required
 	 */
-	private String escape(char character) {
+	private String escapeCharacter(char character) {
 		switch (character) {
 			case '"':
 				return "\\\"";
