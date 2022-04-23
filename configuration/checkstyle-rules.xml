@@ -189,6 +189,12 @@
 			<property name="onCommentFormat" value="END IGNORE CODE STYLE" />
 			<property name="checkFormat" value="NoWhitespaceBefore|ParenPad|SingleSpaceSeparator" />
 		</module>
+
+		<module name="SuppressionCommentFilter">
+			<property name="offCommentFormat" value="START IGNORE RULES\: ([\w\|]+)"/>
+			<property name="onCommentFormat" value="END IGNORE RULES\: ([\w\|]+)"/>
+			<property name="checkFormat" value="$1"/>
+		</module>
 		<module name="ThrowsCount"/>
 		<module name="TodoComment">
 			<property name="format" value="(TODO)|(FIXME)" />
