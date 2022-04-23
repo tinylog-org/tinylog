@@ -14,7 +14,10 @@ import org.tinylog.impl.writers.WriterBuilder;
  */
 class WriterConfiguration {
 
-	private static final String TYPE_KEY = "type";
+	/**
+	 * Property name for writer name.
+	 */
+	static final String TYPE_KEY = "type";
 
 	private final Framework framework;
 	private final Configuration entireConfiguration;

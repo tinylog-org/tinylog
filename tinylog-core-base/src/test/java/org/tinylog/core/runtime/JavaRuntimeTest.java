@@ -48,6 +48,15 @@ class JavaRuntimeTest {
 		assertThat(time2).isGreaterThan(time1);
 	}
 
+	/**
+	 * Verifies that {@code console} the default writer.
+	 */
+	@Test
+	void defaultWriter() {
+		JavaRuntime runtime = new JavaRuntime();
+		assertThat(runtime.getDefaultWriter()).isEqualTo("console");
+	}
+
 	@Nested
 	class ProcessId {
 
@@ -108,7 +117,7 @@ class JavaRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(DirectCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getFullLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(105);
+				assertThat(element.getLineNumber()).isEqualTo(114);
 			});
 		}
 
@@ -174,7 +183,7 @@ class JavaRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(RelativeCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getValidFullLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(171);
+				assertThat(element.getLineNumber()).isEqualTo(180);
 			});
 		}
 

@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.runtime.AndroidRuntime;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.writers.console.ConsoleWriter;
 import org.tinylog.impl.writers.logcat.LogcatWriter;
@@ -18,7 +19,7 @@ class LoggingConfigurationParserTest {
 	private Framework framework;
 
 	/**
-	 * Verifies that no writers are created for an empty configuration.
+	 * Verifies that all severity levels are enabled and the default writer is created for an empty configuration.
 	 */
 	@CaptureLogEntries(configuration = {})
 	@Test
@@ -29,11 +30,15 @@ class LoggingConfigurationParserTest {
 			.hasSize(1)
 			.anySatisfy((key, value) -> {
 				assertThat(key).isEqualTo("");
-				assertThat(value.getLevel("-")).isEqualTo(Level.OFF);
-				assertThat(value.getLevel("foo")).isEqualTo(Level.OFF);
+				assertThat(value.getLevel("-")).isEqualTo(Level.TRACE);
+				assertThat(value.getLevel("foo")).isEqualTo(Level.TRACE);
 			});
 
-		assertThat(configuration.getAllWriters()).isEmpty();
+		if (framework.getRuntime() instanceof AndroidRuntime) {
+			assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(LogcatWriter.class);
+		} else {
+			assertThat(configuration.getAllWriters()).hasExactlyElementsOfTypes(ConsoleWriter.class);
+		}
 	}
 
 	/**

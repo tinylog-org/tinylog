@@ -34,6 +34,17 @@ class LogcatWriterBuilderTest {
 	private Framework framework;
 
 	/**
+	 * Verifies that the logcat writer builder is the default writer builder on Android.
+	 */
+	@Test
+	@EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	void defaultWriter() {
+		String builderWriterName = new LogcatWriterBuilder().getName();
+		String defaultWriterName = framework.getRuntime().getDefaultWriter();
+		assertThat(builderWriterName).isEqualTo(defaultWriterName);
+	}
+
+	/**
 	 * Verifies that the builder is registered as service.
 	 */
 	@Test

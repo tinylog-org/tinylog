@@ -45,6 +45,11 @@ public class AndroidRuntime implements RuntimeFlavor {
 	}
 
 	@Override
+	public String getDefaultWriter() {
+		return "logcat";
+	}
+
+	@Override
 	public Supplier<Object> getDirectCaller(OutputDetails outputDetails) {
 		switch (outputDetails) {
 			case ENABLED_WITH_FULL_LOCATION_INFORMATION:

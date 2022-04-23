@@ -109,6 +109,12 @@ class LoggingConfigurationParser {
 			}
 		}
 
+		if (writerConfigurations.isEmpty()) {
+			Configuration subConfiguration = new Configuration();
+			subConfiguration.set(WriterConfiguration.TYPE_KEY, framework.getRuntime().getDefaultWriter());
+			writerConfigurations.add(new WriterConfiguration(framework, subConfiguration));
+		}
+
 		return writerConfigurations;
 	}
 

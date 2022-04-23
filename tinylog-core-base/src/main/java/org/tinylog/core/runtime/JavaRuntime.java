@@ -69,6 +69,11 @@ public class JavaRuntime implements RuntimeFlavor {
 	}
 
 	@Override
+	public String getDefaultWriter() {
+		return "console";
+	}
+
+	@Override
 	public Supplier<Object> getDirectCaller(OutputDetails outputDetails) {
 		switch (outputDetails) {
 			case ENABLED_WITH_FULL_LOCATION_INFORMATION:

@@ -26,6 +26,13 @@ public interface RuntimeFlavor {
 	Duration getUptime();
 
 	/**
+	 * Gets the name of the default writer to use if none is explicitly configured.
+	 *
+	 * @return The name of the default writer
+	 */
+	String getDefaultWriter();
+
+	/**
 	 * Gets a supplier that resolves the location information of the direct caller. The direct caller is the caller
 	 * of the method that resolves the returned supplier. The result type of the supplier depends on the passed required
 	 * output details.

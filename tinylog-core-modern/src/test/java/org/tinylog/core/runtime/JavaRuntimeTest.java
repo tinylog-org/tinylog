@@ -45,6 +45,15 @@ class JavaRuntimeTest {
 	}
 
 	/**
+	 * Verifies that {@code console} the default writer.
+	 */
+	@Test
+	void defaultWriter() {
+		JavaRuntime runtime = new JavaRuntime();
+		assertThat(runtime.getDefaultWriter()).isEqualTo("console");
+	}
+
+	/**
 	 * Tests for {@link JavaRuntime#getDirectCaller(OutputDetails)}.
 	 */
 	@Nested
@@ -66,7 +75,7 @@ class JavaRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(DirectCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getFullLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(63);
+				assertThat(element.getLineNumber()).isEqualTo(72);
 			});
 		}
 
@@ -132,7 +141,7 @@ class JavaRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(RelativeCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getValidFullLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(129);
+				assertThat(element.getLineNumber()).isEqualTo(138);
 			});
 		}
 

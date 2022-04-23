@@ -46,6 +46,14 @@ class AndroidRuntimeTest {
 		assertThat(time2).isGreaterThan(time1);
 	}
 
+	/**
+	 * Verifies that {@code logcat} the default writer.
+	 */
+	@Test
+	void defaultWriter() {
+		AndroidRuntime runtime = new AndroidRuntime();
+		assertThat(runtime.getDefaultWriter()).isEqualTo("logcat");
+	}
 
 	/**
 	 * Tests for {@link AndroidRuntime#getDirectCaller(OutputDetails)}.
@@ -69,7 +77,7 @@ class AndroidRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(DirectCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getFullLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(AndroidRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(66);
+				assertThat(element.getLineNumber()).isEqualTo(74);
 			});
 		}
 
@@ -140,7 +148,7 @@ class AndroidRuntimeTest {
 				assertThat(element.getClassName()).isEqualTo(RelativeCaller.class.getName());
 				assertThat(element.getMethodName()).isEqualTo("getValidLocationInformation");
 				assertThat(element.getFileName()).isEqualTo(AndroidRuntimeTest.class.getSimpleName() + ".java");
-				assertThat(element.getLineNumber()).isEqualTo(137);
+				assertThat(element.getLineNumber()).isEqualTo(145);
 			});
 		}
 

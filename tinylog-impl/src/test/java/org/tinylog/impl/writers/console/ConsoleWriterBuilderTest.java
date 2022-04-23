@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -197,6 +198,17 @@ class ConsoleWriterBuilderTest {
 			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
 			assertThat(entry.getMessage()).contains("foo");
 		});
+	}
+
+	/**
+	 * Verifies that the console writer builder is the default writer builder on standard Java.
+	 */
+	@Test
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+	void defaultWriter() {
+		String builderWriterName = new ConsoleWriterBuilder().getName();
+		String defaultWriterName = framework.getRuntime().getDefaultWriter();
+		assertThat(builderWriterName).isEqualTo(defaultWriterName);
 	}
 
 	/**
