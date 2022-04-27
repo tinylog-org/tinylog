@@ -18,10 +18,10 @@ import java.util.stream.Stream;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.assertj.db.type.Source;
 import org.assertj.db.type.Table;
-import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -131,8 +131,8 @@ class JdbcWriterTest {
 		createTable(TABLE_NAME);
 
 		InitialContext context = new InitialContext();
-		JdbcDataSource dataSource = new JdbcDataSource();
-		dataSource.setUrl(url);
+		DataSource dataSource = mock(DataSource.class);
+		when(dataSource.getConnection()).then(invocation -> DriverManager.getConnection(url));
 		context.bind(DATA_SOURCE_URL, dataSource);
 
 		try {
@@ -153,8 +153,12 @@ class JdbcWriterTest {
 
 		try {
 			InitialContext context = new InitialContext();
-			JdbcDataSource dataSource = new JdbcDataSource();
-			dataSource.setUrl(url);
+			DataSource dataSource = mock(DataSource.class);
+			when(dataSource.getConnection(any(), any())).then(invocation -> DriverManager.getConnection(
+				url,
+				invocation.getArgument(0),
+				invocation.getArgument(1)
+			));
 			context.bind(DATA_SOURCE_URL, dataSource);
 
 			try {
