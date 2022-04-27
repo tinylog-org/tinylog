@@ -25,6 +25,7 @@ import org.assertj.db.type.Table;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -54,6 +55,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 class JdbcWriterTest {
 
 	private static final String JDBC_URL = "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1";

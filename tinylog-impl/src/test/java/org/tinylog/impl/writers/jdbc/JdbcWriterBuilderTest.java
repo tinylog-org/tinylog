@@ -13,6 +13,7 @@ import org.assertj.db.type.Source;
 import org.assertj.db.type.Table;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.db.api.Assertions.assertThat;
 
 @CaptureLogEntries
+@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 class JdbcWriterBuilderTest {
 
 	private static final String JDBC_URL = "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1";
