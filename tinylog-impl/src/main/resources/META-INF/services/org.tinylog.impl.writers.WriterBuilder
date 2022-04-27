@@ -1,3 +1,4 @@
 org.tinylog.impl.writers.console.ConsoleWriterBuilder
 org.tinylog.impl.writers.file.FileWriterBuilder
 org.tinylog.impl.writers.logcat.LogcatWriterBuilder
+org.tinylog.impl.writers.jdbc.JdbcWriterBuilder

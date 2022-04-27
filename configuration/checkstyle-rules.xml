@@ -36,7 +36,9 @@
 		<module name="ArrayTypeStyle"/>
 		<module name="AtclauseOrder"/>
 		<module name="AvoidDoubleBraceInitialization"/>
-		<module name="AvoidEscapedUnicodeCharacters"/>
+		<module name="AvoidEscapedUnicodeCharacters">
+			<property name="allowIfAllCharactersEscaped" value="true"/>
+		</module>
 		<module name="AvoidNestedBlocks"/>
 		<module name="AvoidNoArgumentSuperConstructorCall"/>
 		<module name="AvoidStarImport"/>

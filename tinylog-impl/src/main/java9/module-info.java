@@ -41,10 +41,12 @@ import org.tinylog.impl.policies.WeeklyPolicyBuilder;
 import org.tinylog.impl.writers.WriterBuilder;
 import org.tinylog.impl.writers.console.ConsoleWriterBuilder;
 import org.tinylog.impl.writers.file.FileWriterBuilder;
+import org.tinylog.impl.writers.jdbc.JdbcWriterBuilder;
 import org.tinylog.impl.writers.logcat.LogcatWriterBuilder;
 
 module org.tinylog.impl {
 
+	requires java.sql;
 	requires org.tinylog.core;
 
 	provides LoggingBackendBuilder with
@@ -101,6 +103,7 @@ module org.tinylog.impl {
 	provides WriterBuilder with
 		ConsoleWriterBuilder,
 		FileWriterBuilder,
+		JdbcWriterBuilder,
 		LogcatWriterBuilder;
 
 	exports org.tinylog.impl;
