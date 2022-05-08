@@ -55,10 +55,10 @@ public final class JdbcWriter extends AbstractWriter {
 	private final Object mutex;
 	private final String sql;
 	private final List<Token> tokens;
+	private final List<LogEntry> entries;
 
 	private Connection connection;
 	private PreparedStatement statement;
-	private long batchCount;
 	private long lostCount;
 	private long reconnectTimestamp;
 
@@ -92,6 +92,7 @@ public final class JdbcWriter extends AbstractWriter {
 
 		mutex = getBooleanValue("writingthread") ? null : new Object();
 
+		entries = new ArrayList<LogEntry>();
 		connection = connect(url, user, password);
 		sql = renderSql(properties, connection.getMetaData().getIdentifierQuoteString());
 		statement = connection.prepareStatement(sql);
@@ -154,13 +155,11 @@ public final class JdbcWriter extends AbstractWriter {
 	private void doWrite(final LogEntry logEntry) throws SQLException {
 		if (checkConnection()) {
 			if (batch) {
-				batchCount += 1;
+				entries.add(logEntry);
 			}
 
 			try {
-				for (int i = 0; i < tokens.size(); ++i) {
-					tokens.get(i).apply(logEntry, statement, i + 1);
-				}
+				applyLogEntry(logEntry);
 			} catch (SQLException ex) {
 				resetConnection();
 				throw ex;
@@ -169,9 +168,9 @@ public final class JdbcWriter extends AbstractWriter {
 			try {
 				if (batch) {
 					statement.addBatch();
-					if (batchCount >= MAX_BATCH_SIZE) {
+					if (entries.size() >= MAX_BATCH_SIZE) {
 						statement.executeBatch();
-						batchCount = 0;
+						entries.clear();
 					}
 				} else {
 					statement.executeUpdate();
@@ -180,6 +179,8 @@ public final class JdbcWriter extends AbstractWriter {
 				resetConnection();
 				throw ex;
 			}
+		} else if (batch && entries.size() < MAX_BATCH_SIZE) {
+			entries.add(logEntry);
 		} else {
 			lostCount += 1;
 		}
@@ -192,10 +193,10 @@ public final class JdbcWriter extends AbstractWriter {
 	 *             Database access failed
 	 */
 	private void doFlush() throws SQLException {
-		if (batchCount > 0) {
+		if (entries.size() > 0) {
 			try {
 				statement.executeBatch();
-				batchCount = 0;
+				entries.clear();
 			} catch (SQLException ex) {
 				resetConnection();
 				throw ex;
@@ -215,6 +216,10 @@ public final class JdbcWriter extends AbstractWriter {
 				doFlush();
 			}
 		} finally {
+			if (!entries.isEmpty()) {
+				lostCount += entries.size();
+			}
+
 			if (lostCount > 0) {
 				InternalLogger.log(Level.ERROR, "Lost log entries due to broken database connection: " + lostCount);
 			}
@@ -237,8 +242,21 @@ public final class JdbcWriter extends AbstractWriter {
 				try {
 					connection = connect(url, user, password);
 					statement = connection.prepareStatement(sql);
-					InternalLogger.log(Level.ERROR, "Lost log entries due to broken database connection: " + lostCount);
-					lostCount = 0;
+
+					if (!entries.isEmpty()) {
+						for (LogEntry entry : entries) {
+							applyLogEntry(entry);
+							statement.addBatch();
+						}
+						statement.executeBatch();
+						entries.clear();
+					}
+
+					if (lostCount > 0) {
+						InternalLogger.log(Level.ERROR, "Lost log entries due to broken database connection: " + lostCount);
+						lostCount = 0;
+					}
+
 					return true;
 				} catch (NamingException ex) {
 					long now = System.currentTimeMillis();
@@ -266,8 +284,7 @@ public final class JdbcWriter extends AbstractWriter {
 		if (reconnect) {
 			closeConnectionSilently();
 			statement = null;
-			lostCount = batch ? batchCount : 1;
-			batchCount = 0;
+			lostCount = batch ? 0 : 1;
 			reconnectTimestamp = 0;
 		}
 	}
@@ -290,12 +307,24 @@ public final class JdbcWriter extends AbstractWriter {
 	}
 
 	/**
+	 * Applies a log entry to the current {@link PreparedStatement}.
+	 *
+	 * @param logEntry Log entry to apply
+	 * @throws SQLException Failed to apply the passed log entry
+	 */
+	private void applyLogEntry(final LogEntry logEntry) throws SQLException {
+		for (int i = 0; i < tokens.size(); ++i) {
+			tokens.get(i).apply(logEntry, statement, i + 1);
+		}
+	}
+
+	/**
 	 * Establishes the connection to the database.
 	 *
 	 * @param url
 	 *            JDBC or data source URL
 	 * @param user
-	 *            User name for login (can be {@code null} if no login is required)
+	 *            Username for login (can be {@code null} if no login is required)
 	 * @param password
 	 *            Password for login (can be {@code null} if no login is required)
 	 * @return Connection to the database

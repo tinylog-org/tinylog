@@ -496,11 +496,10 @@ public final class JdbcWriterTest {
 			Thread.sleep(1000);
 
 			writer.write(LogEntryBuilder.empty().message("Three").create());
-			assertThat(systemStream.consumeErrorOutput()).containsOnlyOnce("ERROR").containsOnlyOnce("2");
-
 			writer.close();
 
-			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("Three");
+			assertThat(fetchTable(TABLE_NAME)).column("MESSAGE").containsValues("One", "Two", "Three");
+			assertThat(systemStream.consumeErrorOutput()).isEmpty();
 		}
 
 		/**
