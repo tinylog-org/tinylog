@@ -224,9 +224,7 @@ public final class JsonWriter extends AbstractFileBasedWriter {
 			}
 		}
 
-		if (lineDelimitedJson) {
-			builder.append(' ');
-		} else {
+		if (!lineDelimitedJson) {
 			builder.append(NEW_LINE).append('\t');
 		}
 
