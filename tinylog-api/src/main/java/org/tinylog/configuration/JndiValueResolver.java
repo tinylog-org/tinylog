@@ -13,13 +13,6 @@
 
 package org.tinylog.configuration;
 
-import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingException;
-
-import org.tinylog.Level;
-import org.tinylog.provider.InternalLogger;
-
 /**
  * Resolver for JNDI values.
  */
@@ -49,16 +42,7 @@ public final class JndiValueResolver implements Resolver {
 	@Override
 	public String resolve(final String name) {
 		String fullName = name.contains(":") ? name : DEFAULT_PREFIX + name;
-
-		try {
-			Object value = InitialContext.doLookup(fullName);
-			return value == null ? null : value.toString();
-		} catch (NameNotFoundException ex) {
-			return null;
-		} catch (NamingException ex) {
-			InternalLogger.log(Level.ERROR, ex, "Failed to look up \"" + fullName + "\"");
-			return null;
-		}
+		return InitialContextWrapper.resolve(fullName);
 	}
 
 }

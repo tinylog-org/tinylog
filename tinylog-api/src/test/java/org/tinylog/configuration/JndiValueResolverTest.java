@@ -14,17 +14,13 @@
 package org.tinylog.configuration;
 
 import javax.naming.InitialContext;
-import javax.naming.InvalidNameException;
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.tinylog.rules.SystemStreamCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -40,19 +36,12 @@ public final class JndiValueResolverTest {
 	private static final JndiValueResolver resolver = JndiValueResolver.INSTANCE;
 
 	/**
-	 * Redirects and collects system output streams.
-	 */
-	@Rule
-	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
-
-	/**
 	 * Initialize mocking of {@link InitialContext}.
 	 */
 	@Before
 	public void init() {
 		mockStatic(InitialContext.class);
 	}
-
 
 	/**
 	 * Verifies the name of the resolver.
@@ -71,54 +60,28 @@ public final class JndiValueResolverTest {
 	}
 
 	/**
-	 * Verifies that the String value of a JNDI name can be resolved.
+	 * Verifies that the String value of a JNDI name can be resolved by providing the full JNDI name.
 	 *
 	 * @throws NamingException
 	 *             Failed mocking JNDI lookup
 	 */
 	@Test
-	public void resolveJndiStringValue() throws NamingException {
+	public void resolveWithPrefix() throws NamingException {
+		when(InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
+		assertThat(resolver.resolve("java:comp/env/foo")).isEqualTo("bar");
+	}
+
+	/**
+	 * Verifies that the String value of a JNDI name can be resolved by providing the JNDI name without the default
+	 * prefix.
+	 *
+	 * @throws NamingException
+	 *             Failed mocking JNDI lookup
+	 */
+	@Test
+	public void resolveWithoutPrefix() throws NamingException {
 		when(InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
 		assertThat(resolver.resolve("foo")).isEqualTo("bar");
-	}
-
-	/**
-	 * Verifies that the {@code null} value of a JNDI name can be resolved.
-	 *
-	 * @throws NamingException
-	 *             Failed mocking JNDI lookup
-	 */
-	@Test
-	public void resolveJndiNullValue() throws NamingException {
-		when(InitialContext.doLookup("java:comp/env/foo")).thenReturn(null);
-		assertThat(resolver.resolve("foo")).isNull();
-	}
-
-	/**
-	 * Verifies that {@code null} is returned for a non-existent JNDI name.
-	 *
-	 * @throws NamingException
-	 *             Failed mocking JNDI lookup
-	 */
-	@Test
-	public void resolveMissingJndiName() throws NamingException {
-		when(InitialContext.doLookup("java:comp/env/foo")).thenThrow(NameNotFoundException.class);
-		assertThat(resolver.resolve("foo")).isNull();
-	}
-
-	/**
-	 * Verifies that {@code null} is returned and an error is logged, if the {@link InitialContext} throws any kind of
-	 * {@link NamingException} during lookup.
-	 *
-	 * @throws NamingException
-	 *             Failed mocking JNDI lookup
-	 */
-	@Test
-	public void failResolvingInvalidJndiName() throws NamingException {
-		when(InitialContext.doLookup("java:comp/env/foo")).thenThrow(InvalidNameException.class);
-		assertThat(resolver.resolve("foo")).isNull();
-		assertThat(systemStream.consumeErrorOutput())
-			.contains(InvalidNameException.class.getName(), "java:comp/env/foo");
 	}
 
 }
