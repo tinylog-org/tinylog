@@ -13,6 +13,8 @@
 
 package org.tinylog.slf4j;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +37,11 @@ public final class TinylogMdcAdapter implements MDCAdapter {
 	}
 
 	@Override
+	public void pushByKey(final String key, final String value) {
+		// Ignore
+	}
+
+	@Override
 	public String get(final String key) {
 		return ThreadContext.get(key);
 	}
@@ -45,13 +52,28 @@ public final class TinylogMdcAdapter implements MDCAdapter {
 	}
 
 	@Override
+	public String popByKey(final String key) {
+		return null;
+	}
+
+	@Override
 	public void clear() {
 		ThreadContext.clear();
 	}
 
 	@Override
+	public void clearDequeByKey(final String key) {
+		// Ignore
+	}
+
+	@Override
 	public Map<String, String> getCopyOfContextMap() {
 		return new HashMap<String, String>(ThreadContext.getMapping());
+	}
+
+	@Override
+	public Deque<String> getCopyOfDequeByKey(final String key) {
+		return new ArrayDeque<String>(0);
 	}
 
 	@Override

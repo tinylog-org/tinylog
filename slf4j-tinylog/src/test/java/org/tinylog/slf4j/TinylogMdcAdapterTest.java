@@ -27,6 +27,7 @@ import org.tinylog.provider.ProviderRegistry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -66,12 +67,30 @@ public final class TinylogMdcAdapterTest {
 	}
 
 	/**
+	 * Verifies that pushing a key value pair will be ignored.
+	 */
+	@Test
+	public void pushByKey() {
+		new TinylogMdcAdapter().pushByKey("test", "42");
+		verifyNoInteractions(provider);
+	}
+
+	/**
 	 * Verifies that an existing mapping from the actual context provider can be received.
 	 */
 	@Test
 	public void get() {
 		when(provider.get("test")).thenReturn("42");
 		assertThat(new TinylogMdcAdapter().get("test")).isEqualTo("42");
+	}
+
+	/**
+	 * Verifies that a popping a value will return always {@code null}.
+	 */
+	@Test
+	public void popByKey() {
+		assertThat(new TinylogMdcAdapter().popByKey("test")).isNull();
+		verifyNoInteractions(provider);
 	}
 
 	/**
@@ -93,6 +112,15 @@ public final class TinylogMdcAdapterTest {
 	}
 
 	/**
+	 * Verifies that clearing values by key will be ignored.
+	 */
+	@Test
+	public void clearDequeByKey() {
+		new TinylogMdcAdapter().clearDequeByKey("test");
+		verifyNoInteractions(provider);
+	}
+
+	/**
 	 * Verifies that the context map from the actual context provider will be returned as a copy.
 	 */
 	@Test
@@ -101,6 +129,15 @@ public final class TinylogMdcAdapterTest {
 		when(provider.getMapping()).thenReturn(currentMap);
 
 		assertThat(new TinylogMdcAdapter().getCopyOfContextMap()).isEqualTo(currentMap).isNotSameAs(currentMap);
+	}
+
+	/**
+	 * Verifies that the copy of a deque will always be empty.
+	 */
+	@Test
+	public void getCopyOfDequeByKey() {
+		assertThat(new TinylogMdcAdapter().getCopyOfDequeByKey("test")).isEmpty();
+		verifyNoInteractions(provider);
 	}
 
 	/**
