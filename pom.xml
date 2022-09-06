@@ -81,7 +81,7 @@
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
 		<assertj-db.version>2.0.2</assertj-db.version>
-		<checkstyle.version>10.3.3</checkstyle.version>
+		<checkstyle.version>9.3</checkstyle.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-logging.version>1.2</commons-logging.version>
 		<h2.version>2.1.214</h2.version>
