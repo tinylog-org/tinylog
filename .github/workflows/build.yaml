@@ -94,7 +94,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                api-level: [ 26, 27, 28, 29, 30, 31 ]
+                api-level: [ 26, 27, 28, 29, 30, 31, 32 ]
         steps:
             - name: Checkout Git repository
               uses: actions/checkout@v2
