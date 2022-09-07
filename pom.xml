@@ -425,6 +425,7 @@
 					<artifactId>scala-maven-plugin</artifactId>
 					<version>${scala-maven-plugin.version}</version>
 					<configuration>
+						<target>8</target>
 						<args>
 							<arg>-g:line</arg>
 							<arg>-deprecation</arg>
