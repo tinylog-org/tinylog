@@ -163,7 +163,6 @@ internal class LoggerTest {
 			"false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
 			"true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
 		)
-
 		fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
 			whenever(visibility.debug).thenReturn(outputDetails)
 			whenever(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled)
@@ -942,9 +941,13 @@ internal class LoggerTest {
 					same(level),
 					same(exception),
 					same(message),
-					if (arguments.isEmpty()) isNull() else argThat {
-						this.size == arguments.size && this.withIndex().all { (index, value) ->
-							value is Supplier<*> && value.get() == arguments[index]()
+					if (arguments.isEmpty()) {
+						isNull()
+					} else {
+						argThat {
+							this.size == arguments.size && this.withIndex().all { (index, value) ->
+								value is Supplier<*> && value.get() == arguments[index]()
+							}
 						}
 					},
 					if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>()
