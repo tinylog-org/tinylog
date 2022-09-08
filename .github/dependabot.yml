@@ -3,13 +3,11 @@ version: 2
 updates:
 
   - package-ecosystem: "maven"
-    target-branch: v3.0
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
 
   - package-ecosystem: "github-actions"
-    target-branch: v3.0
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
