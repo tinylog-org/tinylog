@@ -32,7 +32,7 @@ jobs:
             - name: Build with Maven
               run: mvn --batch-mode --update-snapshots verify
             - name: Upload code coverage report
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v3
 
     release-build:
         name: Release build with JDK 8 + 11
@@ -88,7 +88,7 @@ jobs:
             - name: Build with Maven
               run: mvn -P release --batch-mode --update-snapshots verify
             - name: Upload code coverage report
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v3
 
     android-tests:
         name: Tests on Android (API level ${{ matrix.api-level }})
@@ -145,4 +145,4 @@ jobs:
                   working-directory: ./tinylog-android-tests
                   script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
             - name: Upload code coverage report
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v3
