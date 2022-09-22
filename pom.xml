@@ -77,7 +77,7 @@
 		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
 		<p2-maven-plugin.version>2.0.0</p2-maven-plugin.version>
 
-		<android.version>1.5_r3</android.version>
+		<android.version>4.1.1.4</android.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
 		<assertj-db.version>2.0.2</assertj-db.version>
 		<checkstyle.version>9.3</checkstyle.version>
