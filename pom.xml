@@ -88,7 +88,7 @@
 		<jboss-logging.version>3.4.3.Final</jboss-logging.version>
 		<jmh.version>1.35</jmh.version>
 		<junit.version>4.13.2</junit.version>
-		<kotlin.version>1.6.21</kotlin.version>
+		<kotlin.version>1.4.32</kotlin.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.12.4</mockk.version>
 		<powermock.version>2.0.9</powermock.version>
