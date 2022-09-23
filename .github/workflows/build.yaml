@@ -1,152 +1,181 @@
 name: Build
 
 on:
-    push:
-        branches: ["v*"]
-    pull_request:
-        branches: ["**"]
+  push:
+    branches: [ "v*" ]
+  pull_request:
+    branches: [ "**" ]
 
 jobs:
 
-    development-build:
-        name: Development build with JDK ${{ matrix.jdk }}
-        runs-on: ubuntu-20.04
-        strategy:
-            fail-fast: false
-            matrix:
-                jdk: [ 11, 17 ]
-        steps:
-            - name: Checkout Git repository
-              uses: actions/checkout@v3
-            - name: Restore local Maven repository
-              uses: actions/cache@v3
-              with:
-                  path: ~/.m2/repository
-                  key: maven-dev${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
-                  restore-keys: |
-                      maven-dev${{ matrix.jdk }}-
-            - name: Download and install JDK ${{ matrix.jdk }}
-              uses: actions/setup-java@v3
-              with:
-                  distribution: zulu
-                  java-version: ${{ matrix.jdk }}
-            - name: Build with Maven
-              run: mvn --batch-mode --update-snapshots verify
-            - name: Upload code coverage report
-              uses: codecov/codecov-action@v3
+  development-build:
 
-    release-build:
-        name: Release build with JDK 8 + 11
-        runs-on: ubuntu-20.04
-        steps:
-            - name: Checkout Git repository
-              uses: actions/checkout@v3
-            - name: Restore local Maven repository
-              uses: actions/cache@v3
-              with:
-                  path: ~/.m2/repository
-                  key: maven-release-${{ hashFiles('**/pom.xml') }}
-                  restore-keys: |
-                      maven-release-
-            - name: Download and install JDK 8
-              uses: actions/setup-java@v3
-              with:
-                  distribution: zulu
-                  java-version: 8
-            - name: Store Java 8 home directory as environment variable
-              run: echo "JAVA8_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-            - name: Download and install JDK 11
-              uses: actions/setup-java@v3
-              with:
-                  distribution: zulu
-                  java-version: 11
-            - name: Store Java 11 home directory as environment variable
-              run: echo "JAVA11_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-            - name: Set up Maven toolchain
-              shell: bash
-              run: |
-                  mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
-                  <?xml version="1.0" encoding="UTF8"?>
-                  <toolchains>
-                      <toolchain>
-                          <type>jdk</type>
-                          <provides>
-                              <version>11</version>
-                          </provides>
-                          <configuration>
-                              <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
-                          </configuration>
-                      </toolchain>
-                      <toolchain>
-                          <type>jdk</type>
-                          <provides>
-                              <version>8</version>
-                          </provides>
-                          <configuration>
-                              <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
-                          </configuration>
-                      </toolchain>
-                  </toolchains>
-                  EOF
-            - name: Build with Maven
-              run: mvn -P release --batch-mode --update-snapshots verify
-            - name: Upload code coverage report
-              uses: codecov/codecov-action@v3
+    name: Development build with JDK ${{ matrix.jdk }}
+    runs-on: ubuntu-20.04
 
-    android-tests:
-        name: Tests on Android (API level ${{ matrix.api-level }})
-        runs-on: macos-10.15
-        timeout-minutes: 60
-        strategy:
-            fail-fast: false
-            matrix:
-                api-level: [ 26, 27, 28, 29, 30, 31, 32 ]
-        steps:
-            - name: Checkout Git repository
-              uses: actions/checkout@v3
-            - name: Restore Gradle caches and wrapper
-              uses: actions/cache@v3
-              with:
-                  path: |
-                      ~/.gradle/caches
-                      ~/.gradle/wrapper
-                  key: gradle-android${{ matrix.api-level }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                  restore-keys: |
-                      gradle-android${{ matrix.api-level }}-
-            - name: Restore Android virtual device
-              id: avd-cache
-              uses: actions/cache@v3
-              with:
-                  path: |
-                      ~/.android/avd/*
-                      ~/.android/adb*
-                  key: avd-android${{ matrix.api-level }}
-            - name: Download and install JDK 11
-              uses: actions/setup-java@v3
-              with:
-                  distribution: zulu
-                  java-version: 11
-            - name: Set up Android virtual device if not cached
-              uses: reactivecircus/android-emulator-runner@v2
-              if: steps.avd-cache.outputs.cache-hit != 'true'
-              with:
-                  api-level: ${{ matrix.api-level }}
-                  arch: x86_64
-                  target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
-                  force-avd-creation: false
-                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-                  disable-animations: false
-                  script: echo "Generated AVD snapshot for caching."
-            - name: Run instrumented tests on Android virtual device
-              uses: reactivecircus/android-emulator-runner@v2
-              with:
-                  api-level: ${{ matrix.api-level }}
-                  arch: x86_64
-                  target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
-                  force-avd-creation: false
-                  emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-                  disable-animations: true
-                  working-directory: ./tinylog-android-tests
-                  script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
-            - name: Upload code coverage report
-              uses: codecov/codecov-action@v3
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [ 11, 17 ]
+
+    steps:
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+
+      - name: Restore local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-dev${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-dev${{ matrix.jdk }}-
+
+      - name: Download and install JDK ${{ matrix.jdk }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: ${{ matrix.jdk }}
+
+      - name: Build with Maven
+        run: mvn --batch-mode --update-snapshots verify
+
+      - name: Upload code coverage report
+        uses: codecov/codecov-action@v3
+
+  release-build:
+
+    name: Release build with JDK 8 + 11
+    runs-on: ubuntu-20.04
+
+    steps:
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+
+      - name: Restore local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-release-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-release-
+
+      - name: Download and install JDK 8
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 8
+
+      - name: Store Java 8 home directory as environment variable
+        run: echo "JAVA8_HOME=${JAVA_HOME}" >> $GITHUB_ENV
+
+      - name: Download and install JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 11
+
+      - name: Store Java 11 home directory as environment variable
+        run: echo "JAVA11_HOME=${JAVA_HOME}" >> $GITHUB_ENV
+
+      - name: Set up Maven toolchain
+        shell: bash
+        run: |
+          mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
+            <?xml version="1.0" encoding="UTF8"?>
+            <toolchains>
+              <toolchain>
+                <type>jdk</type>
+                <provides>
+                  <version>11</version>
+                </provides>
+                <configuration>
+                  <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
+                </configuration>
+              </toolchain>
+              <toolchain>
+                <type>jdk</type>
+                <provides>
+                  <version>8</version>
+                </provides>
+                <configuration>
+                  <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
+                </configuration>
+              </toolchain>
+            </toolchains>
+          EOF
+
+      - name: Build with Maven
+        run: mvn -P release --batch-mode --update-snapshots verify
+
+      - name: Upload code coverage report
+        uses: codecov/codecov-action@v3
+
+  android-tests:
+
+    name: Tests on Android (API level ${{ matrix.api-level }})
+    runs-on: macos-10.15
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [ 26, 27, 28, 29, 30, 31, 32 ]
+
+    steps:
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+
+      - name: Restore Gradle caches and wrapper
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-android${{ matrix.api-level }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-android${{ matrix.api-level }}-
+
+      - name: Restore Android virtual device
+        id: avd-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-android${{ matrix.api-level }}
+
+      - name: Download and install JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 11
+
+      - name: Set up Android virtual device if not cached
+        uses: reactivecircus/android-emulator-runner@v2
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run instrumented tests on Android virtual device
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          working-directory: ./tinylog-android-tests
+          script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport
+
+      - name: Upload code coverage report
+        uses: codecov/codecov-action@v3

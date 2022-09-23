@@ -2,3 +2,8 @@ root = true
 
 [*.*]
 indent_style = tab
+
+[*.yaml]
+indent_style = space
+indent_size = 2
+
