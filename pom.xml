@@ -18,8 +18,8 @@
 		<git.url>https://github.com/pmwmedia/tinylog</git.url>
 		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
 		<git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
-		<kotlin.compiler.languageVersion>1.6</kotlin.compiler.languageVersion>
-		<kotlin.compiler.apiVersion>1.6</kotlin.compiler.apiVersion>
+		<kotlin.compiler.languageVersion>1.7</kotlin.compiler.languageVersion>
+		<kotlin.compiler.apiVersion>1.7</kotlin.compiler.apiVersion>
 		<kotlin.compiler.jvmTarget>9</kotlin.compiler.jvmTarget>
 		<maven.compiler.source>9</maven.compiler.source>
 		<maven.compiler.target>9</maven.compiler.target>
