@@ -83,27 +83,27 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
-            <?xml version="1.0" encoding="UTF8"?>
-            <toolchains>
-              <toolchain>
-                <type>jdk</type>
-                <provides>
-                  <version>11</version>
-                </provides>
-                <configuration>
-                  <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
-                </configuration>
-              </toolchain>
-              <toolchain>
-                <type>jdk</type>
-                <provides>
-                  <version>8</version>
-                </provides>
-                <configuration>
-                  <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
-                </configuration>
-              </toolchain>
-            </toolchains>
+          <?xml version="1.0" encoding="UTF8"?>
+          <toolchains>
+            <toolchain>
+              <type>jdk</type>
+              <provides>
+                <version>11</version>
+              </provides>
+              <configuration>
+                <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
+              </configuration>
+            </toolchain>
+            <toolchain>
+              <type>jdk</type>
+              <provides>
+                <version>8</version>
+              </provides>
+              <configuration>
+                <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
+              </configuration>
+            </toolchain>
+          </toolchains>
           EOF
 
       - name: Build with Maven
