@@ -145,7 +145,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: tinylog3-${{ runner.os }}-avd{{ matrix.api-level }}
+          key: tinylog3-${{ runner.os }}-avd${{ matrix.api-level }}
 
       - name: Download and install JDK 11
         uses: actions/setup-java@v3
