@@ -567,9 +567,11 @@
 					<extensions>true</extensions>
 					<configuration>
 						<instructions>
-							<_exportcontents>!META-INF.versions.9,*</_exportcontents>
-							<Import-Package>!sun.reflect,*</Import-Package>
+							<Import-Package>!android.*,!sun.reflect,*</Import-Package>
 							<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+							<!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
+							<_exportcontents>!META-INF.versions.9,*</_exportcontents>
+							<_fixupmessages>"*META-INF/versions/9*"</_fixupmessages>
 						</instructions>
 					</configuration>
 				</plugin>
