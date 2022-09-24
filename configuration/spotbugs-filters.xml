@@ -4,6 +4,10 @@
 		<Package name="~.*\.(jmh_)?generated" />
 	</Match>
 	<Match>
+		<!-- Allow exposing internal representations -->
+		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2, MS_EXPOSE_REP" />
+	</Match>
+	<Match>
 		<!-- Loggers and Thread Context -->
 		<Or>
 			<Class name="org.tinylog.Logger" />
@@ -11,15 +15,6 @@
 			<Class name="org.tinylog.ThreadContext" />
 		</Or>
 		<Bug pattern="UC_USELESS_VOID_METHOD" />
-	</Match>
-	<Match>
-		<!-- Legacy Timestamp, Log Entry and Log Entry Builder -->
-		<Or>
-			<Class name="org.tinylog.runtime.LegacyTimestamp" />
-			<Class name="org.tinylog.core.LogEntry" />
-			<Class name="org.tinylog.util.LogEntryBuilder" />
-		</Or>
-		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2" />
 	</Match>
 	<Match>
 		<!-- Runtime Dialects -->
