@@ -76,19 +76,19 @@ public abstract class AbstractDatePolicy implements Policy {
 	}
 
 	@Override
-	public boolean continueExistingFile(final String path) {
+	public final boolean continueExistingFile(final String path) {
 		Calendar clone = (Calendar) calendar.clone();
 		scrollBack(clone);
 		return clone.getTimeInMillis() <= new File(path).lastModified();
 	}
 
 	@Override
-	public boolean continueCurrentFile(final byte[] entry) {
+	public final boolean continueCurrentFile(final byte[] entry) {
 		return calendar.getTimeInMillis() > System.currentTimeMillis();
 	}
 
 	@Override
-	public void reset() {
+	public final void reset() {
 		while (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
 			scrollAhead(calendar);
 		}

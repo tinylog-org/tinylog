@@ -69,7 +69,7 @@ final class ThreadContextToken implements Token {
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
 		String value = logEntry.getContext().get(key);
-		if (value == null && defaultValue != DEFAULT_EMPTY_VALUE) {
+		if (value == null && !DEFAULT_EMPTY_VALUE.equals(defaultValue)) {
 			statement.setString(index, defaultValue);
 		} else {
 			statement.setString(index, value);
