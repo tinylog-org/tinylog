@@ -334,7 +334,7 @@
 				<plugin>
 					<groupId>com.github.gantsign.maven</groupId>
 					<artifactId>ktlint-maven-plugin</artifactId>
-					<version>1.15.1</version>
+					<version>1.15.2</version>
 					<executions>
 						<execution>
 							<id>check</id>
