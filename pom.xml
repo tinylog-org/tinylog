@@ -313,7 +313,7 @@
 				<plugin>
 					<groupId>org.jetbrains.kotlin</groupId>
 					<artifactId>kotlin-maven-plugin</artifactId>
-					<version>1.7.10</version>
+					<version>1.7.20</version>
 					<executions>
 						<execution>
 							<id>compile</id>
