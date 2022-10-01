@@ -628,7 +628,7 @@ class NativeLoggingBackendTest {
 		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
 		backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-		Thread.currentThread().join(100);
+		Thread.currentThread().join(300);
 
 		verify(asyncWriter).log(any());
 		verify(asyncWriter).flush();
