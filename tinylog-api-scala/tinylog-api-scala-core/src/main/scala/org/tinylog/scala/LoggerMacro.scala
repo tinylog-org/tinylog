@@ -13,12 +13,16 @@
 
 package org.tinylog.scala
 
+import org.tinylog.Supplier
+
 import scala.reflect.macros.blackbox
 
 /**
 	* Macros for transforming calls of [[org.tinylog.scala.Logger]] into calls of [[org.tinylog.Logger]].
 	*/
 private object LoggerMacro {
+
+	private type LoggerContext = blackbox.Context
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#isTraceEnabled]] to [[org.tinylog.Logger#isTraceEnabled]].
@@ -27,12 +31,11 @@ private object LoggerMacro {
 		* Macro context
 		* @return Replaced source code
 		*/
-	def isTraceEnabled(context: blackbox.Context)
-	                  ()
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.isTraceEnabled()"
-	}
+	def isTraceEnabled(context: LoggerContext)
+										()
+	: context.universe.Expr[Boolean] = context.universe.reify(
+		org.tinylog.Logger.isTraceEnabled
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(message:Any)]] and [[org.tinylog.scala.Logger#trace(message:String)]]
@@ -44,14 +47,19 @@ private object LoggerMacro {
 		* Passed message object
 		* @return Replaced source code
 		*/
-	def tracePlainMessage(context: blackbox.Context)
-	                     (message: context.Expr[Any])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def tracePlainMessage(context: LoggerContext)
+											 (message: context.Expr[Any])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.trace(new Supplier[Any] {
+					override def get(): Any = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.trace($message.asInstanceOf[Any])"
+			context.universe.reify(
+				org.tinylog.Logger.trace(message.splice.asInstanceOf[Any])
+			)
 		}
 	}
 
@@ -65,12 +73,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def traceLazyMessage(context: blackbox.Context)
-	                    (message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.trace(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def traceLazyMessage(context: LoggerContext)
+											(message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(new Supplier[Any] {
+			override def get(): Any = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:Any*)]] to
@@ -84,12 +93,14 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def traceMessageWithPlainArguments(context: blackbox.Context)
-	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.trace($message, ..$arguments)"
-	}
+	def traceMessageWithPlainArguments(context: LoggerContext)
+																		(message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(message:String,arguments:()=>Any*)]] to
@@ -103,13 +114,16 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def traceMessageWithLazyArguments(context: blackbox.Context)
-	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.trace($message, ..$suppliers)"
-	}
+	def traceMessageWithLazyArguments(context: LoggerContext)
+																	 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable)]] to
@@ -121,12 +135,11 @@ private object LoggerMacro {
 		* Passed exception or other throwable
 		* @return Replaced source code
 		*/
-	def traceException(context: blackbox.Context)
-	                  (exception: context.Expr[Throwable])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.trace($exception)"
-	}
+	def traceException(context: LoggerContext)
+										(exception: context.Expr[Throwable])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(exception.splice)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String)]] to
@@ -140,14 +153,19 @@ private object LoggerMacro {
 		* Passed text message
 		* @return Replaced source code
 		*/
-	def traceExceptionWithPlainMessage(context: blackbox.Context)
-	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def traceExceptionWithPlainMessage(context: LoggerContext)
+																		(exception: context.Expr[Throwable], message: context.Expr[String])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.trace(exception.splice, new Supplier[String] {
+					override def get(): String = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.trace($exception, $message)"
+			context.universe.reify(
+				org.tinylog.Logger.trace(exception.splice, message.splice)
+			)
 		}
 	}
 
@@ -163,12 +181,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def traceExceptionWithLazyMessage(context: blackbox.Context)
-	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.trace($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def traceExceptionWithLazyMessage(context: LoggerContext)
+																	 (exception: context.Expr[Throwable], message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(exception.splice, new Supplier[String] {
+			override def get(): String = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:Any*)]] to
@@ -184,12 +203,15 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def traceExceptionWithMessageWithPlainArguments(context: blackbox.Context)
-	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.trace($exception, $message, ..$arguments)"
-	}
+	def traceExceptionWithMessageWithPlainArguments(context: LoggerContext)
+																								 (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#trace(exception:Throwable,message:String,arguments:()=>Any*)]] to
@@ -205,13 +227,17 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def traceExceptionWithMessageWithLazyArguments(context: blackbox.Context)
-	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.trace($exception, $message, ..$suppliers)"
-	}
+	def traceExceptionWithMessageWithLazyArguments(context: LoggerContext)
+																								(exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.trace(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#isDebugEnabled]] to [[org.tinylog.Logger#isDebugEnabled]].
@@ -220,12 +246,11 @@ private object LoggerMacro {
 		* Macro context
 		* @return Replaced source code
 		*/
-	def isDebugEnabled(context: blackbox.Context)
-	                  ()
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.isDebugEnabled()"
-	}
+	def isDebugEnabled(context: LoggerContext)
+										()
+	: context.universe.Expr[Boolean] = context.universe.reify(
+		org.tinylog.Logger.isDebugEnabled
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(message:Any)]] and [[org.tinylog.scala.Logger#debug(message:String)]]
@@ -237,14 +262,19 @@ private object LoggerMacro {
 		* Passed message object
 		* @return Replaced source code
 		*/
-	def debugPlainMessage(context: blackbox.Context)
-	                     (message: context.Expr[Any])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def debugPlainMessage(context: LoggerContext)
+											 (message: context.Expr[Any])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.debug(new Supplier[Any] {
+					override def get(): Any = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.debug($message.asInstanceOf[Any])"
+			context.universe.reify(
+				org.tinylog.Logger.debug(message.splice.asInstanceOf[Any])
+			)
 		}
 	}
 
@@ -258,12 +288,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def debugLazyMessage(context: blackbox.Context)
-	                    (message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.debug(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def debugLazyMessage(context: LoggerContext)
+											(message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(new Supplier[Any] {
+			override def get(): Any = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:Any*)]] to
@@ -277,12 +308,14 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def debugMessageWithPlainArguments(context: blackbox.Context)
-	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.debug($message, ..$arguments)"
-	}
+	def debugMessageWithPlainArguments(context: LoggerContext)
+																		(message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(message:String,arguments:()=>Any*)]] to
@@ -296,13 +329,16 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def debugMessageWithLazyArguments(context: blackbox.Context)
-	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.debug($message, ..$suppliers)"
-	}
+	def debugMessageWithLazyArguments(context: LoggerContext)
+																	 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable)]] to
@@ -314,12 +350,11 @@ private object LoggerMacro {
 		* Passed exception or other throwable
 		* @return Replaced source code
 		*/
-	def debugException(context: blackbox.Context)
-	                  (exception: context.Expr[Throwable])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.debug($exception)"
-	}
+	def debugException(context: LoggerContext)
+										(exception: context.Expr[Throwable])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(exception.splice)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String)]] to
@@ -333,14 +368,19 @@ private object LoggerMacro {
 		* Passed text message
 		* @return Replaced source code
 		*/
-	def debugExceptionWithPlainMessage(context: blackbox.Context)
-	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def debugExceptionWithPlainMessage(context: LoggerContext)
+																		(exception: context.Expr[Throwable], message: context.Expr[String])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.debug(exception.splice, new Supplier[String] {
+					override def get(): String = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.debug($exception, $message)"
+			context.universe.reify(
+				org.tinylog.Logger.debug(exception.splice, message.splice)
+			)
 		}
 	}
 
@@ -356,12 +396,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def debugExceptionWithLazyMessage(context: blackbox.Context)
-	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.debug($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def debugExceptionWithLazyMessage(context: LoggerContext)
+																	 (exception: context.Expr[Throwable], message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(exception.splice, new Supplier[String] {
+			override def get(): String = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:Any*)]] to
@@ -377,12 +418,15 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def debugExceptionWithMessageWithPlainArguments(context: blackbox.Context)
-	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.debug($exception, $message, ..$arguments)"
-	}
+	def debugExceptionWithMessageWithPlainArguments(context: LoggerContext)
+																								 (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#debug(exception:Throwable,message:String,arguments:()=>Any*)]] to
@@ -398,13 +442,17 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def debugExceptionWithMessageWithLazyArguments(context: blackbox.Context)
-	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.debug($exception, $message, ..$suppliers)"
-	}
+	def debugExceptionWithMessageWithLazyArguments(context: LoggerContext)
+																								(exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.debug(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#isInfoEnabled]] to [[org.tinylog.Logger#isInfoEnabled]].
@@ -413,12 +461,11 @@ private object LoggerMacro {
 		* Macro context
 		* @return Replaced source code
 		*/
-	def isInfoEnabled(context: blackbox.Context)
-	                  ()
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.isInfoEnabled()"
-	}
+	def isInfoEnabled(context: LoggerContext)
+									 ()
+	: context.universe.Expr[Boolean] = context.universe.reify(
+		org.tinylog.Logger.isInfoEnabled
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(message:Any)]] and [[org.tinylog.scala.Logger#info(message:String)]]
@@ -430,14 +477,19 @@ private object LoggerMacro {
 		* Passed message object
 		* @return Replaced source code
 		*/
-	def infoPlainMessage(context: blackbox.Context)
-	                     (message: context.Expr[Any])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def infoPlainMessage(context: LoggerContext)
+											(message: context.Expr[Any])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.info(new Supplier[Any] {
+					override def get(): Any = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.info($message.asInstanceOf[Any])"
+			context.universe.reify(
+				org.tinylog.Logger.info(message.splice.asInstanceOf[Any])
+			)
 		}
 	}
 
@@ -451,12 +503,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def infoLazyMessage(context: blackbox.Context)
-	                    (message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.info(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def infoLazyMessage(context: LoggerContext)
+										 (message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(new Supplier[Any] {
+			override def get(): Any = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:Any*)]] to
@@ -470,12 +523,14 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def infoMessageWithPlainArguments(context: blackbox.Context)
-	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.info($message, ..$arguments)"
-	}
+	def infoMessageWithPlainArguments(context: LoggerContext)
+																	 (message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(message:String,arguments:()=>Any*)]] to
@@ -489,13 +544,16 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def infoMessageWithLazyArguments(context: blackbox.Context)
-	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.info($message, ..$suppliers)"
-	}
+	def infoMessageWithLazyArguments(context: LoggerContext)
+																	(message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable)]] to
@@ -507,12 +565,11 @@ private object LoggerMacro {
 		* Passed exception or other throwable
 		* @return Replaced source code
 		*/
-	def infoException(context: blackbox.Context)
-	                  (exception: context.Expr[Throwable])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.info($exception)"
-	}
+	def infoException(context: LoggerContext)
+									 (exception: context.Expr[Throwable])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(exception.splice)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String)]] to
@@ -526,14 +583,19 @@ private object LoggerMacro {
 		* Passed text message
 		* @return Replaced source code
 		*/
-	def infoExceptionWithPlainMessage(context: blackbox.Context)
-	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def infoExceptionWithPlainMessage(context: LoggerContext)
+																	 (exception: context.Expr[Throwable], message: context.Expr[String])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.info(exception.splice, new Supplier[String] {
+					override def get(): String = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.info($exception, $message)"
+			context.universe.reify(
+				org.tinylog.Logger.info(exception.splice, message.splice)
+			)
 		}
 	}
 
@@ -549,12 +611,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def infoExceptionWithLazyMessage(context: blackbox.Context)
-	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.info($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def infoExceptionWithLazyMessage(context: LoggerContext)
+																	(exception: context.Expr[Throwable], message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(exception.splice, new Supplier[String] {
+			override def get(): String = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:Any*)]] to
@@ -570,12 +633,15 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def infoExceptionWithMessageWithPlainArguments(context: blackbox.Context)
-	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.info($exception, $message, ..$arguments)"
-	}
+	def infoExceptionWithMessageWithPlainArguments(context: LoggerContext)
+																								(exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#info(exception:Throwable,message:String,arguments:()=>Any*)]] to
@@ -591,13 +657,17 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def infoExceptionWithMessageWithLazyArguments(context: blackbox.Context)
-	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.info($exception, $message, ..$suppliers)"
-	}
+	def infoExceptionWithMessageWithLazyArguments(context: LoggerContext)
+																							 (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.info(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#isWarnEnabled]] to [[org.tinylog.Logger#isWarnEnabled]].
@@ -606,12 +676,11 @@ private object LoggerMacro {
 		* Macro context
 		* @return Replaced source code
 		*/
-	def isWarnEnabled(context: blackbox.Context)
-	                  ()
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.isWarnEnabled()"
-	}
+	def isWarnEnabled(context: LoggerContext)
+									 ()
+	: context.universe.Expr[Boolean] = context.universe.reify(
+		org.tinylog.Logger.isWarnEnabled
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(message:Any)]] and [[org.tinylog.scala.Logger#warn(message:String)]]
@@ -623,14 +692,19 @@ private object LoggerMacro {
 		* Passed message object
 		* @return Replaced source code
 		*/
-	def warnPlainMessage(context: blackbox.Context)
-	                     (message: context.Expr[Any])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def warnPlainMessage(context: LoggerContext)
+											(message: context.Expr[Any])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.warn(new Supplier[Any] {
+					override def get(): Any = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.warn($message.asInstanceOf[Any])"
+			context.universe.reify(
+				org.tinylog.Logger.warn(message.splice.asInstanceOf[Any])
+			)
 		}
 	}
 
@@ -644,12 +718,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def warnLazyMessage(context: blackbox.Context)
-	                    (message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.warn(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def warnLazyMessage(context: LoggerContext)
+										 (message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(new Supplier[Any] {
+			override def get(): Any = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:Any*)]] to
@@ -663,12 +738,14 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def warnMessageWithPlainArguments(context: blackbox.Context)
-	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.warn($message, ..$arguments)"
-	}
+	def warnMessageWithPlainArguments(context: LoggerContext)
+																	 (message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(message:String,arguments:()=>Any*)]] to
@@ -682,13 +759,16 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def warnMessageWithLazyArguments(context: blackbox.Context)
-	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.warn($message, ..$suppliers)"
-	}
+	def warnMessageWithLazyArguments(context: LoggerContext)
+																	(message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable)]] to
@@ -700,12 +780,11 @@ private object LoggerMacro {
 		* Passed exception or other throwable
 		* @return Replaced source code
 		*/
-	def warnException(context: blackbox.Context)
-	                  (exception: context.Expr[Throwable])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.warn($exception)"
-	}
+	def warnException(context: LoggerContext)
+									 (exception: context.Expr[Throwable])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(exception.splice)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String)]] to
@@ -719,14 +798,19 @@ private object LoggerMacro {
 		* Passed text message
 		* @return Replaced source code
 		*/
-	def warnExceptionWithPlainMessage(context: blackbox.Context)
-	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def warnExceptionWithPlainMessage(context: LoggerContext)
+																	 (exception: context.Expr[Throwable], message: context.Expr[String])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.warn(exception.splice, new Supplier[String] {
+					override def get(): String = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.warn($exception, $message)"
+			context.universe.reify(
+				org.tinylog.Logger.warn(exception.splice, message.splice)
+			)
 		}
 	}
 
@@ -742,12 +826,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def warnExceptionWithLazyMessage(context: blackbox.Context)
-	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.warn($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def warnExceptionWithLazyMessage(context: LoggerContext)
+																	(exception: context.Expr[Throwable], message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(exception.splice, new Supplier[String] {
+			override def get(): String = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:Any*)]] to
@@ -763,12 +848,15 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def warnExceptionWithMessageWithPlainArguments(context: blackbox.Context)
-	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.warn($exception, $message, ..$arguments)"
-	}
+	def warnExceptionWithMessageWithPlainArguments(context: LoggerContext)
+																								(exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#warn(exception:Throwable,message:String,arguments:()=>Any*)]] to
@@ -784,13 +872,17 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def warnExceptionWithMessageWithLazyArguments(context: blackbox.Context)
-	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.warn($exception, $message, ..$suppliers)"
-	}
+	def warnExceptionWithMessageWithLazyArguments(context: LoggerContext)
+																							 (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.warn(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#isErrorEnabled]] to [[org.tinylog.Logger#isErrorEnabled]].
@@ -799,12 +891,11 @@ private object LoggerMacro {
 		* Macro context
 		* @return Replaced source code
 		*/
-	def isErrorEnabled(context: blackbox.Context)
-	                  ()
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.isErrorEnabled()"
-	}
+	def isErrorEnabled(context: LoggerContext)
+										()
+	: context.universe.Expr[Boolean] = context.universe.reify(
+		org.tinylog.Logger.isErrorEnabled
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(message:Any)]] and [[org.tinylog.scala.Logger#error(message:String)]]
@@ -816,14 +907,19 @@ private object LoggerMacro {
 		* Passed message object
 		* @return Replaced source code
 		*/
-	def errorPlainMessage(context: blackbox.Context)
-	                     (message: context.Expr[Any])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def errorPlainMessage(context: LoggerContext)
+											 (message: context.Expr[Any])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.error(new Supplier[Any] {
+					override def get(): Any = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.error($message.asInstanceOf[Any])"
+			context.universe.reify(
+				org.tinylog.Logger.error(message.splice.asInstanceOf[Any])
+			)
 		}
 	}
 
@@ -837,12 +933,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def errorLazyMessage(context: blackbox.Context)
-	                    (message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.error(new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def errorLazyMessage(context: LoggerContext)
+											(message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(new Supplier[Any] {
+			override def get(): Any = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:Any*)]] to
@@ -856,12 +953,14 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def errorMessageWithPlainArguments(context: blackbox.Context)
-	                                  (message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.error($message, ..$arguments)"
-	}
+	def errorMessageWithPlainArguments(context: LoggerContext)
+																		(message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(message:String,arguments:()=>Any*)]] to
@@ -875,13 +974,16 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def errorMessageWithLazyArguments(context: blackbox.Context)
-	                                 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.error($message, ..$suppliers)"
-	}
+	def errorMessageWithLazyArguments(context: LoggerContext)
+																	 (message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable)]] to
@@ -893,12 +995,11 @@ private object LoggerMacro {
 		* Passed exception or other throwable
 		* @return Replaced source code
 		*/
-	def errorException(context: blackbox.Context)
-	                  (exception: context.Expr[Throwable])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.error($exception)"
-	}
+	def errorException(context: LoggerContext)
+										(exception: context.Expr[Throwable])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(exception.splice)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String)]] to
@@ -912,14 +1013,19 @@ private object LoggerMacro {
 		* Passed text message
 		* @return Replaced source code
 		*/
-	def errorExceptionWithPlainMessage(context: blackbox.Context)
-	                                  (exception: context.Expr[Throwable], message: context.Expr[String])
-	: context.universe.Tree = {
-		import context.universe._
-		if (message.actualType == typeOf[String] && message.tree.children.nonEmpty) {
-			q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message })"
+	def errorExceptionWithPlainMessage(context: LoggerContext)
+																		(exception: context.Expr[Throwable], message: context.Expr[String])
+	: context.universe.Expr[Unit] = {
+		if (message.actualType =:= context.universe.typeOf[String] && message.tree.children.nonEmpty) {
+			context.universe.reify(
+				org.tinylog.Logger.error(exception.splice, new Supplier[String] {
+					override def get(): String = message.splice
+				})
+			)
 		} else {
-			q"org.tinylog.Logger.error($exception, $message)"
+			context.universe.reify(
+				org.tinylog.Logger.error(exception.splice, message.splice)
+			)
 		}
 	}
 
@@ -935,12 +1041,13 @@ private object LoggerMacro {
 		* Passed message supplier function
 		* @return Replaced source code
 		*/
-	def errorExceptionWithLazyMessage(context: blackbox.Context)
-	                                 (exception: context.Expr[Throwable], message: context.Expr[() => String])
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.error($exception, new org.tinylog.Supplier[String] { override def get(): String = $message.apply() })"
-	}
+	def errorExceptionWithLazyMessage(context: LoggerContext)
+																	 (exception: context.Expr[Throwable], message: context.Expr[() => String])
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(exception.splice, new Supplier[String] {
+			override def get(): String = message.splice.apply()
+		})
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:Any*)]] to
@@ -956,12 +1063,15 @@ private object LoggerMacro {
 		* Passed arguments for formatted text message
 		* @return Replaced source code
 		*/
-	def errorExceptionWithMessageWithPlainArguments(context: blackbox.Context)
-	                                               (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		q"org.tinylog.Logger.error($exception, $message, ..$arguments)"
-	}
+	def errorExceptionWithMessageWithPlainArguments(context: LoggerContext)
+																								 (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.asInstanceOf[Seq[Object]]: _*
+		)
+	)
 
 	/**
 		* Redirects [[org.tinylog.scala.Logger#error(exception:Throwable,message:String,arguments:()=>Any*)]] to
@@ -977,12 +1087,39 @@ private object LoggerMacro {
 		* Passed argument supplier functions for formatted text message
 		* @return Replaced source code
 		*/
-	def errorExceptionWithMessageWithLazyArguments(context: blackbox.Context)
-	                                              (exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
-	: context.universe.Tree = {
-		import context.universe._
-		val suppliers = arguments.map(argument => q"new org.tinylog.Supplier[Any] { override def get(): Any = $argument.apply() }")
-		q"org.tinylog.Logger.error($exception, $message, ..$suppliers)"
+	def errorExceptionWithMessageWithLazyArguments(context: LoggerContext)
+																								(exception: context.Expr[Throwable], message: context.Expr[String], arguments: context.Expr[() => Any]*)
+	: context.universe.Expr[Unit] = context.universe.reify(
+		org.tinylog.Logger.error(
+			exception.splice,
+			message.splice,
+			convertSeqToExpr(context)(arguments).splice.map(argument => new Supplier[Any] {
+				override def get(): Any = argument.apply()
+			}): _*
+		)
+	)
+
+	/**
+		* Converts a sequence of varargs into an expression.
+		*
+		* @param context
+		* Macro context
+		* @param seq
+		* Sequence of varargs
+		* @tparam T
+		* Type of expressions
+		* @return The passed sequence of varargs as expression
+		*/
+	private def convertSeqToExpr[T: context.WeakTypeTag](context: LoggerContext)
+																											(seq: Seq[context.Expr[T]])
+	: context.Expr[Seq[T]] = {
+		seq.foldRight(context.universe.reify {
+			Seq.empty[T]
+		}) { (expr, acc) =>
+			context.universe.reify {
+				expr.splice +: acc.splice
+			}
+		}
 	}
 
 }

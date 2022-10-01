@@ -92,7 +92,7 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.12.4</mockk.version>
 		<powermock.version>2.0.9</powermock.version>
-		<scala.version>2.13.8</scala.version>
+		<scala.version>2.13.9</scala.version>
 		<slf4j.version>2.0.3</slf4j.version>
 
 	</properties>
@@ -425,7 +425,7 @@
 					<artifactId>scala-maven-plugin</artifactId>
 					<version>${scala-maven-plugin.version}</version>
 					<configuration>
-						<target>8</target>
+						<release>8</release>
 						<args>
 							<arg>-g:line</arg>
 							<arg>-deprecation</arg>

@@ -32,6 +32,8 @@
 
 	<properties>
 		<maven.deploy.skip>true</maven.deploy.skip>
+		<maven.compiler.source/>
+		<maven.compiler.target/>
 	</properties>
 
 </project>

@@ -19,7 +19,7 @@
 	<url>${website.url}</url>
 
 	<properties>
-		<scala.version>2.12.13</scala.version>
+		<scala.version>2.12.17</scala.version>
 	</properties>
 
 	<scm>
