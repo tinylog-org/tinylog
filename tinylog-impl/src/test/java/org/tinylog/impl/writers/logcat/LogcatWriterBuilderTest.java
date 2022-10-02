@@ -183,6 +183,8 @@ class LogcatWriterBuilderTest {
 				writer.log(logEntry);
 			}
 
+			Thread.sleep(100);
+
 			Pattern pattern = Pattern.compile("\\W+I\\W+(pl\\.android\\.tes\\W+)?Hello World!$");
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
 		}
@@ -202,6 +204,9 @@ class LogcatWriterBuilderTest {
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 			}
+
+			Thread.sleep(100);
+
 			Pattern pattern = Pattern.compile("\\W+I\\W+foo\\W+Hello World!$");
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
 		}
@@ -222,6 +227,8 @@ class LogcatWriterBuilderTest {
 				writer.log(logEntry);
 			}
 
+			Thread.sleep(100);
+
 			Pattern pattern = Pattern.compile("\\W+I\\W+12345678901234567890\\.\\.\\.\\W+Hello World!$");
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
 		}
@@ -241,6 +248,8 @@ class LogcatWriterBuilderTest {
 			try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
 				writer.log(logEntry);
 			}
+
+			Thread.sleep(100);
 
 			Pattern pattern = Pattern.compile("\\W+I\\W+(pl\\.android\\.tes\\W+)?MyClass: Hello World!$");
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
