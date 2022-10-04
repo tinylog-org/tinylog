@@ -13,8 +13,12 @@
 
 package org.tinylog.slf4j;
 
+import java.util.List;
+
 import org.slf4j.Marker;
+import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LocationAwareLogger;
+import org.slf4j.spi.LoggingEventAware;
 import org.tinylog.Level;
 import org.tinylog.format.LegacyMessageFormatter;
 import org.tinylog.format.MessageFormatter;
@@ -24,7 +28,7 @@ import org.tinylog.provider.ProviderRegistry;
 /**
  * Location aware logger for tinylog's {@link LoggingProvider}.
  */
-public final class TinylogLogger implements LocationAwareLogger {
+public final class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
 
 	private static final int STACKTRACE_DEPTH = 2;
 
@@ -499,6 +503,23 @@ public final class TinylogLogger implements LocationAwareLogger {
 		String tag = marker == null ? null : marker.getName();
 		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
 			provider.log(fqcn, tag, severityLevel, exception, formatter, message, arguments);
+		}
+	}
+
+	@Override
+	public void log(final LoggingEvent event) {
+		Level severityLevel = translateLevel(event.getLevel().toInt());
+		List<Marker> markers = event.getMarkers();
+		String tag = markers == null || markers.isEmpty() ? null : markers.get(0).getName();
+		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
+			provider.log(
+				event.getCallerBoundary(),
+				tag, severityLevel,
+				event.getThrowable(),
+				formatter,
+				event.getMessage(),
+				event.getArgumentArray()
+			);
 		}
 	}
 

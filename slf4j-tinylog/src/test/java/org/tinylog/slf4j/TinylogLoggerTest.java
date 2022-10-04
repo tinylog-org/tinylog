@@ -30,6 +30,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Marker;
+import org.slf4j.event.DefaultLoggingEvent;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.tinylog.Level;
 import org.tinylog.format.LegacyMessageFormatter;
@@ -619,11 +620,36 @@ public final class TinylogLoggerTest {
 		 * Verifies that location aware logging is fully supported.
 		 */
 		@Test
-		public void logWithLoggerClassName() {
+		public void logLocationAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(null, TinylogLogger.class.getName(), level.ordinal() * 10, "Hello {}!", arguments, exception);
+			logger.log(null, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+
+			if (level == Level.OFF) {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
+			} else {
+				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
+						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
+			}
+		}
+
+		/**
+		 * Verifies that event aware logging is fully supported.
+		 */
+		@Test
+		public void logEventAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
+			RuntimeException exception = new RuntimeException();
+
+			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
+			event.setCallerBoundary(TinylogLogger.class.getName());
+			event.setThrowable(exception);
+			event.setMessage("Hello {}!");
+			event.addArgument("World");
+
+			logger.log(event);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -1212,11 +1238,37 @@ public final class TinylogLoggerTest {
 		 * Verifies that location aware logging is fully supported.
 		 */
 		@Test
-		public void logWithLoggerClassName() {
+		public void logLocationAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(marker, TinylogLogger.class.getName(), level.ordinal() * 10, "Hello {}!", arguments, exception);
+			logger.log(marker, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+
+			if (level == Level.OFF) {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
+			} else {
+				verify(provider).log(eq(TinylogLogger.class.getName()), eq(TAG), eq(level), same(exception),
+						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
+			}
+		}
+
+		/**
+		 * Verifies that event aware logging is fully supported.
+		 */
+		@Test
+		public void logEventAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
+			RuntimeException exception = new RuntimeException();
+
+			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
+			event.setCallerBoundary(TinylogLogger.class.getName());
+			event.addMarker(marker);
+			event.setThrowable(exception);
+			event.setMessage("Hello {}!");
+			event.addArgument("World");
+
+			logger.log(event);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
@@ -1790,15 +1842,41 @@ public final class TinylogLoggerTest {
 			}
 		}
 
+
 		/**
 		 * Verifies that location aware logging is fully supported.
 		 */
 		@Test
-		public void logWithLoggerClassName() {
+		public void logLocationAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(null, TinylogLogger.class.getName(), level.ordinal() * 10, "Hello {}!", arguments, exception);
+			logger.log(null, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+
+			if (level == Level.OFF) {
+				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
+			} else {
+				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
+						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
+			}
+		}
+
+		/**
+		 * Verifies that event aware logging is fully supported.
+		 */
+		@Test
+		public void logEventAwareWithLoggerClassName() {
+			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
+			RuntimeException exception = new RuntimeException();
+
+			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
+			event.setCallerBoundary(TinylogLogger.class.getName());
+			event.setThrowable(exception);
+			event.setMessage("Hello {}!");
+			event.addArgument("World");
+
+			logger.log(event);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
