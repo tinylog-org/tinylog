@@ -516,7 +516,8 @@ public final class TinylogLogger implements LocationAwareLogger, LoggingEventAwa
 		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
 			provider.log(
 				event.getCallerBoundary(),
-				tag, severityLevel,
+				tag,
+				severityLevel,
 				event.getThrowable(),
 				formatter,
 				event.getMessage(),
