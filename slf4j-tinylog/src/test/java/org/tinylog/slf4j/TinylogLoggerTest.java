@@ -1872,6 +1872,7 @@ public final class TinylogLoggerTest {
 
 			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
 			event.setCallerBoundary(TinylogLogger.class.getName());
+			event.addMarker(null);
 			event.setThrowable(exception);
 			event.setMessage("Hello {}!");
 			event.addArgument("World");

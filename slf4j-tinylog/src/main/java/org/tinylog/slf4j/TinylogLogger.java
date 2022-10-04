@@ -510,7 +510,9 @@ public final class TinylogLogger implements LocationAwareLogger, LoggingEventAwa
 	public void log(final LoggingEvent event) {
 		Level severityLevel = translateLevel(event.getLevel().toInt());
 		List<Marker> markers = event.getMarkers();
-		String tag = markers == null || markers.isEmpty() ? null : markers.get(0).getName();
+		Marker marker = markers == null || markers.isEmpty() ? null : markers.get(0);
+		String tag = marker == null ? null : marker.getName();
+
 		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
 			provider.log(
 				event.getCallerBoundary(),
