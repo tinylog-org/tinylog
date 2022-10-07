@@ -140,7 +140,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.tinylog.api.scala</Bundle-SymbolicName>
+						<Bundle-SymbolicName>org.tinylog.api.scala_2.13</Bundle-SymbolicName>
 					</instructions>
 				</configuration>
 			</plugin>
