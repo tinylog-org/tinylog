@@ -78,7 +78,7 @@ jobs:
           ftp_username: tinylog2-p2-repository@tinylog.org
           ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_P2_REPOSITORY}}
           local_source_dir: "target/repository"
-          dist_target_dir: "."
+          dist_target_dir: ${{github.event.inputs.version}}
 
       - name: Set up JDK 8
         if: ${{!contains(github.event.inputs.version, '-')}}
