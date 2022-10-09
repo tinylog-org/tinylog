@@ -75,7 +75,7 @@
 		<maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
 		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
-		<p2-maven-plugin.version>2.0.0</p2-maven-plugin.version>
+		<p2-maven-plugin.version>1.7.0</p2-maven-plugin.version>
 
 		<android.version>1.5_r3</android.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
