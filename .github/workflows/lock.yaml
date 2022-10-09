@@ -1,0 +1,28 @@
+name: Lock Closed Issues and PRs
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: lock
+
+jobs:
+  lock:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: dessant/lock-threads@v3
+        with:
+          issue-inactive-days: 7
+          issue-comment: |
+            This closed issue has been locked automatically.
+            However, please feel free to file a [new issue](/tinylog-org/tinylog/issues/new).
+          pr-inactive-days: 7
+          pr-comment:
+            This closed pull request has been locked automatically.
+            However, please feel free to file an [issue](/tinylog-org/tinylog/issues/new) or create a new pull request.
