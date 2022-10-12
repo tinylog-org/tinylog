@@ -19,10 +19,4 @@ jobs:
       - uses: dessant/lock-threads@v3
         with:
           issue-inactive-days: 7
-          issue-comment:
-            This closed issue has been locked automatically.
-            However, please feel free to file a [new issue](/tinylog-org/tinylog/issues/new/choose).
           pr-inactive-days: 7
-          pr-comment:
-            This closed pull request has been locked automatically.
-            However, please feel free to file an [issue](/tinylog-org/tinylog/issues/new/choose) or create a new pull request.
