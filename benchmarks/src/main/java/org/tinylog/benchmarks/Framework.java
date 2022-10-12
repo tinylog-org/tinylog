@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.tinylog.benchmarks.converters;
+package org.tinylog.benchmarks;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,8 +31,8 @@ import org.tinylog.Logger;
  */
 public final class Framework {
 
-	private static final Pattern JAR_VERSION = Pattern.compile(".*-([\\d\\.]+)\\.jar");
-	private static final Pattern POM_VERSION = Pattern.compile("<parent>.*<version>([\\S]+)<\\/version>.*<\\/parent>", Pattern.DOTALL);
+	private static final Pattern JAR_VERSION = Pattern.compile(".*-([\\d.]+(-.*)?)\\.jar");
+	private static final Pattern POM_VERSION = Pattern.compile("<parent>.*<version>(\\S+)</version>.*</parent>", Pattern.DOTALL);
 
 	private final String name;
 	private final String async;
@@ -40,7 +40,7 @@ public final class Framework {
 
 	/**
 	 * @param name
-	 *            Human readable name
+	 *            Human-readable name
 	 */
 	public Framework(final String name) {
 		this.name = name;
@@ -50,31 +50,7 @@ public final class Framework {
 
 	/**
 	 * @param name
-	 *            Human readable name
-	 * @param async
-	 *            Description for asynchronous execution
-	 */
-	public Framework(final String name, final String async) {
-		this.name = name;
-		this.async = async;
-		this.version = null;
-	}
-
-	/**
-	 * @param name
-	 *            Human readable name
-	 * @param logger
-	 *            Logger class of the framework
-	 */
-	public Framework(final String name, final Class<?> logger) {
-		this.name = name;
-		this.async = null;
-		this.version = getVersion(logger);
-	}
-
-	/**
-	 * @param name
-	 *            Human readable name
+	 *            Human-readable name
 	 * @param async
 	 *            Description for asynchronous execution
 	 * @param logger
@@ -87,21 +63,16 @@ public final class Framework {
 	}
 
 	/**
-	 * Gets the human readable name of the framework. The version will be included if available.
-	 * 
-	 * @return Human readable name of the framework
+	 * Gets the human-readable name of the framework. The version will be included if available.
+	 *
+	 * @param async
+	 *            {@code true} for appending the async suffix to the name,
+	 *            {@code false} for receiving the name without the async suffix
+	 * @return Human-readable name of the framework
 	 */
-	public String getName() {
-		return version == null ? name : name + " " + version;
-	}
-
-	/**
-	 * Gets the description for asynchronous execution.
-	 * 
-	 * @return Description for asynchronous execution or {@code null} if not available
-	 */
-	public String getAsync() {
-		return async;
+	public String getName(final boolean async) {
+		String versionedName = version == null ? name : name + " " + version;
+		return async ? versionedName + " " + this.async : versionedName;
 	}
 
 	/**

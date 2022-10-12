@@ -163,9 +163,11 @@
 						<configuration>
 							<arguments>
 								<argument>-Dfile.encoding=UTF-8</argument>
+								<argument>-Duser.country=US</argument>
+								<argument>-Duser.language=en</argument>
 								<argument>-classpath</argument>
 								<classpath />
-								<argument>org.openjdk.jmh.Main</argument>
+								<argument>org.tinylog.benchmarks.Application</argument>
 								<argument>${benchmark.class}</argument>
 								<argument>-f</argument>
 								<argument>${benchmark.forks}</argument>
@@ -215,9 +217,11 @@
 				<configuration>
 					<arguments>
 						<argument>-Dfile.encoding=UTF-8</argument>
+						<argument>-Duser.country=US</argument>
+						<argument>-Duser.language=en</argument>
 						<argument>-classpath</argument>
 						<classpath />
-						<argument>org.openjdk.jmh.Main</argument>
+						<argument>org.tinylog.benchmarks.Application</argument>
 						<argument>${benchmark.class}</argument>
 						<argument>-f</argument>
 						<argument>${benchmark.forks}</argument>
@@ -226,9 +230,9 @@
 						<argument>-i</argument>
 						<argument>${benchmark.iterations}</argument>
 						<argument>-rf</argument>
-						<argument>text</argument>
+						<argument>csv</argument>
 						<argument>-rff</argument>
-						<argument>${project.basedir}/src/main/resources/output.txt</argument>
+						<argument>${project.basedir}/src/main/resources/benchmark.csv</argument>
 					</arguments>
 				</configuration>
 			</plugin>
