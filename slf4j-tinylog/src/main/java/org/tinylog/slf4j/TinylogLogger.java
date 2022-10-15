@@ -561,7 +561,7 @@ public class TinylogLogger implements LocationAwareLogger {
 		OutputDetails outputDetails = visibility.get(level);
 		if (outputDetails != OutputDetails.DISABLED) {
 			Object location = getRelativeCaller(outputDetails).apply(LOGGER_CLASS_NAME);
-			issueLogEntry(location, marker, getLevel(levelCode), throwable, message, arguments);
+			issueLogEntry(location, marker, level, throwable, message, arguments);
 		}
 	}
 
