@@ -20,9 +20,9 @@
 	<properties>
 		<root.basedir>${project.parent.basedir}</root.basedir>
 		<benchmark.pattern>org\.tinylog\.benchmarks\.(.*)Benchmark</benchmark.pattern>
-		<benchmark.forks>10</benchmark.forks>
-		<benchmark.warmups>10</benchmark.warmups>
-		<benchmark.iterations>10</benchmark.iterations>
+		<benchmark.forks>5</benchmark.forks>
+		<benchmark.warmups>5</benchmark.warmups>
+		<benchmark.iterations>5</benchmark.iterations>
 	</properties>
 
 	<modules>
