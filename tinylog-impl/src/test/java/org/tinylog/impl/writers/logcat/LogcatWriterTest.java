@@ -204,7 +204,9 @@ class LogcatWriterTest {
 				writer.log(logEntry);
 			}
 
-			Pattern pattern = Pattern.compile("\\W+" + androidPriority + "\\W+(pl\\.android\\.test?\\W+)?Hello World!$");
+			Pattern pattern = Pattern.compile(
+				"\\W+" + androidPriority + "\\W+(pl\\.android\\.test?\\W+)?Hello World!$"
+			);
 			assertThat(logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
 		}
 
