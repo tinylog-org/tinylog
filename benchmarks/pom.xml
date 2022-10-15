@@ -127,6 +127,8 @@
 					<skip>true</skip>
 					<arguments>
 						<argument>-Dfile.encoding=UTF-8</argument>
+						<argument>-Duser.country=US</argument>
+						<argument>-Duser.language=en</argument>
 						<argument>-classpath</argument>
 						<classpath />
 						<argument>org.openjdk.jmh.Main</argument>
