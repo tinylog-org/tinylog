@@ -8,6 +8,11 @@
             "automerge": true,
             "automergeType": "branch",
             "automergeStrategy": "rebase"
+        },
+        {
+            "matchPackagePatterns": ["^org.tinylog:"],
+            "matchCurrentValue": "/-SNAPSHOT$/",
+            "enabled": false
         }
     ]
 }
