@@ -31,8 +31,8 @@
 		<maven.deploy.skip>true</maven.deploy.skip>
 		<!-- JMH -->
 		<benchmark.class>org\.tinylog\.benchmarks\.logging\.(.*)Benchmark</benchmark.class>
-		<benchmark.forks>10</benchmark.forks>
-		<benchmark.iterations>10</benchmark.iterations>
+		<benchmark.forks>5</benchmark.forks>
+		<benchmark.iterations>5</benchmark.iterations>
 	</properties>
 
 	<dependencies>
