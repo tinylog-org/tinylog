@@ -3,6 +3,8 @@ dependencies {
 }
 
 android {
+	namespace "org.tinylog.core.android"
+
 	sourceSets {
 		main {
 			java {
