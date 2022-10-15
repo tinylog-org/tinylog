@@ -1,12 +1,17 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [ "config:base" ],
-    "packageRules": [
-        {
-            "matchUpdateTypes": [ "minor", "patch" ],
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [ "config:base" ],
+	"packageRules": [
+		{
+			"matchUpdateTypes": [ "minor", "patch" ],
 			"automerge": true,
 			"automergeType": "branch",
 			"automergeStrategy": "rebase"
+		},
+		{
+			"matchPackagePatterns": ["^org.tinylog:"],
+			"matchCurrentValue": "/-SNAPSHOT$/",
+			"enabled": false
 		}
-    ]
+	]
 }
