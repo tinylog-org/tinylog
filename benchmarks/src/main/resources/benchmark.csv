@@ -1,0 +1,68 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: async","Param: locationInfo"
+"tinylog 2.5.0 / discard","thrpt",1,100,2172184509.908976,53915753.187079,"ops/s",false,NONE
+"tinylog 2.5.0 / discard","thrpt",1,100,2231935582.105362,18239958.937158,"ops/s",false,CLASS_OR_CATEGORY_ONLY
+"tinylog 2.5.0 / discard","thrpt",1,100,2239453170.669922,14804101.116573,"ops/s",false,FULL
+"tinylog 2.5.0 with writing thread / discard","thrpt",1,100,2114796441.747985,12604002.654966,"ops/s",true,NONE
+"tinylog 2.5.0 with writing thread / discard","thrpt",1,100,2122058547.565847,16726889.810472,"ops/s",true,CLASS_OR_CATEGORY_ONLY
+"tinylog 2.5.0 with writing thread / discard","thrpt",1,100,2291806550.223167,55392636.073577,"ops/s",true,FULL
+"tinylog 2.5.0 / output","ss",1,100,3.807872,0.034733,"s/op",false,NONE
+"tinylog 2.5.0 / output","ss",1,100,5.135915,0.135961,"s/op",false,CLASS_OR_CATEGORY_ONLY
+"tinylog 2.5.0 / output","ss",1,100,6.760494,0.055328,"s/op",false,FULL
+"tinylog 2.5.0 with writing thread / output","ss",1,100,1.124425,0.182051,"s/op",true,NONE
+"tinylog 2.5.0 with writing thread / output","ss",1,100,1.419831,0.107607,"s/op",true,CLASS_OR_CATEGORY_ONLY
+"tinylog 2.5.0 with writing thread / output","ss",1,100,2.642971,0.058729,"s/op",true,FULL
+"tinylog 1.3.6 / discard","thrpt",1,100,854746675.559290,6888472.887664,"ops/s",false,NONE
+"tinylog 1.3.6 / discard","thrpt",1,100,855800962.774496,5531375.629945,"ops/s",false,CLASS_OR_CATEGORY_ONLY
+"tinylog 1.3.6 / discard","thrpt",1,100,856985954.076114,4878191.792171,"ops/s",false,FULL
+"tinylog 1.3.6 with writing thread / discard","thrpt",1,100,807242393.588187,4892826.673145,"ops/s",true,NONE
+"tinylog 1.3.6 with writing thread / discard","thrpt",1,100,805882427.431531,5515681.880180,"ops/s",true,CLASS_OR_CATEGORY_ONLY
+"tinylog 1.3.6 with writing thread / discard","thrpt",1,100,809006944.144172,5523578.555226,"ops/s",true,FULL
+"tinylog 1.3.6 / output","ss",1,100,3.772502,0.042552,"s/op",false,NONE
+"tinylog 1.3.6 / output","ss",1,100,6.325531,0.043559,"s/op",false,CLASS_OR_CATEGORY_ONLY
+"tinylog 1.3.6 / output","ss",1,100,6.717753,0.051418,"s/op",false,FULL
+"tinylog 1.3.6 with writing thread / output","ss",1,100,0.678281,0.111863,"s/op",true,NONE
+"tinylog 1.3.6 with writing thread / output","ss",1,100,2.636569,0.044188,"s/op",true,CLASS_OR_CATEGORY_ONLY
+"tinylog 1.3.6 with writing thread / output","ss",1,100,2.906422,0.079164,"s/op",true,FULL
+"Log4j 2.17.1 / discard","thrpt",1,100,639501906.318825,2535426.686721,"ops/s",false,NONE
+"Log4j 2.17.1 / discard","thrpt",1,100,623411151.206243,18846339.577058,"ops/s",false,CLASS_OR_CATEGORY_ONLY
+"Log4j 2.17.1 / discard","thrpt",1,100,647251403.170112,5171623.719314,"ops/s",false,FULL
+"Log4j 2.17.1 with async logger / discard","thrpt",1,100,625886311.091823,5709602.551871,"ops/s",true,NONE
+"Log4j 2.17.1 with async logger / discard","thrpt",1,100,628710595.255888,2296544.896113,"ops/s",true,CLASS_OR_CATEGORY_ONLY
+"Log4j 2.17.1 with async logger / discard","thrpt",1,100,626429255.611560,3846705.207399,"ops/s",true,FULL
+"Log4j 2.17.1 / output","ss",1,100,4.414009,0.066040,"s/op",false,NONE
+"Log4j 2.17.1 / output","ss",1,100,4.454333,0.038537,"s/op",false,CLASS_OR_CATEGORY_ONLY
+"Log4j 2.17.1 / output","ss",1,100,11.005020,0.094064,"s/op",false,FULL
+"Log4j 2.17.1 with async logger / output","ss",1,100,2.078338,0.028860,"s/op",true,NONE
+"Log4j 2.17.1 with async logger / output","ss",1,100,2.388618,0.051858,"s/op",true,CLASS_OR_CATEGORY_ONLY
+"Log4j 2.17.1 with async logger / output","ss",1,100,9.031939,0.092431,"s/op",true,FULL
+"Log4j 1.2.17 / discard","thrpt",1,100,706612952.330764,11325879.702067,"ops/s",false,NONE
+"Log4j 1.2.17 / discard","thrpt",1,100,692210955.074785,5724705.888548,"ops/s",false,CLASS_OR_CATEGORY_ONLY
+"Log4j 1.2.17 / discard","thrpt",1,100,695022735.855599,2886749.538369,"ops/s",false,FULL
+"Log4j 1.2.17 with async appender / discard","thrpt",1,100,690923579.064444,6866212.921932,"ops/s",true,NONE
+"Log4j 1.2.17 with async appender / discard","thrpt",1,100,692155371.174751,11527748.375656,"ops/s",true,CLASS_OR_CATEGORY_ONLY
+"Log4j 1.2.17 with async appender / discard","thrpt",1,100,697297733.863292,6721982.983818,"ops/s",true,FULL
+"Log4j 1.2.17 / output","ss",1,100,4.072246,0.040735,"s/op",false,NONE
+"Log4j 1.2.17 / output","ss",1,100,4.234408,0.057339,"s/op",false,CLASS_OR_CATEGORY_ONLY
+"Log4j 1.2.17 / output","ss",1,100,13.707069,0.118462,"s/op",false,FULL
+"Log4j 1.2.17 with async appender / output","ss",1,100,0.879474,0.026845,"s/op",true,NONE
+"Log4j 1.2.17 with async appender / output","ss",1,100,1.016168,0.026125,"s/op",true,CLASS_OR_CATEGORY_ONLY
+"Log4j 1.2.17 with async appender / output","ss",1,100,13.444632,0.205337,"s/op",true,FULL
+"Logback 1.2.7 / discard","thrpt",1,100,678595515.022309,7898975.710471,"ops/s",false,NONE
+"Logback 1.2.7 / discard","thrpt",1,100,603475131.397059,8574018.807555,"ops/s",false,CLASS_OR_CATEGORY_ONLY
+"Logback 1.2.7 / discard","thrpt",1,100,613172039.334868,3854367.983994,"ops/s",false,FULL
+"Logback 1.2.7 with async appender / discard","thrpt",1,100,608154005.113437,3905921.562635,"ops/s",true,NONE
+"Logback 1.2.7 with async appender / discard","thrpt",1,100,608650057.978368,4675836.838498,"ops/s",true,CLASS_OR_CATEGORY_ONLY
+"Logback 1.2.7 with async appender / discard","thrpt",1,100,606336636.162364,7994296.061479,"ops/s",true,FULL
+"Logback 1.2.7 / output","ss",1,100,3.809591,0.031525,"s/op",false,NONE
+"Logback 1.2.7 / output","ss",1,100,3.928190,0.040771,"s/op",false,CLASS_OR_CATEGORY_ONLY
+"Logback 1.2.7 / output","ss",1,100,14.669959,0.153378,"s/op",false,FULL
+"Logback 1.2.7 with async appender / output","ss",1,100,0.580698,0.023930,"s/op",true,NONE
+"Logback 1.2.7 with async appender / output","ss",1,100,0.764202,0.024239,"s/op",true,CLASS_OR_CATEGORY_ONLY
+"Logback 1.2.7 with async appender / output","ss",1,100,13.730494,0.121707,"s/op",true,FULL
+"java.util.logging / discard","thrpt",1,100,1076744270.174471,10870024.365170,"ops/s",,NONE
+"java.util.logging / discard","thrpt",1,100,1079547927.903509,3455239.657686,"ops/s",,CLASS_OR_CATEGORY_ONLY
+"java.util.logging / discard","thrpt",1,100,1083030533.686424,652315.508792,"ops/s",,FULL
+"java.util.logging / output","ss",1,100,4.979410,0.090698,"s/op",,NONE
+"java.util.logging / output","ss",1,100,5.060307,0.068418,"s/op",,CLASS_OR_CATEGORY_ONLY
+"java.util.logging / output","ss",1,100,11.850270,0.151834,"s/op",,FULL
+"Empty Method / emptyMethod","thrpt",1,100,2235396971.276923,14367109.451917,"ops/s",,
