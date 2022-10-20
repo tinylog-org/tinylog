@@ -19,7 +19,7 @@ jobs:
           git config --global user.name "${{github.actor}}"
           git config --global user.email "${{github.actor}}@users.noreply.github.com"
 
-      - name: Check out repository
+      - name: Check out tinylog repository
         uses: actions/checkout@v2
 
       - name: Set up JDK 9
@@ -47,25 +47,6 @@ jobs:
           nexus_username: pmw
           nexus_password: ${{secrets.OSSRH_SERVER_PASSWORD}}
 
-      - name: Upload ZIP files
-        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
-        with:
-          ftp_host: tinylog.org
-          ftp_username: tinylog2-zip-files@tinylog.org
-          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_ZIP_FILES}}
-          local_source_dir: "target"
-          dist_target_dir: "."
-
-      - name: Create release draft
-        uses: ncipollo/release-action@v1
-        with:
-          name: "Version ${{github.event.inputs.version}}"
-          tag: "${{github.event.inputs.version}}"
-          artifacts: "target/*"
-          prerelease: ${{contains(github.event.inputs.version, '-')}}
-          draft: true
-          token: ${{secrets.GITHUB_TOKEN}}
-
       - name: Create P2 repository
         run: |
           mvn -P release --no-transfer-progress --batch-mode --non-recursive p2:site
@@ -79,34 +60,62 @@ jobs:
           local_source_dir: "target/repository"
           dist_target_dir: "."
 
-      - name: Set up JDK 8
-        if: ${{!contains(github.event.inputs.version, '-')}}
-        uses: actions/setup-java@v1
+      - name: Create release draft
+        uses: ncipollo/release-action@v1
         with:
-          java-version: 8
+          name: "Version ${{github.event.inputs.version}}"
+          tag: "${{github.event.inputs.version}}"
+          artifacts: "target/*"
+          prerelease: ${{contains(github.event.inputs.version, '-')}}
+          draft: true
+          token: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Generate API documentation
-        if: ${{!contains(github.event.inputs.version, '-')}}
+      - name: Store file size
         run: |
-          cd tinylog-api
-          mvn -P release --no-transfer-progress --batch-mode javadoc:javadoc
-
-      - name: Upload API documentation
-        if: ${{!contains(github.event.inputs.version, '-')}}
-        uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
-        with:
-          ftp_host: tinylog.org
-          ftp_username: tinylog2-api-docs@tinylog.org
-          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_API_DOCS}}
-          local_source_dir: "tinylog-api/target/site/apidocs"
-          dist_target_dir: "."
+          FILE_PATH_API=tinylog-api/target/tinylog-api-${{github.event.inputs.version}}.jar
+          FILE_SIZE_API=$(stat -c%s "$FILE_PATH_API")
+          FILE_PATH_IMPL=tinylog-impl/target/tinylog-impl-${{github.event.inputs.version}}.jar
+          FILE_SIZE_IMPL=$(stat -c%s "$FILE_PATH_IMPL")
+          echo "FILE_SIZE=$((FILE_SIZE_API + FILE_SIZE_IMPL))" >> $GITHUB_ENV
 
       - name: Restore original version
         run: |
           mvn -DnewVersion=${ORIGINAL_VERSION} -DgenerateBackupPoms=false --no-transfer-progress --batch-mode versions:set
           git commit -am "Restore snapshot version ${ORIGINAL_VERSION}"
 
-      - name: Push changes
+      - name: Push changes to tinylog repository
         run: |
           git push origin
           git push origin "${{github.event.inputs.version}}"
+
+      - name: Check out website repository
+        uses: actions/checkout@v2
+        with:
+          repository: tinylog-org/website
+          ssh-key: ${{secrets.PRIVATE_KEY_FOR_WEBSITE_REPOSITORY}}
+          path: website
+
+      - name: Update website params
+        run: |
+          NEW_VERSION=${{github.event.inputs.version}}
+          CURRENT_STABLE_VERSION=$(yq -r ".params.stableVersion" "website/config.yaml")
+          CURRENT_PREVIEW_VERSION=$(yq -r ".params.previewVersion" "website/config.yaml")
+          pip3 install yq
+          if [ $(.github/scripts/is-stable-version $NEW_VERSION) = 0 ] && [ $(.github/scripts/is-latest-version $NEW_VERSION $CURRENT_STABLE_VERSION) = 0 ]
+          then
+            patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.stableVersion = \"$NEW_VERSION\"" "website/config.yaml"))
+            patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.size = $FILE_SIZE" "website/config.yaml"))
+          fi
+          if [ $(sh .github/scripts/is-latest-version $NEW_VERSION $CURRENT_PREVIEW_VERSION) = 0 ]
+          then
+           patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.previewVersion = \"$NEW_VERSION\"" "website/config.yaml"))
+          fi
+
+      - name: Push changes to website repository
+        run: |
+          cd website
+          if [[ $(git status --porcelain) ]]
+          then
+            git commit -am "Update tinylog to version ${{github.event.inputs.version}}"
+            git push origin
+          fi
