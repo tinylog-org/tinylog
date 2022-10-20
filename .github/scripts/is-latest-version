@@ -1,0 +1,14 @@
+#!/bin/sh
+
+first_version=$(echo "$1" | sed -E "s/-.*//")
+second_version=$(echo "$2" | sed -E "s/-.*//")
+if [ "$first_version" = "$second_version" ]
+then
+  first_postfix=$(echo "$1" | sed -E "s/[^-]*(-(.*))?/\2/")
+  second_postfix=$(echo "$2" | sed -E "s/[^-]*(-(.*))?/\2/")
+  postfix=$(printf "%s\n%s" "$first_postfix" "$second_postfix" | sort -rV | head -n1)
+  [ ! "$first_postfix" ] || [ "$postfix" = "$first_postfix" ] && echo 0 || echo 1
+else
+  version=$(printf "%s\n%s" "$first_version" "$second_version" | sort -rV | head -n1)
+  [ "$version" = "$first_version" ] && echo 0 || echo 1
+fi

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+postfix=$(echo "$1" | sed -E "s/[^-]*(-(.*))?/\2/")
+[ "$postfix" ] && echo 1 || echo 0
