@@ -108,4 +108,15 @@ public class CallerBenchmark {
 		}.getCallerClass().getName();
 	}
 
+	/**
+	 * Gets a static string with a fully-qualified caller class name as reference.
+	 *
+	 * @return A static string with a fully-qualified caller class name
+	 */
+	@Benchmark
+	@BenchmarkMode(Mode.Throughput)
+	public String staticString() {
+		return "org.tinylog.benchmarks.caller.CallerBenchmark";
+	}
+
 }
