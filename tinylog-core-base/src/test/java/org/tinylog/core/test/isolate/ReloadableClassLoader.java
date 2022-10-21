@@ -23,20 +23,18 @@ public class ReloadableClassLoader extends URLClassLoader {
 	}
 
 	@Override
-	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		synchronized (getClassLoadingLock(name)) {
-			if (reloadableClassNames.contains(stripClassName(name))) {
-				Class<?> clazz = findLoadedClass(name);
-				if (clazz == null) {
-					clazz = findClass(name);
-				}
-				if (resolve) {
-					resolveClass(clazz);
-				}
-				return clazz;
-			} else {
-				return super.loadClass(name, resolve);
+	protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+		if (reloadableClassNames.contains(stripClassName(name))) {
+			Class<?> clazz = findLoadedClass(name);
+			if (clazz == null) {
+				clazz = findClass(name);
 			}
+			if (resolve) {
+				resolveClass(clazz);
+			}
+			return clazz;
+		} else {
+			return super.loadClass(name, resolve);
 		}
 	}
 
