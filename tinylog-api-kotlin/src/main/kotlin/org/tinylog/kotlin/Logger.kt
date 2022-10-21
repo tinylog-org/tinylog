@@ -11,12 +11,26 @@ import java.util.concurrent.ConcurrentHashMap
  * Static logger for issuing log entries.
  */
 object Logger {
+	private val taggedLoggers = ConcurrentHashMap<String, TaggedLogger>()
 	private val framework = Tinylog.getFramework()
 	private val runtime = framework.runtime
 	private val backend = framework.loggingBackend
-	private val visibility = backend.getLevelVisibilityByTag(null)
 	private val formatter: MessageFormatter = EnhancedMessageFormatter(framework)
-	private val taggedLoggers = ConcurrentHashMap<String, TaggedLogger>()
+
+	private val visibilityTrace: OutputDetails
+	private val visibilityDebug: OutputDetails
+	private val visibilityInfo: OutputDetails
+	private val visibilityWarn: OutputDetails
+	private val visibilityError: OutputDetails
+
+	init {
+		val visibility = backend.getLevelVisibilityByTag(null)
+		visibilityTrace = visibility.trace
+		visibilityDebug = visibility.debug
+		visibilityInfo = visibility.info
+		visibilityWarn = visibility.warn
+		visibilityError = visibility.error
+	}
 
 	/**
 	 * Retrieves a tagged logger instance. Category tags are case-sensitive. If a tagged logger does not yet exist for
@@ -27,7 +41,6 @@ object Logger {
 	 *            logger
 	 * @return Logger instance
 	 */
-	@JvmStatic
 	fun tag(tag: String?): TaggedLogger {
 		return if (tag.isNullOrEmpty()) {
 			taggedLoggers.computeIfAbsent("") {
@@ -48,11 +61,9 @@ object Logger {
 	 *
 	 * @return `true` if enabled, otherwise `false`
 	 */
-	@JvmStatic
 	fun isTraceEnabled(): Boolean {
-		val outputDetails = visibility.trace
-		return outputDetails != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.TRACE)
+		return visibilityTrace != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(visibilityTrace), null, Level.TRACE)
 	}
 
 	/**
@@ -67,11 +78,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun trace(message: Any?) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, null, message, null, null)
 		}
 	}
@@ -85,11 +94,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun trace(message: String) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, null, message, null, null)
 		}
 	}
@@ -107,11 +114,9 @@ object Logger {
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun trace(message: () -> Any?) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, null, message.asSupplier(), null, null)
 		}
 	}
@@ -134,11 +139,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun trace(message: String, vararg arguments: Any?) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -152,11 +155,9 @@ object Logger {
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
-	@JvmStatic
 	fun trace(exception: Throwable) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, exception, null, null, null)
 		}
 	}
@@ -172,11 +173,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun trace(exception: Throwable, message: String) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, exception, message, null, null)
 		}
 	}
@@ -195,11 +194,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun trace(exception: Throwable, message: () -> String) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, exception, message.asSupplier(), null, null)
 		}
 	}
@@ -224,11 +221,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun trace(exception: Throwable, message: String?, vararg arguments: Any?) {
-		val outputDetails = visibility.trace
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityTrace)
 			backend.log(location.get(), null, Level.TRACE, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -241,11 +236,9 @@ object Logger {
 	 *
 	 * @return `true` if enabled, otherwise `false`
 	 */
-	@JvmStatic
 	fun isDebugEnabled(): Boolean {
-		val outputDetails = visibility.debug
-		return outputDetails != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.DEBUG)
+		return visibilityDebug != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(visibilityDebug), null, Level.DEBUG)
 	}
 
 	/**
@@ -260,11 +253,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun debug(message: Any?) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, null, message, null, null)
 		}
 	}
@@ -278,11 +269,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun debug(message: String) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, null, message, null, null)
 		}
 	}
@@ -300,11 +289,9 @@ object Logger {
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun debug(message: () -> Any?) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, null, message.asSupplier(), null, null)
 		}
 	}
@@ -327,11 +314,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun debug(message: String, vararg arguments: Any?) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -345,11 +330,9 @@ object Logger {
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
-	@JvmStatic
 	fun debug(exception: Throwable) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, exception, null, null, null)
 		}
 	}
@@ -365,11 +348,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun debug(exception: Throwable, message: String) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, exception, message, null, null)
 		}
 	}
@@ -388,11 +369,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun debug(exception: Throwable, message: () -> String) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, exception, message.asSupplier(), null, null)
 		}
 	}
@@ -417,11 +396,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun debug(exception: Throwable, message: String?, vararg arguments: Any?) {
-		val outputDetails = visibility.debug
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityDebug)
 			backend.log(location.get(), null, Level.DEBUG, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -434,11 +411,9 @@ object Logger {
 	 *
 	 * @return `true` if enabled, otherwise `false`
 	 */
-	@JvmStatic
 	fun isInfoEnabled(): Boolean {
-		val outputDetails = visibility.info
-		return outputDetails != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.INFO)
+		return visibilityInfo != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(visibilityInfo), null, Level.INFO)
 	}
 
 	/**
@@ -453,11 +428,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun info(message: Any?) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, null, message, null, null)
 		}
 	}
@@ -471,11 +444,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun info(message: String) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, null, message, null, null)
 		}
 	}
@@ -493,11 +464,9 @@ object Logger {
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun info(message: () -> Any?) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, null, message.asSupplier(), null, null)
 		}
 	}
@@ -520,11 +489,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun info(message: String, vararg arguments: Any?) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -538,11 +505,9 @@ object Logger {
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
-	@JvmStatic
 	fun info(exception: Throwable) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, exception, null, null, null)
 		}
 	}
@@ -558,11 +523,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun info(exception: Throwable, message: String) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, exception, message, null, null)
 		}
 	}
@@ -581,11 +544,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun info(exception: Throwable, message: () -> String) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, exception, message.asSupplier(), null, null)
 		}
 	}
@@ -610,11 +571,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun info(exception: Throwable, message: String?, vararg arguments: Any?) {
-		val outputDetails = visibility.info
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityInfo)
 			backend.log(location.get(), null, Level.INFO, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -627,11 +586,9 @@ object Logger {
 	 *
 	 * @return `true` if enabled, otherwise `false`
 	 */
-	@JvmStatic
 	fun isWarnEnabled(): Boolean {
-		val outputDetails = visibility.warn
-		return outputDetails != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.WARN)
+		return visibilityWarn != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(visibilityWarn), null, Level.WARN)
 	}
 
 	/**
@@ -646,11 +603,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun warn(message: Any?) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, null, message, null, null)
 		}
 	}
@@ -664,11 +619,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun warn(message: String) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, null, message, null, null)
 		}
 	}
@@ -686,11 +639,9 @@ object Logger {
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun warn(message: () -> Any?) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, null, message.asSupplier(), null, null)
 		}
 	}
@@ -713,11 +664,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun warn(message: String, vararg arguments: Any?) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -731,11 +680,9 @@ object Logger {
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
-	@JvmStatic
 	fun warn(exception: Throwable) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, exception, null, null, null)
 		}
 	}
@@ -751,11 +698,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun warn(exception: Throwable, message: String) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, exception, message, null, null)
 		}
 	}
@@ -774,11 +719,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun warn(exception: Throwable, message: () -> String) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, exception, message.asSupplier(), null, null)
 		}
 	}
@@ -803,11 +746,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun warn(exception: Throwable, message: String?, vararg arguments: Any?) {
-		val outputDetails = visibility.warn
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityWarn)
 			backend.log(location.get(), null, Level.WARN, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -820,11 +761,9 @@ object Logger {
 	 *
 	 * @return `true` if enabled, otherwise `false`
 	 */
-	@JvmStatic
 	fun isErrorEnabled(): Boolean {
-		val outputDetails = visibility.error
-		return outputDetails != OutputDetails.DISABLED &&
-			backend.isEnabled(runtime.getDirectCaller(outputDetails), null, Level.ERROR)
+		return visibilityError != OutputDetails.DISABLED &&
+			backend.isEnabled(runtime.getDirectCaller(visibilityError), null, Level.ERROR)
 	}
 
 	/**
@@ -839,11 +778,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun error(message: Any?) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, null, message, null, null)
 		}
 	}
@@ -857,11 +794,9 @@ object Logger {
 	 *
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun error(message: String) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, null, message, null, null)
 		}
 	}
@@ -879,11 +814,9 @@ object Logger {
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun error(message: () -> Any?) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, null, message.asSupplier(), null, null)
 		}
 	}
@@ -906,11 +839,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun error(message: String, vararg arguments: Any?) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, null, message, arguments.withSuppliers(), formatter)
 		}
 	}
@@ -924,11 +855,9 @@ object Logger {
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
-	@JvmStatic
 	fun error(exception: Throwable) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, exception, null, null, null)
 		}
 	}
@@ -944,11 +873,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
 	 */
-	@JvmStatic
 	fun error(exception: Throwable, message: String) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, exception, message, null, null)
 		}
 	}
@@ -967,11 +894,9 @@ object Logger {
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
-	@JvmStatic
 	fun error(exception: Throwable, message: () -> String) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, exception, message.asSupplier(), null, null)
 		}
 	}
@@ -996,11 +921,9 @@ object Logger {
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values or lazy suppliers for the placeholders
 	 */
-	@JvmStatic
 	fun error(exception: Throwable, message: String?, vararg arguments: Any?) {
-		val outputDetails = visibility.error
-		if (outputDetails != OutputDetails.DISABLED) {
-			val location = runtime.getDirectCaller(outputDetails)
+		if (visibilityError != OutputDetails.DISABLED) {
+			val location = runtime.getDirectCaller(visibilityError)
 			backend.log(location.get(), null, Level.ERROR, exception, message, arguments.withSuppliers(), formatter)
 		}
 	}

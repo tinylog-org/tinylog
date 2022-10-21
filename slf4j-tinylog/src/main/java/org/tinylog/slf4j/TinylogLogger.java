@@ -24,8 +24,14 @@ public class TinylogLogger implements LocationAwareLogger {
 	private final String category;
 	private final RuntimeFlavor runtime;
 	private final LoggingBackend backend;
-	private final LevelVisibility visibility;
 	private final MessageFormatter formatter;
+
+	private final LevelVisibility visibility;
+	private final OutputDetails visibilityTrace;
+	private final OutputDetails visibilityDebug;
+	private final OutputDetails visibilityInfo;
+	private final OutputDetails visibilityWarn;
+	private final OutputDetails visibilityError;
 
 	/**
 	 * @param category The logger category (usually the fully-qualified name of the class that uses this logger)
@@ -35,8 +41,14 @@ public class TinylogLogger implements LocationAwareLogger {
 		this.category = category;
 		this.runtime = framework.getRuntime();
 		this.backend = framework.getLoggingBackend();
-		this.visibility = backend.getLevelVisibilityByClass(category);
 		this.formatter = new SimpleMessageFormatter();
+
+		this.visibility = backend.getLevelVisibilityByClass(category);
+		this.visibilityTrace = visibility.getTrace();
+		this.visibilityDebug = visibility.getDebug();
+		this.visibilityInfo = visibility.getInfo();
+		this.visibilityWarn = visibility.getWarn();
+		this.visibilityError = visibility.getError();
 	}
 
 	@Override
@@ -46,510 +58,450 @@ public class TinylogLogger implements LocationAwareLogger {
 
 	@Override
 	public boolean isTraceEnabled() {
-		OutputDetails outputDetails = visibility.getTrace();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(null, Level.TRACE);
+		return visibilityTrace != OutputDetails.DISABLED && isEnabled(null, Level.TRACE);
 	}
 
 	@Override
 	public boolean isTraceEnabled(Marker marker) {
-		OutputDetails outputDetails = visibility.getTrace();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(marker, Level.TRACE);
+		return visibilityTrace != OutputDetails.DISABLED && isEnabled(marker, Level.TRACE);
 	}
 
 	@Override
 	public void trace(String message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, null, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, null, Level.TRACE, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(String message, Object argument) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, null, Level.TRACE, null, message, argument);
 		}
 	}
 
 	@Override
 	public void trace(String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, null, Level.TRACE, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, null, Level.TRACE, null, message, arguments);
 		}
 	}
 
 	@Override
 	public void trace(Marker marker, String message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, marker, Level.TRACE, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(Marker marker, String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, marker, Level.TRACE, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void trace(Marker marker, String message, Object argument) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, marker, Level.TRACE, null, message, argument);
 		}
 	}
 
 	@Override
 	public void trace(Marker marker, String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, marker, Level.TRACE, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void trace(Marker marker, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityTrace).get();
 			issueLogEntry(location, marker, Level.TRACE, null, message, arguments);
 		}
 	}
 
 	@Override
 	public boolean isDebugEnabled() {
-		OutputDetails outputDetails = visibility.getDebug();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(null, Level.DEBUG);
+		return visibilityDebug != OutputDetails.DISABLED && isEnabled(null, Level.DEBUG);
 	}
 
 	@Override
 	public boolean isDebugEnabled(Marker marker) {
-		OutputDetails outputDetails = visibility.getDebug();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(marker, Level.DEBUG);
+		return visibilityDebug != OutputDetails.DISABLED && isEnabled(marker, Level.DEBUG);
 	}
 
 	@Override
 	public void debug(String message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, null, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, null, Level.DEBUG, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(String message, Object argument) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, null, Level.DEBUG, null, message, argument);
 		}
 	}
 
 	@Override
 	public void debug(String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, null, Level.DEBUG, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, null, Level.DEBUG, null, message, arguments);
 		}
 	}
 
 	@Override
 	public void debug(Marker marker, String message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, marker, Level.DEBUG, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(Marker marker, String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, marker, Level.DEBUG, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void debug(Marker marker, String message, Object argument) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, marker, Level.DEBUG, null, message, argument);
 		}
 	}
 
 	@Override
 	public void debug(Marker marker, String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, marker, Level.DEBUG, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void debug(Marker marker, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityDebug).get();
 			issueLogEntry(location, marker, Level.DEBUG, null, message, arguments);
 		}
 	}
 
 	@Override
 	public boolean isInfoEnabled() {
-		OutputDetails outputDetails = visibility.getInfo();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(null, Level.INFO);
+		return visibilityInfo != OutputDetails.DISABLED && isEnabled(null, Level.INFO);
 	}
 
 	@Override
 	public boolean isInfoEnabled(Marker marker) {
-		OutputDetails outputDetails = visibility.getInfo();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(marker, Level.INFO);
+		return visibilityInfo != OutputDetails.DISABLED && isEnabled(marker, Level.INFO);
 	}
 
 	@Override
 	public void info(String message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, null, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, null, Level.INFO, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(String message, Object argument) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, null, Level.INFO, null, message, argument);
 		}
 	}
 
 	@Override
 	public void info(String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, null, Level.INFO, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, null, Level.INFO, null, message, arguments);
 		}
 	}
 
 	@Override
 	public void info(Marker marker, String message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, marker, Level.INFO, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(Marker marker, String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, marker, Level.INFO, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void info(Marker marker, String message, Object argument) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, marker, Level.INFO, null, message, argument);
 		}
 	}
 
 	@Override
 	public void info(Marker marker, String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, marker, Level.INFO, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void info(Marker marker, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityInfo).get();
 			issueLogEntry(location, marker, Level.INFO, null, message, arguments);
 		}
 	}
 
 	@Override
 	public boolean isWarnEnabled() {
-		OutputDetails outputDetails = visibility.getWarn();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(null, Level.WARN);
+		return visibilityWarn != OutputDetails.DISABLED && isEnabled(null, Level.WARN);
 	}
 
 	@Override
 	public boolean isWarnEnabled(Marker marker) {
-		OutputDetails outputDetails = visibility.getWarn();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(marker, Level.WARN);
+		return visibilityWarn != OutputDetails.DISABLED && isEnabled(marker, Level.WARN);
 	}
 
 	@Override
 	public void warn(String message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, null, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, null, Level.WARN, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(String message, Object argument) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, null, Level.WARN, null, message, argument);
 		}
 	}
 
 	@Override
 	public void warn(String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, null, Level.WARN, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, null, Level.WARN, null, message, arguments);
 		}
 	}
 
 	@Override
 	public void warn(Marker marker, String message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, marker, Level.WARN, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(Marker marker, String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, marker, Level.WARN, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void warn(Marker marker, String message, Object argument) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, marker, Level.WARN, null, message, argument);
 		}
 	}
 
 	@Override
 	public void warn(Marker marker, String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, marker, Level.WARN, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void warn(Marker marker, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityWarn).get();
 			issueLogEntry(location, marker, Level.WARN, null, message, arguments);
 		}
 	}
 
 	@Override
 	public boolean isErrorEnabled() {
-		OutputDetails outputDetails = visibility.getError();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(null, Level.ERROR);
+		return visibilityError != OutputDetails.DISABLED && isEnabled(null, Level.ERROR);
 	}
 
 	@Override
 	public boolean isErrorEnabled(Marker marker) {
-		OutputDetails outputDetails = visibility.getError();
-		return outputDetails != OutputDetails.DISABLED && isEnabled(marker, Level.ERROR);
+		return visibilityError != OutputDetails.DISABLED && isEnabled(marker, Level.ERROR);
 	}
 
 	@Override
 	public void error(String message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, null, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, null, Level.ERROR, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(String message, Object argument) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, null, Level.ERROR, null, message, argument);
 		}
 	}
 
 	@Override
 	public void error(String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, null, Level.ERROR, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, null, Level.ERROR, null, message, arguments);
 		}
 	}
 
 	@Override
 	public void error(Marker marker, String message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, marker, Level.ERROR, null, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(Marker marker, String message, Throwable throwable) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, marker, Level.ERROR, throwable, message, (Object[]) null);
 		}
 	}
 
 	@Override
 	public void error(Marker marker, String message, Object argument) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, marker, Level.ERROR, null, message, argument);
 		}
 	}
 
 	@Override
 	public void error(Marker marker, String message, Object arg1, Object arg2) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, marker, Level.ERROR, null, message, arg1, arg2);
 		}
 	}
 
 	@Override
 	public void error(Marker marker, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Object location = getDirectCaller(outputDetails).get();
+		if (visibilityError != OutputDetails.DISABLED) {
+			Object location = getDirectCaller(visibilityError).get();
 			issueLogEntry(location, marker, Level.ERROR, null, message, arguments);
 		}
 	}

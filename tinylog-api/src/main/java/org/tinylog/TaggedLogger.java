@@ -19,8 +19,13 @@ public final class TaggedLogger {
 	private final String tag;
 	private final RuntimeFlavor runtime;
 	private final LoggingBackend backend;
-	private final LevelVisibility visibility;
 	private final MessageFormatter formatter;
+
+	private final OutputDetails visibilityTrace;
+	private final OutputDetails visibilityDebug;
+	private final OutputDetails visibilityInfo;
+	private final OutputDetails visibilityWarn;
+	private final OutputDetails visibilityError;
 
 	/**
 	 * @param tag The case-sensitive category tag for the logger (can be {@code null})
@@ -30,8 +35,15 @@ public final class TaggedLogger {
 		this.tag = tag;
 		this.runtime = framework.getRuntime();
 		this.backend = framework.getLoggingBackend();
-		this.visibility = backend.getLevelVisibilityByTag(tag);
 		this.formatter = new EnhancedMessageFormatter(framework);
+
+		LevelVisibility visibility = backend.getLevelVisibilityByTag(tag);
+
+		this.visibilityTrace = visibility.getTrace();
+		this.visibilityDebug = visibility.getDebug();
+		this.visibilityInfo = visibility.getInfo();
+		this.visibilityWarn = visibility.getWarn();
+		this.visibilityError = visibility.getError();
 	}
 
 	/**
@@ -54,9 +66,8 @@ public final class TaggedLogger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public boolean isTraceEnabled() {
-		OutputDetails outputDetails = visibility.getTrace();
-		return outputDetails != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.TRACE);
+		return visibilityTrace != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(visibilityTrace), tag, Level.TRACE);
 	}
 
 	/**
@@ -75,9 +86,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void trace(Object message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, null, message, null, null);
 		}
 	}
@@ -99,9 +109,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void trace(Supplier<?> message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, null, message, null, null);
 		}
 	}
@@ -124,9 +133,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void trace(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
@@ -150,9 +158,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void trace(String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, null, message, arguments, formatter);
 		}
 	}
@@ -168,9 +175,8 @@ public final class TaggedLogger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public void trace(Throwable exception) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, exception, null, null, null);
 		}
 	}
@@ -188,9 +194,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void trace(Throwable exception, String message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, exception, message, null, null);
 		}
 	}
@@ -213,9 +218,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void trace(Throwable exception, Supplier<String> message) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, exception, message, null, null);
 		}
 	}
@@ -240,9 +244,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void trace(Throwable exception, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
@@ -268,9 +271,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void trace(Throwable exception, String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getTrace();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityTrace != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
 			backend.log(location.get(), tag, Level.TRACE, exception, message, arguments, formatter);
 		}
 	}
@@ -286,9 +288,8 @@ public final class TaggedLogger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public boolean isDebugEnabled() {
-		OutputDetails outputDetails = visibility.getDebug();
-		return outputDetails != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.DEBUG);
+		return visibilityDebug != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(visibilityDebug), tag, Level.DEBUG);
 	}
 
 	/**
@@ -307,9 +308,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void debug(Object message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, null, message, null, null);
 		}
 	}
@@ -331,9 +331,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void debug(Supplier<?> message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, null, message, null, null);
 		}
 	}
@@ -356,9 +355,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void debug(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
@@ -382,9 +380,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void debug(String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, null, message, arguments, formatter);
 		}
 	}
@@ -400,9 +397,8 @@ public final class TaggedLogger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public void debug(Throwable exception) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, exception, null, null, null);
 		}
 	}
@@ -420,9 +416,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void debug(Throwable exception, String message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, exception, message, null, null);
 		}
 	}
@@ -445,9 +440,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void debug(Throwable exception, Supplier<String> message) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, exception, message, null, null);
 		}
 	}
@@ -472,9 +466,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void debug(Throwable exception, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
@@ -500,9 +493,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void debug(Throwable exception, String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getDebug();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityDebug != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
 			backend.log(location.get(), tag, Level.DEBUG, exception, message, arguments, formatter);
 		}
 	}
@@ -518,9 +510,8 @@ public final class TaggedLogger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public boolean isInfoEnabled() {
-		OutputDetails outputDetails = visibility.getInfo();
-		return outputDetails != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.INFO);
+		return visibilityInfo != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(visibilityInfo), tag, Level.INFO);
 	}
 
 	/**
@@ -539,9 +530,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void info(Object message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, null, message, null, null);
 		}
 	}
@@ -563,9 +553,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void info(Supplier<?> message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, null, message, null, null);
 		}
 	}
@@ -588,9 +577,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void info(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, null, message, arguments, formatter);
 		}
 	}
@@ -614,9 +602,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void info(String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, null, message, arguments, formatter);
 		}
 	}
@@ -632,9 +619,8 @@ public final class TaggedLogger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public void info(Throwable exception) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, exception, null, null, null);
 		}
 	}
@@ -652,9 +638,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void info(Throwable exception, String message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, exception, message, null, null);
 		}
 	}
@@ -677,9 +662,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void info(Throwable exception, Supplier<String> message) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, exception, message, null, null);
 		}
 	}
@@ -704,9 +688,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void info(Throwable exception, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
@@ -732,9 +715,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void info(Throwable exception, String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getInfo();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityInfo != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
 			backend.log(location.get(), tag, Level.INFO, exception, message, arguments, formatter);
 		}
 	}
@@ -750,9 +732,8 @@ public final class TaggedLogger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public boolean isWarnEnabled() {
-		OutputDetails outputDetails = visibility.getWarn();
-		return outputDetails != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.WARN);
+		return visibilityWarn != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(visibilityWarn), tag, Level.WARN);
 	}
 
 	/**
@@ -771,9 +752,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void warn(Object message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, null, message, null, null);
 		}
 	}
@@ -795,9 +775,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void warn(Supplier<?> message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, null, message, null, null);
 		}
 	}
@@ -820,9 +799,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void warn(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, null, message, arguments, formatter);
 		}
 	}
@@ -846,9 +824,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void warn(String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, null, message, arguments, formatter);
 		}
 	}
@@ -864,9 +841,8 @@ public final class TaggedLogger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public void warn(Throwable exception) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, exception, null, null, null);
 		}
 	}
@@ -884,9 +860,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void warn(Throwable exception, String message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, exception, message, null, null);
 		}
 	}
@@ -909,9 +884,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void warn(Throwable exception, Supplier<String> message) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, exception, message, null, null);
 		}
 	}
@@ -936,9 +910,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void warn(Throwable exception, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
@@ -964,9 +937,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void warn(Throwable exception, String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getWarn();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityWarn != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
 			backend.log(location.get(), tag, Level.WARN, exception, message, arguments, formatter);
 		}
 	}
@@ -982,9 +954,8 @@ public final class TaggedLogger {
 	 * @return {@code true} if enabled, otherwise {@code false}
 	 */
 	public boolean isErrorEnabled() {
-		OutputDetails outputDetails = visibility.getError();
-		return outputDetails != OutputDetails.DISABLED
-			&& backend.isEnabled(runtime.getDirectCaller(outputDetails), tag, Level.ERROR);
+		return visibilityError != OutputDetails.DISABLED
+			&& backend.isEnabled(runtime.getDirectCaller(visibilityError), tag, Level.ERROR);
 	}
 
 	/**
@@ -1003,9 +974,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void error(Object message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, null, message, null, null);
 		}
 	}
@@ -1027,9 +997,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void error(Supplier<?> message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, null, message, null, null);
 		}
 	}
@@ -1052,9 +1021,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void error(String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
@@ -1078,9 +1046,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void error(String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, null, message, arguments, formatter);
 		}
 	}
@@ -1096,9 +1063,8 @@ public final class TaggedLogger {
 	 * @param exception The exception or other kind of throwable to log
 	 */
 	public void error(Throwable exception) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, exception, null, null, null);
 		}
 	}
@@ -1116,9 +1082,8 @@ public final class TaggedLogger {
 	 * @param message The message to log
 	 */
 	public void error(Throwable exception, String message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, exception, message, null, null);
 		}
 	}
@@ -1141,9 +1106,8 @@ public final class TaggedLogger {
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
 	public void error(Throwable exception, Supplier<String> message) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, exception, message, null, null);
 		}
 	}
@@ -1168,9 +1132,8 @@ public final class TaggedLogger {
 	 * @param arguments The real values for the placeholders
 	 */
 	public void error(Throwable exception, String message, Object... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}
@@ -1196,9 +1159,8 @@ public final class TaggedLogger {
 	 * @param arguments Lazy suppliers for the real values for the placeholders
 	 */
 	public void error(Throwable exception, String message, Supplier<?>... arguments) {
-		OutputDetails outputDetails = visibility.getError();
-		if (outputDetails != OutputDetails.DISABLED) {
-			Supplier<?> location = runtime.getDirectCaller(outputDetails);
+		if (visibilityError != OutputDetails.DISABLED) {
+			Supplier<?> location = runtime.getDirectCaller(visibilityError);
 			backend.log(location.get(), tag, Level.ERROR, exception, message, arguments, formatter);
 		}
 	}

@@ -1,17 +1,16 @@
 package org.tinylog.kotlin
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.MockedStatic
-import org.mockito.Mockito
 import org.mockito.Mockito.atMostOnce
 import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isA
@@ -29,50 +28,54 @@ import org.tinylog.core.backend.LevelVisibility
 import org.tinylog.core.backend.LoggingBackend
 import org.tinylog.core.backend.OutputDetails
 import org.tinylog.core.format.message.EnhancedMessageFormatter
-import org.tinylog.core.test.log.CaptureLogEntries
+import org.tinylog.core.test.isolate.IsolatedExecution
 import java.util.function.Supplier
 
+@IsolatedExecution(classes = [Logger::class, TaggedLogger::class])
 internal class LoggerTest {
-	companion object {
-		private lateinit var tinylogMock: MockedStatic<Tinylog>
-		private lateinit var backend: LoggingBackend
-		private lateinit var visibility: LevelVisibility
+	private lateinit var tinylogMock: MockedStatic<Tinylog>
+	private lateinit var backend: LoggingBackend
+	private lateinit var visibility: LevelVisibility
 
-		/**
-		 * Initializes all mocks.
-		 */
-		@BeforeAll
-		@JvmStatic
-		fun create() {
-			tinylogMock = mockStatic(Tinylog::class.java)
-			backend = mock()
-			visibility = mock()
-			
-			tinylogMock.`when`<Framework> {
-				Tinylog.getFramework()
-			}.thenReturn(object : Framework(false, false) {
-				override fun getLoggingBackend() = backend
-			})
-			
-			whenever(backend.getLevelVisibilityByTag(null)).thenReturn(visibility)
-		}
+	/**
+	 * Initializes all mocks.
+	 */
+	@BeforeEach
+	fun create() {
+		tinylogMock = mockStatic(Tinylog::class.java)
+		backend = mock()
 
-		/**
-		 * Restores the mocked tinylog class.
-		 */
-		@AfterAll
-		@JvmStatic
-		fun dispose() {
-			tinylogMock.close()
+		tinylogMock.`when`<Framework> {
+			Tinylog.getFramework()
+		}.thenReturn(object : Framework(false, false) {
+			override fun getLoggingBackend() = backend
+		})
+
+		visibility = mock()
+		whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
+		whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
+		whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
+		whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
+		whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
+
+		val visibilityForTags = mock<LevelVisibility>()
+		whenever(visibilityForTags.trace).thenReturn(OutputDetails.DISABLED)
+		whenever(visibilityForTags.debug).thenReturn(OutputDetails.DISABLED)
+		whenever(visibilityForTags.info).thenReturn(OutputDetails.DISABLED)
+		whenever(visibilityForTags.warn).thenReturn(OutputDetails.DISABLED)
+		whenever(visibilityForTags.error).thenReturn(OutputDetails.DISABLED)
+
+		whenever(backend.getLevelVisibilityByTag(anyOrNull())).thenAnswer {
+			if (it.getArgument<Any?>(0) == null) visibility else visibilityForTags
 		}
 	}
 
 	/**
-	 * Resets the logging backend and level visibility mocks.
+	 * Restores the mocked tinylog class.
 	 */
 	@AfterEach
-	fun reset() {
-		Mockito.reset(backend, visibility)
+	fun dispose() {
+		tinylogMock.close()
 	}
 
 	/**
@@ -256,7 +259,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceObjectMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -268,7 +270,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceTextMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -280,7 +281,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceLazyMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -292,7 +292,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceFormattedMessageWithArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -304,7 +303,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceFormattedMessageWithLazyArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -316,7 +314,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceException() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -329,7 +326,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceExceptionAndTextMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -342,7 +338,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceExceptionAndLazyMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -355,7 +350,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -369,7 +363,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(level = Level.TRACE)
 			@Test
 			fun traceExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -382,7 +375,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugObjectMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -394,7 +386,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugTextMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -406,7 +397,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugLazyMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -418,7 +408,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugFormattedMessageWithArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -430,7 +419,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugFormattedMessageWithLazyArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -442,7 +430,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugException() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -455,7 +442,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugExceptionAndTextMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -468,7 +454,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugExceptionAndLazyMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -481,7 +466,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -495,7 +479,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun debugExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -508,7 +491,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoObjectMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -520,7 +502,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoTextMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -532,7 +513,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoLazyMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -544,7 +524,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoFormattedMessageWithArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -556,7 +535,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoFormattedMessageWithLazyArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -568,7 +546,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoException() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -581,7 +558,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoExceptionAndTextMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -594,7 +570,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoExceptionAndLazyMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -607,7 +582,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -621,7 +595,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun infoExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -634,7 +607,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnObjectMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -646,7 +618,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnTextMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -658,7 +629,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnLazyMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -670,7 +640,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnFormattedMessageWithArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -682,7 +651,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnFormattedMessageWithLazyArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -694,7 +662,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnException() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -707,7 +674,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnExceptionAndTextMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -720,7 +686,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnExceptionAndLazyMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -733,7 +698,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -747,7 +711,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun warnExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -760,7 +723,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an object can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorObjectMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -772,7 +734,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorTextMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -784,7 +745,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorLazyMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -796,7 +756,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorFormattedMessageWithArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -808,7 +767,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with a message with placeholders and lazy arguments can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorFormattedMessageWithLazyArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -820,7 +778,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorException() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -833,7 +790,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a plain text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorExceptionAndTextMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -846,7 +802,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a lazy text message can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorExceptionAndLazyMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -859,7 +814,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception and a message with placeholders can be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -873,7 +827,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments can
 			 * be issued.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun errorExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
@@ -963,7 +916,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an object is discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceObjectMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -976,7 +928,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceTextMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -989,7 +940,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with a lazy text message is discarded if the trace severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceLazyMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1002,7 +952,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with a message with placeholders is discarded if the trace severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceFormattedMessageWithArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1015,7 +964,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with a message with placeholders and lazy arguments is discarded if the
 			 * trace severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceFormattedMessageWithLazyArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1027,7 +975,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a trace log entry with an exception is discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceException() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1040,7 +987,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with an exception and a plain text message is discarded if the trace
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceExceptionAndTextMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1053,7 +999,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with an exception and a lazy text message is discarded if the trace
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceExceptionAndLazyMessage() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1066,7 +1011,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders is discarded if the
 			 * trace severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1079,7 +1023,6 @@ internal class LoggerTest {
 			 * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the trace severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
 			fun traceExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -1091,7 +1034,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an object is discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugObjectMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1104,7 +1046,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with a plain text message is discarded if the debug severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugTextMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1117,7 +1058,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with a lazy text message is discarded if the debug severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugLazyMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1130,7 +1070,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with a message with placeholders is discarded if the debug severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugFormattedMessageWithArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1143,7 +1082,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with a message with placeholders and lazy arguments is discarded if the
 			 * debug severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugFormattedMessageWithLazyArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1155,7 +1093,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a debug log entry with an exception is discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugException() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1168,7 +1105,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with an exception and a plain text message is discarded if the debug
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugExceptionAndTextMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1181,7 +1117,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with an exception and a lazy text message is discarded if the debug
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugExceptionAndLazyMessage() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1194,7 +1129,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders is discarded if the
 			 * debug severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1207,7 +1141,6 @@ internal class LoggerTest {
 			 * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the debug severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.INFO)
 			@Test
 			fun debugExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
@@ -1219,7 +1152,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an object is discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoObjectMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1232,7 +1164,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with a plain text message is discarded if the info severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoTextMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1245,7 +1176,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with a lazy text message is discarded if the info severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoLazyMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1258,7 +1188,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with a message with placeholders is discarded if the info severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoFormattedMessageWithArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1271,7 +1200,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with a message with placeholders and lazy arguments is discarded if the
 			 * info severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoFormattedMessageWithLazyArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1283,7 +1211,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an info log entry with an exception is discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoException() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1296,7 +1223,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with an exception and a plain text message is discarded if the info
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoExceptionAndTextMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1309,7 +1235,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with an exception and a lazy text message is discarded if the info
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoExceptionAndLazyMessage() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1322,7 +1247,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders is discarded if the
 			 * info severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1335,7 +1259,6 @@ internal class LoggerTest {
 			 * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the info severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.WARN)
 			@Test
 			fun infoExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
@@ -1347,7 +1270,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an object is discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnObjectMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1360,7 +1282,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with a plain text message is discarded if the warn severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnTextMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1373,7 +1294,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with a lazy text message is discarded if the warn severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnLazyMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1386,7 +1306,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with a message with placeholders is discarded if the warn severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnFormattedMessageWithArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1399,7 +1318,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with a message with placeholders and lazy arguments is discarded if the
 			 * warn severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnFormattedMessageWithLazyArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1411,7 +1329,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that a warning log entry with an exception is discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnException() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1424,7 +1341,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with an exception and a plain text message is discarded if the warn
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnExceptionAndTextMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1437,7 +1353,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with an exception and a lazy text message is discarded if the warn
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnExceptionAndLazyMessage() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1450,7 +1365,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders is discarded if the
 			 * warn severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1463,7 +1377,6 @@ internal class LoggerTest {
 			 * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the warn severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.ERROR)
 			@Test
 			fun warnExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
@@ -1475,7 +1388,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an object is discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorObjectMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1488,7 +1400,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with a plain text message is discarded if the error severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorTextMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1501,7 +1412,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with a lazy text message is discarded if the error severity level is
 			 * disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorLazyMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1514,7 +1424,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with a message with placeholders is discarded if the error severity level
 			 * is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorFormattedMessageWithArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1527,7 +1436,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with a message with placeholders and lazy arguments is discarded if the
 			 * error severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorFormattedMessageWithLazyArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1539,7 +1447,6 @@ internal class LoggerTest {
 			/**
 			 * Verifies that an error log entry with an exception is discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorException() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1552,7 +1459,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with an exception and a plain text message is discarded if the error
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorExceptionAndTextMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1565,7 +1471,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with an exception and a lazy text message is discarded if the error
 			 * severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorExceptionAndLazyMessage() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1578,7 +1483,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders is discarded if the
 			 * error severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorExceptionAndFormattedMessageWithArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
@@ -1591,7 +1495,6 @@ internal class LoggerTest {
 			 * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments is
 			 * discarded if the error severity level is disabled.
 			 */
-			@CaptureLogEntries(level = Level.OFF)
 			@Test
 			fun errorExceptionAndFormattedMessageWithLazyArgument() {
 				whenever(visibility.error).thenReturn(OutputDetails.DISABLED)

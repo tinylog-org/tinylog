@@ -5,11 +5,11 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
@@ -22,7 +22,6 @@ import org.tinylog.core.test.log.LogEntry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 class TaggedLoggerTest {
@@ -60,7 +59,7 @@ class TaggedLoggerTest {
 	/**
 	 * Tests for severity levels.
 	 */
-	@ExtendWith(MockitoExtension.class)
+	@MockitoSettings(strictness = Strictness.LENIENT)
 	@Nested
 	class Levels {
 
@@ -104,7 +103,7 @@ class TaggedLoggerTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -138,7 +137,7 @@ class TaggedLoggerTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -172,7 +171,7 @@ class TaggedLoggerTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -206,7 +205,7 @@ class TaggedLoggerTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -240,7 +239,7 @@ class TaggedLoggerTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
 
 			TaggedLogger logger = new TaggedLogger("test", framework);
 			assertThat(logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);

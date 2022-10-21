@@ -10,6 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -26,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.tinylog.core.test.mockito.MockitoMatchers.isStackTraceElement;
@@ -38,7 +39,7 @@ class TinylogLoggerWithMarkersTest {
 	/**
 	 * Tests for severity levels.
 	 */
-	@ExtendWith(MockitoExtension.class)
+	@MockitoSettings(strictness = Strictness.LENIENT)
 	@Nested
 	class Levels {
 
@@ -82,7 +83,7 @@ class TinylogLoggerWithMarkersTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("bar"), eq(Level.TRACE))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("bar"), eq(Level.TRACE))).thenReturn(enabled);
 
 			TinylogLogger logger = new TinylogLogger("Foo", framework);
 			assertThat(logger.isTraceEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -116,7 +117,7 @@ class TinylogLoggerWithMarkersTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("bar"), eq(Level.DEBUG))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("bar"), eq(Level.DEBUG))).thenReturn(enabled);
 
 			TinylogLogger logger = new TinylogLogger("Foo", framework);
 			assertThat(logger.isDebugEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -150,7 +151,7 @@ class TinylogLoggerWithMarkersTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("bar"), eq(Level.INFO))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("bar"), eq(Level.INFO))).thenReturn(enabled);
 
 			TinylogLogger logger = new TinylogLogger("Foo", framework);
 			assertThat(logger.isInfoEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -184,7 +185,7 @@ class TinylogLoggerWithMarkersTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("bar"), eq(Level.WARN))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("bar"), eq(Level.WARN))).thenReturn(enabled);
 
 			TinylogLogger logger = new TinylogLogger("Foo", framework);
 			assertThat(logger.isWarnEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -218,7 +219,7 @@ class TinylogLoggerWithMarkersTest {
 				)
 			);
 
-			lenient().when(backend.isEnabled(notNull(), eq("bar"), eq(Level.ERROR))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), eq("bar"), eq(Level.ERROR))).thenReturn(enabled);
 
 			TinylogLogger logger = new TinylogLogger("Foo", framework);
 			assertThat(logger.isErrorEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
@@ -1350,7 +1351,7 @@ class TinylogLoggerWithMarkersTest {
 					StackTraceInformation.class.getName(),
 					"infoLogWithFullStackTraceInformation",
 					TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-					1346
+					1347
 				),
 				eq("bar"),
 				eq(Level.INFO),
@@ -1429,7 +1430,7 @@ class TinylogLoggerWithMarkersTest {
 					StackTraceInformation.class.getName(),
 					"genericLogWithFullStackTraceInformation",
 					TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-					1418
+					1419
 				),
 				eq("bar"),
 				eq(Level.INFO),

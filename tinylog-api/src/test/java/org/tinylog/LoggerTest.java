@@ -2,15 +2,13 @@ package org.tinylog;
 
 import java.util.function.Supplier;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.Tinylog;
@@ -18,36 +16,37 @@ import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
+import org.tinylog.core.test.isolate.IsolatedExecution;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@IsolatedExecution(classes = { Logger.class, TaggedLogger.class })
 class LoggerTest {
 
-	private static MockedStatic<Tinylog> tinylogMock;
-	private static LoggingBackend backend;
-	private static LevelVisibility visibility;
+	private MockedStatic<Tinylog> tinylogMock;
+	private LoggingBackend backend;
+	private LevelVisibility visibility;
 
 	/**
 	 * Initializes all mocks.
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
-	@BeforeAll
-	static void create() {
+	@BeforeEach
+	void init() {
 		tinylogMock = mockStatic(Tinylog.class);
 		backend = mock(LoggingBackend.class);
-		visibility = mock(LevelVisibility.class);
 
 		tinylogMock.when(Tinylog::getFramework).thenReturn(new Framework(false, false) {
 			@Override
@@ -56,22 +55,29 @@ class LoggerTest {
 			}
 		});
 
-		when(backend.getLevelVisibilityByTag(null)).thenReturn(visibility);
-	}
+		visibility = mock(LevelVisibility.class);
+		when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+		when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+		when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+		when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+		when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
 
-	/**
-	 * Resets the logging backend and level visibility mocks.
-	 */
-	@AfterEach
-	void reset() {
-		Mockito.reset(backend, visibility);
+		LevelVisibility visibilityForTags = mock(LevelVisibility.class);
+		when(visibilityForTags.getTrace()).thenReturn(OutputDetails.DISABLED);
+		when(visibilityForTags.getDebug()).thenReturn(OutputDetails.DISABLED);
+		when(visibilityForTags.getInfo()).thenReturn(OutputDetails.DISABLED);
+		when(visibilityForTags.getWarn()).thenReturn(OutputDetails.DISABLED);
+		when(visibilityForTags.getError()).thenReturn(OutputDetails.DISABLED);
+
+		when(backend.getLevelVisibilityByTag(any()))
+			.thenAnswer(answer -> answer.getArgument(0) == null ? visibility : visibilityForTags);
 	}
 
 	/**
 	 * Restores the mocked tinylog class.
 	 */
-	@AfterAll
-	static void dispose() {
+	@AfterEach
+	void reset() {
 		tinylogMock.close();
 	}
 
@@ -147,7 +153,7 @@ class LoggerTest {
 		})
 		void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(visibility.getTrace()).thenReturn(outputDetails);
-			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled);
 
 			assertThat(Logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
@@ -171,7 +177,7 @@ class LoggerTest {
 		})
 		void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(visibility.getDebug()).thenReturn(outputDetails);
-			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled);
 
 			assertThat(Logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
@@ -195,7 +201,7 @@ class LoggerTest {
 		})
 		void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(visibility.getInfo()).thenReturn(outputDetails);
-			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled);
 
 			assertThat(Logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
@@ -219,7 +225,7 @@ class LoggerTest {
 		})
 		void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(visibility.getWarn()).thenReturn(outputDetails);
-			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled);
 
 			assertThat(Logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
@@ -243,7 +249,7 @@ class LoggerTest {
 		})
 		void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
 			when(visibility.getError()).thenReturn(outputDetails);
-			lenient().when(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled);
+			when(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled);
 
 			assertThat(Logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
 		}
