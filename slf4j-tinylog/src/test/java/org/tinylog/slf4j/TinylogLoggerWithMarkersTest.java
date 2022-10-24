@@ -344,7 +344,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.TRACE)
 			@Test
-			void logTraceInfoEntry() {
+			void logGenericTraceEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -355,6 +355,26 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume())
+					.containsExactly(createLogEntry(Level.TRACE, "Oops Alice and Bob!", exception));
+			}
+
+			/**
+			 * Verifies that a full trace log entry can be issued via the event log method.
+			 */
+			@CaptureLogEntries(level = Level.TRACE)
+			@Test
+			void logEventTraceEntry() {
+				Exception exception = new Exception();
+
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.TRACE)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(exception)
+					.log();
 
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.TRACE, "Oops Alice and Bob!", exception));
@@ -445,7 +465,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
-			void logDebugInfoEntry() {
+			void logGenericDebugEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -456,6 +476,26 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume())
+					.containsExactly(createLogEntry(Level.DEBUG, "Oops Alice and Bob!", exception));
+			}
+
+			/**
+			 * Verifies that a full debug log entry can be issued via the event log method.
+			 */
+			@CaptureLogEntries(level = Level.DEBUG)
+			@Test
+			void logEventDebugEntry() {
+				Exception exception = new Exception();
+
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(exception)
+					.log();
 
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.DEBUG, "Oops Alice and Bob!", exception));
@@ -546,7 +586,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.INFO)
 			@Test
-			void logFullInfoEntry() {
+			void logGenericInfoEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -557,6 +597,26 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume())
+					.containsExactly(createLogEntry(Level.INFO, "Oops Alice and Bob!", exception));
+			}
+
+			/**
+			 * Verifies that a full info log entry can be issued via the event log method.
+			 */
+			@CaptureLogEntries(level = Level.INFO)
+			@Test
+			void logEventInfoEntry() {
+				Exception exception = new Exception();
+
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(exception)
+					.log();
 
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.INFO, "Oops Alice and Bob!", exception));
@@ -647,7 +707,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.WARN)
 			@Test
-			void logFullWarningEntry() {
+			void logGenericWarningEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -658,6 +718,26 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume())
+					.containsExactly(createLogEntry(Level.WARN, "Oops Alice and Bob!", exception));
+			}
+
+			/**
+			 * Verifies that a warning error log entry can be issued via the event log method.
+			 */
+			@CaptureLogEntries(level = Level.WARN)
+			@Test
+			void logEventWarningEntry() {
+				Exception exception = new Exception();
+
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.WARN)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(exception)
+					.log();
 
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.WARN, "Oops Alice and Bob!", exception));
@@ -748,7 +828,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.ERROR)
 			@Test
-			void logFullErrorEntry() {
+			void logGenericErrorEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -759,6 +839,26 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume())
+					.containsExactly(createLogEntry(Level.ERROR, "Oops Alice and Bob!", exception));
+			}
+
+			/**
+			 * Verifies that a full error log entry can be issued via the event log method.
+			 */
+			@CaptureLogEntries(level = Level.ERROR)
+			@Test
+			void logEventErrorEntry() {
+				Exception exception = new Exception();
+
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.ERROR)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(exception)
+					.log();
 
 				assertThat(log.consume())
 					.containsExactly(createLogEntry(Level.ERROR, "Oops Alice and Bob!", exception));
@@ -867,7 +967,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.DEBUG)
 			@Test
-			void logFullTraceEntry() {
+			void logGenericTraceEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -878,6 +978,24 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume()).isEmpty();
+			}
+
+			/**
+			 * Verifies that a trace log entry issued via the event log method is discarded if the trace severity
+			 * level is disabled.
+			 */
+			@CaptureLogEntries(level = Level.DEBUG)
+			@Test
+			void logEventTraceEntry() {
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.TRACE)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(new Exception())
+					.log();
 
 				assertThat(log.consume()).isEmpty();
 			}
@@ -965,7 +1083,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.INFO)
 			@Test
-			void logFullDebugEntry() {
+			void logGenericDebugEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -976,6 +1094,24 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume()).isEmpty();
+			}
+
+			/**
+			 * Verifies that a debug log entry issued via the event log method is discarded if the debug severity
+			 * level is disabled.
+			 */
+			@CaptureLogEntries(level = Level.INFO)
+			@Test
+			void logEventDebugEntry() {
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(new Exception())
+					.log();
 
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1063,7 +1199,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.WARN)
 			@Test
-			void logFullInfoEntry() {
+			void logGenericInfoEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -1074,6 +1210,24 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume()).isEmpty();
+			}
+
+			/**
+			 * Verifies that an info log entry issued via the event log method is discarded if the info severity level
+			 * is disabled.
+			 */
+			@CaptureLogEntries(level = Level.WARN)
+			@Test
+			void logEventInfoEntry() {
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(new Exception())
+					.log();
 
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1161,7 +1315,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.ERROR)
 			@Test
-			void logFullWarningEntry() {
+			void logGenericWarningEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -1172,6 +1326,24 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume()).isEmpty();
+			}
+
+			/**
+			 * Verifies that a warning log entry issued via the event log method is discarded if the warn severity
+			 * level is disabled.
+			 */
+			@CaptureLogEntries(level = Level.ERROR)
+			@Test
+			void logEventWarningEntry() {
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.WARN)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(new Exception())
+					.log();
 
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1259,7 +1431,7 @@ class TinylogLoggerWithMarkersTest {
 			 */
 			@CaptureLogEntries(level = Level.OFF)
 			@Test
-			void logFullErrorEntry() {
+			void logGenericErrorEntry() {
 				Exception exception = new Exception();
 
 				logger.log(
@@ -1270,6 +1442,24 @@ class TinylogLoggerWithMarkersTest {
 					new Object[] {"Alice", "Bob"},
 					exception
 				);
+
+				assertThat(log.consume()).isEmpty();
+			}
+
+			/**
+			 * Verifies that an error log entry issued via the event log method is discarded if the error severity
+			 * level is disabled.
+			 */
+			@CaptureLogEntries(level = Level.OFF)
+			@Test
+			void logEventErrorEntry() {
+				logger.makeLoggingEventBuilder(org.slf4j.event.Level.ERROR)
+					.addMarker(marker)
+					.setMessage("Oops {} and {}!")
+					.addArgument("Alice")
+					.addArgument("Bob")
+					.setCause(new Exception())
+					.log();
 
 				assertThat(log.consume()).isEmpty();
 			}
@@ -1351,7 +1541,7 @@ class TinylogLoggerWithMarkersTest {
 					StackTraceInformation.class.getName(),
 					"infoLogWithFullStackTraceInformation",
 					TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-					1347
+					1537
 				),
 				eq("bar"),
 				eq(Level.INFO),
@@ -1430,7 +1620,76 @@ class TinylogLoggerWithMarkersTest {
 					StackTraceInformation.class.getName(),
 					"genericLogWithFullStackTraceInformation",
 					TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-					1419
+					1609
+				),
+				eq("bar"),
+				eq(Level.INFO),
+				isNull(),
+				eq("Hello World!"),
+				isNull(),
+				isNull()
+			);
+		}
+
+		/**
+		 * Verifies that only the category name is passed as location object, if the severity level is enabled and
+		 * requires the caller class name.
+		 */
+		@Test
+		void eventLogWithCategoryOnly() {
+			when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			new TinylogLogger("Foo", framework)
+				.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
+				.addMarker(marker)
+				.log("Hello World!");
+
+			verify(backend).log(
+				"Foo",
+				"bar",
+				Level.INFO,
+				null,
+				"Hello World!",
+				null,
+				null
+			);
+		}
+
+		/**
+		 * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
+		 * and requires the full location information.
+		 */
+		@Test
+		void eventLogWithFullStackTraceInformation() {
+			when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
+				new LevelVisibility(
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED,
+					OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
+					OutputDetails.DISABLED,
+					OutputDetails.DISABLED
+				)
+			);
+
+			new TinylogLogger(TinylogLoggerWithMarkersTest.StackTraceInformation.class.getName(), framework)
+				.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
+				.addMarker(marker)
+				.log("Hello World!");
+
+			verify(backend).log(
+				isStackTraceElement(
+					StackTraceInformation.class.getName(),
+					"eventLogWithFullStackTraceInformation",
+					TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
+					1685
 				),
 				eq("bar"),
 				eq(Level.INFO),

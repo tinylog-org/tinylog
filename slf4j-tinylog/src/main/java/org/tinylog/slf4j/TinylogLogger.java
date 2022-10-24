@@ -1,10 +1,13 @@
 package org.tinylog.slf4j;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.slf4j.Marker;
+import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LocationAwareLogger;
+import org.slf4j.spi.LoggingEventAware;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
@@ -17,7 +20,7 @@ import org.tinylog.core.runtime.RuntimeFlavor;
 /**
  * SLF4J logger implementation for tinylog.
  */
-public class TinylogLogger implements LocationAwareLogger {
+public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
 
 	private static final String LOGGER_CLASS_NAME = TinylogLogger.class.getName();
 
@@ -517,6 +520,18 @@ public class TinylogLogger implements LocationAwareLogger {
 		}
 	}
 
+	@Override
+	public void log(LoggingEvent event) {
+		Level level = getLevel(event.getLevel().toInt());
+		OutputDetails outputDetails = visibility.get(level);
+		if (outputDetails != OutputDetails.DISABLED) {
+			Object location = getRelativeCaller(outputDetails).apply(event.getCallerBoundary());
+			List<Marker> markers = event.getMarkers();
+			Marker marker = markers == null || markers.isEmpty() ? null : markers.get(0);
+			issueLogEntry(location, marker, level, event.getThrowable(), event.getMessage(), event.getArgumentArray());
+		}
+	}
+
 	/**
 	 * Converts an SLF4J level code into a tinylog severity level.
 	 *
@@ -595,7 +610,7 @@ public class TinylogLogger implements LocationAwareLogger {
 			Object... arguments) {
 		String tag = marker == null ? null : marker.getName();
 		if (throwable == null) {
-			Object lastArgument = arguments != null && arguments.length > 0 ? arguments[arguments.length - 1] : null;
+			Object lastArgument = arguments == null || arguments.length == 0 ? null : arguments[arguments.length - 1];
 			throwable = lastArgument instanceof Throwable ? (Throwable) lastArgument : null;
 		}
 		backend.log(location, tag, level, throwable, message, arguments, arguments == null ? null : formatter);
