@@ -93,6 +93,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: tinylog-org/website
+          ref: v2
           ssh-key: ${{secrets.PRIVATE_KEY_FOR_WEBSITE_REPOSITORY}}
           path: website
 
