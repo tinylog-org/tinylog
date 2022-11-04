@@ -148,6 +148,10 @@ public class Framework {
 
 				loadLoggingBackend();
 
+				if (!"false".equalsIgnoreCase(configuration.getValue("auto-shutdown"))) {
+					Runtime.getRuntime().addShutdownHook(new Thread(this::shutDown, "tinylog-shutdown-thread"));
+				}
+
 				InternalLogger.debug(null, "Logging framework is up");
 			}
 		}

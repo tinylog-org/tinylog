@@ -7,8 +7,14 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 import org.tinylog.core.backend.BundleLoggingBackend;
 import org.tinylog.core.backend.InternalLoggingBackend;
 import org.tinylog.core.backend.LoggingBackend;
@@ -21,8 +27,11 @@ import org.tinylog.core.test.system.CaptureSystemOutput;
 import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -382,6 +391,69 @@ class FrameworkTest {
 			assertThat(framework.getConfiguration().isFrozen()).isFalse();
 			assertThat(framework.getLoggingBackend()).isNotNull();
 			assertThat(framework.getConfiguration().isFrozen()).isTrue();
+		}
+
+	}
+
+	/**
+	 * Tests for shutting down {@link Framework} via shutdown hook.
+	 */
+	@Nested
+	class AutoShutdown {
+
+		private MockedStatic<Runtime> runtimeClassMock;
+		private Runtime runtimeInstanceMock;
+
+		/**
+		 * Initializes the runtime mocks.
+		 */
+		@SuppressWarnings("ResultOfMethodCallIgnored")
+		@BeforeEach
+		void init() {
+			runtimeClassMock = mockStatic(Runtime.class);
+			runtimeInstanceMock = mock(Runtime.class);
+			runtimeClassMock.when(Runtime::getRuntime).thenReturn(runtimeInstanceMock);
+		}
+
+		/**
+		 * Closes the static runtime class mock.
+		 */
+		@AfterEach
+		void dispose() {
+			runtimeClassMock.close();
+		}
+
+		/**
+		 * Verifies that a shutdown hook will be registered, if auto-shutdown is enabled.
+		 *
+		 * @param value The value for the {@code auto-shutdown} property
+		 */
+		@ParameterizedTest
+		@NullSource
+		@ValueSource(strings = { "true", "TRUE" })
+		void enableAutoShutdown(String value) {
+			Framework framework = new Framework(false, false);
+			framework.getConfiguration().set("auto-shutdown", value);
+			framework.startUp();
+			framework.shutDown();
+
+			verify(runtimeInstanceMock).addShutdownHook(notNull());
+		}
+
+		/**
+		 * Verifies that no shutdown hook will be registered, if auto-shutdown is disabled.
+		 *
+		 * @param value The value for the {@code auto-shutdown} property
+		 */
+		@ParameterizedTest
+		@ValueSource(strings = { "false", "FALSE" })
+		void disableAutoShutdown(String value) {
+			Framework framework = new Framework(false, false);
+			framework.getConfiguration().set("auto-shutdown", value);
+			framework.startUp();
+			framework.shutDown();
+
+			verify(runtimeInstanceMock, never()).addShutdownHook(any());
 		}
 
 	}
