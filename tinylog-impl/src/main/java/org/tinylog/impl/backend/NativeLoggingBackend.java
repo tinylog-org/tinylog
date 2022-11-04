@@ -288,7 +288,7 @@ public class NativeLoggingBackend implements LoggingBackend {
 			stackTraceElement.getLineNumber(),
 			tag,
 			level,
-			formatter == null
+			formatter == null || arguments == null
 				? message == null ? null : message.toString()
 				: formatter.format((String) message, arguments),
 			throwable

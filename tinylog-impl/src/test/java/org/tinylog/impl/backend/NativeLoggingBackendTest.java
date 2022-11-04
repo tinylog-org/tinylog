@@ -501,7 +501,7 @@ class NativeLoggingBackendTest {
 	 * Verifies that a formatted message with arguments can be resolved and logged.
 	 */
 	@Test
-	void logFormattedMessage() throws Exception {
+	void logFormattedMessageWithArguments() throws Exception {
 		when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
 		NativeLoggingBackend backend = new Builder()
@@ -522,6 +522,33 @@ class NativeLoggingBackendTest {
 
 		verify(writer).log(logEntryCaptor.capture());
 		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello Alice!");
+	}
+
+	/**
+	 * Verifies that a formatted message without arguments can be logged.
+	 */
+	@Test
+	void logFormattedMessageWithoutArguments() throws Exception {
+		when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
+
+		NativeLoggingBackend backend = new Builder()
+			.rootLevel(Level.TRACE)
+			.writers(Level.TRACE, writer)
+			.create();
+
+		StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
+		backend.log(
+			stackTraceElement,
+			null,
+			Level.INFO,
+			null,
+			"Hello {}!",
+			null,
+			new EnhancedMessageFormatter(framework)
+		);
+
+		verify(writer).log(logEntryCaptor.capture());
+		assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello {}!");
 	}
 
 	/**
