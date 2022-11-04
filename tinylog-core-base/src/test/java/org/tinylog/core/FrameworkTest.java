@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -399,6 +400,7 @@ class FrameworkTest {
 	 * Tests for shutting down {@link Framework} via shutdown hook.
 	 */
 	@Nested
+	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 	class AutoShutdown {
 
 		private MockedStatic<Runtime> runtimeClassMock;
