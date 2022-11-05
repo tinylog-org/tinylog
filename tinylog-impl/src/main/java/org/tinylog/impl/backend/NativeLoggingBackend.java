@@ -26,13 +26,6 @@ import org.tinylog.impl.writers.Writer;
  */
 public class NativeLoggingBackend implements LoggingBackend {
 
-	private static final StackTraceElement EMPTY_STACK_TRACE_ELEMENT = new StackTraceElement(
-		"<unknown>",
-		"<unknown>",
-		null,
-		-1
-	);
-
 	private final Framework framework;
 	private final ContextStorage contextStorage;
 	private final LoggingConfiguration configuration;
@@ -190,22 +183,11 @@ public class NativeLoggingBackend implements LoggingBackend {
 	 * @return The assigned level configuration
 	 */
 	private LevelConfiguration getLevelConfiguration(Object location) {
-		String caller;
-		if (location instanceof StackTraceElement) {
-			caller = ((StackTraceElement) location).getClassName();
-		} else if (location instanceof Class) {
-			caller = ((Class<?>) location).getName();
-		} else if (location instanceof String) {
-			caller = (String) location;
-		} else {
-			caller = "";
-		}
-
 		Map<String, LevelConfiguration> severityLevels = configuration.getSeverityLevels();
 		if (severityLevels.size() == 1) {
 			return severityLevels.get("");
 		} else {
-			String packageOrClass = caller;
+			String packageOrClass = LocationInfo.resolveClassName(location);
 			while (true) {
 				LevelConfiguration levelConfiguration = severityLevels.get(packageOrClass);
 				if (levelConfiguration == null) {
@@ -256,26 +238,7 @@ public class NativeLoggingBackend implements LoggingBackend {
 	 */
 	private LogEntry createLogEntry(Object location, String tag, Level level, Throwable throwable, Object message,
 			Object[] arguments, MessageFormatter formatter, Set<LogEntryValue> logEntryValues) {
-		StackTraceElement stackTraceElement;
-		if (location instanceof StackTraceElement) {
-			stackTraceElement = (StackTraceElement) location;
-		} else if (location instanceof Class) {
-			stackTraceElement = new StackTraceElement(
-				((Class<?>) location).getName(),
-				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
-				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
-				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
-			);
-		} else if (location instanceof String) {
-			stackTraceElement = new StackTraceElement(
-				(String) location,
-				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
-				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
-				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
-			);
-		} else {
-			stackTraceElement = EMPTY_STACK_TRACE_ELEMENT;
-		}
+		StackTraceElement stackTraceElement = LocationInfo.resolveStackTraceElement(location);
 
 		return new LogEntry(
 			logEntryValues.contains(LogEntryValue.TIMESTAMP) ? Instant.now() : null,
