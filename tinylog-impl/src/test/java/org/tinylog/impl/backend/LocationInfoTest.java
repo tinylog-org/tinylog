@@ -1,5 +1,7 @@
 package org.tinylog.impl.backend;
 
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -153,6 +155,72 @@ class LocationInfoTest {
 			assertThat(output)
 				.extracting(StackTraceElement::getLineNumber)
 				.isEqualTo(-1);
+		}
+
+	}
+
+	/**
+	 * Tests for normalizing class names.
+	 */
+	@Nested
+	class NormalizingClassNames {
+
+		/**
+		 * Verifies that the class name of the enclosing class will be used for anonymous classes.
+		 */
+		@Test
+		void normalizeAnonymousClass() {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					// Do nothing
+				}
+			};
+
+			String className = LocationInfo.resolveClassName(runnable.getClass());
+			assertThat(className).isEqualTo("org.tinylog.impl.backend.LocationInfoTest$NormalizingClassNames");
+
+			StackTraceElement stackTraceElement = LocationInfo.resolveStackTraceElement(runnable.getClass());
+			assertThat(stackTraceElement)
+				.extracting(StackTraceElement::getClassName)
+				.isEqualTo("org.tinylog.impl.backend.LocationInfoTest$NormalizingClassNames");
+		}
+
+		/**
+		 * Verifies that the class name of the enclosing class will be used for lambdas.
+		 */
+		@Test
+		void normalizeLambda() {
+			Runnable runnable = () -> { /* Do nothing */ };
+
+			String className = LocationInfo.resolveClassName(runnable.getClass());
+			assertThat(className).isEqualTo("org.tinylog.impl.backend.LocationInfoTest$NormalizingClassNames");
+
+			StackTraceElement stackTraceElement = LocationInfo.resolveStackTraceElement(runnable.getClass());
+			assertThat(stackTraceElement)
+				.extracting(StackTraceElement::getClassName)
+				.isEqualTo("org.tinylog.impl.backend.LocationInfoTest$NormalizingClassNames");
+		}
+
+	}
+
+	/**
+	 * Tests for normalizing method names.
+	 */
+	@Nested
+	class NormalizingMethodNames {
+
+		/**
+		 * Verifies that the method name of the enclosing method will be used for lambdas.
+		 */
+		@Test
+		void normalizeLambda() {
+			Supplier<StackTraceElement> supplier = () -> new Throwable().getStackTrace()[0];
+			StackTraceElement stackTraceElement = LocationInfo.resolveStackTraceElement(supplier.get());
+
+			assertThat(stackTraceElement)
+				.extracting(StackTraceElement::getMethodName)
+				.isEqualTo("normalizeLambda");
 		}
 
 	}

@@ -36,11 +36,11 @@ final class LocationInfo {
 	 */
 	static String resolveClassName(Object location) {
 		if (location instanceof StackTraceElement) {
-			return ((StackTraceElement) location).getClassName();
+			return normalizeClassName(((StackTraceElement) location).getClassName());
 		} else if (location instanceof Class) {
-			return ((Class<?>) location).getName();
+			return normalizeClassName(((Class<?>) location).getName());
 		} else if (location instanceof String) {
-			return (String) location;
+			return normalizeClassName((String) location);
 		} else {
 			return "";
 		}
@@ -68,17 +68,31 @@ final class LocationInfo {
 	 */
 	static StackTraceElement resolveStackTraceElement(Object location) {
 		if (location instanceof StackTraceElement) {
-			return (StackTraceElement) location;
+			StackTraceElement stackTraceElement = (StackTraceElement) location;
+			String originalClassName = stackTraceElement.getClassName();
+			String normalizedClassName = normalizeClassName(originalClassName);
+			String originalMethodName = stackTraceElement.getMethodName();
+			String normalizedMethodName = normalizeMethodName(originalMethodName);
+			if (originalClassName.equals(normalizedClassName) && originalMethodName.equals(normalizedMethodName)) {
+				return stackTraceElement;
+			} else {
+				return new StackTraceElement(
+					normalizedClassName,
+					normalizedMethodName,
+					stackTraceElement.getFileName(),
+					stackTraceElement.getLineNumber()
+				);
+			}
 		} else if (location instanceof Class) {
 			return new StackTraceElement(
-				((Class<?>) location).getName(),
+				normalizeClassName(((Class<?>) location).getName()),
 				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
 				EMPTY_STACK_TRACE_ELEMENT.getFileName(),
 				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
 			);
 		} else if (location instanceof String) {
 			return new StackTraceElement(
-				(String) location,
+				normalizeClassName((String) location),
 				EMPTY_STACK_TRACE_ELEMENT.getMethodName(),
 				EMPTY_STACK_TRACE_ELEMENT.getFileName(),
 				EMPTY_STACK_TRACE_ELEMENT.getLineNumber()
@@ -86,6 +100,47 @@ final class LocationInfo {
 		} else {
 			return EMPTY_STACK_TRACE_ELEMENT;
 		}
+	}
+
+	/**
+	 * Remove class name attachments from anonymous classes and lambdas.
+	 *
+	 * @param className Fully-qualified class name
+	 * @return Normalized fully-qualified class name
+	 */
+	private static String normalizeClassName(String className) {
+		int start = Math.max(0, className.lastIndexOf("."));
+
+		for (
+			int index = className.indexOf('$', start);
+			index >= 0 && index < className.length() - 1;
+			index = className.indexOf('$', index + 1)
+		) {
+			char character = className.charAt(index + 1);
+			if (character == '$' || character >= '0' && character <= '9') {
+				return className.substring(0, index);
+			}
+		}
+
+		return className;
+	}
+
+	/**
+	 * Remove method name attachments from lambdas.
+	 *
+	 * @param methodName Method name
+	 * @return Normalized method name
+	 */
+	private static String normalizeMethodName(String methodName) {
+		int firstIndex = methodName.indexOf('$');
+		if (firstIndex >= 0) {
+			int secondIndex = methodName.indexOf('$', firstIndex + 1);
+			if (secondIndex >= 0) {
+				return methodName.substring(firstIndex + 1, secondIndex);
+			}
+		}
+
+		return methodName;
 	}
 
 }
