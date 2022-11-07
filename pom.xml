@@ -15,9 +15,9 @@
 
 	<properties>
 		<builder.name>tinylog.org</builder.name>
-		<git.url>https://github.com/pmwmedia/tinylog</git.url>
-		<git.connection>scm:git:github.com/pmwmedia/tinylog.git</git.connection>
-		<git.developerConnection>scm:git:git@github.com:pmwmedia/tinylog.git</git.developerConnection>
+		<git.url>https://github.com/tinylog-org/tinylog</git.url>
+		<git.connection>scm:git:github.com/tinylog-org/tinylog.git</git.connection>
+		<git.developerConnection>scm:git:git@github.com:tinylog-org/tinylog.git</git.developerConnection>
 		<kotlin.version>1.7.20</kotlin.version>
 		<kotlin.compiler.languageVersion>1.7</kotlin.compiler.languageVersion>
 		<kotlin.compiler.apiVersion>1.7</kotlin.compiler.apiVersion>
