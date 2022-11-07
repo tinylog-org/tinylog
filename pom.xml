@@ -271,6 +271,7 @@
 				<configuration>
 					<doctitle>tinylog ${project.version}</doctitle>
 					<windowtitle>tinylog ${project.version}</windowtitle>
+					<linksource>true</linksource>
 					<sourcepath>
 						tinylog-api/src/main/java;
 						tinylog-core-base/src/main/java;
