@@ -69,10 +69,12 @@ final class LocationInfo {
 	static StackTraceElement resolveStackTraceElement(Object location) {
 		if (location instanceof StackTraceElement) {
 			StackTraceElement stackTraceElement = (StackTraceElement) location;
+
 			String originalClassName = stackTraceElement.getClassName();
 			String normalizedClassName = normalizeClassName(originalClassName);
 			String originalMethodName = stackTraceElement.getMethodName();
 			String normalizedMethodName = normalizeMethodName(originalMethodName);
+
 			if (originalClassName.equals(normalizedClassName) && originalMethodName.equals(normalizedMethodName)) {
 				return stackTraceElement;
 			} else {
