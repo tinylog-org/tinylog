@@ -9,6 +9,7 @@ jacoco.exec
 
 # Folders
 
+target/
 */target/
 benchmarks/*/target/
 benchmarks/benchmark-logging/*/target/
