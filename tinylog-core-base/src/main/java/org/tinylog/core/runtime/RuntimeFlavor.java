@@ -38,6 +38,7 @@ public interface RuntimeFlavor {
 	 * output details.
 	 *
 	 * <table>
+	 *     <caption>Output Details</caption>
 	 *     <tr>
 	 *         <th>Passed required output details</th>
 	 *         <th>Supplier result type</th>
@@ -71,6 +72,7 @@ public interface RuntimeFlavor {
 	 * details.
 	 *
 	 * <table>
+	 *     <caption>Output Details</caption>
 	 *     <tr>
 	 *         <th>Passed required output details</th>
 	 *         <th>Function result type</th>

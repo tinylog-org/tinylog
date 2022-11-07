@@ -7,20 +7,14 @@ import java.util.function.BiConsumer;
  * can be escaped by wrapping them in single quotes ('). Two directly consecutive single quotes ('') are output as one
  * single quote.
  *
- * <p>
- *     Example format pattern with placeholders:
- *     <pre><code>Hello {foo}!</code></pre>
- * </p>
+ * <p>Example format pattern with placeholders:</p>
+ * <pre><code>Hello {foo}!</code></pre>
  *
- * <p>
- *     Example format pattern with quoting:
- *     <pre><code>'{"bar": "'{foo}'"}'</code></pre>
- * </p>
+ * <p>Example format pattern with quoting:</p>
+ * <pre><code>'{"bar": "'{foo}'"}'</code></pre>
  *
- * <p>
- *     Example format pattern with single quotes:
- *     <pre><code>It''s {foo} o''clock</code></pre>
- * </p>
+ * <p>Example format pattern with single quotes:</p>
+ * <pre><code>It''s {foo} o''clock</code></pre>
  */
 public abstract class AbstractPatternParser {
 

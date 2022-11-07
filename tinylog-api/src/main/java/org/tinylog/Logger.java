@@ -99,10 +99,8 @@ public final class Logger {
 	 *     is enabled for the actual class.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace("Hello World!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace("Hello World!");</code></pre>
 	 *
 	 * @param message The message to log
 	 */
@@ -122,10 +120,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the trace severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(() -> "Hello " + person.geName() + "!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(() -&gt; "Hello " + person.geName() + "!");</code></pre>
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
@@ -145,10 +141,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values for the placeholders
@@ -170,10 +164,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments Lazy suppliers for the real values for the placeholders
@@ -188,10 +180,8 @@ public final class Logger {
 	/**
 	 * Issues a trace log entry for an exception or any other kind of throwable.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(ex);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(ex);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
@@ -206,10 +196,8 @@ public final class Logger {
 	 * Issues a trace log entry for an exception (or any other kind of throwable) together with a custom plain text
 	 * message.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(ex, "Oops, something went wrong");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(ex, "Oops, something went wrong");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
@@ -230,10 +218,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the trace severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(ex, () -> "User " + person.getName() + " has broken the system");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(ex, () -&gt; "User " + person.getName() + " has broken the system");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
@@ -255,10 +241,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -282,10 +266,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.trace(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.trace(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -321,10 +303,8 @@ public final class Logger {
 	 *     is enabled for the actual class.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug("Hello World!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug("Hello World!");</code></pre>
 	 *
 	 * @param message The message to log
 	 */
@@ -344,10 +324,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the debug severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(() -> "Hello " + person.geName() + "!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(() -&gt; "Hello " + person.geName() + "!");</code></pre>
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
@@ -367,10 +345,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values for the placeholders
@@ -392,10 +368,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments Lazy suppliers for the real values for the placeholders
@@ -410,10 +384,8 @@ public final class Logger {
 	/**
 	 * Issues a debug log entry for an exception or any other kind of throwable.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(ex);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(ex);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
@@ -428,10 +400,8 @@ public final class Logger {
 	 * Issues a debug log entry for an exception (or any other kind of throwable) together with a custom plain text
 	 * message.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(ex, "Oops, something went wrong");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(ex, "Oops, something went wrong");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
@@ -452,10 +422,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the debug severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(ex, () -> "User " + person.getName() + " has broken the system");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(ex, () -&gt; "User " + person.getName() + " has broken the system");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
@@ -477,10 +445,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -504,10 +470,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.debug(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.debug(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -543,10 +507,8 @@ public final class Logger {
 	 *     is enabled for the actual class.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info("Hello World!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info("Hello World!");</code></pre>
 	 *
 	 * @param message The message to log
 	 */
@@ -566,10 +528,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the info severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(() -> "Hello " + person.geName() + "!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(() -&gt; "Hello " + person.geName() + "!");</code></pre>
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
@@ -589,10 +549,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values for the placeholders
@@ -614,10 +572,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments Lazy suppliers for the real values for the placeholders
@@ -632,10 +588,8 @@ public final class Logger {
 	/**
 	 * Issues an info log entry for an exception or any other kind of throwable.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(ex);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(ex);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
@@ -650,10 +604,8 @@ public final class Logger {
 	 * Issues an info log entry for an exception (or any other kind of throwable) together with a custom plain text
 	 * message.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(ex, "Oops, something went wrong");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(ex, "Oops, something went wrong");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
@@ -674,10 +626,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the info severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(ex, () -> "User " + person.getName() + " has broken the system");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(ex, () -&gt; "User " + person.getName() + " has broken the system");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
@@ -699,10 +649,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -726,10 +674,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.info(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.info(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -765,10 +711,8 @@ public final class Logger {
 	 *     is enabled for the actual class.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn("Hello World!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn("Hello World!");</code></pre>
 	 *
 	 * @param message The message to log
 	 */
@@ -788,10 +732,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the warn severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(() -> "Hello " + person.geName() + "!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(() -&gt; "Hello " + person.geName() + "!");</code></pre>
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
@@ -811,10 +753,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values for the placeholders
@@ -836,10 +776,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments Lazy suppliers for the real values for the placeholders
@@ -854,10 +792,8 @@ public final class Logger {
 	/**
 	 * Issues a warning log entry for an exception or any other kind of throwable.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(ex);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(ex);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
@@ -872,10 +808,8 @@ public final class Logger {
 	 * Issues a warning log entry for an exception (or any other kind of throwable) together with a custom plain text
 	 * message.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(ex, "Oops, something went wrong");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(ex, "Oops, something went wrong");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
@@ -896,10 +830,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the warn severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(ex, () -> "User " + person.getName() + " has broken the system");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(ex, () -&gt; "User " + person.getName() + " has broken the system");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
@@ -921,10 +853,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -948,10 +878,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.warn(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.warn(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -987,10 +915,8 @@ public final class Logger {
 	 *     is enabled for the actual class.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error("Hello World!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error("Hello World!");</code></pre>
 	 *
 	 * @param message The message to log
 	 */
@@ -1010,10 +936,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the error severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(() -> "Hello " + person.geName() + "!");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(() -&gt; "Hello " + person.geName() + "!");</code></pre>
 	 *
 	 * @param message The lazy supplier for evaluating the message to log
 	 */
@@ -1033,10 +957,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error("The radius of {} are {#,###} km", "earth", 6371);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments The real values for the placeholders
@@ -1058,10 +980,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error("The radius of {} are {#,###} km", planet::getName, planet::getRadius);</code></pre>
 	 *
 	 * @param message The text message with placeholders to log
 	 * @param arguments Lazy suppliers for the real values for the placeholders
@@ -1076,10 +996,8 @@ public final class Logger {
 	/**
 	 * Issues an error log entry for an exception or any other kind of throwable.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(ex);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(ex);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 */
@@ -1094,10 +1012,8 @@ public final class Logger {
 	 * Issues an error log entry for an exception (or any other kind of throwable) together with a custom plain text
 	 * message.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(ex, "Oops, something went wrong");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(ex, "Oops, something went wrong");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The message to log
@@ -1118,10 +1034,8 @@ public final class Logger {
 	 *     class. This prevents unnecessary computing of the message if the error severity level is disabled.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(ex, () -> "User " + person.getName() + " has broken the system");</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(ex, () -&gt; "User " + person.getName() + " has broken the system");</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The lazy supplier for evaluating the message to log
@@ -1143,10 +1057,8 @@ public final class Logger {
 	 *     patterns can be provided for numbers, dates, and other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(ex, "User {} broke it on {dd/MM/yyyy}", "Alice", date);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log
@@ -1170,10 +1082,8 @@ public final class Logger {
 	 *     other formattable values.
 	 * </p>
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>Logger.error(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+	 * <pre><code>Logger.error(ex, "User {} broke it on {dd/MM/yyyy}", person::getName, Date::new);</code></pre>
 	 *
 	 * @param exception The exception or other kind of throwable to log
 	 * @param message The text message with placeholders to log

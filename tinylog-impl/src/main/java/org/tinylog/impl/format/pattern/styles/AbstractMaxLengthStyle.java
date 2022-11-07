@@ -46,10 +46,8 @@ public abstract class AbstractMaxLengthStyle extends AbstractStylePlaceholder {
 	 * Shortens packet segments to single letters until the entire packet name is no longer than the defined maximum
 	 * length.
 	 *
-	 * <p>
-	 *     Example:
-	 *     <pre><code>org.foo.example -> o.f.example</code></pre>
-	 * </p>
+	 * <p>Example:</p>
+ *     <pre><code>org.foo.example -&gt; o.f.example</code></pre>
 	 *
 	 * @param builder The string builder containing a package name
 	 * @param start The start index of the package name in the passed string builder (inclusive)

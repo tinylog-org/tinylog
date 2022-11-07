@@ -284,6 +284,32 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.jetbrains.dokka</groupId>
+					<artifactId>dokka-maven-plugin</artifactId>
+					<version>1.7.20</version>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
+						</archive>
+						<moduleName>${project.artifactId} ${project.version}</moduleName>
+						<jdkVersion>${java.vm.specification.version}</jdkVersion>
+						<includes>
+							<include>${project.basedir}/module-info.md</include>
+						</includes>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>javadocJar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>3.1.0</version>
@@ -447,6 +473,31 @@
 							<addMavenDescriptor>false</addMavenDescriptor>
 						</archive>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.4.1</version>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifestEntries>
+								<Built-By>${builder.name}</Built-By>
+							</manifestEntries>
+						</archive>
+						<doctitle>${project.name} ${project.version}</doctitle>
+						<windowtitle>${project.name} ${project.version}</windowtitle>
+						<source>${java.vm.specification.version}</source>
+						<sourcepath>${project.basedir}/src/main/java</sourcepath>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
