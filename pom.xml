@@ -263,23 +263,27 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>enforce</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>3.5.0</version>
-								</requireMavenVersion>
-								<banDuplicatePomDependencyVersions />
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<inherited>false</inherited>
+				<configuration>
+					<doctitle>tinylog ${project.version}</doctitle>
+					<windowtitle>tinylog ${project.version}</windowtitle>
+					<sourcepath>
+						tinylog-api/src/main/java;
+						tinylog-core-base/src/main/java;
+						tinylog-impl/src/main/java
+					</sourcepath>
+					<additionalDependencies>
+						<dependency>
+							<groupId>com.google.android</groupId>
+							<artifactId>android</artifactId>
+							<version>4.1.1.4</version>
+						</dependency>
+					</additionalDependencies>
+				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -481,6 +485,27 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.1.0</version>
+					<executions>
+						<execution>
+							<id>enforce</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<requireMavenVersion>
+										<version>3.5.0</version>
+									</requireMavenVersion>
+									<banDuplicatePomDependencyVersions />
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
