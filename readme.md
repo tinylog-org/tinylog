@@ -20,7 +20,7 @@ public class Application {
 }
 ```
 
-Outputting log entries to the console and into a log file via *tinylog.properties*
+*tinylog.properties* configuration for outputting log entries to the console and into a log file:
 
 ```properties
 level            = INFO
@@ -37,7 +37,7 @@ writer2.pattern  = {date: HH:mm:ss} [{thread}] {level}: {message}
 Contributing
 ------------
 
-On GitHub, issues and pull requests are always welcome :)
+Issues and pull requests are always welcome :)
 
 For building tinylog or contributing to this project, please take a look at [contributing.md](./contributing.md).
 

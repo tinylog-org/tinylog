@@ -1,10 +1,10 @@
 # Contributing to tinylog
 
-[Pull requests](https://github.com/tinylog-org/tinylog/pulls) are always welcome :) This document should help to build tinylog on your local machine. If you have any build problem nevertheless, please feel free to report a [GitHub issue](https://github.com/tinylog-org/tinylog/issues/new?assignees=&labels=question&template=question.md&title=).
+[Pull requests](https://github.com/tinylog-org/tinylog/pulls) are always welcome :) This document should help to build tinylog on your local machine. If you have any problem with the build though, please feel free to file a [GitHub issue](https://github.com/tinylog-org/tinylog/issues/new?assignees=&labels=question&template=question.md&title=).
 
 ## Building tinylog
 
-For compiling tinylog 3, a JDK 9 or later is required. It is recommended to use a JDK 9 or any later LTS version.
+A JDK 9 or higher is required to compile tinylog 3. It is recommended to use the Long-Term-Support (LTS) JDK versions 11 or 17.
 
 As build tool, Maven 3.5 or later is required. tinylog 3 can be built and installed in the local repository via the typical Maven command:
 
@@ -12,7 +12,7 @@ As build tool, Maven 3.5 or later is required. tinylog 3 can be built and instal
 mvn clean install
 ```
 
-Before creating a pull request, please always ensure that this Maven command `mvn verify` can be executed successfully. It compiles the code, runs JUnit tests, checks the code style via Checkstyle, and analyzes the code with SpotBugs.
+Before creating a pull request, please always make sure that the Maven command `mvn verify` can be executed successfully. It compiles the code, runs the JUnit tests, checks the code style with Checkstyle, and analyzes the code with SpotBugs.
 
 ## Source code
 
@@ -24,7 +24,7 @@ In general, tinylog uses standard Java source code style and Checkstyle will rep
 
 When committing to tinylog, the subject line of the commit message should start with a verb, not end with any punctuation, and be no longer than 72 characters. If a more detailed message description is useful, it can be put after the subject line, separated by a blank line. For the optional detailed message description, there is no line length limit, and it may contain one or more sentences. The associated issue or pull request can either be in parentheses at the end of the subject line or be part of the description body.
 
-Good examples for commit messages:
+Good examples of commit messages:
 
 ```
 Add automatic module names and reuse them for bundles (#110)
