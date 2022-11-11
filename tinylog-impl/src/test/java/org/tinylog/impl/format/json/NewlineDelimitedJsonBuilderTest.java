@@ -19,7 +19,7 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries
-class LineDelimitedJsonBuilderTest {
+class NewlineDelimitedJsonBuilderTest {
 
 	@Inject
 	private Framework framework;
@@ -33,7 +33,7 @@ class LineDelimitedJsonBuilderTest {
 	@Test
 	void noFields() {
 		Configuration configuration = new Configuration();
-		OutputFormat format = new LineDelimitedJsonBuilder().create(framework, configuration);
+		OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
 
 		assertThat(log.consume()).singleElement().satisfies(entry -> {
 			assertThat(entry.getLevel()).isEqualTo(Level.WARN);
@@ -53,7 +53,7 @@ class LineDelimitedJsonBuilderTest {
 	@Test
 	void singleField() {
 		Configuration configuration = new Configuration().set("fields.level", "level");
-		OutputFormat format = new LineDelimitedJsonBuilder().create(framework, configuration);
+		OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
@@ -72,7 +72,7 @@ class LineDelimitedJsonBuilderTest {
 			.set("fields.foo", "bar")
 			.set("fields.msg", "{message}");
 
-		OutputFormat format = new LineDelimitedJsonBuilder().create(framework, configuration);
+		OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
 		LogEntry logEntry = new LogEntryBuilder()
@@ -90,8 +90,8 @@ class LineDelimitedJsonBuilderTest {
 	@Test
 	void service() {
 		assertThat(ServiceLoader.load(OutputFormatBuilder.class)).anySatisfy(builder -> {
-			assertThat(builder).isInstanceOf(LineDelimitedJsonBuilder.class);
-			assertThat(builder.getName()).isEqualTo("ld-json");
+			assertThat(builder).isInstanceOf(NewlineDelimitedJsonBuilder.class);
+			assertThat(builder.getName()).isEqualTo("ndjson");
 		});
 	}
 

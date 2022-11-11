@@ -15,9 +15,9 @@ import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
- * Output format for rendering log entries as line-delimited JSON.
+ * Output format for rendering log entries as newline-delimited JSON.
  */
-public class LineDelimitedJson implements OutputFormat {
+public class NewlineDelimitedJson implements OutputFormat {
 
 	private final Map<String, Placeholder> fields;
 	private final Formatter formatter;
@@ -25,7 +25,7 @@ public class LineDelimitedJson implements OutputFormat {
 	/**
 	 * @param fields The fields to render (the key is used as field name and the placeholder as field value)
 	 */
-	public LineDelimitedJson(Map<String, Placeholder> fields) {
+	public NewlineDelimitedJson(Map<String, Placeholder> fields) {
 		this.fields = new LinkedHashMap<>(fields);
 		this.formatter = new Formatter(Locale.ROOT);
 	}

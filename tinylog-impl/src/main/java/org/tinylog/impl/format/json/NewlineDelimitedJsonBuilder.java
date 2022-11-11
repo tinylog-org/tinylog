@@ -12,17 +12,17 @@ import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
- * Builder for creating an instance of {@link LineDelimitedJson}.
+ * Builder for creating an instance of {@link NewlineDelimitedJson}.
  */
-public class LineDelimitedJsonBuilder implements OutputFormatBuilder {
+public class NewlineDelimitedJsonBuilder implements OutputFormatBuilder {
 
 	/** */
-	public LineDelimitedJsonBuilder() {
+	public NewlineDelimitedJsonBuilder() {
 	}
 
 	@Override
 	public String getName() {
-		return "ld-json";
+		return "ndjson";
 	}
 
 	@Override
@@ -36,10 +36,10 @@ public class LineDelimitedJsonBuilder implements OutputFormatBuilder {
 		}
 
 		if (fields.isEmpty()) {
-			InternalLogger.warn(null, "No fields defined for line-delimited JSON");
+			InternalLogger.warn(null, "No fields defined for newline-delimited JSON");
 		}
 
-		return new LineDelimitedJson(fields);
+		return new NewlineDelimitedJson(fields);
 	}
 
 }

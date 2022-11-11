@@ -21,7 +21,7 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.format.json.LineDelimitedJson;
+import org.tinylog.impl.format.json.NewlineDelimitedJson;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
@@ -87,13 +87,13 @@ class FileWriterBuilderTest {
 	}
 
 	/**
-	 * Verifies that custom output formats like {@link LineDelimitedJson} are supported.
+	 * Verifies that custom output formats like {@link NewlineDelimitedJson} are supported.
 	 */
 	@Test
 	void customJsonFormat() throws Exception {
 		Configuration configuration = new Configuration()
 			.set("file", file.toString())
-			.set("format", "ld-json")
+			.set("format", "ndjson")
 			.set("fields.msg", "message");
 
 		try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {

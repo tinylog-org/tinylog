@@ -29,14 +29,14 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LineDelimitedJsonTest {
+class NewlineDelimitedJsonTest {
 
 	/**
 	 * Verifies that a JSON without any field is correctly rendered.
 	 */
 	@Test
 	void renderWithoutFields() {
-		LineDelimitedJson format = new LineDelimitedJson(emptyMap());
+		NewlineDelimitedJson format = new NewlineDelimitedJson(emptyMap());
 
 		assertThat(format.getRequiredLogEntryValues()).isEmpty();
 
@@ -52,7 +52,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithIntegerField() {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap("line", new LinePlaceholder()));
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("line", new LinePlaceholder()));
 		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LINE);
 
 		FormatOutputRenderer renderer = new FormatOutputRenderer(format);
@@ -71,7 +71,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithLongField() {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap("timestamp", new TimestampPlaceholder(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("timestamp", new TimestampPlaceholder(
 			Instant::getEpochSecond
 		)));
 		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
@@ -92,7 +92,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithDecimalField() {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap("uptime", new UptimePlaceholder(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("uptime", new UptimePlaceholder(
 			"S", false
 		)));
 		assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.UPTIME);
@@ -113,7 +113,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithTimestampField() {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap("date", new DatePlaceholder(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("date", new DatePlaceholder(
 			DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).withZone(ZoneOffset.UTC),
 			false
 		)));
@@ -135,7 +135,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithStringField() {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap("message", new MessagePlaceholder()));
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("message", new MessagePlaceholder()));
 		assertThat(format.getRequiredLogEntryValues())
 			.containsExactlyInAnyOrder(LogEntryValue.EXCEPTION, LogEntryValue.MESSAGE);
 
@@ -155,7 +155,7 @@ class LineDelimitedJsonTest {
 	 */
 	@Test
 	void renderWithTwoFields() {
-		LineDelimitedJson format = new LineDelimitedJson(ImmutableMap.of(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(ImmutableMap.of(
 			"level", new LevelPlaceholder(),
 			"message", new MessageOnlyPlaceholder()
 		));
@@ -192,7 +192,7 @@ class LineDelimitedJsonTest {
 		" _\237_ , _\\u009F_"
 	})
 	void escapeFieldName(String originalName, String escapedName) {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap(
 			originalName, new MessageOnlyPlaceholder()
 		));
 
@@ -225,7 +225,7 @@ class LineDelimitedJsonTest {
 		" _\237_ , _\\u009F_"
 	})
 	void escapeFieldValue(String originalValue, String escapedValue) {
-		LineDelimitedJson format = new LineDelimitedJson(singletonMap(
+		NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap(
 			"foo", new StaticTextPlaceholder(originalValue)
 		));
 
