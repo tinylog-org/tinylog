@@ -6,8 +6,8 @@ package org.tinylog.core;
 public enum Level {
 
     /**
-     * The off severity level is for configuration use only and disables any logging. Log entries must never have
-     * an off severity level assigned.
+     * The off severity level is for configuration use only and disables any logging. Log entries must never be assigned
+     * an off severity level.
      */
     OFF,
 

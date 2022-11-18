@@ -11,7 +11,7 @@ import org.tinylog.impl.LogEntryValue;
  * <p>
  *     By default, tinylog calls the {@link Writer#log(LogEntry)} synchronously. This means that the thread, which
  *     issues a log entry, is blocked until {@link Writer#log(LogEntry)} terminates and that the writer can be called
- *     by multiple threads in parallel. Therefore, a writer must be ensure thread safety.
+ *     by multiple threads in parallel. Therefore, a writer must be implemented to be thread safe.
  * </p>
  *
  * <p>

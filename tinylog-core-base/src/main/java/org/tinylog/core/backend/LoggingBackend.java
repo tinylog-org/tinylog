@@ -8,7 +8,7 @@ import org.tinylog.core.format.message.MessageFormatter;
  * Provider for issuing log entries.
  *
  * <p>
- *     This interface must be implemented by all logging backends.
+ *     This interface has to be implemented by all logging backends.
  * </p>
  */
 public interface LoggingBackend {
