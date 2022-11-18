@@ -10,43 +10,43 @@ import org.tinylog.slf4j.TinylogLoggerFactory;
  */
 public final class StaticLoggerBinder implements LoggerFactoryBinder {
 
-	/**
-	 * Request SLF4J 1.7.
-	 *
-	 * <p>
-	 *     This field must not be final to avoid constant folding by the compiler.
-	 * </p>
-	 */
-	// START IGNORE RULES: StaticVariableName|VisibilityModifier
-	public static String REQUESTED_API_VERSION = "1.7";
-	// END IGNORE RULES: StaticVariableName|VisibilityModifier
+    /**
+     * Request SLF4J 1.7.
+     *
+     * <p>
+     *     This field must not be final to avoid constant folding by the compiler.
+     * </p>
+     */
+    // START IGNORE RULES: StaticVariableName|VisibilityModifier
+    public static String REQUESTED_API_VERSION = "1.7";
+    // END IGNORE RULES: StaticVariableName|VisibilityModifier
 
-	private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
+    private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
-	private final ILoggerFactory factory;
+    private final ILoggerFactory factory;
 
-	/** */
-	private StaticLoggerBinder() {
-		factory = new TinylogLoggerFactory(Tinylog.getFramework());
-	}
+    /** */
+    private StaticLoggerBinder() {
+        factory = new TinylogLoggerFactory(Tinylog.getFramework());
+    }
 
-	/**
-	 * Gets the singleton instance of this static logger binder.
-	 *
-	 * @return The static logger binder instance
-	 */
-	public static StaticLoggerBinder getSingleton() {
-		return SINGLETON;
-	}
+    /**
+     * Gets the singleton instance of this static logger binder.
+     *
+     * @return The static logger binder instance
+     */
+    public static StaticLoggerBinder getSingleton() {
+        return SINGLETON;
+    }
 
-	@Override
-	public ILoggerFactory getLoggerFactory() {
-		return factory;
-	}
+    @Override
+    public ILoggerFactory getLoggerFactory() {
+        return factory;
+    }
 
-	@Override
-	public String getLoggerFactoryClassStr() {
-		return TinylogLoggerFactory.class.getName();
-	}
+    @Override
+    public String getLoggerFactoryClassStr() {
+        return TinylogLoggerFactory.class.getName();
+    }
 
 }

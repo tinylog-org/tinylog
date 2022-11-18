@@ -23,86 +23,86 @@ import static org.mockito.Mockito.verify;
 @CaptureLogEntries
 class LifeCycleHookTest {
 
-	@Inject
-	private Log log;
+    @Inject
+    private Log log;
 
-	/**
-	 * Verifies that multiple writers can be closed successfully.
-	 */
-	@Test
-	void shutDownWritersSuccessfully() throws Exception {
-		Writer first = mock(Writer.class);
-		Writer second = mock(Writer.class);
+    /**
+     * Verifies that multiple writers can be closed successfully.
+     */
+    @Test
+    void shutDownWritersSuccessfully() throws Exception {
+        Writer first = mock(Writer.class);
+        Writer second = mock(Writer.class);
 
-		Hook hook = new LifeCycleHook(ImmutableList.of(first, second), null);
-		hook.startUp();
-		hook.shutDown();
+        Hook hook = new LifeCycleHook(ImmutableList.of(first, second), null);
+        hook.startUp();
+        hook.shutDown();
 
-		verify(first).close();
-		verify(second).close();
-	}
+        verify(first).close();
+        verify(second).close();
+    }
 
-	/**
-	 * Verifies that other writers can be closed successfully, if failed closing a writer.
-	 */
-	@Test
-	void shutDownWritersUnsuccessfully() throws Exception {
-		Writer first = mock(Writer.class);
-		Writer second = mock(Writer.class);
-		Writer third = mock(Writer.class);
+    /**
+     * Verifies that other writers can be closed successfully, if failed closing a writer.
+     */
+    @Test
+    void shutDownWritersUnsuccessfully() throws Exception {
+        Writer first = mock(Writer.class);
+        Writer second = mock(Writer.class);
+        Writer third = mock(Writer.class);
 
-		doThrow(IOException.class).when(second).close();
+        doThrow(IOException.class).when(second).close();
 
-		Hook hook = new LifeCycleHook(ImmutableList.of(first, second, third), null);
-		hook.startUp();
-		hook.shutDown();
+        Hook hook = new LifeCycleHook(ImmutableList.of(first, second, third), null);
+        hook.startUp();
+        hook.shutDown();
 
-		assertThat(log.consume()).singleElement().satisfies(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isInstanceOf(IOException.class);
-		});
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isInstanceOf(IOException.class);
+        });
 
-		verify(first).close();
-		verify(third).close();
-	}
+        verify(first).close();
+        verify(third).close();
+    }
 
-	/**
-	 * Verifies that a writing thread can be shut down successfully.
-	 */
-	@Test
-	void shutDownWritingThreadSuccessfully() {
-		WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
-		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
+    /**
+     * Verifies that a writing thread can be shut down successfully.
+     */
+    @Test
+    void shutDownWritingThreadSuccessfully() {
+        WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
+        Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
 
-		try {
-			assertThat(writingThread.getState()).isEqualTo(Thread.State.NEW);
-			hook.startUp();
-			assertThat(writingThread.isAlive()).isTrue();
-		} finally {
-			hook.shutDown();
-			assertThat(writingThread.getState()).isEqualTo(Thread.State.TERMINATED);
-		}
-	}
+        try {
+            assertThat(writingThread.getState()).isEqualTo(Thread.State.NEW);
+            hook.startUp();
+            assertThat(writingThread.isAlive()).isTrue();
+        } finally {
+            hook.shutDown();
+            assertThat(writingThread.getState()).isEqualTo(Thread.State.TERMINATED);
+        }
+    }
 
-	/**
-	 * Verifies that the hook can be interrupted while waiting for shutdown of a writing thread.
-	 */
-	@Test
-	void shutDownWritingThreadUnsuccessfully() {
-		WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
-		Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
+    /**
+     * Verifies that the hook can be interrupted while waiting for shutdown of a writing thread.
+     */
+    @Test
+    void shutDownWritingThreadUnsuccessfully() {
+        WritingThread writingThread = new WritingThread(Collections.emptyList(), 1);
+        Hook hook = new LifeCycleHook(Collections.emptyList(), writingThread);
 
-		try {
-			hook.startUp();
-		} finally {
-			Thread.currentThread().interrupt();
-			hook.shutDown();
-		}
+        try {
+            hook.startUp();
+        } finally {
+            Thread.currentThread().interrupt();
+            hook.shutDown();
+        }
 
-		assertThat(log.consume()).singleElement().satisfies(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isInstanceOf(InterruptedException.class);
-		});
-	}
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isInstanceOf(InterruptedException.class);
+        });
+    }
 
 }

@@ -27,176 +27,176 @@ import static org.mockito.Mockito.verify;
 @CaptureLogEntries
 class WritingThreadTest {
 
-	@Inject
-	private Log log;
+    @Inject
+    private Log log;
 
-	/**
-	 * Verifies that the writing thread starts and shuts down correctly.
-	 */
-	@Test
-	void lifeCycle() throws InterruptedException {
-		WritingThread thread = new WritingThread(Collections.emptyList(), 10);
-		thread.start();
+    /**
+     * Verifies that the writing thread starts and shuts down correctly.
+     */
+    @Test
+    void lifeCycle() throws InterruptedException {
+        WritingThread thread = new WritingThread(Collections.emptyList(), 10);
+        thread.start();
 
-		try {
-			assertThat(thread.isAlive()).isTrue();
-		} finally {
-			thread.shutDown();
-			thread.join(1000);
-			assertThat(thread.isAlive()).isFalse();
-		}
-	}
+        try {
+            assertThat(thread.isAlive()).isTrue();
+        } finally {
+            thread.shutDown();
+            thread.join(1000);
+            assertThat(thread.isAlive()).isFalse();
+        }
+    }
 
-	/**
-	 * Verifies that the writing thread writes log entries and flushes writers correctly.
-	 */
-	@Test
-	void outputLogEntries() throws Exception {
-		LogEntry firstLogEntry = new LogEntryBuilder().message("1").create();
-		LogEntry secondLogEntry = new LogEntryBuilder().message("2").create();
-		LogEntry thirdLogEntry = new LogEntryBuilder().message("3").create();
+    /**
+     * Verifies that the writing thread writes log entries and flushes writers correctly.
+     */
+    @Test
+    void outputLogEntries() throws Exception {
+        LogEntry firstLogEntry = new LogEntryBuilder().message("1").create();
+        LogEntry secondLogEntry = new LogEntryBuilder().message("2").create();
+        LogEntry thirdLogEntry = new LogEntryBuilder().message("3").create();
 
-		AsyncWriter writer = mock(AsyncWriter.class);
+        AsyncWriter writer = mock(AsyncWriter.class);
 
-		WritingThread thread = new WritingThread(Collections.singletonList(writer), 2);
-		thread.start();
-		try {
-			thread.enqueue(writer, firstLogEntry);
-			thread.enqueue(writer, secondLogEntry);
-			thread.enqueue(writer, thirdLogEntry);
-		} finally {
-			thread.shutDown();
-		}
+        WritingThread thread = new WritingThread(Collections.singletonList(writer), 2);
+        thread.start();
+        try {
+            thread.enqueue(writer, firstLogEntry);
+            thread.enqueue(writer, secondLogEntry);
+            thread.enqueue(writer, thirdLogEntry);
+        } finally {
+            thread.shutDown();
+        }
 
-		thread.join();
+        thread.join();
 
-		InOrder inOrder = inOrder(writer);
-		inOrder.verify(writer).log(firstLogEntry);
-		inOrder.verify(writer).log(secondLogEntry);
-		inOrder.verify(writer).log(thirdLogEntry);
+        InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer).log(firstLogEntry);
+        inOrder.verify(writer).log(secondLogEntry);
+        inOrder.verify(writer).log(thirdLogEntry);
 
-		verify(writer, atLeast(1)).flush();
-		verify(writer, atMost(2)).flush();
-	}
+        verify(writer, atLeast(1)).flush();
+        verify(writer, atMost(2)).flush();
+    }
 
-	/**
-	 * Verifies that internal tinylog log entries will be discarded, if the waiting queue is full, but all standard log
-	 * entries will be output nevertheless.
-	 */
-	@Test
-	void discardLogEntries() throws Exception {
-		LogEntry standardLogEntry = new LogEntryBuilder().tag(null).message("Hello World!").create();
-		LogEntry internalLogEntry = new LogEntryBuilder().tag("tinylog").message("internal").create();
+    /**
+     * Verifies that internal tinylog log entries will be discarded, if the waiting queue is full, but all standard log
+     * entries will be output nevertheless.
+     */
+    @Test
+    void discardLogEntries() throws Exception {
+        LogEntry standardLogEntry = new LogEntryBuilder().tag(null).message("Hello World!").create();
+        LogEntry internalLogEntry = new LogEntryBuilder().tag("tinylog").message("internal").create();
 
-		AsyncWriter writer = mock(AsyncWriter.class);
+        AsyncWriter writer = mock(AsyncWriter.class);
 
-		WritingThread thread = new WritingThread(Collections.singletonList(writer), 3);
-		thread.start();
-		try {
-			for (int i = 0; i < 100; ++i) {
-				thread.enqueue(writer, standardLogEntry);
-				thread.enqueue(writer, internalLogEntry);
-			}
-		} finally {
-			thread.shutDown();
-		}
+        WritingThread thread = new WritingThread(Collections.singletonList(writer), 3);
+        thread.start();
+        try {
+            for (int i = 0; i < 100; ++i) {
+                thread.enqueue(writer, standardLogEntry);
+                thread.enqueue(writer, internalLogEntry);
+            }
+        } finally {
+            thread.shutDown();
+        }
 
-		thread.join();
+        thread.join();
 
-		verify(writer, times(100)).log(standardLogEntry);
-		verify(writer, atLeast(1)).log(internalLogEntry);
-		verify(writer, atMost(99)).log(internalLogEntry);
-	}
+        verify(writer, times(100)).log(standardLogEntry);
+        verify(writer, atLeast(1)).log(internalLogEntry);
+        verify(writer, atMost(99)).log(internalLogEntry);
+    }
 
-	/**
-	 * Verifies that thrown exceptions while outputting a log entry are reported but do not prevent the output of other
-	 * log entries.
-	 */
-	@Test
-	void reportLoggingException() throws Exception {
-		LogEntry logEntry = new LogEntryBuilder().message("foo").create();
-		AsyncWriter evilWriter = mock(AsyncWriter.class);
-		AsyncWriter goodWriter = mock(AsyncWriter.class);
+    /**
+     * Verifies that thrown exceptions while outputting a log entry are reported but do not prevent the output of other
+     * log entries.
+     */
+    @Test
+    void reportLoggingException() throws Exception {
+        LogEntry logEntry = new LogEntryBuilder().message("foo").create();
+        AsyncWriter evilWriter = mock(AsyncWriter.class);
+        AsyncWriter goodWriter = mock(AsyncWriter.class);
 
-		doThrow(NullPointerException.class).when(evilWriter).log(any());
+        doThrow(NullPointerException.class).when(evilWriter).log(any());
 
-		WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 10);
-		thread.start();
-		try {
-			thread.enqueue(evilWriter, logEntry);
-			thread.enqueue(goodWriter, logEntry);
-		} finally {
-			thread.shutDown();
-		}
+        WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 10);
+        thread.start();
+        try {
+            thread.enqueue(evilWriter, logEntry);
+            thread.enqueue(goodWriter, logEntry);
+        } finally {
+            thread.shutDown();
+        }
 
-		thread.join();
+        thread.join();
 
-		verify(evilWriter).log(logEntry);
-		verify(goodWriter).log(logEntry);
+        verify(evilWriter).log(logEntry);
+        verify(goodWriter).log(logEntry);
 
-		assertThat(log.consume()).singleElement().satisfies(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
-			assertThat(entry.getMessage()).contains("log entry");
-		});
-	}
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
+            assertThat(entry.getMessage()).contains("log entry");
+        });
+    }
 
-	/**
-	 * Verifies that thrown exceptions while outputting an internal tinylog log entry are ignored.
-	 */
-	@Test
-	void ignoreLoggingException() throws Exception {
-		LogEntry logEntry = new LogEntryBuilder().tag("tinylog").message("foo").create();
-		AsyncWriter evilWriter = mock(AsyncWriter.class);
-		AsyncWriter goodWriter = mock(AsyncWriter.class);
+    /**
+     * Verifies that thrown exceptions while outputting an internal tinylog log entry are ignored.
+     */
+    @Test
+    void ignoreLoggingException() throws Exception {
+        LogEntry logEntry = new LogEntryBuilder().tag("tinylog").message("foo").create();
+        AsyncWriter evilWriter = mock(AsyncWriter.class);
+        AsyncWriter goodWriter = mock(AsyncWriter.class);
 
-		doThrow(NullPointerException.class).when(evilWriter).log(any());
+        doThrow(NullPointerException.class).when(evilWriter).log(any());
 
-		WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 10);
-		thread.start();
-		try {
-			thread.enqueue(evilWriter, logEntry);
-			thread.enqueue(goodWriter, logEntry);
-		} finally {
-			thread.shutDown();
-		}
+        WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 10);
+        thread.start();
+        try {
+            thread.enqueue(evilWriter, logEntry);
+            thread.enqueue(goodWriter, logEntry);
+        } finally {
+            thread.shutDown();
+        }
 
-		thread.join();
+        thread.join();
 
-		verify(evilWriter).log(logEntry);
-		verify(goodWriter).log(logEntry);
-	}
+        verify(evilWriter).log(logEntry);
+        verify(goodWriter).log(logEntry);
+    }
 
-	/**
-	 * Verifies that thrown exceptions while flushing a writer are reported but do not prevent flushing other writers.
-	 */
-	@Test
-	void reportFlushingException() throws Exception {
-		LogEntry logEntry = new LogEntryBuilder().message("foo").create();
-		AsyncWriter evilWriter = mock(AsyncWriter.class);
-		AsyncWriter goodWriter = mock(AsyncWriter.class);
+    /**
+     * Verifies that thrown exceptions while flushing a writer are reported but do not prevent flushing other writers.
+     */
+    @Test
+    void reportFlushingException() throws Exception {
+        LogEntry logEntry = new LogEntryBuilder().message("foo").create();
+        AsyncWriter evilWriter = mock(AsyncWriter.class);
+        AsyncWriter goodWriter = mock(AsyncWriter.class);
 
-		doThrow(NullPointerException.class).when(evilWriter).flush();
+        doThrow(NullPointerException.class).when(evilWriter).flush();
 
-		WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 2);
-		thread.start();
-		try {
-			thread.enqueue(evilWriter, logEntry);
-			thread.enqueue(goodWriter, logEntry);
-		} finally {
-			thread.shutDown();
-		}
+        WritingThread thread = new WritingThread(ImmutableList.of(evilWriter, goodWriter), 2);
+        thread.start();
+        try {
+            thread.enqueue(evilWriter, logEntry);
+            thread.enqueue(goodWriter, logEntry);
+        } finally {
+            thread.shutDown();
+        }
 
-		thread.join();
+        thread.join();
 
-		verify(evilWriter).flush();
-		verify(goodWriter).flush();
+        verify(evilWriter).flush();
+        verify(goodWriter).flush();
 
-		assertThat(log.consume()).singleElement().satisfies(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
-			assertThat(entry.getMessage()).contains("flush");
-		});
-	}
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isInstanceOf(NullPointerException.class);
+            assertThat(entry.getMessage()).contains("flush");
+        });
+    }
 
 }

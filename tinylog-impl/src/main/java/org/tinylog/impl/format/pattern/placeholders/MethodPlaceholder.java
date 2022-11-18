@@ -12,29 +12,29 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class MethodPlaceholder implements Placeholder {
 
-	/** */
-	public MethodPlaceholder() {
-	}
+    /** */
+    public MethodPlaceholder() {
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.METHOD);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.METHOD);
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.STRING;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.STRING;
+    }
 
-	@Override
-	public String getValue(LogEntry entry) {
-		return entry.getMethodName();
-	}
+    @Override
+    public String getValue(LogEntry entry) {
+        return entry.getMethodName();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String methodName = entry.getMethodName();
-		builder.append(methodName == null ? "<method unknown>" : methodName);
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        String methodName = entry.getMethodName();
+        builder.append(methodName == null ? "<method unknown>" : methodName);
+    }
 
 }

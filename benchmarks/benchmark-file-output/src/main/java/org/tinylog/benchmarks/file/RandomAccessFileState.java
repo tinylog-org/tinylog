@@ -13,18 +13,18 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Thread)
 public class RandomAccessFileState extends AbstractState<RandomAccessFile> {
 
-	/** */
-	public RandomAccessFileState() {
-	}
+    /** */
+    public RandomAccessFileState() {
+    }
 
-	@Override
-	public void write(String content) throws IOException {
-		instance.write(content.getBytes(CHARSET));
-	}
+    @Override
+    public void write(String content) throws IOException {
+        instance.write(content.getBytes(CHARSET));
+    }
 
-	@Override
-	protected RandomAccessFile create(Path path) throws IOException {
-		return new RandomAccessFile(path.toFile(), "rw");
-	}
+    @Override
+    protected RandomAccessFile create(Path path) throws IOException {
+        return new RandomAccessFile(path.toFile(), "rw");
+    }
 
 }

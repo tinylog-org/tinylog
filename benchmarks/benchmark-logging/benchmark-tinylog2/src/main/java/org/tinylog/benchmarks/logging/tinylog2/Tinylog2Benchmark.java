@@ -23,67 +23,67 @@ import org.tinylog.provider.ProviderRegistry;
 @State(Scope.Thread)
 public class Tinylog2Benchmark extends AbstractLoggingBenchmark {
 
-	@Param
-	private LocationInfo locationInfo;
+    @Param
+    private LocationInfo locationInfo;
 
-	private String logFile;
+    private String logFile;
 
-	/** */
-	public Tinylog2Benchmark() {
-	}
+    /** */
+    public Tinylog2Benchmark() {
+    }
 
-	/**
-	 * @param locationInfo The location information details to log
-	 */
-	public Tinylog2Benchmark(LocationInfo locationInfo) {
-		this.locationInfo = locationInfo;
-	}
+    /**
+     * @param locationInfo The location information details to log
+     */
+    public Tinylog2Benchmark(LocationInfo locationInfo) {
+        this.locationInfo = locationInfo;
+    }
 
-	@Setup(Level.Trial)
-	@Override
-	public void configure() throws IOException {
-		logFile = createLogFile("tinylog3");
+    @Setup(Level.Trial)
+    @Override
+    public void configure() throws IOException {
+        logFile = createLogFile("tinylog3");
 
-		StringBuilder formatPattern = new StringBuilder();
-		formatPattern.append("{date:yyyy-MM-dd HH:mm:ss} - {thread}");
-		if (locationInfo == LocationInfo.FULL) {
-			formatPattern.append(" - {class}.{method}() - ");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			formatPattern.append(" - {class} - ");
-		} else {
-			formatPattern.append(" - ");
-		}
-		formatPattern.append("{level}: {message}");
+        StringBuilder formatPattern = new StringBuilder();
+        formatPattern.append("{date:yyyy-MM-dd HH:mm:ss} - {thread}");
+        if (locationInfo == LocationInfo.FULL) {
+            formatPattern.append(" - {class}.{method}() - ");
+        } else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+            formatPattern.append(" - {class} - ");
+        } else {
+            formatPattern.append(" - ");
+        }
+        formatPattern.append("{level}: {message}");
 
-		Configuration.set("level", "INFO");
-		Configuration.set("writer", "file");
-		Configuration.set("writer.file", logFile);
-		Configuration.set("writer.format", formatPattern.toString());
-	}
+        Configuration.set("level", "INFO");
+        Configuration.set("writer", "file");
+        Configuration.set("writer.file", logFile);
+        Configuration.set("writer.format", formatPattern.toString());
+    }
 
-	@Override
-	public String getLogFile() {
-		return logFile;
-	}
+    @Override
+    public String getLogFile() {
+        return logFile;
+    }
 
-	@TearDown(Level.Trial)
-	@Override
-	public void shutdown() throws InterruptedException {
-		ProviderRegistry.getLoggingProvider().shutdown();
-	}
+    @TearDown(Level.Trial)
+    @Override
+    public void shutdown() throws InterruptedException {
+        ProviderRegistry.getLoggingProvider().shutdown();
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void discard() {
-		Logger.debug("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void discard() {
+        Logger.debug("Hello {}!", MAGIC_NUMBER);
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void output() {
-		Logger.info("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void output() {
+        Logger.info("Hello {}!", MAGIC_NUMBER);
+    }
 
 }

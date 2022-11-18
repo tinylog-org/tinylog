@@ -8,23 +8,23 @@ import java.nio.file.Path;
  */
 public class StartupPolicy implements Policy {
 
-	/** */
-	public StartupPolicy() {
-	}
+    /** */
+    public StartupPolicy() {
+    }
 
-	@Override
-	public boolean canContinueFile(Path file) {
-		return false;
-	}
+    @Override
+    public boolean canContinueFile(Path file) {
+        return false;
+    }
 
-	@Override
-	public void init(Path file) {
-		// Ignore
-	}
+    @Override
+    public void init(Path file) {
+        // Ignore
+    }
 
-	@Override
-	public boolean canAcceptLogEntry(int bytes) {
-		return true;
-	}
+    @Override
+    public boolean canAcceptLogEntry(int bytes) {
+        return true;
+    }
 
 }

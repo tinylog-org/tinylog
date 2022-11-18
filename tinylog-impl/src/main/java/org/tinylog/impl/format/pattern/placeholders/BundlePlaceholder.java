@@ -19,37 +19,37 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class BundlePlaceholder implements Placeholder {
 
-	private final List<Placeholder> placeholders;
+    private final List<Placeholder> placeholders;
 
-	/**
-	 * @param placeholders Child placeholders
-	 */
-	public BundlePlaceholder(List<Placeholder> placeholders) {
-		this.placeholders = new ArrayList<>(placeholders);
-	}
+    /**
+     * @param placeholders Child placeholders
+     */
+    public BundlePlaceholder(List<Placeholder> placeholders) {
+        this.placeholders = new ArrayList<>(placeholders);
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		Set<LogEntryValue> requiredValues = EnumSet.noneOf(LogEntryValue.class);
-		placeholders.forEach(placeholder -> requiredValues.addAll(placeholder.getRequiredLogEntryValues()));
-		return requiredValues;
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        Set<LogEntryValue> requiredValues = EnumSet.noneOf(LogEntryValue.class);
+        placeholders.forEach(placeholder -> requiredValues.addAll(placeholder.getRequiredLogEntryValues()));
+        return requiredValues;
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.STRING;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.STRING;
+    }
 
-	@Override
-	public String getValue(LogEntry entry) {
-		StringBuilder builder = new StringBuilder();
-		render(builder, entry);
-		return builder.toString();
-	}
+    @Override
+    public String getValue(LogEntry entry) {
+        StringBuilder builder = new StringBuilder();
+        render(builder, entry);
+        return builder.toString();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		placeholders.forEach(placeholder -> placeholder.render(builder, entry));
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        placeholders.forEach(placeholder -> placeholder.render(builder, entry));
+    }
 
 }

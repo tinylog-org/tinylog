@@ -11,23 +11,23 @@ import org.tinylog.impl.format.pattern.placeholders.Placeholder;
  */
 public class FormatPatternBuilder implements OutputFormatBuilder {
 
-	private static final String PATTERN_KEY = "pattern";
-	private static final String DEFAULT_PATTERN =
-		"{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
+    private static final String PATTERN_KEY = "pattern";
+    private static final String DEFAULT_PATTERN =
+        "{date} [{thread}] {level|min-length:5} {class}.{method}(): {message}";
 
-	/** */
-	public FormatPatternBuilder() {
-	}
+    /** */
+    public FormatPatternBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "pattern";
-	}
+    @Override
+    public String getName() {
+        return "pattern";
+    }
 
-	@Override
-	public OutputFormat create(Framework framework, Configuration configuration) {
-		String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
-		return new FormatPatternParser(framework).parse(pattern);
-	}
+    @Override
+    public OutputFormat create(Framework framework, Configuration configuration) {
+        String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
+        return new FormatPatternParser(framework).parse(pattern);
+    }
 
 }

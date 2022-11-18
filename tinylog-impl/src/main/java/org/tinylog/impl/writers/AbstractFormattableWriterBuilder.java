@@ -21,60 +21,60 @@ import org.tinylog.impl.format.pattern.FormatPatternBuilder;
  */
 public abstract class AbstractFormattableWriterBuilder implements WriterBuilder {
 
-	private static final String FORMAT_KEY = "format";
+    private static final String FORMAT_KEY = "format";
 
-	@Override
-	public final Writer create(Framework framework, Configuration configuration) throws Exception {
-		String name = configuration.getValue(FORMAT_KEY);
-		OutputFormatBuilder builder = null;
+    @Override
+    public final Writer create(Framework framework, Configuration configuration) throws Exception {
+        String name = configuration.getValue(FORMAT_KEY);
+        OutputFormatBuilder builder = null;
 
-		if (name != null) {
-			List<OutputFormatBuilder> builders = SafeServiceLoader.asList(
-				framework, OutputFormatBuilder.class, "output format builders"
-			);
+        if (name != null) {
+            List<OutputFormatBuilder> builders = SafeServiceLoader.asList(
+                framework, OutputFormatBuilder.class, "output format builders"
+            );
 
-			builder = builders.stream()
-				.filter(service -> Objects.equals(service.getName(), name))
-				.findAny()
-				.orElse(null);
+            builder = builders.stream()
+                .filter(service -> Objects.equals(service.getName(), name))
+                .findAny()
+                .orElse(null);
 
-			if (builder == null) {
-				InternalLogger.error(
-					null,
-					"Unknown output format \"{}\" in property \"{}\"",
-					name,
-					configuration.resolveFullKey(FORMAT_KEY)
-				);
-			}
-		}
+            if (builder == null) {
+                InternalLogger.error(
+                    null,
+                    "Unknown output format \"{}\" in property \"{}\"",
+                    name,
+                    configuration.resolveFullKey(FORMAT_KEY)
+                );
+            }
+        }
 
-		if (builder == null) {
-			builder = new FormatPatternBuilder();
-		}
+        if (builder == null) {
+            builder = new FormatPatternBuilder();
+        }
 
-		OutputFormat format = builder.create(framework, configuration);
-		return create(framework, configuration, format);
-	}
+        OutputFormat format = builder.create(framework, configuration);
+        return create(framework, configuration, format);
+    }
 
-	/**
-	 * Creates a new instance of the writer.
-	 *
-	 * <p>
-	 *     Synchronous writers can implement the plain {@link Writer} interface and asynchronous writers the
-	 *     {@link AsyncWriter} interface. Writers with blocking output operations (e.g. outputting log entries to files,
-	 *     databases, or remote servers) should use the {@link AsyncWriter} interface for performance reasons.
-	 * </p>
-	 *
-	 * @param framework The actual logging framework instance
-	 * @param configuration The configuration properties for the new writer instance
-	 * @param format The output format for log entries
-	 * @return New instance of the writer
-	 * @throws Exception Failed to create a new writer for the passed configuration
-	 */
-	public abstract Writer create(
-		Framework framework,
-		Configuration configuration,
-		OutputFormat format
-	) throws Exception;
+    /**
+     * Creates a new instance of the writer.
+     *
+     * <p>
+     *     Synchronous writers can implement the plain {@link Writer} interface and asynchronous writers the
+     *     {@link AsyncWriter} interface. Writers with blocking output operations (e.g. outputting log entries to files,
+     *     databases, or remote servers) should use the {@link AsyncWriter} interface for performance reasons.
+     * </p>
+     *
+     * @param framework The actual logging framework instance
+     * @param configuration The configuration properties for the new writer instance
+     * @param format The output format for log entries
+     * @return New instance of the writer
+     * @throws Exception Failed to create a new writer for the passed configuration
+     */
+    public abstract Writer create(
+        Framework framework,
+        Configuration configuration,
+        OutputFormat format
+    ) throws Exception;
 
 }

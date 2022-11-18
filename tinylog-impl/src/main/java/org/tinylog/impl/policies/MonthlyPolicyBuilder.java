@@ -13,24 +13,24 @@ import org.tinylog.core.Framework;
  */
 public class MonthlyPolicyBuilder extends AbstractDatePolicyBuilder {
 
-	/** */
-	public MonthlyPolicyBuilder() {
-	}
+    /** */
+    public MonthlyPolicyBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "monthly";
-	}
+    @Override
+    public String getName() {
+        return "monthly";
+    }
 
-	@Override
-	public Policy create(Framework framework, String value) {
-		Clock clock = framework.getClock();
+    @Override
+    public Policy create(Framework framework, String value) {
+        Clock clock = framework.getClock();
 
-		TemporalAccessor accessor = parse("H:mm[ z]", value);
-		LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
-		ZoneId zone = getOrDefault(accessor, TemporalQueries.zone(), clock.getZone());
+        TemporalAccessor accessor = parse("H:mm[ z]", value);
+        LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
+        ZoneId zone = getOrDefault(accessor, TemporalQueries.zone(), clock.getZone());
 
-		return new MonthlyPolicy(clock.withZone(zone), time);
-	}
+        return new MonthlyPolicy(clock.withZone(zone), time);
+    }
 
 }

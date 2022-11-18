@@ -16,30 +16,30 @@ import org.tinylog.impl.format.pattern.placeholders.Placeholder;
  */
 public class NewlineDelimitedJsonBuilder implements OutputFormatBuilder {
 
-	/** */
-	public NewlineDelimitedJsonBuilder() {
-	}
+    /** */
+    public NewlineDelimitedJsonBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "ndjson";
-	}
+    @Override
+    public String getName() {
+        return "ndjson";
+    }
 
-	@Override
-	public OutputFormat create(Framework framework, Configuration configuration) {
-		FormatPatternParser parser = new FormatPatternParser(framework);
-		Configuration subConfiguration = configuration.getSubConfiguration("fields");
-		Map<String, Placeholder> fields = new LinkedHashMap<>();
+    @Override
+    public OutputFormat create(Framework framework, Configuration configuration) {
+        FormatPatternParser parser = new FormatPatternParser(framework);
+        Configuration subConfiguration = configuration.getSubConfiguration("fields");
+        Map<String, Placeholder> fields = new LinkedHashMap<>();
 
-		for (String key : subConfiguration.getKeys()) {
-			fields.put(key, parser.parse(subConfiguration.getValue(key)));
-		}
+        for (String key : subConfiguration.getKeys()) {
+            fields.put(key, parser.parse(subConfiguration.getValue(key)));
+        }
 
-		if (fields.isEmpty()) {
-			InternalLogger.warn(null, "No fields defined for newline-delimited JSON");
-		}
+        if (fields.isEmpty()) {
+            InternalLogger.warn(null, "No fields defined for newline-delimited JSON");
+        }
 
-		return new NewlineDelimitedJson(fields);
-	}
+        return new NewlineDelimitedJson(fields);
+    }
 
 }

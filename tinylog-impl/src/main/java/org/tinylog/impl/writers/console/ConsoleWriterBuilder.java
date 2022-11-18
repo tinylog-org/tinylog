@@ -15,36 +15,36 @@ import org.tinylog.impl.writers.Writer;
  */
 public class ConsoleWriterBuilder extends AbstractFormattableWriterBuilder {
 
-	private static final String THRESHOLD_KEY = "threshold";
-	private static final Level DEFAULT_THRESHOLD = Level.WARN;
+    private static final String THRESHOLD_KEY = "threshold";
+    private static final Level DEFAULT_THRESHOLD = Level.WARN;
 
-	/** */
-	public ConsoleWriterBuilder() {
-	}
+    /** */
+    public ConsoleWriterBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "console";
-	}
+    @Override
+    public String getName() {
+        return "console";
+    }
 
-	@Override
-	public Writer create(Framework framework, Configuration configuration, OutputFormat format) {
-		String threshold = configuration.getValue(THRESHOLD_KEY);
-		Level level = DEFAULT_THRESHOLD;
-		if (threshold != null) {
-			try {
-				level = Level.valueOf(threshold.toUpperCase(Locale.ENGLISH));
-			} catch (IllegalArgumentException ex) {
-				InternalLogger.error(
-					null,
-					"Invalid severity level \"{}\" in property \"{}\"",
-					threshold,
-					configuration.resolveFullKey(THRESHOLD_KEY)
-				);
-			}
-		}
+    @Override
+    public Writer create(Framework framework, Configuration configuration, OutputFormat format) {
+        String threshold = configuration.getValue(THRESHOLD_KEY);
+        Level level = DEFAULT_THRESHOLD;
+        if (threshold != null) {
+            try {
+                level = Level.valueOf(threshold.toUpperCase(Locale.ENGLISH));
+            } catch (IllegalArgumentException ex) {
+                InternalLogger.error(
+                    null,
+                    "Invalid severity level \"{}\" in property \"{}\"",
+                    threshold,
+                    configuration.resolveFullKey(THRESHOLD_KEY)
+                );
+            }
+        }
 
-		return new ConsoleWriter(format, level);
-	}
+        return new ConsoleWriter(format, level);
+    }
 
 }

@@ -15,12 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(SystemStreamCaptureExtension.class)
 public @interface CaptureSystemOutput {
 
-	/**
-	 * Regular expressions for lines that should be excluded from output.
-	 *
-	 * @return An output line will be discarded silently, if it matches with at least one of the defined regular
-	 *         expressions.
-	 */
-	String[] excludes() default {};
+    /**
+     * Regular expressions for lines that should be excluded from output.
+     *
+     * @return An output line will be discarded silently, if it matches with at least one of the defined regular
+     *         expressions.
+     */
+    String[] excludes() default {};
 
 }

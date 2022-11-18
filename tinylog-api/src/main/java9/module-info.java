@@ -1,7 +1,7 @@
 module org.tinylog.api {
 
-	requires org.tinylog.core;
+    requires org.tinylog.core;
 
-	exports org.tinylog;
+    exports org.tinylog;
 
 }

@@ -16,18 +16,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ServiceRegistrationExtension.class)
 public @interface RegisterService {
 
-	/**
-	 * The service interface.
-	 *
-	 * @return The service interface class
-	 */
-	Class<?> service();
+    /**
+     * The service interface.
+     *
+     * @return The service interface class
+     */
+    Class<?> service();
 
-	/**
-	 * Service implementations to register.
-	 *
-	 * @return The implementation classes
-	 */
-	Class<?>[] implementations();
+    /**
+     * Service implementations to register.
+     *
+     * @return The implementation classes
+     */
+    Class<?>[] implementations();
 
 }

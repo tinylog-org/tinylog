@@ -12,31 +12,31 @@ import java.util.Locale;
  */
 public class JavaTimeFormat implements ValueFormat {
 
-	private final Locale locale;
-	private final ZoneId defaultZone;
+    private final Locale locale;
+    private final ZoneId defaultZone;
 
-	/**
-	 * @param locale Locale for language or country depending format outputs
-	 * @param defaultZone Default zone for {@link Instant} instances
-	 */
-	JavaTimeFormat(Locale locale, ZoneId defaultZone) {
-		this.locale = locale;
-		this.defaultZone = defaultZone;
-	}
+    /**
+     * @param locale Locale for language or country depending format outputs
+     * @param defaultZone Default zone for {@link Instant} instances
+     */
+    JavaTimeFormat(Locale locale, ZoneId defaultZone) {
+        this.locale = locale;
+        this.defaultZone = defaultZone;
+    }
 
-	@Override
-	public boolean isSupported(Object value) {
-		return value instanceof TemporalAccessor;
-	}
+    @Override
+    public boolean isSupported(Object value) {
+        return value instanceof TemporalAccessor;
+    }
 
-	@Override
-	public String format(final String pattern, final Object value) {
-		TemporalAccessor accessor = (TemporalAccessor) value;
-		if (accessor instanceof Instant) {
-			accessor = ZonedDateTime.ofInstant((Instant) accessor, defaultZone);
-		}
+    @Override
+    public String format(final String pattern, final Object value) {
+        TemporalAccessor accessor = (TemporalAccessor) value;
+        if (accessor instanceof Instant) {
+            accessor = ZonedDateTime.ofInstant((Instant) accessor, defaultZone);
+        }
 
-		return DateTimeFormatter.ofPattern(pattern, locale).format(accessor);
-	}
+        return DateTimeFormatter.ofPattern(pattern, locale).format(accessor);
+    }
 
 }

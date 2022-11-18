@@ -5,15 +5,15 @@ package org.tinylog.core.format.message;
  */
 public interface MessageFormatter {
 
-	/**
-	 * Replaces all placeholders with real values.
-	 *
-	 * @param message
-	 *            Text message with placeholders
-	 * @param arguments
-	 *            Replacements for placeholders
-	 * @return Formatted text message
-	 */
-	String format(String message, Object... arguments);
+    /**
+     * Replaces all placeholders with real values.
+     *
+     * @param message
+     *            Text message with placeholders
+     * @param arguments
+     *            Replacements for placeholders
+     * @return Formatted text message
+     */
+    String format(String message, Object... arguments);
 
 }

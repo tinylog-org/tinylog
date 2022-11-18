@@ -8,26 +8,26 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class CountSegmentBuilder implements PathSegmentBuilder {
 
-	/** */
-	public CountSegmentBuilder() {
-	}
+    /** */
+    public CountSegmentBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "count";
-	}
+    @Override
+    public String getName() {
+        return "count";
+    }
 
-	@Override
-	public PathSegment create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for count path segment: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public PathSegment create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for count path segment: \"{}\"",
+                value
+            );
+        }
 
-		return new CountSegment();
-	}
+        return new CountSegment();
+    }
 
 }

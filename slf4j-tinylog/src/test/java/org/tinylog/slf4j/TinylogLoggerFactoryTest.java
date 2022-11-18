@@ -11,29 +11,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @CaptureLogEntries
 class TinylogLoggerFactoryTest {
 
-	@Inject
-	private Framework framework;
+    @Inject
+    private Framework framework;
 
-	/**
-	 * Verifies that the factory provides the same logger instance for the same name.
-	 */
-	@Test
-	void getSameLoggerInstanceForSameName() {
-		TinylogLoggerFactory factory = new TinylogLoggerFactory(framework);
-		TinylogLogger logger = factory.getLogger("Foo");
-		TinylogLogger other = factory.getLogger("Foo");
-		assertThat(other).isSameAs(logger);
-	}
+    /**
+     * Verifies that the factory provides the same logger instance for the same name.
+     */
+    @Test
+    void getSameLoggerInstanceForSameName() {
+        TinylogLoggerFactory factory = new TinylogLoggerFactory(framework);
+        TinylogLogger logger = factory.getLogger("Foo");
+        TinylogLogger other = factory.getLogger("Foo");
+        assertThat(other).isSameAs(logger);
+    }
 
-	/**
-	 * Verifies that the factory provides another same logger instance for another name.
-	 */
-	@Test
-	void getDifferentLoggerInstanceForDifferentName() {
-		TinylogLoggerFactory factory = new TinylogLoggerFactory(framework);
-		TinylogLogger logger = factory.getLogger("Foo");
-		TinylogLogger other = factory.getLogger("Bar");
-		assertThat(other).isNotSameAs(logger);
-	}
+    /**
+     * Verifies that the factory provides another same logger instance for another name.
+     */
+    @Test
+    void getDifferentLoggerInstanceForDifferentName() {
+        TinylogLoggerFactory factory = new TinylogLoggerFactory(framework);
+        TinylogLogger logger = factory.getLogger("Foo");
+        TinylogLogger other = factory.getLogger("Bar");
+        assertThat(other).isNotSameAs(logger);
+    }
 
 }

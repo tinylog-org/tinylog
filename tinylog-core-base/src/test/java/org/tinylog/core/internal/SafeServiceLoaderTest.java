@@ -21,150 +21,150 @@ import static org.mockito.Mockito.verify;
 @CaptureLogEntries
 class SafeServiceLoaderTest {
 
-	@Inject
-	private Framework framework;
+    @Inject
+    private Framework framework;
 
-	@Inject
-	private Log log;
+    @Inject
+    private Log log;
 
-	/**
-	 * Verifies that all registered service implementations can be loaded.
-	 */
-	@RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
-	@Test
-	void loadAllServiceImplementations() {
-		List<FooService> services = SafeServiceLoader.asList(
-			framework,
-			FooService.class,
-			"foo services"
-		);
+    /**
+     * Verifies that all registered service implementations can be loaded.
+     */
+    @RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
+    @Test
+    void loadAllServiceImplementations() {
+        List<FooService> services = SafeServiceLoader.asList(
+            framework,
+            FooService.class,
+            "foo services"
+        );
 
-		assertThat(services)
-			.hasSize(2)
-			.hasAtLeastOneElementOfType(FirstServiceImpl.class)
-			.hasAtLeastOneElementOfType(SecondServiceImpl.class);
-	}
+        assertThat(services)
+            .hasSize(2)
+            .hasAtLeastOneElementOfType(FirstServiceImpl.class)
+            .hasAtLeastOneElementOfType(SecondServiceImpl.class);
+    }
 
-	/**
-	 * Verifies that all registered service implementations can be mapped.
-	 */
-	@RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
-	@Test
-	void mapAllServiceImplementations() {
-		List<String> names = SafeServiceLoader.asList(
-			framework,
-			FooService.class,
-			"foo services",
-			FooService::getName
-		);
+    /**
+     * Verifies that all registered service implementations can be mapped.
+     */
+    @RegisterService(service = FooService.class, implementations = {FirstServiceImpl.class, SecondServiceImpl.class})
+    @Test
+    void mapAllServiceImplementations() {
+        List<String> names = SafeServiceLoader.asList(
+            framework,
+            FooService.class,
+            "foo services",
+            FooService::getName
+        );
 
-		assertThat(names).containsExactlyInAnyOrder("first", "second");
-	}
+        assertThat(names).containsExactlyInAnyOrder("first", "second");
+    }
 
-	/**
-	 * Verifies that a map operation can be executed for a single service implementation.
-	 */
-	@Test
-	void mapSingleServiceImplementation() {
-		List<String> names = new ArrayList<>();
-		SafeServiceLoader.execute(names, new FirstServiceImpl(), "map", FooService::getName);
+    /**
+     * Verifies that a map operation can be executed for a single service implementation.
+     */
+    @Test
+    void mapSingleServiceImplementation() {
+        List<String> names = new ArrayList<>();
+        SafeServiceLoader.execute(names, new FirstServiceImpl(), "map", FooService::getName);
 
-		assertThat(names).containsExactly("first");
-	}
+        assertThat(names).containsExactly("first");
+    }
 
-	/**
-	 * Verifies that a failed map operation is logged but does not throw any exception.
-	 */
-	@Test
-	void logFailedMapping() {
-		List<String> names = new ArrayList<>();
-		SafeServiceLoader.execute(names, new EvilServiceImpl(), "map", FooService::getName);
+    /**
+     * Verifies that a failed map operation is logged but does not throw any exception.
+     */
+    @Test
+    void logFailedMapping() {
+        List<String> names = new ArrayList<>();
+        SafeServiceLoader.execute(names, new EvilServiceImpl(), "map", FooService::getName);
 
-		assertThat(names).isEmpty();
-		assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isExactlyInstanceOf(UnsupportedOperationException.class);
-			assertThat(entry.getMessage()).contains("map").contains(EvilServiceImpl.class.getName());
-		});
-	}
+        assertThat(names).isEmpty();
+        assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isExactlyInstanceOf(UnsupportedOperationException.class);
+            assertThat(entry.getMessage()).contains("map").contains(EvilServiceImpl.class.getName());
+        });
+    }
 
-	/**
-	 * Verifies that a consume operation can be executed for a single service implementation.
-	 */
-	@SuppressWarnings("unchecked")
-	@Test
-	void consumeSingleServiceImplementation() {
-		FirstServiceImpl implementation = new FirstServiceImpl();
-		Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
-		SafeServiceLoader.execute(implementation, "consume", action);
+    /**
+     * Verifies that a consume operation can be executed for a single service implementation.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    void consumeSingleServiceImplementation() {
+        FirstServiceImpl implementation = new FirstServiceImpl();
+        Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
+        SafeServiceLoader.execute(implementation, "consume", action);
 
-		verify(action).accept(implementation);
-	}
+        verify(action).accept(implementation);
+    }
 
-	/**
-	 * Verifies that a failed consume operation is logged but does not throw any exception.
-	 */
-	@SuppressWarnings("unchecked")
-	@Test
-	void logFailedConsuming() {
-		FirstServiceImpl implementation = new FirstServiceImpl();
-		Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
-		doThrow(UnsupportedOperationException.class).when(action).accept(implementation);
-		SafeServiceLoader.execute(implementation, "consume", action);
+    /**
+     * Verifies that a failed consume operation is logged but does not throw any exception.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    void logFailedConsuming() {
+        FirstServiceImpl implementation = new FirstServiceImpl();
+        Consumer<FooService> action = (Consumer<FooService>) mock(Consumer.class);
+        doThrow(UnsupportedOperationException.class).when(action).accept(implementation);
+        SafeServiceLoader.execute(implementation, "consume", action);
 
-		assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getThrowable()).isExactlyInstanceOf(UnsupportedOperationException.class);
-			assertThat(entry.getMessage()).contains("consume").contains(FirstServiceImpl.class.getName());
-		});
-	}
+        assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isExactlyInstanceOf(UnsupportedOperationException.class);
+            assertThat(entry.getMessage()).contains("consume").contains(FirstServiceImpl.class.getName());
+        });
+    }
 
-	/**
-	 * Test service interface.
-	 */
-	public interface FooService {
+    /**
+     * Test service interface.
+     */
+    public interface FooService {
 
-		/**
-		 * Gets the name of the service implementation.
-		 *
-		 * @return The name of the service implementation
-		 */
-		String getName();
+        /**
+         * Gets the name of the service implementation.
+         *
+         * @return The name of the service implementation
+         */
+        String getName();
 
-	}
+    }
 
-	/**
-	 * First test service implementation.
-	 */
-	public static class FirstServiceImpl implements FooService {
+    /**
+     * First test service implementation.
+     */
+    public static class FirstServiceImpl implements FooService {
 
-		@Override
-		public String getName() {
-			return "first";
-		}
-	}
+        @Override
+        public String getName() {
+            return "first";
+        }
+    }
 
-	/**
-	 * Second test service implementation.
-	 */
-	public static class SecondServiceImpl implements FooService {
+    /**
+     * Second test service implementation.
+     */
+    public static class SecondServiceImpl implements FooService {
 
-		@Override
-		public String getName() {
-			return "second";
-		}
-	}
+        @Override
+        public String getName() {
+            return "second";
+        }
+    }
 
-	/**
-	 * Evil test service implementation that throws an {@link java.lang.UnsupportedOperationException}.
-	 */
-	public static class EvilServiceImpl implements FooService {
+    /**
+     * Evil test service implementation that throws an {@link java.lang.UnsupportedOperationException}.
+     */
+    public static class EvilServiceImpl implements FooService {
 
-		@Override
-		public String getName() {
-			throw new UnsupportedOperationException();
-		}
+        @Override
+        public String getName() {
+            throw new UnsupportedOperationException();
+        }
 
-	}
+    }
 
 }

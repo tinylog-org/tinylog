@@ -7,13 +7,13 @@ import java.util.Locale;
  */
 public class DateFormatBuilder implements ValueFormatBuilder {
 
-	/** */
-	public DateFormatBuilder() {
-	}
+    /** */
+    public DateFormatBuilder() {
+    }
 
-	@Override
-	public DateFormat create(Locale locale) {
-		return new DateFormat(locale);
-	}
+    @Override
+    public DateFormat create(Locale locale) {
+        return new DateFormat(locale);
+    }
 
 }

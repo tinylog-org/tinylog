@@ -21,86 +21,86 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 @CaptureLogEntries
 class MonthlyPolicyBuilderTest {
 
-	@Inject
-	private Framework framework;
+    @Inject
+    private Framework framework;
 
-	@Inject
-	private TestClock clock;
+    @Inject
+    private TestClock clock;
 
-	/**
-	 * Verifies that the created monthly policy will trigger a rollover event on the first day of the month at midnight
-	 * at the system default time zone.
-	 */
-	@Test
-	void defaultOnMidnightWithSystemZone() throws Exception {
-		clock.setZone(ZoneId.of("UTC-1"));
-		clock.setInstant(Instant.parse("2000-01-01T00:59:59Z"));
+    /**
+     * Verifies that the created monthly policy will trigger a rollover event on the first day of the month at midnight
+     * at the system default time zone.
+     */
+    @Test
+    void defaultOnMidnightWithSystemZone() throws Exception {
+        clock.setZone(ZoneId.of("UTC-1"));
+        clock.setInstant(Instant.parse("2000-01-01T00:59:59Z"));
 
-		Policy policy = new MonthlyPolicyBuilder().create(framework, null);
-		policy.init(null);
-		assertThat(policy.canAcceptLogEntry(0)).isTrue();
+        Policy policy = new MonthlyPolicyBuilder().create(framework, null);
+        policy.init(null);
+        assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-		clock.setInstant(Instant.parse("2000-01-01T01:00:00Z"));
-		assertThat(policy.canAcceptLogEntry(0)).isFalse();
-	}
+        clock.setInstant(Instant.parse("2000-01-01T01:00:00Z"));
+        assertThat(policy.canAcceptLogEntry(0)).isFalse();
+    }
 
-	/**
-	 * Verifies that a custom time can be configured for monthly rollover events without defining a time zone.
-	 */
-	@Test
-	void customTimeWithSystemZone() throws Exception {
-		clock.setZone(ZoneOffset.UTC);
-		clock.setInstant(Instant.parse("2000-01-01T03:59:59Z"));
+    /**
+     * Verifies that a custom time can be configured for monthly rollover events without defining a time zone.
+     */
+    @Test
+    void customTimeWithSystemZone() throws Exception {
+        clock.setZone(ZoneOffset.UTC);
+        clock.setInstant(Instant.parse("2000-01-01T03:59:59Z"));
 
-		Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00");
-		policy.init(null);
-		assertThat(policy.canAcceptLogEntry(0)).isTrue();
+        Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00");
+        policy.init(null);
+        assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-		clock.setInstant(Instant.parse("2000-01-01T04:00:00Z"));
-		assertThat(policy.canAcceptLogEntry(0)).isFalse();
-	}
+        clock.setInstant(Instant.parse("2000-01-01T04:00:00Z"));
+        assertThat(policy.canAcceptLogEntry(0)).isFalse();
+    }
 
-	/**
-	 * Verifies that a custom time and custom zone can be configured for monthly rollover events.
-	 */
-	@Test
-	void customTimeAndZone() throws Exception {
-		clock.setZone(ZoneOffset.UTC);
-		clock.setInstant(Instant.parse("2000-01-01T02:59:59Z"));
+    /**
+     * Verifies that a custom time and custom zone can be configured for monthly rollover events.
+     */
+    @Test
+    void customTimeAndZone() throws Exception {
+        clock.setZone(ZoneOffset.UTC);
+        clock.setInstant(Instant.parse("2000-01-01T02:59:59Z"));
 
-		Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00 CET");
-		policy.init(null);
-		assertThat(policy.canAcceptLogEntry(0)).isTrue();
+        Policy policy = new MonthlyPolicyBuilder().create(framework, "04:00 CET");
+        policy.init(null);
+        assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-		clock.setInstant(Instant.parse("2000-01-01T03:00:00Z"));
-		assertThat(policy.canAcceptLogEntry(0)).isFalse();
-	}
+        clock.setInstant(Instant.parse("2000-01-01T03:00:00Z"));
+        assertThat(policy.canAcceptLogEntry(0)).isFalse();
+    }
 
-	/**
-	 * Verifies that an exception with a meaningful message will be thrown, if the configuration value contains an
-	 * invalid time or zone.
-	 *
-	 * @param configurationValue The configuration value with an invalid value for the monthly policy
-	 */
-	@ParameterizedTest
-	@ValueSource(strings = {"foo", "foo UTC", "00:00 FOO"})
-	void invalidConfiguration(String configurationValue) {
-		Throwable throwable = catchThrowable(() -> new MonthlyPolicyBuilder().create(framework, configurationValue));
-		assertThat(throwable)
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessageContaining(configurationValue)
-			.hasCauseInstanceOf(DateTimeException.class);
-	}
+    /**
+     * Verifies that an exception with a meaningful message will be thrown, if the configuration value contains an
+     * invalid time or zone.
+     *
+     * @param configurationValue The configuration value with an invalid value for the monthly policy
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"foo", "foo UTC", "00:00 FOO"})
+    void invalidConfiguration(String configurationValue) {
+        Throwable throwable = catchThrowable(() -> new MonthlyPolicyBuilder().create(framework, configurationValue));
+        assertThat(throwable)
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining(configurationValue)
+            .hasCauseInstanceOf(DateTimeException.class);
+    }
 
-	/**
-	 * Verifies that the builder is registered as service.
-	 */
-	@Test
-	void service() {
-		assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
-			assertThat(builder).isInstanceOf(MonthlyPolicyBuilder.class);
-			assertThat(builder.getName()).isEqualTo("monthly");
-		});
-	}
+    /**
+     * Verifies that the builder is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(PolicyBuilder.class)).anySatisfy(builder -> {
+            assertThat(builder).isInstanceOf(MonthlyPolicyBuilder.class);
+            assertThat(builder.getName()).isEqualTo("monthly");
+        });
+    }
 
 }

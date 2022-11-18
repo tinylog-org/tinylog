@@ -10,18 +10,18 @@ package org.tinylog.core.runtime;
  */
 public interface RuntimeBuilder {
 
-	/**
-	 * Tests whether this runtime flavor supports the actual virtual machine.
-	 *
-	 * @return {@code true} if supported, otherwise {@code false}
-	 */
-	boolean isSupported();
+    /**
+     * Tests whether this runtime flavor supports the actual virtual machine.
+     *
+     * @return {@code true} if supported, otherwise {@code false}
+     */
+    boolean isSupported();
 
-	/**
-	 * Creates a new instance of the runtime flavor.
-	 *
-	 * @return New instance of the runtime flavor
-	 */
-	RuntimeFlavor create();
+    /**
+     * Creates a new instance of the runtime flavor.
+     *
+     * @return New instance of the runtime flavor
+     */
+    RuntimeFlavor create();
 
 }

@@ -6,12 +6,12 @@ package org.tinylog.core.test.isolate;
 @FunctionalInterface
 public interface ObjectSupplier {
 
-	/**
-	 * Creates a new object instance.
-	 *
-	 * @return The created object instance
-	 * @throws ReflectiveOperationException Failed to create an object instance
-	 */
-	Object create() throws ReflectiveOperationException;
+    /**
+     * Creates a new object instance.
+     *
+     * @return The created object instance
+     * @throws ReflectiveOperationException Failed to create an object instance
+     */
+    Object create() throws ReflectiveOperationException;
 
 }

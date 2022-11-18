@@ -9,23 +9,23 @@ import java.util.Locale;
  */
 public class DateFormat implements ValueFormat {
 
-	private final Locale locale;
+    private final Locale locale;
 
-	/**
-	 * @param locale Locale for language or country depending format outputs
-	 */
-	DateFormat(Locale locale) {
-		this.locale = locale;
-	}
+    /**
+     * @param locale Locale for language or country depending format outputs
+     */
+    DateFormat(Locale locale) {
+        this.locale = locale;
+    }
 
-	@Override
-	public boolean isSupported(final Object value) {
-		return value instanceof Date;
-	}
+    @Override
+    public boolean isSupported(final Object value) {
+        return value instanceof Date;
+    }
 
-	@Override
-	public String format(final String pattern, final Object value) {
-		return new SimpleDateFormat(pattern, locale).format(value);
-	}
+    @Override
+    public String format(final String pattern, final Object value) {
+        return new SimpleDateFormat(pattern, locale).format(value);
+    }
 
 }

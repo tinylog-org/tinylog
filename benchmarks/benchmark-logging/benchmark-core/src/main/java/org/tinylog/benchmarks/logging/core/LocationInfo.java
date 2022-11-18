@@ -5,19 +5,19 @@ package org.tinylog.benchmarks.logging.core;
  */
 public enum LocationInfo {
 
-	/**
-	 * No location information.
-	 */
-	NONE,
+    /**
+     * No location information.
+     */
+    NONE,
 
-	/**
-	 * Only class or category (depends on the actual logging framework).
-	 */
-	CLASS_OR_CATEGORY_ONLY,
+    /**
+     * Only class or category (depends on the actual logging framework).
+     */
+    CLASS_OR_CATEGORY_ONLY,
 
-	/**
-	 * Full location information (class and method).
-	 */
-	FULL
+    /**
+     * Full location information (class and method).
+     */
+    FULL
 
 }

@@ -8,27 +8,27 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class ProcessIdSegmentBuilder implements PathSegmentBuilder {
 
-	/** */
-	public ProcessIdSegmentBuilder() {
-	}
+    /** */
+    public ProcessIdSegmentBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "process-id";
-	}
+    @Override
+    public String getName() {
+        return "process-id";
+    }
 
-	@Override
-	public PathSegment create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for process ID path segment: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public PathSegment create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for process ID path segment: \"{}\"",
+                value
+            );
+        }
 
-		long processId = framework.getRuntime().getProcessId();
-		return new StaticPathSegment(Long.toString(processId));
-	}
+        long processId = framework.getRuntime().getProcessId();
+        return new StaticPathSegment(Long.toString(processId));
+    }
 
 }

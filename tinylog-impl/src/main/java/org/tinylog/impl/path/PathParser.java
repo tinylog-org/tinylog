@@ -30,76 +30,76 @@ import org.tinylog.impl.path.segments.StaticPathSegment;
  */
 public class PathParser extends AbstractPatternParser {
 
-	private final Framework framework;
-	private final Map<String, PathSegmentBuilder> builders;
+    private final Framework framework;
+    private final Map<String, PathSegmentBuilder> builders;
 
-	/**
-	 * @param framework The actual logging framework instance
-	 */
-	public PathParser(Framework framework) {
-		this.framework = framework;
-		this.builders = new HashMap<>();
+    /**
+     * @param framework The actual logging framework instance
+     */
+    public PathParser(Framework framework) {
+        this.framework = framework;
+        this.builders = new HashMap<>();
 
-		SafeServiceLoader
-			.asList(framework, PathSegmentBuilder.class, "path segment builders")
-			.forEach(builder -> builders.put(builder.getName(), builder));
-	}
+        SafeServiceLoader
+            .asList(framework, PathSegmentBuilder.class, "path segment builders")
+            .forEach(builder -> builders.put(builder.getName(), builder));
+    }
 
-	/**
-	 * Parses the dynamic path to the log file.
-	 *
-	 * @param path The dynamic path with placeholders
-	 * @return Resolvable path segments
-	 */
-	public List<PathSegment> parse(String path) {
-		List<PathSegment> segments = new ArrayList<>();
+    /**
+     * Parses the dynamic path to the log file.
+     *
+     * @param path The dynamic path with placeholders
+     * @return Resolvable path segments
+     */
+    public List<PathSegment> parse(String path) {
+        List<PathSegment> segments = new ArrayList<>();
 
-		BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
-			if (builder.length() > 0) {
-				segments.add(new StaticPathSegment(builder.toString()));
-				builder.setLength(0);
-			}
+        BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
+            if (builder.length() > 0) {
+                segments.add(new StaticPathSegment(builder.toString()));
+                builder.setLength(0);
+            }
 
-			PathSegment segment = createSegment(group);
-			if (segment == null) {
-				segments.add(new StaticPathSegment("undefined"));
-			} else {
-				segments.add(segment);
-			}
-		};
+            PathSegment segment = createSegment(group);
+            if (segment == null) {
+                segments.add(new StaticPathSegment("undefined"));
+            } else {
+                segments.add(segment);
+            }
+        };
 
-		StringBuilder builder = parse(path, groupConsumer);
+        StringBuilder builder = parse(path, groupConsumer);
 
-		if (builder.length() > 0) {
-			segments.add(new StaticPathSegment(builder.toString()));
-		}
+        if (builder.length() > 0) {
+            segments.add(new StaticPathSegment(builder.toString()));
+        }
 
-		return segments;
-	}
+        return segments;
+    }
 
-	/**
-	 * Creates a path segment from a string placeholder.
-	 *
-	 * @param placeholder The placeholder with the name and optionally configuration value
-	 * @return The corresponding path segment or {@code null}
-	 */
-	private PathSegment createSegment(String placeholder) {
-		int index = placeholder.indexOf(':');
-		String name = index >= 0 ? placeholder.substring(0, index).trim() : placeholder.trim();
-		String value = index >= 0 ? placeholder.substring(index + 1).trim() : null;
+    /**
+     * Creates a path segment from a string placeholder.
+     *
+     * @param placeholder The placeholder with the name and optionally configuration value
+     * @return The corresponding path segment or {@code null}
+     */
+    private PathSegment createSegment(String placeholder) {
+        int index = placeholder.indexOf(':');
+        String name = index >= 0 ? placeholder.substring(0, index).trim() : placeholder.trim();
+        String value = index >= 0 ? placeholder.substring(index + 1).trim() : null;
 
-		PathSegmentBuilder builder = builders.get(name);
-		if (builder == null) {
-			InternalLogger.error(null, "Invalid path segment \"{}\"", placeholder);
-			return null;
-		} else {
-			try {
-				return builder.create(framework, value);
-			} catch (Exception ex) {
-				InternalLogger.error(ex, "Failed to create path segment for \"{}\"", placeholder);
-				return null;
-			}
-		}
-	}
+        PathSegmentBuilder builder = builders.get(name);
+        if (builder == null) {
+            InternalLogger.error(null, "Invalid path segment \"{}\"", placeholder);
+            return null;
+        } else {
+            try {
+                return builder.create(framework, value);
+            } catch (Exception ex) {
+                InternalLogger.error(ex, "Failed to create path segment for \"{}\"", placeholder);
+                return null;
+            }
+        }
+    }
 
 }

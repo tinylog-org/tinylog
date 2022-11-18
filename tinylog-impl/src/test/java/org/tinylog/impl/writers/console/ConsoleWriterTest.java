@@ -19,69 +19,69 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ConsoleWriterTest {
 
-	@Mock
-	private PrintStream mockedOutputStream;
+    @Mock
+    private PrintStream mockedOutputStream;
 
-	@Mock
-	private PrintStream mockedErrorStream;
+    @Mock
+    private PrintStream mockedErrorStream;
 
-	private PrintStream originalOutputStream;
-	private PrintStream originalErrorStream;
+    private PrintStream originalOutputStream;
+    private PrintStream originalErrorStream;
 
-	/**
-	 * Mocks {@link System#out} and {@link System#err}.
-	 */
-	@BeforeEach
-	void init() {
-		originalOutputStream = System.out;
-		originalErrorStream = System.err;
+    /**
+     * Mocks {@link System#out} and {@link System#err}.
+     */
+    @BeforeEach
+    void init() {
+        originalOutputStream = System.out;
+        originalErrorStream = System.err;
 
-		System.setOut(mockedOutputStream);
-		System.setErr(mockedErrorStream);
-	}
+        System.setOut(mockedOutputStream);
+        System.setErr(mockedErrorStream);
+    }
 
-	/**
-	 * Restores the original streams for {@link System#out} and {@link System#err}.
-	 */
-	@AfterEach
-	void reset() {
-		System.setOut(originalOutputStream);
-		System.setErr(originalErrorStream);
-	}
+    /**
+     * Restores the original streams for {@link System#out} and {@link System#err}.
+     */
+    @AfterEach
+    void reset() {
+        System.setOut(originalOutputStream);
+        System.setErr(originalErrorStream);
+    }
 
-	/**
-	 * Verifies that the console writer requires all log entry values from the passed placeholder plus
-	 * {@link LogEntryValue#LEVEL}.
-	 */
-	@Test
-	void requiredLogEntryValues() {
-		try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
-			assertThat(writer.getRequiredLogEntryValues())
-				.containsExactlyInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
-		}
-	}
+    /**
+     * Verifies that the console writer requires all log entry values from the passed placeholder plus
+     * {@link LogEntryValue#LEVEL}.
+     */
+    @Test
+    void requiredLogEntryValues() {
+        try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
+            assertThat(writer.getRequiredLogEntryValues())
+                .containsExactlyInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
+        }
+    }
 
-	/**
-	 * Verifies that all log entries are output to the correct stream according to the defined severity level threshold.
-	 */
-	@Test
-	void logging() {
-		try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
-			writer.log(new LogEntryBuilder().severityLevel(Level.TRACE).message("Hello Trace!").create());
-			verify(mockedOutputStream).print("Hello Trace!");
+    /**
+     * Verifies that all log entries are output to the correct stream according to the defined severity level threshold.
+     */
+    @Test
+    void logging() {
+        try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
+            writer.log(new LogEntryBuilder().severityLevel(Level.TRACE).message("Hello Trace!").create());
+            verify(mockedOutputStream).print("Hello Trace!");
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.DEBUG).message("Hello Debug!").create());
-			verify(mockedOutputStream).print("Hello Debug!");
+            writer.log(new LogEntryBuilder().severityLevel(Level.DEBUG).message("Hello Debug!").create());
+            verify(mockedOutputStream).print("Hello Debug!");
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello Info!").create());
-			verify(mockedOutputStream).print("Hello Info!");
+            writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello Info!").create());
+            verify(mockedOutputStream).print("Hello Info!");
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello Warn!").create());
-			verify(mockedErrorStream).print("Hello Warn!");
+            writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello Warn!").create());
+            verify(mockedErrorStream).print("Hello Warn!");
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello Error!").create());
-			verify(mockedErrorStream).print("Hello Error!");
-		}
-	}
+            writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello Error!").create());
+            verify(mockedErrorStream).print("Hello Error!");
+        }
+    }
 
 }

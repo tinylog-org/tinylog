@@ -12,32 +12,32 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class MessageOnlyPlaceholder implements Placeholder {
 
-	/** */
-	public MessageOnlyPlaceholder() {
-	}
+    /** */
+    public MessageOnlyPlaceholder() {
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.MESSAGE);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.MESSAGE);
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.STRING;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.STRING;
+    }
 
-	@Override
-	public String getValue(LogEntry entry) {
-		return entry.getMessage();
-	}
+    @Override
+    public String getValue(LogEntry entry) {
+        return entry.getMessage();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		String message = entry.getMessage();
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        String message = entry.getMessage();
 
-		if (message != null) {
-			builder.append(message);
-		}
-	}
+        if (message != null) {
+            builder.append(message);
+        }
+    }
 
 }

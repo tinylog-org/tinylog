@@ -7,20 +7,20 @@ import org.tinylog.core.Framework;
  */
 public class NopLoggingBackendBuilder implements LoggingBackendBuilder {
 
-	private static final NopLoggingBackend PROVIDER = new NopLoggingBackend();
+    private static final NopLoggingBackend PROVIDER = new NopLoggingBackend();
 
-	/** */
-	public NopLoggingBackendBuilder() {
-	}
+    /** */
+    public NopLoggingBackendBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "nop";
-	}
+    @Override
+    public String getName() {
+        return "nop";
+    }
 
-	@Override
-	public LoggingBackend create(Framework framework) {
-		return PROVIDER;
-	}
+    @Override
+    public LoggingBackend create(Framework framework) {
+        return PROVIDER;
+    }
 
 }

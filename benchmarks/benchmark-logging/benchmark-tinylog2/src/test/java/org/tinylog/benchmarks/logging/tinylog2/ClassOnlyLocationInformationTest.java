@@ -18,64 +18,64 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(OrderAnnotation.class)
 class ClassOnlyLocationInformationTest {
 
-	private static final String NEW_LINE = System.lineSeparator();
+    private static final String NEW_LINE = System.lineSeparator();
 
-	private static Tinylog2Benchmark benchmark;
+    private static Tinylog2Benchmark benchmark;
 
-	/**
-	 * Initializes the benchmark including the logging framework.
-	 *
-	 * @throws IOException Failed to configure the logging framework
-	 */
-	@BeforeAll
-	static void init() throws IOException {
-		benchmark = new Tinylog2Benchmark(LocationInfo.CLASS_OR_CATEGORY_ONLY);
-		benchmark.configure();
-	}
+    /**
+     * Initializes the benchmark including the logging framework.
+     *
+     * @throws IOException Failed to configure the logging framework
+     */
+    @BeforeAll
+    static void init() throws IOException {
+        benchmark = new Tinylog2Benchmark(LocationInfo.CLASS_OR_CATEGORY_ONLY);
+        benchmark.configure();
+    }
 
-	/**
-	 * Shuts the benchmark including the logging framework gracefully down.
-	 *
-	 * @throws InterruptedException Failed to wait for the graceful shutdown
-	 */
-	@AfterAll
-	static void dispose() throws InterruptedException {
-		benchmark.shutdown();
-	}
+    /**
+     * Shuts the benchmark including the logging framework gracefully down.
+     *
+     * @throws InterruptedException Failed to wait for the graceful shutdown
+     */
+    @AfterAll
+    static void dispose() throws InterruptedException {
+        benchmark.shutdown();
+    }
 
-	/**
-	 * Verifies that the debug log entry will be not output.
-	 */
-	@Test
-	@Order(1)
-	void discard() throws InterruptedException {
-		benchmark.discard();
-		Thread.sleep(10);
+    /**
+     * Verifies that the debug log entry will be not output.
+     */
+    @Test
+    @Order(1)
+    void discard() throws InterruptedException {
+        benchmark.discard();
+        Thread.sleep(10);
 
-		String logFile = benchmark.getLogFile();
-		assertThat(logFile).isNotNull();
+        String logFile = benchmark.getLogFile();
+        assertThat(logFile).isNotNull();
 
-		Path path = Paths.get(logFile);
-		assertThat(path).isEmptyFile();
-	}
+        Path path = Paths.get(logFile);
+        assertThat(path).isEmptyFile();
+    }
 
-	/**
-	 * Verifies that the into log entry will be output correctly.
-	 */
-	@Test
-	@Order(2)
-	void output() throws InterruptedException {
-		benchmark.output();
-		Thread.sleep(10);
+    /**
+     * Verifies that the into log entry will be output correctly.
+     */
+    @Test
+    @Order(2)
+    void output() throws InterruptedException {
+        benchmark.output();
+        Thread.sleep(10);
 
-		String logFile = benchmark.getLogFile();
-		assertThat(logFile).isNotNull();
+        String logFile = benchmark.getLogFile();
+        assertThat(logFile).isNotNull();
 
-		Path path = Paths.get(logFile);
-		assertThat(path)
-			.content(StandardCharsets.UTF_8)
-			.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} - main - org\\.tinylog\\.benchmarks\\.logging\\."
-				+ "tinylog2\\.Tinylog2Benchmark - INFO: Hello 42!" + NEW_LINE);
-	}
+        Path path = Paths.get(logFile);
+        assertThat(path)
+            .content(StandardCharsets.UTF_8)
+            .matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} - main - org\\.tinylog\\.benchmarks\\.logging\\."
+                + "tinylog2\\.Tinylog2Benchmark - INFO: Hello 42!" + NEW_LINE);
+    }
 
 }

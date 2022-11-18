@@ -18,216 +18,216 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class UptimePlaceholder implements Placeholder {
 
-	private static final int DECIMAL_BASE = 10;
-	private static final int NANOS_SCALE = 9;
+    private static final int DECIMAL_BASE = 10;
+    private static final int NANOS_SCALE = 9;
 
-	private static final int MAX_SECOND = 60;
-	private static final int MAX_MINUTE = 60;
-	private static final int MAX_HOUR = 24;
+    private static final int MAX_SECOND = 60;
+    private static final int MAX_MINUTE = 60;
+    private static final int MAX_HOUR = 24;
 
-	private static final int MINUTE_IN_SECONDS = MAX_SECOND;
-	private static final int HOUR_IN_SECONDS = MAX_MINUTE * MINUTE_IN_SECONDS;
-	private static final int DAY_IN_SECONDS = MAX_HOUR * HOUR_IN_SECONDS;
+    private static final int MINUTE_IN_SECONDS = MAX_SECOND;
+    private static final int HOUR_IN_SECONDS = MAX_MINUTE * MINUTE_IN_SECONDS;
+    private static final int DAY_IN_SECONDS = MAX_HOUR * HOUR_IN_SECONDS;
 
-	private final List<BiConsumer<StringBuilder, Duration>> segments;
-	private final boolean formatAlways;
+    private final List<BiConsumer<StringBuilder, Duration>> segments;
+    private final boolean formatAlways;
 
-	/**
-	 * @param pattern The format pattern to use for formatting the uptime
-	 * @param formatAlways The uptime will be returned as formatted string by the value getter if {@code true},
-	 *                        otherwise it will be returned as {@link BigDecimal}
-	 */
-	public UptimePlaceholder(String pattern, boolean formatAlways) {
-		this.segments = parse(pattern);
-		this.formatAlways = formatAlways;
-	}
+    /**
+     * @param pattern The format pattern to use for formatting the uptime
+     * @param formatAlways The uptime will be returned as formatted string by the value getter if {@code true},
+     *                        otherwise it will be returned as {@link BigDecimal}
+     */
+    public UptimePlaceholder(String pattern, boolean formatAlways) {
+        this.segments = parse(pattern);
+        this.formatAlways = formatAlways;
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.UPTIME);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.UPTIME);
+    }
 
-	@Override
-	public ValueType getType() {
-		return formatAlways ? ValueType.STRING : ValueType.DECIMAL;
-	}
+    @Override
+    public ValueType getType() {
+        return formatAlways ? ValueType.STRING : ValueType.DECIMAL;
+    }
 
-	@Override
-	public Object getValue(LogEntry entry) {
-		Duration duration = entry.getUptime();
+    @Override
+    public Object getValue(LogEntry entry) {
+        Duration duration = entry.getUptime();
 
-		if (duration == null) {
-			return null;
-		} else if (formatAlways) {
-			StringBuilder builder = new StringBuilder();
-			format(builder, duration);
-			return builder.toString();
-		} else {
-			BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds());
-			BigDecimal nanos = BigDecimal.valueOf(duration.getNano(), NANOS_SCALE);
-			return seconds.add(nanos);
-		}
-	}
+        if (duration == null) {
+            return null;
+        } else if (formatAlways) {
+            StringBuilder builder = new StringBuilder();
+            format(builder, duration);
+            return builder.toString();
+        } else {
+            BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds());
+            BigDecimal nanos = BigDecimal.valueOf(duration.getNano(), NANOS_SCALE);
+            return seconds.add(nanos);
+        }
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Duration duration = entry.getUptime();
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        Duration duration = entry.getUptime();
 
-		if (duration == null) {
-			builder.append("<uptime unknown>");
-		} else {
-			format(builder, duration);
-		}
-	}
+        if (duration == null) {
+            builder.append("<uptime unknown>");
+        } else {
+            format(builder, duration);
+        }
+    }
 
-	/**
-	 * Parses format patterns.
-	 *
-	 * <p>
-	 *     The returned consumers can be used for formatting a {@link Duration} into a {@link StringBuilder}.
-	 * </p>
-	 *
-	 * @param pattern The format pattern to parse
-	 * @return List of formattable segments
-	 */
-	private static List<BiConsumer<StringBuilder, Duration>> parse(String pattern) {
-		List<BiConsumer<StringBuilder, Duration>> segments = new ArrayList<>();
-		boolean firstTimeUnit = true;
+    /**
+     * Parses format patterns.
+     *
+     * <p>
+     *     The returned consumers can be used for formatting a {@link Duration} into a {@link StringBuilder}.
+     * </p>
+     *
+     * @param pattern The format pattern to parse
+     * @return List of formattable segments
+     */
+    private static List<BiConsumer<StringBuilder, Duration>> parse(String pattern) {
+        List<BiConsumer<StringBuilder, Duration>> segments = new ArrayList<>();
+        boolean firstTimeUnit = true;
 
-		for (int i = 0; i < pattern.length(); ++i) {
-			char character = pattern.charAt(i);
+        for (int i = 0; i < pattern.length(); ++i) {
+            char character = pattern.charAt(i);
 
-			if (character == '\'') {
-				int end = pattern.indexOf('\'', i + 1);
-				if (end == -1) { // Unescaped single quote
-					segments.add((builder, duration) -> builder.append(character));
-				} else if (end == i + 1) { // Escaped single quote
-					segments.add((builder, duration) -> builder.append(character));
-					i += 1;
-				} else { // Escaped phrase
-					String text = pattern.substring(i + 1, end);
-					segments.add((builder, duration) -> builder.append(text));
-					i = end;
-				}
-			} else {
-				int length = count(pattern, i, character);
-				ToLongFunction<Duration> timeUnitResolver = createTimeUnitResolver(character, length, firstTimeUnit);
+            if (character == '\'') {
+                int end = pattern.indexOf('\'', i + 1);
+                if (end == -1) { // Unescaped single quote
+                    segments.add((builder, duration) -> builder.append(character));
+                } else if (end == i + 1) { // Escaped single quote
+                    segments.add((builder, duration) -> builder.append(character));
+                    i += 1;
+                } else { // Escaped phrase
+                    String text = pattern.substring(i + 1, end);
+                    segments.add((builder, duration) -> builder.append(text));
+                    i = end;
+                }
+            } else {
+                int length = count(pattern, i, character);
+                ToLongFunction<Duration> timeUnitResolver = createTimeUnitResolver(character, length, firstTimeUnit);
 
-				if (timeUnitResolver == null) { // Plain character
-					segments.add((builder, duration) -> builder.append(character));
-				} else { // Time unit placeholder
-					segments.add(
-						(builder, duration) -> formatLong(builder, timeUnitResolver.applyAsLong(duration), length)
-					);
-					firstTimeUnit = false;
-					i += length - 1;
-				}
-			}
-		}
+                if (timeUnitResolver == null) { // Plain character
+                    segments.add((builder, duration) -> builder.append(character));
+                } else { // Time unit placeholder
+                    segments.add(
+                        (builder, duration) -> formatLong(builder, timeUnitResolver.applyAsLong(duration), length)
+                    );
+                    firstTimeUnit = false;
+                    i += length - 1;
+                }
+            }
+        }
 
-		return segments;
-	}
+        return segments;
+    }
 
-	/**
-	 * Counts the sequence length of a character at the given position in the passed text.
-	 *
-	 * @param text The source text that contains the character
-	 * @param start The position in the passed text, where the sequence length count of the passed character starts
-	 * @param character The character to count
-	 * @return The sequence length of the passed character
-	 */
-	private static int count(final String text, final int start, final char character) {
-		int index = start;
-		while (index < text.length() && text.charAt(index) == character) {
-			++index;
-		}
-		return index - start;
-	}
+    /**
+     * Counts the sequence length of a character at the given position in the passed text.
+     *
+     * @param text The source text that contains the character
+     * @param start The position in the passed text, where the sequence length count of the passed character starts
+     * @param character The character to count
+     * @return The sequence length of the passed character
+     */
+    private static int count(final String text, final int start, final char character) {
+        int index = start;
+        while (index < text.length() && text.charAt(index) == character) {
+            ++index;
+        }
+        return index - start;
+    }
 
-	/**
-	 * Creates a function that can resolve the time for the given time unit from a {@link Duration}.
-	 *
-	 * <p>
-	 *     Supported time units:
-	 *     <ul>
-	 *     <li>'S': Fraction of second</li>
-	 *     <li>'s': Seconds</li>
-	 *     <li>'m': Minutes</li>
-	 *     <li>'H': Hours</li>
-	 *     <li>'d': Days</li>
-	 *     </ul>
-	 * </p>
-	 *
-	 * @param timeUnit The time unit as character
-	 * @param length The sequence length of the passed time unit character
-	 * @param firstTimeUnit {@code true} if this is the first time unit in the format pattern, otherwise {@code false}
-	 * @return The created resolve function if the passed time unit is supported, otherwise {@code null}
-	 */
-	private static ToLongFunction<Duration> createTimeUnitResolver(char timeUnit, int length, boolean firstTimeUnit) {
-		switch (timeUnit) {
-			case 'S':
-				if (NANOS_SCALE > length) {
-					long divisor = (long) Math.pow(DECIMAL_BASE, NANOS_SCALE - length);
-					return duration -> duration.getNano() / divisor;
-				} else {
-					long multiplier = (long) Math.pow(DECIMAL_BASE, length - NANOS_SCALE);
-					return duration -> duration.getNano() * multiplier;
-				}
-			case 's':
-				if (firstTimeUnit) {
-					return Duration::getSeconds;
-				} else {
-					return duration -> duration.getSeconds() % MAX_SECOND;
-				}
-			case 'm':
-				if (firstTimeUnit) {
-					return duration -> duration.getSeconds() / MINUTE_IN_SECONDS;
-				} else {
-					return duration -> duration.getSeconds() / MINUTE_IN_SECONDS % MAX_MINUTE;
-				}
-			case 'H':
-				if (firstTimeUnit) {
-					return duration -> duration.getSeconds() / HOUR_IN_SECONDS;
-				} else {
-					return duration -> duration.getSeconds() / HOUR_IN_SECONDS % MAX_HOUR;
-				}
-			case 'd':
-				return duration -> duration.getSeconds() / DAY_IN_SECONDS;
-			default:
-				return null;
-		}
-	}
+    /**
+     * Creates a function that can resolve the time for the given time unit from a {@link Duration}.
+     *
+     * <p>
+     *     Supported time units:
+     *     <ul>
+     *     <li>'S': Fraction of second</li>
+     *     <li>'s': Seconds</li>
+     *     <li>'m': Minutes</li>
+     *     <li>'H': Hours</li>
+     *     <li>'d': Days</li>
+     *     </ul>
+     * </p>
+     *
+     * @param timeUnit The time unit as character
+     * @param length The sequence length of the passed time unit character
+     * @param firstTimeUnit {@code true} if this is the first time unit in the format pattern, otherwise {@code false}
+     * @return The created resolve function if the passed time unit is supported, otherwise {@code null}
+     */
+    private static ToLongFunction<Duration> createTimeUnitResolver(char timeUnit, int length, boolean firstTimeUnit) {
+        switch (timeUnit) {
+            case 'S':
+                if (NANOS_SCALE > length) {
+                    long divisor = (long) Math.pow(DECIMAL_BASE, NANOS_SCALE - length);
+                    return duration -> duration.getNano() / divisor;
+                } else {
+                    long multiplier = (long) Math.pow(DECIMAL_BASE, length - NANOS_SCALE);
+                    return duration -> duration.getNano() * multiplier;
+                }
+            case 's':
+                if (firstTimeUnit) {
+                    return Duration::getSeconds;
+                } else {
+                    return duration -> duration.getSeconds() % MAX_SECOND;
+                }
+            case 'm':
+                if (firstTimeUnit) {
+                    return duration -> duration.getSeconds() / MINUTE_IN_SECONDS;
+                } else {
+                    return duration -> duration.getSeconds() / MINUTE_IN_SECONDS % MAX_MINUTE;
+                }
+            case 'H':
+                if (firstTimeUnit) {
+                    return duration -> duration.getSeconds() / HOUR_IN_SECONDS;
+                } else {
+                    return duration -> duration.getSeconds() / HOUR_IN_SECONDS % MAX_HOUR;
+                }
+            case 'd':
+                return duration -> duration.getSeconds() / DAY_IN_SECONDS;
+            default:
+                return null;
+        }
+    }
 
-	/**
-	 * Formats a long value into a {@link StringBuilder}.
-	 *
-	 * <p>
-	 *     If the passed long value has fewer digits than the passed number of minimum digits, additional zeros are
-	 *     inserted before the actual formatted number to satisfy the number of minimum digits.
-	 * </p>
-	 *
-	 * @param builder The target string builder for the formatted long value
-	 * @param value The long value to format
-	 * @param minDigits The minimum number of digits
-	 */
-	private static void formatLong(StringBuilder builder, long value, long minDigits) {
-		String formatted = Long.toString(value);
-		for (int i = 0; i < minDigits - formatted.length(); ++i) {
-			builder.append('0');
-		}
-		builder.append(formatted);
-	}
+    /**
+     * Formats a long value into a {@link StringBuilder}.
+     *
+     * <p>
+     *     If the passed long value has fewer digits than the passed number of minimum digits, additional zeros are
+     *     inserted before the actual formatted number to satisfy the number of minimum digits.
+     * </p>
+     *
+     * @param builder The target string builder for the formatted long value
+     * @param value The long value to format
+     * @param minDigits The minimum number of digits
+     */
+    private static void formatLong(StringBuilder builder, long value, long minDigits) {
+        String formatted = Long.toString(value);
+        for (int i = 0; i < minDigits - formatted.length(); ++i) {
+            builder.append('0');
+        }
+        builder.append(formatted);
+    }
 
-	/**
-	 * Formats a {@link Duration} into a {@link StringBuilder}.
-	 *
-	 * @param builder The target string builder for the formatted duration
-	 * @param duration The duration to format
-	 */
-	private void format(StringBuilder builder, Duration duration) {
-		for (BiConsumer<StringBuilder, Duration> segment : segments) {
-			segment.accept(builder, duration);
-		}
-	}
+    /**
+     * Formats a {@link Duration} into a {@link StringBuilder}.
+     *
+     * @param builder The target string builder for the formatted duration
+     * @param duration The duration to format
+     */
+    private void format(StringBuilder builder, Duration duration) {
+        for (BiConsumer<StringBuilder, Duration> segment : segments) {
+            segment.accept(builder, duration);
+        }
+    }
 
 }

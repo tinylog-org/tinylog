@@ -18,258 +18,258 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureSystemOutput
 class InternalLoggingBackendTest {
-	
-	@Inject
-	private Output output;
 
-	/**
-	 * Verifies that the provided context storage does not store any context values.
-	 */
-	@Test
-	void contextStorage() {
-		ContextStorage storage = new InternalLoggingBackend().getContextStorage();
-		storage.put("foo", "42");
-		assertThat(storage.getMapping()).isEmpty();
-	}
+    @Inject
+    private Output output;
 
-	/**
-	 * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
-	 * information) in the precalculated level visibility object for all classes.
-	 *
-	 * @param className The fully-qualified class name to test
-	 */
-	@ParameterizedTest
-	@ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
-	void classesVisibility(String className) {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByClass(className);
-		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-	}
+    /**
+     * Verifies that the provided context storage does not store any context values.
+     */
+    @Test
+    void contextStorage() {
+        ContextStorage storage = new InternalLoggingBackend().getContextStorage();
+        storage.put("foo", "42");
+        assertThat(storage.getMapping()).isEmpty();
+    }
 
-	/**
-	 * Verifies that all severity levels are disabled in the precalculated level visibility object for untagged log
-	 * entries.
-	 */
-	@Test
-	void untaggedVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag(null);
-		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
-	}
+    /**
+     * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
+     * information) in the precalculated level visibility object for all classes.
+     *
+     * @param className The fully-qualified class name to test
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
+    void classesVisibility(String className) {
+        LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByClass(className);
+        assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+    }
 
-	/**
-	 * Verifies that all severity levels are disabled in the precalculated level visibility object for log entries with
-	 * another tag than "tinylog".
-	 */
-	@Test
-	void unknownTaggedVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("foo");
-		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
-	}
+    /**
+     * Verifies that all severity levels are disabled in the precalculated level visibility object for untagged log
+     * entries.
+     */
+    @Test
+    void untaggedVisibility() {
+        LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag(null);
+        assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+    }
 
-	/**
-	 * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
-	 * information) in the precalculated level visibility object for internal tinylog log entries.
-	 */
-	@Test
-	void tinylogTaggedVisibility() {
-		LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("tinylog");
-		assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-		assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-		assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-	}
+    /**
+     * Verifies that all severity levels are disabled in the precalculated level visibility object for log entries with
+     * another tag than "tinylog".
+     */
+    @Test
+    void unknownTaggedVisibility() {
+        LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("foo");
+        assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.DISABLED);
+    }
 
-	/**
-	 * Verifies that logging is disabled for untagged log entries at all severity levels.
-	 *
-	 * @param level The severity level to test
-	 */
-	@ParameterizedTest
-	@EnumSource(Level.class)
-	void untaggedLogEntriesDisabled(Level level) {
-		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(null, null, level)).isFalse();
-	}
+    /**
+     * Verifies that only the severity levels WARN and ERROR are enabled (but without requiring any stack trace
+     * information) in the precalculated level visibility object for internal tinylog log entries.
+     */
+    @Test
+    void tinylogTaggedVisibility() {
+        LevelVisibility visibility = new InternalLoggingBackend().getLevelVisibilityByTag("tinylog");
+        assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+    }
 
-	/**
-	 * Verifies that logging is disabled for tinylog log entries at trace, debug, and info severity levels.
-	 *
-	 * @param level The severity level to test
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-	void tinylogLogEntriesDisabled(Level level) {
-		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(null, "tinylog", level)).isFalse();
-	}
+    /**
+     * Verifies that logging is disabled for untagged log entries at all severity levels.
+     *
+     * @param level The severity level to test
+     */
+    @ParameterizedTest
+    @EnumSource(Level.class)
+    void untaggedLogEntriesDisabled(Level level) {
+        InternalLoggingBackend backend = new InternalLoggingBackend();
+        assertThat(backend.isEnabled(null, null, level)).isFalse();
+    }
 
-	/**
-	 * Verifies that logging is enabled for tinylog log entries at warn and error severity levels.
-	 *
-	 * @param level The severity level to test
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	void tinylogLogEntriesEnabled(Level level) {
-		InternalLoggingBackend backend = new InternalLoggingBackend();
-		assertThat(backend.isEnabled(null, "tinylog", level)).isTrue();
-	}
+    /**
+     * Verifies that logging is disabled for tinylog log entries at trace, debug, and info severity levels.
+     *
+     * @param level The severity level to test
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
+    void tinylogLogEntriesDisabled(Level level) {
+        InternalLoggingBackend backend = new InternalLoggingBackend();
+        assertThat(backend.isEnabled(null, "tinylog", level)).isFalse();
+    }
 
-	/**
-	 * Verifies that a plain text message can be output at the severity levels warn and error.
-	 *
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	void plainTextMessage(Level level) {
-		new InternalLoggingBackend().log(
-			null,
-			"tinylog",
-			level,
-			null,
-			"Hello World!",
-			null,
-			null
-		);
+    /**
+     * Verifies that logging is enabled for tinylog log entries at warn and error severity levels.
+     *
+     * @param level The severity level to test
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    void tinylogLogEntriesEnabled(Level level) {
+        InternalLoggingBackend backend = new InternalLoggingBackend();
+        assertThat(backend.isEnabled(null, "tinylog", level)).isTrue();
+    }
 
-		assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello World!");
-	}
+    /**
+     * Verifies that a plain text message can be output at the severity levels warn and error.
+     *
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    void plainTextMessage(Level level) {
+        new InternalLoggingBackend().log(
+            null,
+            "tinylog",
+            level,
+            null,
+            "Hello World!",
+            null,
+            null
+        );
 
-	/**
-	 * Verifies that a formatted text message with placeholders can be output at the severity levels warn and error.
-	 *
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	void formattedTextMessage(Level level) {
-		new InternalLoggingBackend().log(
-			null,
-			"tinylog",
-			level,
-			null,
-			"Hello {}!",
-			new Object[] {"world"},
-			new EnhancedMessageFormatter(new Framework(false, false))
-		);
+        assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello World!");
+    }
 
-		assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello world!");
-	}
+    /**
+     * Verifies that a formatted text message with placeholders can be output at the severity levels warn and error.
+     *
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    void formattedTextMessage(Level level) {
+        new InternalLoggingBackend().log(
+            null,
+            "tinylog",
+            level,
+            null,
+            "Hello {}!",
+            new Object[] {"world"},
+            new EnhancedMessageFormatter(new Framework(false, false))
+        );
 
-	/**
-	 * Verifies that an exception can be output at the severity levels warn and error.
-	 *
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	void exceptionOnly(Level level) {
-		Exception exception = new NullPointerException();
-		exception.setStackTrace(new StackTraceElement[] {
-			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
-			new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
-		});
+        assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello world!");
+    }
 
-		new InternalLoggingBackend().log(
-			null,
-			"tinylog",
-			level,
-			exception,
-			null,
-			null,
-			null
-		);
+    /**
+     * Verifies that an exception can be output at the severity levels warn and error.
+     *
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    void exceptionOnly(Level level) {
+        Exception exception = new NullPointerException();
+        exception.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
+            new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
+        });
 
-		assertThat(output.consume()).containsExactly(
-			"TINYLOG " + level + ": java.lang.NullPointerException",
-			"\tat example.MyClass.foo(MyClass.java:42)",
-			"\tat example.OtherClass.bar(OtherClass.java:42)"
-		);
-	}
+        new InternalLoggingBackend().log(
+            null,
+            "tinylog",
+            level,
+            exception,
+            null,
+            null,
+            null
+        );
 
-	/**
-	 * Verifies that an exception can be output together with a custom message at the severity levels warn and error.
-	 *
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-	void exceptionWithCustomMessage(Level level) {
-		Exception exception = new UnsupportedOperationException();
-		exception.setStackTrace(new StackTraceElement[] {
-			new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
-		});
+        assertThat(output.consume()).containsExactly(
+            "TINYLOG " + level + ": java.lang.NullPointerException",
+            "\tat example.MyClass.foo(MyClass.java:42)",
+            "\tat example.OtherClass.bar(OtherClass.java:42)"
+        );
+    }
 
-		new InternalLoggingBackend().log(
-			null,
-			"tinylog",
-			level,
-			exception,
-			"Oops!",
-			null,
-			null
-		);
+    /**
+     * Verifies that an exception can be output together with a custom message at the severity levels warn and error.
+     *
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    void exceptionWithCustomMessage(Level level) {
+        Exception exception = new UnsupportedOperationException();
+        exception.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
+        });
 
-		assertThat(output.consume()).containsExactly(
-			"TINYLOG " + level + ": Oops!: java.lang.UnsupportedOperationException",
-			"\tat example.MyClass.foo(MyClass.java:42)"
-		);
-	}
+        new InternalLoggingBackend().log(
+            null,
+            "tinylog",
+            level,
+            exception,
+            "Oops!",
+            null,
+            null
+        );
 
-	/**
-	 * Verifies that log entries are discarded for the severity levels trace, debug, and info.
-	 *
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-	void discardNonServeLogEntries(Level level) {
-		new InternalLoggingBackend().log(
-			null,
-			"tinylog",
-			level,
-			null,
-			"Hello World!",
-			null,
-			null
-		);
+        assertThat(output.consume()).containsExactly(
+            "TINYLOG " + level + ": Oops!: java.lang.UnsupportedOperationException",
+            "\tat example.MyClass.foo(MyClass.java:42)"
+        );
+    }
 
-		assertThat(output.consume()).isEmpty();
-	}
+    /**
+     * Verifies that log entries are discarded for the severity levels trace, debug, and info.
+     *
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
+    void discardNonServeLogEntries(Level level) {
+        new InternalLoggingBackend().log(
+            null,
+            "tinylog",
+            level,
+            null,
+            "Hello World!",
+            null,
+            null
+        );
 
-	/**
-	 * Verifies that log entries will be discarded, if tag is not {@code tinylog}.
-	 *
-	 * @param tag The category tag for the log entry
-	 * @param level The severity level for the log entry
-	 */
-	@ParameterizedTest
-	@CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
-	void discardNonTinylogLogEntries(String tag, Level level) {
-		new InternalLoggingBackend().log(
-			null,
-			tag,
-			level,
-			null,
-			"Hello World!",
-			null,
-			null
-		);
+        assertThat(output.consume()).isEmpty();
+    }
 
-		assertThat(output.consume()).isEmpty();
-	}
+    /**
+     * Verifies that log entries will be discarded, if tag is not {@code tinylog}.
+     *
+     * @param tag The category tag for the log entry
+     * @param level The severity level for the log entry
+     */
+    @ParameterizedTest
+    @CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
+    void discardNonTinylogLogEntries(String tag, Level level) {
+        new InternalLoggingBackend().log(
+            null,
+            tag,
+            level,
+            null,
+            "Hello World!",
+            null,
+            null
+        );
+
+        assertThat(output.consume()).isEmpty();
+    }
 
 }

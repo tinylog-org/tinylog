@@ -1,28 +1,28 @@
 dependencies {
-	implementation project(":tinylog-core")
+    implementation project(":tinylog-core")
 }
 
 android {
-	namespace "org.tinylog.impl.android"
+    namespace "org.tinylog.impl.android"
 
-	sourceSets {
-		main {
-			java {
-				srcDirs += "../../tinylog-impl/src/main/java"
-			}
+    sourceSets {
+        main {
+            java {
+                srcDirs += "../../tinylog-impl/src/main/java"
+            }
 
-			resources {
-				srcDirs += "../../tinylog-impl/src/main/resources"
-			}
-		}
+            resources {
+                srcDirs += "../../tinylog-impl/src/main/resources"
+            }
+        }
 
-		androidTest {
-			java {
-				srcDirs += "../../tinylog-core-base/src/test/java"
-				srcDirs += "../../tinylog-impl/src/test/java"
-				exclude "org/tinylog/core/*Test.java"
-				exclude "org/tinylog/core/**/*Test.java"
-			}
-		}
-	}
+        androidTest {
+            java {
+                srcDirs += "../../tinylog-core-base/src/test/java"
+                srcDirs += "../../tinylog-impl/src/test/java"
+                exclude "org/tinylog/core/*Test.java"
+                exclude "org/tinylog/core/**/*Test.java"
+            }
+        }
+    }
 }

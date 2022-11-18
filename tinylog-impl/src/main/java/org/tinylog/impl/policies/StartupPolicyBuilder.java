@@ -8,26 +8,26 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class StartupPolicyBuilder implements PolicyBuilder {
 
-	/** */
-	public StartupPolicyBuilder() {
-	}
+    /** */
+    public StartupPolicyBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "startup";
-	}
+    @Override
+    public String getName() {
+        return "startup";
+    }
 
-	@Override
-	public Policy create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for startup policy: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public Policy create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for startup policy: \"{}\"",
+                value
+            );
+        }
 
-		return new StartupPolicy();
-	}
+        return new StartupPolicy();
+    }
 
 }

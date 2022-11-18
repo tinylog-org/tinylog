@@ -23,106 +23,106 @@ import org.tinylog.impl.writers.Writer;
  */
 public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
 
-	private static final String FILE_KEY = "file";
-	private static final String CHARSET_KEY = "charset";
-	private static final String POLICIES_KEY = "policies";
+    private static final String FILE_KEY = "file";
+    private static final String CHARSET_KEY = "charset";
+    private static final String POLICIES_KEY = "policies";
 
-	/** */
-	public FileWriterBuilder() {
-	}
+    /** */
+    public FileWriterBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "file";
-	}
+    @Override
+    public String getName() {
+        return "file";
+    }
 
-	@Override
-	public Writer create(Framework framework, Configuration configuration, OutputFormat format) throws Exception {
-		String fileName = configuration.getValue(FILE_KEY);
-		if (fileName == null) {
-			String fullKey = configuration.resolveFullKey(FILE_KEY);
-			throw new IllegalArgumentException("File name is missing in required property \"" + fullKey + "\"");
-		}
+    @Override
+    public Writer create(Framework framework, Configuration configuration, OutputFormat format) throws Exception {
+        String fileName = configuration.getValue(FILE_KEY);
+        if (fileName == null) {
+            String fullKey = configuration.resolveFullKey(FILE_KEY);
+            throw new IllegalArgumentException("File name is missing in required property \"" + fullKey + "\"");
+        }
 
-		Charset charset = getCharset(configuration);
-		Policy policy = getPolicy(framework, configuration);
-		DynamicPath path = new DynamicPath(framework, fileName);
+        Charset charset = getCharset(configuration);
+        Policy policy = getPolicy(framework, configuration);
+        DynamicPath path = new DynamicPath(framework, fileName);
 
-		return new FileWriter(format, policy, path, charset);
-	}
+        return new FileWriter(format, policy, path, charset);
+    }
 
-	/**
-	 * Gets the charset for the {@link FileWriter}.
-	 *
-	 * @param configuration The file writer configuration
-	 * @return The configured charset or UTF-8 is no charset is configured
-	 */
-	private Charset getCharset(Configuration configuration) {
-		String charsetName = configuration.getValue(CHARSET_KEY);
-		Charset charset = StandardCharsets.UTF_8;
-		if (charsetName != null) {
-			try {
-				charset = Charset.forName(charsetName);
-			} catch (IllegalArgumentException ex) {
-				InternalLogger.error(
-					ex,
-					"Invalid charset \"{}\" in property \"{}\"",
-					charsetName,
-					configuration.resolveFullKey(CHARSET_KEY)
-				);
-			}
-		}
-		return charset;
-	}
+    /**
+     * Gets the charset for the {@link FileWriter}.
+     *
+     * @param configuration The file writer configuration
+     * @return The configured charset or UTF-8 is no charset is configured
+     */
+    private Charset getCharset(Configuration configuration) {
+        String charsetName = configuration.getValue(CHARSET_KEY);
+        Charset charset = StandardCharsets.UTF_8;
+        if (charsetName != null) {
+            try {
+                charset = Charset.forName(charsetName);
+            } catch (IllegalArgumentException ex) {
+                InternalLogger.error(
+                    ex,
+                    "Invalid charset \"{}\" in property \"{}\"",
+                    charsetName,
+                    configuration.resolveFullKey(CHARSET_KEY)
+                );
+            }
+        }
+        return charset;
+    }
 
-	/**
-	 * Gets the policy for {@link FileWriter}.
-	 *
-	 * <p>
-	 *     Multiple policies will be bundled into a single policy by using {@link BundlePolicy}.
-	 * </p>
-	 *
-	 * @param framework The actual logging framework instance
-	 * @param configuration The file writer configuration
-	 * @return The configured policies or {@link EndlessPolicy} if no policies are configured
-	 */
-	private Policy getPolicy(Framework framework, Configuration configuration) {
-		List<Policy> policies = new ArrayList<>();
+    /**
+     * Gets the policy for {@link FileWriter}.
+     *
+     * <p>
+     *     Multiple policies will be bundled into a single policy by using {@link BundlePolicy}.
+     * </p>
+     *
+     * @param framework The actual logging framework instance
+     * @param configuration The file writer configuration
+     * @return The configured policies or {@link EndlessPolicy} if no policies are configured
+     */
+    private Policy getPolicy(Framework framework, Configuration configuration) {
+        List<Policy> policies = new ArrayList<>();
 
-		for (String policyConfiguration : configuration.getList(POLICIES_KEY)) {
-			int index = policyConfiguration.indexOf(':');
-			String name = index >= 0 ? policyConfiguration.substring(0, index).trim() : policyConfiguration;
-			String value = index >= 0 ? policyConfiguration.substring(index + 1).trim() : null;
+        for (String policyConfiguration : configuration.getList(POLICIES_KEY)) {
+            int index = policyConfiguration.indexOf(':');
+            String name = index >= 0 ? policyConfiguration.substring(0, index).trim() : policyConfiguration;
+            String value = index >= 0 ? policyConfiguration.substring(index + 1).trim() : null;
 
-			PolicyBuilder builder = SafeServiceLoader
-				.asList(framework, PolicyBuilder.class, "policy builders")
-				.stream()
-				.filter(policyBuilder -> name.equals(policyBuilder.getName()))
-				.findAny()
-				.orElse(null);
+            PolicyBuilder builder = SafeServiceLoader
+                .asList(framework, PolicyBuilder.class, "policy builders")
+                .stream()
+                .filter(policyBuilder -> name.equals(policyBuilder.getName()))
+                .findAny()
+                .orElse(null);
 
-			if (builder == null) {
-				InternalLogger.error(
-					null,
-					"Could not find any policy builder with the name \"{}\" in the classpath",
-					name
-				);
-			} else {
-				try {
-					policies.add(builder.create(framework, value));
-				} catch (Exception ex) {
-					InternalLogger.error(ex, "Failed to create policy for \"{}\"", name);
-				}
-			}
-		}
+            if (builder == null) {
+                InternalLogger.error(
+                    null,
+                    "Could not find any policy builder with the name \"{}\" in the classpath",
+                    name
+                );
+            } else {
+                try {
+                    policies.add(builder.create(framework, value));
+                } catch (Exception ex) {
+                    InternalLogger.error(ex, "Failed to create policy for \"{}\"", name);
+                }
+            }
+        }
 
-		if (policies.isEmpty()) {
-			return new EndlessPolicy();
-		} else if (policies.size() == 1) {
-			return policies.get(0);
-		} else {
-			return new BundlePolicy(policies);
-		}
-	}
+        if (policies.isEmpty()) {
+            return new EndlessPolicy();
+        } else if (policies.size() == 1) {
+            return policies.get(0);
+        } else {
+            return new BundlePolicy(policies);
+        }
+    }
 
 }

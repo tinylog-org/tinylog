@@ -7,29 +7,29 @@ import org.tinylog.core.Framework;
  */
 public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public ContextPlaceholderBuilder() {
-	}
+    /** */
+    public ContextPlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "context";
-	}
+    @Override
+    public String getName() {
+        return "context";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value == null) {
-			throw new IllegalArgumentException("Thread context key is not defined for context placeholder");
-		} else {
-			int commaIndex = value.indexOf(',');
-			if (commaIndex < 0) {
-				return new ContextPlaceholder(value, null, "<" + value + " not set>");
-			} else {
-				String key = value.substring(0, commaIndex);
-				String defaultValue = value.substring(commaIndex + 1);
-				return new ContextPlaceholder(key, defaultValue, defaultValue);
-			}
-		}
-	}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Thread context key is not defined for context placeholder");
+        } else {
+            int commaIndex = value.indexOf(',');
+            if (commaIndex < 0) {
+                return new ContextPlaceholder(value, null, "<" + value + " not set>");
+            } else {
+                String key = value.substring(0, commaIndex);
+                String defaultValue = value.substring(commaIndex + 1);
+                return new ContextPlaceholder(key, defaultValue, defaultValue);
+            }
+        }
+    }
 
 }

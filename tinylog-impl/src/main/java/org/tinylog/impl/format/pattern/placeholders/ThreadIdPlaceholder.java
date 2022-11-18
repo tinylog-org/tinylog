@@ -12,30 +12,30 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class ThreadIdPlaceholder implements Placeholder {
 
-	/** */
-	public ThreadIdPlaceholder() {
-	}
+    /** */
+    public ThreadIdPlaceholder() {
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.THREAD);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.THREAD);
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.LONG;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.LONG;
+    }
 
-	@Override
-	public Long getValue(LogEntry entry) {
-		Thread thread = entry.getThread();
-		return thread == null ? null : thread.getId();
-	}
+    @Override
+    public Long getValue(LogEntry entry) {
+        Thread thread = entry.getThread();
+        return thread == null ? null : thread.getId();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Thread thread = entry.getThread();
-		builder.append(thread == null ? "?" : thread.getId());
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        Thread thread = entry.getThread();
+        builder.append(thread == null ? "?" : thread.getId());
+    }
 
 }

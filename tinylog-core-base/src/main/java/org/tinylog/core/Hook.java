@@ -10,14 +10,14 @@ package org.tinylog.core;
  */
 public interface Hook {
 
-	/**
-	 * This method is called when tinylog is starting.
-	 */
-	void startUp();
+    /**
+     * This method is called when tinylog is starting.
+     */
+    void startUp();
 
-	/**
-	 * This method is called when tinylog is shutting down.
-	 */
-	void shutDown();
+    /**
+     * This method is called when tinylog is shutting down.
+     */
+    void shutDown();
 
 }

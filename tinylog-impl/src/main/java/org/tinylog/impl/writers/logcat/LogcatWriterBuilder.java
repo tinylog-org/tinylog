@@ -13,38 +13,38 @@ import org.tinylog.impl.writers.WriterBuilder;
  */
 public class LogcatWriterBuilder implements WriterBuilder {
 
-	private static final String TAG_PATTERN_KEY = "tag-pattern";
-	private static final String DEFAULT_TAG_PATTERN = null;
-	private static final int MAX_TAG_LENGTH = 23;
+    private static final String TAG_PATTERN_KEY = "tag-pattern";
+    private static final String DEFAULT_TAG_PATTERN = null;
+    private static final int MAX_TAG_LENGTH = 23;
 
-	private static final String MESSAGE_PATTERN_KEY = "message-pattern";
-	private static final String DEFAULT_MESSAGE_PATTERN = "{message}";
+    private static final String MESSAGE_PATTERN_KEY = "message-pattern";
+    private static final String DEFAULT_MESSAGE_PATTERN = "{message}";
 
-	/** */
-	public LogcatWriterBuilder() {
-	}
+    /** */
+    public LogcatWriterBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "logcat";
-	}
+    @Override
+    public String getName() {
+        return "logcat";
+    }
 
-	@Override
-	public Writer create(Framework framework, Configuration configuration) {
-		FormatPatternParser formatPatternParser = new FormatPatternParser(framework);
+    @Override
+    public Writer create(Framework framework, Configuration configuration) {
+        FormatPatternParser formatPatternParser = new FormatPatternParser(framework);
 
-		String tagPattern = configuration.getValue(TAG_PATTERN_KEY, DEFAULT_TAG_PATTERN);
-		Placeholder tagPlaceholder = null;
-		if (tagPattern != null) {
-			Placeholder placeholder = formatPatternParser.parse(tagPattern);
-			MaxLengthStyleBuilder maxLengthStyleBuilder = new MaxLengthStyleBuilder();
-			tagPlaceholder = maxLengthStyleBuilder.create(framework, placeholder, Integer.toString(MAX_TAG_LENGTH));
-		}
+        String tagPattern = configuration.getValue(TAG_PATTERN_KEY, DEFAULT_TAG_PATTERN);
+        Placeholder tagPlaceholder = null;
+        if (tagPattern != null) {
+            Placeholder placeholder = formatPatternParser.parse(tagPattern);
+            MaxLengthStyleBuilder maxLengthStyleBuilder = new MaxLengthStyleBuilder();
+            tagPlaceholder = maxLengthStyleBuilder.create(framework, placeholder, Integer.toString(MAX_TAG_LENGTH));
+        }
 
-		String messagePattern = configuration.getValue(MESSAGE_PATTERN_KEY, DEFAULT_MESSAGE_PATTERN);
-		Placeholder messagePlaceholder = formatPatternParser.parse(messagePattern);
+        String messagePattern = configuration.getValue(MESSAGE_PATTERN_KEY, DEFAULT_MESSAGE_PATTERN);
+        Placeholder messagePlaceholder = formatPatternParser.parse(messagePattern);
 
-		return new LogcatWriter(tagPlaceholder, messagePlaceholder);
-	}
+        return new LogcatWriter(tagPlaceholder, messagePlaceholder);
+    }
 
 }

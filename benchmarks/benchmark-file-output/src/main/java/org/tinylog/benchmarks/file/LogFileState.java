@@ -14,31 +14,31 @@ import org.tinylog.impl.writers.file.LogFile;
 @State(Scope.Thread)
 public class LogFileState extends AbstractState<LogFile> {
 
-	/**
-	 * The buffer sizes to benchmark.
-	 */
-	@Param({ "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
-	private int bufferSize;
+    /**
+     * The buffer sizes to benchmark.
+     */
+    @Param({ "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
+    private int bufferSize;
 
-	/** */
-	public LogFileState() {
-	}
+    /** */
+    public LogFileState() {
+    }
 
-	/**
-	 * @param bufferSize The buffer size in bytes
-	 */
-	public LogFileState(int bufferSize) {
-		this.bufferSize = bufferSize;
-	}
+    /**
+     * @param bufferSize The buffer size in bytes
+     */
+    public LogFileState(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
-	@Override
-	public void write(String content) throws IOException {
-		instance.write(content.getBytes(CHARSET), 0);
-	}
+    @Override
+    public void write(String content) throws IOException {
+        instance.write(content.getBytes(CHARSET), 0);
+    }
 
-	@Override
-	protected LogFile create(Path path) throws IOException {
-		return new LogFile(path, bufferSize, false);
-	}
+    @Override
+    protected LogFile create(Path path) throws IOException {
+        return new LogFile(path, bufferSize, false);
+    }
 
 }

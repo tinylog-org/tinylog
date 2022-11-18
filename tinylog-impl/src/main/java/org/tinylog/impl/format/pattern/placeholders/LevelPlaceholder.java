@@ -13,30 +13,30 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class LevelPlaceholder implements Placeholder {
 
-	/** */
-	public LevelPlaceholder() {
-	}
+    /** */
+    public LevelPlaceholder() {
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.LEVEL);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.LEVEL);
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.STRING;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.STRING;
+    }
 
-	@Override
-	public String getValue(LogEntry entry) {
-		Level level = entry.getSeverityLevel();
-		return level == null ? null : level.toString();
-	}
+    @Override
+    public String getValue(LogEntry entry) {
+        Level level = entry.getSeverityLevel();
+        return level == null ? null : level.toString();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Level level = entry.getSeverityLevel();
-		builder.append(level == null ? "<level unknown>" : level.toString());
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        Level level = entry.getSeverityLevel();
+        builder.append(level == null ? "<level unknown>" : level.toString());
+    }
 
 }

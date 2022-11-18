@@ -13,34 +13,34 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class SeverityCodePlaceholder implements Placeholder {
 
-	/** */
-	public SeverityCodePlaceholder() {
-	}
+    /** */
+    public SeverityCodePlaceholder() {
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.of(LogEntryValue.LEVEL);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.of(LogEntryValue.LEVEL);
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.INTEGER;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.INTEGER;
+    }
 
-	@Override
-	public Integer getValue(LogEntry entry) {
-		Level level = entry.getSeverityLevel();
-		return level == null ? null : level.ordinal();
-	}
+    @Override
+    public Integer getValue(LogEntry entry) {
+        Level level = entry.getSeverityLevel();
+        return level == null ? null : level.ordinal();
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		Level level = entry.getSeverityLevel();
-		if (level == null) {
-			builder.append("?");
-		} else {
-			builder.append(level.ordinal());
-		}
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        Level level = entry.getSeverityLevel();
+        if (level == null) {
+            builder.append("?");
+        } else {
+            builder.append(level.ordinal());
+        }
+    }
 
 }

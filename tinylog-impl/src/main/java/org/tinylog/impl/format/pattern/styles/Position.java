@@ -5,19 +5,19 @@ package org.tinylog.impl.format.pattern.styles;
  */
 public enum Position {
 
-	/**
-	 * The string should be left-aligned.
-	 */
-	LEFT,
+    /**
+     * The string should be left-aligned.
+     */
+    LEFT,
 
-	/**
-	 * The string should be centered.
-	 */
-	CENTER,
+    /**
+     * The string should be centered.
+     */
+    CENTER,
 
-	/**
-	 * The string should be right-aligned.
-	 */
-	RIGHT
+    /**
+     * The string should be right-aligned.
+     */
+    RIGHT
 
 }

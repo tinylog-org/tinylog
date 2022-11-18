@@ -5,18 +5,18 @@ package org.tinylog.core.runtime;
  */
 public class AndroidRuntimeBuilder implements RuntimeBuilder {
 
-	/** */
-	public AndroidRuntimeBuilder() {
-	}
+    /** */
+    public AndroidRuntimeBuilder() {
+    }
 
-	@Override
-	public boolean isSupported() {
-		return "Android Runtime".equals(System.getProperty("java.runtime.name"));
-	}
+    @Override
+    public boolean isSupported() {
+        return "Android Runtime".equals(System.getProperty("java.runtime.name"));
+    }
 
-	@Override
-	public RuntimeFlavor create() {
-		return new AndroidRuntime();
-	}
+    @Override
+    public RuntimeFlavor create() {
+        return new AndroidRuntime();
+    }
 
 }

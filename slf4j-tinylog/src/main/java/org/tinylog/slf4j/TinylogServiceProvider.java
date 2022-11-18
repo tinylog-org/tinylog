@@ -12,39 +12,39 @@ import org.tinylog.core.Tinylog;
  */
 public class TinylogServiceProvider implements SLF4JServiceProvider {
 
-	private ILoggerFactory loggerFactory;
-	private IMarkerFactory markerFactory;
-	private MDCAdapter mdcAdapter;
+    private ILoggerFactory loggerFactory;
+    private IMarkerFactory markerFactory;
+    private MDCAdapter mdcAdapter;
 
-	/** */
-	public TinylogServiceProvider() {
-	}
+    /** */
+    public TinylogServiceProvider() {
+    }
 
-	@Override
-	public ILoggerFactory getLoggerFactory() {
-		return loggerFactory;
-	}
+    @Override
+    public ILoggerFactory getLoggerFactory() {
+        return loggerFactory;
+    }
 
-	@Override
-	public IMarkerFactory getMarkerFactory() {
-		return markerFactory;
-	}
+    @Override
+    public IMarkerFactory getMarkerFactory() {
+        return markerFactory;
+    }
 
-	@Override
-	public MDCAdapter getMDCAdapter() {
-		return mdcAdapter;
-	}
+    @Override
+    public MDCAdapter getMDCAdapter() {
+        return mdcAdapter;
+    }
 
-	@Override
-	public String getRequestedApiVersion() {
-		return "2.0";
-	}
+    @Override
+    public String getRequestedApiVersion() {
+        return "2.0";
+    }
 
-	@Override
-	public void initialize() {
-		loggerFactory = new TinylogLoggerFactory(Tinylog.getFramework());
-		markerFactory = new BasicMarkerFactory();
-		mdcAdapter = new TinylogMdcAdapter(Tinylog.getFramework().getLoggingBackend().getContextStorage());
-	}
+    @Override
+    public void initialize() {
+        loggerFactory = new TinylogLoggerFactory(Tinylog.getFramework());
+        markerFactory = new BasicMarkerFactory();
+        mdcAdapter = new TinylogMdcAdapter(Tinylog.getFramework().getLoggingBackend().getContextStorage());
+    }
 
 }

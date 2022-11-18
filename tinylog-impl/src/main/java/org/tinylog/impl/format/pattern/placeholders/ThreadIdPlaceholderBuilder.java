@@ -8,26 +8,26 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class ThreadIdPlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public ThreadIdPlaceholderBuilder() {
-	}
+    /** */
+    public ThreadIdPlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "thread-id";
-	}
+    @Override
+    public String getName() {
+        return "thread-id";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for thread ID placeholder: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for thread ID placeholder: \"{}\"",
+                value
+            );
+        }
 
-		return new ThreadIdPlaceholder();
-	}
+        return new ThreadIdPlaceholder();
+    }
 
 }

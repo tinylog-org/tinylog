@@ -13,43 +13,43 @@ import static org.mockito.Mockito.mockStatic;
 
 class StaticLoggerBinderTest {
 
-	/**
-	 * Verifies that SLF4J version 1.7 is requested.
-	 */
-	@Test
-	void requestSupportedVersion() {
-		assertThat(StaticLoggerBinder.REQUESTED_API_VERSION).isEqualTo("1.7");
-	}
+    /**
+     * Verifies that SLF4J version 1.7 is requested.
+     */
+    @Test
+    void requestSupportedVersion() {
+        assertThat(StaticLoggerBinder.REQUESTED_API_VERSION).isEqualTo("1.7");
+    }
 
-	/**
-	 * Verifies that the static binder returns {@link TinylogLoggerFactory} as logger factory.
-	 */
-	@SuppressWarnings("ResultOfMethodCallIgnored")
-	@Test
-	void provideLoggerFactoryInstance() {
-		Framework framework = mock(Framework.class);
+    /**
+     * Verifies that the static binder returns {@link TinylogLoggerFactory} as logger factory.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Test
+    void provideLoggerFactoryInstance() {
+        Framework framework = mock(Framework.class);
 
-		try (MockedStatic<Tinylog> tinylogMock = mockStatic(Tinylog.class)) {
-			tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
-			ILoggerFactory factory = StaticLoggerBinder.getSingleton().getLoggerFactory();
-			assertThat(factory).isInstanceOf(TinylogLoggerFactory.class);
-		}
-	}
+        try (MockedStatic<Tinylog> tinylogMock = mockStatic(Tinylog.class)) {
+            tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
+            ILoggerFactory factory = StaticLoggerBinder.getSingleton().getLoggerFactory();
+            assertThat(factory).isInstanceOf(TinylogLoggerFactory.class);
+        }
+    }
 
-	/**
-	 * Verifies that the static binder returns the fully-qualified class name of {@link TinylogLoggerFactory} as logger
-	 * factory class name.
-	 */
-	@SuppressWarnings("ResultOfMethodCallIgnored")
-	@Test
-	void provideLoggerFactoryClassName() {
-		Framework framework = mock(Framework.class);
+    /**
+     * Verifies that the static binder returns the fully-qualified class name of {@link TinylogLoggerFactory} as logger
+     * factory class name.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Test
+    void provideLoggerFactoryClassName() {
+        Framework framework = mock(Framework.class);
 
-		try (MockedStatic<Tinylog> tinylogMock = mockStatic(Tinylog.class)) {
-			tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
-			String className = StaticLoggerBinder.getSingleton().getLoggerFactoryClassStr();
-			assertThat(className).isEqualTo(TinylogLoggerFactory.class.getName());
-		}
-	}
+        try (MockedStatic<Tinylog> tinylogMock = mockStatic(Tinylog.class)) {
+            tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
+            String className = StaticLoggerBinder.getSingleton().getLoggerFactoryClassStr();
+            assertThat(className).isEqualTo(TinylogLoggerFactory.class.getName());
+        }
+    }
 
 }

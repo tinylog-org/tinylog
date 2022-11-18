@@ -9,50 +9,50 @@ import java.time.ZoneId;
  */
 public class TestClock extends Clock {
 
-	private final Clock parent;
-	private ZoneId zone;
-	private Instant instant;
+    private final Clock parent;
+    private ZoneId zone;
+    private Instant instant;
 
-	/**
-	 * @param parent The parent clock to use if the time or zone are not fixed
-	 */
-	public TestClock(Clock parent) {
-		this.parent = parent;
-	}
+    /**
+     * @param parent The parent clock to use if the time or zone are not fixed
+     */
+    public TestClock(Clock parent) {
+        this.parent = parent;
+    }
 
-	@Override
-	public ZoneId getZone() {
-		return zone == null ? parent.getZone() : zone;
-	}
+    @Override
+    public ZoneId getZone() {
+        return zone == null ? parent.getZone() : zone;
+    }
 
-	/**
-	 * Sets the time zone to a fixed value.
-	 *
-	 * @param zone The new time zone or {@code null} for resetting to default
-	 */
-	public void setZone(ZoneId zone) {
-		this.zone = zone;
-	}
+    /**
+     * Sets the time zone to a fixed value.
+     *
+     * @param zone The new time zone or {@code null} for resetting to default
+     */
+    public void setZone(ZoneId zone) {
+        this.zone = zone;
+    }
 
-	@Override
-	public Instant instant() {
-		return instant == null ? parent.instant() : instant;
-	}
+    @Override
+    public Instant instant() {
+        return instant == null ? parent.instant() : instant;
+    }
 
-	/**
-	 * Sets the current instant to a fixed value.
-	 *
-	 * @param instant The new current date-time or {@code null} for resetting to default
-	 */
-	public void setInstant(Instant instant) {
-		this.instant = instant;
-	}
+    /**
+     * Sets the current instant to a fixed value.
+     *
+     * @param instant The new current date-time or {@code null} for resetting to default
+     */
+    public void setInstant(Instant instant) {
+        this.instant = instant;
+    }
 
-	@Override
-	public Clock withZone(ZoneId zone) {
-		TestClock clock = new TestClock(this);
-		clock.setZone(zone);
-		return clock;
-	}
+    @Override
+    public Clock withZone(ZoneId zone) {
+        TestClock clock = new TestClock(this);
+        clock.setZone(zone);
+        return clock;
+    }
 
 }

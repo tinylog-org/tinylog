@@ -26,102 +26,102 @@ import org.tinylog.benchmarks.logging.core.LocationInfo;
 @State(Scope.Thread)
 public class Log4j2__Benchmark extends AbstractLoggingBenchmark {
 
-	@Param
-	private LocationInfo locationInfo;
+    @Param
+    private LocationInfo locationInfo;
 
-	private String logFile;
-	private Logger logger;
+    private String logFile;
+    private Logger logger;
 
-	/** */
-	public Log4j2__Benchmark() {
-	}
+    /** */
+    public Log4j2__Benchmark() {
+    }
 
-	/**
-	 * @param locationInfo The location information details to log
-	 */
-	public Log4j2__Benchmark(LocationInfo locationInfo) {
-		this.locationInfo = locationInfo;
-	}
+    /**
+     * @param locationInfo The location information details to log
+     */
+    public Log4j2__Benchmark(LocationInfo locationInfo) {
+        this.locationInfo = locationInfo;
+    }
 
-	@Setup(Level.Trial)
-	@Override
-	public void configure() throws IOException {
-		logFile = createLogFile("log4j");
+    @Setup(Level.Trial)
+    @Override
+    public void configure() throws IOException {
+        logFile = createLogFile("log4j");
 
-		byte[] configuration = createConfiguration(logFile).getBytes(Charset.defaultCharset());
-		ByteArrayInputStream stream = new ByteArrayInputStream(configuration);
-		ConfigurationSource source = new ConfigurationSource(stream);
-		Configurator.initialize(null, source);
+        byte[] configuration = createConfiguration(logFile).getBytes(Charset.defaultCharset());
+        ByteArrayInputStream stream = new ByteArrayInputStream(configuration);
+        ConfigurationSource source = new ConfigurationSource(stream);
+        Configurator.initialize(null, source);
 
-		logger = LogManager.getLogger(Log4j2__Benchmark.class);
-	}
+        logger = LogManager.getLogger(Log4j2__Benchmark.class);
+    }
 
-	@Override
-	public String getLogFile() {
-		return logFile;
-	}
+    @Override
+    public String getLogFile() {
+        return logFile;
+    }
 
-	@TearDown(Level.Trial)
-	@Override
-	public void shutdown() {
-		LogManager.shutdown();
-	}
+    @TearDown(Level.Trial)
+    @Override
+    public void shutdown() {
+        LogManager.shutdown();
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void discard() {
-		logger.debug("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void discard() {
+        logger.debug("Hello {}!", MAGIC_NUMBER);
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void output() {
-		logger.info("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void output() {
+        logger.info("Hello {}!", MAGIC_NUMBER);
+    }
 
-	/**
-	 * Creates the XML configuration for Apache Log4j 2.
-	 *
-	 * @param file The path to the log file
-	 * @return The configuration for Apache Log4j 2 as XML
-	 */
-	private String createConfiguration(String file) {
-		StringBuilder xml = new StringBuilder();
+    /**
+     * Creates the XML configuration for Apache Log4j 2.
+     *
+     * @param file The path to the log file
+     * @return The configuration for Apache Log4j 2 as XML
+     */
+    private String createConfiguration(String file) {
+        StringBuilder xml = new StringBuilder();
 
-		xml.append("<Configuration>");
+        xml.append("<Configuration>");
 
-		xml.append("<Appenders>");
-		xml.append("<RandomAccessFile");
-		xml.append(" name=\"file\"");
-		xml.append(" fileName=\"").append(file).append("\"");
-		xml.append(" immediateFlush=\"false\"");
-		xml.append(">");
-		xml.append("<PatternLayout><Pattern>");
-		if (locationInfo == LocationInfo.FULL) {
-			xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %class.%method\\(\\) - %level: %message%n");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %logger - %level: %message%n");
-		} else {
-			xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %level: %message%n");
-		}
-		xml.append("</Pattern></PatternLayout>");
-		xml.append("</RandomAccessFile>");
-		xml.append("</Appenders>");
+        xml.append("<Appenders>");
+        xml.append("<RandomAccessFile");
+        xml.append(" name=\"file\"");
+        xml.append(" fileName=\"").append(file).append("\"");
+        xml.append(" immediateFlush=\"false\"");
+        xml.append(">");
+        xml.append("<PatternLayout><Pattern>");
+        if (locationInfo == LocationInfo.FULL) {
+            xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %class.%method\\(\\) - %level: %message%n");
+        } else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+            xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %logger - %level: %message%n");
+        } else {
+            xml.append("%date{yyyy-MM-dd HH:mm:ss} - %thread - %level: %message%n");
+        }
+        xml.append("</Pattern></PatternLayout>");
+        xml.append("</RandomAccessFile>");
+        xml.append("</Appenders>");
 
-		xml.append("<Loggers>");
-		xml.append("<AsyncRoot");
-		xml.append(" level=\"info\"");
-		xml.append(" includeLocation=\"").append(locationInfo == LocationInfo.FULL).append("\"");
-		xml.append(">");
-		xml.append("<AppenderRef ref=\"file\" />");
-		xml.append("</AsyncRoot>");
-		xml.append("</Loggers>");
+        xml.append("<Loggers>");
+        xml.append("<AsyncRoot");
+        xml.append(" level=\"info\"");
+        xml.append(" includeLocation=\"").append(locationInfo == LocationInfo.FULL).append("\"");
+        xml.append(">");
+        xml.append("<AppenderRef ref=\"file\" />");
+        xml.append("</AsyncRoot>");
+        xml.append("</Loggers>");
 
-		xml.append("</Configuration>");
+        xml.append("</Configuration>");
 
-		return xml.toString();
-	}
+        return xml.toString();
+    }
 
 }

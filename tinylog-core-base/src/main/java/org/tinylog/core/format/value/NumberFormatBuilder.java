@@ -7,13 +7,13 @@ import java.util.Locale;
  */
 public class NumberFormatBuilder implements ValueFormatBuilder {
 
-	/** */
-	public NumberFormatBuilder() {
-	}
+    /** */
+    public NumberFormatBuilder() {
+    }
 
-	@Override
-	public NumberFormat create(Locale locale) {
-		return new NumberFormat(locale);
-	}
+    @Override
+    public NumberFormat create(Locale locale) {
+        return new NumberFormat(locale);
+    }
 
 }

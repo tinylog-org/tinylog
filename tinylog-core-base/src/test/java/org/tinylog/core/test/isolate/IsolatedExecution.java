@@ -15,11 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(IsolateInvocationExtension.class)
 public @interface IsolatedExecution {
 
-	/**
-	 * These classes will be reloaded for each test.
-	 *
-	 * @return The classes to reload for each test.
-	 */
-	Class[] classes() default {};
+    /**
+     * These classes will be reloaded for each test.
+     *
+     * @return The classes to reload for each test.
+     */
+    Class[] classes() default {};
 
 }

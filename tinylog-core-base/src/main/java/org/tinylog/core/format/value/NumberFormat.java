@@ -9,23 +9,23 @@ import java.util.Locale;
  */
 public class NumberFormat implements ValueFormat {
 
-	private final DecimalFormatSymbols symbols;
+    private final DecimalFormatSymbols symbols;
 
-	/**
-	 * @param locale Locale for language or country depending decimal format symbols
-	 */
-	NumberFormat(Locale locale) {
-		this.symbols = new DecimalFormatSymbols(locale);
-	}
+    /**
+     * @param locale Locale for language or country depending decimal format symbols
+     */
+    NumberFormat(Locale locale) {
+        this.symbols = new DecimalFormatSymbols(locale);
+    }
 
-	@Override
-	public boolean isSupported(final Object value) {
-		return value instanceof Number;
-	}
+    @Override
+    public boolean isSupported(final Object value) {
+        return value instanceof Number;
+    }
 
-	@Override
-	public String format(final String pattern, final Object value) {
-		return new DecimalFormat(pattern, symbols).format(value);
-	}
+    @Override
+    public String format(final String pattern, final Object value) {
+        return new DecimalFormat(pattern, symbols).format(value);
+    }
 
 }

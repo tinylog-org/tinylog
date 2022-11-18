@@ -9,38 +9,38 @@ import java.util.Map;
  */
 public class NopContextStorage implements ContextStorage {
 
-	/** */
-	public NopContextStorage() {
-	}
+    /** */
+    public NopContextStorage() {
+    }
 
-	@Override
-	public Map<String, String> getMapping() {
-		return Collections.emptyMap();
-	}
+    @Override
+    public Map<String, String> getMapping() {
+        return Collections.emptyMap();
+    }
 
-	@Override
-	public String get(String key) {
-		return null;
-	}
+    @Override
+    public String get(String key) {
+        return null;
+    }
 
-	@Override
-	public void put(String key, String value) {
-		// Ignore
-	}
+    @Override
+    public void put(String key, String value) {
+        // Ignore
+    }
 
-	@Override
-	public void replace(Map<String, String> mapping) {
-		// Ignore
-	}
+    @Override
+    public void replace(Map<String, String> mapping) {
+        // Ignore
+    }
 
-	@Override
-	public void remove(String key) {
-		// Ignore
-	}
+    @Override
+    public void remove(String key) {
+        // Ignore
+    }
 
-	@Override
-	public void clear() {
-		// Ignore
-	}
+    @Override
+    public void clear() {
+        // Ignore
+    }
 
 }

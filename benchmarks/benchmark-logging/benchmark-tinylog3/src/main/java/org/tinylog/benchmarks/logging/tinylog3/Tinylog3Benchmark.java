@@ -23,68 +23,68 @@ import org.tinylog.core.Tinylog;
 @State(Scope.Thread)
 public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 
-	@Param
-	private LocationInfo locationInfo;
+    @Param
+    private LocationInfo locationInfo;
 
-	private String logFile;
+    private String logFile;
 
-	/** */
-	public Tinylog3Benchmark() {
-	}
+    /** */
+    public Tinylog3Benchmark() {
+    }
 
-	/**
-	 * @param locationInfo The location information details to log
-	 */
-	public Tinylog3Benchmark(LocationInfo locationInfo) {
-		this.locationInfo = locationInfo;
-	}
+    /**
+     * @param locationInfo The location information details to log
+     */
+    public Tinylog3Benchmark(LocationInfo locationInfo) {
+        this.locationInfo = locationInfo;
+    }
 
-	@Setup(Level.Trial)
-	@Override
-	public void configure() throws IOException {
-		logFile = createLogFile("tinylog3");
+    @Setup(Level.Trial)
+    @Override
+    public void configure() throws IOException {
+        logFile = createLogFile("tinylog3");
 
-		StringBuilder formatPattern = new StringBuilder();
-		formatPattern.append("{date:yyyy-MM-dd HH:mm:ss} - {thread}");
-		if (locationInfo == LocationInfo.FULL) {
-			formatPattern.append(" - {class}.{method}() - ");
-		} else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
-			formatPattern.append(" - {class} - ");
-		} else {
-			formatPattern.append(" - ");
-		}
-		formatPattern.append("{level}: {message}");
+        StringBuilder formatPattern = new StringBuilder();
+        formatPattern.append("{date:yyyy-MM-dd HH:mm:ss} - {thread}");
+        if (locationInfo == LocationInfo.FULL) {
+            formatPattern.append(" - {class}.{method}() - ");
+        } else if (locationInfo == LocationInfo.CLASS_OR_CATEGORY_ONLY) {
+            formatPattern.append(" - {class} - ");
+        } else {
+            formatPattern.append(" - ");
+        }
+        formatPattern.append("{level}: {message}");
 
-		Configuration configuration = Tinylog.getConfiguration();
-		configuration.set("level", "INFO");
-		configuration.set("writer.type", "file");
-		configuration.set("writer.file", logFile);
-		configuration.set("writer.pattern", formatPattern.toString());
-	}
+        Configuration configuration = Tinylog.getConfiguration();
+        configuration.set("level", "INFO");
+        configuration.set("writer.type", "file");
+        configuration.set("writer.file", logFile);
+        configuration.set("writer.pattern", formatPattern.toString());
+    }
 
-	@Override
-	public String getLogFile() {
-		return logFile;
-	}
+    @Override
+    public String getLogFile() {
+        return logFile;
+    }
 
-	@TearDown(Level.Trial)
-	@Override
-	public void shutdown() {
-		Tinylog.shutDown();
-	}
+    @TearDown(Level.Trial)
+    @Override
+    public void shutdown() {
+        Tinylog.shutDown();
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void discard() {
-		Logger.debug("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void discard() {
+        Logger.debug("Hello {}!", MAGIC_NUMBER);
+    }
 
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@Override
-	public void output() {
-		Logger.info("Hello {}!", MAGIC_NUMBER);
-	}
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    @Override
+    public void output() {
+        Logger.info("Hello {}!", MAGIC_NUMBER);
+    }
 
 }

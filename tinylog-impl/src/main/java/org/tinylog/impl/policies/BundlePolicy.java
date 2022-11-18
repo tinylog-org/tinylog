@@ -9,56 +9,56 @@ import java.util.List;
  */
 public class BundlePolicy implements Policy {
 
-	private final List<Policy> policies;
+    private final List<Policy> policies;
 
-	/**
-	 * @param policies The policies to combine
-	 */
-	public BundlePolicy(List<Policy> policies) {
-		this.policies = new ArrayList<>(policies);
-	}
+    /**
+     * @param policies The policies to combine
+     */
+    public BundlePolicy(List<Policy> policies) {
+        this.policies = new ArrayList<>(policies);
+    }
 
-	@Override
-	public boolean canContinueFile(Path file) throws Exception {
-		for (Policy policy : policies) {
-			if (!policy.canContinueFile(file)) {
-				return false;
-			}
-		}
+    @Override
+    public boolean canContinueFile(Path file) throws Exception {
+        for (Policy policy : policies) {
+            if (!policy.canContinueFile(file)) {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void init(Path file) throws Exception {
-		Exception exception = null;
+    @Override
+    public void init(Path file) throws Exception {
+        Exception exception = null;
 
-		for (Policy policy : policies) {
-			try {
-				policy.init(file);
-			} catch (Exception ex) {
-				if (exception == null) {
-					exception = ex;
-				} else {
-					exception.addSuppressed(ex);
-				}
-			}
-		}
+        for (Policy policy : policies) {
+            try {
+                policy.init(file);
+            } catch (Exception ex) {
+                if (exception == null) {
+                    exception = ex;
+                } else {
+                    exception.addSuppressed(ex);
+                }
+            }
+        }
 
-		if (exception != null) {
-			throw exception;
-		}
-	}
+        if (exception != null) {
+            throw exception;
+        }
+    }
 
-	@Override
-	public boolean canAcceptLogEntry(int bytes) {
-		for (Policy policy : policies) {
-			if (!policy.canAcceptLogEntry(bytes)) {
-				return false;
-			}
-		}
+    @Override
+    public boolean canAcceptLogEntry(int bytes) {
+        for (Policy policy : policies) {
+            if (!policy.canAcceptLogEntry(bytes)) {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

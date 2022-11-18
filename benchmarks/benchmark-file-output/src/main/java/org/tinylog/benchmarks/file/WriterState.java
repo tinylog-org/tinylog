@@ -17,37 +17,37 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Thread)
 public class WriterState extends AbstractState<Writer> {
 
-	/**
-	 * The buffer sizes to benchmark.
-	 */
-	@Param({ "0", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
-	private int bufferSize;
+    /**
+     * The buffer sizes to benchmark.
+     */
+    @Param({ "0", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
+    private int bufferSize;
 
-	/** */
-	public WriterState() {
-	}
+    /** */
+    public WriterState() {
+    }
 
-	/**
-	 * @param bufferSize The buffer size in bytes
-	 */
-	public WriterState(int bufferSize) {
-		this.bufferSize = bufferSize;
-	}
+    /**
+     * @param bufferSize The buffer size in bytes
+     */
+    public WriterState(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
-	@Override
-	public void write(String content) throws IOException {
-		instance.write(content);
-	}
+    @Override
+    public void write(String content) throws IOException {
+        instance.write(content);
+    }
 
-	@Override
-	protected Writer create(Path path) throws IOException {
-		Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), CHARSET);
+    @Override
+    protected Writer create(Path path) throws IOException {
+        Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), CHARSET);
 
-		if (bufferSize > 0) {
-			return new BufferedWriter(writer, bufferSize);
-		}
+        if (bufferSize > 0) {
+            return new BufferedWriter(writer, bufferSize);
+        }
 
-		return writer;
-	}
+        return writer;
+    }
 
 }

@@ -11,66 +11,66 @@ import org.tinylog.core.context.ContextStorage;
  */
 public class ThreadLocalContextStorage implements ContextStorage {
 
-	private final ThreadLocal<Map<String, String>> threadLocal;
+    private final ThreadLocal<Map<String, String>> threadLocal;
 
-	/** */
-	public ThreadLocalContextStorage() {
-		threadLocal = new InheritableThreadLocal<Map<String, String>>() {
+    /** */
+    public ThreadLocalContextStorage() {
+        threadLocal = new InheritableThreadLocal<Map<String, String>>() {
 
-			@Override
-			protected Map<String, String> initialValue() {
-				return Collections.emptyMap();
-			}
+            @Override
+            protected Map<String, String> initialValue() {
+                return Collections.emptyMap();
+            }
 
-		};
-	}
+        };
+    }
 
-	@Override
-	public Map<String, String> getMapping() {
-		return threadLocal.get();
-	}
+    @Override
+    public Map<String, String> getMapping() {
+        return threadLocal.get();
+    }
 
-	@Override
-	public String get(String key) {
-		return getMapping().get(key);
-	}
+    @Override
+    public String get(String key) {
+        return getMapping().get(key);
+    }
 
-	@Override
-	public void put(String key, String value) {
-		Map<String, String> map = new HashMap<>(getMapping());
-		if (value == null) {
-			map.remove(key);
-		} else {
-			map.put(key, value);
-		}
+    @Override
+    public void put(String key, String value) {
+        Map<String, String> map = new HashMap<>(getMapping());
+        if (value == null) {
+            map.remove(key);
+        } else {
+            map.put(key, value);
+        }
 
-		set(map);
-	}
+        set(map);
+    }
 
-	@Override
-	public void replace(Map<String, String> mapping) {
-		set(mapping);
-	}
+    @Override
+    public void replace(Map<String, String> mapping) {
+        set(mapping);
+    }
 
-	@Override
-	public void remove(String key) {
-		Map<String, String> map = new HashMap<>(getMapping());
-		map.remove(key);
-		set(map);
-	}
+    @Override
+    public void remove(String key) {
+        Map<String, String> map = new HashMap<>(getMapping());
+        map.remove(key);
+        set(map);
+    }
 
-	@Override
-	public void clear() {
-		threadLocal.set(Collections.emptyMap());
-	}
+    @Override
+    public void clear() {
+        threadLocal.set(Collections.emptyMap());
+    }
 
-	/**
-	 * Replaces the map stored in the thread local.
-	 *
-	 * @param map The new map to store
-	 */
-	private void set(Map<String, String> map) {
-		threadLocal.set(map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map));
-	}
+    /**
+     * Replaces the map stored in the thread local.
+     *
+     * @param map The new map to store
+     */
+    private void set(Map<String, String> map) {
+        threadLocal.set(map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map));
+    }
 
 }

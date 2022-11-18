@@ -8,26 +8,26 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class ExceptionPlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public ExceptionPlaceholderBuilder() {
-	}
+    /** */
+    public ExceptionPlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "exception";
-	}
+    @Override
+    public String getName() {
+        return "exception";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for exception placeholder: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for exception placeholder: \"{}\"",
+                value
+            );
+        }
 
-		return new ExceptionPlaceholder();
-	}
+        return new ExceptionPlaceholder();
+    }
 
 }

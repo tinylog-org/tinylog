@@ -11,26 +11,26 @@ import org.slf4j.spi.MarkerFactoryBinder;
  */
 public final class StaticMarkerBinder implements MarkerFactoryBinder {
 
-	/**
-	 * Singleton instance of this static marker binder.
-	 */
-	public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
+    /**
+     * Singleton instance of this static marker binder.
+     */
+    public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
 
-	private final IMarkerFactory factory;
+    private final IMarkerFactory factory;
 
-	/** */
-	private StaticMarkerBinder() {
-		factory = new BasicMarkerFactory();
-	}
+    /** */
+    private StaticMarkerBinder() {
+        factory = new BasicMarkerFactory();
+    }
 
-	@Override
-	public IMarkerFactory getMarkerFactory() {
-		return factory;
-	}
+    @Override
+    public IMarkerFactory getMarkerFactory() {
+        return factory;
+    }
 
-	@Override
-	public String getMarkerFactoryClassStr() {
-		return BasicMarkerFactory.class.getName();
-	}
+    @Override
+    public String getMarkerFactoryClassStr() {
+        return BasicMarkerFactory.class.getName();
+    }
 
 }

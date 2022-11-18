@@ -11,43 +11,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MaxTextLengthStyleTest {
 
-	/**
-	 * Verifies that the max length style is applied to input strings as expected.
-	 *
-	 * @param input The source string to which the max length style should be applied
-	 * @param maxLength The maximum length for the input string
-	 * @param expected The expected result after applying the max length style
-	 */
-	@ParameterizedTest
-	@CsvSource({
-		/* two letters input   */
-		"'ab'   , 1, 'a'    ",
-		"'ab'   , 2, 'ab'   ",
-		"'ab'   , 3, 'ab'   ",
-		/* three letters input */
-		"'abc'  , 1, 'a'    ",
-		"'abc'  , 2, 'ab'   ",
-		"'abc'  , 3, 'abc'  ",
-		"'abc'  , 4, 'abc'  ",
-		/* four letters input  */
-		"'abcd' , 1, 'a'    ",
-		"'abcd' , 2, 'ab'   ",
-		"'abcd' , 3, '...'  ",
-		"'abcd' , 4, 'abcd' ",
-		"'abcd' , 5, 'abcd' ",
-		/* five letters input  */
-		"'abcde', 1, 'a'    ",
-		"'abcde', 2, 'ab'   ",
-		"'abcde', 3, '...'  ",
-		"'abcde', 4, 'a...' ",
-		"'abcde', 5, 'abcde'",
-		"'abcde', 6, 'abcde'"
-	})
-	void apply(String input, int maxLength, String expected) {
-		MaxTextLengthStyle style = new MaxTextLengthStyle(new StaticTextPlaceholder(input), maxLength);
-		FormatOutputRenderer renderer = new FormatOutputRenderer(style);
-		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo(expected);
-	}
+    /**
+     * Verifies that the max length style is applied to input strings as expected.
+     *
+     * @param input The source string to which the max length style should be applied
+     * @param maxLength The maximum length for the input string
+     * @param expected The expected result after applying the max length style
+     */
+    @ParameterizedTest
+    @CsvSource({
+        /* two letters input   */
+        "'ab'   , 1, 'a'    ",
+        "'ab'   , 2, 'ab'   ",
+        "'ab'   , 3, 'ab'   ",
+        /* three letters input */
+        "'abc'  , 1, 'a'    ",
+        "'abc'  , 2, 'ab'   ",
+        "'abc'  , 3, 'abc'  ",
+        "'abc'  , 4, 'abc'  ",
+        /* four letters input  */
+        "'abcd' , 1, 'a'    ",
+        "'abcd' , 2, 'ab'   ",
+        "'abcd' , 3, '...'  ",
+        "'abcd' , 4, 'abcd' ",
+        "'abcd' , 5, 'abcd' ",
+        /* five letters input  */
+        "'abcde', 1, 'a'    ",
+        "'abcde', 2, 'ab'   ",
+        "'abcde', 3, '...'  ",
+        "'abcde', 4, 'a...' ",
+        "'abcde', 5, 'abcde'",
+        "'abcde', 6, 'abcde'"
+    })
+    void apply(String input, int maxLength, String expected) {
+        MaxTextLengthStyle style = new MaxTextLengthStyle(new StaticTextPlaceholder(input), maxLength);
+        FormatOutputRenderer renderer = new FormatOutputRenderer(style);
+        LogEntry logEntry = new LogEntryBuilder().create();
+        assertThat(renderer.render(logEntry)).isEqualTo(expected);
+    }
 
 }

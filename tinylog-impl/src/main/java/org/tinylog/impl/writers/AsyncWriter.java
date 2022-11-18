@@ -17,16 +17,16 @@ import org.tinylog.impl.LogEntry;
  */
 public interface AsyncWriter extends Writer {
 
-	/**
-	 * Flushes the output after passing all currently available log entries to {@link Writer#log(LogEntry)}.
-	 *
-	 * <p>
-	 *     The writing thread calls this method after passing a complete batch of log entries. Thrown exceptions are
-	 *     handled by tinylog and have no effect on other writers.
-	 * </p>
-	 *
-	 * @throws Exception Any exception can be thrown, if the flush fails
-	 */
-	void flush() throws Exception;
+    /**
+     * Flushes the output after passing all currently available log entries to {@link Writer#log(LogEntry)}.
+     *
+     * <p>
+     *     The writing thread calls this method after passing a complete batch of log entries. Thrown exceptions are
+     *     handled by tinylog and have no effect on other writers.
+     * </p>
+     *
+     * @throws Exception Any exception can be thrown, if the flush fails
+     */
+    void flush() throws Exception;
 
 }

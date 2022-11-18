@@ -16,35 +16,35 @@ import org.tinylog.core.Level;
 @ExtendWith(LogCaptureExtension.class)
 public @interface CaptureLogEntries {
 
-	/**
-	 * Key value pairs to apply to the framework's configuration.
-	 *
-	 * <p>
-	 * Examples:
-	 * <blockquote><pre>
-	 * {@literal @}CaptureLogEntries(configuration = "locale=en_US")
-	 * {@literal @}CaptureLogEntries(configuration = {"backends=nop", "locale=en_US"})
-	 * </pre></blockquote>
-	 * </p>
-	 *
-	 * @return The initial configuration to apply to the framework
-	 */
-	String[] configuration() default "";
+    /**
+     * Key value pairs to apply to the framework's configuration.
+     *
+     * <p>
+     * Examples:
+     * <blockquote><pre>
+     * {@literal @}CaptureLogEntries(configuration = "locale=en_US")
+     * {@literal @}CaptureLogEntries(configuration = {"backends=nop", "locale=en_US"})
+     * </pre></blockquote>
+     * </p>
+     *
+     * @return The initial configuration to apply to the framework
+     */
+    String[] configuration() default "";
 
-	/**
-	 * All log entries with a severity level less severe than the configured level are ignored.
-	 *
-	 * @return The configured severity level
-	 */
-	Level level() default Level.WARN;
+    /**
+     * All log entries with a severity level less severe than the configured level are ignored.
+     *
+     * @return The configured severity level
+     */
+    Level level() default Level.WARN;
 
-	/**
-	 * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,
-	 * autostart can be disabled by setting {@code autostart = false}.
-	 *
-	 * @return {@code true} if the framework should be automatically started, {@code false} if the framework should not
-	 *         be started in advance
-	 */
-	boolean autostart() default true;
+    /**
+     * By default ({@code autostart = true}, the extension will automatically start the provided framework. However,
+     * autostart can be disabled by setting {@code autostart = false}.
+     *
+     * @return {@code true} if the framework should be automatically started, {@code false} if the framework should not
+     *         be started in advance
+     */
+    boolean autostart() default true;
 
 }

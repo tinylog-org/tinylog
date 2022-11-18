@@ -18,45 +18,45 @@ import org.tinylog.core.variable.VariableResolver;
 
 module org.tinylog.core {
 
-	requires java.management;
-	requires java.naming;
+    requires java.management;
+    requires java.naming;
 
-	uses Hook;
+    uses Hook;
 
-	uses LoggingBackendBuilder;
-	provides LoggingBackendBuilder with
-		InternalLoggingBackendBuilder,
-		NopLoggingBackendBuilder;
+    uses LoggingBackendBuilder;
+    provides LoggingBackendBuilder with
+        InternalLoggingBackendBuilder,
+        NopLoggingBackendBuilder;
 
-	uses ValueFormatBuilder;
-	provides ValueFormatBuilder with
-		DateFormatBuilder,
-		JavaTimeFormatBuilder,
-		NumberFormatBuilder;
+    uses ValueFormatBuilder;
+    provides ValueFormatBuilder with
+        DateFormatBuilder,
+        JavaTimeFormatBuilder,
+        NumberFormatBuilder;
 
-	uses ConfigurationLoader;
-	provides ConfigurationLoader with
-		PropertiesLoader;
+    uses ConfigurationLoader;
+    provides ConfigurationLoader with
+        PropertiesLoader;
 
-	uses VariableResolver;
-	provides VariableResolver with
-		EnvironmentVariableResolver,
-		JndiValueResolver,
-		SystemPropertyResolver;
+    uses VariableResolver;
+    provides VariableResolver with
+        EnvironmentVariableResolver,
+        JndiValueResolver,
+        SystemPropertyResolver;
 
-	uses RuntimeBuilder;
-	provides RuntimeBuilder with
-		AndroidRuntimeBuilder,
-		JavaRuntimeBuilder;
+    uses RuntimeBuilder;
+    provides RuntimeBuilder with
+        AndroidRuntimeBuilder,
+        JavaRuntimeBuilder;
 
-	exports org.tinylog.core;
-	exports org.tinylog.core.backend;
-	exports org.tinylog.core.context;
-	exports org.tinylog.core.format.message;
-	exports org.tinylog.core.format.value;
-	exports org.tinylog.core.internal;
-	exports org.tinylog.core.loader;
-	exports org.tinylog.core.runtime;
-	exports org.tinylog.core.variable;
+    exports org.tinylog.core;
+    exports org.tinylog.core.backend;
+    exports org.tinylog.core.context;
+    exports org.tinylog.core.format.message;
+    exports org.tinylog.core.format.value;
+    exports org.tinylog.core.internal;
+    exports org.tinylog.core.loader;
+    exports org.tinylog.core.runtime;
+    exports org.tinylog.core.variable;
 
 }

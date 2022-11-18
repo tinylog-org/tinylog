@@ -1,25 +1,25 @@
 android {
-	namespace "org.tinylog.core.android"
+    namespace "org.tinylog.core.android"
 
-	sourceSets {
-		main {
-			java {
-				srcDirs += "../../tinylog-core-base/src/main/java"
-			}
+    sourceSets {
+        main {
+            java {
+                srcDirs += "../../tinylog-core-base/src/main/java"
+            }
 
-			resources {
-				srcDirs += "../../tinylog-core-base/src/main/resources"
-			}
-		}
+            resources {
+                srcDirs += "../../tinylog-core-base/src/main/resources"
+            }
+        }
 
-		androidTest {
-			java {
-				srcDirs += "../../tinylog-core-base/src/test/java"
-			}
+        androidTest {
+            java {
+                srcDirs += "../../tinylog-core-base/src/test/java"
+            }
 
-			resources {
-				srcDirs += "../../tinylog-core-base/src/test/resources"
-			}
-		}
-	}
+            resources {
+                srcDirs += "../../tinylog-core-base/src/test/resources"
+            }
+        }
+    }
 }

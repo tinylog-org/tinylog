@@ -7,23 +7,23 @@ import java.nio.file.Path;
  */
 public class EndlessPolicy implements Policy {
 
-	/** */
-	public EndlessPolicy() {
-	}
+    /** */
+    public EndlessPolicy() {
+    }
 
-	@Override
-	public boolean canContinueFile(Path file) {
-		return true;
-	}
+    @Override
+    public boolean canContinueFile(Path file) {
+        return true;
+    }
 
-	@Override
-	public void init(Path file) {
-		// Ignore
-	}
+    @Override
+    public void init(Path file) {
+        // Ignore
+    }
 
-	@Override
-	public boolean canAcceptLogEntry(int bytes) {
-		return true;
-	}
+    @Override
+    public boolean canAcceptLogEntry(int bytes) {
+        return true;
+    }
 
 }

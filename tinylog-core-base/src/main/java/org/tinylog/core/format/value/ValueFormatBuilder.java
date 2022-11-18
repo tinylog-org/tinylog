@@ -12,12 +12,12 @@ import java.util.Locale;
  */
 public interface ValueFormatBuilder {
 
-	/**
-	 * Creates a new instance of the value format.
-	 *
-	 * @param locale Locale for language or country depending format outputs
-	 * @return New instance of the value format
-	 */
-	ValueFormat create(Locale locale);
+    /**
+     * Creates a new instance of the value format.
+     *
+     * @param locale Locale for language or country depending format outputs
+     * @return New instance of the value format
+     */
+    ValueFormat create(Locale locale);
 
 }

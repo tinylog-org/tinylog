@@ -7,20 +7,20 @@ import org.tinylog.core.Framework;
  */
 public class InternalLoggingBackendBuilder implements LoggingBackendBuilder {
 
-	private static final InternalLoggingBackend PROVIDER = new InternalLoggingBackend();
+    private static final InternalLoggingBackend PROVIDER = new InternalLoggingBackend();
 
-	/** */
-	public InternalLoggingBackendBuilder() {
-	}
+    /** */
+    public InternalLoggingBackendBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "internal";
-	}
+    @Override
+    public String getName() {
+        return "internal";
+    }
 
-	@Override
-	public LoggingBackend create(Framework framework) {
-		return PROVIDER;
-	}
+    @Override
+    public LoggingBackend create(Framework framework) {
+        return PROVIDER;
+    }
 
 }

@@ -9,34 +9,34 @@ package org.tinylog.core.format.message;
  */
 public class SimpleMessageFormatter implements MessageFormatter {
 
-	/** */
-	public SimpleMessageFormatter() {
-	}
+    /** */
+    public SimpleMessageFormatter() {
+    }
 
-	@Override
-	public String format(String message, Object... arguments) {
-		int length = message.length();
-		StringBuilder builder = new StringBuilder(length);
+    @Override
+    public String format(String message, Object... arguments) {
+        int length = message.length();
+        StringBuilder builder = new StringBuilder(length);
 
-		int messageIndex = 0;
-		int argumentIndex = 0;
+        int messageIndex = 0;
+        int argumentIndex = 0;
 
-		while (messageIndex < length) {
-			char character = message.charAt(messageIndex);
-			if (character == '{'
-				&& messageIndex + 1 < length
-				&& message.charAt(messageIndex + 1) == '}'
-				&& argumentIndex < arguments.length
-			) {
-				builder.append(arguments[argumentIndex++]);
-				messageIndex += 2;
-			} else {
-				builder.append(character);
-				messageIndex += 1;
-			}
-		}
+        while (messageIndex < length) {
+            char character = message.charAt(messageIndex);
+            if (character == '{'
+                && messageIndex + 1 < length
+                && message.charAt(messageIndex + 1) == '}'
+                && argumentIndex < arguments.length
+            ) {
+                builder.append(arguments[argumentIndex++]);
+                messageIndex += 2;
+            } else {
+                builder.append(character);
+                messageIndex += 1;
+            }
+        }
 
-		return builder.toString();
-	}
+        return builder.toString();
+    }
 
 }

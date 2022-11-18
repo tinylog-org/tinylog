@@ -17,113 +17,113 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BundlePolicyTest {
 
-	@Mock
-	private Path file;
+    @Mock
+    private Path file;
 
-	@Mock(lenient = true)
-	private Policy firstPolicy;
+    @Mock(lenient = true)
+    private Policy firstPolicy;
 
-	@Mock(lenient = true)
-	private Policy secondPolicy;
+    @Mock(lenient = true)
+    private Policy secondPolicy;
 
-	/**
-	 * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
-	 * {@link Policy#canContinueFile(Path)}.
-	 */
-	@Test
-	void discontinueFileByBothPolicies() throws Exception {
-		when(firstPolicy.canContinueFile(file)).thenReturn(false);
-		when(secondPolicy.canContinueFile(file)).thenReturn(false);
+    /**
+     * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
+     * {@link Policy#canContinueFile(Path)}.
+     */
+    @Test
+    void discontinueFileByBothPolicies() throws Exception {
+        when(firstPolicy.canContinueFile(file)).thenReturn(false);
+        when(secondPolicy.canContinueFile(file)).thenReturn(false);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		assertThat(bundlePolicy.canContinueFile(file)).isFalse();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        assertThat(bundlePolicy.canContinueFile(file)).isFalse();
+    }
 
-	/**
-	 * Verifies that a log file will be discontinued, if one of the wrapped policies returns {@code false} for
-	 * {@link Policy#canContinueFile(Path)}.
-	 */
-	@Test
-	void discontinueFileByOnePolicy() throws Exception {
-		when(firstPolicy.canContinueFile(file)).thenReturn(false);
-		when(secondPolicy.canContinueFile(file)).thenReturn(true);
+    /**
+     * Verifies that a log file will be discontinued, if one of the wrapped policies returns {@code false} for
+     * {@link Policy#canContinueFile(Path)}.
+     */
+    @Test
+    void discontinueFileByOnePolicy() throws Exception {
+        when(firstPolicy.canContinueFile(file)).thenReturn(false);
+        when(secondPolicy.canContinueFile(file)).thenReturn(true);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		assertThat(bundlePolicy.canContinueFile(file)).isFalse();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        assertThat(bundlePolicy.canContinueFile(file)).isFalse();
+    }
 
-	/**
-	 * Verifies that a log file will be continued, if all wrapped policies return {@code true} for
-	 * {@link Policy#canContinueFile(Path)}.
-	 */
-	@Test
-	void continueFileByBothPolicies() throws Exception {
-		when(firstPolicy.canContinueFile(file)).thenReturn(true);
-		when(secondPolicy.canContinueFile(file)).thenReturn(true);
+    /**
+     * Verifies that a log file will be continued, if all wrapped policies return {@code true} for
+     * {@link Policy#canContinueFile(Path)}.
+     */
+    @Test
+    void continueFileByBothPolicies() throws Exception {
+        when(firstPolicy.canContinueFile(file)).thenReturn(true);
+        when(secondPolicy.canContinueFile(file)).thenReturn(true);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		assertThat(bundlePolicy.canContinueFile(file)).isTrue();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        assertThat(bundlePolicy.canContinueFile(file)).isTrue();
+    }
 
-	/**
-	 * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
-	 * {@link Policy#canAcceptLogEntry(int)}.
-	 */
-	@Test
-	void discontinueLogEntryByBothPolicies() throws Exception {
-		when(firstPolicy.canAcceptLogEntry(42)).thenReturn(false);
-		when(secondPolicy.canAcceptLogEntry(42)).thenReturn(false);
+    /**
+     * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
+     * {@link Policy#canAcceptLogEntry(int)}.
+     */
+    @Test
+    void discontinueLogEntryByBothPolicies() throws Exception {
+        when(firstPolicy.canAcceptLogEntry(42)).thenReturn(false);
+        when(secondPolicy.canAcceptLogEntry(42)).thenReturn(false);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		bundlePolicy.init(file);
-		assertThat(bundlePolicy.canAcceptLogEntry(42)).isFalse();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        bundlePolicy.init(file);
+        assertThat(bundlePolicy.canAcceptLogEntry(42)).isFalse();
+    }
 
-	/**
-	 * Verifies that a log file will be discontinued, if one of the wrapped policies returns {@code false} for
-	 * {@link Policy#canAcceptLogEntry(int)}.
-	 */
-	@Test
-	void discontinueLogEntryByOnePolicy() throws Exception {
-		when(firstPolicy.canAcceptLogEntry(42)).thenReturn(false);
-		when(secondPolicy.canAcceptLogEntry(42)).thenReturn(true);
+    /**
+     * Verifies that a log file will be discontinued, if one of the wrapped policies returns {@code false} for
+     * {@link Policy#canAcceptLogEntry(int)}.
+     */
+    @Test
+    void discontinueLogEntryByOnePolicy() throws Exception {
+        when(firstPolicy.canAcceptLogEntry(42)).thenReturn(false);
+        when(secondPolicy.canAcceptLogEntry(42)).thenReturn(true);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		bundlePolicy.init(file);
-		assertThat(bundlePolicy.canAcceptLogEntry(42)).isFalse();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        bundlePolicy.init(file);
+        assertThat(bundlePolicy.canAcceptLogEntry(42)).isFalse();
+    }
 
-	/**
-	 * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
-	 * {@link Policy#canAcceptLogEntry(int)}.
-	 */
-	@Test
-	void continueLogEntryByBothPolicies() throws Exception {
-		when(firstPolicy.canAcceptLogEntry(42)).thenReturn(true);
-		when(secondPolicy.canAcceptLogEntry(42)).thenReturn(true);
+    /**
+     * Verifies that a log file will be discontinued, if all wrapped policies return {@code false} for
+     * {@link Policy#canAcceptLogEntry(int)}.
+     */
+    @Test
+    void continueLogEntryByBothPolicies() throws Exception {
+        when(firstPolicy.canAcceptLogEntry(42)).thenReturn(true);
+        when(secondPolicy.canAcceptLogEntry(42)).thenReturn(true);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		bundlePolicy.init(file);
-		assertThat(bundlePolicy.canAcceptLogEntry(42)).isTrue();
-	}
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        bundlePolicy.init(file);
+        assertThat(bundlePolicy.canAcceptLogEntry(42)).isTrue();
+    }
 
-	/**
-	 * Verifies that all exceptions thrown during the policy initialization are rethrown as single exception.
-	 */
-	@Test
-	void failedInitialization() throws Exception {
-		Exception firstException = new RuntimeException();
-		doThrow(firstException).when(firstPolicy).init(file);
+    /**
+     * Verifies that all exceptions thrown during the policy initialization are rethrown as single exception.
+     */
+    @Test
+    void failedInitialization() throws Exception {
+        Exception firstException = new RuntimeException();
+        doThrow(firstException).when(firstPolicy).init(file);
 
-		Exception secondException = new RuntimeException();
-		doThrow(secondException).when(secondPolicy).init(file);
+        Exception secondException = new RuntimeException();
+        doThrow(secondException).when(secondPolicy).init(file);
 
-		BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
-		Throwable thrown = catchThrowable(() -> bundlePolicy.init(file));
+        BundlePolicy bundlePolicy = new BundlePolicy(ImmutableList.of(firstPolicy, secondPolicy));
+        Throwable thrown = catchThrowable(() -> bundlePolicy.init(file));
 
-		assertThat(thrown)
-			.isEqualTo(firstException)
-			.hasSuppressedException(secondException);
-	}
+        assertThat(thrown)
+            .isEqualTo(firstException)
+            .hasSuppressedException(secondException);
+    }
 
 }

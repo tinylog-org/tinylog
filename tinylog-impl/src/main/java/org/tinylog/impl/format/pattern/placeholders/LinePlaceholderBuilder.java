@@ -8,22 +8,22 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class LinePlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public LinePlaceholderBuilder() {
-	}
+    /** */
+    public LinePlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "line";
-	}
+    @Override
+    public String getName() {
+        return "line";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(null, "Unexpected configuration value for line placeholder: \"{}\"", value);
-		}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(null, "Unexpected configuration value for line placeholder: \"{}\"", value);
+        }
 
-		return new LinePlaceholder();
-	}
+        return new LinePlaceholder();
+    }
 
 }

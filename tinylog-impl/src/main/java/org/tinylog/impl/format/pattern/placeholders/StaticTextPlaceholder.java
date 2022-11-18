@@ -17,33 +17,33 @@ import org.tinylog.impl.format.pattern.ValueType;
  */
 public class StaticTextPlaceholder implements Placeholder {
 
-	private final String text;
+    private final String text;
 
-	/**
-	 * @param text Plain text to output
-	 */
-	public StaticTextPlaceholder(String text) {
-		this.text = text;
-	}
+    /**
+     * @param text Plain text to output
+     */
+    public StaticTextPlaceholder(String text) {
+        this.text = text;
+    }
 
-	@Override
-	public Set<LogEntryValue> getRequiredLogEntryValues() {
-		return EnumSet.noneOf(LogEntryValue.class);
-	}
+    @Override
+    public Set<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.noneOf(LogEntryValue.class);
+    }
 
-	@Override
-	public String getValue(LogEntry entry) {
-		return text;
-	}
+    @Override
+    public String getValue(LogEntry entry) {
+        return text;
+    }
 
-	@Override
-	public ValueType getType() {
-		return ValueType.STRING;
-	}
+    @Override
+    public ValueType getType() {
+        return ValueType.STRING;
+    }
 
-	@Override
-	public void render(StringBuilder builder, LogEntry entry) {
-		builder.append(text);
-	}
+    @Override
+    public void render(StringBuilder builder, LogEntry entry) {
+        builder.append(text);
+    }
 
 }

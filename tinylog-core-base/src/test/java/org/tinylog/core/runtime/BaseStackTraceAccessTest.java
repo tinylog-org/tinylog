@@ -8,55 +8,55 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BaseStackTraceAccessTest {
 
-	private final BaseStackTraceAccess access = new BaseStackTraceAccess() { };
+    private final BaseStackTraceAccess access = new BaseStackTraceAccess() { };
 
-	/**
-	 * Verifies that an invokable method handle is provided for existing and valid methods.
-	 */
-	@Test
-	void validMethod() throws Throwable {
-		MethodHandle handle = access.getMethod(
-			ignore -> true, String.class.getName(), "substring", int.class, int.class
-		);
+    /**
+     * Verifies that an invokable method handle is provided for existing and valid methods.
+     */
+    @Test
+    void validMethod() throws Throwable {
+        MethodHandle handle = access.getMethod(
+            ignore -> true, String.class.getName(), "substring", int.class, int.class
+        );
 
-		assertThat(handle).isNotNull();
-		assertThat(handle.invoke("12345", 2, 4)).isEqualTo("34");
-	}
+        assertThat(handle).isNotNull();
+        assertThat(handle.invoke("12345", 2, 4)).isEqualTo("34");
+    }
 
-	/**
-	 * Verifies that {@code null} is provided for existing but invalid methods.
-	 */
-	@Test
-	void invalidMethod() {
-		MethodHandle handle = access.getMethod(
-			ignore -> false, String.class.getName(), "substring", int.class, int.class
-		);
+    /**
+     * Verifies that {@code null} is provided for existing but invalid methods.
+     */
+    @Test
+    void invalidMethod() {
+        MethodHandle handle = access.getMethod(
+            ignore -> false, String.class.getName(), "substring", int.class, int.class
+        );
 
-		assertThat(handle).isNull();
-	}
+        assertThat(handle).isNull();
+    }
 
-	/**
-	 * Verifies that {@code null} is provided for non-existent classes.
-	 */
-	@Test
-	void nonExistentClass() {
-		MethodHandle handle = access.getMethod(
-			ignore -> true, "invalid.Foo", "substring", int.class, int.class
-		);
+    /**
+     * Verifies that {@code null} is provided for non-existent classes.
+     */
+    @Test
+    void nonExistentClass() {
+        MethodHandle handle = access.getMethod(
+            ignore -> true, "invalid.Foo", "substring", int.class, int.class
+        );
 
-		assertThat(handle).isNull();
-	}
+        assertThat(handle).isNull();
+    }
 
-	/**
-	 * Verifies that {@code null} is provided for non-existent methods.
-	 */
-	@Test
-	void nonExistentMethod() {
-		MethodHandle handle = access.getMethod(
-			ignore -> true, String.class.getName(), "substring", double.class, double.class
-		);
+    /**
+     * Verifies that {@code null} is provided for non-existent methods.
+     */
+    @Test
+    void nonExistentMethod() {
+        MethodHandle handle = access.getMethod(
+            ignore -> true, String.class.getName(), "substring", double.class, double.class
+        );
 
-		assertThat(handle).isNull();
-	}
+        assertThat(handle).isNull();
+    }
 
 }

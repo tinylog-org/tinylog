@@ -8,27 +8,27 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class ProcessIdPlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public ProcessIdPlaceholderBuilder() {
-	}
+    /** */
+    public ProcessIdPlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "process-id";
-	}
+    @Override
+    public String getName() {
+        return "process-id";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for process ID placeholder: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for process ID placeholder: \"{}\"",
+                value
+            );
+        }
 
-		long processId = framework.getRuntime().getProcessId();
-		return new ProcessIdPlaceholder(processId);
-	}
+        long processId = framework.getRuntime().getProcessId();
+        return new ProcessIdPlaceholder(processId);
+    }
 
 }

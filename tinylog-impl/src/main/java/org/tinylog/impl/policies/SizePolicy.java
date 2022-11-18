@@ -10,38 +10,38 @@ import java.nio.file.Path;
  */
 public class SizePolicy implements Policy {
 
-	private final long maxSize;
-	private long currentSize;
+    private final long maxSize;
+    private long currentSize;
 
-	/**
-	 * @param maxSize The maximum size in bytes for log files
-	 */
-	public SizePolicy(long maxSize) {
-		this.maxSize = maxSize;
-	}
+    /**
+     * @param maxSize The maximum size in bytes for log files
+     */
+    public SizePolicy(long maxSize) {
+        this.maxSize = maxSize;
+    }
 
-	@Override
-	public boolean canContinueFile(Path file) throws IOException {
-		try {
-			return Files.size(file) < maxSize;
-		} catch (NoSuchFileException ex) {
-			return false;
-		}
-	}
+    @Override
+    public boolean canContinueFile(Path file) throws IOException {
+        try {
+            return Files.size(file) < maxSize;
+        } catch (NoSuchFileException ex) {
+            return false;
+        }
+    }
 
-	@Override
-	public void init(Path file) throws IOException {
-		try {
-			currentSize = Files.size(file);
-		} catch (NoSuchFileException ex) {
-			currentSize = 0;
-		}
-	}
+    @Override
+    public void init(Path file) throws IOException {
+        try {
+            currentSize = Files.size(file);
+        } catch (NoSuchFileException ex) {
+            currentSize = 0;
+        }
+    }
 
-	@Override
-	public boolean canAcceptLogEntry(int bytes) {
-		currentSize += bytes;
-		return currentSize <= maxSize;
-	}
+    @Override
+    public boolean canAcceptLogEntry(int bytes) {
+        currentSize += bytes;
+        return currentSize <= maxSize;
+    }
 
 }

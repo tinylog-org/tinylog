@@ -14,50 +14,50 @@ import java.time.ZonedDateTime;
  */
 public abstract class AbstractDatePolicy implements Policy {
 
-	private final Clock clock;
-	private Instant deadline;
+    private final Clock clock;
+    private Instant deadline;
 
-	/**
-	 * @param clock The clock for receiving the current date, time, and zone
-	 */
-	public AbstractDatePolicy(Clock clock) {
-		this.clock = clock;
-	}
+    /**
+     * @param clock The clock for receiving the current date, time, and zone
+     */
+    public AbstractDatePolicy(Clock clock) {
+        this.clock = clock;
+    }
 
-	@Override
-	public boolean canContinueFile(Path file) throws IOException {
-		ZonedDateTime now = ZonedDateTime.now(clock);
-		ZonedDateTime minDate = getMinDate(now);
-		FileTime creationTime = Files.readAttributes(file, BasicFileAttributes.class).creationTime();
-		return !creationTime.toInstant().isBefore(minDate.toInstant());
-	}
+    @Override
+    public boolean canContinueFile(Path file) throws IOException {
+        ZonedDateTime now = ZonedDateTime.now(clock);
+        ZonedDateTime minDate = getMinDate(now);
+        FileTime creationTime = Files.readAttributes(file, BasicFileAttributes.class).creationTime();
+        return !creationTime.toInstant().isBefore(minDate.toInstant());
+    }
 
-	@Override
-	public void init(Path file) {
-		ZonedDateTime now = ZonedDateTime.now(clock);
-		ZonedDateTime date = getMaxDate(now);
-		deadline = date.toInstant();
-	}
+    @Override
+    public void init(Path file) {
+        ZonedDateTime now = ZonedDateTime.now(clock);
+        ZonedDateTime date = getMaxDate(now);
+        deadline = date.toInstant();
+    }
 
-	@Override
-	public boolean canAcceptLogEntry(int bytes) {
-		return clock.instant().isBefore(deadline);
-	}
+    @Override
+    public boolean canAcceptLogEntry(int bytes) {
+        return clock.instant().isBefore(deadline);
+    }
 
-	/**
-	 * Gets the minimum {@link ZonedDateTime} that is accepted as creation date-time for log files to continue them.
-	 *
-	 * @param now The current date-time
-	 * @return The minimum acceptable creation date-time
-	 */
-	protected abstract ZonedDateTime getMinDate(ZonedDateTime now);
+    /**
+     * Gets the minimum {@link ZonedDateTime} that is accepted as creation date-time for log files to continue them.
+     *
+     * @param now The current date-time
+     * @return The minimum acceptable creation date-time
+     */
+    protected abstract ZonedDateTime getMinDate(ZonedDateTime now);
 
-	/**
-	 * Gets the maximum {@link ZonedDateTime} until new log entries can be written to the current log file.
-	 *
-	 * @param now The current date-time
-	 * @return The deadline for accepting log entries for the current log file
-	 */
-	protected abstract ZonedDateTime getMaxDate(ZonedDateTime now);
+    /**
+     * Gets the maximum {@link ZonedDateTime} until new log entries can be written to the current log file.
+     *
+     * @param now The current date-time
+     * @return The deadline for accepting log entries for the current log file
+     */
+    protected abstract ZonedDateTime getMaxDate(ZonedDateTime now);
 
 }

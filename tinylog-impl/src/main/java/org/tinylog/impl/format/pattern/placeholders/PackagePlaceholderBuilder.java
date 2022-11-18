@@ -8,26 +8,26 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class PackagePlaceholderBuilder implements PlaceholderBuilder {
 
-	/** */
-	public PackagePlaceholderBuilder() {
-	}
+    /** */
+    public PackagePlaceholderBuilder() {
+    }
 
-	@Override
-	public String getName() {
-		return "package";
-	}
+    @Override
+    public String getName() {
+        return "package";
+    }
 
-	@Override
-	public Placeholder create(Framework framework, String value) {
-		if (value != null) {
-			InternalLogger.warn(
-				null,
-				"Unexpected configuration value for package placeholder: \"{}\"",
-				value
-			);
-		}
+    @Override
+    public Placeholder create(Framework framework, String value) {
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for package placeholder: \"{}\"",
+                value
+            );
+        }
 
-		return new PackagePlaceholder();
-	}
+        return new PackagePlaceholder();
+    }
 
 }

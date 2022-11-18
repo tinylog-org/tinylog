@@ -12,55 +12,55 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class LevelPlaceholderTest {
 
-	/**
-	 * Verifies that the log entry value {@link LogEntryValue#LEVEL} is defined as required by the level placeholder.
-	 */
-	@Test
-	void requiredLogEntryValues() {
-		LevelPlaceholder placeholder = new LevelPlaceholder();
-		assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LEVEL);
-	}
+    /**
+     * Verifies that the log entry value {@link LogEntryValue#LEVEL} is defined as required by the level placeholder.
+     */
+    @Test
+    void requiredLogEntryValues() {
+        LevelPlaceholder placeholder = new LevelPlaceholder();
+        assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LEVEL);
+    }
 
-	/**
-	 * Verifies that the severity level of a log entry will be resolved, if set.
-	 */
-	@Test
-	void resolveWithSeverityLevel() {
-		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
-		LevelPlaceholder placeholder = new LevelPlaceholder();
-		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
-		assertThat(placeholder.getValue(logEntry)).isEqualTo("INFO");
-	}
+    /**
+     * Verifies that the severity level of a log entry will be resolved, if set.
+     */
+    @Test
+    void resolveWithSeverityLevel() {
+        LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
+        LevelPlaceholder placeholder = new LevelPlaceholder();
+        assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("INFO");
+    }
 
-	/**
-	 * Verifies that {@code null} will be resolved, if the severity level is not set.
-	 */
-	@Test
-	void resolveWithoutSeverityLevel() {
-		LogEntry logEntry = new LogEntryBuilder().create();
-		LevelPlaceholder placeholder = new LevelPlaceholder();
-		assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
-		assertThat(placeholder.getValue(logEntry)).isNull();
-	}
+    /**
+     * Verifies that {@code null} will be resolved, if the severity level is not set.
+     */
+    @Test
+    void resolveWithoutSeverityLevel() {
+        LogEntry logEntry = new LogEntryBuilder().create();
+        LevelPlaceholder placeholder = new LevelPlaceholder();
+        assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
+        assertThat(placeholder.getValue(logEntry)).isNull();
+    }
 
-	/**
-	 * Verifies that the severity level of a log entry will be output, if set.
-	 */
-	@Test
-	void renderWithSeverityLevel() {
-		FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
-		LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
-		assertThat(renderer.render(logEntry)).isEqualTo("INFO");
-	}
+    /**
+     * Verifies that the severity level of a log entry will be output, if set.
+     */
+    @Test
+    void renderWithSeverityLevel() {
+        FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
+        LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
+        assertThat(renderer.render(logEntry)).isEqualTo("INFO");
+    }
 
-	/**
-	 * Verifies that {@code <level unknown>} will be output, if the severity level is not set.
-	 */
-	@Test
-	void renderWithoutSeverityLevel() {
-		FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
-		LogEntry logEntry = new LogEntryBuilder().create();
-		assertThat(renderer.render(logEntry)).isEqualTo("<level unknown>");
-	}
+    /**
+     * Verifies that {@code <level unknown>} will be output, if the severity level is not set.
+     */
+    @Test
+    void renderWithoutSeverityLevel() {
+        FormatOutputRenderer renderer = new FormatOutputRenderer(new LevelPlaceholder());
+        LogEntry logEntry = new LogEntryBuilder().create();
+        assertThat(renderer.render(logEntry)).isEqualTo("<level unknown>");
+    }
 
 }

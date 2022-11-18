@@ -24,49 +24,49 @@ import org.tinylog.core.test.AbstractExtension;
  */
 public class ServiceRegistrationExtension extends AbstractExtension {
 
-	/** */
-	public ServiceRegistrationExtension() {
-	}
+    /** */
+    public ServiceRegistrationExtension() {
+    }
 
-	@Override
-	public void beforeEach(ExtensionContext context) throws IOException {
-		Path temporaryFolder = Files.createTempDirectory(null);
-		Path serviceFolder = temporaryFolder.resolve("META-INF").resolve("services");
-		Files.createDirectories(serviceFolder);
+    @Override
+    public void beforeEach(ExtensionContext context) throws IOException {
+        Path temporaryFolder = Files.createTempDirectory(null);
+        Path serviceFolder = temporaryFolder.resolve("META-INF").resolve("services");
+        Files.createDirectories(serviceFolder);
 
-		for (RegisterService annotation : findAnnotations(context, RegisterService.class)) {
-			String content = Arrays.stream(annotation.implementations())
-				.map(Class::getName)
-				.collect(Collectors.joining("\n"));
-			Path file = serviceFolder.resolve(annotation.service().getName());
-			byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-			Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-		}
+        for (RegisterService annotation : findAnnotations(context, RegisterService.class)) {
+            String content = Arrays.stream(annotation.implementations())
+                .map(Class::getName)
+                .collect(Collectors.joining("\n"));
+            Path file = serviceFolder.resolve(annotation.service().getName());
+            byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+            Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        }
 
-		URL[] urls = new URL[] {temporaryFolder.toUri().toURL()};
-		ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();
-		ClassLoader wrappedLoader = new URLClassLoader(urls, defaultLoader);
+        URL[] urls = new URL[] {temporaryFolder.toUri().toURL()};
+        ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader wrappedLoader = new URLClassLoader(urls, defaultLoader);
 
-		put(context, Path.class, temporaryFolder);
-		put(context, ClassLoader.class, defaultLoader);
+        put(context, Path.class, temporaryFolder);
+        put(context, ClassLoader.class, defaultLoader);
 
-		Thread.currentThread().setContextClassLoader(wrappedLoader);
-		temporaryFolder.toFile().deleteOnExit();
-	}
+        Thread.currentThread().setContextClassLoader(wrappedLoader);
+        temporaryFolder.toFile().deleteOnExit();
+    }
 
-	@Override
-	public void afterEach(ExtensionContext context) throws IOException {
-		ClassLoader loader = get(context, ClassLoader.class);
-		if (loader != null) {
-			Thread.currentThread().setContextClassLoader(loader);
-		}
+    @Override
+    public void afterEach(ExtensionContext context) throws IOException {
+        ClassLoader loader = get(context, ClassLoader.class);
+        if (loader != null) {
+            Thread.currentThread().setContextClassLoader(loader);
+        }
 
-		Path folder = get(context, Path.class);
-		if (folder != null) {
-			for (Path path : Files.walk(folder).sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
-				Files.deleteIfExists(path);
-			}
-		}
-	}
+        Path folder = get(context, Path.class);
+        if (folder != null) {
+            for (Path path : Files.walk(folder).sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
+                Files.deleteIfExists(path);
+            }
+        }
+    }
 
 }

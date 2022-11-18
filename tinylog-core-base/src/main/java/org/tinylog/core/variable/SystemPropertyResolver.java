@@ -5,23 +5,23 @@ package org.tinylog.core.variable;
  */
 public class SystemPropertyResolver implements VariableResolver {
 
-	/** */
-	public SystemPropertyResolver() {
-	}
+    /** */
+    public SystemPropertyResolver() {
+    }
 
-	@Override
-	public String getName() {
-		return "system property";
-	}
+    @Override
+    public String getName() {
+        return "system property";
+    }
 
-	@Override
-	public String getPrefix() {
-		return "#";
-	}
+    @Override
+    public String getPrefix() {
+        return "#";
+    }
 
-	@Override
-	public String resolve(String name) {
-		return System.getProperty(name);
-	}
+    @Override
+    public String resolve(String name) {
+        return System.getProperty(name);
+    }
 
 }

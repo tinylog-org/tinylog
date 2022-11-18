@@ -11,35 +11,35 @@ import org.tinylog.slf4j.TinylogMdcAdapter;
 // START IGNORE RULES: AbbreviationAsWordInName
 public final class StaticMDCBinder {
 
-	/**
-	 * Singleton instance of this static MDC binder.
-	 */
-	public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
+    /**
+     * Singleton instance of this static MDC binder.
+     */
+    public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
 
-	private final MDCAdapter adapter;
+    private final MDCAdapter adapter;
 
-	/** */
-	private StaticMDCBinder() {
-		ContextStorage contextStorage = Tinylog.getFramework().getLoggingBackend().getContextStorage();
-		this.adapter = new TinylogMdcAdapter(contextStorage);
-	}
+    /** */
+    private StaticMDCBinder() {
+        ContextStorage contextStorage = Tinylog.getFramework().getLoggingBackend().getContextStorage();
+        this.adapter = new TinylogMdcAdapter(contextStorage);
+    }
 
-	/**
-	 * Gets the MDC adapter implementation.
-	 * 
-	 * @return The MDC adapter instance
-	 */
-	public MDCAdapter getMDCA() {
-		return adapter;
-	}
+    /**
+     * Gets the MDC adapter implementation.
+     * 
+     * @return The MDC adapter instance
+     */
+    public MDCAdapter getMDCA() {
+        return adapter;
+    }
 
-	/**
-	 * Gets the fully-qualified MDC adapter class name.
-	 * 
-	 * @return The fully-qualified class name of the MDC adapter
-	 */
-	public String getMDCAdapterClassStr() {
-		return TinylogMdcAdapter.class.getName();
-	}
+    /**
+     * Gets the fully-qualified MDC adapter class name.
+     * 
+     * @return The fully-qualified class name of the MDC adapter
+     */
+    public String getMDCAdapterClassStr() {
+        return TinylogMdcAdapter.class.getName();
+    }
 
 }

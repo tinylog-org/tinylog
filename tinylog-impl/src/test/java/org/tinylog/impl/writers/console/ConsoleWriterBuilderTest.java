@@ -31,195 +31,195 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ConsoleWriterBuilderTest {
 
-	@Inject
-	private Framework framework;
+    @Inject
+    private Framework framework;
 
-	@Inject
-	private Log log;
+    @Inject
+    private Log log;
 
-	@Mock
-	private PrintStream mockedOutputStream;
+    @Mock
+    private PrintStream mockedOutputStream;
 
-	@Mock
-	private PrintStream mockedErrorStream;
+    @Mock
+    private PrintStream mockedErrorStream;
 
-	private PrintStream originalOutputStream;
-	private PrintStream originalErrorStream;
+    private PrintStream originalOutputStream;
+    private PrintStream originalErrorStream;
 
-	/**
-	 * Mocks {@link System#out} and {@link System#err}.
-	 */
-	@BeforeEach
-	void init() {
-		originalOutputStream = System.out;
-		originalErrorStream = System.err;
+    /**
+     * Mocks {@link System#out} and {@link System#err}.
+     */
+    @BeforeEach
+    void init() {
+        originalOutputStream = System.out;
+        originalErrorStream = System.err;
 
-		System.setOut(mockedOutputStream);
-		System.setErr(mockedErrorStream);
-	}
+        System.setOut(mockedOutputStream);
+        System.setErr(mockedErrorStream);
+    }
 
-	/**
-	 * Restores the original streams for {@link System#out} and {@link System#err}.
-	 */
-	@AfterEach
-	void reset() {
-		System.setOut(originalOutputStream);
-		System.setErr(originalErrorStream);
-	}
+    /**
+     * Restores the original streams for {@link System#out} and {@link System#err}.
+     */
+    @AfterEach
+    void reset() {
+        System.setOut(originalOutputStream);
+        System.setErr(originalErrorStream);
+    }
 
-	/**
-	 * Verifies that the default format pattern will be used, if no custom format pattern is set.
-	 */
-	@Test
-	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
-	void defaultPattern() throws Exception {
-		Configuration configuration = new Configuration();
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			LogEntry logEntry = new LogEntryBuilder()
-				.timestamp(Instant.EPOCH)
-				.thread(new Thread(() -> { }, "main"))
-				.severityLevel(Level.INFO)
-				.className("org.MyClass")
-				.methodName("foo")
-				.message("Hello World!")
-				.create();
+    /**
+     * Verifies that the default format pattern will be used, if no custom format pattern is set.
+     */
+    @Test
+    @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+    void defaultPattern() throws Exception {
+        Configuration configuration = new Configuration();
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            LogEntry logEntry = new LogEntryBuilder()
+                .timestamp(Instant.EPOCH)
+                .thread(new Thread(() -> { }, "main"))
+                .severityLevel(Level.INFO)
+                .className("org.MyClass")
+                .methodName("foo")
+                .message("Hello World!")
+                .create();
 
-			writer.log(logEntry);
+            writer.log(logEntry);
 
-			verify(mockedOutputStream)
-				.print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
-		}
-	}
+            verify(mockedOutputStream)
+                .print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that custom output formats like {@link NewlineDelimitedJson} are supported.
-	 */
-	@Test
-	void customJsonFormat() throws Exception {
-		Configuration configuration = new Configuration()
-			.set("format", "ndjson")
-			.set("fields.msg", "message");
+    /**
+     * Verifies that custom output formats like {@link NewlineDelimitedJson} are supported.
+     */
+    @Test
+    void customJsonFormat() throws Exception {
+        Configuration configuration = new Configuration()
+            .set("format", "ndjson")
+            .set("fields.msg", "message");
 
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
-			writer.log(logEntry);
-			verify(mockedOutputStream).print("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
-		}
-	}
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
+            writer.log(logEntry);
+            verify(mockedOutputStream).print("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that illegal output formats are reported and the writer will use the default pattern output format
-	 * instead.
-	 */
-	@Test
-	@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
-	void illegalOutputFormat() throws Exception {
-		Configuration configuration = new Configuration().set("format", "foo");
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			assertThat(log.consume()).singleElement().satisfies(entry -> {
-				assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-				assertThat(entry.getMessage()).contains("format", "foo");
-			});
+    /**
+     * Verifies that illegal output formats are reported and the writer will use the default pattern output format
+     * instead.
+     */
+    @Test
+    @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+    void illegalOutputFormat() throws Exception {
+        Configuration configuration = new Configuration().set("format", "foo");
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            assertThat(log.consume()).singleElement().satisfies(entry -> {
+                assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+                assertThat(entry.getMessage()).contains("format", "foo");
+            });
 
-			LogEntry logEntry = new LogEntryBuilder()
-				.timestamp(Instant.EPOCH)
-				.thread(new Thread(() -> { }, "main"))
-				.severityLevel(Level.INFO)
-				.className("org.MyClass")
-				.methodName("foo")
-				.message("Hello World!")
-				.create();
+            LogEntry logEntry = new LogEntryBuilder()
+                .timestamp(Instant.EPOCH)
+                .thread(new Thread(() -> { }, "main"))
+                .severityLevel(Level.INFO)
+                .className("org.MyClass")
+                .methodName("foo")
+                .message("Hello World!")
+                .create();
 
-			writer.log(logEntry);
+            writer.log(logEntry);
 
-			verify(mockedOutputStream)
-				.print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
-		}
-	}
+            verify(mockedOutputStream)
+                .print("1970-01-01 00:00:00 [main] INFO  org.MyClass.foo(): Hello World!" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that a new line will be appended to a custom format pattern automatically.
-	 */
-	@Test
-	void appendNewLineToCustomPattern() throws Exception {
-		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "off");
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
-			verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
-		}
-	}
+    /**
+     * Verifies that a new line will be appended to a custom format pattern automatically.
+     */
+    @Test
+    void appendNewLineToCustomPattern() throws Exception {
+        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "off");
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
+            verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that {@link Level#WARN} will be used as default severity level threshold, if no custom threshold is set.
-	 */
-	@Test
-	void defaultSeverityLevelThreshold() throws Exception {
-		Configuration configuration = new Configuration().set("pattern", "{message}");
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
-			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
+    /**
+     * Verifies that {@link Level#WARN} will be used as default severity level threshold, if no custom threshold is set.
+     */
+    @Test
+    void defaultSeverityLevelThreshold() throws Exception {
+        Configuration configuration = new Configuration().set("pattern", "{message}");
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
+            verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
-			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		}
-	}
+            writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
+            verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that a custom severity level threshold can be set.
-	 */
-	@Test
-	void customSeverityLevelThreshold() throws Exception {
-		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "error");
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
-			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
+    /**
+     * Verifies that a custom severity level threshold can be set.
+     */
+    @Test
+    void customSeverityLevelThreshold() throws Exception {
+        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "error");
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
+            verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello system err!").create());
-			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		}
-	}
+            writer.log(new LogEntryBuilder().severityLevel(Level.ERROR).message("Hello system err!").create());
+            verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
+        }
+    }
 
-	/**
-	 * Verifies that an illegal severity level as threshold is logged and the writer uses the default severity level
-	 * threshold {@link Level#WARN} instead.
-	 */
-	@Test
-	void illegalSeverityLevelThreshold() throws Exception {
-		Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "foo");
-		try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
-			writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
-			verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
+    /**
+     * Verifies that an illegal severity level as threshold is logged and the writer uses the default severity level
+     * threshold {@link Level#WARN} instead.
+     */
+    @Test
+    void illegalSeverityLevelThreshold() throws Exception {
+        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "foo");
+        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+            writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
+            verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
-			writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
-			verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
-		}
+            writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system err!").create());
+            verify(mockedErrorStream).print("Hello system err!" + System.lineSeparator());
+        }
 
-		assertThat(log.consume()).singleElement().satisfies(entry -> {
-			assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-			assertThat(entry.getMessage()).contains("foo");
-		});
-	}
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getMessage()).contains("foo");
+        });
+    }
 
-	/**
-	 * Verifies that the console writer builder is the default writer builder on standard Java.
-	 */
-	@Test
-	@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
-	void defaultWriter() {
-		String builderWriterName = new ConsoleWriterBuilder().getName();
-		String defaultWriterName = framework.getRuntime().getDefaultWriter();
-		assertThat(builderWriterName).isEqualTo(defaultWriterName);
-	}
+    /**
+     * Verifies that the console writer builder is the default writer builder on standard Java.
+     */
+    @Test
+    @DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
+    void defaultWriter() {
+        String builderWriterName = new ConsoleWriterBuilder().getName();
+        String defaultWriterName = framework.getRuntime().getDefaultWriter();
+        assertThat(builderWriterName).isEqualTo(defaultWriterName);
+    }
 
-	/**
-	 * Verifies that the builder is registered as service.
-	 */
-	@Test
-	void service() {
-		assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
-			assertThat(builder).isInstanceOf(ConsoleWriterBuilder.class);
-			assertThat(builder.getName()).isEqualTo("console");
-		});
-	}
+    /**
+     * Verifies that the builder is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(WriterBuilder.class)).anySatisfy(builder -> {
+            assertThat(builder).isInstanceOf(ConsoleWriterBuilder.class);
+            assertThat(builder.getName()).isEqualTo("console");
+        });
+    }
 
 }

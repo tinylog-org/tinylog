@@ -18,49 +18,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 @CaptureLogEntries
 class UptimePlaceholderBuilderTest {
 
-	@Inject
-	private Framework framework;
+    @Inject
+    private Framework framework;
 
-	/**
-	 * Verifies that the builder can create a valid {@link UptimePlaceholder} with default format pattern.
-	 */
-	@Test
-	void creationWithDefaultPattern() {
-		Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, null);
-		assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
+    /**
+     * Verifies that the builder can create a valid {@link UptimePlaceholder} with default format pattern.
+     */
+    @Test
+    void creationWithDefaultPattern() {
+        Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, null);
+        assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
-		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
-		assertThat(placeholder.getValue(logEntry)).isEqualTo(new BigDecimal("7170.000000000"));
+        LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo(new BigDecimal("7170.000000000"));
 
-		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-		assertThat(renderer.render(logEntry)).isEqualTo("01:59:30");
-	}
+        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
+        assertThat(renderer.render(logEntry)).isEqualTo("01:59:30");
+    }
 
-	/**
-	 * Verifies that the builder can create a valid {@link UptimePlaceholder} with custom format pattern.
-	 */
-	@Test
-	void creationWithCustomPattern() {
-		Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, "s.SSS");
-		assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
+    /**
+     * Verifies that the builder can create a valid {@link UptimePlaceholder} with custom format pattern.
+     */
+    @Test
+    void creationWithCustomPattern() {
+        Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, "s.SSS");
+        assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
-		LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
-		assertThat(placeholder.getValue(logEntry)).isEqualTo("7170.000");
+        LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("7170.000");
 
-		FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-		assertThat(renderer.render(logEntry)).isEqualTo("7170.000");
+        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
+        assertThat(renderer.render(logEntry)).isEqualTo("7170.000");
 
-	}
+    }
 
-	/**
-	 * Verifies that the builder is registered as service.
-	 */
-	@Test
-	void service() {
-		assertThat(ServiceLoader.load(PlaceholderBuilder.class)).anySatisfy(builder -> {
-			assertThat(builder).isInstanceOf(UptimePlaceholderBuilder.class);
-			assertThat(builder.getName()).isEqualTo("uptime");
-		});
-	}
+    /**
+     * Verifies that the builder is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(PlaceholderBuilder.class)).anySatisfy(builder -> {
+            assertThat(builder).isInstanceOf(UptimePlaceholderBuilder.class);
+            assertThat(builder.getName()).isEqualTo("uptime");
+        });
+    }
 
 }

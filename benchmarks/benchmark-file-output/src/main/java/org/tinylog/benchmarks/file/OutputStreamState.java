@@ -16,37 +16,37 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Thread)
 public class OutputStreamState extends AbstractState<OutputStream> {
 
-	/**
-	 * The buffer sizes to benchmark.
-	 */
-	@Param({ "0", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
-	private int bufferSize;
+    /**
+     * The buffer sizes to benchmark.
+     */
+    @Param({ "0", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072" })
+    private int bufferSize;
 
-	/** */
-	public OutputStreamState() {
-	}
+    /** */
+    public OutputStreamState() {
+    }
 
-	/**
-	 * @param bufferSize The buffer size in bytes
-	 */
-	public OutputStreamState(int bufferSize) {
-		this.bufferSize = bufferSize;
-	}
+    /**
+     * @param bufferSize The buffer size in bytes
+     */
+    public OutputStreamState(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
-	@Override
-	public void write(String content) throws IOException {
-		instance.write(content.getBytes(CHARSET));
-	}
+    @Override
+    public void write(String content) throws IOException {
+        instance.write(content.getBytes(CHARSET));
+    }
 
-	@Override
-	protected OutputStream create(Path path) throws IOException {
-		OutputStream stream = new FileOutputStream(path.toFile());
+    @Override
+    protected OutputStream create(Path path) throws IOException {
+        OutputStream stream = new FileOutputStream(path.toFile());
 
-		if (bufferSize > 0) {
-			return new BufferedOutputStream(stream, bufferSize);
-		}
+        if (bufferSize > 0) {
+            return new BufferedOutputStream(stream, bufferSize);
+        }
 
-		return stream;
-	}
+        return stream;
+    }
 
 }

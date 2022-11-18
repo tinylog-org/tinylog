@@ -46,80 +46,80 @@ import org.tinylog.impl.writers.logcat.LogcatWriterBuilder;
 
 module org.tinylog.impl {
 
-	requires java.sql;
-	requires org.tinylog.core;
+    requires java.sql;
+    requires org.tinylog.core;
 
-	provides LoggingBackendBuilder with
-		NativeLoggingBackendBuilder;
+    provides LoggingBackendBuilder with
+        NativeLoggingBackendBuilder;
 
-	provides OutputFormatBuilder with
-		FormatPatternBuilder,
-		NewlineDelimitedJsonBuilder;
+    provides OutputFormatBuilder with
+        FormatPatternBuilder,
+        NewlineDelimitedJsonBuilder;
 
-	uses PlaceholderBuilder;
-	provides PlaceholderBuilder with
-		ClassNamePlaceholderBuilder,
-		ClassPlaceholderBuilder,
-		ContextPlaceholderBuilder,
-		DatePlaceholderBuilder,
-		ExceptionPlaceholderBuilder,
-		FilePlaceholderBuilder,
-		LevelPlaceholderBuilder,
-		LinePlaceholderBuilder,
-		MessageOnlyPlaceholderBuilder,
-		MessagePlaceholderBuilder,
-		MethodPlaceholderBuilder,
-		PackagePlaceholderBuilder,
-		ProcessIdPlaceholderBuilder,
-		SeverityCodePlaceholderBuilder,
-		TagPlaceholderBuilder,
-		ThreadIdPlaceholderBuilder,
-		ThreadPlaceholderBuilder,
-		TimestampPlaceholderBuilder,
-		UptimePlaceholderBuilder;
+    uses PlaceholderBuilder;
+    provides PlaceholderBuilder with
+        ClassNamePlaceholderBuilder,
+        ClassPlaceholderBuilder,
+        ContextPlaceholderBuilder,
+        DatePlaceholderBuilder,
+        ExceptionPlaceholderBuilder,
+        FilePlaceholderBuilder,
+        LevelPlaceholderBuilder,
+        LinePlaceholderBuilder,
+        MessageOnlyPlaceholderBuilder,
+        MessagePlaceholderBuilder,
+        MethodPlaceholderBuilder,
+        PackagePlaceholderBuilder,
+        ProcessIdPlaceholderBuilder,
+        SeverityCodePlaceholderBuilder,
+        TagPlaceholderBuilder,
+        ThreadIdPlaceholderBuilder,
+        ThreadPlaceholderBuilder,
+        TimestampPlaceholderBuilder,
+        UptimePlaceholderBuilder;
 
-	uses StyleBuilder;
-	provides StyleBuilder with
-		IndentStyleBuilder,
-		LengthStyleBuilder,
-		MaxLengthStyleBuilder,
-		MinLengthStyleBuilder;
+    uses StyleBuilder;
+    provides StyleBuilder with
+        IndentStyleBuilder,
+        LengthStyleBuilder,
+        MaxLengthStyleBuilder,
+        MinLengthStyleBuilder;
 
-	uses PolicyBuilder;
-	provides PolicyBuilder with
-		DailyPolicyBuilder,
-		MonthlyPolicyBuilder,
-		SizePolicyBuilder,
-		StartupPolicyBuilder,
-		WeeklyPolicyBuilder;
+    uses PolicyBuilder;
+    provides PolicyBuilder with
+        DailyPolicyBuilder,
+        MonthlyPolicyBuilder,
+        SizePolicyBuilder,
+        StartupPolicyBuilder,
+        WeeklyPolicyBuilder;
 
-	uses PathSegmentBuilder;
-	provides PathSegmentBuilder with
-		CountSegmentBuilder,
-		DateTimeSegmentBuilder,
-		ProcessIdSegmentBuilder;
+    uses PathSegmentBuilder;
+    provides PathSegmentBuilder with
+        CountSegmentBuilder,
+        DateTimeSegmentBuilder,
+        ProcessIdSegmentBuilder;
 
-	uses WriterBuilder;
-	provides WriterBuilder with
-		ConsoleWriterBuilder,
-		FileWriterBuilder,
-		JdbcWriterBuilder,
-		LogcatWriterBuilder;
+    uses WriterBuilder;
+    provides WriterBuilder with
+        ConsoleWriterBuilder,
+        FileWriterBuilder,
+        JdbcWriterBuilder,
+        LogcatWriterBuilder;
 
-	exports org.tinylog.impl;
-	exports org.tinylog.impl.backend;
-	exports org.tinylog.impl.context;
-	exports org.tinylog.impl.format;
-	exports org.tinylog.impl.format.json;
-	exports org.tinylog.impl.format.pattern;
-	exports org.tinylog.impl.format.pattern.placeholders;
-	exports org.tinylog.impl.format.pattern.styles;
-	exports org.tinylog.impl.path;
-	exports org.tinylog.impl.path.segments;
-	exports org.tinylog.impl.policies;
-	exports org.tinylog.impl.writers;
-	exports org.tinylog.impl.writers.console;
-	exports org.tinylog.impl.writers.file;
-	exports org.tinylog.impl.writers.logcat;
+    exports org.tinylog.impl;
+    exports org.tinylog.impl.backend;
+    exports org.tinylog.impl.context;
+    exports org.tinylog.impl.format;
+    exports org.tinylog.impl.format.json;
+    exports org.tinylog.impl.format.pattern;
+    exports org.tinylog.impl.format.pattern.placeholders;
+    exports org.tinylog.impl.format.pattern.styles;
+    exports org.tinylog.impl.path;
+    exports org.tinylog.impl.path.segments;
+    exports org.tinylog.impl.policies;
+    exports org.tinylog.impl.writers;
+    exports org.tinylog.impl.writers.console;
+    exports org.tinylog.impl.writers.file;
+    exports org.tinylog.impl.writers.logcat;
 
 }

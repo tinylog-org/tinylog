@@ -9,16 +9,16 @@ import org.openjdk.jmh.annotations.Mode;
  */
 public class NoOperationBenchmark {
 
-	/** */
-	public NoOperationBenchmark() {
-	}
+    /** */
+    public NoOperationBenchmark() {
+    }
 
-	/**
-	 * Does nothing as a no-operation benchmark method.
-	 */
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	public void emptyMethod() {
-	}
+    /**
+     * Does nothing as a no-operation benchmark method.
+     */
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public void emptyMethod() {
+    }
 
 }

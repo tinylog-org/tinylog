@@ -11,35 +11,35 @@ import org.tinylog.core.internal.InternalLogger;
  */
 public class JndiValueResolver implements VariableResolver {
 
-	private static final String DEFAULT_PREFIX = "java:comp/env/";
+    private static final String DEFAULT_PREFIX = "java:comp/env/";
 
-	/** */
-	public JndiValueResolver() {
-	}
+    /** */
+    public JndiValueResolver() {
+    }
 
-	@Override
-	public String getName() {
-		return "JNDI value";
-	}
+    @Override
+    public String getName() {
+        return "JNDI value";
+    }
 
-	@Override
-	public String getPrefix() {
-		return "@";
-	}
+    @Override
+    public String getPrefix() {
+        return "@";
+    }
 
-	@Override
-	public String resolve(String name) {
-		String fullName = name.contains(":") ? name : DEFAULT_PREFIX + name;
+    @Override
+    public String resolve(String name) {
+        String fullName = name.contains(":") ? name : DEFAULT_PREFIX + name;
 
-		try {
-			Object value = InitialContext.doLookup(fullName);
-			return value == null ? null : value.toString();
-		} catch (NameNotFoundException ex) {
-			return null;
-		} catch (NamingException ex) {
-			InternalLogger.error(ex, "Failed to look up \"{}\"", fullName);
-			return null;
-		}
-	}
+        try {
+            Object value = InitialContext.doLookup(fullName);
+            return value == null ? null : value.toString();
+        } catch (NameNotFoundException ex) {
+            return null;
+        } catch (NamingException ex) {
+            InternalLogger.error(ex, "Failed to look up \"{}\"", fullName);
+            return null;
+        }
+    }
 
 }

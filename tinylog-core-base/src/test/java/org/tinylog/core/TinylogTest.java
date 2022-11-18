@@ -13,48 +13,48 @@ import static org.mockito.Mockito.verify;
 @CaptureSystemOutput(excludes = "TINYLOG WARN:.*tinylog-impl\\.jar.*")
 class TinylogTest {
 
-	/**
-	 * Ensures that {@link Tinylog} is down before and after each test.
-	 */
-	@BeforeEach
-	@AfterEach
-	void shutDownTinylog() {
-		Tinylog.shutDown();
-	}
+    /**
+     * Ensures that {@link Tinylog} is down before and after each test.
+     */
+    @BeforeEach
+    @AfterEach
+    void shutDownTinylog() {
+        Tinylog.shutDown();
+    }
 
-	/**
-	 * Verifies that a {@link Configuration} is provided.
-	 */
-	@Test
-	void configuration() {
-		assertThat(Tinylog.getConfiguration()).isNotNull();
-	}
+    /**
+     * Verifies that a {@link Configuration} is provided.
+     */
+    @Test
+    void configuration() {
+        assertThat(Tinylog.getConfiguration()).isNotNull();
+    }
 
-	/**
-	 * Verifies that the {@link Framework} instance is provided.
-	 */
-	@Test
-	void framework() {
-		assertThat(Tinylog.getFramework()).isNotNull();
-	}
+    /**
+     * Verifies that the {@link Framework} instance is provided.
+     */
+    @Test
+    void framework() {
+        assertThat(Tinylog.getFramework()).isNotNull();
+    }
 
-	/**
-	 * Verifies that the life cycle works including hook registration.
-	 */
-	@Test
-	void lifeCycle() {
-		Hook hook = mock(Hook.class);
-		Tinylog.registerHook(hook);
+    /**
+     * Verifies that the life cycle works including hook registration.
+     */
+    @Test
+    void lifeCycle() {
+        Hook hook = mock(Hook.class);
+        Tinylog.registerHook(hook);
 
-		try {
-			Tinylog.startUp();
-			Tinylog.removeHook(hook);
-		} finally {
-			Tinylog.shutDown();
-		}
+        try {
+            Tinylog.startUp();
+            Tinylog.removeHook(hook);
+        } finally {
+            Tinylog.shutDown();
+        }
 
-		verify(hook).startUp();
-		verify(hook, never()).shutDown();
-	}
+        verify(hook).startUp();
+        verify(hook, never()).shutDown();
+    }
 
 }

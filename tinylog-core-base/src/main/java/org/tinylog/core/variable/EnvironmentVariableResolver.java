@@ -5,23 +5,23 @@ package org.tinylog.core.variable;
  */
 public class EnvironmentVariableResolver implements VariableResolver {
 
-	/** */
-	public EnvironmentVariableResolver() {
-	}
+    /** */
+    public EnvironmentVariableResolver() {
+    }
 
-	@Override
-	public String getName() {
-		return "environment variable";
-	}
+    @Override
+    public String getName() {
+        return "environment variable";
+    }
 
-	@Override
-	public String getPrefix() {
-		return "$";
-	}
+    @Override
+    public String getPrefix() {
+        return "$";
+    }
 
-	@Override
-	public String resolve(String name) {
-		return System.getenv(name);
-	}
+    @Override
+    public String resolve(String name) {
+        return System.getenv(name);
+    }
 
 }

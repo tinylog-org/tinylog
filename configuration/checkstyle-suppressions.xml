@@ -1,35 +1,35 @@
 <?xml version="1.0"?>
 <!DOCTYPE suppressions PUBLIC
-		"-//Puppy Crawl//DTD Suppressions 1.1//EN"
-		"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
 
-	<!-- All Java Files but Tests -->
-	<suppress
-		files="([/\\]src[/\\]java.*[/\\].*\.java)|(.*(?&lt;!Test)\.java)"
-		id="javadocMethodTests"
-	/>
+    <!-- All Java Files but Tests -->
+    <suppress
+        files="([/\\]src[/\\]java.*[/\\].*\.java)|(.*(?&lt;!Test)\.java)"
+        id="javadocMethodTests"
+    />
 
-	<!-- JUnit Tests -->
-	<suppress
-		files="[/\\]src[/\\]test[/\\].*Test\.java"
-		checks="(AbstractClassName|AvoidStaticImport|ClassDataAbstractionCoupling|ClassFanOutComplexity|JavadocPackage|MagicNumber|MissingCtor|MultipleStringLiterals|VisibilityModifier)"
-	/>
-	<suppress
-		files="[/\\]src[/\\]test[/\\].*Test\.java"
-		id="javadocMethodDefault"
-	/>
+    <!-- JUnit Tests -->
+    <suppress
+        files="[/\\]src[/\\]test[/\\].*Test\.java"
+        checks="(AbstractClassName|AvoidStaticImport|ClassDataAbstractionCoupling|ClassFanOutComplexity|JavadocPackage|MagicNumber|MissingCtor|MultipleStringLiterals|VisibilityModifier)"
+    />
+    <suppress
+        files="[/\\]src[/\\]test[/\\].*Test\.java"
+        id="javadocMethodDefault"
+    />
 
-	<!-- JMH Benchmarks -->
-	<suppress
-			files="[/\\]benchmarks[/\\].*State\.java"
-			checks="VisibilityModifier"
-	/>
+    <!-- JMH Benchmarks -->
+    <suppress
+            files="[/\\]benchmarks[/\\].*State\.java"
+            checks="VisibilityModifier"
+    />
 
-	<!-- Generated Source Files -->
-	<suppress
-		files="[/\\]target[/\\]generated\-sources[/\\].*\.java"
-		checks=".*"
-	/>
+    <!-- Generated Source Files -->
+    <suppress
+        files="[/\\]target[/\\]generated\-sources[/\\].*\.java"
+        checks=".*"
+    />
 
 </suppressions>
