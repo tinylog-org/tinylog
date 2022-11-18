@@ -6,7 +6,7 @@ import org.tinylog.core.Framework;
  * Builder for creating an instance of a {@link Policy}.
  *
  * <p>
- *     New policy builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+ *     New policy builders can be provided as {@link java.util.ServiceLoader service} via {@code META-INF/services}.
  * </p>
  */
 public interface PolicyBuilder {

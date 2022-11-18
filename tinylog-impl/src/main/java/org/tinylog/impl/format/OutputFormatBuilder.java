@@ -7,7 +7,7 @@ import org.tinylog.core.Framework;
  * Builder for creating an instance of an {@link OutputFormat}.
  *
  * <p>
- *     New output format builders can be provided as {@link java.util.ServiceLoader service} in
+ *     New output format builders can be provided as {@link java.util.ServiceLoader service} via
  *     {@code META-INF/services}.
  * </p>
  */

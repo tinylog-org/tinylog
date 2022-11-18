@@ -7,7 +7,7 @@ import org.tinylog.impl.format.pattern.placeholders.Placeholder;
  * Builder for creating a style wrapper for a {@link Placeholder}.
  *
  * <p>
- *     New style builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+ *     New style builders can be provided as {@link java.util.ServiceLoader service} via {@code META-INF/services}.
  * </p>
  *
  * <p>

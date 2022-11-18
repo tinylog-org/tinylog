@@ -6,7 +6,8 @@ import org.tinylog.core.Framework;
  * Builder for creating an instance of a {@link Placeholder}.
  *
  * <p>
- *     New placeholder builders can be provided as {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+ *     New placeholder builders can be provided as {@link java.util.ServiceLoader service} via
+ *     {@code META-INF/services}.
  * </p>
  */
 public interface PlaceholderBuilder {

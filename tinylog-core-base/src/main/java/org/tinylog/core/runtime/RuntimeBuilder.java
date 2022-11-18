@@ -4,8 +4,7 @@ package org.tinylog.core.runtime;
  * Builder for creating an instance of a {@link RuntimeFlavor}.
  *
  * <p>
- *     This interface must be implemented by all logging backends and provided as
- *     {@link java.util.ServiceLoader service} in {@code META-INF/services}.
+ *     New runtime builders can be provided as {@link java.util.ServiceLoader service} via {@code META-INF/services}.
  * </p>
  */
 public interface RuntimeBuilder {

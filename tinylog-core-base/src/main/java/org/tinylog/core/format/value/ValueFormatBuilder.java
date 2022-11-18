@@ -6,7 +6,7 @@ import java.util.Locale;
  * Builder for creating an instance of a {@link ValueFormat}.
  *
  * <p>
- *     New value format builders can be provided as {@link java.util.ServiceLoader service} in
+ *     New value format builders can be provided as {@link java.util.ServiceLoader service} via
  *     {@code META-INF/services}.
  * </p>
  */

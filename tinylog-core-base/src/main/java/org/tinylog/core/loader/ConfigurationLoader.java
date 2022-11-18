@@ -8,7 +8,7 @@ import org.tinylog.core.Framework;
  * Service interface for loading configurations.
  *
  * <p>
- *     New configuration loaders can be provided as {@link java.util.ServiceLoader service} in
+ *     New configuration loaders can be provided as {@link java.util.ServiceLoader service} via
  *     {@code META-INF/services}.
  * </p>
  */
