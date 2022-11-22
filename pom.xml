@@ -218,7 +218,7 @@
                 <artifactId>slf4j-nop</artifactId>
                 <version>2.0.4</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
                 <version>1.2.1</version>
@@ -519,11 +519,15 @@
                     <version>3.3.0</version>
                     <configuration>
                         <archive>
+                            <addMavenDescriptor>false</addMavenDescriptor>
+                            <manifest>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
                             <manifestEntries>
                                 <Built-By>${builder.name}</Built-By>
                                 <Multi-Release>true</Multi-Release>
                             </manifestEntries>
-                            <addMavenDescriptor>false</addMavenDescriptor>
                         </archive>
                     </configuration>
                 </plugin>
