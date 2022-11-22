@@ -582,6 +582,10 @@
 					<configuration>
 						<archive>
 							<addMavenDescriptor>false</addMavenDescriptor>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
 							<manifestEntries>
 								<Built-By>${builder.name}</Built-By>
 								<Multi-Release>true</Multi-Release>
