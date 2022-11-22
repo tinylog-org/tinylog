@@ -140,6 +140,10 @@
                         <argument>${benchmark.warmups}</argument>
                         <argument>-i</argument>
                         <argument>${benchmark.iterations}</argument>
+                        <argument>-rf</argument>
+                        <argument>csv</argument>
+                        <argument>-rff</argument>
+                        <argument>${project.build.directory}/benchmark.csv</argument>
                     </arguments>
                 </configuration>
             </plugin>
