@@ -19,6 +19,7 @@
 
     <properties>
         <root.basedir>${project.parent.basedir}</root.basedir>
+        <benchmark.app>org.openjdk.jmh.Main</benchmark.app>
         <benchmark.pattern>org\.tinylog\.benchmarks\.(.*)Benchmark</benchmark.pattern>
         <benchmark.forks>5</benchmark.forks>
         <benchmark.warmups>5</benchmark.warmups>
@@ -131,7 +132,7 @@
                         <argument>-Duser.language=en</argument>
                         <argument>-classpath</argument>
                         <classpath />
-                        <argument>org.openjdk.jmh.Main</argument>
+                        <argument>${benchmark.app}</argument>
                         <argument>org\.tinylog\.benchmarks\.(.*)Benchmark</argument>
                         <argument>-f</argument>
                         <argument>${benchmark.forks}</argument>

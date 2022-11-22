@@ -19,6 +19,7 @@
 
     <properties>
         <root.basedir>${project.parent.parent.basedir}</root.basedir>
+        <benchmark.app>org.tinylog.benchmarks.logging.core.Application</benchmark.app>
     </properties>
 
     <modules>

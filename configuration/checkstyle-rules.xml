@@ -202,7 +202,6 @@
         <module name="TypeName">
             <property name="format" value="^[A-Z][_a-zA-Z0-9]*$" />
         </module>
-        <module name="UncommentedMain"/>
         <module name="UnnecessaryParentheses"/>
         <module name="UnnecessarySemicolonInEnumeration"/>
         <module name="UnnecessarySemicolonInTryWithResources"/>
