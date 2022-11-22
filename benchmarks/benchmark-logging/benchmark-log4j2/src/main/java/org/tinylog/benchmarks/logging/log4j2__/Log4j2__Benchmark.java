@@ -21,7 +21,7 @@ import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
 
 /**
- * Benchmark for issuing log entries with Logback.
+ * Benchmark for issuing log entries with Apache Log4j.
  */
 @State(Scope.Thread)
 public class Log4j2__Benchmark extends AbstractLoggingBenchmark {
