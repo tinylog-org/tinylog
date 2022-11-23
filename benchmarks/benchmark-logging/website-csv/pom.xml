@@ -56,18 +56,40 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <scope>test</scope>
+            <groupId>org.tinylog</groupId>
+            <artifactId>benchmark-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>benchmark-core</artifactId>
+            <artifactId>slf4j-tinylog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog-impl</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <arguments>
+                        <argument>-Dfile.encoding=UTF-8</argument>
+                        <argument>-Duser.country=US</argument>
+                        <argument>-Duser.language=en</argument>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>org.tinylog.benchmarks.logging.csv.Application</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

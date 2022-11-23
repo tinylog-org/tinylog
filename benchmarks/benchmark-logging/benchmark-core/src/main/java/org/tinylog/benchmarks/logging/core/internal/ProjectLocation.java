@@ -18,9 +18,14 @@ public class ProjectLocation {
     public static final String POM_XML = "pom.xml";
 
     /**
-     * Path to the file that should contain the human-readable name of the benchmarked logging framework.
+     * Path to the text file that should contain the human-readable name of the benchmarked logging framework.
      */
     public static final String BENCHMARK_NAME_FILE = "target/benchmark-name.txt";
+
+    /**
+     * Path to the CSV file that should contain the benchmark results of the benchmarked logging framework.
+     */
+    public static final String BENCHMARK_CSV_FILE = "target/benchmark.csv";
 
     private final Path basePath;
 

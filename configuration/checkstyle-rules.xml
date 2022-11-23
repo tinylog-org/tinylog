@@ -13,7 +13,6 @@
         <property name="max" value="120"/>
     </module>
     <module name="NewlineAtEndOfFile"/>
-    <module name="OrderedProperties"/>
     <module name="SuppressionFilter">
         <property name="file" value="${workspace_loc}/configuration/checkstyle-suppressions.xml" />
         <property name="optional" value="false" />
