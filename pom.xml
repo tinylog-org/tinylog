@@ -139,16 +139,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>io.github.kayr</groupId>
-                <artifactId>fuzzy-csv</artifactId>
-                <version>1.8.1-groovy3</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>3.23.1</version>
@@ -157,6 +147,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-db</artifactId>
                 <version>2.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.kayr</groupId>
+                <artifactId>fuzzy-csv</artifactId>
+                <version>1.8.1-groovy3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -169,9 +164,9 @@
                 <version>2.1.214</version>
             </dependency>
             <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>1.7.21</version>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -192,6 +187,11 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
                 <version>5.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-jdk8</artifactId>
+                <version>1.7.21</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
