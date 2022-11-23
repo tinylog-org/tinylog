@@ -30,6 +30,7 @@
         <module>benchmark-noop</module>
         <module>benchmark-tinylog2</module>
         <module>benchmark-tinylog3</module>
+        <module>website-csv</module>
     </modules>
 
     <dependencyManagement>
