@@ -88,36 +88,3 @@ jobs:
         run: |
           git push origin
           git push origin "${{github.event.inputs.version}}"
-
-      - name: Check out website repository
-        uses: actions/checkout@v3
-        with:
-          repository: tinylog-org/website
-          ref: v2
-          ssh-key: ${{secrets.PRIVATE_KEY_FOR_WEBSITE_REPOSITORY}}
-          path: website
-
-      - name: Update website params
-        run: |
-          NEW_VERSION=${{github.event.inputs.version}}
-          CURRENT_STABLE_VERSION=$(yq -r ".params.stableVersion" "website/config.yaml")
-          CURRENT_PREVIEW_VERSION=$(yq -r ".params.previewVersion" "website/config.yaml")
-          pip3 install yq
-          if [ $(.github/scripts/is-stable-version $NEW_VERSION) = 0 ] && [ $(.github/scripts/is-latest-version $NEW_VERSION $CURRENT_STABLE_VERSION) = 0 ]
-          then
-            patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.stableVersion = \"$NEW_VERSION\"" "website/config.yaml"))
-            patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.size = $FILE_SIZE" "website/config.yaml"))
-          fi
-          if [ $(sh .github/scripts/is-latest-version $NEW_VERSION $CURRENT_PREVIEW_VERSION) = 0 ]
-          then
-           patch "website/config.yaml" <<< $(diff -B <(yq -y "." "website/config.yaml") <(yq -y ".params.previewVersion = \"$NEW_VERSION\"" "website/config.yaml"))
-          fi
-
-      - name: Push changes to website repository
-        run: |
-          cd website
-          if [[ $(git status --porcelain) ]]
-          then
-            git commit -am "Update tinylog to version ${{github.event.inputs.version}}"
-            git push origin
-          fi
