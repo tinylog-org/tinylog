@@ -27,11 +27,6 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
     }
 
     @Override
-    public String getName() {
-        return "properties";
-    }
-
-    @Override
     public int getPriority() {
         return 0;
     }
