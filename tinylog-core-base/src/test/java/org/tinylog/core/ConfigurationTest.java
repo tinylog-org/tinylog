@@ -14,7 +14,6 @@ import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -495,11 +494,6 @@ class ConfigurationTest {
         private static Map<String, String> data;
 
         @Override
-        public String getName() {
-            return "test1";
-        }
-
-        @Override
         public int getPriority() {
             return 1;
         }
@@ -517,11 +511,6 @@ class ConfigurationTest {
     public static final class TestTwoConfigurationLoader implements ConfigurationLoader {
 
         private static Map<String, String> data;
-
-        @Override
-        public String getName() {
-            return "test2";
-        }
 
         @Override
         public int getPriority() {
