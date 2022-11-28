@@ -61,15 +61,6 @@ class PropertiesLoaderTest {
     }
 
     /**
-     * Verifies that the name is "properties".
-     */
-    @Test
-    void name() {
-        PropertiesLoader loader = new PropertiesLoader();
-        assertThat(loader.getName()).isEqualTo("properties");
-    }
-
-    /**
      * Verifies that the priority is "0".
      */
     @Test
