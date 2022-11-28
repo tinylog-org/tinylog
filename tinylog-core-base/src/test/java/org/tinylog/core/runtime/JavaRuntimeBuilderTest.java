@@ -29,6 +29,14 @@ class JavaRuntimeBuilderTest {
     }
 
     /**
+     * Verifies that the priority is "0".
+     */
+    @Test
+    void priority() {
+        assertThat(new JavaRuntimeBuilder().getPriority()).isZero();
+    }
+
+    /**
      * Verifies that an instance {@link JavaRuntime} can be created on standard Java.
      */
     @EnabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")

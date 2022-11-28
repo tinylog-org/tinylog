@@ -15,6 +15,11 @@ public class AndroidRuntimeBuilder implements RuntimeBuilder {
     }
 
     @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
     public RuntimeFlavor create() {
         return new AndroidRuntime();
     }

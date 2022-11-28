@@ -3,6 +3,7 @@ package org.tinylog.core;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -241,6 +242,7 @@ public class Framework {
             .asList(this, RuntimeBuilder.class, "runtime builders")
             .stream()
             .filter(RuntimeBuilder::isSupported)
+            .sorted(Comparator.comparingInt(RuntimeBuilder::getPriority).reversed())
             .findAny()
             .orElseThrow(() -> new IllegalStateException("No supported runtime available"))
             .create();
