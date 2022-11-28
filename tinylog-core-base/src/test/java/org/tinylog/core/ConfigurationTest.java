@@ -454,7 +454,7 @@ class ConfigurationTest {
         }
 
         /**
-         * Verifies that a configuration loader that cannot provide and configuration is skipped.
+         * Verifies that a configuration loader that cannot provide a configuration is skipped.
          */
         @RegisterService(
             service = ConfigurationLoader.class,
@@ -470,56 +470,6 @@ class ConfigurationTest {
 
             assertThat(configuration.getValue("first")).isEqualTo("yes");
             assertThat(configuration.getValue("second")).isNull();
-        }
-
-        /**
-         * Verifies that a configuration loader can be defined by name.
-         */
-        @RegisterService(
-            service = ConfigurationLoader.class,
-            implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
-        )
-        @Test
-        void defineConfigurationLoaderByName() throws Exception {
-            TestOneConfigurationLoader.data = singletonMap("first", "yes");
-            TestTwoConfigurationLoader.data = singletonMap("second", "yes");
-
-            Configuration configuration = new Configuration();
-
-            restoreSystemProperties(() -> {
-                System.setProperty("tinylog.configurationLoader", "test1");
-                configuration.load(framework);
-            });
-
-            assertThat(configuration.getValue("first")).isEqualTo("yes");
-            assertThat(configuration.getValue("second")).isNull();
-        }
-
-        /**
-         * Verifies that an invalid configuration name is reported and another available configuration loader will be
-         * used instead.
-         */
-        @RegisterService(
-            service = ConfigurationLoader.class,
-            implementations = TestOneConfigurationLoader.class
-        )
-        @Test
-        void reportInvalidConfigurationLoaderName() throws Exception {
-            TestOneConfigurationLoader.data = singletonMap("foo", "bar");
-            Configuration configuration = new Configuration();
-
-            restoreSystemProperties(() -> {
-                System.setProperty("tinylog.configurationLoader", "test0");
-                configuration.load(framework);
-            });
-
-            assertThat(configuration.getValue("foo")).isEqualTo("bar");
-            assertThat(log.consume())
-                .hasSize(1)
-                .allSatisfy(entry -> {
-                    assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-                    assertThat(entry.getMessage()).contains("test0");
-                });
         }
 
         /**

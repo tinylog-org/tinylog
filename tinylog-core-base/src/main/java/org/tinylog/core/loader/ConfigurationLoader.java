@@ -29,8 +29,8 @@ public interface ConfigurationLoader {
     String getName();
 
     /**
-     * Gets the priority of this configuration loader. If no configuration loader has been defined via a system
-     * property, tinylog will try all available configuration loaders in order. The configuration loader with the
+     * Gets the priority of this configuration loader. tinylog tries all available configuration loaders in order to
+     * find a configuration loader that can provide a configuration for tinylog. The configuration loader with the
      * highest priority comes first and the one with the lowest priority comes last.
      *
      * @return The priority of this configuration loader
