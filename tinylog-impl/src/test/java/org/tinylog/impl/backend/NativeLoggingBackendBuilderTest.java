@@ -32,10 +32,13 @@ class NativeLoggingBackendBuilderTest {
 
         try {
             Framework framework = new Framework(false, false);
+            framework.getConfigurationBuilder(false)
+                .set("level", "INFO")
+                .set("writer.type", "console")
+                .set("writer.pattern", "{level}:{message}")
+                .activate();
+
             try {
-                framework.getConfiguration().set("level", "INFO");
-                framework.getConfiguration().set("writer.type", "console");
-                framework.getConfiguration().set("writer.pattern", "{level}:{message}");
                 framework.startUp();
 
                 LoggingBackend backend = framework.getLoggingBackend();
@@ -64,11 +67,14 @@ class NativeLoggingBackendBuilderTest {
 
         try {
             Framework framework = new Framework(false, false);
+            framework.getConfigurationBuilder(false)
+                .set("level", "INFO")
+                .set("writer.type", "file")
+                .set("writer.file", logFile.toAbsolutePath().toString())
+                .set("writer.pattern", "{level}:{message}")
+                .activate();
+
             try {
-                framework.getConfiguration().set("level", "INFO");
-                framework.getConfiguration().set("writer.type", "file");
-                framework.getConfiguration().set("writer.file", logFile.toAbsolutePath().toString());
-                framework.getConfiguration().set("writer.pattern", "{level}:{message}");
                 framework.startUp();
 
                 LoggingBackend backend = framework.getLoggingBackend();

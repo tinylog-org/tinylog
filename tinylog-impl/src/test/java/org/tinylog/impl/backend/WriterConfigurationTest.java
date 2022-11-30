@@ -1,5 +1,7 @@
 package org.tinylog.impl.backend;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,9 @@ import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.console.ConsoleWriter;
 
+import com.google.common.collect.ImmutableMap;
+
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries
@@ -27,9 +32,8 @@ class WriterConfigurationTest {
      */
     @Test
     void writerCreationWithDefaultSeverityLevel() {
-        Configuration consoleConfiguration = new Configuration();
-        consoleConfiguration.set("type", "console");
-
+        Map<String, String> properties = ImmutableMap.of("type", "console");
+        Configuration consoleConfiguration = new Configuration(properties);
         WriterConfiguration writerConfiguration = new WriterConfiguration(framework, consoleConfiguration);
 
         LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
@@ -49,10 +53,8 @@ class WriterConfigurationTest {
      */
     @Test
     void writerCreationWithCustomSeverityLevel() {
-        Configuration consoleConfiguration = new Configuration();
-        consoleConfiguration.set("type", "console");
-        consoleConfiguration.set("level", "debug");
-
+        Map<String, String> properties = ImmutableMap.of("type", "console", "level", "debug");
+        Configuration consoleConfiguration = new Configuration(properties);
         WriterConfiguration writerConfiguration = new WriterConfiguration(framework, consoleConfiguration);
 
         LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
@@ -72,7 +74,7 @@ class WriterConfigurationTest {
      */
     @Test
     void missingTypeProperty() {
-        WriterConfiguration configuration = new WriterConfiguration(framework, new Configuration());
+        WriterConfiguration configuration = new WriterConfiguration(framework, new Configuration(emptyMap()));
         assertThat(configuration.getOrCreateWriter()).isNull();
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
@@ -86,8 +88,8 @@ class WriterConfigurationTest {
      */
     @Test
     void invalidWriterNameInTypeProperty() {
-        Configuration invalidConfiguration = new Configuration();
-        invalidConfiguration.set("type", "foo");
+        Map<String, String> properties = ImmutableMap.of("type", "foo");
+        Configuration invalidConfiguration = new Configuration(properties);
 
         WriterConfiguration writerConfiguration = new WriterConfiguration(framework, invalidConfiguration);
         assertThat(writerConfiguration.getOrCreateWriter()).isNull();
@@ -103,8 +105,8 @@ class WriterConfigurationTest {
      */
     @Test
     void writerCreationFailed() {
-        Configuration fileWriter = new Configuration();
-        fileWriter.set("type", "file");
+        Map<String, String> properties = ImmutableMap.of("type", "file");
+        Configuration fileWriter = new Configuration(properties);
 
         WriterConfiguration writerConfiguration = new WriterConfiguration(framework, fileWriter);
         assertThat(writerConfiguration.getOrCreateWriter()).isNull();

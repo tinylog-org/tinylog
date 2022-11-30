@@ -866,9 +866,9 @@ class NativeLoggingBackendTest {
          * @return The same instance of this builder
          */
         public Builder customLevel(String packageOrClass, Level level) {
-            Map<String, Level> mappedLevels = ImmutableMap.of(
-                LevelConfiguration.UNTAGGED_PLACEHOLDER, level,
-                LevelConfiguration.TAGGED_PLACEHOLDER, level
+            Map<String, Level> mappedLevels = ImmutableMap.ofEntries(
+                entry(LevelConfiguration.UNTAGGED_PLACEHOLDER, level),
+                entry(LevelConfiguration.TAGGED_PLACEHOLDER, level)
             );
 
             levelConfigurations.put(packageOrClass, new LevelConfiguration(mappedLevels));

@@ -16,6 +16,8 @@ import org.tinylog.impl.format.OutputFormatBuilder;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
@@ -29,7 +31,7 @@ class FormatPatternBuilderTest {
      */
     @Test
     void defaultPattern() {
-        Configuration configuration = new Configuration();
+        Configuration configuration = new Configuration(emptyMap());
         OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
@@ -51,7 +53,7 @@ class FormatPatternBuilderTest {
      */
     @Test
     void customPattern() {
-        Configuration configuration = new Configuration().set("pattern", "{level}: {message}");
+        Configuration configuration = new Configuration(singletonMap("pattern", "{level}: {message}"));
         OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 

@@ -3,6 +3,7 @@ package org.tinylog.impl.backend;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -110,8 +111,10 @@ class LoggingConfigurationParser {
         }
 
         if (writerConfigurations.isEmpty()) {
-            Configuration subConfiguration = new Configuration();
-            subConfiguration.set(WriterConfiguration.TYPE_KEY, framework.getRuntime().getDefaultWriter());
+            Configuration subConfiguration = new Configuration(Collections.singletonMap(
+                WriterConfiguration.TYPE_KEY,
+                framework.getRuntime().getDefaultWriter()
+            ));
             writerConfigurations.add(new WriterConfiguration(framework, subConfiguration));
         }
 

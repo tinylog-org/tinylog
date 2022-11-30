@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
@@ -24,6 +25,9 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.db.api.Assertions.assertThat;
@@ -58,9 +62,8 @@ class JdbcWriterBuilderTest {
         executeSql("CREATE TABLE LOGS");
 
         try {
-            Configuration configuration = new Configuration();
-            configuration.set("url", url);
-            configuration.set("table", "LOGS");
+            Map<String, String> properties = ImmutableMap.of("url", url, "table", "LOGS");
+            Configuration configuration = new Configuration(properties);
 
             try (Writer writer = new JdbcWriterBuilder().create(framework, configuration)) {
                 assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
@@ -90,14 +93,16 @@ class JdbcWriterBuilderTest {
         executeSql("DROP USER \"\"", "alice", "secret");
 
         try {
-            Configuration configuration = new Configuration();
-            configuration.set("url", url);
-            configuration.set("schema", "TINYLOG");
-            configuration.set("table", "LOGS");
-            configuration.set("user", "alice");
-            configuration.set("password", "secret");
-            configuration.set("fields.SEVERITY", "severity-code");
-            configuration.set("fields.MESSAGE", "{class}: {message}");
+            Map<String, String> properties = ImmutableMap.ofEntries(
+                entry("url", url),
+                entry("schema", "TINYLOG"),
+                entry("table", "LOGS"),
+                entry("user", "alice"),
+                entry("password", "secret"),
+                entry("fields.SEVERITY", "severity-code"),
+                entry("fields.MESSAGE", "{class}: {message}")
+            );
+            Configuration configuration = new Configuration(properties);
 
             try (Writer writer = new JdbcWriterBuilder().create(framework, configuration)) {
                 LogEntry entry = new LogEntryBuilder()
@@ -120,8 +125,8 @@ class JdbcWriterBuilderTest {
      */
     @Test
     void missingUrl() {
-        Configuration configuration = new Configuration();
-        configuration.set("table", "FOO");
+        Map<String, String> properties = ImmutableMap.of("table", "FOO");
+        Configuration configuration = new Configuration(properties);
 
         Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(framework, configuration).close());
 
@@ -134,8 +139,8 @@ class JdbcWriterBuilderTest {
      */
     @Test
     void missingTableName() {
-        Configuration configuration = new Configuration();
-        configuration.set("url", url);
+        Map<String, String> properties = ImmutableMap.of("url", url);
+        Configuration configuration = new Configuration(properties);
 
         Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(framework, configuration).close());
 

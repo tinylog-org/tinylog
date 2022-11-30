@@ -1,5 +1,6 @@
 package org.tinylog.impl.format.json;
 
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -16,6 +17,10 @@ import org.tinylog.impl.format.OutputFormatBuilder;
 import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries
@@ -32,7 +37,7 @@ class NewlineDelimitedJsonBuilderTest {
      */
     @Test
     void noFields() {
-        Configuration configuration = new Configuration();
+        Configuration configuration = new Configuration(emptyMap());
         OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
@@ -52,7 +57,8 @@ class NewlineDelimitedJsonBuilderTest {
      */
     @Test
     void singleField() {
-        Configuration configuration = new Configuration().set("fields.level", "level");
+        Map<String, String> properties = ImmutableMap.of("fields.level", "level");
+        Configuration configuration = new Configuration(properties);
         OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
@@ -67,11 +73,13 @@ class NewlineDelimitedJsonBuilderTest {
      */
     @Test
     void multipleFields() {
-        Configuration configuration = new Configuration()
-            .set("fields.level", "{level}")
-            .set("fields.foo", "bar")
-            .set("fields.msg", "{message}");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("fields.level", "{level}"),
+            entry("fields.foo", "bar"),
+            entry("fields.msg", "{message}")
+        );
 
+        Configuration configuration = new Configuration(properties);
         OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 

@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -22,12 +23,16 @@ import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.service.RegisterService;
 import org.tinylog.core.test.system.CaptureSystemOutput;
 import org.tinylog.core.test.system.Output;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.clearInvocations;
@@ -65,11 +70,90 @@ class FrameworkTest {
     }
 
     /**
-     * Verifies that a {@link Configuration} is provided.
+     * Tests for receiving, modifying, and applying configurations.
      */
-    @Test
-    void configuration() {
-        assertThat(new Framework(false, false).getConfiguration()).isNotNull();
+    @Nested
+    class Configurations {
+
+        /**
+         * Verifies that no configuration loader will be used if configuration loading is disabled.
+         */
+        @RegisterService(
+            service = ConfigurationLoader.class,
+            implementations = TestOneConfigurationLoader.class
+        )
+        @Test
+        void useEmptyConfiguration() {
+            TestOneConfigurationLoader.data = singletonMap("foo", "bar");
+
+            Framework framework = new Framework(false, false);
+            Configuration configuration = framework.getConfiguration();
+
+            assertThat(configuration.getAllValues()).isEmpty();
+        }
+
+        /**
+         * Verifies that the configuration loader with the highest priority will be used.
+         */
+        @RegisterService(
+            service = ConfigurationLoader.class,
+            implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
+        )
+        @Test
+        void useConfigurationLoaderWithHighestPriority() {
+            TestOneConfigurationLoader.data = singletonMap("first", "yes");
+            TestTwoConfigurationLoader.data = singletonMap("second", "yes");
+
+            Framework framework = new Framework(true, false);
+            Configuration configuration = framework.getConfiguration();
+
+            assertThat(configuration.getValue("first")).isNull();
+            assertThat(configuration.getValue("second")).isEqualTo("yes");
+        }
+
+        /**
+         * Verifies that a configuration loader that cannot provide a configuration is skipped.
+         */
+        @RegisterService(
+            service = ConfigurationLoader.class,
+            implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
+        )
+        @Test
+        void skipConfigurationLoaderWithoutResult() {
+            TestOneConfigurationLoader.data = singletonMap("first", "yes");
+            TestTwoConfigurationLoader.data = null;
+
+            Framework framework = new Framework(true, false);
+            Configuration configuration = framework.getConfiguration();
+
+            assertThat(configuration.getValue("first")).isEqualTo("yes");
+            assertThat(configuration.getValue("second")).isNull();
+        }
+
+        /**
+         * Verifies that an empty configuration builder can be received without inheriting the existing configuration.
+         */
+        @Test
+        void receiveEmptyConfigurationBuilder() {
+            Framework framework = new Framework(false, false);
+            framework.getConfigurationBuilder(false).set("foo", "bar").activate();
+
+            ConfigurationBuilder builder = framework.getConfigurationBuilder(false);
+            assertThat(builder.get("foo")).isNull();
+        }
+
+        /**
+         * Verifies that an inherit configuration builder can be received that contains the existing configuration.
+         */
+        @Test
+        void receiveInheritedConfigurationBuilder() {
+            Framework framework = new Framework(false, false);
+            framework.getConfigurationBuilder(false).set("foo", "bar").activate();
+
+            ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
+            assertThat(builder.get("foo")).isEqualTo("bar");
+        }
+
     }
 
     /**
@@ -238,9 +322,9 @@ class FrameworkTest {
         void freezeConfigurationAfterStartup() {
             Framework framework = new Framework(false, false);
             try {
-                assertThat(framework.getConfiguration().isFrozen()).isFalse();
                 framework.startUp();
-                assertThat(framework.getConfiguration().isFrozen()).isTrue();
+                assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
+                    .isInstanceOf(UnsupportedOperationException.class);
             } finally {
                 framework.shutDown();
             }
@@ -322,7 +406,10 @@ class FrameworkTest {
         @Test
         void loadSingleProviderByName() {
             Framework framework = new Framework(false, false);
-            framework.getConfiguration().set("backends", "test2");
+            framework.getConfigurationBuilder(false)
+                .set("backends", "test2")
+                .activate();
+
             assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
         }
 
@@ -336,14 +423,17 @@ class FrameworkTest {
         @Test
         void loadMultipleProvidersByName() {
             Framework framework = new Framework(true, false);
-            framework.getConfiguration().set("backends", "test1, nop");
+            framework.getConfigurationBuilder(false)
+                .set("backends", "test1, nop")
+                .activate();
 
             LoggingBackend backend = framework.getLoggingBackend();
             assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
             Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
             assertThat(children).containsExactlyInAnyOrder(
-                TestOneLoggingBackendBuilder.backend, new NopLoggingBackendBuilder().create(null)
+                TestOneLoggingBackendBuilder.backend,
+                new NopLoggingBackendBuilder().create(null)
             );
         }
 
@@ -355,7 +445,10 @@ class FrameworkTest {
         @Test
         void fallbackForEntireInvalidName() {
             Framework framework = new Framework(true, false);
-            framework.getConfiguration().set("backends", "test0");
+            framework.getConfigurationBuilder(false)
+                .set("backends", "test0")
+                .activate();
+
             LoggingBackend backend = framework.getLoggingBackend();
 
             assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
@@ -374,7 +467,10 @@ class FrameworkTest {
         @Test
         void fallbackForPartialInvalidName() {
             Framework framework = new Framework(true, false);
-            framework.getConfiguration().set("backends", "test2, test3");
+            framework.getConfigurationBuilder(false)
+                .set("backends", "test2, test3")
+                .activate();
+
             LoggingBackend backend = framework.getLoggingBackend();
 
             assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
@@ -389,9 +485,10 @@ class FrameworkTest {
         @Test
         void freezeConfigurationAfterProvidingLoggingBackend() {
             Framework framework = new Framework(false, false);
-            assertThat(framework.getConfiguration().isFrozen()).isFalse();
+
             assertThat(framework.getLoggingBackend()).isNotNull();
-            assertThat(framework.getConfiguration().isFrozen()).isTrue();
+            assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
+                .isInstanceOf(UnsupportedOperationException.class);
         }
 
     }
@@ -435,7 +532,10 @@ class FrameworkTest {
         @ValueSource(strings = { "true", "TRUE" })
         void enableAutoShutdown(String value) {
             Framework framework = new Framework(false, false);
-            framework.getConfiguration().set("auto-shutdown", value);
+            framework.getConfigurationBuilder(false)
+                .set("auto-shutdown", value)
+                .activate();
+
             framework.startUp();
             framework.shutDown();
 
@@ -451,7 +551,10 @@ class FrameworkTest {
         @ValueSource(strings = { "false", "FALSE" })
         void disableAutoShutdown(String value) {
             Framework framework = new Framework(false, false);
-            framework.getConfiguration().set("auto-shutdown", value);
+            framework.getConfigurationBuilder(false)
+                .set("auto-shutdown", value)
+                .activate();
+
             framework.startUp();
             framework.shutDown();
 
@@ -475,6 +578,44 @@ class FrameworkTest {
         @Override
         public void shutDown() {
             running = false;
+        }
+
+    }
+
+    /**
+     * Additional logging configuration builder for JUnit tests.
+     */
+    public static final class TestOneConfigurationLoader implements ConfigurationLoader {
+
+        private static Map<String, String> data;
+
+        @Override
+        public int getPriority() {
+            return 1;
+        }
+
+        @Override
+        public Map<String, String> load(Framework framework) {
+            return data;
+        }
+
+    }
+
+    /**
+     * Additional logging configuration builder for JUnit tests.
+     */
+    public static final class TestTwoConfigurationLoader implements ConfigurationLoader {
+
+        private static Map<String, String> data;
+
+        @Override
+        public int getPriority() {
+            return 2;
+        }
+
+        @Override
+        public Map<String, String> load(Framework framework) {
+            return data;
         }
 
     }

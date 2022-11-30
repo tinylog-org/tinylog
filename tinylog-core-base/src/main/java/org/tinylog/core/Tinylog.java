@@ -12,12 +12,14 @@ public final class Tinylog {
     }
 
     /**
-     * Gets the configuration.
+     * Creates a {@link ConfigurationBuilder} for changing the current tinylog configuration.
      *
-     * @return The configuration of tinylog
+     * @param inherit {@code true} for initializing the {@link ConfigurationBuilder} with the current configuration,
+     *                {@code false} for creating an empty {@link ConfigurationBuilder}
+     * @return A new configuration builder instance
      */
-    public static Configuration getConfiguration() {
-        return framework.getConfiguration();
+    public static ConfigurationBuilder getConfigurationBuilder(boolean inherit) {
+        return framework.getConfigurationBuilder(inherit);
     }
 
     /**

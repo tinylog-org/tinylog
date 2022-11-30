@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -26,6 +26,11 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
@@ -67,7 +72,8 @@ class FileWriterBuilderTest {
     @Test
     @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
     void defaultPattern() throws Exception {
-        Configuration configuration = new Configuration().set("file", file.toString());
+        Map<String, String> properties = ImmutableMap.of("file", file.toString());
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             LogEntry logEntry = new LogEntryBuilder()
@@ -91,10 +97,12 @@ class FileWriterBuilderTest {
      */
     @Test
     void customJsonFormat() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("file", file.toString())
-            .set("format", "ndjson")
-            .set("fields.msg", "message");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("file", file.toString()),
+            entry("format", "ndjson"),
+            entry("fields.msg", "message")
+        );
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
@@ -111,9 +119,8 @@ class FileWriterBuilderTest {
     @Test
     @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
     void illegalOutputFormat() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("file", file.toString())
-            .set("format", "foo");
+        Map<String, String> properties = ImmutableMap.of("file", file.toString(), "format", "foo");
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             assertThat(log.consume()).singleElement().satisfies(entry -> {
@@ -142,9 +149,8 @@ class FileWriterBuilderTest {
      */
     @Test
     void appendNewLineToCustomPattern() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString());
+        Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "file", file.toString());
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("Hello World!").create());
@@ -158,7 +164,7 @@ class FileWriterBuilderTest {
      */
     @Test
     void missingFileName() {
-        Configuration configuration = new Configuration();
+        Configuration configuration = new Configuration(emptyMap());
         Throwable throwable = catchThrowable(() -> new FileWriterBuilder().create(framework, configuration).close());
 
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
@@ -173,10 +179,12 @@ class FileWriterBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"utf8", "utf-8", "UTF8", "UTF-8"})
     void utf8Charset(String charsetName) throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("charset", charsetName);
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("charset", charsetName)
+        );
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
@@ -195,10 +203,12 @@ class FileWriterBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"ascii", "us-ascii", "ASCII", "US-ASCII"})
     void asciiCharset(String charsetName) throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("charset", charsetName);
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("charset", charsetName)
+        );
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
@@ -215,10 +225,12 @@ class FileWriterBuilderTest {
      */
     @Test
     void invalidCharset() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("charset", "dummy");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("charset", "dummy")
+        );
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("Hello World!").create());
@@ -237,12 +249,14 @@ class FileWriterBuilderTest {
      */
     @Test
     void noPolicy() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("chatset", StandardCharsets.US_ASCII.name());
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("chatset", StandardCharsets.US_ASCII.name())
+        );
+        Configuration configuration = new Configuration(properties);
 
-        Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+        Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
@@ -256,13 +270,15 @@ class FileWriterBuilderTest {
      */
     @Test
     void singlePolicy() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("chatset", StandardCharsets.US_ASCII.name())
-            .set("policies", "startup");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("chatset", StandardCharsets.US_ASCII.name()),
+            entry("policies", "startup")
+        );
+        Configuration configuration = new Configuration(properties);
 
-        Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+        Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
@@ -277,14 +293,15 @@ class FileWriterBuilderTest {
     @Test
     void multiplePolicies() throws Exception {
         int size = (1 + System.lineSeparator().length()) * 2; // two lines (letter + line separator)
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("chatset", StandardCharsets.US_ASCII.name()),
+            entry("policies", "startup, size: " + size)
+        );
+        Configuration configuration = new Configuration(properties);
 
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("chatset", StandardCharsets.US_ASCII.name())
-            .set("policies", "startup, size: " + size);
-
-        Files.write(file, Collections.singleton("a"), StandardCharsets.US_ASCII);
+        Files.write(file, singleton("a"), StandardCharsets.US_ASCII);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("b").create());
@@ -300,13 +317,15 @@ class FileWriterBuilderTest {
      */
     @Test
     void reportUnknownPolicy() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("chatset", StandardCharsets.US_ASCII.name())
-            .set("policies", "foo, startup");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("chatset", StandardCharsets.US_ASCII.name()),
+            entry("policies", "foo, startup")
+        );
+        Configuration configuration = new Configuration(properties);
 
-        Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+        Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
@@ -324,13 +343,15 @@ class FileWriterBuilderTest {
      */
     @Test
     void reportInvalidPolicy() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("pattern", "{message}")
-            .set("file", file.toString())
-            .set("chatset", StandardCharsets.US_ASCII.name())
-            .set("policies", "size: AB, startup");
+        Map<String, String> properties = ImmutableMap.ofEntries(
+            entry("pattern", "{message}"),
+            entry("file", file.toString()),
+            entry("chatset", StandardCharsets.US_ASCII.name()),
+            entry("policies", "size: AB, startup")
+        );
+        Configuration configuration = new Configuration(properties);
 
-        Files.write(file, Collections.singleton("foo"), StandardCharsets.US_ASCII);
+        Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
         try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());

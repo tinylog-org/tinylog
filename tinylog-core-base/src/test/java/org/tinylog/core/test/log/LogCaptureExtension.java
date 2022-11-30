@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.tinylog.core.Configuration;
+import org.tinylog.core.ConfigurationBuilder;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
@@ -44,7 +44,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
         Log log = getOrCreateLog(context);
         injectFields(context, log);
 
-        Configuration configuration = framework.getConfiguration();
+        ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
         annotations.stream().flatMap(annotation -> Arrays.stream(annotation.configuration())).forEach(entry -> {
             int index = entry.indexOf('=');
             if (index >= 0) {
@@ -53,6 +53,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
                 configuration.set(key, value);
             }
         });
+        configuration.activate();
 
         if (lastAnnotation == null || lastAnnotation.autostart()) {
             log.setLevel(Level.mostSevereLevel(level, Level.WARN));

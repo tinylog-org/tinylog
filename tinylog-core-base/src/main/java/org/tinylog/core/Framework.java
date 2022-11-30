@@ -3,11 +3,13 @@ package org.tinylog.core;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 import org.tinylog.core.backend.BundleLoggingBackend;
@@ -18,6 +20,7 @@ import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
+import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 
@@ -26,13 +29,18 @@ import org.tinylog.core.runtime.RuntimeFlavor;
  */
 public class Framework {
 
+    private static final String FROZEN_MESSAGE =
+        "The configuration has already been applied and cannot be modified anymore";
+
     private final Object mutex = new Object();
 
     private final RuntimeFlavor runtime;
-    private final Configuration configuration;
     private final Collection<Hook> hooks;
 
+    private volatile Configuration configuration;
     private volatile LoggingBackend loggingBackend;
+
+    private boolean frozen;
     private boolean running;
 
     /**
@@ -45,12 +53,8 @@ public class Framework {
      */
     public Framework(boolean loadConfiguration, boolean loadHooks) {
         this.runtime = createRuntime();
-        this.configuration = new Configuration();
+        this.configuration = loadConfiguration ? loadConfiguration() : new Configuration(Collections.emptyMap());
         this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
-
-        if (loadConfiguration) {
-            configuration.load(this);
-        }
     }
 
     /**
@@ -88,6 +92,42 @@ public class Framework {
      */
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Replaces the current configuration with the new passed configuration.
+     *
+     * <p>
+     *     The configuration can be replaced as needed before issuing any log entries. As soon as the first log entry is
+     *     issued, the configuration becomes frozen and can no longer be replaced anymore.
+     * </p>
+     *
+     * @param configuration The new configuration
+     * @throws UnsupportedOperationException The current configuration has already been applied and cannot be replaced
+     */
+    public void setConfiguration(Configuration configuration) {
+        synchronized (mutex) {
+            if (frozen) {
+                throw new UnsupportedOperationException(FROZEN_MESSAGE);
+            } else {
+                this.configuration = configuration;
+            }
+        }
+    }
+
+    /**
+     * Creates a {@link ConfigurationBuilder} for changing the current configuration.
+     *
+     * @param inherit {@code true} for initializing the {@link ConfigurationBuilder} with the current configuration,
+     *                {@code false} for creating an empty {@link ConfigurationBuilder}
+     * @return A new configuration builder instance
+     */
+    public ConfigurationBuilder getConfigurationBuilder(boolean inherit) {
+        if (inherit) {
+            return new ConfigurationBuilder(this, configuration.getAllValues());
+        } else {
+            return new ConfigurationBuilder(this, Collections.emptyMap());
+        }
     }
 
     /**
@@ -258,10 +298,32 @@ public class Framework {
     }
 
     /**
+     * Loads the configuration via a registered {@link ConfigurationLoader}.
+     *
+     * @return The initial configuration
+     */
+    private Configuration loadConfiguration() {
+        List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
+            this,
+            ConfigurationLoader.class,
+            "configuration loaders"
+        );
+
+        Map<String, String> properties = loaders.stream()
+            .sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
+            .map(loader -> loader.load(this))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(Collections.emptyMap());
+
+        return new Configuration(properties);
+    }
+
+    /**
      * Freezes the stored configuration and creates a new logging backend, if none is assigned yet.
      */
     private void loadLoggingBackend() {
-        configuration.freeze();
+        frozen = true;
         startUp();
 
         if (loggingBackend == null) {

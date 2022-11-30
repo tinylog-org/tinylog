@@ -23,11 +23,19 @@ class TinylogTest {
     }
 
     /**
-     * Verifies that a {@link Configuration} is provided.
+     * Verifies that an empty {@link ConfigurationBuilder} can be provided.
      */
     @Test
-    void configuration() {
-        assertThat(Tinylog.getConfiguration()).isNotNull();
+    void emptyConfiguration() {
+        assertThat(Tinylog.getConfigurationBuilder(false)).isNotNull();
+    }
+
+    /**
+     * Verifies that an inherited {@link ConfigurationBuilder} can be provided.
+     */
+    @Test
+    void inheritedConfiguration() {
+        assertThat(Tinylog.getConfigurationBuilder(true)).isNotNull();
     }
 
     /**

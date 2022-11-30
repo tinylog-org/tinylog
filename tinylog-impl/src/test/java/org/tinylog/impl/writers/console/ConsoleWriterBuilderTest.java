@@ -2,6 +2,7 @@ package org.tinylog.impl.writers.console;
 
 import java.io.PrintStream;
 import java.time.Instant;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -24,6 +25,9 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -73,7 +77,8 @@ class ConsoleWriterBuilderTest {
     @Test
     @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
     void defaultPattern() throws Exception {
-        Configuration configuration = new Configuration();
+        Configuration configuration = new Configuration(emptyMap());
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             LogEntry logEntry = new LogEntryBuilder()
                 .timestamp(Instant.EPOCH)
@@ -96,9 +101,8 @@ class ConsoleWriterBuilderTest {
      */
     @Test
     void customJsonFormat() throws Exception {
-        Configuration configuration = new Configuration()
-            .set("format", "ndjson")
-            .set("fields.msg", "message");
+        Map<String, String> properties = ImmutableMap.of("format", "ndjson", "fields.msg", "message");
+        Configuration configuration = new Configuration(properties);
 
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
@@ -114,7 +118,9 @@ class ConsoleWriterBuilderTest {
     @Test
     @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
     void illegalOutputFormat() throws Exception {
-        Configuration configuration = new Configuration().set("format", "foo");
+        Map<String, String> properties = ImmutableMap.of("format", "foo");
+        Configuration configuration = new Configuration(properties);
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             assertThat(log.consume()).singleElement().satisfies(entry -> {
                 assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -142,7 +148,9 @@ class ConsoleWriterBuilderTest {
      */
     @Test
     void appendNewLineToCustomPattern() throws Exception {
-        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "off");
+        Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "off");
+        Configuration configuration = new Configuration(properties);
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
             verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
@@ -154,7 +162,9 @@ class ConsoleWriterBuilderTest {
      */
     @Test
     void defaultSeverityLevelThreshold() throws Exception {
-        Configuration configuration = new Configuration().set("pattern", "{message}");
+        Map<String, String> properties = ImmutableMap.of("pattern", "{message}");
+        Configuration configuration = new Configuration(properties);
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
@@ -169,7 +179,9 @@ class ConsoleWriterBuilderTest {
      */
     @Test
     void customSeverityLevelThreshold() throws Exception {
-        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "error");
+        Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "error");
+        Configuration configuration = new Configuration(properties);
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
@@ -185,7 +197,9 @@ class ConsoleWriterBuilderTest {
      */
     @Test
     void illegalSeverityLevelThreshold() throws Exception {
-        Configuration configuration = new Configuration().set("pattern", "{message}").set("threshold", "foo");
+        Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "foo");
+        Configuration configuration = new Configuration(properties);
+
         try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());

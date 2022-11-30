@@ -6,62 +6,40 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.core.loader.ConfigurationLoader;
 
 /**
  * Configuration for tinylog.
- *
- * <p>
- *     The configuration can be set and modified as needed before issuing any log entries. As soon as the first log
- *     entry is issued, the configuration becomes frozen and can no longer be modified.
- * </p>
  */
 public class Configuration {
-
-    private static final String FROZEN_MESSAGE =
-        "The configuration has already been applied and cannot be modified anymore";
 
     private static final int MAX_LOCALE_ARGUMENTS = 3;
 
     private final Configuration parent;
     private final String prefix;
     private final Map<String, String> properties;
-    private boolean frozen;
 
-    /** */
-    public Configuration() {
-        this(null, null);
+    /**
+     * @param properties All keys and values to store
+     */
+    public Configuration(Map<String, String> properties) {
+        this(null, null, properties);
     }
 
     /**
      * @param parent The parent configuration ({@code null} for root configurations)
      * @param prefix The prefix for resolving real keys for subset configurations ({@code null} for root configurations)
+     * @param properties All keys and values to store
      */
-    private Configuration(Configuration parent, String prefix) {
+    private Configuration(Configuration parent, String prefix, Map<String, String> properties) {
         this.parent = parent;
         this.prefix = prefix;
-        this.properties = new LinkedHashMap<>();
-        this.frozen = false;
-    }
-
-    /**
-     * Checks if the configuration is already frozen.
-     *
-     * @return {@code true} if the configuration is frozen, {@code false} if still modifiable
-     */
-    public boolean isFrozen() {
-        synchronized (properties) {
-            return frozen;
-        }
+        this.properties = new LinkedHashMap<>(properties);
     }
 
     /**
@@ -69,11 +47,9 @@ public class Configuration {
      *
      * @param key The key to search for
      * @return {@code true} if a value is stored for the passed key, {@code false} otherwise
-     */
+    */
     public boolean isPresent(String key) {
-        synchronized (properties) {
-            return properties.containsKey(key);
-        }
+        return properties.containsKey(key);
     }
 
     /**
@@ -118,24 +94,22 @@ public class Configuration {
     }
 
     /**
-     * Searches the value of a specific key.
+     * Searches for the value of a specific key.
      *
      * @param key The key to search for
      * @return The found value or {@code null} if the key does not exist
      */
     public String getValue(String key) {
-        synchronized (properties) {
-            String value = properties.get(key);
-            if (value == null) {
-                return null;
-            } else {
-                return value.trim();
-            }
+        String value = properties.get(key);
+        if (value == null) {
+            return null;
+        } else {
+            return value.trim();
         }
     }
 
     /**
-     * Searches the value of a specific key.
+     * Searches for the value of a specific key.
      *
      * @param key The key to search for
      * @param defaultValue The default value to use if there is no value stored for the passed key
@@ -151,7 +125,7 @@ public class Configuration {
     }
 
     /**
-     * Searches the values of a specific key.
+     * Searches for the values of a specific key.
      *
      * <p>
      *     The found string is split by commas.
@@ -161,20 +135,18 @@ public class Configuration {
      * @return The found values or an empty list if the key does not exist
      */
     public List<String> getList(String key) {
-        synchronized (properties) {
-            String value = properties.get(key);
-            if (value == null) {
-                return Collections.emptyList();
-            } else {
-                List<String> elements = new ArrayList<>();
-                for (String element : value.split(",")) {
-                    String normalized = element.trim();
-                    if (!normalized.isEmpty()) {
-                        elements.add(normalized);
-                    }
+        String value = properties.get(key);
+        if (value == null) {
+            return Collections.emptyList();
+        } else {
+            List<String> elements = new ArrayList<>();
+            for (String element : value.split(",")) {
+                String normalized = element.trim();
+                if (!normalized.isEmpty()) {
+                    elements.add(normalized);
                 }
-                return elements;
             }
+            return elements;
         }
     }
 
@@ -191,16 +163,14 @@ public class Configuration {
     public Collection<String> getRootKeys() {
         List<String> keys = new ArrayList<>();
 
-        synchronized (properties) {
-            for (String key : properties.keySet()) {
-                int index = key.indexOf('.');
-                if (index >= 0) {
-                    key = key.substring(0, index);
-                }
+        for (String key : properties.keySet()) {
+            int index = key.indexOf('.');
+            if (index >= 0) {
+                key = key.substring(0, index);
+            }
 
-                if (!keys.contains(key)) {
-                    keys.add(key);
-                }
+            if (!keys.contains(key)) {
+                keys.add(key);
             }
         }
 
@@ -246,17 +216,15 @@ public class Configuration {
     public Configuration getSubConfiguration(String prefix, char separator) {
         prefix = prefix + separator;
 
-        Configuration configuration = new Configuration(this, resolveFullKey(prefix));
-        synchronized (properties) {
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                String key = entry.getKey();
-                if (key.startsWith(prefix)) {
-                    configuration.set(key.substring(prefix.length()), entry.getValue());
-                }
+        Map<String, String> childProperties = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith(prefix)) {
+                childProperties.put(key.substring(prefix.length()), entry.getValue());
             }
         }
-        configuration.frozen = true;
-        return configuration;
+
+        return new Configuration(this, resolveFullKey(prefix), childProperties);
     }
 
     /**
@@ -279,67 +247,16 @@ public class Configuration {
     }
 
     /**
-     * Sets a value for a given key. If another value is already stored under the passed key, the old value will be
-     * overwritten with the new value.
-     *
-     * @param key Key under which the value should to be stored
-     * @param value Value to store
-     * @return The same configuration instance (can be used als fluent API)
-     * @throws UnsupportedOperationException The Configuration has already been applied and cannot be modified anymore
-     */
-    public Configuration set(String key, String value) {
-        synchronized (properties) {
-            if (frozen) {
-                throw new UnsupportedOperationException(FROZEN_MESSAGE);
-            }
-
-            properties.put(key, value);
-        }
-
-        return this;
-    }
-
-    /**
-     * Loads the configuration.
-     *
-     * @param framework The actual logging framework instance
-     * @throws UnsupportedOperationException The configuration has already been applied and cannot be modified anymore
-     */
-    void load(Framework framework) {
-        synchronized (properties) {
-            if (frozen) {
-                throw new UnsupportedOperationException(FROZEN_MESSAGE);
-            } else {
-                List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
-                    framework,
-                    ConfigurationLoader.class,
-                    "configuration loaders"
-                );
-
-                loaders.stream()
-                    .sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
-                    .map(loader -> loader.load(framework))
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .ifPresent(properties::putAll);
-            }
-        }
-    }
-
-    /**
-     * Freezes the configuration.
+     * Gets all stored keys and values.
      *
      * <p>
-     *     Afterwards, the configuration cannot be modified anymore.
+     *     The returned map must be not modified.
      * </p>
+     *
+     * @return All stored keys and values
      */
-    void freeze() {
-        synchronized (properties) {
-            if (!frozen) {
-                frozen = true;
-                InternalLogger.debug(null, "Configuration for tinylog: {}", properties);
-            }
-        }
+    Map<String, String> getAllValues() {
+        return properties;
     }
 
 }

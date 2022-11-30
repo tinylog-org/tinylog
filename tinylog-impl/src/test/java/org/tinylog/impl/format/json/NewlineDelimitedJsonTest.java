@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableMap;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NewlineDelimitedJsonTest {
@@ -155,9 +156,9 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithTwoFields() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(ImmutableMap.of(
-            "level", new LevelPlaceholder(),
-            "message", new MessageOnlyPlaceholder()
+        NewlineDelimitedJson format = new NewlineDelimitedJson(ImmutableMap.ofEntries(
+            entry("level", new LevelPlaceholder()),
+            entry("message", new MessageOnlyPlaceholder())
         ));
 
         assertThat(format.getRequiredLogEntryValues())

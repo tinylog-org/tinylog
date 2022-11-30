@@ -14,7 +14,6 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.tinylog.Logger;
 import org.tinylog.benchmarks.logging.core.AbstractLoggingBenchmark;
 import org.tinylog.benchmarks.logging.core.LocationInfo;
-import org.tinylog.core.Configuration;
 import org.tinylog.core.Tinylog;
 
 /**
@@ -55,11 +54,12 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
         }
         formatPattern.append("{level}: {message}");
 
-        Configuration configuration = Tinylog.getConfiguration();
-        configuration.set("level", "INFO");
-        configuration.set("writer.type", "file");
-        configuration.set("writer.file", logFile);
-        configuration.set("writer.pattern", formatPattern.toString());
+        Tinylog.getConfigurationBuilder(false)
+            .set("level", "INFO")
+            .set("writer.type", "file")
+            .set("writer.file", logFile)
+            .set("writer.pattern", formatPattern.toString())
+            .activate();
     }
 
     @Override
