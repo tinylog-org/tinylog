@@ -120,6 +120,7 @@ module org.tinylog.impl {
     exports org.tinylog.impl.writers;
     exports org.tinylog.impl.writers.console;
     exports org.tinylog.impl.writers.file;
+    exports org.tinylog.impl.writers.jdbc;
     exports org.tinylog.impl.writers.logcat;
 
 }
