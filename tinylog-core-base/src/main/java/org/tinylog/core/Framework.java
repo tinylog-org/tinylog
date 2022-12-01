@@ -95,27 +95,6 @@ public class Framework {
     }
 
     /**
-     * Replaces the current configuration with the new passed configuration.
-     *
-     * <p>
-     *     The configuration can be replaced as needed before issuing any log entries. As soon as the first log entry is
-     *     issued, the configuration becomes frozen and can no longer be replaced anymore.
-     * </p>
-     *
-     * @param configuration The new configuration
-     * @throws UnsupportedOperationException The current configuration has already been applied and cannot be replaced
-     */
-    public void setConfiguration(Configuration configuration) {
-        synchronized (mutex) {
-            if (frozen) {
-                throw new UnsupportedOperationException(FROZEN_MESSAGE);
-            } else {
-                this.configuration = configuration;
-            }
-        }
-    }
-
-    /**
      * Creates a {@link ConfigurationBuilder} for changing the current configuration.
      *
      * @param inherit {@code true} for initializing the {@link ConfigurationBuilder} with the current configuration,
@@ -216,6 +195,27 @@ public class Framework {
 
                 loggingBackend = null;
                 InternalLogger.reset();
+            }
+        }
+    }
+
+    /**
+     * Replaces the current configuration with the new passed configuration.
+     *
+     * <p>
+     *     The configuration can be replaced as needed before issuing any log entries. As soon as the first log entry is
+     *     issued, the configuration becomes frozen and can no longer be replaced anymore.
+     * </p>
+     *
+     * @param configuration The new configuration
+     * @throws UnsupportedOperationException The current configuration has already been applied and cannot be replaced
+     */
+    void setConfiguration(Configuration configuration) {
+        synchronized (mutex) {
+            if (frozen) {
+                throw new UnsupportedOperationException(FROZEN_MESSAGE);
+            } else {
+                this.configuration = configuration;
             }
         }
     }
