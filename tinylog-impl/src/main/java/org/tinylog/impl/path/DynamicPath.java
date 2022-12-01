@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.tinylog.core.Framework;
@@ -15,6 +16,7 @@ import org.tinylog.impl.path.segments.PathSegment;
 public class DynamicPath {
 
     private final Clock clock;
+    private final ZoneId zone;
     private final PathSegment[] pathSegments;
 
     /**
@@ -23,6 +25,7 @@ public class DynamicPath {
      */
     public DynamicPath(Framework framework, String path) {
         this.clock = framework.getClock();
+        this.zone = framework.getConfiguration().getZone();
         this.pathSegments = new PathParser(framework).parse(path).toArray(new PathSegment[0]);
     }
 
@@ -73,7 +76,7 @@ public class DynamicPath {
      * @throws Exception Failed to generate the file path
      */
     public Path generateNewPath() throws Exception {
-        ZonedDateTime date = ZonedDateTime.ofInstant(clock.instant(), clock.getZone());
+        ZonedDateTime date = ZonedDateTime.ofInstant(clock.instant(), zone);
         StringBuilder builder = new StringBuilder();
 
         for (PathSegment segment : pathSegments) {
