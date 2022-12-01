@@ -25,10 +25,10 @@ public class DailyPolicyBuilder extends AbstractDatePolicyBuilder {
     @Override
     public Policy create(Framework framework, String value) {
         Clock clock = framework.getClock();
+        ZoneId zone = framework.getConfiguration().getZone();
 
-        TemporalAccessor accessor = parse("H:mm[ z]", value);
+        TemporalAccessor accessor = parse("H:mm", value);
         LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
-        ZoneId zone = getOrDefault(accessor, TemporalQueries.zone(), clock.getZone());
 
         return new DailyPolicy(clock.withZone(zone), time);
     }

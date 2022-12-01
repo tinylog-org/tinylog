@@ -29,18 +29,18 @@ public class WeeklyPolicyBuilder extends AbstractDatePolicyBuilder {
     @Override
     public Policy create(Framework framework, String value) {
         Clock clock = framework.getClock();
+        ZoneId zone = framework.getConfiguration().getZone();
         WeekFields weekFields = WeekFields.of(framework.getConfiguration().getLocale());
 
         TemporalAccessor accessor;
         try {
-            accessor = parse("EEE[ H:mm[ z]]", value);
+            accessor = parse("EEE[ H:mm]", value);
         } catch (IllegalArgumentException ex) {
-            accessor = parse("EEEE[ H:mm[ z]]", value);
+            accessor = parse("EEEE[ H:mm]", value);
         }
 
         LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
         DayOfWeek day = getOrDefault(accessor, this::getDayOfWeek, weekFields.getFirstDayOfWeek());
-        ZoneId zone = getOrDefault(accessor, TemporalQueries.zone(), clock.getZone());
 
         return new WeeklyPolicy(clock.withZone(zone), day, time);
     }

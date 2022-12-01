@@ -2,8 +2,6 @@ package org.tinylog.impl.policies;
 
 import java.time.DateTimeException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -18,7 +16,7 @@ import org.tinylog.core.test.log.TestClock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@CaptureLogEntries
+@CaptureLogEntries(configuration = "zone=UTC")
 class DailyPolicyBuilderTest {
 
     @Inject
@@ -28,27 +26,25 @@ class DailyPolicyBuilderTest {
     private TestClock clock;
 
     /**
-     * Verifies that the created daily policy will trigger a rollover event at midnight at the system default time zone.
+     * Verifies that the created daily policy will trigger a rollover event at midnight.
      */
     @Test
     void defaultOnMidnightWithSystemZone() throws Exception {
-        clock.setZone(ZoneId.of("UTC-1"));
-        clock.setInstant(Instant.parse("2000-01-01T00:59:59Z"));
+        clock.setInstant(Instant.parse("1999-12-31T23:59:59Z"));
 
         Policy policy = new DailyPolicyBuilder().create(framework, null);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-        clock.setInstant(Instant.parse("2000-01-01T01:00:00Z"));
+        clock.setInstant(Instant.parse("2000-01-01T00:00:00Z"));
         assertThat(policy.canAcceptLogEntry(0)).isFalse();
     }
 
     /**
-     * Verifies that a custom time can be configured for daily rollover events without defining a time zone.
+     * Verifies that a custom time can be configured for daily rollover events.
      */
     @Test
-    void customTimeWithSystemZone() throws Exception {
-        clock.setZone(ZoneOffset.UTC);
+    void customTime() throws Exception {
         clock.setInstant(Instant.parse("2000-01-01T03:59:59Z"));
 
         Policy policy = new DailyPolicyBuilder().create(framework, "04:00");
@@ -56,22 +52,6 @@ class DailyPolicyBuilderTest {
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
         clock.setInstant(Instant.parse("2000-01-01T04:00:00Z"));
-        assertThat(policy.canAcceptLogEntry(0)).isFalse();
-    }
-
-    /**
-     * Verifies that a custom time and custom zone can be configured for daily rollover events.
-     */
-    @Test
-    void customTimeAndZone() throws Exception {
-        clock.setZone(ZoneOffset.UTC);
-        clock.setInstant(Instant.parse("2000-01-01T02:59:59Z"));
-
-        Policy policy = new DailyPolicyBuilder().create(framework, "04:00 CET");
-        policy.init(null);
-        assertThat(policy.canAcceptLogEntry(0)).isTrue();
-
-        clock.setInstant(Instant.parse("2000-01-01T03:00:00Z"));
         assertThat(policy.canAcceptLogEntry(0)).isFalse();
     }
 

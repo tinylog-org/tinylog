@@ -2,8 +2,6 @@ package org.tinylog.impl.policies;
 
 import java.time.DateTimeException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ServiceLoader;
 
 import javax.inject.Inject;
@@ -18,7 +16,7 @@ import org.tinylog.core.test.log.TestClock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@CaptureLogEntries(configuration = "locale=en_US")
+@CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
 class WeeklyPolicyBuilderTest {
 
     @Inject
@@ -28,52 +26,46 @@ class WeeklyPolicyBuilderTest {
     private TestClock clock;
 
     /**
-     * Verifies that the created weekly policy will trigger a rollover event on the first day of the week at midnight
-     * at the system default time zone.
+     * Verifies that the created weekly policy will trigger a rollover event on the first day of the week at midnight.
      */
     @Test
-    void defaultOnMidnightWithSystemZone() throws Exception {
-        clock.setZone(ZoneId.of("UTC-1"));
-        clock.setInstant(Instant.parse("2000-01-02T00:59:59Z"));
+    void defaultOnMidnight() throws Exception {
+        clock.setInstant(Instant.parse("2000-01-01T23:59:59Z"));
 
         Policy policy = new WeeklyPolicyBuilder().create(framework, null);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-        clock.setInstant(Instant.parse("2000-01-02T01:00:00Z"));
+        clock.setInstant(Instant.parse("2000-01-02T00:00:00Z"));
         assertThat(policy.canAcceptLogEntry(0)).isFalse();
     }
 
     /**
-     * Verifies that a custom day of week can be configured for weekly rollover events without defining a time nor
-     * a zone.
+     * Verifies that a custom day of week can be configured for weekly rollover events without defining a time.
      *
      * @param configurationValue Different supported notations to test
      */
     @ParameterizedTest
     @ValueSource(strings = {"MON", "Mon", "mon", "MONDAY", "Monday", "monday"})
     void customDay(String configurationValue) throws Exception {
-        clock.setZone(ZoneId.of("UTC-1"));
-        clock.setInstant(Instant.parse("2000-01-03T00:59:59Z"));
+        clock.setInstant(Instant.parse("2000-01-02T23:59:59Z"));
 
         Policy policy = new WeeklyPolicyBuilder().create(framework, configurationValue);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
-        clock.setInstant(Instant.parse("2000-01-03T01:00:00Z"));
+        clock.setInstant(Instant.parse("2000-01-03T00:00:00Z"));
         assertThat(policy.canAcceptLogEntry(0)).isFalse();
     }
 
     /**
-     * Verifies that a custom day of week and custom time can be configured for weekly rollover events without defining
-     * a zone.
+     * Verifies that a custom day of week and custom time can be configured for weekly rollover events without defining.
      *
      * @param configurationValue Different supported notations to test
      */
     @ParameterizedTest
     @ValueSource(strings = {"MON 4:00", "Monday 04:00"})
     void customDayAndTime(String configurationValue) throws Exception {
-        clock.setZone(ZoneOffset.UTC);
         clock.setInstant(Instant.parse("2000-01-03T03:59:59Z"));
 
         Policy policy = new WeeklyPolicyBuilder().create(framework, configurationValue);
@@ -84,24 +76,6 @@ class WeeklyPolicyBuilderTest {
         assertThat(policy.canAcceptLogEntry(0)).isFalse();
     }
 
-    /**
-     * Verifies that a custom day of week, custom time and custom zone can be configured for weekly rollover events.
-     *
-     * @param configurationValue Different supported notations to test
-     */
-    @ParameterizedTest
-    @ValueSource(strings = {"MON 4:00 CET", "Monday 04:00 CET"})
-    void customDayAndTimeAndZone(String configurationValue) throws Exception {
-        clock.setZone(ZoneOffset.UTC);
-        clock.setInstant(Instant.parse("2000-01-03T02:59:59Z"));
-
-        Policy policy = new WeeklyPolicyBuilder().create(framework, configurationValue);
-        policy.init(null);
-        assertThat(policy.canAcceptLogEntry(0)).isTrue();
-
-        clock.setInstant(Instant.parse("2000-01-03T03:00:00Z"));
-        assertThat(policy.canAcceptLogEntry(0)).isFalse();
-    }
 
     /**
      * Verifies that an exception with a meaningful message will be thrown, if the configuration value contains an
