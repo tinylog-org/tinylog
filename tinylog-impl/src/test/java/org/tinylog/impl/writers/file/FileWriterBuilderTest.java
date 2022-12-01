@@ -30,9 +30,9 @@ import com.google.common.collect.ImmutableMap;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.entry;
 
 @CaptureLogEntries
 class FileWriterBuilderTest {

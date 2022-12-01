@@ -20,8 +20,8 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import com.google.common.collect.ImmutableMap;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 @CaptureLogEntries
 class NewlineDelimitedJsonBuilderTest {

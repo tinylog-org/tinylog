@@ -27,9 +27,9 @@ import org.tinylog.impl.writers.WriterBuilder;
 
 import com.google.common.collect.ImmutableMap;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.db.api.Assertions.assertThat;
 
 @CaptureLogEntries
