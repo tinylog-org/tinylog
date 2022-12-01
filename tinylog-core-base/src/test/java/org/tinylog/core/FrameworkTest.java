@@ -2,7 +2,6 @@ package org.tinylog.core;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Map;
 
@@ -56,17 +55,19 @@ class FrameworkTest {
     }
 
     /**
-     * Verifies that a working {@link Clock} with the default time zone is provided.
+     * Verifies that a working {@link Clock} is provided.
      */
     @Test
-    void clock() {
+    void clock() throws InterruptedException {
         Clock clock = new Framework(false, false).getClock();
-        assertThat(clock.getZone()).isEqualTo(ZoneId.systemDefault());
 
         Instant before = Clock.systemDefaultZone().instant();
+        Thread.sleep(1);
         Instant instant = clock.instant();
+        Thread.sleep(1);
         Instant after = Clock.systemDefaultZone().instant();
-        assertThat(instant).isBetween(before, after);
+
+        assertThat(instant).isStrictlyBetween(before, after);
     }
 
     /**

@@ -49,7 +49,7 @@ class DailyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-31T03:00:00Z"));
 
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -61,7 +61,7 @@ class DailyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-31T02:59:59Z"));
 
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isFalse();
         }
 
@@ -73,7 +73,7 @@ class DailyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2000-01-01T03:00:00Z"));
 
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -85,7 +85,7 @@ class DailyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2100-12-31T23:59:59Z"));
 
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -114,19 +114,11 @@ class DailyPolicyTest {
         private Clock clock;
 
         /**
-         * Sets UTC as time zone for the mocked clock.
-         */
-        @BeforeEach
-        void init() {
-            when(clock.getZone()).thenReturn(ZoneOffset.UTC);
-        }
-
-        /**
          * Verifies that log entries are accepted if the current date-time hasn't been changed since the initialization.
          */
         @Test
         void firstAcceptedLogEntry() {
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -139,7 +131,7 @@ class DailyPolicyTest {
          */
         @Test
         void latestAcceptedLogEntry() {
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -153,7 +145,7 @@ class DailyPolicyTest {
          */
         @Test
         void earliestUnacceptedLogEntry() {
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -167,7 +159,7 @@ class DailyPolicyTest {
          */
         @Test
         void pastDateTime() {
-            DailyPolicy policy = new DailyPolicy(clock, LocalTime.of(3, 0));
+            DailyPolicy policy = new DailyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);

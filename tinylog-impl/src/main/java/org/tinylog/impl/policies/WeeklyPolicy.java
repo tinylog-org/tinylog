@@ -3,6 +3,7 @@ package org.tinylog.impl.policies;
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -17,11 +18,12 @@ public class WeeklyPolicy extends AbstractDatePolicy {
 
     /**
      * @param clock The clock for receiving the current date, time, and zone
+     * @param zone The time zone to sue for date and time
      * @param day The day on which a rollover event should be triggered every week
      * @param time The time on which a rollover event should be triggered every week
      */
-    public WeeklyPolicy(Clock clock, DayOfWeek day, LocalTime time) {
-        super(clock);
+    public WeeklyPolicy(Clock clock, ZoneId zone, DayOfWeek day, LocalTime time) {
+        super(clock, zone);
         this.day = day;
         this.time = time;
     }

@@ -50,7 +50,7 @@ class WeeklyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-25T03:00:00Z"));
 
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -62,7 +62,7 @@ class WeeklyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-25T02:59:59Z"));
 
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isFalse();
         }
 
@@ -74,7 +74,7 @@ class WeeklyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2000-01-01T03:00:00Z"));
 
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -86,7 +86,7 @@ class WeeklyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2100-12-01T23:59:59Z"));
 
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -115,19 +115,11 @@ class WeeklyPolicyTest {
         private Clock clock;
 
         /**
-         * Sets UTC as time zone for the mocked clock.
-         */
-        @BeforeEach
-        void init() {
-            when(clock.getZone()).thenReturn(ZoneOffset.UTC);
-        }
-
-        /**
          * Verifies that log entries are accepted if the current date-time hasn't been changed since the initialization.
          */
         @Test
         void firstAcceptedLogEntry() {
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -140,7 +132,7 @@ class WeeklyPolicyTest {
          */
         @Test
         void latestAcceptedLogEntry() {
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -154,7 +146,7 @@ class WeeklyPolicyTest {
          */
         @Test
         void earliestUnacceptedLogEntry() {
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -168,7 +160,7 @@ class WeeklyPolicyTest {
          */
         @Test
         void pastDateTime() {
-            WeeklyPolicy policy = new WeeklyPolicy(clock, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
+            WeeklyPolicy policy = new WeeklyPolicy(clock, ZoneOffset.UTC, DayOfWeek.SATURDAY, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);

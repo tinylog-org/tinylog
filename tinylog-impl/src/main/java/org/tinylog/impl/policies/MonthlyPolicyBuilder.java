@@ -30,7 +30,7 @@ public class MonthlyPolicyBuilder extends AbstractDatePolicyBuilder {
         TemporalAccessor accessor = parse("H:mm", value);
         LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
 
-        return new MonthlyPolicy(clock.withZone(zone), time);
+        return new MonthlyPolicy(clock, zone, time);
     }
 
 }

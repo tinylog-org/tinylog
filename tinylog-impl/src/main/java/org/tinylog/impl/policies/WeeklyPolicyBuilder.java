@@ -42,7 +42,7 @@ public class WeeklyPolicyBuilder extends AbstractDatePolicyBuilder {
         LocalTime time = getOrDefault(accessor, TemporalQueries.localTime(), LocalTime.MIDNIGHT);
         DayOfWeek day = getOrDefault(accessor, this::getDayOfWeek, weekFields.getFirstDayOfWeek());
 
-        return new WeeklyPolicy(clock.withZone(zone), day, time);
+        return new WeeklyPolicy(clock, zone, day, time);
     }
 
     /**

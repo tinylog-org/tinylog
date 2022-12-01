@@ -2,6 +2,7 @@ package org.tinylog.impl.policies;
 
 import java.time.Clock;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -13,10 +14,11 @@ public class DailyPolicy extends AbstractDatePolicy {
 
     /**
      * @param clock The clock for receiving the current date, time, and zone
+     * @param zone The time zone to sue for date and time
      * @param time The time on which a rollover event should be triggered every day
      */
-    public DailyPolicy(Clock clock, LocalTime time) {
-        super(clock);
+    public DailyPolicy(Clock clock, ZoneId zone, LocalTime time) {
+        super(clock, zone);
         this.time = time;
     }
 

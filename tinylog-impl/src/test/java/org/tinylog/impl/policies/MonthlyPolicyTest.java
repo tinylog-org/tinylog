@@ -49,7 +49,7 @@ class MonthlyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-01T03:00:00Z"));
 
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -61,7 +61,7 @@ class MonthlyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T02:59:59Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("1999-12-01T02:59:59Z"));
 
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isFalse();
         }
 
@@ -73,7 +73,7 @@ class MonthlyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2000-01-01T03:00:00Z"));
 
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -85,7 +85,7 @@ class MonthlyPolicyTest {
             Clock clock = Clock.fixed(Instant.parse("2000-01-01T03:00:00Z"), ZoneOffset.UTC);
             applyFileTime(file, Instant.parse("2100-12-01T23:59:59Z"));
 
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
             assertThat(policy.canContinueFile(file)).isTrue();
         }
 
@@ -114,19 +114,11 @@ class MonthlyPolicyTest {
         private Clock clock;
 
         /**
-         * Sets UTC as time zone for the mocked clock.
-         */
-        @BeforeEach
-        void init() {
-            when(clock.getZone()).thenReturn(ZoneOffset.UTC);
-        }
-
-        /**
          * Verifies that log entries are accepted if the current date-time hasn't been changed since the initialization.
          */
         @Test
         void firstAcceptedLogEntry() {
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -139,7 +131,7 @@ class MonthlyPolicyTest {
          */
         @Test
         void latestAcceptedLogEntry() {
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -153,7 +145,7 @@ class MonthlyPolicyTest {
          */
         @Test
         void earliestUnacceptedLogEntry() {
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);
@@ -167,7 +159,7 @@ class MonthlyPolicyTest {
          */
         @Test
         void pastDateTime() {
-            MonthlyPolicy policy = new MonthlyPolicy(clock, LocalTime.of(3, 0));
+            MonthlyPolicy policy = new MonthlyPolicy(clock, ZoneOffset.UTC, LocalTime.of(3, 0));
 
             when(clock.instant()).thenReturn(Instant.parse("2000-01-01T03:00:00Z"));
             policy.init(null);

@@ -7,6 +7,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -15,18 +16,21 @@ import java.time.ZonedDateTime;
 public abstract class AbstractDatePolicy implements Policy {
 
     private final Clock clock;
+    private final ZoneId zone;
     private Instant deadline;
 
     /**
-     * @param clock The clock for receiving the current date, time, and zone
+     * @param clock The clock for receiving the current date and time
+     * @param zone The time zone to sue for date and time
      */
-    public AbstractDatePolicy(Clock clock) {
+    public AbstractDatePolicy(Clock clock, ZoneId zone) {
         this.clock = clock;
+        this.zone = zone;
     }
 
     @Override
     public boolean canContinueFile(Path file) throws IOException {
-        ZonedDateTime now = ZonedDateTime.now(clock);
+        ZonedDateTime now = ZonedDateTime.ofInstant(clock.instant(), zone);
         ZonedDateTime minDate = getMinDate(now);
         FileTime creationTime = Files.readAttributes(file, BasicFileAttributes.class).creationTime();
         return !creationTime.toInstant().isBefore(minDate.toInstant());
@@ -34,7 +38,7 @@ public abstract class AbstractDatePolicy implements Policy {
 
     @Override
     public void init(Path file) {
-        ZonedDateTime now = ZonedDateTime.now(clock);
+        ZonedDateTime now = ZonedDateTime.ofInstant(clock.instant(), zone);
         ZonedDateTime date = getMaxDate(now);
         deadline = date.toInstant();
     }
