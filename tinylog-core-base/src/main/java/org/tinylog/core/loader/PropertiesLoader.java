@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
@@ -32,25 +31,25 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
     }
 
     @Override
-    public Map<String, String> load(Framework framework) {
+    public Map<String, String> load(ClassLoader loader) {
         String file = System.getProperty(CONFIGURATION_PROPERTY);
 
         if (file != null) {
-            try (InputStream stream = getInputStream(framework.getClassLoader(), file)) {
+            try (InputStream stream = getInputStream(loader, file)) {
                 InternalLogger.info(null, "Load configuration from \"{}\"", file);
-                return load(framework, stream);
+                return load(loader, stream);
             } catch (IOException ex) {
                 InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
             }
         }
 
         for (String name : CONFIGURATION_FILES) {
-            try (InputStream stream = framework.getClassLoader().getResourceAsStream(name)) {
+            try (InputStream stream = loader.getResourceAsStream(name)) {
                 if (stream == null) {
                     InternalLogger.debug(null, "Configuration file \"{}\" does not exist", name);
                 } else {
                     InternalLogger.info(null, "Load configuration from \"{}\"", name);
-                    return load(framework, stream);
+                    return load(loader, stream);
                 }
             } catch (IOException ex) {
                 InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", name);
@@ -63,12 +62,12 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
     /**
      * Loads the properties from an input stream and resolves all variables.
      *
-     * @param framework The actual framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @param stream The input stream of a properties file
      * @return All properties as map
      * @throws IOException Failed to read from the passed input stream
      */
-    private Map<String, String> load(Framework framework, InputStream stream) throws IOException {
+    private Map<String, String> load(ClassLoader loader, InputStream stream) throws IOException {
         Map<String, String> map = new LinkedHashMap<>();
 
         new Properties() {
@@ -78,7 +77,7 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
             }
         }.load(stream);
 
-        resolveVariables(framework, map);
+        resolveVariables(loader, map);
 
         return map;
     }

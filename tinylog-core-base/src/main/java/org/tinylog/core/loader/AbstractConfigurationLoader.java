@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.core.variable.VariableResolver;
@@ -51,12 +50,12 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
     /**
      * Resolves all variables in the passed configuration map.
      *
-     * @param framework The actual framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @param configuration The map with the loaded tinylog configuration
      */
-    protected static void resolveVariables(Framework framework, Map<String, String> configuration) {
+    protected static void resolveVariables(ClassLoader loader, Map<String, String> configuration) {
         List<VariableResolver> resolvers = SafeServiceLoader.asList(
-            framework.getClassLoader(),
+            loader,
             VariableResolver.class,
             "variable resolvers"
         );

@@ -595,7 +595,7 @@ class FrameworkTest {
         }
 
         @Override
-        public Map<String, String> load(Framework framework) {
+        public Map<String, String> load(ClassLoader loader) {
             return data;
         }
 
@@ -614,7 +614,7 @@ class FrameworkTest {
         }
 
         @Override
-        public Map<String, String> load(Framework framework) {
+        public Map<String, String> load(ClassLoader loader) {
             return data;
         }
 

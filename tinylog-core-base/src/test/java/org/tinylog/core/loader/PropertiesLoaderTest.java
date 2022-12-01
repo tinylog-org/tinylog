@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
@@ -26,38 +25,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
 class PropertiesLoaderTest {
 
-    /**
-     * Custom temporary folder for creating files.
-     */
     @TempDir
-    Path folder;
-
-    @Inject
-    private Framework actualFramework;
+    private Path folder;
 
     @Inject
     private Log log;
 
-    private Framework enrichedFramework;
+    private ClassLoader classLoader;
 
     /**
-     * Enriches the actual framework by adding the actual temporary folder to the classpath.
+     * Create a class loader that contains the current temporary folder.
      *
      * @throws MalformedURLException Failed to provide the current temporary folder as URL
      */
     @BeforeEach
-    void enrichFramework() throws MalformedURLException {
+    void init() throws MalformedURLException {
         URL[] urls = new URL[] {folder.toUri().toURL()};
-        URLClassLoader classLoader = new URLClassLoader(urls, actualFramework.getClassLoader());
-
-        enrichedFramework = spy(actualFramework);
-        when(enrichedFramework.getClassLoader()).thenReturn(classLoader);
+        classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -76,7 +65,7 @@ class PropertiesLoaderTest {
     void loadDefaultProductionPropertiesFile() throws IOException {
         createTextFile("tinylog.properties", "environment = production");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("environment", "production"));
     }
 
@@ -87,7 +76,7 @@ class PropertiesLoaderTest {
     void loadDefaultTestPropertiesFile() throws IOException {
         createTextFile("tinylog-test.properties", "environment = test");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("environment", "test"));
     }
 
@@ -98,7 +87,7 @@ class PropertiesLoaderTest {
     void loadDefaultDevelopmentPropertiesFile() throws IOException {
         createTextFile("tinylog-dev.properties", "environment = development");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("environment", "development"));
     }
 
@@ -111,7 +100,7 @@ class PropertiesLoaderTest {
         createTextFile("tinylog.properties", "production = yes");
         createTextFile("tinylog-test.properties", "test = yes");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("test", "yes"));
     }
 
@@ -124,7 +113,7 @@ class PropertiesLoaderTest {
         createTextFile("tinylog-test.properties", "test = yes");
         createTextFile("tinylog-dev.properties", "development = yes");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("development", "yes"));
     }
 
@@ -137,7 +126,7 @@ class PropertiesLoaderTest {
             createTextFile("my-configuration.properties", "foo = bar");
             System.setProperty("tinylog.configuration", "my-configuration.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
             assertThat(configuration).containsExactly(entry("foo", "bar"));
         });
     }
@@ -151,7 +140,7 @@ class PropertiesLoaderTest {
             Path file = createTextFile("my-configuration.properties", "foo = bar");
             System.setProperty("tinylog.configuration", file.toString());
 
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
             assertThat(configuration).containsExactly(entry("foo", "bar"));
         });
     }
@@ -165,7 +154,7 @@ class PropertiesLoaderTest {
             Path file = createTextFile("my-configuration.properties", "foo = bar");
             System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
 
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
             assertThat(configuration).containsExactly(entry("foo", "bar"));
         });
     }
@@ -183,7 +172,7 @@ class PropertiesLoaderTest {
 
             System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
             assertThat(configuration).containsExactly(entry("custom", "yes"));
         });
     }
@@ -198,7 +187,7 @@ class PropertiesLoaderTest {
             createTextFile("tinylog.properties", "production = yes");
             System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
             assertThat(configuration).containsExactly(entry("production", "yes"));
 
             assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
@@ -213,7 +202,7 @@ class PropertiesLoaderTest {
      */
     @Test
     void printErrorIfLoadingPropertiesFileFails() {
-        ClassLoader classLoader = new URLClassLoader(new URL[0], actualFramework.getClassLoader()) {
+        classLoader = new URLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader()) {
             @Override
             public InputStream getResourceAsStream(String name) {
                 try {
@@ -226,8 +215,7 @@ class PropertiesLoaderTest {
             }
         };
 
-        when(enrichedFramework.getClassLoader()).thenReturn(classLoader);
-        new PropertiesLoader().load(enrichedFramework);
+        new PropertiesLoader().load(classLoader);
 
         assertThat(log.consume()).hasSize(3).allSatisfy(entry -> {
             assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -242,7 +230,7 @@ class PropertiesLoaderTest {
     void preserveOrderOfProperties() throws IOException {
         createTextFile("tinylog.properties", "b=1", "c=2", "a=3");
 
-        Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
         assertThat(configuration).containsExactly(entry("b", "1"), entry("c", "2"), entry("a", "3"));
     }
 
@@ -255,7 +243,7 @@ class PropertiesLoaderTest {
 
         restoreSystemProperties(() -> {
             System.setProperty("foo", "42");
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
 
             assertThat(configuration).containsExactly(entry("example", "42"));
         });
@@ -270,7 +258,7 @@ class PropertiesLoaderTest {
 
         restoreSystemProperties(() -> {
             System.clearProperty("foo");
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
 
             assertThat(configuration).containsExactly(entry("example", "#{foo}"));
             assertThat(log.consume()).singleElement().satisfies(entry -> {
@@ -289,7 +277,7 @@ class PropertiesLoaderTest {
 
         restoreSystemProperties(() -> {
             System.setProperty("foo", "42");
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
 
             assertThat(configuration).containsExactly(entry("example", "42"));
         });
@@ -305,7 +293,7 @@ class PropertiesLoaderTest {
 
         restoreSystemProperties(() -> {
             System.clearProperty("foo");
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
 
             assertThat(configuration).containsExactly(entry("example", "default"));
         });
@@ -321,7 +309,7 @@ class PropertiesLoaderTest {
         restoreSystemProperties(() -> {
             System.setProperty("foo", "1");
             System.setProperty("bar", "2");
-            Map<String, String> configuration = new PropertiesLoader().load(enrichedFramework);
+            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
 
             assertThat(configuration).containsExactly(entry("example", "<1> <2>"));
         });

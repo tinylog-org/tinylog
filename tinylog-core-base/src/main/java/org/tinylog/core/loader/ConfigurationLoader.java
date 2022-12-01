@@ -2,8 +2,6 @@ package org.tinylog.core.loader;
 
 import java.util.Map;
 
-import org.tinylog.core.Framework;
-
 /**
  * Service interface for loading configurations.
  *
@@ -26,10 +24,10 @@ public interface ConfigurationLoader {
     /**
      * Tries to load the configuration for tinylog.
      *
-     * @param framework The actual framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @return The loaded configuration as map if any configuration could be found and successfully loaded, or
      *         {@code null} if there is no suitable configuration
      */
-    Map<String, String> load(Framework framework);
+    Map<String, String> load(ClassLoader loader);
 
 }

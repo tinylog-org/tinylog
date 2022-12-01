@@ -311,7 +311,7 @@ public class Framework {
 
         Map<String, String> properties = loaders.stream()
             .sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
-            .map(loader -> loader.load(this))
+            .map(loader -> loader.load(getClassLoader()))
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(Collections.emptyMap());
