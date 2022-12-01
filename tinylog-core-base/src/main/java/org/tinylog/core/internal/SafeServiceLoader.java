@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.tinylog.core.Framework;
-
 /**
  * Service loader wrapper that catches and logs thrown exceptions while executing service implementations.
  *
@@ -26,22 +24,22 @@ public final class SafeServiceLoader {
     /**
      * Retrieves all service implementations as a list.
      *
-     * @param framework The actual logging framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @param service The interface or abstract class representing the service
      * @param name The human-readable plural service name for logging
      * @param <S> The service type
      * @return All found service implementations in the current classpath
      */
-    public static <S> List<S> asList(Framework framework, Class<S> service, String name) {
+    public static <S> List<S> asList(ClassLoader loader, Class<S> service, String name) {
         List<S> list = new ArrayList<>();
-        load(framework, service, name, list::add);
+        load(loader, service, name, list::add);
         return list;
     }
 
     /**
      * Retrieves all service implementations and returns them as a mapped list.
      *
-     * @param framework The actual logging framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @param service The interface or abstract class representing the service
      * @param name The human-readable plural service name for logging
      * @param mapper The mapping function to apply for found service implementations
@@ -49,23 +47,23 @@ public final class SafeServiceLoader {
      * @param <R> The mapped type
      * @return Mapped elements for all found service implementations
      */
-    public static <S, R> List<R> asList(Framework framework, Class<S> service, String name, Function<S, R> mapper) {
+    public static <S, R> List<R> asList(ClassLoader loader, Class<S> service, String name, Function<S, R> mapper) {
         List<R> list = new ArrayList<>();
-        load(framework, service, name, implementation -> list.add(mapper.apply(implementation)));
+        load(loader, service, name, implementation -> list.add(mapper.apply(implementation)));
         return list;
     }
 
     /**
      * Loads all service implementations.
      *
-     * @param framework The actual logging framework instance
+     * @param loader The class loader to use for loading the service files and service implementation classes
      * @param service The interface or abstract class representing the service
      * @param name The human-readable plural service name for logging
      * @param action Consumer for found service implementations
      * @param <S> The service type
      */
-    public static <S> void load(Framework framework, Class<S> service, String name, Consumer<S> action) {
-        Iterable<S> iterable = ServiceLoader.load(service, framework.getClassLoader());
+    public static <S> void load(ClassLoader loader, Class<S> service, String name, Consumer<S> action) {
+        Iterable<S> iterable = ServiceLoader.load(service, loader);
         Stream<S> stream = StreamSupport.stream(iterable.spliterator(), false);
 
         InternalLogger.debug(

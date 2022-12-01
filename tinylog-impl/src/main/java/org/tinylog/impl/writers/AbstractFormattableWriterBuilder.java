@@ -30,7 +30,9 @@ public abstract class AbstractFormattableWriterBuilder implements WriterBuilder 
 
         if (name != null) {
             List<OutputFormatBuilder> builders = SafeServiceLoader.asList(
-                framework, OutputFormatBuilder.class, "output format builders"
+                framework.getClassLoader(),
+                OutputFormatBuilder.class,
+                "output format builders"
             );
 
             builder = builders.stream()

@@ -40,7 +40,10 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     public EnhancedMessageFormatter(Framework framework) {
         Locale locale = framework.getConfiguration().getLocale();
         formats = SafeServiceLoader.asList(
-            framework, ValueFormatBuilder.class, "value format builders", builder -> builder.create(locale)
+            framework.getClassLoader(),
+            ValueFormatBuilder.class,
+            "value format builders",
+            builder -> builder.create(locale)
         );
     }
 

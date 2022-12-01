@@ -49,11 +49,11 @@ public class FormatPatternParser extends AbstractPatternParser {
         this.styleBuilders = new HashMap<>();
 
         SafeServiceLoader
-            .asList(framework, PlaceholderBuilder.class, "placeholder builders")
+            .asList(framework.getClassLoader(), PlaceholderBuilder.class, "placeholder builders")
             .forEach(builder -> placeholderBuilders.put(builder.getName(), builder));
 
         SafeServiceLoader
-            .asList(framework, StyleBuilder.class, "style builders")
+            .asList(framework.getClassLoader(), StyleBuilder.class, "style builders")
             .forEach(builder -> styleBuilders.put(builder.getName(), builder));
     }
 

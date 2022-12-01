@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
@@ -22,9 +21,6 @@ import static org.mockito.Mockito.verify;
 class SafeServiceLoaderTest {
 
     @Inject
-    private Framework framework;
-
-    @Inject
     private Log log;
 
     /**
@@ -34,7 +30,7 @@ class SafeServiceLoaderTest {
     @Test
     void loadAllServiceImplementations() {
         List<FooService> services = SafeServiceLoader.asList(
-            framework,
+            Thread.currentThread().getContextClassLoader(),
             FooService.class,
             "foo services"
         );
@@ -52,7 +48,7 @@ class SafeServiceLoaderTest {
     @Test
     void mapAllServiceImplementations() {
         List<String> names = SafeServiceLoader.asList(
-            framework,
+            Thread.currentThread().getContextClassLoader(),
             FooService.class,
             "foo services",
             FooService::getName

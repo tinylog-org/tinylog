@@ -41,7 +41,7 @@ public class PathParser extends AbstractPatternParser {
         this.builders = new HashMap<>();
 
         SafeServiceLoader
-            .asList(framework, PathSegmentBuilder.class, "path segment builders")
+            .asList(framework.getClassLoader(), PathSegmentBuilder.class, "path segment builders")
             .forEach(builder -> builders.put(builder.getName(), builder));
     }
 

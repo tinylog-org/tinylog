@@ -74,7 +74,7 @@ class WriterConfiguration {
             } else {
                 String name = type.toLowerCase(Locale.ENGLISH);
                 WriterBuilder builder = SafeServiceLoader
-                    .asList(framework, WriterBuilder.class, "writer builders")
+                    .asList(framework.getClassLoader(), WriterBuilder.class, "writer builders")
                     .stream()
                     .filter(writerBuilder -> name.equals(writerBuilder.getName()))
                     .findAny()

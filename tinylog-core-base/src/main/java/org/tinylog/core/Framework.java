@@ -231,7 +231,7 @@ public class Framework {
         List<LoggingBackend> backends = new ArrayList<>();
 
         SafeServiceLoader.load(
-            this,
+            getClassLoader(),
             LoggingBackendBuilder.class,
             "logging backend builders",
             builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder)
@@ -279,7 +279,7 @@ public class Framework {
      */
     private RuntimeFlavor createRuntime() {
         return SafeServiceLoader
-            .asList(this, RuntimeBuilder.class, "runtime builders")
+            .asList(getClassLoader(), RuntimeBuilder.class, "runtime builders")
             .stream()
             .filter(RuntimeBuilder::isSupported)
             .sorted(Comparator.comparingInt(RuntimeBuilder::getPriority).reversed())
@@ -294,7 +294,7 @@ public class Framework {
      * @return All found hooks
      */
     private Collection<Hook> loadHooks() {
-        return SafeServiceLoader.asList(this, Hook.class, "hooks");
+        return SafeServiceLoader.asList(getClassLoader(), Hook.class, "hooks");
     }
 
     /**
@@ -304,7 +304,7 @@ public class Framework {
      */
     private Configuration loadConfiguration() {
         List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
-            this,
+            getClassLoader(),
             ConfigurationLoader.class,
             "configuration loaders"
         );

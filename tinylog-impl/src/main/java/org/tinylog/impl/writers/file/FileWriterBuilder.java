@@ -95,7 +95,7 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
             String value = index >= 0 ? policyConfiguration.substring(index + 1).trim() : null;
 
             PolicyBuilder builder = SafeServiceLoader
-                .asList(framework, PolicyBuilder.class, "policy builders")
+                .asList(framework.getClassLoader(), PolicyBuilder.class, "policy builders")
                 .stream()
                 .filter(policyBuilder -> name.equals(policyBuilder.getName()))
                 .findAny()

@@ -56,7 +56,7 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
      */
     protected static void resolveVariables(Framework framework, Map<String, String> configuration) {
         List<VariableResolver> resolvers = SafeServiceLoader.asList(
-            framework,
+            framework.getClassLoader(),
             VariableResolver.class,
             "variable resolvers"
         );
