@@ -10,12 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 class Tinylog2BenchmarkInfoTest {
 
     /**
-     * Verifies that the provided logger is part of tinylog.
+     * Verifies that the provided logger is part of tinylog and provides a valid implementation version.
      */
     @Test
     void logger() {
         BenchmarkInfo benchmarkInfo = new Tinylog2BenchmarkInfo();
-        assertThat(benchmarkInfo.getLogger()).hasPackage("org.tinylog");
+        assertThat(benchmarkInfo.getLogger())
+            .hasPackage("org.tinylog")
+            .satisfies(logger -> {
+                String version = logger.getPackage().getImplementationVersion();
+                assertThat(version).matches("2(\\.\\d+)+(-.+)?");
+            });
     }
 
     /**
