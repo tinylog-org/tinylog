@@ -23,7 +23,7 @@ public final class TinylogLoggerFactory implements ILoggerFactory {
     }
 
     @Override
-    public TinylogLogger getLogger(final String name) {
+    public TinylogLogger getLogger(String name) {
         return loggers.computeIfAbsent(name, this::createNewLogger);
     }
 

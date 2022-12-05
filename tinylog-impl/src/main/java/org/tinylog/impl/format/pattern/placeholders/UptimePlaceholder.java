@@ -136,7 +136,7 @@ public class UptimePlaceholder implements Placeholder {
      * @param character The character to count
      * @return The sequence length of the passed character
      */
-    private static int count(final String text, final int start, final char character) {
+    private static int count(String text, int start, char character) {
         int index = start;
         while (index < text.length() && text.charAt(index) == character) {
             ++index;

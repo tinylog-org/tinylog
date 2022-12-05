@@ -108,7 +108,7 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
      * @param pattern The pattern to check
      * @return {@code true} if the passed pattern is conditional, {@code false} if not
      */
-    private boolean isConditional(final String pattern) {
+    private boolean isConditional(String pattern) {
         int length = pattern.length();
         for (int index = 0; index < length; ++index) {
             char character = pattern.charAt(index);

@@ -24,13 +24,13 @@ public class SimpleFormatter extends Formatter {
     /**
      * @param locationInfo The location information to output
      */
-    public SimpleFormatter(final LocationInfo locationInfo) {
+    public SimpleFormatter(LocationInfo locationInfo) {
         this.locationInfo = locationInfo;
         this.formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     }
 
     @Override
-    public String format(final LogRecord record) {
+    public String format(LogRecord record) {
         StringBuilder builder = new StringBuilder();
 
         synchronized (formatter) {
