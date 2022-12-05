@@ -4,14 +4,12 @@ import java.text.ChoiceFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
-import org.tinylog.core.format.value.ValueFormatBuilder;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.SafeServiceLoader;
@@ -35,36 +33,29 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     private final List<ValueFormat> formats;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param loader The class loader to use for loading service files and service implementation classes
      */
-    public EnhancedMessageFormatter(Framework framework) {
-        Locale locale = framework.getConfiguration().getLocale();
-        formats = SafeServiceLoader.asList(
-            framework.getClassLoader(),
-            ValueFormatBuilder.class,
-            "value format builders",
-            builder -> builder.create(locale)
-        );
+    public EnhancedMessageFormatter(ClassLoader loader) {
+        formats = SafeServiceLoader.asList(loader, ValueFormat.class, "value formats");
     }
 
     @Override
-    public String format(String message, Object... arguments) {
-        return format(message, Arrays.stream(arguments).iterator());
+    public String format(Framework framework, String message, Object... arguments) {
+        return format(framework, message, Arrays.stream(arguments).iterator());
     }
 
     /**
      * Replaces all placeholders with real values.
      *
-     * @param message
-     *            Text message with placeholders
-     * @param arguments
-     *            Replacements for placeholders
+     * @param framework The actual framework instance
+     * @param message A text message with placeholders
+     * @param arguments The actual replacement values for placeholders
      * @return Formatted text message
      */
-    private String format(String message, Iterator<Object> arguments) {
+    private String format(Framework framework, String message, Iterator<Object> arguments) {
         BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
             if (arguments.hasNext()) {
-                builder.append(render(group, arguments.next()));
+                builder.append(render(framework, group, arguments.next()));
             } else {
                 builder.append('{').append(group).append('}');
             }
@@ -76,11 +67,12 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     /**
      * Renders a value as string.
      *
+     * @param framework The actual framework instance
      * @param pattern The format pattern for rendering the passed value
-     * @param value Object to render
+     * @param value The object to render
      * @return The formatted representation of the passed value
      */
-    private String render(String pattern, Object value) {
+    private String render(Framework framework, String pattern, Object value) {
         if (value instanceof Supplier<?>) {
             value = ((Supplier<?>) value).get();
         }
@@ -90,7 +82,7 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
                 try {
                     Object singleton = value;
                     Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
-                    return new ChoiceFormat(format(pattern, iterator)).format(value);
+                    return new ChoiceFormat(format(framework, pattern, iterator)).format(value);
                 } catch (RuntimeException ex) {
                     InternalLogger.error(ex, "Invalid choice format pattern \"{}\" for value \"{}\"", pattern, value);
                 }
@@ -98,7 +90,7 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
                 for (ValueFormat format : formats) {
                     if (format.isSupported(value)) {
                         try {
-                            return format.format(pattern, value);
+                            return format.format(framework, pattern, value);
                         } catch (RuntimeException ex) {
                             InternalLogger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
                         }

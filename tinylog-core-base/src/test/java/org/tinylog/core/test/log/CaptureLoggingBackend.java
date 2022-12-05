@@ -2,6 +2,7 @@ package org.tinylog.core.test.log;
 
 import java.util.function.Supplier;
 
+import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
@@ -14,15 +15,18 @@ import org.tinylog.core.format.message.MessageFormatter;
  */
 class CaptureLoggingBackend implements LoggingBackend {
 
+    private final Framework framework;
     private final Log log;
     private final Level visibleLevel;
 
     /**
+     * @param framework The actual framework instance
      * @param log All issued log entries will be stored in this {@link Log}
      * @param visibleLevel The least severe visible severity level for {@link #getLevelVisibilityByClass(String)} and
      *                     {@link #getLevelVisibilityByTag(String)}
      */
-    CaptureLoggingBackend(Log log, Level visibleLevel) {
+    CaptureLoggingBackend(Framework framework, Log log, Level visibleLevel) {
+        this.framework = framework;
         this.log = log;
         this.visibleLevel = visibleLevel;
     }
@@ -71,7 +75,7 @@ class CaptureLoggingBackend implements LoggingBackend {
         } else if (arguments == null) {
             output = String.valueOf(message);
         } else {
-            output = formatter.format(message.toString(), arguments);
+            output = formatter.format(framework, message.toString(), arguments);
         }
 
         log.add(new LogEntry(caller, tag, level, throwable, output));

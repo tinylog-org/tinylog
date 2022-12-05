@@ -517,7 +517,7 @@ class NativeLoggingBackendTest {
             null,
             "Hello {}!",
             new Object[] {"Alice"},
-            new EnhancedMessageFormatter(framework)
+            new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
         verify(writer).log(logEntryCaptor.capture());
@@ -544,7 +544,7 @@ class NativeLoggingBackendTest {
             null,
             "Hello {}!",
             null,
-            new EnhancedMessageFormatter(framework)
+            new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
         verify(writer).log(logEntryCaptor.capture());

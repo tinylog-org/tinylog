@@ -38,7 +38,7 @@ public final class Logger {
         framework = Tinylog.getFramework();
         runtime = framework.getRuntime();
         backend = framework.getLoggingBackend();
-        formatter = new EnhancedMessageFormatter(framework);
+        formatter = new EnhancedMessageFormatter(framework.getClassLoader());
 
         LevelVisibility visibility = backend.getLevelVisibilityByTag(null);
 

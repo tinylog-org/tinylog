@@ -15,7 +15,7 @@ object Logger {
     private val framework = Tinylog.getFramework()
     private val runtime = framework.runtime
     private val backend = framework.loggingBackend
-    private val formatter: MessageFormatter = EnhancedMessageFormatter(framework)
+    private val formatter: MessageFormatter = EnhancedMessageFormatter(framework.classLoader)
 
     private val visibilityTrace: OutputDetails
     private val visibilityDebug: OutputDetails

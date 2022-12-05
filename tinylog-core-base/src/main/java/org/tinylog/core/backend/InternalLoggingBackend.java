@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
 
+import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.context.NopContextStorage;
@@ -33,8 +34,13 @@ public class InternalLoggingBackend implements LoggingBackend {
         OutputDetails.DISABLED
     );
 
-    /** */
-    public InternalLoggingBackend() {
+    private final Framework framework;
+
+    /**
+     * @param framework The actual framework instance
+     */
+    public InternalLoggingBackend(Framework framework) {
+        this.framework = framework;
     }
 
     @Override
@@ -75,7 +81,7 @@ public class InternalLoggingBackend implements LoggingBackend {
                 if (formatter == null || arguments == null) {
                     builder.append(message);
                 } else {
-                    builder.append(formatter.format(message.toString(), arguments));
+                    builder.append(formatter.format(framework, message.toString(), arguments));
                 }
             }
 

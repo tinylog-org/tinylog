@@ -38,9 +38,10 @@ public final class InternalLogger {
      * @param framework Fully initialized framework for setting this logger up
      */
     public static void init(Framework framework) {
+        ClassLoader classLoader = framework.getClassLoader();
         RuntimeFlavor runtime = framework.getRuntime();
         LoggingBackend backend = framework.getLoggingBackend();
-        MessageFormatter formatter = new EnhancedMessageFormatter(framework);
+        MessageFormatter formatter = new EnhancedMessageFormatter(classLoader);
 
         try {
             lock.writeLock().lock();

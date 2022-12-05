@@ -1,0 +1,3 @@
+org.tinylog.core.format.value.DateFormat
+org.tinylog.core.format.value.JavaTimeFormat
+org.tinylog.core.format.value.NumberFormat

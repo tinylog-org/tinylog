@@ -264,7 +264,7 @@ public class Framework {
             InternalLogger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
                 + "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
                 + "entries, or disable logging explicitly by setting \"backends = nop\" in the configuration.");
-            return new InternalLoggingBackend();
+            return new InternalLoggingBackend(this);
         } else if (backends.size() == 1) {
             return backends.get(0);
         } else {

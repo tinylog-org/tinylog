@@ -253,7 +253,7 @@ public class NativeLoggingBackend implements LoggingBackend {
             level,
             formatter == null || arguments == null
                 ? message == null ? null : message.toString()
-                : formatter.format((String) message, arguments),
+                : formatter.format(framework, (String) message, arguments),
             throwable
         );
     }

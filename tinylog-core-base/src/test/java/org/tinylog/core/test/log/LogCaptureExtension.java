@@ -48,8 +48,8 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
         annotations.stream().flatMap(annotation -> Arrays.stream(annotation.configuration())).forEach(entry -> {
             int index = entry.indexOf('=');
             if (index >= 0) {
-                String key = entry.substring(0, index);
-                String value = entry.substring(index + 1);
+                String key = entry.substring(0, index).trim();
+                String value = entry.substring(index + 1).trim();
                 configuration.set(key, value);
             }
         });
@@ -139,7 +139,11 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
         return getOrCreate(
             context,
             CaptureLoggingBackend.class,
-            () -> new CaptureLoggingBackend(getOrCreateLog(context), get(context, Level.class))
+            () -> new CaptureLoggingBackend(
+                getOrCreateFramework(context),
+                getOrCreateLog(context),
+                get(context, Level.class)
+            )
         );
     }
 

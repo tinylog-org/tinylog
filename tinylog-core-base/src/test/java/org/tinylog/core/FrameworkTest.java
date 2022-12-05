@@ -626,7 +626,7 @@ class FrameworkTest {
      */
     public static final class TestOneLoggingBackendBuilder implements LoggingBackendBuilder {
 
-        private static final LoggingBackend backend = new InternalLoggingBackend();
+        private static final LoggingBackend backend = new InternalLoggingBackend(null);
 
         @Override
         public String getName() {
@@ -645,7 +645,7 @@ class FrameworkTest {
      */
     public static final class TestTwoLoggingBackendBuilder implements LoggingBackendBuilder {
 
-        private static final LoggingBackend backend = new InternalLoggingBackend();
+        private static final LoggingBackend backend = new InternalLoggingBackend(null);
 
         @Override
         public String getName() {

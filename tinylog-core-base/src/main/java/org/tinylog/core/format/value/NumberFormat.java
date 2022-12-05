@@ -4,27 +4,26 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.tinylog.core.Framework;
+
 /**
  * Format for numbers.
  */
 public class NumberFormat implements ValueFormat {
 
-    private final DecimalFormatSymbols symbols;
-
-    /**
-     * @param locale Locale for language or country depending decimal format symbols
-     */
-    NumberFormat(Locale locale) {
-        this.symbols = new DecimalFormatSymbols(locale);
+    /** */
+    public NumberFormat() {
     }
 
     @Override
-    public boolean isSupported(final Object value) {
+    public boolean isSupported(Object value) {
         return value instanceof Number;
     }
 
     @Override
-    public String format(final String pattern, final Object value) {
+    public String format(Framework framework, String pattern, Object value) {
+        Locale locale = framework.getConfiguration().getLocale();
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
         return new DecimalFormat(pattern, symbols).format(value);
     }
 

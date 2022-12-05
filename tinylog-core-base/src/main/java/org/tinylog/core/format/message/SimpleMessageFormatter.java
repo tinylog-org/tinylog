@@ -1,5 +1,7 @@
 package org.tinylog.core.format.message;
 
+import org.tinylog.core.Framework;
+
 /**
  * Simple message formatter that just replaces '{}' placeholders with passed arguments.
  *
@@ -14,7 +16,7 @@ public class SimpleMessageFormatter implements MessageFormatter {
     }
 
     @Override
-    public String format(String message, Object... arguments) {
+    public String format(Framework framework, String message, Object... arguments) {
         int length = message.length();
         StringBuilder builder = new StringBuilder(length);
 

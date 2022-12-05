@@ -7,8 +7,6 @@ import org.tinylog.core.Framework;
  */
 public class InternalLoggingBackendBuilder implements LoggingBackendBuilder {
 
-    private static final InternalLoggingBackend PROVIDER = new InternalLoggingBackend();
-
     /** */
     public InternalLoggingBackendBuilder() {
     }
@@ -20,7 +18,7 @@ public class InternalLoggingBackendBuilder implements LoggingBackendBuilder {
 
     @Override
     public LoggingBackend create(Framework framework) {
-        return PROVIDER;
+        return new InternalLoggingBackend(framework);
     }
 
 }

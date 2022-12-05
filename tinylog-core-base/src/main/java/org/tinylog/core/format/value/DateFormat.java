@@ -1,31 +1,35 @@
 package org.tinylog.core.format.value;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+
+import org.tinylog.core.Framework;
 
 /**
  * Format for {@link Date}.
  */
 public class DateFormat implements ValueFormat {
 
-    private final Locale locale;
-
-    /**
-     * @param locale Locale for language or country depending format outputs
-     */
-    DateFormat(Locale locale) {
-        this.locale = locale;
+    /** */
+    public DateFormat() {
     }
 
     @Override
-    public boolean isSupported(final Object value) {
+    public boolean isSupported(Object value) {
         return value instanceof Date;
     }
 
     @Override
-    public String format(final String pattern, final Object value) {
-        return new SimpleDateFormat(pattern, locale).format(value);
+    public String format(Framework framework, String pattern, Object value) {
+        Locale locale = framework.getConfiguration().getLocale();
+        ZoneId zone = framework.getConfiguration().getZone();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(zone));
+        return dateFormat.format(value);
     }
 
 }

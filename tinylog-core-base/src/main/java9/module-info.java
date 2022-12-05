@@ -1,8 +1,8 @@
 import org.tinylog.core.Hook;
-import org.tinylog.core.format.value.DateFormatBuilder;
-import org.tinylog.core.format.value.JavaTimeFormatBuilder;
-import org.tinylog.core.format.value.NumberFormatBuilder;
-import org.tinylog.core.format.value.ValueFormatBuilder;
+import org.tinylog.core.format.value.DateFormat;
+import org.tinylog.core.format.value.JavaTimeFormat;
+import org.tinylog.core.format.value.NumberFormat;
+import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.InternalLoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
@@ -28,11 +28,11 @@ module org.tinylog.core {
         InternalLoggingBackendBuilder,
         NopLoggingBackendBuilder;
 
-    uses ValueFormatBuilder;
-    provides ValueFormatBuilder with
-        DateFormatBuilder,
-        JavaTimeFormatBuilder,
-        NumberFormatBuilder;
+    uses ValueFormat;
+    provides ValueFormat with
+        DateFormat,
+        JavaTimeFormat,
+        NumberFormat;
 
     uses ConfigurationLoader;
     provides ConfigurationLoader with

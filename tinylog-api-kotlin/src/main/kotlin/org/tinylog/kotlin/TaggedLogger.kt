@@ -14,7 +14,7 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter
 class TaggedLogger(val tag: String?, framework: Framework) {
     private val runtime = framework.runtime
     private val backend = framework.loggingBackend
-    private val formatter = EnhancedMessageFormatter(framework)
+    private val formatter = EnhancedMessageFormatter(framework.classLoader)
 
     private val visibilityTrace: OutputDetails
     private val visibilityDebug: OutputDetails
