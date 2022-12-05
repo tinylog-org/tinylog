@@ -1,7 +1,7 @@
 package org.tinylog.impl.path.segments;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link StaticPathSegment} with the process ID of the current process.
@@ -18,7 +18,7 @@ public class ProcessIdSegmentBuilder implements PathSegmentBuilder {
     }
 
     @Override
-    public PathSegment create(Framework framework, String value) {
+    public PathSegment create(LoggingContext context, String value) {
         if (value != null) {
             InternalLogger.warn(
                 null,
@@ -27,7 +27,7 @@ public class ProcessIdSegmentBuilder implements PathSegmentBuilder {
             );
         }
 
-        long processId = framework.getRuntime().getProcessId();
+        long processId = context.getFramework().getRuntime().getProcessId();
         return new StaticPathSegment(Long.toString(processId));
     }
 

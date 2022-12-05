@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.FormatOutputRenderer;
@@ -21,7 +21,7 @@ class ContextPlaceholderBuilderTest {
     private static final LogEntry filledLogEntry = new LogEntryBuilder().context("foo", "boo").create();
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that an {@link IllegalArgumentException} with a meaningful message description will be thrown, if the
@@ -29,7 +29,7 @@ class ContextPlaceholderBuilderTest {
      */
     @Test
     void creationWithoutConfigurationValue() {
-        assertThatThrownBy(() -> new ContextPlaceholderBuilder().create(framework, null))
+        assertThatThrownBy(() -> new ContextPlaceholderBuilder().create(context, null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("key");
     }
@@ -39,7 +39,7 @@ class ContextPlaceholderBuilderTest {
      */
     @Test
     void creationWithKeyOnly() {
-        Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo");
+        Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo");
         assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
         assertThat(placeholder.getValue(emptyLogEntry)).isNull();
         assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");
@@ -54,7 +54,7 @@ class ContextPlaceholderBuilderTest {
      */
     @Test
     void creationWithKeyAndDefaultValue() {
-        Placeholder placeholder = new ContextPlaceholderBuilder().create(framework, "foo,bar");
+        Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo,bar");
         assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
         assertThat(placeholder.getValue(emptyLogEntry)).isEqualTo("bar");
         assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");

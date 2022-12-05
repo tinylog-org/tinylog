@@ -1,7 +1,7 @@
 package org.tinylog.impl.policies;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link StartupPolicy}.
@@ -18,7 +18,7 @@ public class StartupPolicyBuilder implements PolicyBuilder {
     }
 
     @Override
-    public Policy create(Framework framework, String value) {
+    public Policy create(LoggingContext context, String value) {
         if (value != null) {
             InternalLogger.warn(
                 null,

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.path.segments.PathSegment;
 import org.tinylog.impl.path.segments.PathSegmentBuilder;
@@ -30,18 +30,18 @@ import org.tinylog.impl.path.segments.StaticPathSegment;
  */
 public class PathParser extends AbstractPatternParser {
 
-    private final Framework framework;
+    private final LoggingContext context;
     private final Map<String, PathSegmentBuilder> builders;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      */
-    public PathParser(Framework framework) {
-        this.framework = framework;
+    public PathParser(LoggingContext context) {
+        this.context = context;
         this.builders = new HashMap<>();
 
         SafeServiceLoader
-            .asList(framework.getClassLoader(), PathSegmentBuilder.class, "path segment builders")
+            .asList(context.getFramework().getClassLoader(), PathSegmentBuilder.class, "path segment builders")
             .forEach(builder -> builders.put(builder.getName(), builder));
     }
 
@@ -94,7 +94,7 @@ public class PathParser extends AbstractPatternParser {
             return null;
         } else {
             try {
-                return builder.create(framework, value);
+                return builder.create(context, value);
             } catch (Exception ex) {
                 InternalLogger.error(ex, "Failed to create path segment for \"{}\"", placeholder);
                 return null;

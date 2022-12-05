@@ -35,9 +35,10 @@ public final class InternalLogger {
     /**
      * Initializes the internal logger.
      *
-     * @param framework Fully initialized framework for setting this logger up
+     * @param context The current logging context
      */
-    public static void init(Framework framework) {
+    public static void init(LoggingContext context) {
+        Framework framework = context.getFramework();
         ClassLoader classLoader = framework.getClassLoader();
         RuntimeFlavor runtime = framework.getRuntime();
         LoggingBackend backend = framework.getLoggingBackend();

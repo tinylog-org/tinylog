@@ -2,7 +2,7 @@ package org.tinylog.impl.format.pattern.styles;
 
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -21,7 +21,7 @@ public class LengthStyleBuilder implements StyleBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, Placeholder placeholder, String value) {
+    public Placeholder create(LoggingContext context, Placeholder placeholder, String value) {
         if (value == null) {
             throw new IllegalArgumentException("Length is not defined for length style");
         } else {

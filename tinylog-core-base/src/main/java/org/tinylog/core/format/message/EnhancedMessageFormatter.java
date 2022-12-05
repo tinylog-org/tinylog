@@ -8,10 +8,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 
 /**
@@ -40,22 +40,22 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     }
 
     @Override
-    public String format(Framework framework, String message, Object... arguments) {
-        return format(framework, message, Arrays.stream(arguments).iterator());
+    public String format(LoggingContext context, String message, Object... arguments) {
+        return format(context, message, Arrays.stream(arguments).iterator());
     }
 
     /**
      * Replaces all placeholders with real values.
      *
-     * @param framework The actual framework instance
+     * @param context The current logging context
      * @param message A text message with placeholders
      * @param arguments The actual replacement values for placeholders
      * @return Formatted text message
      */
-    private String format(Framework framework, String message, Iterator<Object> arguments) {
+    private String format(LoggingContext context, String message, Iterator<Object> arguments) {
         BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
             if (arguments.hasNext()) {
-                builder.append(render(framework, group, arguments.next()));
+                builder.append(render(context, group, arguments.next()));
             } else {
                 builder.append('{').append(group).append('}');
             }
@@ -67,12 +67,12 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     /**
      * Renders a value as string.
      *
-     * @param framework The actual framework instance
+     * @param context The current logging context
      * @param pattern The format pattern for rendering the passed value
      * @param value The object to render
      * @return The formatted representation of the passed value
      */
-    private String render(Framework framework, String pattern, Object value) {
+    private String render(LoggingContext context, String pattern, Object value) {
         if (value instanceof Supplier<?>) {
             value = ((Supplier<?>) value).get();
         }
@@ -82,7 +82,7 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
                 try {
                     Object singleton = value;
                     Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
-                    return new ChoiceFormat(format(framework, pattern, iterator)).format(value);
+                    return new ChoiceFormat(format(context, pattern, iterator)).format(value);
                 } catch (RuntimeException ex) {
                     InternalLogger.error(ex, "Invalid choice format pattern \"{}\" for value \"{}\"", pattern, value);
                 }
@@ -90,7 +90,7 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
                 for (ValueFormat format : formats) {
                     if (format.isSupported(value)) {
                         try {
-                            return format.format(framework, pattern, value);
+                            return format.format(context, pattern, value);
                         } catch (RuntimeException ex) {
                             InternalLogger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
                         }

@@ -1,6 +1,6 @@
 package org.tinylog.impl.format.pattern.styles;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -36,11 +36,11 @@ public interface StyleBuilder {
     /**
      * Creates a new style wrapper of another placeholder.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param placeholder The actual placeholder to style
      * @param value Optional configuration value for the style
      * @return New instance of the styled placeholder
      */
-    Placeholder create(Framework framework, Placeholder placeholder, String value);
+    Placeholder create(LoggingContext context, Placeholder placeholder, String value);
 
 }

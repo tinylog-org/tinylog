@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class IndentStyleBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that indentation will be applied as tabs ("\t"), if indentation depth is not set.
@@ -28,7 +28,7 @@ class IndentStyleBuilderTest {
     @Test
     void defaultIndentationByTab() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, null);
+        Placeholder styled = new IndentStyleBuilder().create(context, placeholder, null);
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().create();
@@ -41,7 +41,7 @@ class IndentStyleBuilderTest {
     @Test
     void customIndentationBySpaces() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, "2");
+        Placeholder styled = new IndentStyleBuilder().create(context, placeholder, "2");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().create();
@@ -54,7 +54,7 @@ class IndentStyleBuilderTest {
     @Test
     void noneIndentation() {
         Placeholder placeholder = new StaticTextPlaceholder("\tfoo");
-        Placeholder styled = new IndentStyleBuilder().create(framework, placeholder, "0");
+        Placeholder styled = new IndentStyleBuilder().create(context, placeholder, "0");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().create();
@@ -67,7 +67,7 @@ class IndentStyleBuilderTest {
     @Test
     void invalidIndentation() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        assertThatCode(() -> new IndentStyleBuilder().create(framework, placeholder, "boo"))
+        assertThatCode(() -> new IndentStyleBuilder().create(context, placeholder, "boo"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("boo");
     }

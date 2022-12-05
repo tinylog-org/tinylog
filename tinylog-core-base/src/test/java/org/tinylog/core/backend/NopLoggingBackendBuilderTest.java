@@ -3,8 +3,11 @@ package org.tinylog.core.backend;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NopLoggingBackendBuilderTest {
@@ -24,8 +27,9 @@ class NopLoggingBackendBuilderTest {
     @Test
     void creation() {
         Framework framework = new Framework(false, false);
+        LoggingContext context = new LoggingContext(framework, new Configuration(emptyMap()));
         NopLoggingBackendBuilder builder = new NopLoggingBackendBuilder();
-        assertThat(builder.create(framework)).isInstanceOf(NopLoggingBackend.class);
+        assertThat(builder.create(context)).isInstanceOf(NopLoggingBackend.class);
     }
 
     /**

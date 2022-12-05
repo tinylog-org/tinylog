@@ -1,6 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of a {@link Placeholder}.
@@ -28,10 +28,10 @@ public interface PlaceholderBuilder {
     /**
      * Creates a new instance of the placeholder.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param value Optional configuration value for the created placeholder
      * @return New instance of the placeholder
      */
-    Placeholder create(Framework framework, String value);
+    Placeholder create(LoggingContext context, String value);
 
 }

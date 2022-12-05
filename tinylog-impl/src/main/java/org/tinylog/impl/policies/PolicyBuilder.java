@@ -1,6 +1,6 @@
 package org.tinylog.impl.policies;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of a {@link Policy}.
@@ -27,11 +27,11 @@ public interface PolicyBuilder {
     /**
      * Creates a new instance of the policy.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param value Optional configuration value for the created policy
      * @return New instance of the policy
      * @throws Exception Failed to create a new policy for the passed configuration value
      */
-    Policy create(Framework framework, String value) throws Exception;
+    Policy create(LoggingContext context, String value) throws Exception;
 
 }

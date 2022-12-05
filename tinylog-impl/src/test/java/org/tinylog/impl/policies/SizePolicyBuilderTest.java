@@ -14,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class SizePolicyBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     private Path logFile;
 
@@ -70,7 +70,7 @@ class SizePolicyBuilderTest {
         "10GB, 10737418240"
     })
     void validFileSize(String configurationValue, long maxFileSize) throws Exception {
-        Policy policy = new SizePolicyBuilder().create(framework, configurationValue);
+        Policy policy = new SizePolicyBuilder().create(context, configurationValue);
         policy.init(logFile);
 
         for (int i = 0; i < maxFileSize / Integer.MAX_VALUE; ++i) {
@@ -90,7 +90,7 @@ class SizePolicyBuilderTest {
     @ParameterizedTest
     @NullAndEmptySource
     void missingFileSize(String configurationValue) {
-        Throwable throwable = catchThrowable(() -> new SizePolicyBuilder().create(framework, configurationValue));
+        Throwable throwable = catchThrowable(() -> new SizePolicyBuilder().create(context, configurationValue));
         assertThat(throwable)
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("maximum file size");
@@ -105,7 +105,7 @@ class SizePolicyBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"foo", "MB"})
     void invalidFileSize(String configurationValue) {
-        Throwable throwable = catchThrowable(() -> new SizePolicyBuilder().create(framework, configurationValue));
+        Throwable throwable = catchThrowable(() -> new SizePolicyBuilder().create(context, configurationValue));
         assertThat(throwable)
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining(configurationValue);

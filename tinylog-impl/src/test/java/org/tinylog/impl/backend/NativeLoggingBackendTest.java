@@ -31,6 +31,7 @@ import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -62,6 +63,9 @@ class NativeLoggingBackendTest {
 
     @Inject
     private Framework framework;
+
+    @Inject
+    private LoggingContext context;
 
     @Mock
     private Writer writer;
@@ -942,7 +946,7 @@ class NativeLoggingBackendTest {
                 .collect(Collectors.toSet());
 
             WritingThread writingThread = asyncWriters.isEmpty() ? null : new WritingThread(asyncWriters, 64);
-            return new NativeLoggingBackend(framework, loggingConfiguration, writingThread);
+            return new NativeLoggingBackend(context, loggingConfiguration, writingThread);
         }
 
     }

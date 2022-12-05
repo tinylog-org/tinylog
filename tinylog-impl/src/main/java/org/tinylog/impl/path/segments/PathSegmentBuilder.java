@@ -1,6 +1,6 @@
 package org.tinylog.impl.path.segments;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of a {@link PathSegment}.
@@ -28,11 +28,11 @@ public interface PathSegmentBuilder {
     /**
      * Creates a new instance of the path segment.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param value Optional configuration value for the created path segment
      * @return New instance of the path segment
      * @throws Exception Failed to create a new path segment for the passed configuration value
      */
-    PathSegment create(Framework framework, String value) throws Exception;
+    PathSegment create(LoggingContext context, String value) throws Exception;
 
 }

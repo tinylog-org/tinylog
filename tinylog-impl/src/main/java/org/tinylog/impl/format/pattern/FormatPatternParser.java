@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.format.pattern.placeholders.BundlePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
@@ -36,24 +36,24 @@ public class FormatPatternParser extends AbstractPatternParser {
 
     private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\n|\r");
 
-    private final Framework framework;
+    private final LoggingContext context;
     private final Map<String, PlaceholderBuilder> placeholderBuilders;
     private final Map<String, StyleBuilder> styleBuilders;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      */
-    public FormatPatternParser(Framework framework) {
-        this.framework = framework;
+    public FormatPatternParser(LoggingContext context) {
+        this.context = context;
         this.placeholderBuilders = new HashMap<>();
         this.styleBuilders = new HashMap<>();
 
         SafeServiceLoader
-            .asList(framework.getClassLoader(), PlaceholderBuilder.class, "placeholder builders")
+            .asList(context.getFramework().getClassLoader(), PlaceholderBuilder.class, "placeholder builders")
             .forEach(builder -> placeholderBuilders.put(builder.getName(), builder));
 
         SafeServiceLoader
-            .asList(framework.getClassLoader(), StyleBuilder.class, "style builders")
+            .asList(context.getFramework().getClassLoader(), StyleBuilder.class, "style builders")
             .forEach(builder -> styleBuilders.put(builder.getName(), builder));
     }
 
@@ -116,7 +116,7 @@ public class FormatPatternParser extends AbstractPatternParser {
 
         if (builder != null) {
             try {
-                Placeholder placeholder = builder.create(framework, configuration.getValue());
+                Placeholder placeholder = builder.create(context, configuration.getValue());
                 List<String> styles = parts.subList(1, parts.size());
                 return applyStyles(placeholder, styles);
             } catch (RuntimeException ex) {
@@ -192,7 +192,7 @@ public class FormatPatternParser extends AbstractPatternParser {
             InternalLogger.error(null, "Invalid style \"{}\"", style);
         } else {
             try {
-                return builder.create(framework, placeholder, configuration.getValue());
+                return builder.create(context, placeholder, configuration.getValue());
             } catch (RuntimeException ex) {
                 InternalLogger.error(ex, "Failed to create style for \"{}\"", style);
             }

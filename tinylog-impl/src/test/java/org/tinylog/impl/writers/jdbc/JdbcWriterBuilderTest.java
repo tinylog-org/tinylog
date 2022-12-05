@@ -16,8 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -39,7 +39,7 @@ class JdbcWriterBuilderTest {
     private static final String JDBC_URL = "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1";
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -65,7 +65,7 @@ class JdbcWriterBuilderTest {
             Map<String, String> properties = ImmutableMap.of("url", url, "table", "LOGS");
             Configuration configuration = new Configuration(properties);
 
-            try (Writer writer = new JdbcWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new JdbcWriterBuilder().create(context, configuration)) {
                 assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
                     assertThat(entry.getLevel()).isEqualTo(Level.WARN);
                     assertThat(entry.getMessage()).containsIgnoringCase("no fields");
@@ -104,7 +104,7 @@ class JdbcWriterBuilderTest {
             );
             Configuration configuration = new Configuration(properties);
 
-            try (Writer writer = new JdbcWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new JdbcWriterBuilder().create(context, configuration)) {
                 LogEntry entry = new LogEntryBuilder()
                     .severityLevel(Level.INFO)
                     .className("Foo")
@@ -128,7 +128,7 @@ class JdbcWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("table", "FOO");
         Configuration configuration = new Configuration(properties);
 
-        Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(framework, configuration).close());
+        Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(context, configuration).close());
 
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).contains("URL");
@@ -142,7 +142,7 @@ class JdbcWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("url", url);
         Configuration configuration = new Configuration(properties);
 
-        Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(framework, configuration).close());
+        Throwable throwable = catchThrowable(() -> new JdbcWriterBuilder().create(context, configuration).close());
 
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).containsIgnoringCase("table");

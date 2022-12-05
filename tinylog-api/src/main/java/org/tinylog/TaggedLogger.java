@@ -29,7 +29,7 @@ public final class TaggedLogger {
 
     /**
      * @param tag The case-sensitive category tag for the logger (can be {@code null})
-     * @param framework The actual framework instance
+     * @param framework The underlying framework instance
      */
     TaggedLogger(String tag, Framework framework) {
         this.tag = tag;

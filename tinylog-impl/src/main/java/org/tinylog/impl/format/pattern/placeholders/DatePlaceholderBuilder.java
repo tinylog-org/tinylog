@@ -4,8 +4,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link DatePlaceholder}.
@@ -24,10 +24,10 @@ public class DatePlaceholderBuilder implements PlaceholderBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, String value) {
+    public Placeholder create(LoggingContext context, String value) {
         String pattern = value == null ? DEFAULT_PATTERN : value;
-        Locale locale = framework.getConfiguration().getLocale();
-        ZoneId zone = framework.getConfiguration().getZone();
+        Locale locale = context.getConfiguration().getLocale();
+        ZoneId zone = context.getConfiguration().getZone();
 
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);

@@ -1,7 +1,7 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link ProcessIdPlaceholder}.
@@ -18,7 +18,7 @@ public class ProcessIdPlaceholderBuilder implements PlaceholderBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, String value) {
+    public Placeholder create(LoggingContext context, String value) {
         if (value != null) {
             InternalLogger.warn(
                 null,
@@ -27,7 +27,7 @@ public class ProcessIdPlaceholderBuilder implements PlaceholderBuilder {
             );
         }
 
-        long processId = framework.getRuntime().getProcessId();
+        long processId = context.getFramework().getRuntime().getProcessId();
         return new ProcessIdPlaceholder(processId);
     }
 

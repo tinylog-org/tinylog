@@ -3,8 +3,8 @@ package org.tinylog.impl.backend;
 import java.util.Locale;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
@@ -19,7 +19,7 @@ class WriterConfiguration {
      */
     static final String TYPE_KEY = "type";
 
-    private final Framework framework;
+    private final LoggingContext context;
     private final Configuration entireConfiguration;
     private final LevelConfiguration levelConfiguration;
 
@@ -27,11 +27,11 @@ class WriterConfiguration {
     private boolean created;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param configuration The writer configuration to parse
      */
-    WriterConfiguration(Framework framework, Configuration configuration) {
-        this.framework = framework;
+    WriterConfiguration(LoggingContext context, Configuration configuration) {
+        this.context = context;
         this.entireConfiguration = configuration;
         this.levelConfiguration = new LevelConfiguration(
             configuration.getList(LevelConfiguration.KEY),
@@ -74,7 +74,7 @@ class WriterConfiguration {
             } else {
                 String name = type.toLowerCase(Locale.ENGLISH);
                 WriterBuilder builder = SafeServiceLoader
-                    .asList(framework.getClassLoader(), WriterBuilder.class, "writer builders")
+                    .asList(context.getFramework().getClassLoader(), WriterBuilder.class, "writer builders")
                     .stream()
                     .filter(writerBuilder -> name.equals(writerBuilder.getName()))
                     .findAny()
@@ -88,7 +88,7 @@ class WriterConfiguration {
                     );
                 } else {
                     try {
-                        writer = builder.create(framework, entireConfiguration);
+                        writer = builder.create(context, entireConfiguration);
                     } catch (Exception ex) {
                         InternalLogger.error(ex, "Failed to create writer for \"{}\"", name);
                     }

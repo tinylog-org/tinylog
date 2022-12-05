@@ -2,7 +2,7 @@ package org.tinylog.impl.format.pattern.styles;
 
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 
 /**
@@ -20,7 +20,7 @@ public class MinLengthStyleBuilder implements StyleBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, Placeholder placeholder, String value) {
+    public Placeholder create(LoggingContext context, Placeholder placeholder, String value) {
         if (value == null) {
             throw new IllegalArgumentException("Minimum length is not defined for min length style");
         } else {

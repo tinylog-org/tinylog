@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.path.segments.PathSegment;
@@ -23,6 +24,9 @@ class PathParserTest {
     private Framework framework;
 
     @Inject
+    private LoggingContext context;
+
+    @Inject
     private Log log;
 
     /**
@@ -30,7 +34,7 @@ class PathParserTest {
      */
     @Test
     void empty() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("");
+        List<PathSegment> segments = new PathParser(context).parse("");
         assertThat(render(segments)).isEqualTo("");
     }
 
@@ -39,7 +43,7 @@ class PathParserTest {
      */
     @Test
     void staticPath() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("foo/log.txt");
+        List<PathSegment> segments = new PathParser(context).parse("foo/log.txt");
         assertThat(render(segments)).isEqualTo("foo/log.txt");
     }
 
@@ -48,7 +52,7 @@ class PathParserTest {
      */
     @Test
     void escaped() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("log.'{foo}'.txt");
+        List<PathSegment> segments = new PathParser(context).parse("log.'{foo}'.txt");
         assertThat(render(segments)).isEqualTo("log.{foo}.txt");
     }
 
@@ -57,7 +61,7 @@ class PathParserTest {
      */
     @Test
     void singlePlaceholderWithoutValue() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("foo/{date}.txt");
+        List<PathSegment> segments = new PathParser(context).parse("foo/{date}.txt");
         assertThat(render(segments)).isEqualTo("foo/1970-01-01_00-00-00.txt");
     }
 
@@ -66,7 +70,7 @@ class PathParserTest {
      */
     @Test
     void singlePlaceholderWithValue() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("foo/{date: YYYY.MM.DD}.txt");
+        List<PathSegment> segments = new PathParser(context).parse("foo/{date: YYYY.MM.DD}.txt");
         assertThat(render(segments)).isEqualTo("foo/1970.01.01.txt");
     }
 
@@ -75,7 +79,7 @@ class PathParserTest {
      */
     @Test
     void multiplePlaceholders() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("{process-id}/{date: YYYY.MM.DD}.txt");
+        List<PathSegment> segments = new PathParser(context).parse("{process-id}/{date: YYYY.MM.DD}.txt");
         assertThat(render(segments)).isEqualTo(framework.getRuntime().getProcessId() + "/1970.01.01.txt");
     }
 
@@ -84,7 +88,7 @@ class PathParserTest {
      */
     @Test
     void unknownPlaceholder() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("log.{foo}.txt");
+        List<PathSegment> segments = new PathParser(context).parse("log.{foo}.txt");
         assertThat(render(segments)).isEqualTo("log.undefined.txt");
         assertThat(log.consume()).singleElement().satisfies(logEntry -> {
             assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);
@@ -97,7 +101,7 @@ class PathParserTest {
      */
     @Test
     void invalidPlaceholder() throws Exception {
-        List<PathSegment> segments = new PathParser(framework).parse("log.{date: foo}.txt");
+        List<PathSegment> segments = new PathParser(context).parse("log.{date: foo}.txt");
         assertThat(render(segments)).isEqualTo("log.undefined.txt");
         assertThat(log.consume()).singleElement().satisfies(logEntry -> {
             assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);

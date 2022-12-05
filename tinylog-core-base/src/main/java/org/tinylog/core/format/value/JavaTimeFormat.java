@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Format for date and time classes from {@link java.time}.
@@ -24,14 +24,14 @@ public class JavaTimeFormat implements ValueFormat {
     }
 
     @Override
-    public String format(Framework framework, String pattern, Object value) {
+    public String format(LoggingContext context, String pattern, Object value) {
         TemporalAccessor accessor = (TemporalAccessor) value;
         if (accessor instanceof Instant) {
-            ZoneId zone = framework.getConfiguration().getZone();
+            ZoneId zone = context.getConfiguration().getZone();
             accessor = ZonedDateTime.ofInstant((Instant) accessor, zone);
         }
 
-        Locale locale = framework.getConfiguration().getLocale();
+        Locale locale = context.getConfiguration().getLocale();
         return DateTimeFormatter.ofPattern(pattern, locale).format(accessor);
     }
 

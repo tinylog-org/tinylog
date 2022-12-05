@@ -1,6 +1,6 @@
 package org.tinylog.core.format.value;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Format interface for different value types.
@@ -18,11 +18,11 @@ public interface ValueFormat {
     /**
      * Formats the passed value.
      *
-     * @param framework The actual framework instance
+     * @param context The current logging context
      * @param pattern The format pattern for the value
      * @param value The value to format
      * @return The formatted value
      */
-    String format(Framework framework, String pattern, Object value);
+    String format(LoggingContext context, String pattern, Object value);
 
 }

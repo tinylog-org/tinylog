@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.TestClock;
 
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class DailyPolicyBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private TestClock clock;
@@ -32,7 +32,7 @@ class DailyPolicyBuilderTest {
     void defaultOnMidnightWithSystemZone() throws Exception {
         clock.setInstant(Instant.parse("1999-12-31T23:59:59Z"));
 
-        Policy policy = new DailyPolicyBuilder().create(framework, null);
+        Policy policy = new DailyPolicyBuilder().create(context, null);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -47,7 +47,7 @@ class DailyPolicyBuilderTest {
     void customTime() throws Exception {
         clock.setInstant(Instant.parse("2000-01-01T03:59:59Z"));
 
-        Policy policy = new DailyPolicyBuilder().create(framework, "04:00");
+        Policy policy = new DailyPolicyBuilder().create(context, "04:00");
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -64,7 +64,7 @@ class DailyPolicyBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"foo", "foo UTC", "00:00 FOO"})
     void invalidConfiguration(String configurationValue) {
-        Throwable throwable = catchThrowable(() -> new DailyPolicyBuilder().create(framework, configurationValue));
+        Throwable throwable = catchThrowable(() -> new DailyPolicyBuilder().create(context, configurationValue));
         assertThat(throwable)
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining(configurationValue)

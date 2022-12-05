@@ -8,7 +8,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class DateTimeSegmentBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that {@code yyyy-MM-dd_HH-mm-ss} is used as default date-time pattern if none is explicitly configured.
@@ -27,7 +27,7 @@ class DateTimeSegmentBuilderTest {
     void defaultPattern() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
         ZonedDateTime date = ZonedDateTime.ofInstant(Instant.parse("2000-01-01T12:30:59Z"), ZoneOffset.UTC);
-        new DateTimeSegmentBuilder().create(framework, null).resolve(builder, date);
+        new DateTimeSegmentBuilder().create(context, null).resolve(builder, date);
         assertThat(builder).asString().isEqualTo("bar/2000-01-01_12-30-59");
 
     }
@@ -39,7 +39,7 @@ class DateTimeSegmentBuilderTest {
     void customPattern() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
         ZonedDateTime date = ZonedDateTime.ofInstant(Instant.parse("2000-01-01T12:30:59Z"), ZoneOffset.UTC);
-        new DateTimeSegmentBuilder().create(framework, "yyyy_MM_dd'T'HH_mm").resolve(builder, date);
+        new DateTimeSegmentBuilder().create(context, "yyyy_MM_dd'T'HH_mm").resolve(builder, date);
         assertThat(builder).asString().isEqualTo("bar/2000_01_01T12_30");
     }
 
@@ -48,7 +48,7 @@ class DateTimeSegmentBuilderTest {
      */
     @Test
     void rejectPatternWithOptionalSections() {
-        assertThatCode(() -> new DateTimeSegmentBuilder().create(framework, "HH-mm[_yyyy-MM-dd]"))
+        assertThatCode(() -> new DateTimeSegmentBuilder().create(context, "HH-mm[_yyyy-MM-dd]"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("optional");
     }

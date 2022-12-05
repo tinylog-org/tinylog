@@ -1,6 +1,6 @@
 package org.tinylog.core.backend;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of a {@link LoggingBackend}.
@@ -28,9 +28,9 @@ public interface LoggingBackendBuilder {
     /**
      * Creates a new instance of the logging backend.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @return New instance of the logging backend
      */
-    LoggingBackend create(Framework framework);
+    LoggingBackend create(LoggingContext context);
 
 }

@@ -243,7 +243,7 @@ class InternalLoggerTest {
         InternalLogger.info(null, "Hello World!");
         assertThat(log.consume()).isEmpty();
 
-        InternalLogger.init(framework);
+        framework.startUp();
         assertThat(log.consume()).containsExactly(
             new LogEntry(InternalLogger.class.getName(), "tinylog", Level.INFO, null, "Hello World!")
         );
@@ -258,7 +258,7 @@ class InternalLoggerTest {
         InternalLogger.info(null, "Hello World!");
         assertThat(log.consume()).isEmpty();
 
-        InternalLogger.init(framework);
+        framework.startUp();
         assertThat(log.consume()).isEmpty();
     }
 

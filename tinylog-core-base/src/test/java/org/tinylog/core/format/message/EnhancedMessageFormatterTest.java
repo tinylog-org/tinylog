@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 
@@ -21,6 +22,9 @@ class EnhancedMessageFormatterTest {
     private Framework framework;
 
     @Inject
+    private LoggingContext context;
+
+    @Inject
     private Log log;
 
     /**
@@ -29,7 +33,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatDefaultStringWithoutPattern() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "Hello {}!", "Alice");
+        String output = formatter.format(context, "Hello {}!", "Alice");
         assertThat(output).isEqualTo("Hello Alice!");
     }
 
@@ -39,7 +43,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void ignorePatternForStrings() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "Hello {###}!", "Alice");
+        String output = formatter.format(context, "Hello {###}!", "Alice");
         assertThat(output).isEqualTo("Hello Alice!");
     }
 
@@ -49,7 +53,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatNumberWithoutPattern() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "The maximum port number is {}.", 65535);
+        String output = formatter.format(context, "The maximum port number is {}.", 65535);
         assertThat(output).isEqualTo("The maximum port number is 65535.");
     }
 
@@ -59,7 +63,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatNumberWithPattern() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "Pi is {0.00}", Math.PI);
+        String output = formatter.format(context, "Pi is {0.00}", Math.PI);
         assertThat(output).isEqualTo("Pi is 3.14");
     }
 
@@ -69,7 +73,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatTimeWithPattern() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "It is {hh:mm a}.", LocalTime.of(12, 30));
+        String output = formatter.format(context, "It is {hh:mm a}.", LocalTime.of(12, 30));
         assertThat(output).isEqualTo("It is 12:30 PM.");
     }
 
@@ -80,7 +84,7 @@ class EnhancedMessageFormatterTest {
     void formatLazyArgument() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
         Supplier<?> supplier = () -> "Alice";
-        String output = formatter.format(framework, "Hello {}!", supplier);
+        String output = formatter.format(context, "Hello {}!", supplier);
         assertThat(output).isEqualTo("Hello Alice!");
     }
 
@@ -90,7 +94,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatMultipleArguments() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "{} + {} = {}", 1, 2, 3);
+        String output = formatter.format(context, "{} + {} = {}", 1, 2, 3);
         assertThat(output).isEqualTo("1 + 2 = 3");
     }
 
@@ -100,7 +104,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void ignoreSuperfluousPlaceholders() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "{}, {}, and {}", 1, 2);
+        String output = formatter.format(context, "{}, {}, and {}", 1, 2);
         assertThat(output).isEqualTo("1, 2, and {}");
     }
 
@@ -110,7 +114,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void ignoreSuperfluousArguments() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "{}, {}, and {}", 1, 2, 3, 4);
+        String output = formatter.format(context, "{}, {}, and {}", 1, 2, 3, 4);
         assertThat(output).isEqualTo("1, 2, and 3");
     }
 
@@ -120,7 +124,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void reportInvalidPatterns() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "<{0 # 0}>", 42);
+        String output = formatter.format(context, "<{0 # 0}>", 42);
         assertThat(output).isEqualTo("<42>");
 
         assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
@@ -135,7 +139,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void escapeCurlyBrackets() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "Brackets can be escaped ('{}') or replaced ({})", 42);
+        String output = formatter.format(context, "Brackets can be escaped ('{}') or replaced ({})", 42);
         assertThat(output).isEqualTo("Brackets can be escaped ({}) or replaced (42)");
     }
 
@@ -145,7 +149,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void escapePhraseInPatterns() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "It is {hh 'o''clock'}.", LocalTime.of(12, 0));
+        String output = formatter.format(context, "It is {hh 'o''clock'}.", LocalTime.of(12, 0));
         assertThat(output).isEqualTo("It is 12 o'clock.");
     }
 
@@ -155,7 +159,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void supportCurlyBracketsInPatterns() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "We give {{0}%}!", 1.00);
+        String output = formatter.format(context, "We give {{0}%}!", 1.00);
         assertThat(output).isEqualTo("We give {100}%!");
     }
 
@@ -166,9 +170,9 @@ class EnhancedMessageFormatterTest {
     void formatConditionalWithoutPlaceholders() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
         String message = "{-1#negative|0#zero|0<positive}";
-        assertThat(formatter.format(framework, message, -1)).isEqualTo("negative");
-        assertThat(formatter.format(framework, message, 0)).isEqualTo("zero");
-        assertThat(formatter.format(framework, message, +1)).isEqualTo("positive");
+        assertThat(formatter.format(context, message, -1)).isEqualTo("negative");
+        assertThat(formatter.format(context, message, 0)).isEqualTo("zero");
+        assertThat(formatter.format(context, message, +1)).isEqualTo("positive");
     }
 
     /**
@@ -178,11 +182,11 @@ class EnhancedMessageFormatterTest {
     void formatConditionalWithSinglePlaceholder() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
         String message = "There {0#are no files|1#is one file|1<are {#,###} files}.";
-        assertThat(formatter.format(framework, message, -1)).isEqualTo("There are no files.");
-        assertThat(formatter.format(framework, message, 0)).isEqualTo("There are no files.");
-        assertThat(formatter.format(framework, message, 1)).isEqualTo("There is one file.");
-        assertThat(formatter.format(framework, message, 2)).isEqualTo("There are 2 files.");
-        assertThat(formatter.format(framework, message, 1000)).isEqualTo("There are 1,000 files.");
+        assertThat(formatter.format(context, message, -1)).isEqualTo("There are no files.");
+        assertThat(formatter.format(context, message, 0)).isEqualTo("There are no files.");
+        assertThat(formatter.format(context, message, 1)).isEqualTo("There is one file.");
+        assertThat(formatter.format(context, message, 2)).isEqualTo("There are 2 files.");
+        assertThat(formatter.format(context, message, 1000)).isEqualTo("There are 1,000 files.");
     }
 
     /**
@@ -192,8 +196,8 @@ class EnhancedMessageFormatterTest {
     void formatConditionalWithMultiplePlaceholders() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
         String message = "The call took {0#{0.00}|10#{#,###}} seconds.";
-        assertThat(formatter.format(framework, message, 0.00)).isEqualTo("The call took 0.00 seconds.");
-        assertThat(formatter.format(framework, message, 1000)).isEqualTo("The call took 1,000 seconds.");
+        assertThat(formatter.format(context, message, 0.00)).isEqualTo("The call took 0.00 seconds.");
+        assertThat(formatter.format(context, message, 1000)).isEqualTo("The call took 1,000 seconds.");
     }
 
     /**
@@ -202,7 +206,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void formatConditionalWithInValidPattern() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        assertThat(formatter.format(framework, "{#|#}", 42)).isEqualTo("42");
+        assertThat(formatter.format(context, "{#|#}", 42)).isEqualTo("42");
 
         assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
             assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -216,7 +220,7 @@ class EnhancedMessageFormatterTest {
     @Test
     void escapePipes() {
         EnhancedMessageFormatter formatter = new EnhancedMessageFormatter(framework.getClassLoader());
-        String output = formatter.format(framework, "There are {'|'#,###'|'} files.", 42);
+        String output = formatter.format(context, "There are {'|'#,###'|'} files.", 42);
         assertThat(output).isEqualTo("There are |42| files.");
     }
 

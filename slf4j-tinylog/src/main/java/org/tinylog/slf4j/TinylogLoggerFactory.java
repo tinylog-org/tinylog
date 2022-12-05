@@ -15,7 +15,7 @@ public final class TinylogLoggerFactory implements ILoggerFactory {
     private final ConcurrentMap<String, TinylogLogger> loggers;
 
     /**
-     * @param framework The actual logging framework
+     * @param framework The underlying framework instance
      */
     public TinylogLoggerFactory(Framework framework) {
         this.framework = framework;

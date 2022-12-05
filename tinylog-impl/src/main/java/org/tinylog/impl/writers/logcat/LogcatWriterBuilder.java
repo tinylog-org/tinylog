@@ -1,7 +1,7 @@
 package org.tinylog.impl.writers.logcat;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
@@ -30,15 +30,15 @@ public class LogcatWriterBuilder implements WriterBuilder {
     }
 
     @Override
-    public Writer create(Framework framework, Configuration configuration) {
-        FormatPatternParser formatPatternParser = new FormatPatternParser(framework);
+    public Writer create(LoggingContext context, Configuration configuration) {
+        FormatPatternParser formatPatternParser = new FormatPatternParser(context);
 
         String tagPattern = configuration.getValue(TAG_PATTERN_KEY, DEFAULT_TAG_PATTERN);
         Placeholder tagPlaceholder = null;
         if (tagPattern != null) {
             Placeholder placeholder = formatPatternParser.parse(tagPattern);
             MaxLengthStyleBuilder maxLengthStyleBuilder = new MaxLengthStyleBuilder();
-            tagPlaceholder = maxLengthStyleBuilder.create(framework, placeholder, Integer.toString(MAX_TAG_LENGTH));
+            tagPlaceholder = maxLengthStyleBuilder.create(context, placeholder, Integer.toString(MAX_TAG_LENGTH));
         }
 
         String messagePattern = configuration.getValue(MESSAGE_PATTERN_KEY, DEFAULT_MESSAGE_PATTERN);

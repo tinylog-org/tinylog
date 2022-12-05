@@ -2,7 +2,7 @@ package org.tinylog.impl.path.segments;
 
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link DateTimeSegment}.
@@ -21,9 +21,9 @@ public class DateTimeSegmentBuilder implements PathSegmentBuilder {
     }
 
     @Override
-    public PathSegment create(Framework framework, String value) throws Exception {
+    public PathSegment create(LoggingContext context, String value) throws Exception {
         String pattern = value == null ? DEFAULT_PATTERN : value;
-        Locale locale = framework.getConfiguration().getLocale();
+        Locale locale = context.getConfiguration().getLocale();
 
         if (pattern.indexOf('[') >= 0) {
             throw new IllegalArgumentException(

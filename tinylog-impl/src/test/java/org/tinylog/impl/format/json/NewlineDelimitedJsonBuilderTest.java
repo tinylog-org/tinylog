@@ -7,8 +7,8 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.entry;
 class NewlineDelimitedJsonBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -38,7 +38,7 @@ class NewlineDelimitedJsonBuilderTest {
     @Test
     void noFields() {
         Configuration configuration = new Configuration(emptyMap());
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
             assertThat(entry.getLevel()).isEqualTo(Level.WARN);
@@ -59,7 +59,7 @@ class NewlineDelimitedJsonBuilderTest {
     void singleField() {
         Map<String, String> properties = ImmutableMap.of("fields.level", "level");
         Configuration configuration = new Configuration(properties);
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
         LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
@@ -80,7 +80,7 @@ class NewlineDelimitedJsonBuilderTest {
         );
 
         Configuration configuration = new Configuration(properties);
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(framework, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
         LogEntry logEntry = new LogEntryBuilder()

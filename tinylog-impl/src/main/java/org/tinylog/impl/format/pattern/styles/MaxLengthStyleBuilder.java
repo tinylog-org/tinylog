@@ -1,6 +1,6 @@
 package org.tinylog.impl.format.pattern.styles;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.placeholders.ClassPlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.PackagePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
@@ -21,7 +21,7 @@ public class MaxLengthStyleBuilder implements StyleBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, Placeholder placeholder, String value) {
+    public Placeholder create(LoggingContext context, Placeholder placeholder, String value) {
         if (value == null) {
             throw new IllegalArgumentException("Maximum length is not defined for max length style");
         } else {

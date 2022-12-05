@@ -5,8 +5,8 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CountSegmentBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -28,7 +28,7 @@ class CountSegmentBuilderTest {
     @Test
     void creationWithoutConfigurationValue() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
-        new CountSegmentBuilder().create(framework, null).resolve(builder, null);
+        new CountSegmentBuilder().create(context, null).resolve(builder, null);
         assertThat(builder).asString().isEqualTo("bar/0");
 
         assertThat(log.consume()).isEmpty();
@@ -41,7 +41,7 @@ class CountSegmentBuilderTest {
     @Test
     void creationWithConfigurationValue() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
-        new CountSegmentBuilder().create(framework, "foo").resolve(builder, null);
+        new CountSegmentBuilder().create(context, "foo").resolve(builder, null);
         assertThat(builder).asString().isEqualTo("bar/0");
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {

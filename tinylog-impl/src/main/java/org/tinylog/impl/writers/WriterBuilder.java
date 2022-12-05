@@ -1,7 +1,7 @@
 package org.tinylog.impl.writers;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of a {@link Writer}.
@@ -34,11 +34,11 @@ public interface WriterBuilder {
      *     databases, or remote servers) should use the {@link AsyncWriter} interface for performance reasons.
      * </p>
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param configuration The configuration properties for the new writer instance
      * @return New instance of the writer
      * @throws Exception Failed to create a new writer for the passed configuration
      */
-    Writer create(Framework framework, Configuration configuration) throws Exception;
+    Writer create(LoggingContext context, Configuration configuration) throws Exception;
 
 }

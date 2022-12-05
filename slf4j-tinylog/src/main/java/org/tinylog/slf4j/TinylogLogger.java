@@ -38,7 +38,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
 
     /**
      * @param category The logger category (usually the fully-qualified name of the class that uses this logger)
-     * @param framework The actual tinylog framework instance
+     * @param framework The underlying framework instance
      */
     TinylogLogger(String category, Framework framework) {
         this.category = category;

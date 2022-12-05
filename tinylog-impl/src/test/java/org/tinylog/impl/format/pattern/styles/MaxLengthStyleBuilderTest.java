@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.ClassPlaceholder;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class MaxLengthStyleBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that a max length style can be created for a {@link StaticTextPlaceholder} with maximum length passed as
@@ -32,7 +32,7 @@ class MaxLengthStyleBuilderTest {
     @Test
     void creationForText() {
         Placeholder textPlaceholder = new StaticTextPlaceholder("foo");
-        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, textPlaceholder, "2");
+        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(context, textPlaceholder, "2");
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
         LogEntry logEntry = new LogEntryBuilder().create();
@@ -46,7 +46,7 @@ class MaxLengthStyleBuilderTest {
     @Test
     void creationForClass() {
         Placeholder classPlaceholder = new ClassPlaceholder();
-        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, classPlaceholder, "11");
+        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(context, classPlaceholder, "11");
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
         LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
@@ -60,7 +60,7 @@ class MaxLengthStyleBuilderTest {
     @Test
     void creationForPackage() {
         Placeholder packagePlaceholder = new PackagePlaceholder();
-        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(framework, packagePlaceholder, "5");
+        Placeholder stylePlaceholder = new MaxLengthStyleBuilder().create(context, packagePlaceholder, "5");
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
         LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
@@ -73,7 +73,7 @@ class MaxLengthStyleBuilderTest {
     @Test
     void creationWithMissingMaxLength() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        Throwable throwable = catchThrowable(() -> new MaxLengthStyleBuilder().create(framework, placeholder, null));
+        Throwable throwable = catchThrowable(() -> new MaxLengthStyleBuilder().create(context, placeholder, null));
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).containsIgnoringCase("maximum length");
     }
@@ -84,7 +84,7 @@ class MaxLengthStyleBuilderTest {
     @Test
     void creationWithInvalidMaxLength() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        assertThatCode(() -> new MaxLengthStyleBuilder().create(framework, placeholder, "bar"))
+        assertThatCode(() -> new MaxLengthStyleBuilder().create(context, placeholder, "bar"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("bar");
     }

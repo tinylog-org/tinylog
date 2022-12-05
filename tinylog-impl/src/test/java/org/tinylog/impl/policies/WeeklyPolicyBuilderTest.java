@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.TestClock;
 
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class WeeklyPolicyBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private TestClock clock;
@@ -32,7 +32,7 @@ class WeeklyPolicyBuilderTest {
     void defaultOnMidnight() throws Exception {
         clock.setInstant(Instant.parse("2000-01-01T23:59:59Z"));
 
-        Policy policy = new WeeklyPolicyBuilder().create(framework, null);
+        Policy policy = new WeeklyPolicyBuilder().create(context, null);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -50,7 +50,7 @@ class WeeklyPolicyBuilderTest {
     void customDay(String configurationValue) throws Exception {
         clock.setInstant(Instant.parse("2000-01-02T23:59:59Z"));
 
-        Policy policy = new WeeklyPolicyBuilder().create(framework, configurationValue);
+        Policy policy = new WeeklyPolicyBuilder().create(context, configurationValue);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -68,7 +68,7 @@ class WeeklyPolicyBuilderTest {
     void customDayAndTime(String configurationValue) throws Exception {
         clock.setInstant(Instant.parse("2000-01-03T03:59:59Z"));
 
-        Policy policy = new WeeklyPolicyBuilder().create(framework, configurationValue);
+        Policy policy = new WeeklyPolicyBuilder().create(context, configurationValue);
         policy.init(null);
         assertThat(policy.canAcceptLogEntry(0)).isTrue();
 
@@ -86,7 +86,7 @@ class WeeklyPolicyBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"FOO", "FOO 00:00", "FOO 00:00 UTC", "SUN foo", "SUN foo UTC", "SUN 00:00 FOO"})
     void invalidConfiguration(String configurationValue) {
-        Throwable throwable = catchThrowable(() -> new WeeklyPolicyBuilder().create(framework, configurationValue));
+        Throwable throwable = catchThrowable(() -> new WeeklyPolicyBuilder().create(context, configurationValue));
         assertThat(throwable)
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining(configurationValue)

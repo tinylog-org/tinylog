@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 
@@ -19,6 +20,9 @@ class ProcessIdSegmentBuilderTest {
     private Framework framework;
 
     @Inject
+    private LoggingContext context;
+
+    @Inject
     private Log log;
 
     /**
@@ -28,7 +32,7 @@ class ProcessIdSegmentBuilderTest {
     @Test
     void creationWithoutConfigurationValue() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
-        new ProcessIdSegmentBuilder().create(framework, null).resolve(builder, null);
+        new ProcessIdSegmentBuilder().create(context, null).resolve(builder, null);
         assertThat(builder).asString().isEqualTo("bar/" + framework.getRuntime().getProcessId());
 
         assertThat(log.consume()).isEmpty();
@@ -41,7 +45,7 @@ class ProcessIdSegmentBuilderTest {
     @Test
     void creationWithConfigurationValue() throws Exception {
         StringBuilder builder = new StringBuilder("bar/");
-        new ProcessIdSegmentBuilder().create(framework, "foo").resolve(builder, null);
+        new ProcessIdSegmentBuilder().create(context, "foo").resolve(builder, null);
         assertThat(builder).asString().isEqualTo("bar/" + framework.getRuntime().getProcessId());
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {

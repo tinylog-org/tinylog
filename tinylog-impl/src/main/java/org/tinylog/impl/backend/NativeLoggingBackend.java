@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
@@ -14,6 +13,7 @@ import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.WritingThread;
@@ -26,24 +26,28 @@ import org.tinylog.impl.writers.Writer;
  */
 public class NativeLoggingBackend implements LoggingBackend {
 
-    private final Framework framework;
+    private final LoggingContext context;
     private final ContextStorage contextStorage;
     private final LoggingConfiguration configuration;
     private final WritingThread writingThread;
 
     /**
-     * @param framework The actual framework instance
+     * @param context The current logging context
      * @param configuration All configured writers mapped to severity levels and tags
      * @param writingThread The writing thread for enqueuing log entries for async writers (can be {@code null} if there
      *                      are no async writers)
      */
-    public NativeLoggingBackend(Framework framework, LoggingConfiguration configuration, WritingThread writingThread) {
-        this.framework = framework;
+    public NativeLoggingBackend(
+        LoggingContext context,
+        LoggingConfiguration configuration,
+        WritingThread writingThread
+    ) {
+        this.context = context;
         this.contextStorage = new ThreadLocalContextStorage();
         this.configuration = configuration;
         this.writingThread = writingThread;
 
-        framework.registerHook(new LifeCycleHook(configuration.getAllWriters(), writingThread));
+        context.getFramework().registerHook(new LifeCycleHook(configuration.getAllWriters(), writingThread));
     }
 
     @Override
@@ -242,7 +246,7 @@ public class NativeLoggingBackend implements LoggingBackend {
 
         return new LogEntry(
             logEntryValues.contains(LogEntryValue.TIMESTAMP) ? Instant.now() : null,
-            logEntryValues.contains(LogEntryValue.UPTIME) ? framework.getRuntime().getUptime() : null,
+            logEntryValues.contains(LogEntryValue.UPTIME) ? context.getFramework().getRuntime().getUptime() : null,
             logEntryValues.contains(LogEntryValue.THREAD) ? Thread.currentThread() : null,
             contextStorage.getMapping(),
             stackTraceElement.getClassName(),
@@ -253,7 +257,7 @@ public class NativeLoggingBackend implements LoggingBackend {
             level,
             formatter == null || arguments == null
                 ? message == null ? null : message.toString()
-                : formatter.format(framework, (String) message, arguments),
+                : formatter.format(context, (String) message, arguments),
             throwable
         );
     }

@@ -15,6 +15,7 @@ import org.mockito.MockedStatic;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
@@ -34,6 +35,9 @@ class LogcatWriterBuilderTest {
 
     @Inject
     private Framework framework;
+
+    @Inject
+    private LoggingContext context;
 
     /**
      * Verifies that the logcat writer builder is the default writer builder on Android.
@@ -92,7 +96,7 @@ class LogcatWriterBuilderTest {
                 .message("Hello World!")
                 .create();
 
-            try (Writer writer = new LogcatWriterBuilder().create(framework, new Configuration(emptyMap()))) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, new Configuration(emptyMap()))) {
                 writer.log(logEntry);
                 logMock.verify(() -> Log.println(Log.INFO, null, "Hello World!"));
             }
@@ -110,7 +114,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
                 logMock.verify(() -> Log.println(Log.INFO, "foo", "Hello World!"));
             }
@@ -128,7 +132,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
                 logMock.verify(() -> Log.println(Log.INFO, "12345678901234567890...", "Hello World!"));
             }
@@ -146,7 +150,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("message-pattern", "{class-name}: {message}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
                 logMock.verify(() -> Log.println(Log.INFO, null, "MyClass: Hello World!"));
             }
@@ -181,7 +185,7 @@ class LogcatWriterBuilderTest {
                 .message("Hello World!")
                 .create();
 
-            try (Writer writer = new LogcatWriterBuilder().create(framework, new Configuration(emptyMap()))) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, new Configuration(emptyMap()))) {
                 writer.log(logEntry);
             }
 
@@ -203,7 +207,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
             }
 
@@ -225,7 +229,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
             }
 
@@ -247,7 +251,7 @@ class LogcatWriterBuilderTest {
                 .create();
 
             Configuration configuration = new Configuration(singletonMap("message-pattern", "{class-name}: {message}"));
-            try (Writer writer = new LogcatWriterBuilder().create(framework, configuration)) {
+            try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
                 writer.log(logEntry);
             }
 

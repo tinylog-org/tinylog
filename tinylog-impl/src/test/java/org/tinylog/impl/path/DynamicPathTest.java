@@ -2,9 +2,7 @@ package org.tinylog.impl.path;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneOffset;
 
 import javax.inject.Inject;
 
@@ -12,13 +10,12 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.test.log.TestClock;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
 class DynamicPathTest {
@@ -27,7 +24,7 @@ class DynamicPathTest {
     private Path directory;
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Tests for {@link  DynamicPath#getLatestPath()}.
@@ -40,7 +37,7 @@ class DynamicPathTest {
          */
         @Test
         void findEmptyPath() throws Exception {
-            DynamicPath path = new DynamicPath(framework, "");
+            DynamicPath path = new DynamicPath(context, "");
             assertThat(path.getLatestPath()).isNull();
         }
 
@@ -49,7 +46,7 @@ class DynamicPathTest {
          */
         @Test
         void findNonExisingPath() throws Exception {
-            DynamicPath path = new DynamicPath(framework, directory + "/foo/file_{count}.log");
+            DynamicPath path = new DynamicPath(context, directory + "/foo/file_{count}.log");
             assertThat(path.getLatestPath()).isNull();
         }
 
@@ -61,7 +58,7 @@ class DynamicPathTest {
             Path file = directory.resolve("foo");
             Files.createFile(file);
 
-            DynamicPath path = new DynamicPath(framework, file.toString());
+            DynamicPath path = new DynamicPath(context, file.toString());
             assertThat(path.getLatestPath()).isEqualTo(file);
         }
 
@@ -73,7 +70,7 @@ class DynamicPathTest {
         void findNonExistentPathWithoutPlaceholders() throws Exception {
             Path file = directory.resolve("foo");
 
-            DynamicPath path = new DynamicPath(framework, file.toString());
+            DynamicPath path = new DynamicPath(context, file.toString());
             assertThat(path.getLatestPath()).isNull();
         }
 
@@ -90,7 +87,7 @@ class DynamicPathTest {
             Files.createDirectories(youngestFile.getParent());
             Files.createFile(youngestFile);
 
-            DynamicPath path = new DynamicPath(framework, directory + "/foo{count}/file_{count}.log");
+            DynamicPath path = new DynamicPath(context, directory + "/foo{count}/file_{count}.log");
             assertThat(path.getLatestPath()).isEqualTo(youngestFile);
         }
 
@@ -101,7 +98,7 @@ class DynamicPathTest {
         void findNonExistentPathWithPlaceholders() throws Exception {
             Files.createDirectories(directory.resolve("foo42"));
 
-            DynamicPath path = new DynamicPath(framework, directory + "/foo{count}/file_{count}.log");
+            DynamicPath path = new DynamicPath(context, directory + "/foo{count}/file_{count}.log");
             assertThat(path.getLatestPath()).isNull();
         }
 
@@ -113,16 +110,17 @@ class DynamicPathTest {
     @Nested
     class GeneratingNewPath {
 
+        @Inject
+        private TestClock clock;
+
         /**
          * Verifies that a file path with dynamic placeholders can be generated.
          */
         @Test
         void generateDynamicPath() throws Exception {
-            Clock clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
-            Framework epochFramework = spy(framework);
-            when(epochFramework.getClock()).thenReturn(clock);
+            clock.setInstant(Instant.EPOCH);
 
-            DynamicPath path = new DynamicPath(epochFramework, directory + "/{date: yyyy-MM-dd}.log");
+            DynamicPath path = new DynamicPath(context, directory + "/{date: yyyy-MM-dd}.log");
             assertThat(path.generateNewPath()).isEqualTo(directory.resolve("1970-01-01.log"));
         }
 
@@ -132,7 +130,7 @@ class DynamicPathTest {
         @Test
         void createDirectories() throws Exception {
             Path file = directory.resolve("sub").resolve("folder").resolve("foo.log");
-            DynamicPath path = new DynamicPath(framework, file.toString());
+            DynamicPath path = new DynamicPath(context, file.toString());
             assertThat(path.generateNewPath())
                 .isEqualTo(file)
                 .doesNotExist()

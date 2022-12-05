@@ -7,8 +7,8 @@ import java.util.Map;
 import javax.naming.NamingException;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
 import org.tinylog.impl.writers.Writer;
@@ -36,8 +36,8 @@ public class JdbcWriterBuilder implements WriterBuilder {
     }
 
     @Override
-    public Writer create(Framework framework, Configuration configuration) throws SQLException, NamingException {
-        FormatPatternParser parser = new FormatPatternParser(framework);
+    public Writer create(LoggingContext context, Configuration configuration) throws SQLException, NamingException {
+        FormatPatternParser parser = new FormatPatternParser(context);
 
         String url = configuration.getValue(URL_KEY);
         if (url == null) {

@@ -3,9 +3,9 @@ package org.tinylog.impl.backend;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.WritingThread;
 import org.tinylog.impl.writers.AsyncWriter;
 import org.tinylog.impl.writers.Writer;
@@ -27,10 +27,10 @@ public class NativeLoggingBackendBuilder implements LoggingBackendBuilder {
     }
 
     @Override
-    public LoggingBackend create(Framework framework) {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+    public LoggingBackend create(LoggingContext context) {
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
         WritingThread writingThread = createWritingThread(configuration.getAllWriters());
-        return new NativeLoggingBackend(framework, configuration, writingThread);
+        return new NativeLoggingBackend(context, configuration, writingThread);
     }
 
     /**

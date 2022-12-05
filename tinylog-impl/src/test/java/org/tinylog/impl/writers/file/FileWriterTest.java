@@ -14,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FileWriterTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @TempDir
     private Path folder;
@@ -44,7 +44,7 @@ class FileWriterTest {
     @Test
     void requiredLogEntryValues() throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), path, UTF_8)) {
             assertThat(writer.getRequiredLogEntryValues())
@@ -61,7 +61,7 @@ class FileWriterTest {
     @ArgumentsSource(CharsetsProvider.class)
     void writeMultipleMessages(Charset charset) throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), path, charset)) {
             LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
@@ -83,7 +83,7 @@ class FileWriterTest {
     @ArgumentsSource(CharsetsProvider.class)
     void continueExistingFile(Charset charset) throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), path, charset)) {
             LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
@@ -107,7 +107,7 @@ class FileWriterTest {
     @ArgumentsSource(CharsetsProvider.class)
     void overwriteExistingFile(Charset charset) throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new StartupPolicy(), path, charset)) {
             LogEntry entry = new LogEntryBuilder().message("Hello World!").create();
@@ -132,7 +132,7 @@ class FileWriterTest {
     void rollingExistingFile(Charset charset) throws Exception {
         int size = "ab".getBytes(charset).length;
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new SizePolicy(size), path, charset)) {
             LogEntry entry = new LogEntryBuilder().message("a").create();
@@ -153,7 +153,7 @@ class FileWriterTest {
     @Test
     void flushing() throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), path, UTF_8)) {
             writer.log(new LogEntryBuilder().message("1").create());
@@ -172,7 +172,7 @@ class FileWriterTest {
     @Test
     void writeUnsupportedCharacter() throws Exception {
         Path file = folder.resolve("tinylog.log");
-        DynamicPath path = new DynamicPath(framework, file.toString());
+        DynamicPath path = new DynamicPath(context, file.toString());
 
         try (FileWriter writer = new FileWriter(new MessagePlaceholder(), new EndlessPolicy(), path, US_ASCII)) {
             LogEntry entry = new LogEntryBuilder().message("<ä>").create();

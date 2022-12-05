@@ -4,8 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.format.OutputFormatBuilder;
 import org.tinylog.impl.format.pattern.FormatPatternParser;
@@ -26,8 +26,8 @@ public class NewlineDelimitedJsonBuilder implements OutputFormatBuilder {
     }
 
     @Override
-    public OutputFormat create(Framework framework, Configuration configuration) {
-        FormatPatternParser parser = new FormatPatternParser(framework);
+    public OutputFormat create(LoggingContext context, Configuration configuration) {
+        FormatPatternParser parser = new FormatPatternParser(context);
         Configuration subConfiguration = configuration.getSubConfiguration("fields");
         Map<String, Placeholder> fields = new LinkedHashMap<>();
 

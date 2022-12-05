@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.entry;
 class FileWriterBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -75,7 +75,7 @@ class FileWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("file", file.toString());
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             LogEntry logEntry = new LogEntryBuilder()
                 .timestamp(Instant.EPOCH)
                 .thread(new Thread(() -> { }, "main"))
@@ -104,7 +104,7 @@ class FileWriterBuilderTest {
         );
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
             writer.log(logEntry);
         }
@@ -122,7 +122,7 @@ class FileWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("file", file.toString(), "format", "foo");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             assertThat(log.consume()).singleElement().satisfies(entry -> {
                 assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
                 assertThat(entry.getMessage()).contains("format", "foo");
@@ -152,7 +152,7 @@ class FileWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "file", file.toString());
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("Hello World!").create());
         }
 
@@ -165,7 +165,7 @@ class FileWriterBuilderTest {
     @Test
     void missingFileName() {
         Configuration configuration = new Configuration(emptyMap());
-        Throwable throwable = catchThrowable(() -> new FileWriterBuilder().create(framework, configuration).close());
+        Throwable throwable = catchThrowable(() -> new FileWriterBuilder().create(context, configuration).close());
 
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).containsIgnoringCase("file");
@@ -186,7 +186,7 @@ class FileWriterBuilderTest {
         );
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
         }
 
@@ -210,7 +210,7 @@ class FileWriterBuilderTest {
         );
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("abc - äöüß - áéíóúüñ - 한글").create());
         }
 
@@ -232,7 +232,7 @@ class FileWriterBuilderTest {
         );
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("Hello World!").create());
         }
 
@@ -258,7 +258,7 @@ class FileWriterBuilderTest {
 
         Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
         }
 
@@ -280,7 +280,7 @@ class FileWriterBuilderTest {
 
         Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
         }
 
@@ -303,7 +303,7 @@ class FileWriterBuilderTest {
 
         Files.write(file, singleton("a"), StandardCharsets.US_ASCII);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("b").create());
             writer.log(new LogEntryBuilder().message("c").create());
             writer.log(new LogEntryBuilder().message("d").create());
@@ -327,7 +327,7 @@ class FileWriterBuilderTest {
 
         Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
         }
 
@@ -353,7 +353,7 @@ class FileWriterBuilderTest {
 
         Files.write(file, singleton("foo"), StandardCharsets.US_ASCII);
 
-        try (Writer writer = new FileWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new FileWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().message("bar").create());
         }
 

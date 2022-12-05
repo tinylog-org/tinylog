@@ -1,7 +1,7 @@
 package org.tinylog.impl.format;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of an {@link OutputFormat}.
@@ -29,10 +29,10 @@ public interface OutputFormatBuilder {
     /**
      * Creates a new instance of the output format.
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param configuration The configuration properties of the writer for which the output format has to be created
      * @return New output format instance
      */
-    OutputFormat create(Framework framework, Configuration configuration);
+    OutputFormat create(LoggingContext context, Configuration configuration);
 
 }

@@ -9,16 +9,13 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries
 class DateFormatTest {
-
-    @Inject
-    private Framework framework;
 
     /**
      * Tests for supported value types.
@@ -52,6 +49,9 @@ class DateFormatTest {
     @Nested
     class Formatting {
 
+        @Inject
+        private LoggingContext context;
+
         /**
          * Verifies that a {@link Date} can be formatted in the US style.
          */
@@ -61,7 +61,7 @@ class DateFormatTest {
             ZonedDateTime zonedDateTime = LocalDateTime.parse("2020-12-31T11:55").atZone(ZoneOffset.UTC);
             Date date = Date.from(zonedDateTime.toInstant());
 
-            String output = new DateFormat().format(framework, "MMMM d, yyyy, HH:mm", date);
+            String output = new DateFormat().format(context, "MMMM d, yyyy, HH:mm", date);
             assertThat(output).isEqualTo("December 31, 2020, 11:55");
         }
 
@@ -74,7 +74,7 @@ class DateFormatTest {
             ZonedDateTime zonedDateTime = LocalDateTime.parse("2020-12-31T11:55").atZone(ZoneOffset.UTC);
             Date date = Date.from(zonedDateTime.toInstant());
 
-            String output = new DateFormat().format(framework, "dd. MMMM yyyy, HH:mm", date);
+            String output = new DateFormat().format(context, "dd. MMMM yyyy, HH:mm", date);
             assertThat(output).isEqualTo("31. Dezember 2020, 11:55");
         }
 
@@ -87,7 +87,7 @@ class DateFormatTest {
     class TimeZones {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that dates are correctly output for the time zone {@code GMT-1}.
@@ -97,7 +97,7 @@ class DateFormatTest {
         void gmtMinus1() {
             LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 0, 0);
             Date date = Date.from(localDateTime.atZone(ZoneOffset.UTC).toInstant());
-            String output = new DateFormat().format(framework, "yyyy-MM-dd HH:mm", date);
+            String output = new DateFormat().format(context, "yyyy-MM-dd HH:mm", date);
             assertThat(output).isEqualTo("2019-12-31 23:00");
         }
 
@@ -109,7 +109,7 @@ class DateFormatTest {
         void gmt() {
             LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 0, 0);
             Date date = Date.from(localDateTime.atZone(ZoneOffset.UTC).toInstant());
-            String output = new DateFormat().format(framework, "yyyy-MM-dd HH:mm", date);
+            String output = new DateFormat().format(context, "yyyy-MM-dd HH:mm", date);
             assertThat(output).isEqualTo("2020-01-01 00:00");
         }
 
@@ -121,7 +121,7 @@ class DateFormatTest {
         void gmtPlus1() {
             LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 0, 0);
             Date date = Date.from(localDateTime.atZone(ZoneOffset.UTC).toInstant());
-            String output = new DateFormat().format(framework, "yyyy-MM-dd HH:mm", date);
+            String output = new DateFormat().format(context, "yyyy-MM-dd HH:mm", date);
             assertThat(output).isEqualTo("2020-01-01 01:00");
         }
 

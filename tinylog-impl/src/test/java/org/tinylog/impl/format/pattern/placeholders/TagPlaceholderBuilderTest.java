@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.FormatOutputRenderer;
@@ -20,14 +20,14 @@ class TagPlaceholderBuilderTest {
     private static final LogEntry filledLogEntry = new LogEntryBuilder().tag("foo").create();
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that tag placeholders without any custom default value are instantiated correctly.
      */
     @Test
     void creationWithoutDefaultValue() {
-        Placeholder placeholder = new TagPlaceholderBuilder().create(framework, null);
+        Placeholder placeholder = new TagPlaceholderBuilder().create(context, null);
         assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
         assertThat(placeholder.getValue(emptyLogEntry)).isNull();
         assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("foo");
@@ -42,7 +42,7 @@ class TagPlaceholderBuilderTest {
      */
     @Test
     void creationWithDefaultValue() {
-        Placeholder placeholder = new TagPlaceholderBuilder().create(framework, "none");
+        Placeholder placeholder = new TagPlaceholderBuilder().create(context, "none");
         assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
         assertThat(placeholder.getValue(emptyLogEntry)).isEqualTo("none");
         assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("foo");

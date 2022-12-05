@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TimestampPlaceholderBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -38,7 +38,7 @@ class TimestampPlaceholderBuilderTest {
     @NullSource
     @ValueSource(strings = {"", "seconds"})
     void creationWithSeconds(String configurationValue) {
-        Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
+        Placeholder placeholder = new TimestampPlaceholderBuilder().create(context, configurationValue);
         assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -55,7 +55,7 @@ class TimestampPlaceholderBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = "milliseconds")
     void creationWithMilliseconds(String configurationValue) {
-        Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
+        Placeholder placeholder = new TimestampPlaceholderBuilder().create(context, configurationValue);
         assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -72,7 +72,7 @@ class TimestampPlaceholderBuilderTest {
     @ParameterizedTest
     @ValueSource(strings = {"foo", "minutes", "hours"})
     void creationWithUnsupportedTimeUnit(String configurationValue) {
-        Placeholder placeholder = new TimestampPlaceholderBuilder().create(framework, configurationValue);
+        Placeholder placeholder = new TimestampPlaceholderBuilder().create(context, configurationValue);
         assertThat(placeholder).isInstanceOf(TimestampPlaceholder.class);
         assertThat(log.consume()).singleElement().satisfies(entry -> {
             assertThat(entry.getLevel()).isEqualTo(Level.WARN);

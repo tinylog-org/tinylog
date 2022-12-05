@@ -2,12 +2,19 @@ package org.tinylog.core.backend;
 
 import java.util.ServiceLoader;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@CaptureLogEntries
 class InternalLoggingBackendBuilderTest {
+
+    @Inject
+    private LoggingContext context;
 
     /**
      * Verifies that the name is "internal".
@@ -23,9 +30,8 @@ class InternalLoggingBackendBuilderTest {
      */
     @Test
     void creation() {
-        Framework framework = new Framework(false, false);
         InternalLoggingBackendBuilder builder = new InternalLoggingBackendBuilder();
-        assertThat(builder.create(framework)).isInstanceOf(InternalLoggingBackend.class);
+        assertThat(builder.create(context)).isInstanceOf(InternalLoggingBackend.class);
     }
 
     /**

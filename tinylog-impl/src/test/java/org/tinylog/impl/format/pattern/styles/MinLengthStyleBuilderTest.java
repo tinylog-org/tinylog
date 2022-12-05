@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
@@ -23,14 +23,14 @@ class MinLengthStyleBuilderTest {
     private final Placeholder fooPlaceholder = new StaticTextPlaceholder("foo");
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that a min length style can be created with minimum length passed as configuration value.
      */
     @Test
     void creationWithMinLengthOnly() {
-        Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5");
+        Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(context, fooPlaceholder, "5");
         FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(renderer.render(logEntry)).isEqualTo("foo  ");
@@ -41,7 +41,7 @@ class MinLengthStyleBuilderTest {
      */
     @Test
     void creationWithMinLengthAndPosition() {
-        Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5,center");
+        Placeholder stylePlaceholder = new MinLengthStyleBuilder().create(context, fooPlaceholder, "5,center");
         FormatOutputRenderer renderer = new FormatOutputRenderer(stylePlaceholder);
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(renderer.render(logEntry)).isEqualTo(" foo ");
@@ -52,7 +52,7 @@ class MinLengthStyleBuilderTest {
      */
     @Test
     void creationWithMissingMinLength() {
-        Throwable throwable = catchThrowable(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, null));
+        Throwable throwable = catchThrowable(() -> new MinLengthStyleBuilder().create(context, fooPlaceholder, null));
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).containsIgnoringCase("minimum length");
     }
@@ -62,7 +62,7 @@ class MinLengthStyleBuilderTest {
      */
     @Test
     void creationWithInvalidMinLength() {
-        assertThatCode(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, "boo"))
+        assertThatCode(() -> new MinLengthStyleBuilder().create(context, fooPlaceholder, "boo"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("boo");
     }
@@ -72,7 +72,7 @@ class MinLengthStyleBuilderTest {
      */
     @Test
     void creationWithInvalidPosition() {
-        assertThatCode(() -> new MinLengthStyleBuilder().create(framework, fooPlaceholder, "5,boo"))
+        assertThatCode(() -> new MinLengthStyleBuilder().create(context, fooPlaceholder, "5,boo"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("boo");
     }

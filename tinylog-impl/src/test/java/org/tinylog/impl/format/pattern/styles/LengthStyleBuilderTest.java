@@ -5,7 +5,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.pattern.placeholders.ClassPlaceholder;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class LengthStyleBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that a length style can be created for a placeholder with plain text output.
@@ -32,7 +32,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationForPText() {
         Placeholder placeholder = new MessageOnlyPlaceholder();
-        Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "10");
+        Placeholder styled = new LengthStyleBuilder().create(context, placeholder, "10");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().message("Hello World!").create();
@@ -49,7 +49,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationForClass() {
         Placeholder placeholder = new ClassPlaceholder();
-        Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "12");
+        Placeholder styled = new LengthStyleBuilder().create(context, placeholder, "12");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
@@ -63,7 +63,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationForPackage() {
         Placeholder placeholder = new PackagePlaceholder();
-        Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "4");
+        Placeholder styled = new LengthStyleBuilder().create(context, placeholder, "4");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().className("org.foo.MyClass").create();
@@ -76,7 +76,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationWithCustomPosition() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        Placeholder styled = new LengthStyleBuilder().create(framework, placeholder, "5,right");
+        Placeholder styled = new LengthStyleBuilder().create(context, placeholder, "5,right");
         FormatOutputRenderer renderer = new FormatOutputRenderer(styled);
 
         LogEntry logEntry = new LogEntryBuilder().create();
@@ -89,7 +89,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationWithMissingLength() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        Throwable throwable = catchThrowable(() -> new LengthStyleBuilder().create(framework, placeholder, null));
+        Throwable throwable = catchThrowable(() -> new LengthStyleBuilder().create(context, placeholder, null));
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
         assertThat(throwable.getMessage()).containsIgnoringCase("length");
     }
@@ -100,7 +100,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationWithInvalidLength() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        assertThatCode(() -> new LengthStyleBuilder().create(framework, placeholder, "boo"))
+        assertThatCode(() -> new LengthStyleBuilder().create(context, placeholder, "boo"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("boo");
     }
@@ -111,7 +111,7 @@ class LengthStyleBuilderTest {
     @Test
     void creationWithInvalidPosition() {
         Placeholder placeholder = new StaticTextPlaceholder("foo");
-        assertThatCode(() -> new LengthStyleBuilder().create(framework, placeholder, "5,boo"))
+        assertThatCode(() -> new LengthStyleBuilder().create(context, placeholder, "5,boo"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("boo");
     }

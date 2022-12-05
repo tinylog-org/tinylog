@@ -10,7 +10,7 @@ import java.time.temporal.TemporalQueries;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.WeekFields;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link WeeklyPolicy}.
@@ -27,10 +27,10 @@ public class WeeklyPolicyBuilder extends AbstractDatePolicyBuilder {
     }
 
     @Override
-    public Policy create(Framework framework, String value) {
-        Clock clock = framework.getClock();
-        ZoneId zone = framework.getConfiguration().getZone();
-        WeekFields weekFields = WeekFields.of(framework.getConfiguration().getLocale());
+    public Policy create(LoggingContext context, String value) {
+        Clock clock = context.getFramework().getClock();
+        ZoneId zone = context.getConfiguration().getZone();
+        WeekFields weekFields = WeekFields.of(context.getConfiguration().getLocale());
 
         TemporalAccessor accessor;
         try {

@@ -22,6 +22,7 @@ import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeFlavor;
 import org.tinylog.core.test.service.RegisterService;
@@ -88,9 +89,9 @@ class FrameworkTest {
             TestOneConfigurationLoader.data = singletonMap("foo", "bar");
 
             Framework framework = new Framework(false, false);
-            Configuration configuration = framework.getConfiguration();
+            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
 
-            assertThat(configuration.getAllValues()).isEmpty();
+            assertThat(configuration.get("foo")).isNull();
         }
 
         /**
@@ -106,10 +107,10 @@ class FrameworkTest {
             TestTwoConfigurationLoader.data = singletonMap("second", "yes");
 
             Framework framework = new Framework(true, false);
-            Configuration configuration = framework.getConfiguration();
+            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
 
-            assertThat(configuration.getValue("first")).isNull();
-            assertThat(configuration.getValue("second")).isEqualTo("yes");
+            assertThat(configuration.get("first")).isNull();
+            assertThat(configuration.get("second")).isEqualTo("yes");
         }
 
         /**
@@ -125,10 +126,10 @@ class FrameworkTest {
             TestTwoConfigurationLoader.data = null;
 
             Framework framework = new Framework(true, false);
-            Configuration configuration = framework.getConfiguration();
+            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
 
-            assertThat(configuration.getValue("first")).isEqualTo("yes");
-            assertThat(configuration.getValue("second")).isNull();
+            assertThat(configuration.get("first")).isEqualTo("yes");
+            assertThat(configuration.get("second")).isNull();
         }
 
         /**
@@ -626,7 +627,7 @@ class FrameworkTest {
      */
     public static final class TestOneLoggingBackendBuilder implements LoggingBackendBuilder {
 
-        private static final LoggingBackend backend = new InternalLoggingBackend(null);
+        private static final LoggingBackend backend = new InternalLoggingBackend(mock(LoggingContext.class));
 
         @Override
         public String getName() {
@@ -634,7 +635,7 @@ class FrameworkTest {
         }
 
         @Override
-        public LoggingBackend create(Framework framework) {
+        public LoggingBackend create(LoggingContext context) {
             return backend;
         }
 
@@ -645,7 +646,7 @@ class FrameworkTest {
      */
     public static final class TestTwoLoggingBackendBuilder implements LoggingBackendBuilder {
 
-        private static final LoggingBackend backend = new InternalLoggingBackend(null);
+        private static final LoggingBackend backend = new InternalLoggingBackend(mock(LoggingContext.class));
 
         @Override
         public String getName() {
@@ -653,7 +654,7 @@ class FrameworkTest {
         }
 
         @Override
-        public LoggingBackend create(Framework framework) {
+        public LoggingBackend create(LoggingContext context) {
             return backend;
         }
 

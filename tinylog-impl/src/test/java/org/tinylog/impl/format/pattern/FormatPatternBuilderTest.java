@@ -7,8 +7,8 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.format.OutputFormat;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FormatPatternBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that the default format pattern will be used, if no custom format pattern is configured.
@@ -32,7 +32,7 @@ class FormatPatternBuilderTest {
     @Test
     void defaultPattern() {
         Configuration configuration = new Configuration(emptyMap());
-        OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
+        OutputFormat format = new FormatPatternBuilder().create(context, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
         LogEntry logEntry = new LogEntryBuilder()
@@ -54,7 +54,7 @@ class FormatPatternBuilderTest {
     @Test
     void customPattern() {
         Configuration configuration = new Configuration(singletonMap("pattern", "{level}: {message}"));
-        OutputFormat format = new FormatPatternBuilder().create(framework, configuration);
+        OutputFormat format = new FormatPatternBuilder().create(context, configuration);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
         LogEntry logEntry = new LogEntryBuilder()

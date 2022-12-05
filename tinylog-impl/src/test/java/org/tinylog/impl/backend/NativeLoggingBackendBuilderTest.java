@@ -66,8 +66,8 @@ class NativeLoggingBackendBuilderTest {
         logFile.toFile().deleteOnExit();
 
         try {
-            Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false)
+            Framework context = new Framework(false, false);
+            context.getConfigurationBuilder(false)
                 .set("level", "INFO")
                 .set("writer.type", "file")
                 .set("writer.file", logFile.toAbsolutePath().toString())
@@ -75,15 +75,15 @@ class NativeLoggingBackendBuilderTest {
                 .activate();
 
             try {
-                framework.startUp();
+                context.startUp();
 
-                LoggingBackend backend = framework.getLoggingBackend();
+                LoggingBackend backend = context.getLoggingBackend();
                 assertThat(backend).isInstanceOf(NativeLoggingBackend.class);
 
                 backend.log(null, null, Level.DEBUG, null, "Hello World!", null, null);
                 backend.log(null, null, Level.INFO, null, "Hello World!", null, null);
             } finally {
-                framework.shutDown();
+                context.shutDown();
             }
 
             assertThat(logFile).hasContent("INFO:Hello World!" + System.lineSeparator());

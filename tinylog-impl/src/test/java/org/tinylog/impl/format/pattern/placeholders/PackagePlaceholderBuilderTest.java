@@ -5,8 +5,8 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PackagePlaceholderBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -28,7 +28,7 @@ class PackagePlaceholderBuilderTest {
     @Test
     void creationWithoutConfigurationValue() {
         PackagePlaceholderBuilder builder = new PackagePlaceholderBuilder();
-        assertThat(builder.create(framework, null)).isInstanceOf(PackagePlaceholder.class);
+        assertThat(builder.create(context, null)).isInstanceOf(PackagePlaceholder.class);
         assertThat(log.consume()).isEmpty();
     }
 
@@ -39,7 +39,7 @@ class PackagePlaceholderBuilderTest {
     @Test
     void creationWithConfigurationValue() {
         PackagePlaceholderBuilder builder = new PackagePlaceholderBuilder();
-        assertThat(builder.create(framework, "foo")).isInstanceOf(PackagePlaceholder.class);
+        assertThat(builder.create(context, "foo")).isInstanceOf(PackagePlaceholder.class);
         assertThat(log.consume()).singleElement().satisfies(entry -> {
             assertThat(entry.getLevel()).isEqualTo(Level.WARN);
             assertThat(entry.getMessage()).contains("foo");

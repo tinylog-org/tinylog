@@ -2,7 +2,7 @@ package org.tinylog.impl.policies;
 
 import java.util.Locale;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link SizePolicy}.
@@ -23,7 +23,7 @@ public class SizePolicyBuilder implements PolicyBuilder {
     }
 
     @Override
-    public Policy create(Framework framework, String value) {
+    public Policy create(LoggingContext context, String value) {
         if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("No maximum file size defined for size policy");
         }

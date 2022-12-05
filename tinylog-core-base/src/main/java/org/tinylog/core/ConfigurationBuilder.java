@@ -18,7 +18,7 @@ public class ConfigurationBuilder {
     private final Map<String, String> properties;
 
     /**
-     * @param framework The actual framework
+     * @param framework The underlying framework instance
      * @param properties The initial configuration
      */
     ConfigurationBuilder(Framework framework, Map<String, String> properties) {

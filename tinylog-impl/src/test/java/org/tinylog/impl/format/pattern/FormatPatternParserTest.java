@@ -11,8 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.core.test.service.RegisterService;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FormatPatternParserTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -210,7 +210,7 @@ class FormatPatternParserTest {
      * @return The formatted log entry
      */
     private String format(String pattern, LogEntry logEntry) {
-        Placeholder placeholder = new FormatPatternParser(framework).parse(pattern);
+        Placeholder placeholder = new FormatPatternParser(context).parse(pattern);
         return new FormatOutputRenderer(placeholder).render(logEntry);
     }
 
@@ -246,12 +246,12 @@ class FormatPatternParserTest {
         }
 
         @Override
-        public Placeholder create(Framework framework, String value) {
+        public Placeholder create(LoggingContext context, String value) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Placeholder create(Framework framework, Placeholder placeholder, String value) {
+        public Placeholder create(LoggingContext context, Placeholder placeholder, String value) {
             throw new UnsupportedOperationException();
         }
 

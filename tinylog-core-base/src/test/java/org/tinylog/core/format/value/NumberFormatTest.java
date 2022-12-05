@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +22,7 @@ class NumberFormatTest {
     class ValueTypes {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that bytes can be formatted.
@@ -32,7 +32,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             byte value = 1;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("1.00");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("1.00");
         }
 
         /**
@@ -43,7 +43,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             short value = 1000;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("1,000.00");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("1,000.00");
         }
 
         /**
@@ -54,7 +54,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             int value = 1_000_000;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("1,000,000.00");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("1,000,000.00");
         }
 
         /**
@@ -65,7 +65,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             long value = 1_000_000_000L;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("1,000,000,000.00");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("1,000,000,000.00");
         }
 
         /**
@@ -76,7 +76,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             BigInteger value = BigInteger.valueOf(1_000_000_000_000L);
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("1,000,000,000,000.00");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("1,000,000,000,000.00");
         }
 
         /**
@@ -87,7 +87,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             float value = 3.14f;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("3.14");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("3.14");
         }
 
         /**
@@ -98,7 +98,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             double value = Math.PI * 1_000;
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("3,141.59");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("3,141.59");
         }
 
         /**
@@ -109,7 +109,7 @@ class NumberFormatTest {
             NumberFormat format = new NumberFormat();
             BigDecimal value = BigDecimal.valueOf(Math.PI * 1_000_000);
             assertThat(format.isSupported(value)).isTrue();
-            assertThat(format.format(framework, "#,###.00", value)).isEqualTo("3,141,592.65");
+            assertThat(format.format(context, "#,###.00", value)).isEqualTo("3,141,592.65");
         }
 
         /**
@@ -130,7 +130,7 @@ class NumberFormatTest {
     class Languages {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that a number can be formatted in the British style.
@@ -139,7 +139,7 @@ class NumberFormatTest {
         @Test
         void britishFormat() {
             NumberFormat format = new NumberFormat();
-            assertThat(format.format(framework, "#,###.00", 1000)).isEqualTo("1,000.00");
+            assertThat(format.format(context, "#,###.00", 1000)).isEqualTo("1,000.00");
         }
 
         /**
@@ -149,7 +149,7 @@ class NumberFormatTest {
         @Test
         void germanFormat() {
             NumberFormat format = new NumberFormat();
-            assertThat(format.format(framework, "#,###.00", 1000)).isEqualTo("1.000,00");
+            assertThat(format.format(context, "#,###.00", 1000)).isEqualTo("1.000,00");
         }
 
     }

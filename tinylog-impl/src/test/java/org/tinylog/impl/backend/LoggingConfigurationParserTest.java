@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.runtime.AndroidRuntime;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.writers.console.ConsoleWriter;
@@ -18,13 +19,16 @@ class LoggingConfigurationParserTest {
     @Inject
     private Framework framework;
 
+    @Inject
+    private LoggingContext context;
+
     /**
      * Verifies that all severity levels are enabled and the default writer is created for an empty configuration.
      */
     @CaptureLogEntries(configuration = {})
     @Test
     void emptyConfiguration() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -47,7 +51,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = "writer.type=console")
     @Test
     void writerWithoutAnySeverityLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -78,7 +82,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"level=INFO", "writer.type=console"})
     @Test
     void writerWithGlobalSeverityLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -109,7 +113,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"level=INFO", "level@bar=WARN", "level@bar.Foo=DEBUG", "writer.type=console"})
     @Test
     void writerWithPackageAndClassSeverityLevels() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(3)
@@ -150,7 +154,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG"})
     @Test
     void writerWithCustomSeverityLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -181,7 +185,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"level=WARN", "level@bar=DEBUG", "writer.type=console", "writer.level=INFO"})
     @Test
     void writerWithCustomAndPackageSeverityLevels() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(2)
@@ -218,7 +222,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"level=TRACE", "writer.type=console", "writer.level=DEBUG"})
     @Test
     void writerWithMoreSevereLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -250,7 +254,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"level=INFO", "writer.type=console", "writer.level=DEBUG"})
     @Test
     void writerWithLessSevereLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -281,7 +285,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"writer.type=console", "writer.level=OFF"})
     @Test
     void writerWithDisabledSeverityLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -300,7 +304,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG@foo"})
     @Test
     void writerWithTaggedSeverityLevel() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -331,7 +335,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"writer.type=console", "writer.level=DEBUG,WARN@foo"})
     @Test
     void writerWithMixedSeverityLevels() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -364,7 +368,7 @@ class LoggingConfigurationParserTest {
     })
     @Test
     void multipleWriters() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)
@@ -398,7 +402,7 @@ class LoggingConfigurationParserTest {
     @CaptureLogEntries(configuration = {"writer1.file=dummy.log", "writer1.type=console"}, level = Level.OFF)
     @Test
     void incompleteWriter() {
-        LoggingConfiguration configuration = new LoggingConfigurationParser(framework).parse();
+        LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
 
         assertThat(configuration.getSeverityLevels())
             .hasSize(1)

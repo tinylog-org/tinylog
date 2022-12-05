@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.writers.Writer;
 
 /**
@@ -23,13 +24,13 @@ class LoggingConfigurationParser {
 
     private static final String WRITER_PREFIX = "writer";
 
-    private final Framework framework;
+    private final LoggingContext context;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      */
-    LoggingConfigurationParser(Framework framework) {
-        this.framework = framework;
+    LoggingConfigurationParser(LoggingContext context) {
+        this.context = context;
     }
 
     /**
@@ -69,7 +70,7 @@ class LoggingConfigurationParser {
     private Map<String, LevelConfiguration> getLevelConfigurations(Set<String> tags) {
         Map<String, LevelConfiguration> levels = new HashMap<>();
 
-        Configuration configuration = framework.getConfiguration();
+        Configuration configuration = context.getConfiguration();
         List<String> globalLevels = configuration.getList(LevelConfiguration.KEY);
         LevelConfiguration globalLevelConfiguration = new LevelConfiguration(globalLevels, true);
         tags.addAll(globalLevelConfiguration.getTags());
@@ -99,12 +100,12 @@ class LoggingConfigurationParser {
      */
     private Collection<WriterConfiguration> getWriterConfigurations(Set<String> tags) {
         List<WriterConfiguration> writerConfigurations = new ArrayList<>();
-        Configuration configuration = framework.getConfiguration();
+        Configuration configuration = context.getConfiguration();
 
         for (String key : configuration.getRootKeys()) {
             if (key.startsWith(WRITER_PREFIX)) {
                 Configuration subConfiguration = configuration.getSubConfiguration(key);
-                WriterConfiguration writerConfiguration = new WriterConfiguration(framework, subConfiguration);
+                WriterConfiguration writerConfiguration = new WriterConfiguration(context, subConfiguration);
                 writerConfigurations.add(writerConfiguration);
                 tags.addAll(writerConfiguration.getLevelConfiguration().getTags());
             }
@@ -113,9 +114,9 @@ class LoggingConfigurationParser {
         if (writerConfigurations.isEmpty()) {
             Configuration subConfiguration = new Configuration(Collections.singletonMap(
                 WriterConfiguration.TYPE_KEY,
-                framework.getRuntime().getDefaultWriter()
+                context.getFramework().getRuntime().getDefaultWriter()
             ));
-            writerConfigurations.add(new WriterConfiguration(framework, subConfiguration));
+            writerConfigurations.add(new WriterConfiguration(context, subConfiguration));
         }
 
         return writerConfigurations;

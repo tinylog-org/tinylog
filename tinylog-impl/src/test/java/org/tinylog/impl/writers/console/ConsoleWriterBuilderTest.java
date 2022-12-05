@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -37,6 +38,9 @@ class ConsoleWriterBuilderTest {
 
     @Inject
     private Framework framework;
+
+    @Inject
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -79,7 +83,7 @@ class ConsoleWriterBuilderTest {
     void defaultPattern() throws Exception {
         Configuration configuration = new Configuration(emptyMap());
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             LogEntry logEntry = new LogEntryBuilder()
                 .timestamp(Instant.EPOCH)
                 .thread(new Thread(() -> { }, "main"))
@@ -104,7 +108,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("format", "ndjson", "fields.msg", "message");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
             writer.log(logEntry);
             verify(mockedOutputStream).print("{\"msg\": \"Hello World!\"}" + System.lineSeparator());
@@ -121,7 +125,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("format", "foo");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             assertThat(log.consume()).singleElement().satisfies(entry -> {
                 assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
                 assertThat(entry.getMessage()).contains("format", "foo");
@@ -151,7 +155,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "off");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create());
             verify(mockedOutputStream).print("Hello World!" + System.lineSeparator());
         }
@@ -165,7 +169,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("pattern", "{message}");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
@@ -182,7 +186,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "error");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.WARN).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 
@@ -200,7 +204,7 @@ class ConsoleWriterBuilderTest {
         Map<String, String> properties = ImmutableMap.of("pattern", "{message}", "threshold", "foo");
         Configuration configuration = new Configuration(properties);
 
-        try (Writer writer = new ConsoleWriterBuilder().create(framework, configuration)) {
+        try (Writer writer = new ConsoleWriterBuilder().create(context, configuration)) {
             writer.log(new LogEntryBuilder().severityLevel(Level.INFO).message("Hello system out!").create());
             verify(mockedOutputStream).print("Hello system out!" + System.lineSeparator());
 

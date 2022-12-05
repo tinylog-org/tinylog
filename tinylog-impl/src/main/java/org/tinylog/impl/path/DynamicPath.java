@@ -7,7 +7,7 @@ import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.path.segments.PathSegment;
 
 /**
@@ -20,13 +20,13 @@ public class DynamicPath {
     private final PathSegment[] pathSegments;
 
     /**
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param path The file path with placeholders
      */
-    public DynamicPath(Framework framework, String path) {
-        this.clock = framework.getClock();
-        this.zone = framework.getConfiguration().getZone();
-        this.pathSegments = new PathParser(framework).parse(path).toArray(new PathSegment[0]);
+    public DynamicPath(LoggingContext context, String path) {
+        this.clock = context.getFramework().getClock();
+        this.zone = context.getConfiguration().getZone();
+        this.pathSegments = new PathParser(context).parse(path).toArray(new PathSegment[0]);
     }
 
     /**

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.path.DynamicPath;
@@ -37,7 +37,7 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
     }
 
     @Override
-    public Writer create(Framework framework, Configuration configuration, OutputFormat format) throws Exception {
+    public Writer create(LoggingContext context, Configuration configuration, OutputFormat format) throws Exception {
         String fileName = configuration.getValue(FILE_KEY);
         if (fileName == null) {
             String fullKey = configuration.resolveFullKey(FILE_KEY);
@@ -45,8 +45,8 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
         }
 
         Charset charset = getCharset(configuration);
-        Policy policy = getPolicy(framework, configuration);
-        DynamicPath path = new DynamicPath(framework, fileName);
+        Policy policy = getPolicy(context, configuration);
+        DynamicPath path = new DynamicPath(context, fileName);
 
         return new FileWriter(format, policy, path, charset);
     }
@@ -82,11 +82,11 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
      *     Multiple policies will be bundled into a single policy by using {@link BundlePolicy}.
      * </p>
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param configuration The file writer configuration
      * @return The configured policies or {@link EndlessPolicy} if no policies are configured
      */
-    private Policy getPolicy(Framework framework, Configuration configuration) {
+    private Policy getPolicy(LoggingContext context, Configuration configuration) {
         List<Policy> policies = new ArrayList<>();
 
         for (String policyConfiguration : configuration.getList(POLICIES_KEY)) {
@@ -95,7 +95,7 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
             String value = index >= 0 ? policyConfiguration.substring(index + 1).trim() : null;
 
             PolicyBuilder builder = SafeServiceLoader
-                .asList(framework.getClassLoader(), PolicyBuilder.class, "policy builders")
+                .asList(context.getFramework().getClassLoader(), PolicyBuilder.class, "policy builders")
                 .stream()
                 .filter(policyBuilder -> name.equals(policyBuilder.getName()))
                 .findAny()
@@ -109,7 +109,7 @@ public class FileWriterBuilder extends AbstractFormattableWriterBuilder {
                 );
             } else {
                 try {
-                    policies.add(builder.create(framework, value));
+                    policies.add(builder.create(context, value));
                 } catch (Exception ex) {
                     InternalLogger.error(ex, "Failed to create policy for \"{}\"", name);
                 }

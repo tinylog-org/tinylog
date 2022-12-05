@@ -9,7 +9,7 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter
  * Logger for issuing tagged log entries.
  *
  * @param tag The case-sensitive category tag of this logger
- * @param framework The actual framework instance
+ * @param framework The underlying framework instance
  */
 class TaggedLogger(val tag: String?, framework: Framework) {
     private val runtime = framework.runtime

@@ -19,6 +19,7 @@ import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeBuilder;
@@ -83,15 +84,6 @@ public class Framework {
      */
     public RuntimeFlavor getRuntime() {
         return runtime;
-    }
-
-    /**
-     * Gets the stored configuration.
-     *
-     * @return The stored configuration
-     */
-    public Configuration getConfiguration() {
-        return configuration;
     }
 
     /**
@@ -223,9 +215,10 @@ public class Framework {
     /**
      * Creates a new {@link LoggingBackend}.
      *
+     * @param context The current logging context
      * @return The newly created logging backend instance
      */
-    protected LoggingBackend createLoggingBackend() {
+    protected LoggingBackend createLoggingBackend(LoggingContext context) {
         List<String> names = configuration.getList("backends");
         Map<String, LoggingBackendBuilder> builders = new HashMap<>();
         List<LoggingBackend> backends = new ArrayList<>();
@@ -246,7 +239,7 @@ public class Framework {
                     name
                 );
             } else {
-                SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(this));
+                SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(context));
             }
         }
 
@@ -255,7 +248,7 @@ public class Framework {
                 LoggingBackendBuilder builder = entry.getValue();
                 if (!(builder instanceof NopLoggingBackendBuilder)
                         && !(builder instanceof InternalLoggingBackendBuilder)) {
-                    SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(this));
+                    SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(context));
                 }
             }
         }
@@ -264,7 +257,7 @@ public class Framework {
             InternalLogger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
                 + "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
                 + "entries, or disable logging explicitly by setting \"backends = nop\" in the configuration.");
-            return new InternalLoggingBackend(this);
+            return new InternalLoggingBackend(context);
         } else if (backends.size() == 1) {
             return backends.get(0);
         } else {
@@ -327,8 +320,9 @@ public class Framework {
         startUp();
 
         if (loggingBackend == null) {
-            loggingBackend = createLoggingBackend();
-            InternalLogger.init(this);
+            LoggingContext context = new LoggingContext(this, configuration);
+            loggingBackend = createLoggingBackend(context);
+            InternalLogger.init(context);
             InternalLogger.debug(null, "Active logging backend: {}", loggingBackend.getClass().getName());
         }
     }

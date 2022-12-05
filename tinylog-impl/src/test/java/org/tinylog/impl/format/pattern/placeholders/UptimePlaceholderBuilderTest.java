@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.FormatOutputRenderer;
@@ -19,14 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UptimePlaceholderBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     /**
      * Verifies that the builder can create a valid {@link UptimePlaceholder} with default format pattern.
      */
     @Test
     void creationWithDefaultPattern() {
-        Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, null);
+        Placeholder placeholder = new UptimePlaceholderBuilder().create(context, null);
         assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
         LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();
@@ -41,7 +41,7 @@ class UptimePlaceholderBuilderTest {
      */
     @Test
     void creationWithCustomPattern() {
-        Placeholder placeholder = new UptimePlaceholderBuilder().create(framework, "s.SSS");
+        Placeholder placeholder = new UptimePlaceholderBuilder().create(context, "s.SSS");
         assertThat(placeholder).isInstanceOf(UptimePlaceholder.class);
 
         LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofHours(2).minusSeconds(30)).create();

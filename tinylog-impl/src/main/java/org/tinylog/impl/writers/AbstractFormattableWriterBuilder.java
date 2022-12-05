@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.format.OutputFormatBuilder;
@@ -24,13 +24,13 @@ public abstract class AbstractFormattableWriterBuilder implements WriterBuilder 
     private static final String FORMAT_KEY = "format";
 
     @Override
-    public final Writer create(Framework framework, Configuration configuration) throws Exception {
+    public final Writer create(LoggingContext context, Configuration configuration) throws Exception {
         String name = configuration.getValue(FORMAT_KEY);
         OutputFormatBuilder builder = null;
 
         if (name != null) {
             List<OutputFormatBuilder> builders = SafeServiceLoader.asList(
-                framework.getClassLoader(),
+                context.getFramework().getClassLoader(),
                 OutputFormatBuilder.class,
                 "output format builders"
             );
@@ -54,8 +54,8 @@ public abstract class AbstractFormattableWriterBuilder implements WriterBuilder 
             builder = new FormatPatternBuilder();
         }
 
-        OutputFormat format = builder.create(framework, configuration);
-        return create(framework, configuration, format);
+        OutputFormat format = builder.create(context, configuration);
+        return create(context, configuration, format);
     }
 
     /**
@@ -67,14 +67,14 @@ public abstract class AbstractFormattableWriterBuilder implements WriterBuilder 
      *     databases, or remote servers) should use the {@link AsyncWriter} interface for performance reasons.
      * </p>
      *
-     * @param framework The actual logging framework instance
+     * @param context The current logging context
      * @param configuration The configuration properties for the new writer instance
      * @param format The output format for log entries
      * @return New instance of the writer
      * @throws Exception Failed to create a new writer for the passed configuration
      */
     public abstract Writer create(
-        Framework framework,
+        LoggingContext context,
         Configuration configuration,
         OutputFormat format
     ) throws Exception;

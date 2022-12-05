@@ -3,9 +3,9 @@ package org.tinylog.impl.writers.console;
 import java.util.Locale;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.writers.AbstractFormattableWriterBuilder;
 import org.tinylog.impl.writers.Writer;
@@ -28,7 +28,7 @@ public class ConsoleWriterBuilder extends AbstractFormattableWriterBuilder {
     }
 
     @Override
-    public Writer create(Framework framework, Configuration configuration, OutputFormat format) {
+    public Writer create(LoggingContext context, Configuration configuration, OutputFormat format) {
         String threshold = configuration.getValue(THRESHOLD_KEY);
         Level level = DEFAULT_THRESHOLD;
         if (threshold != null) {

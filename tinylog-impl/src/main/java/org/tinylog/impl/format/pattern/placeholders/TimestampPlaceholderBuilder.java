@@ -2,8 +2,8 @@ package org.tinylog.impl.format.pattern.placeholders;
 
 import java.time.Instant;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Builder for creating an instance of {@link TimestampPlaceholder}.
@@ -20,7 +20,7 @@ public class TimestampPlaceholderBuilder implements PlaceholderBuilder {
     }
 
     @Override
-    public Placeholder create(Framework framework, String value) {
+    public Placeholder create(LoggingContext context, String value) {
         if ("milliseconds".equals(value)) {
             return new TimestampPlaceholder(Instant::toEpochMilli);
         }

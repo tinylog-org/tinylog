@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +26,7 @@ class JavaTimeFormatTest {
     class JavaTimeTypes {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that a {@link LocalTime} can be formatted.
@@ -36,7 +36,7 @@ class JavaTimeFormatTest {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalTime time = LocalTime.of(12, 30);
             assertThat(format.isSupported(time)).isTrue();
-            assertThat(format.format(framework, "HH:mm", time)).isEqualTo("12:30");
+            assertThat(format.format(context, "HH:mm", time)).isEqualTo("12:30");
         }
 
         /**
@@ -47,7 +47,7 @@ class JavaTimeFormatTest {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalDate date = LocalDate.of(2020, 12, 31);
             assertThat(format.isSupported(date)).isTrue();
-            assertThat(format.format(framework, "dd.MM.yyyy", date)).isEqualTo("31.12.2020");
+            assertThat(format.format(context, "dd.MM.yyyy", date)).isEqualTo("31.12.2020");
         }
 
         /**
@@ -58,7 +58,7 @@ class JavaTimeFormatTest {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalDateTime dateTime = LocalDateTime.of(2020, 12, 31, 12, 30);
             assertThat(format.isSupported(dateTime)).isTrue();
-            assertThat(format.format(framework, "dd.MM.yyyy, HH:mm", dateTime)).isEqualTo("31.12.2020, 12:30");
+            assertThat(format.format(context, "dd.MM.yyyy, HH:mm", dateTime)).isEqualTo("31.12.2020, 12:30");
         }
 
         /**
@@ -73,7 +73,7 @@ class JavaTimeFormatTest {
             ZonedDateTime dateTime = ZonedDateTime.of(date, time, ZoneOffset.ofHours(2));
 
             assertThat(format.isSupported(dateTime)).isTrue();
-            assertThat(format.format(framework, "yyyy-MM-dd HH:mm Z", dateTime)).isEqualTo("2020-12-31 12:30 +0200");
+            assertThat(format.format(context, "yyyy-MM-dd HH:mm Z", dateTime)).isEqualTo("2020-12-31 12:30 +0200");
         }
 
         /**
@@ -84,7 +84,7 @@ class JavaTimeFormatTest {
             JavaTimeFormat format = new JavaTimeFormat();
             Instant instant = Instant.ofEpochMilli(0);
             assertThat(format.isSupported(instant)).isTrue();
-            assertThat(format.format(framework, "yyyy-MM-dd HH:mm", instant)).isEqualTo("1970-01-01 00:00");
+            assertThat(format.format(context, "yyyy-MM-dd HH:mm", instant)).isEqualTo("1970-01-01 00:00");
         }
 
         /**
@@ -105,7 +105,7 @@ class JavaTimeFormatTest {
     class Languages {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that a date can be formatted in the British style.
@@ -114,7 +114,7 @@ class JavaTimeFormatTest {
         @Test
         void britishFormat() {
             LocalDate date = LocalDate.of(2020, 12, 31);
-            String output = new JavaTimeFormat().format(framework, "MMMM d, yyyy", date);
+            String output = new JavaTimeFormat().format(context, "MMMM d, yyyy", date);
             assertThat(output).isEqualTo("December 31, 2020");
         }
 
@@ -125,7 +125,7 @@ class JavaTimeFormatTest {
         @Test
         void germanFormat() {
             LocalDate date = LocalDate.of(2020, 12, 31);
-            String output = new JavaTimeFormat().format(framework, "dd. MMMM yyyy", date);
+            String output = new JavaTimeFormat().format(context, "dd. MMMM yyyy", date);
             assertThat(output).isEqualTo("31. Dezember 2020");
         }
 
@@ -138,7 +138,7 @@ class JavaTimeFormatTest {
     class TimeZones {
 
         @Inject
-        private Framework framework;
+        private LoggingContext context;
 
         /**
          * Verifies that instants are correctly output for the time zone {@code GMT-1}.
@@ -148,7 +148,7 @@ class JavaTimeFormatTest {
         void gmtMinus1() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(framework, "yyyy-MM-dd HH:mm", instant);
+            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2019-12-31 23:00");
         }
 
@@ -160,7 +160,7 @@ class JavaTimeFormatTest {
         void gmt() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(framework, "yyyy-MM-dd HH:mm", instant);
+            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2020-01-01 00:00");
         }
 
@@ -172,7 +172,7 @@ class JavaTimeFormatTest {
         void gmtPlus1() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(framework, "yyyy-MM-dd HH:mm", instant);
+            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2020-01-01 01:00");
         }
 

@@ -4,12 +4,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
 
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.context.NopContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Internal logging backend that prints internal tinylog errors and warnings to {@link System#err}.
@@ -34,13 +34,13 @@ public class InternalLoggingBackend implements LoggingBackend {
         OutputDetails.DISABLED
     );
 
-    private final Framework framework;
+    private final LoggingContext context;
 
     /**
-     * @param framework The actual framework instance
+     * @param context The current logging context
      */
-    public InternalLoggingBackend(Framework framework) {
-        this.framework = framework;
+    public InternalLoggingBackend(LoggingContext context) {
+        this.context = context;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class InternalLoggingBackend implements LoggingBackend {
                 if (formatter == null || arguments == null) {
                     builder.append(message);
                 } else {
-                    builder.append(formatter.format(framework, message.toString(), arguments));
+                    builder.append(formatter.format(context, message.toString(), arguments));
                 }
             }
 

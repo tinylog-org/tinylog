@@ -10,6 +10,7 @@ import org.tinylog.core.ConfigurationBuilder;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.AbstractParameterizedExtension;
 
 /**
@@ -24,6 +25,8 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
     /** */
     public LogCaptureExtension() {
         registerParameter(Framework.class, this::getOrCreateFramework);
+        registerParameter(TestClock.class, this::getOrCreateClock);
+        registerParameter(LoggingContext.class, context -> this.get(context, LoggingContext.class));
         registerParameter(Log.class, this::getOrCreateLog);
     }
 
@@ -105,8 +108,14 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
                 }
 
                 @Override
-                protected LoggingBackend createLoggingBackend() {
-                    return getOrCreateLoggingBackend(context);
+                protected LoggingBackend createLoggingBackend(LoggingContext loggingContext) {
+                    try {
+                        put(context, LoggingContext.class, loggingContext);
+                        injectFields(context, loggingContext);
+                        return getOrCreateLoggingBackend(context);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         );
@@ -140,7 +149,7 @@ public class LogCaptureExtension extends AbstractParameterizedExtension {
             context,
             CaptureLoggingBackend.class,
             () -> new CaptureLoggingBackend(
-                getOrCreateFramework(context),
+                get(context, LoggingContext.class),
                 getOrCreateLog(context),
                 get(context, Level.class)
             )

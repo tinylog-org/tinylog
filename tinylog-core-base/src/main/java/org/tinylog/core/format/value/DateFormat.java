@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.tinylog.core.Framework;
+import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Format for {@link Date}.
@@ -23,9 +23,9 @@ public class DateFormat implements ValueFormat {
     }
 
     @Override
-    public String format(Framework framework, String pattern, Object value) {
-        Locale locale = framework.getConfiguration().getLocale();
-        ZoneId zone = framework.getConfiguration().getZone();
+    public String format(LoggingContext context, String pattern, Object value) {
+        Locale locale = context.getConfiguration().getLocale();
+        ZoneId zone = context.getConfiguration().getZone();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, locale);
         dateFormat.setTimeZone(TimeZone.getTimeZone(zone));

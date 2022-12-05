@@ -6,8 +6,8 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.LogEntry;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DatePlaceholderBuilderTest {
 
     @Inject
-    private Framework framework;
+    private LoggingContext context;
 
     @Inject
     private Log log;
@@ -30,7 +30,7 @@ class DatePlaceholderBuilderTest {
     @CaptureLogEntries(configuration = {"locale=de_DE", "zone=Europe/Berlin"})
     @Test
     void defaultCreationForGermany() {
-        Placeholder placeholder = new DatePlaceholderBuilder().create(framework, null);
+        Placeholder placeholder = new DatePlaceholderBuilder().create(context, null);
         assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -44,7 +44,7 @@ class DatePlaceholderBuilderTest {
     @CaptureLogEntries(configuration = {"locale=en_NZ", "zone=Pacific/Auckland"})
     @Test
     void defaultCreationForNewZealand() {
-        Placeholder placeholder = new DatePlaceholderBuilder().create(framework, null);
+        Placeholder placeholder = new DatePlaceholderBuilder().create(context, null);
         assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -58,7 +58,7 @@ class DatePlaceholderBuilderTest {
     @CaptureLogEntries(configuration = {"locale=de_DE", "zone=Europe/Berlin"})
     @Test
     void customCreationForGermany() {
-        Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "d. MMMM y - HH:mm");
+        Placeholder placeholder = new DatePlaceholderBuilder().create(context, "d. MMMM y - HH:mm");
         assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -72,7 +72,7 @@ class DatePlaceholderBuilderTest {
     @CaptureLogEntries(configuration = {"locale=en_NZ", "zone=Pacific/Auckland"})
     @Test
     void customCreationForNewZealand() {
-        Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "d MMMM y - h.mm a");
+        Placeholder placeholder = new DatePlaceholderBuilder().create(context, "d MMMM y - h.mm a");
         assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
@@ -86,7 +86,7 @@ class DatePlaceholderBuilderTest {
     @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
     @Test
     void fallbackForInvalidPattern() {
-        Placeholder placeholder = new DatePlaceholderBuilder().create(framework, "INVALID <{|#|}>");
+        Placeholder placeholder = new DatePlaceholderBuilder().create(context, "INVALID <{|#|}>");
         assertThat(placeholder).isInstanceOf(DatePlaceholder.class);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
