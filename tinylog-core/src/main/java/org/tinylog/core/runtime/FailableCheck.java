@@ -1,7 +1,7 @@
 package org.tinylog.core.runtime;
 
 /**
- * Predicate for testing values that allows throwing exception of other kind of throwables.
+ * Predicate for testing values that allows throwing exceptions or other kind of throwables.
  *
  * @param <T> Supported value type
  */

@@ -19,12 +19,9 @@ class AndroidStackTraceAccess extends BaseStackTraceAccess {
      * @return Valid getter instance if the method is available, otherwise {@code null}
      */
     MethodHandle getCallerClassGetter() {
-        FailableCheck<MethodHandle> check = new FailableCheck<MethodHandle>() {
-            @Override
-            public boolean test(MethodHandle handle) throws Throwable {
-                Class<?> caller = (Class<?>) handle.invoke();
-                return BaseStackTraceAccess.class.equals(caller);
-            }
+        FailableCheck<MethodHandle> check = handle -> {
+            Class<?> caller = (Class<?>) handle.invoke();
+            return BaseStackTraceAccess.class.equals(caller);
         };
 
         return getMethod(check, "dalvik.system.VMStack", "getStackClass2");
