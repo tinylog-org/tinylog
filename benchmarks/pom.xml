@@ -42,46 +42,6 @@
                 <benchmark.iterations>1</benchmark.iterations>
             </properties>
         </profile>
-        <profile>
-            <id>release</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <executions>
-                                <execution>
-                                    <id>default-compile</id>
-                                    <configuration>
-                                        <jdkToolchain>
-                                            <version>[9,)</version>
-                                        </jdkToolchain>
-                                    </configuration>
-                                </execution>
-                                <execution>
-                                    <id>default-testCompile</id>
-                                    <configuration>
-                                        <jdkToolchain>
-                                            <version>[9,)</version>
-                                        </jdkToolchain>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <jdkToolchain>
-                                    <version>[9,)</version>
-                                </jdkToolchain>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
     </profiles>
 
     <build>

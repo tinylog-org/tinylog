@@ -1,1 +1,1 @@
-include "tinylog-core", "tinylog-impl"
+include "tinylog-core-tests", "tinylog-impl-tests"

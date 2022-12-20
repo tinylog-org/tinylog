@@ -1,0 +1,22 @@
+dependencies {
+    implementation "org.tinylog:tinylog-core:${version}"
+    implementation "org.tinylog:tinylog-impl:${version}"
+    androidTestImplementation "org.tinylog:tinylog-core:${version}:tests"
+}
+
+android {
+    namespace "org.tinylog.impl.android"
+
+    sourceSets {
+         androidTest {
+            java {
+                srcDirs += "../../tinylog-impl/src/test/java"
+                exclude "org/tinylog/impl/writers/jdbc/JdbcWriter*Test.java"
+            }
+
+             resources {
+                 srcDirs += "../../tinylog-impl/src/test/resources"
+             }
+         }
+    }
+}

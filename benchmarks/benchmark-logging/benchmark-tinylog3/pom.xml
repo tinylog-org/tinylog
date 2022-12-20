@@ -52,12 +52,6 @@
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-core-base</artifactId>
-            <version>3.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
             <artifactId>tinylog-impl</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>

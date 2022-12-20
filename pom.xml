@@ -21,11 +21,8 @@
         <kotlin.version>1.7.20</kotlin.version>
         <kotlin.compiler.languageVersion>1.7</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>1.7</kotlin.compiler.apiVersion>
-        <kotlin.compiler.jvmTarget>9</kotlin.compiler.jvmTarget>
-        <maven.compiler.source>9</maven.compiler.source>
-        <maven.compiler.target>9</maven.compiler.target>
-        <maven.compiler.testSource>9</maven.compiler.testSource>
-        <maven.compiler.testTarget>9</maven.compiler.testTarget>
+        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
         <website.url>https://tinylog.org/</website.url>
@@ -37,68 +34,8 @@
         <module>tinylog-api</module>
         <module>tinylog-api-kotlin</module>
         <module>tinylog-core</module>
-        <module>tinylog-core-base</module>
-        <module>tinylog-core-modern</module>
         <module>tinylog-impl</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <properties>
-                <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-                <maven.compiler.source>8</maven.compiler.source>
-                <maven.compiler.target>8</maven.compiler.target>
-                <maven.compiler.testSource>8</maven.compiler.testSource>
-                <maven.compiler.testTarget>8</maven.compiler.testTarget>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <executions>
-                                <execution>
-                                    <id>default-compile</id>
-                                    <configuration>
-                                        <jdkToolchain>
-                                            <version>8</version>
-                                        </jdkToolchain>
-                                    </configuration>
-                                </execution>
-                                <execution>
-                                    <id>compile-java-9</id>
-                                    <configuration>
-                                        <jdkToolchain>
-                                            <version>[9,)</version>
-                                        </jdkToolchain>
-                                    </configuration>
-                                </execution>
-                                <execution>
-                                    <id>default-testCompile</id>
-                                    <configuration>
-                                        <jdkToolchain>
-                                            <version>8</version>
-                                        </jdkToolchain>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <jdkToolchain>
-                                    <version>8</version>
-                                </jdkToolchain>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-    </profiles>
 
     <licenses>
         <license>
@@ -245,12 +182,7 @@
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-core-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-core-base</artifactId>
+                <artifactId>tinylog-core</artifactId>
                 <version>${project.version}</version>
                 <classifier>tests</classifier>
                 <type>test-jar</type>
@@ -284,7 +216,7 @@
                     <linksource>true</linksource>
                     <sourcepath>
                         tinylog-api/src/main/java;
-                        tinylog-core-base/src/main/java;
+                        tinylog-core/src/main/java;
                         tinylog-impl/src/main/java
                     </sourcepath>
                     <additionalDependencies>
@@ -421,8 +353,8 @@
                         <instructions>
                             <Import-Package>!android.*,*</Import-Package>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
-                            <_exportcontents>!META-INF.versions.9,*</_exportcontents>
-                            <_fixupmessages>"*META-INF/versions/9*"</_fixupmessages>
+                            <_exportcontents>!META-INF.versions.11,*</_exportcontents>
+                            <_fixupmessages>"*META-INF/versions/11*"</_fixupmessages>
                         </instructions>
                     </configuration>
                 </plugin>
@@ -470,15 +402,14 @@
                             </goals>
                         </execution>
                         <execution>
-                            <id>compile-java-9</id>
+                            <id>compile-module-info</id>
                             <phase>compile</phase>
                             <goals>
                                 <goal>compile</goal>
                             </goals>
                             <configuration>
-                                <release>9</release>
                                 <compileSourceRoots>
-                                    <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+                                    <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
                                 </compileSourceRoots>
                                 <multiReleaseOutput>true</multiReleaseOutput>
                             </configuration>

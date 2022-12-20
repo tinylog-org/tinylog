@@ -93,12 +93,7 @@
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-core-base</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-core-base</artifactId>
+            <artifactId>tinylog-core</artifactId>
             <classifier>tests</classifier>
             <type>test-jar</type>
             <scope>test</scope>

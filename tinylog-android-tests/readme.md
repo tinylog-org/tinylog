@@ -1,6 +1,6 @@
 # Android Tests
 
-The JUnit tests can be executed on any Android virtual device with API level 26 - 31. The virtual device has to be
+The JUnit tests can be executed on any Android virtual device with API level 26 and higher. The virtual device has to be
 launched before executing the tests.
 
 Gradle command for executing the JUnit tests including code coverage report:

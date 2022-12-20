@@ -8,9 +8,9 @@ on:
 
 jobs:
 
-  development-build:
+  build:
 
-    name: Development build with JDK ${{ matrix.jdk }}
+    name: Build with JDK ${{ matrix.jdk }}
     runs-on: ubuntu-20.04
 
     strategy:
@@ -27,9 +27,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: tinylog3-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: tinylog3-jvm-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            tinylog3-${{ runner.os }}-maven-
+            tinylog3-jvm-${{ runner.os }}-maven-
 
       - name: Download and install JDK ${{ matrix.jdk }}
         uses: actions/setup-java@v3
@@ -39,75 +39,6 @@ jobs:
 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
-
-      - name: Upload code coverage report
-        uses: codecov/codecov-action@v3
-
-  release-build:
-
-    name: Release build with JDK 8 + 11
-    runs-on: ubuntu-20.04
-
-    steps:
-
-      - name: Checkout Git repository
-        uses: actions/checkout@v3
-
-      - name: Restore local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: tinylog3-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            tinylog3-${{ runner.os }}-maven-
-
-      - name: Download and install JDK 8
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 8
-
-      - name: Store Java 8 home directory as environment variable
-        run: echo "JAVA8_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-
-      - name: Download and install JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 11
-
-      - name: Store Java 11 home directory as environment variable
-        run: echo "JAVA11_HOME=${JAVA_HOME}" >> $GITHUB_ENV
-
-      - name: Set up Maven toolchain
-        shell: bash
-        run: |
-          mkdir -p ~/.m2 && cat << EOF > ~/.m2/toolchains.xml
-          <?xml version="1.0" encoding="UTF8"?>
-          <toolchains>
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>11</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ env.JAVA11_HOME }}</jdkHome>
-              </configuration>
-            </toolchain>
-            <toolchain>
-              <type>jdk</type>
-              <provides>
-                <version>8</version>
-              </provides>
-              <configuration>
-                <jdkHome>${{ env.JAVA8_HOME }}</jdkHome>
-              </configuration>
-            </toolchain>
-          </toolchains>
-          EOF
-
-      - name: Build with Maven
-        run: mvn -P release --batch-mode --update-snapshots verify
 
       - name: Upload code coverage report
         uses: codecov/codecov-action@v3
@@ -128,15 +59,23 @@ jobs:
       - name: Checkout Git repository
         uses: actions/checkout@v3
 
+      - name: Restore local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: tinylog3-android-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            tinylog3-android-${{ runner.os }}-maven-
+
       - name: Restore Gradle caches and wrapper
         uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: tinylog3-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: tinylog3-android-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            tinylog3-${{ runner.os }}-gradle-
+            tinylog3-android-${{ runner.os }}-gradle-
 
       - name: Restore Android virtual device
         id: avd-cache
@@ -152,6 +91,9 @@ jobs:
         with:
           distribution: zulu
           java-version: 11
+
+      - name: Install core and impl artifacts via Maven
+        run: mvn --batch-mode --update-snapshots --projects tinylog-core,tinylog-impl install -Dmaven.test.skip=true
 
       - name: Set up Android virtual device if not cached
         uses: reactivecircus/android-emulator-runner@v2
