@@ -303,7 +303,7 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         Instant maxTimestamp = Instant.now();
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -328,7 +328,7 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         Duration maxUptime = framework.getRuntime().getUptime();
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -351,7 +351,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -376,7 +376,7 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         backend.getContextStorage().clear();
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -398,7 +398,7 @@ class NativeLoggingBackendTest {
 
         backend.log("Foo", null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -421,7 +421,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -444,7 +444,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -467,7 +467,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -490,7 +490,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, "foo", Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -513,7 +513,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -536,7 +536,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -567,7 +567,7 @@ class NativeLoggingBackendTest {
             new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -598,7 +598,7 @@ class NativeLoggingBackendTest {
             new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -621,7 +621,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, 42, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -645,7 +645,7 @@ class NativeLoggingBackendTest {
         Exception exception = new Exception();
         backend.log(stackTraceElement, null, Level.INFO, exception, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -678,7 +678,7 @@ class NativeLoggingBackendTest {
         backend.log(className, null, disabledLevel, null, null, null, null);
         backend.log(className, null, enabledLevel, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -703,7 +703,7 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.DEBUG, null, null, null, null);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         verify(writer).flush();
@@ -732,7 +732,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
@@ -767,7 +767,7 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, "tinylog", Level.WARN, null, "Hello tinylog!", null, null);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         verify(writer).log(logEntryCaptor.capture());
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello tinylog!");
