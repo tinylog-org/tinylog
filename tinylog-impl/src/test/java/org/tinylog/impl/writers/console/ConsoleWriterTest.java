@@ -84,4 +84,14 @@ class ConsoleWriterTest {
         }
     }
 
+    /**
+     * Verifies that flushing won't throw any exception.
+     */
+    @Test
+    void flushing() {
+        try (ConsoleWriter writer = new ConsoleWriter(new MessageOnlyPlaceholder(), Level.WARN)) {
+            writer.flush();
+        }
+    }
+
 }

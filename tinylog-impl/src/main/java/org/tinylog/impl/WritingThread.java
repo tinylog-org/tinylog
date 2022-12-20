@@ -7,14 +7,14 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 /**
  * Thread for writing log entries asynchronously.
  */
 public class WritingThread extends Thread {
 
-    private final Collection<AsyncWriter> writers;
+    private final Collection<Writer> writers;
     private final int queueSize;
 
     private final Object mutex;
@@ -26,10 +26,10 @@ public class WritingThread extends Thread {
     private CompletableFuture<Void> waitingFuture;
 
     /**
-     * @param writers All asynchronous writers
+     * @param writers All writers
      * @param queueSize The size for the waiting and working queue
      */
-    public WritingThread(Collection<AsyncWriter> writers, int queueSize) {
+    public WritingThread(Collection<Writer> writers, int queueSize) {
         super("tinylog-writing-thread");
 
         this.writers = new ArrayList<>(writers);
@@ -59,7 +59,7 @@ public class WritingThread extends Thread {
      *               the constructor when this writing thread was instantiated)
      * @param logEntry The log entry to output
      */
-    public void enqueue(AsyncWriter writer, LogEntry logEntry) {
+    public void enqueue(Writer writer, LogEntry logEntry) {
         Task task = new Task(writer, logEntry);
         while (true) {
             CompletableFuture<Void> future = tryToEnqueue(task);
@@ -187,7 +187,7 @@ public class WritingThread extends Thread {
             }
         }
 
-        for (AsyncWriter writer : writers) {
+        for (Writer writer : writers) {
             try {
                 writer.flush();
             } catch (Exception ex) {
@@ -203,14 +203,14 @@ public class WritingThread extends Thread {
      */
     private static final class Task {
 
-        private final AsyncWriter writer;
+        private final Writer writer;
         private final LogEntry logEntry;
 
         /**
          * @param writer The writer to use to output the passed log entry
          * @param logEntry The log entry to output
          */
-        Task(AsyncWriter writer, LogEntry logEntry) {
+        Task(Writer writer, LogEntry logEntry) {
             this.writer = writer;
             this.logEntry = logEntry;
         }

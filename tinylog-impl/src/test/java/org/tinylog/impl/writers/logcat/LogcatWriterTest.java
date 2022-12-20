@@ -256,6 +256,16 @@ class LogcatWriterTest {
             });
         }
 
+        /**
+         * Verifies that flushing won't throw any exception.
+         */
+        @Test
+        void flushing() {
+            try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
+                writer.flush();
+            }
+        }
+
     }
 
     /**

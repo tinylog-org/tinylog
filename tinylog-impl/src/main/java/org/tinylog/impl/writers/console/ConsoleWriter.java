@@ -11,7 +11,7 @@ import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.writers.Writer;
 
 /**
- * Synchronous writer that outputs formatted log entries to {@link System#out} and {@link System#err} respectively.
+ * Writer that outputs formatted log entries to {@link System#out} and {@link System#err} respectively.
  */
 public class ConsoleWriter implements Writer {
 
@@ -46,6 +46,11 @@ public class ConsoleWriter implements Writer {
 
         PrintStream stream = entry.getSeverityLevel().ordinal() <= threshold ? System.err : System.out;
         stream.print(builder.toString());
+    }
+
+    @Override
+    public void flush() {
+        // Ignore
     }
 
     @Override

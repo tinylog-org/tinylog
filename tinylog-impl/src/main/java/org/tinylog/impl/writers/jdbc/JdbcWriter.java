@@ -24,12 +24,12 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.ValueType;
 import org.tinylog.impl.format.pattern.placeholders.Placeholder;
-import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 /**
- * Asynchronous writer for inserting log entries into a relational database table.
+ * Writer for inserting log entries into a relational database table.
  */
-public class JdbcWriter implements AsyncWriter {
+public class JdbcWriter implements Writer {
 
     private static final Pattern NO_CONTROLS_PATTERN = Pattern.compile("[^\\p{Cntrl}]+");
     private static final Pattern SAFE_IDENTIFIER_PATTERN = Pattern.compile("[A-Za-z0-9_@$#]+");

@@ -11,12 +11,12 @@ import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.path.DynamicPath;
 import org.tinylog.impl.policies.Policy;
-import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 /**
- * Asynchronous writer for writing log entries to a file.
+ * Writer for writing log entries to a file.
  */
-public class FileWriter implements AsyncWriter {
+public class FileWriter implements Writer {
 
     private static final int BYTE_BUFFER_CAPACITY = 64 * 1024; // 64 KB
     private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB

@@ -20,7 +20,7 @@ public final class InternalAssertions {
      * @return An iterable assert with all writers from the passed writer repository
      */
     public static IterableAssert<Writer> assertThat(WriterRepository actual) {
-        return new IterableAssert<>(actual.getAllWriters());
+        return new IterableAssert<>(actual.getWriters());
     }
 
 }

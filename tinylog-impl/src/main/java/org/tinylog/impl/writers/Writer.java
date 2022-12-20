@@ -6,16 +6,12 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 
 /**
- * Writer interface for outputting log entries synchronously.
+ * Writer interface for outputting log entries.
  *
  * <p>
- *     By default, tinylog calls the {@link Writer#log(LogEntry)} synchronously. This means that the thread, which
- *     issues a log entry, is blocked until {@link Writer#log(LogEntry)} terminates and that the writer can be called
- *     by multiple threads in parallel. Therefore, a writer must be implemented to be thread safe.
- * </p>
- *
- * <p>
- *     Alternately, the interface {@link AsyncWriter} can be used for outputting log entries asynchronously.
+ *     tinylog access writers in a separate writing thread. Hence, the thread, which issues a log entry, is not
+ *     blocked and tinylog ensures that writers are always called by the same writing thread. Therefore, writer
+ *     implementations do not have to take care about thread safety.
  * </p>
  */
 public interface Writer extends AutoCloseable {
@@ -48,6 +44,18 @@ public interface Writer extends AutoCloseable {
      * @throws Exception Any exception can be thrown, if the output fails
      */
     void log(LogEntry entry) throws Exception;
+
+    /**
+     * Flushes the output after passing all currently available log entries.
+     *
+     * <p>
+     *     The writing thread calls this method after passing a complete batch of log entries. Thrown exceptions are
+     *     handled by tinylog and have no side effects on other writers.
+     * </p>
+     *
+     * @throws Exception Any exception can be thrown, if the flush fails
+     */
+    void flush() throws Exception;
 
     /**
      * Closes the writer when tinylog is shutting down. All allocated resources should be released in this method.

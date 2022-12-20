@@ -1,13 +1,11 @@
 package org.tinylog.impl.backend;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
 import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.WritingThread;
-import org.tinylog.impl.writers.AsyncWriter;
 import org.tinylog.impl.writers.Writer;
 
 /**
@@ -34,19 +32,14 @@ public class NativeLoggingBackendBuilder implements LoggingBackendBuilder {
     }
 
     /**
-     * Creates a {@link WritingThread} instance if there is at least one {@link AsyncWriter}.
+     * Creates a {@link WritingThread} instance if there is at least one {@link Writer}.
      *
-     * @param writers All sync and async writers
-     * @return A started instance of {@link WritingThread} if there is at least one {@link AsyncWriter} in the passed
+     * @param writers All writers
+     * @return A started instance of {@link WritingThread} if there is at least one {@link Writer} in the passed
      *         writer collection, otherwise {@code null}
      */
     private static WritingThread createWritingThread(Collection<Writer> writers) {
-        Collection<AsyncWriter> asyncWriters = writers.stream()
-            .filter(writer -> writer instanceof AsyncWriter)
-            .map(writer -> (AsyncWriter) writer)
-            .collect(Collectors.toList());
-
-        return asyncWriters.isEmpty() ? null : new WritingThread(asyncWriters, QUEUE_SIZE);
+        return writers.isEmpty() ? null : new WritingThread(writers, QUEUE_SIZE);
     }
 
 }

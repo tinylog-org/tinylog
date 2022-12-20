@@ -10,7 +10,7 @@ import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.core.test.log.Log;
 import org.tinylog.impl.test.LogEntryBuilder;
-import org.tinylog.impl.writers.AsyncWriter;
+import org.tinylog.impl.writers.Writer;
 
 import com.google.common.collect.ImmutableList;
 
@@ -56,7 +56,7 @@ class WritingThreadTest {
         LogEntry secondLogEntry = new LogEntryBuilder().message("2").create();
         LogEntry thirdLogEntry = new LogEntryBuilder().message("3").create();
 
-        AsyncWriter writer = mock(AsyncWriter.class);
+        Writer writer = mock(Writer.class);
 
         WritingThread thread = new WritingThread(Collections.singletonList(writer), 2);
         thread.start();
@@ -88,7 +88,7 @@ class WritingThreadTest {
         LogEntry standardLogEntry = new LogEntryBuilder().tag(null).message("Hello World!").create();
         LogEntry internalLogEntry = new LogEntryBuilder().tag("tinylog").message("internal").create();
 
-        AsyncWriter writer = mock(AsyncWriter.class);
+        Writer writer = mock(Writer.class);
 
         WritingThread thread = new WritingThread(Collections.singletonList(writer), 3);
         thread.start();
@@ -115,8 +115,8 @@ class WritingThreadTest {
     @Test
     void reportLoggingException() throws Exception {
         LogEntry logEntry = new LogEntryBuilder().message("foo").create();
-        AsyncWriter evilWriter = mock(AsyncWriter.class);
-        AsyncWriter goodWriter = mock(AsyncWriter.class);
+        Writer evilWriter = mock(Writer.class);
+        Writer goodWriter = mock(Writer.class);
 
         doThrow(NullPointerException.class).when(evilWriter).log(any());
 
@@ -147,8 +147,8 @@ class WritingThreadTest {
     @Test
     void ignoreLoggingException() throws Exception {
         LogEntry logEntry = new LogEntryBuilder().tag("tinylog").message("foo").create();
-        AsyncWriter evilWriter = mock(AsyncWriter.class);
-        AsyncWriter goodWriter = mock(AsyncWriter.class);
+        Writer evilWriter = mock(Writer.class);
+        Writer goodWriter = mock(Writer.class);
 
         doThrow(NullPointerException.class).when(evilWriter).log(any());
 
@@ -173,8 +173,8 @@ class WritingThreadTest {
     @Test
     void reportFlushingException() throws Exception {
         LogEntry logEntry = new LogEntryBuilder().message("foo").create();
-        AsyncWriter evilWriter = mock(AsyncWriter.class);
-        AsyncWriter goodWriter = mock(AsyncWriter.class);
+        Writer evilWriter = mock(Writer.class);
+        Writer goodWriter = mock(Writer.class);
 
         doThrow(NullPointerException.class).when(evilWriter).flush();
 

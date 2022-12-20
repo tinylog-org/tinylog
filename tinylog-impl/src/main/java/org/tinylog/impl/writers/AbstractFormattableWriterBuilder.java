@@ -61,12 +61,6 @@ public abstract class AbstractFormattableWriterBuilder implements WriterBuilder 
     /**
      * Creates a new instance of the writer.
      *
-     * <p>
-     *     Synchronous writers can implement the plain {@link Writer} interface and asynchronous writers the
-     *     {@link AsyncWriter} interface. Writers with blocking output operations (e.g. outputting log entries to files,
-     *     databases, or remote servers) should use the {@link AsyncWriter} interface for performance reasons.
-     * </p>
-     *
      * @param context The current logging context
      * @param configuration The configuration properties for the new writer instance
      * @param format The output format for log entries

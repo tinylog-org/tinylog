@@ -38,7 +38,6 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.WritingThread;
 import org.tinylog.impl.context.ThreadLocalContextStorage;
-import org.tinylog.impl.writers.AsyncWriter;
 import org.tinylog.impl.writers.Writer;
 
 import com.google.common.collect.HashMultimap;
@@ -304,7 +303,11 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         Instant maxTimestamp = Instant.now();
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getTimestamp()).isBetween(minTimestamp, maxTimestamp);
     }
 
@@ -325,7 +328,11 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         Duration maxUptime = framework.getRuntime().getUptime();
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getUptime()).isBetween(minUptime, maxUptime);
     }
 
@@ -344,7 +351,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getThread()).isSameAs(Thread.currentThread());
     }
 
@@ -365,7 +376,11 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
         backend.getContextStorage().clear();
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getContext()).containsExactly(entry("foo", "bar"));
     }
 
@@ -383,7 +398,11 @@ class NativeLoggingBackendTest {
 
         backend.log("Foo", null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getClassName()).isEqualTo("Foo");
     }
 
@@ -402,7 +421,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getMethodName()).isEqualTo("bar");
     }
 
@@ -421,7 +444,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getFileName()).isEqualTo("Foo.java");
     }
 
@@ -440,7 +467,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new StackTraceElement("Foo", "bar", "Foo.java", 42);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getLineNumber()).isEqualTo(42);
     }
 
@@ -459,7 +490,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, "foo", Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getTag()).isEqualTo("foo");
     }
 
@@ -478,7 +513,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(Level.INFO);
     }
 
@@ -497,7 +536,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
     }
 
@@ -524,7 +567,11 @@ class NativeLoggingBackendTest {
             new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello Alice!");
     }
 
@@ -551,7 +598,11 @@ class NativeLoggingBackendTest {
             new EnhancedMessageFormatter(framework.getClassLoader())
         );
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello {}!");
     }
 
@@ -570,7 +621,11 @@ class NativeLoggingBackendTest {
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, 42, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("42");
     }
 
@@ -590,7 +645,11 @@ class NativeLoggingBackendTest {
         Exception exception = new Exception();
         backend.log(stackTraceElement, null, Level.INFO, exception, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getException()).isSameAs(exception);
     }
 
@@ -619,7 +678,11 @@ class NativeLoggingBackendTest {
         backend.log(className, null, disabledLevel, null, null, null, null);
         backend.log(className, null, enabledLevel, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(enabledLevel);
     }
 
@@ -640,29 +703,12 @@ class NativeLoggingBackendTest {
         backend.log(stackTraceElement, null, Level.DEBUG, null, null, null, null);
         backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
 
+        Thread.sleep(100);
+
         verify(writer).log(logEntryCaptor.capture());
+        verify(writer).flush();
+
         assertThat(logEntryCaptor.getValue().getSeverityLevel()).isEqualTo(Level.INFO);
-    }
-
-    /**
-     * Verifies that an async writer can be used for asynchronous logging.
-     */
-    @Test
-    void logWithAsyncWriter() throws Exception {
-        AsyncWriter asyncWriter = mock(AsyncWriter.class);
-
-        NativeLoggingBackend backend = new Builder()
-            .rootLevel(Level.TRACE)
-            .writers(Level.TRACE, asyncWriter)
-            .create();
-
-        StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
-        backend.log(stackTraceElement, null, Level.INFO, null, null, null, null);
-
-        Thread.sleep(1000);
-
-        verify(asyncWriter).log(any());
-        verify(asyncWriter).flush();
     }
 
     /**
@@ -685,6 +731,8 @@ class NativeLoggingBackendTest {
 
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, null, Level.INFO, null, "Hello World!", null, null);
+
+        Thread.sleep(100);
 
         verify(writer).log(logEntryCaptor.capture());
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello World!");
@@ -718,6 +766,8 @@ class NativeLoggingBackendTest {
 
         StackTraceElement stackTraceElement = new Throwable().getStackTrace()[0];
         backend.log(stackTraceElement, "tinylog", Level.WARN, null, "Hello tinylog!", null, null);
+
+        Thread.sleep(100);
 
         verify(writer).log(logEntryCaptor.capture());
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello tinylog!");
@@ -939,13 +989,11 @@ class NativeLoggingBackendTest {
                 repositoriesForTags
             );
 
-            Collection<AsyncWriter> asyncWriters = writers.values().stream()
+            Collection<Writer> uniqueWriters = writers.values().stream()
                 .flatMap(map -> map.values().stream())
-                .filter(writer -> writer instanceof AsyncWriter)
-                .map(writer -> (AsyncWriter) writer)
                 .collect(Collectors.toSet());
 
-            WritingThread writingThread = asyncWriters.isEmpty() ? null : new WritingThread(asyncWriters, 64);
+            WritingThread writingThread = uniqueWriters.isEmpty() ? null : new WritingThread(uniqueWriters, 64);
             return new NativeLoggingBackend(context, loggingConfiguration, writingThread);
         }
 

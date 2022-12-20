@@ -40,7 +40,7 @@ class LoggingConfiguration {
         this.mappedWriters = writers;
         this.unmappedWriters = writers.values().stream()
             .flatMap(map -> map.values().stream())
-            .flatMap(repository -> repository.getAllWriters().stream())
+            .flatMap(repository -> repository.getWriters().stream())
             .collect(Collectors.toSet());
         this.defaultTaggedWritersGetter = tag -> mappedWriters.get(LevelConfiguration.TAGGED_PLACEHOLDER);
     }
@@ -129,7 +129,7 @@ class LoggingConfiguration {
     private static Level getEffectiveLevel(Map<Level, WriterRepository> writers) {
         return Stream.of(Level.values())
             .filter(level -> level != Level.OFF)
-            .filter(level -> !writers.get(level).getAllWriters().isEmpty())
+            .filter(level -> !writers.get(level).getWriters().isEmpty())
             .reduce(Level::leastSevereLevel)
             .orElse(Level.OFF);
     }

@@ -3,7 +3,6 @@ package org.tinylog.impl.backend;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.tinylog.core.Level;
@@ -12,13 +11,11 @@ import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
-import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.WritingThread;
 import org.tinylog.impl.context.ThreadLocalContextStorage;
-import org.tinylog.impl.writers.AsyncWriter;
 import org.tinylog.impl.writers.Writer;
 
 /**
@@ -34,8 +31,7 @@ public class NativeLoggingBackend implements LoggingBackend {
     /**
      * @param context The current logging context
      * @param configuration All configured writers mapped to severity levels and tags
-     * @param writingThread The writing thread for enqueuing log entries for async writers (can be {@code null} if there
-     *                      are no async writers)
+     * @param writingThread The writing thread for enqueuing log entries for writers
      */
     public NativeLoggingBackend(
         LoggingContext context,
@@ -113,17 +109,7 @@ public class NativeLoggingBackend implements LoggingBackend {
                 repository.getRequiredLogEntryValues()
             );
 
-            for (Writer writer : repository.getSyncWriters()) {
-                try {
-                    writer.log(logEntry);
-                } catch (Exception ex) {
-                    if (!Objects.equals(InternalLogger.TAG, tag)) {
-                        InternalLogger.error(ex, "Failed to write log entry");
-                    }
-                }
-            }
-
-            for (AsyncWriter writer : repository.getAsyncWriters()) {
+            for (Writer writer : repository.getWriters()) {
                 writingThread.enqueue(writer, logEntry);
             }
         }
@@ -138,7 +124,7 @@ public class NativeLoggingBackend implements LoggingBackend {
      */
     private OutputDetails getOutputDetails(String tag, Level level) {
         WriterRepository repository = configuration.getWriters(tag, level);
-        if (repository.getAllWriters().isEmpty()) {
+        if (repository.getWriters().isEmpty()) {
             return OutputDetails.DISABLED;
         }
 

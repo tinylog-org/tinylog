@@ -12,7 +12,7 @@ import org.tinylog.impl.writers.Writer;
 import android.util.Log;
 
 /**
- * Synchronous writer that passes log entries to logcat via {@link Log} on Android devices.
+ * Writer that passes log entries to logcat via {@link Log} on Android devices.
  */
 public class LogcatWriter implements Writer {
 
@@ -67,6 +67,11 @@ public class LogcatWriter implements Writer {
             default:
                 InternalLogger.error(null, "Severity level \"{}\" is unsupported", entry.getSeverityLevel());
         }
+    }
+
+    @Override
+    public void flush() {
+        // Ignore
     }
 
     @Override
