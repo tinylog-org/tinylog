@@ -208,7 +208,6 @@
         <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
         <module name="UnusedImports"/>
         <module name="UpperEll"/>
-        <module name="VariableDeclarationUsageDistance"/>
         <module name="VisibilityModifier"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround"/>
