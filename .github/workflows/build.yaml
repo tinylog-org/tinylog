@@ -93,7 +93,7 @@ jobs:
           java-version: 11
 
       - name: Install core and impl artifacts via Maven
-        run: mvn --batch-mode --update-snapshots --projects tinylog-core,tinylog-impl install -DskipTests
+        run: mvn --batch-mode --update-snapshots --also-make --projects :tinylog-core,:tinylog-impl install -DskipTests
 
       - name: Set up Android virtual device if not cached
         uses: reactivecircus/android-emulator-runner@v2
