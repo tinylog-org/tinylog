@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.google.common.collect.ImmutableList;
 
@@ -15,15 +17,16 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class BundlePolicyTest {
 
     @Mock
     private Path file;
 
-    @Mock(lenient = true)
+    @Mock
     private Policy firstPolicy;
 
-    @Mock(lenient = true)
+    @Mock
     private Policy secondPolicy;
 
     /**

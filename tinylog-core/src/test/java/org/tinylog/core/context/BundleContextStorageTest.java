@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -16,14 +18,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class BundleContextStorageTest {
 
     private BundleContextStorage bundleStorage;
 
-    @Mock(lenient = true)
+    @Mock
     private ContextStorage firstChildStorage;
 
-    @Mock(lenient = true)
+    @Mock
     private ContextStorage secondChildStorage;
 
     /**

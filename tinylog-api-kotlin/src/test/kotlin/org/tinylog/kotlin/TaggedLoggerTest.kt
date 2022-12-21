@@ -9,9 +9,11 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.notNull
 import org.mockito.kotlin.whenever
+import org.mockito.quality.Strictness
 import org.tinylog.core.Framework
 import org.tinylog.core.Level
 import org.tinylog.core.backend.LevelVisibility
@@ -56,9 +58,10 @@ internal class TaggedLoggerTest {
      * Tests for severity levels.
      */
     @ExtendWith(MockitoExtension::class)
+    @MockitoSettings(strictness = Strictness.LENIENT)
     @Nested
     inner class Levels {
-        @Mock(lenient = true)
+        @Mock
         private lateinit var backend: LoggingBackend
 
         private val framework: Framework = object : Framework(false, false) {
