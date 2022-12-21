@@ -21,7 +21,7 @@ public class DateTimeSegmentBuilder implements PathSegmentBuilder {
     }
 
     @Override
-    public PathSegment create(LoggingContext context, String value) throws Exception {
+    public PathSegment create(LoggingContext context, String value) {
         String pattern = value == null ? DEFAULT_PATTERN : value;
         Locale locale = context.getConfiguration().getLocale();
 

@@ -35,11 +35,9 @@ class ClassOnlyLocationInformationTest {
 
     /**
      * Shuts the benchmark including the logging framework gracefully down.
-     *
-     * @throws InterruptedException Failed to wait for the graceful shutdown
      */
     @AfterAll
-    static void dispose() throws InterruptedException {
+    static void dispose() {
         benchmark.shutdown();
     }
 
