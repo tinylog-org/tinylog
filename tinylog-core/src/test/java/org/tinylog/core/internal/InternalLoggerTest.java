@@ -149,7 +149,7 @@ class InternalLoggerTest {
     }
 
     /**
-     * Verifies that a warn log entry with a plain text message can be issued.
+     * Verifies that a warning log entry with a plain text message can be issued.
      */
     @CaptureLogEntries(level = Level.WARN)
     @Test
@@ -159,7 +159,7 @@ class InternalLoggerTest {
     }
 
     /**
-     * Verifies that a warn log entry with a placeholder message and arguments can be issued.
+     * Verifies that a warning log entry with a placeholder message and arguments can be issued.
      */
     @CaptureLogEntries(level = Level.WARN)
     @Test
@@ -169,7 +169,7 @@ class InternalLoggerTest {
     }
 
     /**
-     * Verifies that a warn log entry with an exception and a custom text message can be issued.
+     * Verifies that a warning log entry with an exception and a custom text message can be issued.
      */
     @CaptureLogEntries(level = Level.WARN)
     @Test
@@ -180,7 +180,7 @@ class InternalLoggerTest {
     }
 
     /**
-     * Verifies that no warn log entries wil be issued, if the warn severity level is disabled.
+     * Verifies that no warning log entries wil be issued, if the warn severity level is disabled.
      */
     @CaptureLogEntries(level = Level.ERROR)
     @Test

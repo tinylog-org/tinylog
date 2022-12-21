@@ -69,7 +69,7 @@ public class LengthStyleBuilder implements StyleBuilder {
     /**
      * Creates a {@link Position} by reading its name from a string.
      *
-     * @param value The case insensitive position name
+     * @param value The case-insensitive position name
      * @return The position enum value
      * @throws IllegalArgumentException The passed value contains an invalid position name
      */

@@ -184,7 +184,7 @@ public final class InternalLogger {
     }
 
     /**
-     * Issues a warn log entry.
+     * Issues a warning log entry.
      *
      * @param ex Exception or any other kind of throwable
      * @param message Human-readable text message

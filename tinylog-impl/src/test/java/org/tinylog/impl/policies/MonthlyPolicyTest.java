@@ -93,7 +93,7 @@ class MonthlyPolicyTest {
          * Sets the passed instant as create time and last modified time for the passed file.
          *
          * @param file The file to update
-         * @param instant The new create time and last modified time
+         * @param instant The creation time and last modified time
          * @throws IOException Failed to update create time and last modified time
          */
         void applyFileTime(Path file, Instant instant) throws IOException {

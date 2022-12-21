@@ -146,7 +146,7 @@ public class Framework {
     }
 
     /**
-     * Starts the framework and calls the start up method on all registered hooks, if the framework is not yet started.
+     * Starts the framework and calls the start-up method on all registered hooks, if the framework is not yet started.
      */
     public void startUp() {
         synchronized (mutex) {

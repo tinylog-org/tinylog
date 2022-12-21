@@ -51,7 +51,7 @@ class BundleContextStorageTest {
     }
 
     /**
-     * Verifies that the a value can be received that only exists in the first child storage.
+     * Verifies that a value can be received that only exists in the first child storage.
      */
     @Test
     void receiveValueOfFirstStorage() {
@@ -61,7 +61,7 @@ class BundleContextStorageTest {
     }
 
     /**
-     * Verifies that the a value can be received that only exists in the second child storage.
+     * Verifies that a value can be received that only exists in the second child storage.
      */
     @Test
     void receiveValueOfSecondStorage() {

@@ -21,7 +21,7 @@ class ThreadLocalContextStorageTest {
     }
 
     /**
-     * Verifies that a child thread inherits the mapping from it's parent thread.
+     * Verifies that a child thread inherits the mapping from its parent thread.
      */
     @Test
     void receiveMappingInChildThread() throws Throwable {
@@ -32,7 +32,7 @@ class ThreadLocalContextStorageTest {
     }
 
     /**
-     * Verifies that mapping changes from a child thread are not applied to it's parent thread.
+     * Verifies that mapping changes from a child thread are not applied to its parent thread.
      */
     @Test
     void updateMappingInChildThread() throws Throwable {
@@ -132,7 +132,7 @@ class ThreadLocalContextStorageTest {
     }
 
     /**
-     * Verifies that the attempt to remove an non-existent entry is silently ignored.
+     * Verifies that the attempt to remove a non-existent entry is silently ignored.
      */
     @Test
     void removeNonExistentEntry() {
