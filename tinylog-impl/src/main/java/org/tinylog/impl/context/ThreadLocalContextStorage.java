@@ -15,7 +15,7 @@ public class ThreadLocalContextStorage implements ContextStorage {
 
     /** */
     public ThreadLocalContextStorage() {
-        threadLocal = new InheritableThreadLocal<Map<String, String>>() {
+        threadLocal = new InheritableThreadLocal<>() {
 
             @Override
             protected Map<String, String> initialValue() {
