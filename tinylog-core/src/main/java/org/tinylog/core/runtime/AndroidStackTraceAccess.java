@@ -33,15 +33,12 @@ class AndroidStackTraceAccess extends BaseStackTraceAccess {
      * @return Valid filler instance if the method is available, otherwise {@code null}
      */
     MethodHandle getStackTraceElementsFiller() {
-        FailableCheck<MethodHandle> check = new FailableCheck<MethodHandle>() {
-            @Override
-            public boolean test(MethodHandle handle) throws Throwable {
-                StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_DEPTH + 1];
-                handle.invoke(Thread.currentThread(), trace);
-                StackTraceElement element = trace[STACK_TRACE_DEPTH];
-                return element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
-                        && element.getMethodName().contains("getStackTraceElementsFiller");
-            }
+        FailableCheck<MethodHandle> check = handle -> {
+            StackTraceElement[] trace = new StackTraceElement[STACK_TRACE_DEPTH + 1];
+            handle.invoke(Thread.currentThread(), trace);
+            StackTraceElement element = trace[STACK_TRACE_DEPTH];
+            return element.getClassName().startsWith(AndroidStackTraceAccess.class.getName())
+                && element.getMethodName().contains("getStackTraceElementsFiller");
         };
 
         return getMethod(check, "dalvik.system.VMStack", "fillStackTraceElements", Thread.class,

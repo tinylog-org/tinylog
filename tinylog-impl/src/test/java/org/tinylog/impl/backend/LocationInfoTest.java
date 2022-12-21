@@ -170,11 +170,8 @@ class LocationInfoTest {
          */
         @Test
         void normalizeAnonymousClass() {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Do nothing
-                }
+            Runnable runnable = () -> {
+                // Do nothing
             };
 
             String className = LocationInfo.resolveClassName(runnable.getClass());
