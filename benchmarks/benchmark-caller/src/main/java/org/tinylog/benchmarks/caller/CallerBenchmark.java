@@ -99,7 +99,6 @@ public class CallerBenchmark {
      */
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @SuppressWarnings("removal")
     public String securityManager() {
         return new SecurityManager() {
             public Class<?> getCallerClass() {
