@@ -13,13 +13,6 @@
 
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/src/main/java9</directory>
-            <includes>
-                <include>**/*.java</include>
-            </includes>
-            <outputDirectory />
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/src/main/java</directory>
             <includes>
                 <include>**/*.java</include>
@@ -30,6 +23,13 @@
             <directory>${project.basedir}/src/main/kotlin</directory>
             <includes>
                 <include>**/*.kt</include>
+            </includes>
+            <outputDirectory />
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/module</directory>
+            <includes>
+                <include>**/*.java</include>
             </includes>
             <outputDirectory />
         </fileSet>
