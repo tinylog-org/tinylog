@@ -1,11 +1,10 @@
-package org.tinylog.impl.test;
+package org.tinylog.impl.writers.logcat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -13,16 +12,15 @@ import java.util.stream.Collectors;
  */
 public final class Logcat {
 
-    private final Pattern whitelist;
-    private final Pattern blacklist;
-
     /** */
-    public Logcat() {
-        long pid = android.os.Process.myPid();
-        long tid = android.os.Process.myTid();
+    private Logcat() {
+    }
 
-        whitelist = Pattern.compile(String.format("\\W+%d\\W+%d\\W+", pid, tid));
-        blacklist = Pattern.compile("\\W+(AndroidJUnit5|System|TestExecutor|TestLoader|TestRunner)\\W+");
+    /**
+     * Clears all existing Logcat output.
+     */
+    public static void clear() throws IOException, InterruptedException {
+        Runtime.getRuntime().exec("logcat -c").waitFor();
     }
 
     /**
@@ -35,13 +33,11 @@ public final class Logcat {
      * @return Each list element represents one log entry line from logcat
      * @throws IOException Failed to read output of logcat
      */
-    public List<String> fetchOutput() throws IOException {
+    public static List<String> fetchOutput() throws IOException {
         Process process = Runtime.getRuntime().exec("logcat -d -v threadtime");
         try (InputStream stream = process.getInputStream()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
-                return reader.lines()
-                    .filter(line -> whitelist.matcher(line).find() && !blacklist.matcher(line).find())
-                    .collect(Collectors.toList());
+                return reader.lines().collect(Collectors.toList());
             }
         } finally {
             process.destroy();

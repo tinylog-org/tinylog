@@ -1,49 +1,52 @@
 package org.tinylog.impl.writers.logcat;
 
+import java.io.IOException;
 import java.util.ServiceLoader;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.tinylog.core.Configuration;
+import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 
-import android.util.Log;
-
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mockStatic;
 
+@CaptureLogEntries
 class LogcatWriterBuilderTest {
+
+    @Inject
+    private Framework framework;
 
     @Inject
     private LoggingContext context;
 
-    private MockedStatic<Log> logMock;
-
     /**
-     * Mocks the static {@link Log} class.
+     * Clears all existing Logcat output.
      */
     @BeforeEach
-    void init() {
-        logMock = mockStatic(Log.class);
+    void init() throws IOException, InterruptedException {
+        Logcat.clear();
     }
 
     /**
-     * Restores the statically mocked {@link Log} class.
+     * Verifies that the logcat writer builder is the default writer builder on Android.
      */
-    @AfterEach
-    void dispose() {
-        logMock.close();
+    @Test
+    void defaultWriter() {
+        String builderWriterName = new LogcatWriterBuilder().getName();
+        String defaultWriterName = framework.getRuntime().getDefaultWriter();
+        assertThat(builderWriterName).isEqualTo(defaultWriterName);
     }
 
     /**
@@ -58,8 +61,12 @@ class LogcatWriterBuilderTest {
 
         try (Writer writer = new LogcatWriterBuilder().create(context, new Configuration(emptyMap()))) {
             writer.log(logEntry);
-            logMock.verify(() -> Log.println(Log.INFO, null, "Hello World!"));
         }
+
+        Thread.sleep(100);
+
+        Pattern pattern = Pattern.compile("\\W+I\\W+(tinylog\\.test\\W+)?Hello World!$");
+        assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
     }
 
     /**
@@ -76,8 +83,12 @@ class LogcatWriterBuilderTest {
         Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
         try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
             writer.log(logEntry);
-            logMock.verify(() -> Log.println(Log.INFO, "foo", "Hello World!"));
         }
+
+        Thread.sleep(100);
+
+        Pattern pattern = Pattern.compile("\\W+I\\W+foo\\W+Hello World!$");
+        assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
     }
 
     /**
@@ -94,8 +105,12 @@ class LogcatWriterBuilderTest {
         Configuration configuration = new Configuration(singletonMap("tag-pattern", "{tag}"));
         try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
             writer.log(logEntry);
-            logMock.verify(() -> Log.println(Log.INFO, "12345678901234567890...", "Hello World!"));
         }
+
+        Thread.sleep(100);
+
+        Pattern pattern = Pattern.compile("\\W+I\\W+12345678901234567890\\.\\.\\.\\W+Hello World!$");
+        assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
     }
 
     /**
@@ -112,8 +127,12 @@ class LogcatWriterBuilderTest {
         Configuration configuration = new Configuration(singletonMap("message-pattern", "{class-name}: {message}"));
         try (Writer writer = new LogcatWriterBuilder().create(context, configuration)) {
             writer.log(logEntry);
-            logMock.verify(() -> Log.println(Log.INFO, null, "MyClass: Hello World!"));
         }
+
+        Thread.sleep(100);
+
+        Pattern pattern = Pattern.compile("\\W+I\\W+(tinylog\\.test\\W+)?MyClass: Hello World!$");
+        assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
     }
 
     /**

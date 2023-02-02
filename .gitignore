@@ -4,4 +4,5 @@
 local.properties
 hs_err_pid*
 jacoco.exec
+build/
 target/

@@ -1,10 +1,11 @@
 package org.tinylog.impl.writers.logcat;
 
+import java.io.IOException;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.mockito.MockedStatic;
 import org.tinylog.core.Level;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
@@ -25,7 +25,6 @@ import org.tinylog.impl.test.LogEntryBuilder;
 import android.util.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mockStatic;
 
 @CaptureLogEntries
 class LogcatWriterTest {
@@ -73,27 +72,17 @@ class LogcatWriterTest {
     }
 
     /**
-     * Tests for passing log entries to {@link Log} on non-Android platforms.
+     * Tests for passing log entries to {@link Log}.
      */
     @Nested
     class Logging {
 
-        private MockedStatic<Log> logMock;
-
         /**
-         * Mocks the static {@link Log} class.
+         * Clears all existing Logcat output.
          */
         @BeforeEach
-        void init() {
-            logMock = mockStatic(Log.class);
-        }
-
-        /**
-         * Restores the statically mocked {@link Log} class.
-         */
-        @AfterEach
-        void dispose() {
-            logMock.close();
+        void init() throws IOException, InterruptedException {
+            Logcat.clear();
         }
 
         /**
@@ -101,11 +90,11 @@ class LogcatWriterTest {
          * correctly, if no tag placeholder is set.
          *
          * @param tinylogLevel The severity level to test
-         * @param androidPriority The corresponding Android priority for the passed severity level
+         * @param androidPriority The corresponding Android priority as letter for the passed severity level
          */
         @ParameterizedTest
-        @ArgumentsSource(LevelsAndPrioritiesProvider.class)
-        void untaggedLogging(Level tinylogLevel, int androidPriority) {
+        @ArgumentsSource(LevelsAndCharactersProvider.class)
+        void untaggedLogging(Level tinylogLevel, char androidPriority) throws IOException {
             LogEntry logEntry = new LogEntryBuilder()
                 .severityLevel(tinylogLevel)
                 .message("Hello World!")
@@ -113,8 +102,12 @@ class LogcatWriterTest {
 
             try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
                 writer.log(logEntry);
-                logMock.verify(() -> Log.println(androidPriority, null, "Hello World!"));
             }
+
+            Pattern pattern = Pattern.compile(
+                "\\W+" + androidPriority + "\\W+(tinylog\\.test\\W+)?Hello World!$"
+            );
+            assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
         }
 
         /**
@@ -122,11 +115,11 @@ class LogcatWriterTest {
          * correctly, if a custom tag placeholder is set.
          *
          * @param tinylogLevel The severity level to test
-         * @param androidPriority The corresponding Android priority for the passed severity level
+         * @param androidPriority The corresponding Android priority as letter for the passed severity level
          */
         @ParameterizedTest
-        @ArgumentsSource(LevelsAndPrioritiesProvider.class)
-        void taggedLogging(Level tinylogLevel, int androidPriority) {
+        @ArgumentsSource(LevelsAndCharactersProvider.class)
+        void taggedLogging(Level tinylogLevel, char androidPriority) throws IOException {
             LogEntry logEntry = new LogEntryBuilder()
                 .severityLevel(tinylogLevel)
                 .className("org.foo.MyClass")
@@ -135,15 +128,17 @@ class LogcatWriterTest {
 
             try (LogcatWriter writer = new LogcatWriter(new ClassNamePlaceholder(), new MessagePlaceholder())) {
                 writer.log(logEntry);
-                logMock.verify(() -> Log.println(androidPriority, "MyClass", "Hello World!"));
             }
+
+            Pattern pattern = Pattern.compile("\\W+" + androidPriority + "\\W+MyClass\\W+Hello World!$");
+            assertThat(Logcat.fetchOutput()).anySatisfy(line -> assertThat(line).containsPattern(pattern));
         }
 
         /**
          * Verifies that a log entry with an illegal severity level is not passed to {@link Log}.
          */
         @Test
-        void loggingWithIllegalLevel() {
+        void loggingWithIllegalLevel() throws IOException {
             LogEntry logEntry = new LogEntryBuilder()
                 .severityLevel(Level.OFF)
                 .message("Hello Hell!")
@@ -151,8 +146,9 @@ class LogcatWriterTest {
 
             try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
                 writer.log(logEntry);
-                logMock.verifyNoInteractions();
             }
+
+            assertThat(Logcat.fetchOutput()).noneSatisfy(line -> assertThat(line).contains("Hello Hell!"));
 
             assertThat(log.consume()).singleElement().satisfies(entry -> {
                 assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
@@ -160,26 +156,36 @@ class LogcatWriterTest {
             });
         }
 
+        /**
+         * Verifies that flushing won't throw any exception.
+         */
+        @Test
+        void flushing() {
+            try (LogcatWriter writer = new LogcatWriter(null, new MessagePlaceholder())) {
+                writer.flush();
+            }
+        }
+
     }
 
     /**
      * Arguments provider for providing all {@link Level tinylog severity levels} with the corresponding Android
-     * priority numbers.
+     * priority characters.
      *
-     * @see Logging#untaggedLogging(Level, int)
-     * @see Logging#taggedLogging(Level, int)
+     * @see Logging#untaggedLogging(Level, char)
+     * @see Logging#taggedLogging(Level, char)
      */
-    private static class LevelsAndPrioritiesProvider implements ArgumentsProvider {
+    private static class LevelsAndCharactersProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             /* START IGNORE CODE STYLE */
             return Stream.of(
-                Arguments.of(Level.TRACE, Log.VERBOSE),
-                Arguments.of(Level.DEBUG, Log.DEBUG  ),
-                Arguments.of(Level.INFO,  Log.INFO   ),
-                Arguments.of(Level.WARN,  Log.WARN   ),
-                Arguments.of(Level.ERROR, Log.ERROR  )
+                Arguments.of(Level.TRACE, 'V'),
+                Arguments.of(Level.DEBUG, 'D'),
+                Arguments.of(Level.INFO,  'I'),
+                Arguments.of(Level.WARN,  'W'),
+                Arguments.of(Level.ERROR, 'E')
             );
             /* END IGNORE CODE STYLE */
         }
