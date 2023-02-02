@@ -46,8 +46,7 @@ android {
             java {
                 srcDirs += "../tinylog-core/src/main/java"
                 srcDirs += "../tinylog-impl/src/main/java"
-                exclude "**/*.java"
-                include "**/Android*.java", "**/Logcat*.java"
+                exclude "**/Java*.java", "**/Jndi*.java","**/Jdbc*.java"
             }
         }
     }
