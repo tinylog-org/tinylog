@@ -11,6 +11,7 @@ import org.mockito.MockedStatic;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 import org.tinylog.impl.writers.Writer;
@@ -23,6 +24,7 @@ import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 
+@CaptureLogEntries
 class LogcatWriterBuilderTest {
 
     @Inject

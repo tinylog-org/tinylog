@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.tinylog.core.Level;
@@ -18,7 +17,6 @@ import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisabledIfSystemProperty(named = "java.runtime.name", matches = "Android Runtime")
 class JavaRuntimeTest {
 
     /**
@@ -77,7 +75,7 @@ class JavaRuntimeTest {
                 assertThat(element.getClassName()).isEqualTo(DirectCaller.class.getName());
                 assertThat(element.getMethodName()).isEqualTo("getFullLocationInformation");
                 assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-                assertThat(element.getLineNumber()).isEqualTo(74);
+                assertThat(element.getLineNumber()).isEqualTo(72);
             });
         }
 
@@ -143,7 +141,7 @@ class JavaRuntimeTest {
                 assertThat(element.getClassName()).isEqualTo(RelativeCaller.class.getName());
                 assertThat(element.getMethodName()).isEqualTo("getValidFullLocationInformation");
                 assertThat(element.getFileName()).isEqualTo(JavaRuntimeTest.class.getSimpleName() + ".java");
-                assertThat(element.getLineNumber()).isEqualTo(140);
+                assertThat(element.getLineNumber()).isEqualTo(138);
             });
         }
 
