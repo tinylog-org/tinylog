@@ -6,7 +6,7 @@ launched before executing the tests.
 Gradle command for executing the JUnit tests including code coverage report:
 
 ```
-gradlew createDebugCoverageReport
+gradlew createDebugCoverageReport checkstyle
 ```
 
 It is recommended to use the latest version of [Android Studio](https://developer.android.com/studio) for launching the

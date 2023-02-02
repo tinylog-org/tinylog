@@ -1,4 +1,4 @@
-package org.tinylog.impl.writers.logcat;
+package org.tinylog.impl.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +18,9 @@ public final class Logcat {
 
     /**
      * Clears all existing Logcat output.
+     *
+     * @throws IOException Failed to call command line tool
+     * @throws InterruptedException Failed to wait for command line tool
      */
     public static void clear() throws IOException, InterruptedException {
         Runtime.getRuntime().exec("logcat -c").waitFor();

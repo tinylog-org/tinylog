@@ -15,6 +15,7 @@ import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.test.Logcat;
 import org.tinylog.impl.writers.Writer;
 import org.tinylog.impl.writers.WriterBuilder;
 

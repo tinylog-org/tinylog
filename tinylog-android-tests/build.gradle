@@ -1,3 +1,4 @@
+apply plugin: "checkstyle"
 apply plugin: "com.android.library"
 apply plugin: "jacoco"
 apply plugin: "de.mannodermaus.android-junit5"
@@ -75,4 +76,11 @@ android {
         exclude("META-INF/LICENSE*")
         exclude("META-INF/licenses/*")
     }
+}
+
+task checkstyle(type: Checkstyle) {
+    configFile file("../configuration/checkstyle-rules.xml")
+    configProperties["workspace_loc"] = file("..").path
+    source "src"
+    classpath = files()
 }

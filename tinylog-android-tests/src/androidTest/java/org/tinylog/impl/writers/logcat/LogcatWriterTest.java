@@ -21,6 +21,7 @@ import org.tinylog.impl.LogEntryValue;
 import org.tinylog.impl.format.pattern.placeholders.ClassNamePlaceholder;
 import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
 import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.impl.test.Logcat;
 
 import android.util.Log;
 
