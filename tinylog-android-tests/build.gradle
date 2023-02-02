@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.tinylog:tinylog-api:${version}"
+    implementation "org.tinylog:tinylog-core:${version}"
     implementation "org.tinylog:tinylog-impl:${version}"
     androidTestImplementation "androidx.test:runner:1.5.2"
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.3.0"
