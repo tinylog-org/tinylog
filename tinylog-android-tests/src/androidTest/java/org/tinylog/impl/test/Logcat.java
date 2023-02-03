@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +41,10 @@ public final class Logcat {
     public static List<String> fetchOutput() throws IOException {
         Process process = Runtime.getRuntime().exec("logcat -d -v threadtime");
         try (InputStream stream = process.getInputStream()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
-                return reader.lines().collect(Collectors.toList());
+            try (Reader inputReader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                try (BufferedReader bufferedReader = new BufferedReader(inputReader)) {
+                    return bufferedReader.lines().collect(Collectors.toList());
+                }
             }
         } finally {
             process.destroy();

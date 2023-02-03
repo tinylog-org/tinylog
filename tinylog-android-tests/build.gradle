@@ -1,17 +1,20 @@
 apply plugin: "checkstyle"
 apply plugin: "com.android.library"
+apply plugin: "com.github.spotbugs"
 apply plugin: "jacoco"
 apply plugin: "de.mannodermaus.android-junit5"
 
 buildscript {
     repositories {
         google()
+        gradlePluginPortal()
         mavenLocal()
         mavenCentral()
     }
 
     dependencies {
         classpath "com.android.tools.build:gradle:7.4.0"
+        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.13"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.8.2.1"
         classpath "org.jacoco:org.jacoco.core:0.8.8"
     }
@@ -19,6 +22,7 @@ buildscript {
 
 repositories {
     google()
+    gradlePluginPortal()
     mavenLocal()
     mavenCentral()
 }
@@ -76,6 +80,10 @@ android {
         exclude("META-INF/LICENSE*")
         exclude("META-INF/licenses/*")
     }
+}
+
+spotbugs {
+    excludeFilter = file("../configuration/spotbugs-filters.xml")
 }
 
 task checkstyle(type: Checkstyle) {

@@ -12,6 +12,11 @@
         <!-- Allow exposing internal representations -->
     </Match>
     <Match>
+        <Class name="org.tinylog.core.context.BundleContextStorage$CombinedHashMap" />
+        <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
+        <!-- False positive as null as default value for deserialized transient values is actually wanted -->
+    </Match>
+    <Match>
         <Class name="org.tinylog.core.loader.PropertiesLoader" />
         <Method name="load" />
         <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE, RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" />
