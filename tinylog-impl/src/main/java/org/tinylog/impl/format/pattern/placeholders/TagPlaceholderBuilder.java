@@ -1,5 +1,6 @@
 package org.tinylog.impl.format.pattern.placeholders;
 
+import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.LoggingContext;
 
 /**
@@ -18,11 +19,15 @@ public class TagPlaceholderBuilder implements PlaceholderBuilder {
 
     @Override
     public Placeholder create(LoggingContext context, String value) {
-        if (value == null) {
-            return new TagPlaceholder(null, "<untagged>");
-        } else {
-            return new TagPlaceholder(value, value);
+        if (value != null) {
+            InternalLogger.warn(
+                null,
+                "Unexpected configuration value for tag placeholder: \"{}\"",
+                value
+            );
         }
+
+        return new TagPlaceholder();
     }
 
 }

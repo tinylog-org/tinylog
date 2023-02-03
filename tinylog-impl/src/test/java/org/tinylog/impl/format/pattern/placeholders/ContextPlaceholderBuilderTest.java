@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
 import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.test.FormatOutputRenderer;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,9 +15,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @CaptureLogEntries
 class ContextPlaceholderBuilderTest {
-
-    private static final LogEntry emptyLogEntry = new LogEntryBuilder().create();
-    private static final LogEntry filledLogEntry = new LogEntryBuilder().context("foo", "boo").create();
 
     @Inject
     private LoggingContext context;
@@ -35,33 +31,15 @@ class ContextPlaceholderBuilderTest {
     }
 
     /**
-     * Verifies that context placeholders without any custom default value are instantiated correctly.
+     * Verifies that a context placeholder can be created for a given thread context key.
      */
     @Test
-    void creationWithKeyOnly() {
+    void creationWithConfigurationValue() {
         Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo");
         assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
-        assertThat(placeholder.getValue(emptyLogEntry)).isNull();
-        assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");
 
-        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-        assertThat(renderer.render(emptyLogEntry)).isEqualTo("<foo not set>");
-        assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
-    }
-
-    /**
-     * Verifies that context placeholders with a custom default value are instantiated correctly.
-     */
-    @Test
-    void creationWithKeyAndDefaultValue() {
-        Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo,bar");
-        assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
-        assertThat(placeholder.getValue(emptyLogEntry)).isEqualTo("bar");
-        assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("boo");
-
-        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-        assertThat(renderer.render(emptyLogEntry)).isEqualTo("bar");
-        assertThat(renderer.render(filledLogEntry)).isEqualTo("boo");
+        LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
     }
 
     /**

@@ -5,51 +5,44 @@ import java.util.ServiceLoader;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.Level;
 import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.test.FormatOutputRenderer;
-import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.core.test.log.Log;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @CaptureLogEntries
 class TagPlaceholderBuilderTest {
 
-    private static final LogEntry emptyLogEntry = new LogEntryBuilder().create();
-    private static final LogEntry filledLogEntry = new LogEntryBuilder().tag("foo").create();
-
     @Inject
     private LoggingContext context;
 
+    @Inject
+    private Log log;
+
     /**
-     * Verifies that tag placeholders without any custom default value are instantiated correctly.
+     * Verifies that the builder can create an instance of {@link TagPlaceholder} without having a configuration value.
      */
     @Test
-    void creationWithoutDefaultValue() {
-        Placeholder placeholder = new TagPlaceholderBuilder().create(context, null);
-        assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
-        assertThat(placeholder.getValue(emptyLogEntry)).isNull();
-        assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("foo");
-
-        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-        assertThat(renderer.render(emptyLogEntry)).isEqualTo("<untagged>");
-        assertThat(renderer.render(filledLogEntry)).isEqualTo("foo");
+    void creationWithoutConfigurationValue() {
+        TagPlaceholderBuilder builder = new TagPlaceholderBuilder();
+        assertThat(builder.create(context, null)).isInstanceOf(TagPlaceholder.class);
+        assertThat(log.consume()).isEmpty();
     }
 
     /**
-     * Verifies that tag placeholders with a custom default value are instantiated correctly.
+     * Verifies that the builder can create an instance of {@link TagPlaceholder} when having an unexpected
+     * configuration value.
      */
     @Test
-    void creationWithDefaultValue() {
-        Placeholder placeholder = new TagPlaceholderBuilder().create(context, "none");
-        assertThat(placeholder).isInstanceOf(TagPlaceholder.class);
-        assertThat(placeholder.getValue(emptyLogEntry)).isEqualTo("none");
-        assertThat(placeholder.getValue(filledLogEntry)).isEqualTo("foo");
-
-        FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
-        assertThat(renderer.render(emptyLogEntry)).isEqualTo("none");
-        assertThat(renderer.render(filledLogEntry)).isEqualTo("foo");
+    void creationWithConfigurationValue() {
+        TagPlaceholderBuilder builder = new TagPlaceholderBuilder();
+        assertThat(builder.create(context, "foo")).isInstanceOf(TagPlaceholder.class);
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getLevel()).isEqualTo(Level.WARN);
+            assertThat(entry.getMessage()).contains("foo");
+        });
     }
 
     /**

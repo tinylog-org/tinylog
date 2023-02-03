@@ -17,7 +17,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void requiredLogEntryValues() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, null);
+        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
         assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.CONTEXT);
     }
 
@@ -26,21 +26,21 @@ class ContextPlaceholderTest {
      */
     @Test
     void resolveWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
     }
 
     /**
-     * Verifies that the default value will be resolved, if a thread context value is not present.
+     * Verifies that {@code null} will be resolved, if a thread context value is not present.
      */
     @Test
     void resolveWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo", "-", null);
+        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
-        assertThat(placeholder.getValue(logEntry)).isEqualTo("-");
+        assertThat(placeholder.getValue(logEntry)).isNull();
     }
 
     /**
@@ -48,21 +48,21 @@ class ContextPlaceholderTest {
      */
     @Test
     void renderWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
+        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(renderer.render(logEntry)).isEqualTo("bar");
     }
 
     /**
-     * Verifies that the default value will be output, if a thread context value is not present.
+     * Verifies that an empty string will be output, if a thread context value is not present.
      */
     @Test
     void renderWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo", null, "-");
+        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().create();
-        assertThat(renderer.render(logEntry)).isEqualTo("-");
+        assertThat(renderer.render(logEntry)).isEmpty();
     }
 
 }

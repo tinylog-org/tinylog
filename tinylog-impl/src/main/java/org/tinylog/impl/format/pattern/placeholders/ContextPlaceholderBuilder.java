@@ -21,14 +21,7 @@ public class ContextPlaceholderBuilder implements PlaceholderBuilder {
         if (value == null) {
             throw new IllegalArgumentException("Thread context key is not defined for context placeholder");
         } else {
-            int commaIndex = value.indexOf(',');
-            if (commaIndex < 0) {
-                return new ContextPlaceholder(value, null, "<" + value + " not set>");
-            } else {
-                String key = value.substring(0, commaIndex);
-                String defaultValue = value.substring(commaIndex + 1);
-                return new ContextPlaceholder(key, defaultValue, defaultValue);
-            }
+            return new ContextPlaceholder(value);
         }
     }
 

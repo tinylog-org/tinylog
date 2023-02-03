@@ -23,6 +23,7 @@ import org.tinylog.impl.format.pattern.placeholders.ThreadIdPlaceholderBuilder;
 import org.tinylog.impl.format.pattern.placeholders.ThreadPlaceholderBuilder;
 import org.tinylog.impl.format.pattern.placeholders.TimestampPlaceholderBuilder;
 import org.tinylog.impl.format.pattern.placeholders.UptimePlaceholderBuilder;
+import org.tinylog.impl.format.pattern.styles.DefaultValueStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.IndentStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.LengthStyleBuilder;
 import org.tinylog.impl.format.pattern.styles.MaxLengthStyleBuilder;
@@ -80,6 +81,7 @@ module org.tinylog.impl {
 
     uses StyleBuilder;
     provides StyleBuilder with
+        DefaultValueStyleBuilder,
         IndentStyleBuilder,
         LengthStyleBuilder,
         MaxLengthStyleBuilder,

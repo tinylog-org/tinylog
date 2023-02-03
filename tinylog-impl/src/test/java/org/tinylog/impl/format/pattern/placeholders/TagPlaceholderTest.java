@@ -16,7 +16,7 @@ class TagPlaceholderTest {
      */
     @Test
     void requiredLogEntryValues() {
-        TagPlaceholder placeholder = new TagPlaceholder(null, null);
+        TagPlaceholder placeholder = new TagPlaceholder();
         assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TAG);
     }
 
@@ -25,21 +25,21 @@ class TagPlaceholderTest {
      */
     @Test
     void resolveWithTag() {
-        TagPlaceholder placeholder = new TagPlaceholder(null, "-");
+        TagPlaceholder placeholder = new TagPlaceholder();
         LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isEqualTo("foo");
     }
 
     /**
-     * Verifies that the default value is resolved for untagged log entries.
+     * Verifies that {@code null} is resolved for untagged log entries.
      */
     @Test
     void resolveWithoutTag() {
-        TagPlaceholder placeholder = new TagPlaceholder("-", null);
+        TagPlaceholder placeholder = new TagPlaceholder();
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
-        assertThat(placeholder.getValue(logEntry)).isEqualTo("-");
+        assertThat(placeholder.getValue(logEntry)).isNull();
     }
 
     /**
@@ -47,21 +47,21 @@ class TagPlaceholderTest {
      */
     @Test
     void renderWithTag() {
-        TagPlaceholder placeholder = new TagPlaceholder("-", null);
+        TagPlaceholder placeholder = new TagPlaceholder();
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().tag("foo").create();
         assertThat(renderer.render(logEntry)).isEqualTo("foo");
     }
 
     /**
-     * Verifies that the default value is output for untagged log entries.
+     * Verifies that an empty sting is output for untagged log entries.
      */
     @Test
     void renderWithoutTag() {
-        TagPlaceholder placeholder = new TagPlaceholder(null, "-");
+        TagPlaceholder placeholder = new TagPlaceholder();
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().create();
-        assertThat(renderer.render(logEntry)).isEqualTo("-");
+        assertThat(renderer.render(logEntry)).isEmpty();
     }
 
 }
