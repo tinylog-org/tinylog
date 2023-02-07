@@ -85,7 +85,7 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isTraceEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
@@ -94,8 +94,8 @@ internal class TaggedLoggerTest {
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
+                    OutputDetails.DISABLED,
+                ),
             )
 
             whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled)
@@ -119,7 +119,7 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
@@ -128,8 +128,8 @@ internal class TaggedLoggerTest {
                     outputDetails,
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
+                    OutputDetails.DISABLED,
+                ),
             )
 
             whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled)
@@ -153,7 +153,7 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isInfoEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
@@ -162,8 +162,8 @@ internal class TaggedLoggerTest {
                     OutputDetails.DISABLED,
                     outputDetails,
                     OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
+                    OutputDetails.DISABLED,
+                ),
             )
 
             whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled)
@@ -187,7 +187,7 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isWarnEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
@@ -196,8 +196,8 @@ internal class TaggedLoggerTest {
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
                     outputDetails,
-                    OutputDetails.DISABLED
-                )
+                    OutputDetails.DISABLED,
+                ),
             )
 
             whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled)
@@ -221,7 +221,7 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isErrorEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
@@ -230,8 +230,8 @@ internal class TaggedLoggerTest {
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
-                    outputDetails
-                )
+                    outputDetails,
+                ),
             )
 
             whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled)

@@ -140,7 +140,7 @@ internal class LoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isTraceEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(visibility.trace).thenReturn(outputDetails)
@@ -164,7 +164,7 @@ internal class LoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(visibility.debug).thenReturn(outputDetails)
@@ -188,7 +188,7 @@ internal class LoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isInfoEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(visibility.info).thenReturn(outputDetails)
@@ -212,7 +212,7 @@ internal class LoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isWarnEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(visibility.warn).thenReturn(outputDetails)
@@ -236,7 +236,7 @@ internal class LoggerTest {
             "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
             "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
         fun isErrorEnabled(enabled: Boolean, outputDetails: OutputDetails) {
             whenever(visibility.error).thenReturn(outputDetails)
@@ -853,7 +853,7 @@ internal class LoggerTest {
                     same(exception),
                     same(message),
                     if (arguments.isEmpty()) isNull() else eq(arguments),
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>()
+                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
                 )
             }
 
@@ -874,7 +874,7 @@ internal class LoggerTest {
                     same(exception),
                     argThat { this is Supplier<*> && this.get() == message() },
                     if (arguments.isEmpty()) isNull() else eq(arguments),
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>()
+                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
                 )
             }
 
@@ -903,7 +903,7 @@ internal class LoggerTest {
                             }
                         }
                     },
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>()
+                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
                 )
             }
         }
