@@ -21,6 +21,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
@@ -120,6 +121,36 @@ public final class BundleLoggingProviderTest {
 
 		verify(first, atLeastOnce()).isEnabled(eq(2), isNull(), any());
 		verify(second, atLeastOnce()).isEnabled(eq(2), isNull(), any());
+	}
+
+	/**
+	 * Verifies that {@code isEnabled} method evaluates the severity level from underlying logging providers and
+	 * returns {@code true} if given severity level is enabled at least for one of the underlying logging providers.
+	 */
+	@Test
+	public void isEnabledWithLoggerClassName() {
+		init(Level.TRACE, Level.TRACE);
+
+		when(first.isEnabled(anyString(), isNull(), eq(Level.TRACE))).thenReturn(false);
+		when(first.isEnabled(anyString(), isNull(), eq(Level.DEBUG))).thenReturn(false);
+		when(first.isEnabled(anyString(), isNull(), eq(Level.INFO))).thenReturn(false);
+		when(first.isEnabled(anyString(), isNull(), eq(Level.WARN))).thenReturn(true);
+		when(first.isEnabled(anyString(), isNull(), eq(Level.ERROR))).thenReturn(true);
+
+		when(second.isEnabled(anyString(), isNull(), eq(Level.TRACE))).thenReturn(false);
+		when(second.isEnabled(anyString(), isNull(), eq(Level.DEBUG))).thenReturn(true);
+		when(second.isEnabled(anyString(), isNull(), eq(Level.INFO))).thenReturn(true);
+		when(second.isEnabled(anyString(), isNull(), eq(Level.WARN))).thenReturn(true);
+		when(second.isEnabled(anyString(), isNull(), eq(Level.ERROR))).thenReturn(true);
+
+		assertThat(bundle.isEnabled("myLoggerClassName", null, Level.TRACE)).isFalse();
+		assertThat(bundle.isEnabled("myLoggerClassName", null, Level.DEBUG)).isTrue();
+		assertThat(bundle.isEnabled("myLoggerClassName", null, Level.INFO)).isTrue();
+		assertThat(bundle.isEnabled("myLoggerClassName", null, Level.WARN)).isTrue();
+		assertThat(bundle.isEnabled("myLoggerClassName", null, Level.ERROR)).isTrue();
+
+		verify(first, atLeastOnce()).isEnabled(eq("myLoggerClassName"), isNull(), any());
+		verify(second, atLeastOnce()).isEnabled(eq("myLoggerClassName"), isNull(), any());
 	}
 
 	/**

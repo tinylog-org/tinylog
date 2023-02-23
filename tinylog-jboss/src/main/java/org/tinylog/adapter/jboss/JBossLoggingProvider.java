@@ -49,8 +49,12 @@ public final class JBossLoggingProvider implements LoggingProvider {
 
 	@Override
 	public boolean isEnabled(final int depth, final String tag, final Level level) {
-		String callerClassName = RuntimeProvider.getCallerClassName(depth + 1);
-		return Logger.getLogger(callerClassName).isEnabled(translate(level));
+		return isLoggable(RuntimeProvider.getCallerClassName(depth + 1), level);
+	}
+
+	@Override
+	public boolean isEnabled(final String loggerClassName, final String tag, final Level level) {
+		return isLoggable(RuntimeProvider.getCallerClassName(loggerClassName), level);
 	}
 
 	@Override
@@ -87,7 +91,7 @@ public final class JBossLoggingProvider implements LoggingProvider {
 
 	/**
 	 * Translates a tinylog severity level into a JBoss Logging level.
-	 * 
+	 *
 	 * @param level
 	 *            Severity level of tinylog
 	 * @return Corresponding level of JBoss Logging
@@ -109,4 +113,7 @@ public final class JBossLoggingProvider implements LoggingProvider {
 		}
 	}
 
+	private static boolean isLoggable(final String callerClassName, final Level level) {
+		return Logger.getLogger(callerClassName).isEnabled(translate(level));
+	}
 }

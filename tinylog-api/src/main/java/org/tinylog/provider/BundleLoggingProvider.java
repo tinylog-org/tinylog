@@ -69,12 +69,21 @@ public final class BundleLoggingProvider implements LoggingProvider {
 
 	@Override
 	public boolean isEnabled(final int depth, final String tag, final Level level) {
-		for (int i = 0; i < loggingProviders.length; ++i) {
-			if (loggingProviders[i].isEnabled(depth + 1, tag, level)) {
+		for (LoggingProvider loggingProvider : loggingProviders) {
+			if (loggingProvider.isEnabled(depth + 1, tag, level)) {
 				return true;
 			}
 		}
+		return false;
+	}
 
+	@Override
+	public boolean isEnabled(final String loggerClassName, final String tag, final Level level) {
+		for (LoggingProvider loggingProvider : loggingProviders) {
+			if (loggingProvider.isEnabled(loggerClassName, tag, level)) {
+				return true;
+			}
+		}
 		return false;
 	}
 

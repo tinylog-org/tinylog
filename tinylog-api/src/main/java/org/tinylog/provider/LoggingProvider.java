@@ -73,6 +73,19 @@ public interface LoggingProvider {
 	boolean isEnabled(int depth, String tag, Level level);
 
 	/**
+	 * Checks whether log entries, issued by the caller of the given logger class, with given tag and severity level will be output.
+	 *
+	 * @param loggerClassName
+	 *     Fully-qualified class name of the logger instance
+	 * @param tag
+	 *     Tag to check (can be {@code null})
+	 * @param level
+	 *     Severity level to check
+	 * @return {@code true} if given severity level is enabled, {@code false} if disabled
+	 */
+	boolean isEnabled(String loggerClassName, String tag, Level level);
+
+	/**
 	 * Provides a regular log entry.
 	 *
 	 * @param depth
@@ -117,7 +130,7 @@ public interface LoggingProvider {
 	/**
 	 * Shuts down the logging provider and frees all allocated resources. This method should be called only if auto
 	 * shutdown is explicitly disabled.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             Interrupted while waiting for complete shutdown
 	 */

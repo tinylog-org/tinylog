@@ -89,7 +89,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 		Level level = Level.OFF;
 		for (int tagIndex = 0; tagIndex < writers.length; ++tagIndex) {
 			for (int levelIndex = Level.TRACE.ordinal(); levelIndex < level.ordinal(); ++levelIndex) {
-				if (writers[tagIndex][levelIndex].size() > 0) {
+				if (!writers[tagIndex][levelIndex].isEmpty()) {
 					level = Level.values()[levelIndex];
 				}
 			}
@@ -101,7 +101,7 @@ public class TinylogLoggingProvider implements LoggingProvider {
 	public Level getMinimumLevel(final String tag) {
 		int tagIndex = getTagIndex(tag);
 		for (int levelIndex = Level.TRACE.ordinal(); levelIndex < Level.OFF.ordinal(); ++levelIndex) {
-			if (writers[tagIndex][levelIndex].size() > 0) {
+			if (!writers[tagIndex][levelIndex].isEmpty()) {
 				return Level.values()[levelIndex];
 			}
 		}
@@ -110,16 +110,17 @@ public class TinylogLoggingProvider implements LoggingProvider {
 
 	@Override
 	public boolean isEnabled(final int depth, final String tag, final Level level) {
-		Level activeLevel;
+		return isLoggable(RuntimeProvider.getCallerClassName(depth + 1), level, tag);
+	}
 
-		if (customLevels.isEmpty()) {
-			activeLevel = globalLevel;
-		} else {
-			String className = RuntimeProvider.getCallerClassName(depth + 1);
-			activeLevel = getLevel(className);
-		}
+	@Override
+	public boolean isEnabled(final String loggerClassName, final String tag, final Level level) {
+		return isLoggable(RuntimeProvider.getCallerClassName(loggerClassName), level, tag);
+	}
 
-		return activeLevel.ordinal() <= level.ordinal() && writers[getTagIndex(tag)][level.ordinal()].size() > 0;
+	private boolean isLoggable(final String callerClassName, final Level level, final String tag) {
+		Level activeLevel = customLevels.isEmpty() ? globalLevel : getLevel(callerClassName);
+		return activeLevel.ordinal() <= level.ordinal() && !writers[getTagIndex(tag)][level.ordinal()].isEmpty();
 	}
 
 	@Override
