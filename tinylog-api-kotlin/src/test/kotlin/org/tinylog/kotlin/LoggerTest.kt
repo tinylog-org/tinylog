@@ -113,11 +113,11 @@ class LoggerTest {
 		fun applyLoggingProvider() {
 			every { loggingProvider.getMinimumLevel(null) } returns level.level
 
-			every { loggingProvider.isEnabled(any(), null, Level.TRACE) } returns  level.traceEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.DEBUG) } returns  level.debugEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.INFO) } returns  level.infoEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.WARN) } returns  level.warnEnabled
-			every { loggingProvider.isEnabled(any(), null, Level.ERROR) } returns  level.errorEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), null, Level.TRACE) } returns  level.traceEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), null, Level.DEBUG) } returns  level.debugEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), null, Level.INFO) } returns  level.infoEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), null, Level.WARN) } returns  level.warnEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), null, Level.ERROR) } returns  level.errorEnabled
 
 			every { loggingProvider.log(any<Int>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit
 			every { loggingProvider.log(any<String>(), any(), any(), any(), any(), any(), *anyVararg()) } returns Unit

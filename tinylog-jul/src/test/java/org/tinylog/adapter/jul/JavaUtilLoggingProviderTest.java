@@ -102,6 +102,19 @@ public final class JavaUtilLoggingProviderTest {
 	}
 
 	/**
+	 * Verifies that {@link Level#INFO}, {@link Level#WARN}, and {@link Level#ERROR} are enabled.
+	 */
+	@Test
+	public void enabledWithLoggerClassName() {
+		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
+
+		String effectualLoggerClass = JavaUtilLoggingProvider.class.getName();
+		assertThat(provider.isEnabled(effectualLoggerClass, null, Level.INFO)).isTrue();
+		assertThat(provider.isEnabled(effectualLoggerClass, null, Level.WARN)).isTrue();
+		assertThat(provider.isEnabled(effectualLoggerClass, null, Level.ERROR)).isTrue();
+	}
+
+	/**
 	 * Verifies that {@link Level#TRACE} and {@link Level#DEBUG} are disabled.
 	 */
 	@Test
@@ -110,6 +123,18 @@ public final class JavaUtilLoggingProviderTest {
 
 		assertThat(provider.isEnabled(1, null, Level.TRACE)).isFalse();
 		assertThat(provider.isEnabled(1, null, Level.DEBUG)).isFalse();
+	}
+
+	/**
+	 * Verifies that {@link Level#TRACE} and {@link Level#DEBUG} are disabled.
+	 */
+	@Test
+	public void disabledWithLoggerClassName() {
+		JavaUtilLoggingProvider provider = new JavaUtilLoggingProvider();
+
+		String effectualLoggerClass = JavaUtilLoggingProvider.class.getName();
+		assertThat(provider.isEnabled(effectualLoggerClass, null, Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled(effectualLoggerClass, null, Level.DEBUG)).isFalse();
 	}
 
 	/**

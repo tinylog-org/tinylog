@@ -101,22 +101,22 @@ class TaggedLoggerTest(private val tag1Configuration: LevelConfiguration, privat
 
 		every { loggingProvider.getMinimumLevel(tag1) } returns tag1Configuration.level
 
-		every { loggingProvider.isEnabled(any(), tag1, Level.TRACE) } returns tag1Configuration.traceEnabled
-		every { loggingProvider.isEnabled(any(), tag1, Level.DEBUG) } returns tag1Configuration.debugEnabled
-		every { loggingProvider.isEnabled(any(), tag1, Level.INFO) } returns tag1Configuration.infoEnabled
-		every { loggingProvider.isEnabled(any(), tag1, Level.WARN) } returns tag1Configuration.warnEnabled
-		every { loggingProvider.isEnabled(any(), tag1, Level.ERROR) } returns tag1Configuration.errorEnabled
+		every { loggingProvider.isEnabled(ofType(Int::class), tag1, Level.TRACE) } returns tag1Configuration.traceEnabled
+		every { loggingProvider.isEnabled(ofType(Int::class), tag1, Level.DEBUG) } returns tag1Configuration.debugEnabled
+		every { loggingProvider.isEnabled(ofType(Int::class), tag1, Level.INFO) } returns tag1Configuration.infoEnabled
+		every { loggingProvider.isEnabled(ofType(Int::class), tag1, Level.WARN) } returns tag1Configuration.warnEnabled
+		every { loggingProvider.isEnabled(ofType(Int::class), tag1, Level.ERROR) } returns tag1Configuration.errorEnabled
 
 		logger = if (tag2Configuration == null) {
 			TaggedLogger(setOf(tag1))
 		} else {
 			every { loggingProvider.getMinimumLevel(tag2) } returns tag2Configuration.level
 
-			every { loggingProvider.isEnabled(any(), tag2, Level.TRACE) } returns tag2Configuration.traceEnabled
-			every { loggingProvider.isEnabled(any(), tag2, Level.DEBUG) } returns tag2Configuration.debugEnabled
-			every { loggingProvider.isEnabled(any(), tag2, Level.INFO) } returns tag2Configuration.infoEnabled
-			every { loggingProvider.isEnabled(any(), tag2, Level.WARN) } returns tag2Configuration.warnEnabled
-			every { loggingProvider.isEnabled(any(), tag2, Level.ERROR) } returns tag2Configuration.errorEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), tag2, Level.TRACE) } returns tag2Configuration.traceEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), tag2, Level.DEBUG) } returns tag2Configuration.debugEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), tag2, Level.INFO) } returns tag2Configuration.infoEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), tag2, Level.WARN) } returns tag2Configuration.warnEnabled
+			every { loggingProvider.isEnabled(ofType(Int::class), tag2, Level.ERROR) } returns tag2Configuration.errorEnabled
 			TaggedLogger(setOf(tag1, tag2))
 		}
 

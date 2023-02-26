@@ -312,6 +312,11 @@ public final class ProviderRegistryTest {
 		}
 
 		@Override
+		public final boolean isEnabled(final String loggerClassName, final String tag, final Level level) {
+			return false;
+		}
+
+		@Override
 		public final void log(final int depth, final String tag, final Level level, final Throwable exception,
 			final MessageFormatter formatter, final Object obj, final Object... arguments) {
 		}

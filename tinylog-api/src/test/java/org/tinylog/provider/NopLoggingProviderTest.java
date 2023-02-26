@@ -69,6 +69,12 @@ public final class NopLoggingProviderTest {
 		assertThat(provider.isEnabled(2, null, Level.INFO)).isFalse();
 		assertThat(provider.isEnabled(3, null, Level.WARN)).isFalse();
 		assertThat(provider.isEnabled(4, null, Level.ERROR)).isFalse();
+
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", null, Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", null, Level.DEBUG)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", null, Level.INFO)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", null, Level.WARN)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", null, Level.ERROR)).isFalse();
 	}
 
 	/**
@@ -81,6 +87,12 @@ public final class NopLoggingProviderTest {
 		assertThat(provider.isEnabled(2, "test", Level.INFO)).isFalse();
 		assertThat(provider.isEnabled(3, "test", Level.WARN)).isFalse();
 		assertThat(provider.isEnabled(4, "test", Level.ERROR)).isFalse();
+
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", "test", Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", "test", Level.DEBUG)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", "test", Level.INFO)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", "test", Level.WARN)).isFalse();
+		assertThat(provider.isEnabled("any.fully.qualified.class.Name", "test", Level.ERROR)).isFalse();
 	}
 
 	/**

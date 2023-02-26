@@ -101,6 +101,19 @@ public final class JBossLoggingProviderTest {
 	}
 
 	/**
+	 * Verifies that {@link Level#INFO}, {@link Level#WARN}, and {@link Level#ERROR} are enabled.
+	 */
+	@Test
+	public void enabledWithLoggerClassName() {
+		JBossLoggingProvider provider = new JBossLoggingProvider();
+
+		String effectualLoggerClassName = JBossLoggingProvider.class.getName();
+		assertThat(provider.isEnabled(effectualLoggerClassName, null, Level.INFO)).isTrue();
+		assertThat(provider.isEnabled(effectualLoggerClassName, null, Level.WARN)).isTrue();
+		assertThat(provider.isEnabled(effectualLoggerClassName, null, Level.ERROR)).isTrue();
+	}
+
+	/**
 	 * Verifies that {@link Level#TRACE} and {@link Level#DEBUG} are disabled.
 	 */
 	@Test
@@ -109,6 +122,18 @@ public final class JBossLoggingProviderTest {
 
 		assertThat(provider.isEnabled(1, null, Level.TRACE)).isFalse();
 		assertThat(provider.isEnabled(1, null, Level.DEBUG)).isFalse();
+	}
+
+	/**
+	 * Verifies that {@link Level#TRACE} and {@link Level#DEBUG} are disabled.
+	 */
+	@Test
+	public void disabledWithLoggerClassName() {
+		JBossLoggingProvider provider = new JBossLoggingProvider();
+
+		String effectualLoggerClassName = JBossLoggingProvider.class.getName();
+		assertThat(provider.isEnabled(effectualLoggerClassName, null, Level.TRACE)).isFalse();
+		assertThat(provider.isEnabled(effectualLoggerClassName, null, Level.DEBUG)).isFalse();
 	}
 
 	/**
