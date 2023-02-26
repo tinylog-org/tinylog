@@ -124,7 +124,7 @@ public final class BundleLoggingProviderTest {
 	}
 
 	/**
-	 * Verifies that {@code isEnabled()} method evaluates the severity level from underlying logging providers and
+	 * Verifies that {@code isEnabled()} evaluates the severity level from underlying logging providers and
 	 * returns {@code true} if the given severity level is enabled at least for one of the underlying logging providers.
 	 */
 	@Test
