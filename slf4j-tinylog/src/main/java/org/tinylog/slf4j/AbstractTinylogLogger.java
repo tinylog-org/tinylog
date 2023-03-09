@@ -13,12 +13,8 @@
 
 package org.tinylog.slf4j;
 
-import java.util.List;
-
 import org.slf4j.Marker;
-import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LocationAwareLogger;
-import org.slf4j.spi.LoggingEventAware;
 import org.tinylog.Level;
 import org.tinylog.format.LegacyMessageFormatter;
 import org.tinylog.format.MessageFormatter;
@@ -26,29 +22,29 @@ import org.tinylog.provider.LoggingProvider;
 import org.tinylog.provider.ProviderRegistry;
 
 /**
- * Location aware logger for tinylog's {@link LoggingProvider}.
+ * Abstract location aware logger for tinylog's {@link LoggingProvider}.
  */
-public final class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
+public abstract class AbstractTinylogLogger implements LocationAwareLogger {
 
-	private static final int STACKTRACE_DEPTH = 2;
+	protected static final int STACKTRACE_DEPTH = 2;
 
-	private static final MessageFormatter formatter = new LegacyMessageFormatter();
-	private static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
+	protected static final MessageFormatter formatter = new LegacyMessageFormatter();
+	protected static final LoggingProvider provider = ProviderRegistry.getLoggingProvider();
 
 	// @formatter:off
-	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_TRACE = isCoveredByGlobalMinimumLevel(Level.TRACE);
-	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG = isCoveredByGlobalMinimumLevel(Level.DEBUG);
-	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_INFO  = isCoveredByGlobalMinimumLevel(Level.INFO);
-	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_WARN  = isCoveredByGlobalMinimumLevel(Level.WARN);
-	private static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_ERROR = isCoveredByGlobalMinimumLevel(Level.ERROR);
+	protected static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_TRACE = isCoveredByGlobalMinimumLevel(Level.TRACE);
+	protected static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG = isCoveredByGlobalMinimumLevel(Level.DEBUG);
+	protected static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_INFO  = isCoveredByGlobalMinimumLevel(Level.INFO);
+	protected static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_WARN  = isCoveredByGlobalMinimumLevel(Level.WARN);
+	protected static final boolean MINIMUM_GLOBAL_LEVEL_COVERS_ERROR = isCoveredByGlobalMinimumLevel(Level.ERROR);
 	// @formatter:on
 
 	// @formatter:off
-	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_TRACE = isCoveredByDefaultMinimumLevel(Level.TRACE);
-	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG = isCoveredByDefaultMinimumLevel(Level.DEBUG);
-	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_INFO  = isCoveredByDefaultMinimumLevel(Level.INFO);
-	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_WARN  = isCoveredByDefaultMinimumLevel(Level.WARN);
-	private static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_ERROR = isCoveredByDefaultMinimumLevel(Level.ERROR);
+	protected static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_TRACE = isCoveredByDefaultMinimumLevel(Level.TRACE);
+	protected static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG = isCoveredByDefaultMinimumLevel(Level.DEBUG);
+	protected static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_INFO  = isCoveredByDefaultMinimumLevel(Level.INFO);
+	protected static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_WARN  = isCoveredByDefaultMinimumLevel(Level.WARN);
+	protected static final boolean MINIMUM_DEFAULT_LEVEL_COVERS_ERROR = isCoveredByDefaultMinimumLevel(Level.ERROR);
 	// @formatter:on
 
 	private final String name;
@@ -57,7 +53,7 @@ public final class TinylogLogger implements LocationAwareLogger, LoggingEventAwa
 	 * @param name
 	 *            Name for logger
 	 */
-	public TinylogLogger(final String name) {
+	AbstractTinylogLogger(final String name) {
 		this.name = name;
 	}
 
@@ -506,23 +502,24 @@ public final class TinylogLogger implements LocationAwareLogger, LoggingEventAwa
 		}
 	}
 
-	@Override
-	public void log(final LoggingEvent event) {
-		Level severityLevel = translateLevel(event.getLevel().toInt());
-		List<Marker> markers = event.getMarkers();
-		Marker marker = markers == null || markers.isEmpty() ? null : markers.get(0);
-		String tag = marker == null ? null : marker.getName();
-
-		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
-			provider.log(
-				event.getCallerBoundary(),
-				tag,
-				severityLevel,
-				event.getThrowable(),
-				formatter,
-				event.getMessage(),
-				event.getArgumentArray()
-			);
+	/**
+	 * Translate SLF4J severity level codes.
+	 *
+	 * @param level
+	 *            Severity level code from SLF4J
+	 * @return Responding severity level of tinylog
+	 */
+	protected static Level translateLevel(final int level) {
+		if (level <= TRACE_INT) {
+			return Level.TRACE;
+		} else if (level <= DEBUG_INT) {
+			return Level.DEBUG;
+		} else if (level <= INFO_INT) {
+			return Level.INFO;
+		} else if (level <= WARN_INT) {
+			return Level.WARN;
+		} else {
+			return Level.ERROR;
 		}
 	}
 
@@ -546,27 +543,6 @@ public final class TinylogLogger implements LocationAwareLogger, LoggingEventAwa
 	 */
 	private static boolean isCoveredByDefaultMinimumLevel(final Level level) {
 		return provider.getMinimumLevel(null).ordinal() <= level.ordinal();
-	}
-
-	/**
-	 * Translate SLF4J severity level codes.
-	 * 
-	 * @param level
-	 *            Severity level code from SLF4J
-	 * @return Responding severity level of tinylog
-	 */
-	private static Level translateLevel(final int level) {
-		if (level <= TRACE_INT) {
-			return Level.TRACE;
-		} else if (level <= DEBUG_INT) {
-			return Level.DEBUG;
-		} else if (level <= INFO_INT) {
-			return Level.INFO;
-		} else if (level <= WARN_INT) {
-			return Level.WARN;
-		} else {
-			return Level.ERROR;
-		}
 	}
 
 	/**

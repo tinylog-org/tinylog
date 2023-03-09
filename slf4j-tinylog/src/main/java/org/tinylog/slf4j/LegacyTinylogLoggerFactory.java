@@ -19,23 +19,23 @@ import java.util.concurrent.ConcurrentMap;
 import org.slf4j.ILoggerFactory;
 
 /**
- * Logging factory implementation for providing {@link TinylogLogger} instances.
+ * Logging factory implementation for providing {@link LegacyTinylogLogger} instances.
  */
-public final class TinylogLoggerFactory implements ILoggerFactory {
+public final class LegacyTinylogLoggerFactory implements ILoggerFactory {
 
-	private final ConcurrentMap<String, TinylogLogger> loggers;
+	private final ConcurrentMap<String, LegacyTinylogLogger> loggers;
 
 	/** */
-	public TinylogLoggerFactory() {
-		loggers = new ConcurrentHashMap<String, TinylogLogger>();
+	public LegacyTinylogLoggerFactory() {
+		loggers = new ConcurrentHashMap<String, LegacyTinylogLogger>();
 	}
 
 	@Override
-	public TinylogLogger getLogger(final String name) {
-		TinylogLogger logger = loggers.get(name);
+	public LegacyTinylogLogger getLogger(final String name) {
+		LegacyTinylogLogger logger = loggers.get(name);
 		if (logger == null) {
-			TinylogLogger newLogger = new TinylogLogger(name);
-			TinylogLogger existingLogger = loggers.putIfAbsent(name, newLogger);
+			LegacyTinylogLogger newLogger = new LegacyTinylogLogger(name);
+			LegacyTinylogLogger existingLogger = loggers.putIfAbsent(name, newLogger);
 			return existingLogger == null ? newLogger : existingLogger;
 		} else {
 			return logger;

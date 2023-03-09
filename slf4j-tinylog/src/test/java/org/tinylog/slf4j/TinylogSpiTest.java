@@ -30,35 +30,40 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TinylogSpiTest {
 
-	/** Find MDC adapter. */
+	/**
+	 * Verifies that the MDC adapter can be found and loaded.
+	 */
 	@Test
 	public void findMdcAdapterViaSpi() {
-		final MDCAdapter adapter = MDC.getMDCAdapter();
-
+		MDCAdapter adapter = MDC.getMDCAdapter();
 		assertThat(adapter).isExactlyInstanceOf(TinylogMdcAdapter.class);
 	}
 
-	/** Find logger factory. */
+	/**
+	 * Verifies that the logger factory can be found and loaded.
+	 */
 	@Test
 	public void findLoggerFactoryViaSpi() {
-		final ILoggerFactory factory = LoggerFactory.getILoggerFactory();
-
-		assertThat(factory).isExactlyInstanceOf(TinylogLoggerFactory.class);
+		ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+		assertThat(factory).isExactlyInstanceOf(ModernTinylogLoggerFactory.class);
 	}
 
-	/** Find marker factory. */
+	/**
+	 * Verifies that the marker factory can be found and loaded.
+	 */
 	@Test
 	public void findMarkerFactoryViaSpi() {
-		final IMarkerFactory factory = MarkerFactory.getIMarkerFactory();
-
+		IMarkerFactory factory = MarkerFactory.getIMarkerFactory();
 		assertThat(factory).isExactlyInstanceOf(BasicMarkerFactory.class);
 	}
 
-	/** Find logger. */
+	/**
+	 * Verifies that logger instances can be provided.
+	 */
 	@Test
 	public void findLoggerViaSpi() {
-		final Logger logger = LoggerFactory.getLogger(getClass());
-
-		assertThat(logger).isExactlyInstanceOf(TinylogLogger.class);
+		Logger logger = LoggerFactory.getLogger(getClass());
+		assertThat(logger).isInstanceOf(ModernTinylogLogger.class);
 	}
+
 }

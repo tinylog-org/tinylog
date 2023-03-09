@@ -15,7 +15,7 @@ package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
-import org.tinylog.slf4j.TinylogLoggerFactory;
+import org.tinylog.slf4j.LegacyTinylogLoggerFactory;
 
 /**
  * Logger factory binder for using tinylog for logging via SLF4J.
@@ -36,7 +36,7 @@ public final class StaticLoggerBinder implements LoggerFactoryBinder {
 
 	/** */
 	private StaticLoggerBinder() {
-		factory = new TinylogLoggerFactory();
+		factory = new LegacyTinylogLoggerFactory();
 	}
 
 	/**
