@@ -6,7 +6,6 @@ module org.tinylog.api {
     provides org.slf4j.spi.SLF4JServiceProvider with
         org.tinylog.slf4j.TinylogServiceProvider;
 
-    exports org.slf4j.impl;
     exports org.tinylog.slf4j;
 
 }
