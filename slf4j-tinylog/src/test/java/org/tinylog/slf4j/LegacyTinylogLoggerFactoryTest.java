@@ -24,19 +24,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
- * Tests for {@link TinylogLoggerFactory}.
+ * Tests for {@link LegacyTinylogLoggerFactory}.
  */
-public final class TinylogLoggerFactoryTest {
-
-	private LoggingProvider provider;
+public final class LegacyTinylogLoggerFactoryTest {
 
 	/**
 	 * Mocks the underlying logging provider.
 	 */
 	@Before
 	public void init() {
-		provider = mock(LoggingProvider.class);
-		Whitebox.setInternalState(TinylogLogger.class, provider);
+		LoggingProvider provider = mock(LoggingProvider.class);
+		Whitebox.setInternalState(AbstractTinylogLogger.class, provider);
 	}
 
 	/**
@@ -44,7 +42,7 @@ public final class TinylogLoggerFactoryTest {
 	 */
 	@After
 	public void reset() {
-		Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+		Whitebox.setInternalState(AbstractTinylogLogger.class, ProviderRegistry.getLoggingProvider());
 	}
 	
 	/**
@@ -52,12 +50,12 @@ public final class TinylogLoggerFactoryTest {
 	 */
 	@Test
 	public void sameLoggers() {
-		TinylogLoggerFactory factory = new TinylogLoggerFactory();
+		LegacyTinylogLoggerFactory factory = new LegacyTinylogLoggerFactory();
 
-		TinylogLogger first = factory.getLogger("abc");
+		LegacyTinylogLogger first = factory.getLogger("abc");
 		assertThat(first.getName()).isEqualTo("abc");
 
-		TinylogLogger second = factory.getLogger("abc");
+		LegacyTinylogLogger second = factory.getLogger("abc");
 		assertThat(second.getName()).isEqualTo("abc");
 		assertThat(second).isSameAs(first);
 	}
@@ -67,12 +65,12 @@ public final class TinylogLoggerFactoryTest {
 	 */
 	@Test
 	public void differentLoggers() {
-		TinylogLoggerFactory factory = new TinylogLoggerFactory();
+		LegacyTinylogLoggerFactory factory = new LegacyTinylogLoggerFactory();
 
-		TinylogLogger first = factory.getLogger("abc");
+		LegacyTinylogLogger first = factory.getLogger("abc");
 		assertThat(first.getName()).isEqualTo("abc");
 
-		TinylogLogger second = factory.getLogger("ABC");
+		LegacyTinylogLogger second = factory.getLogger("ABC");
 		assertThat(second.getName()).isEqualTo("ABC");
 	}
 

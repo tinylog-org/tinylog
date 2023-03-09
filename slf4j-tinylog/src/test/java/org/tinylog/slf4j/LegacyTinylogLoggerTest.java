@@ -30,7 +30,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Marker;
-import org.slf4j.event.DefaultLoggingEvent;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.tinylog.Level;
 import org.tinylog.format.LegacyMessageFormatter;
@@ -50,16 +49,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link TinylogLogger}.
+ * Tests for {@link LegacyTinylogLogger}.
  */
 @RunWith(Enclosed.class)
-public final class TinylogLoggerTest {
+public final class LegacyTinylogLoggerTest {
 
 	/**
 	 * Test logging without using a {@link Marker}.
 	 */
 	@RunWith(Parameterized.class)
-	@PrepareForTest(TinylogLogger.class)
+	@PrepareForTest(LegacyTinylogLogger.class)
 	public static final class NoneMarker {
 
 		/**
@@ -77,7 +76,7 @@ public final class TinylogLoggerTest {
 		private boolean errorEnabled;
 
 		private LoggingProvider provider;
-		private TinylogLogger logger;
+		private LegacyTinylogLogger logger;
 
 		/**
 		 * @param level
@@ -138,21 +137,21 @@ public final class TinylogLoggerTest {
 			when(provider.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(warnEnabled);
 			when(provider.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
+			logger = new LegacyTinylogLogger(LegacyTinylogLoggerTest.class.getName());
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", errorEnabled);
 
-			Whitebox.setInternalState(TinylogLogger.class, provider);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, provider);
 		}
 
 		/**
@@ -160,7 +159,7 @@ public final class TinylogLoggerTest {
 		 */
 		@After
 		public void reset() {
-			Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+			Whitebox.setInternalState(AbstractTinylogLogger.class, ProviderRegistry.getLoggingProvider());
 		}
 
 		/**
@@ -168,7 +167,7 @@ public final class TinylogLoggerTest {
 		 */
 		@Test
 		public void getName() {
-			assertThat(logger.getName()).isEqualTo(TinylogLoggerTest.class.getName());
+			assertThat(logger.getName()).isEqualTo(LegacyTinylogLoggerTest.class.getName());
 		}
 
 		/**
@@ -625,36 +624,12 @@ public final class TinylogLoggerTest {
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(null, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+			logger.log(null, LegacyTinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
-						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
-			}
-		}
-
-		/**
-		 * Verifies that event aware logging is fully supported.
-		 */
-		@Test
-		public void logEventAwareWithLoggerClassName() {
-			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
-			RuntimeException exception = new RuntimeException();
-
-			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
-			event.setCallerBoundary(TinylogLogger.class.getName());
-			event.setThrowable(exception);
-			event.setMessage("Hello {}!");
-			event.addArgument("World");
-
-			logger.log(event);
-
-			if (level == Level.OFF) {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
-			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
+				verify(provider).log(eq(LegacyTinylogLogger.class.getName()), isNull(), eq(level), same(exception),
 						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
 			}
 		}
@@ -665,7 +640,7 @@ public final class TinylogLoggerTest {
 	 * Test logging with using a real non-null {@link Marker}.
 	 */
 	@RunWith(Parameterized.class)
-	@PrepareForTest(TinylogLogger.class)
+	@PrepareForTest(LegacyTinylogLogger.class)
 	public static final class RealMarker {
 
 		private static final String TAG = "test";
@@ -686,7 +661,7 @@ public final class TinylogLoggerTest {
 		private boolean errorEnabled;
 
 		private LoggingProvider provider;
-		private TinylogLogger logger;
+		private LegacyTinylogLogger logger;
 
 		/**
 		 * @param level
@@ -756,21 +731,21 @@ public final class TinylogLoggerTest {
 			when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.WARN))).thenReturn(warnEnabled);
 			when(provider.isEnabled(anyInt(), eq(TAG), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
+			logger = new LegacyTinylogLogger(LegacyTinylogLoggerTest.class.getName());
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
 
-			Whitebox.setInternalState(TinylogLogger.class, provider);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, provider);
 		}
 
 		/**
@@ -778,7 +753,7 @@ public final class TinylogLoggerTest {
 		 */
 		@After
 		public void reset() {
-			Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+			Whitebox.setInternalState(AbstractTinylogLogger.class, ProviderRegistry.getLoggingProvider());
 		}
 
 		/**
@@ -786,7 +761,7 @@ public final class TinylogLoggerTest {
 		 */
 		@Test
 		public void getName() {
-			assertThat(logger.getName()).isEqualTo(TinylogLoggerTest.class.getName());
+			assertThat(logger.getName()).isEqualTo(LegacyTinylogLoggerTest.class.getName());
 		}
 
 		/**
@@ -1243,37 +1218,12 @@ public final class TinylogLoggerTest {
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(marker, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+			logger.log(marker, LegacyTinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), eq(TAG), eq(level), same(exception),
-						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
-			}
-		}
-
-		/**
-		 * Verifies that event aware logging is fully supported.
-		 */
-		@Test
-		public void logEventAwareWithLoggerClassName() {
-			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
-			RuntimeException exception = new RuntimeException();
-
-			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
-			event.setCallerBoundary(TinylogLogger.class.getName());
-			event.addMarker(marker);
-			event.setThrowable(exception);
-			event.setMessage("Hello {}!");
-			event.addArgument("World");
-
-			logger.log(event);
-
-			if (level == Level.OFF) {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
-			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), eq(TAG), eq(level), same(exception),
+				verify(provider).log(eq(LegacyTinylogLogger.class.getName()), eq(TAG), eq(level), same(exception),
 						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
 			}
 		}
@@ -1284,7 +1234,7 @@ public final class TinylogLoggerTest {
 	 * Test logging with using a null value as {@link Marker}.
 	 */
 	@RunWith(Parameterized.class)
-	@PrepareForTest(TinylogLogger.class)
+	@PrepareForTest(LegacyTinylogLogger.class)
 	public static final class NullMarker {
 
 		/**
@@ -1302,7 +1252,7 @@ public final class TinylogLoggerTest {
 		private boolean errorEnabled;
 
 		private LoggingProvider provider;
-		private TinylogLogger logger;
+		private LegacyTinylogLogger logger;
 
 		/**
 		 * @param level
@@ -1364,21 +1314,21 @@ public final class TinylogLoggerTest {
 			when(provider.isEnabled(anyInt(), isNull(), eq(Level.WARN))).thenReturn(warnEnabled);
 			when(provider.isEnabled(anyInt(), isNull(), eq(Level.ERROR))).thenReturn(errorEnabled);
 
-			logger = new TinylogLogger(TinylogLoggerTest.class.getName());
+			logger = new LegacyTinylogLogger(LegacyTinylogLoggerTest.class.getName());
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_TRACE", traceEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_DEBUG", debugEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_INFO", infoEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_WARN", warnEnabled);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_GLOBAL_LEVEL_COVERS_ERROR", errorEnabled);
 
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
-			Whitebox.setInternalState(TinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_TRACE", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_INFO", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_WARN", false);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, "MINIMUM_DEFAULT_LEVEL_COVERS_ERROR", false);
 
-			Whitebox.setInternalState(TinylogLogger.class, provider);
+			Whitebox.setInternalState(AbstractTinylogLogger.class, provider);
 		}
 
 		/**
@@ -1386,7 +1336,7 @@ public final class TinylogLoggerTest {
 		 */
 		@After
 		public void reset() {
-			Whitebox.setInternalState(TinylogLogger.class, ProviderRegistry.getLoggingProvider());
+			Whitebox.setInternalState(AbstractTinylogLogger.class, ProviderRegistry.getLoggingProvider());
 		}
 
 		/**
@@ -1394,7 +1344,7 @@ public final class TinylogLoggerTest {
 		 */
 		@Test
 		public void getName() {
-			assertThat(logger.getName()).isEqualTo(TinylogLoggerTest.class.getName());
+			assertThat(logger.getName()).isEqualTo(LegacyTinylogLoggerTest.class.getName());
 		}
 
 		/**
@@ -1852,37 +1802,12 @@ public final class TinylogLoggerTest {
 			Object[] arguments = new Object[] { "World" };
 			RuntimeException exception = new RuntimeException();
 
-			logger.log(null, TinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
+			logger.log(null, LegacyTinylogLogger.class.getName(), levelInt, "Hello {}!", arguments, exception);
 
 			if (level == Level.OFF) {
 				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
 			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
-						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
-			}
-		}
-
-		/**
-		 * Verifies that event aware logging is fully supported.
-		 */
-		@Test
-		public void logEventAwareWithLoggerClassName() {
-			int levelInt = Math.min(org.slf4j.event.Level.ERROR.toInt(), level.ordinal() * 10);
-			RuntimeException exception = new RuntimeException();
-
-			DefaultLoggingEvent event = new DefaultLoggingEvent(org.slf4j.event.Level.intToLevel(levelInt), logger);
-			event.setCallerBoundary(TinylogLogger.class.getName());
-			event.addMarker(null);
-			event.setThrowable(exception);
-			event.setMessage("Hello {}!");
-			event.addArgument("World");
-
-			logger.log(event);
-
-			if (level == Level.OFF) {
-				verify(provider, never()).log(anyInt(), anyString(), any(), any(), any(), any(), any());
-			} else {
-				verify(provider).log(eq(TinylogLogger.class.getName()), isNull(), eq(level), same(exception),
+				verify(provider).log(eq(LegacyTinylogLogger.class.getName()), isNull(), eq(level), same(exception),
 						any(LegacyMessageFormatter.class), eq("Hello {}!"), eq("World"));
 			}
 		}

@@ -59,7 +59,7 @@ public class TinylogSlf4jServiceProvider implements SLF4JServiceProvider {
 
 	@Override
 	public void initialize() {
-		loggerFactory = new TinylogLoggerFactory();
+		loggerFactory = new ModernTinylogLoggerFactory();
 		markerFactory = new BasicMarkerFactory();
 		mdcAdapter = new TinylogMdcAdapter();
 	}

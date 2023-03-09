@@ -14,7 +14,7 @@
 package org.slf4j.impl;
 
 import org.junit.Test;
-import org.tinylog.slf4j.TinylogLoggerFactory;
+import org.tinylog.slf4j.LegacyTinylogLoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,24 +28,27 @@ public final class StaticLoggerBinderTest {
 	 */
 	@Test
 	public void singleton() {
-		assertThat(StaticLoggerBinder.getSingleton()).isSameAs(StaticLoggerBinder.getSingleton());
+		assertThat(StaticLoggerBinder.getSingleton())
+			.isSameAs(StaticLoggerBinder.getSingleton());
 	}
 
 	/**
-	 * Verifies that {@link TinylogLoggerFactory} is returned as logger factory.
+	 * Verifies that {@link LegacyTinylogLoggerFactory} is returned as logger factory.
 	 */
 	@Test
 	public void instance() {
-		assertThat(StaticLoggerBinder.getSingleton().getLoggerFactory()).isInstanceOf(TinylogLoggerFactory.class);
+		assertThat(StaticLoggerBinder.getSingleton().getLoggerFactory())
+			.isInstanceOf(LegacyTinylogLoggerFactory.class);
 	}
 
 	/**
-	 * Verifies that the fully-qualified class name of {@link TinylogLoggerFactory} is returned as logger factory class
+	 * Verifies that the fully-qualified class name of {@link LegacyTinylogLoggerFactory} is returned as logger factory class
 	 * name.
 	 */
 	@Test
 	public void className() {
-		assertThat(StaticLoggerBinder.getSingleton().getLoggerFactoryClassStr()).isEqualTo(TinylogLoggerFactory.class.getName());
+		assertThat(StaticLoggerBinder.getSingleton().getLoggerFactoryClassStr())
+			.isEqualTo(LegacyTinylogLoggerFactory.class.getName());
 	}
 
 }
