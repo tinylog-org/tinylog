@@ -18,9 +18,9 @@
         <git.url>https://github.com/tinylog-org/tinylog</git.url>
         <git.connection>scm:git:github.com/tinylog-org/tinylog.git</git.connection>
         <git.developerConnection>scm:git:git@github.com:tinylog-org/tinylog.git</git.developerConnection>
-        <kotlin.version>1.7.20</kotlin.version>
-        <kotlin.compiler.languageVersion>1.7</kotlin.compiler.languageVersion>
-        <kotlin.compiler.apiVersion>1.7</kotlin.compiler.apiVersion>
+        <kotlin.version>1.8.10</kotlin.version>
+        <kotlin.compiler.languageVersion>1.8</kotlin.compiler.languageVersion>
+        <kotlin.compiler.apiVersion>1.8</kotlin.compiler.apiVersion>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
