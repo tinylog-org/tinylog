@@ -9,7 +9,7 @@ import org.tinylog.impl.writers.Writer;
 
 /**
  * Hook for closing writers as well as starting a writing thread and shutting it down for the
- * {@link NativeLoggingBackend}.
+ * {@link ImmutableLoggingBackend}.
  */
 class LifeCycleHook implements Hook {
 

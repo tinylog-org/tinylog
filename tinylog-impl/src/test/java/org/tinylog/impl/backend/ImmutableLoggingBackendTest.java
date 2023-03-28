@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 
 @CaptureLogEntries
 @ExtendWith(MockitoExtension.class)
-class NativeLoggingBackendTest {
+class ImmutableLoggingBackendTest {
 
     @Inject
     private Framework framework;
@@ -77,7 +77,7 @@ class NativeLoggingBackendTest {
      */
     @Test
     void getContextStorage() {
-        NativeLoggingBackend backend = new Builder().rootLevel(Level.OFF).create();
+        ImmutableLoggingBackend backend = new Builder().rootLevel(Level.OFF).create();
         assertThat(backend.getContextStorage()).isInstanceOf(ThreadLocalContextStorage.class);
     }
 
@@ -98,7 +98,7 @@ class NativeLoggingBackendTest {
     ) {
         when(writer.getRequiredLogEntryValues()).thenReturn(requiredLogEntryValues);
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.OFF)
             .customLevel(className, Level.TRACE)
             .writers("foo", Level.INFO, writer)
@@ -121,7 +121,7 @@ class NativeLoggingBackendTest {
     @ParameterizedTest
     @ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
     void getLevelVisibilityForDisabledClasses(String className) {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .customLevel(className, Level.OFF)
             .writers(Level.TRACE, writer)
@@ -141,7 +141,7 @@ class NativeLoggingBackendTest {
      */
     @Test
     void getDifferentLevelVisibilityForDifferentClasses() {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .customLevel("example", Level.DEBUG)
             .writers(Level.TRACE, writer)
@@ -179,7 +179,7 @@ class NativeLoggingBackendTest {
     ) {
         when(writer.getRequiredLogEntryValues()).thenReturn(requiredLogEntryValues);
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .writers(tag, Level.INFO, writer)
             .create();
@@ -198,7 +198,7 @@ class NativeLoggingBackendTest {
      */
     @Test
     void isEnabledWithoutCustomLevels() {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .writers(Level.INFO, writer)
             .create();
@@ -235,7 +235,7 @@ class NativeLoggingBackendTest {
         boolean warnEnabled,
         boolean errorEnabled
     ) {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .customLevel("org.example", Level.WARN)
             .customLevel("org.example.Foo", Level.DEBUG)
@@ -254,17 +254,17 @@ class NativeLoggingBackendTest {
      */
     @Test
     void isEnabledForClass() {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.OFF)
-            .customLevel(NativeLoggingBackendTest.class.getName(), Level.INFO)
+            .customLevel(ImmutableLoggingBackendTest.class.getName(), Level.INFO)
             .writers(Level.INFO, writer)
             .create();
 
-        assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.TRACE)).isFalse();
-        assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.DEBUG)).isFalse();
-        assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.INFO)).isTrue();
-        assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.WARN)).isTrue();
-        assertThat(backend.isEnabled(NativeLoggingBackendTest.class, null, Level.ERROR)).isTrue();
+        assertThat(backend.isEnabled(ImmutableLoggingBackendTest.class, null, Level.TRACE)).isFalse();
+        assertThat(backend.isEnabled(ImmutableLoggingBackendTest.class, null, Level.DEBUG)).isFalse();
+        assertThat(backend.isEnabled(ImmutableLoggingBackendTest.class, null, Level.INFO)).isTrue();
+        assertThat(backend.isEnabled(ImmutableLoggingBackendTest.class, null, Level.WARN)).isTrue();
+        assertThat(backend.isEnabled(ImmutableLoggingBackendTest.class, null, Level.ERROR)).isTrue();
     }
 
     /**
@@ -272,9 +272,9 @@ class NativeLoggingBackendTest {
      */
     @Test
     void isEnabledForStackTraceElement() {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.OFF)
-            .customLevel(NativeLoggingBackendTest.class.getName(), Level.INFO)
+            .customLevel(ImmutableLoggingBackendTest.class.getName(), Level.INFO)
             .writers(Level.INFO, writer)
             .create();
 
@@ -293,7 +293,7 @@ class NativeLoggingBackendTest {
     void logTimestamp() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.TIMESTAMP));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -318,7 +318,7 @@ class NativeLoggingBackendTest {
     void logUptime() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.UPTIME));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -343,7 +343,7 @@ class NativeLoggingBackendTest {
     void logThread() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.THREAD));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -366,7 +366,7 @@ class NativeLoggingBackendTest {
     void logContext() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.CONTEXT));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -391,7 +391,7 @@ class NativeLoggingBackendTest {
     void logClass() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.CLASS));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -413,7 +413,7 @@ class NativeLoggingBackendTest {
     void logMethod() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.METHOD));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -436,7 +436,7 @@ class NativeLoggingBackendTest {
     void logFile() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.FILE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -459,7 +459,7 @@ class NativeLoggingBackendTest {
     void logLine() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.LINE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -482,7 +482,7 @@ class NativeLoggingBackendTest {
     void logTag() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.TAG));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -505,7 +505,7 @@ class NativeLoggingBackendTest {
     void logLevel() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.LEVEL));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -528,7 +528,7 @@ class NativeLoggingBackendTest {
     void logPlainTextMessage() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -551,7 +551,7 @@ class NativeLoggingBackendTest {
     void logFormattedMessageWithArguments() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -582,7 +582,7 @@ class NativeLoggingBackendTest {
     void logFormattedMessageWithoutArguments() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -613,7 +613,7 @@ class NativeLoggingBackendTest {
     void logObjectMessage() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -636,7 +636,7 @@ class NativeLoggingBackendTest {
     void logException() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.EXCEPTION));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.TRACE)
             .writers(Level.TRACE, writer)
             .create();
@@ -668,7 +668,7 @@ class NativeLoggingBackendTest {
         "org.other.Foo      , DEBUG, INFO "
     })
     void logWithCustomLevels(String className, Level disabledLevel, Level enabledLevel) throws Exception {
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .customLevel("org.example", Level.WARN)
             .customLevel("org.example.Foo", Level.DEBUG)
@@ -693,9 +693,9 @@ class NativeLoggingBackendTest {
     void logForActualStackTrace() throws Exception {
         when(writer.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.LEVEL));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.OFF)
-            .customLevel(NativeLoggingBackendTest.class.getName(), Level.INFO)
+            .customLevel(ImmutableLoggingBackendTest.class.getName(), Level.INFO)
             .writers(Level.INFO, writer)
             .create();
 
@@ -724,7 +724,7 @@ class NativeLoggingBackendTest {
         Writer otherWriter = mock(Writer.class);
         when(otherWriter.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .writers(Level.INFO, writer, otherWriter)
             .create();
@@ -759,7 +759,7 @@ class NativeLoggingBackendTest {
         Writer otherWriter = mock(Writer.class);
         when(otherWriter.getRequiredLogEntryValues()).thenReturn(EnumSet.of(LogEntryValue.MESSAGE));
 
-        NativeLoggingBackend backend = new Builder()
+        ImmutableLoggingBackend backend = new Builder()
             .rootLevel(Level.INFO)
             .writers(Level.INFO, writer, otherWriter)
             .create();
@@ -887,7 +887,7 @@ class NativeLoggingBackendTest {
     }
 
     /**
-     * Builder with a fluent API for configuring and creating instances of {@link NativeLoggingBackend}.
+     * Builder with a fluent API for configuring and creating instances of {@link ImmutableLoggingBackend}.
      */
     private final class Builder {
 
@@ -967,11 +967,11 @@ class NativeLoggingBackendTest {
         }
 
         /**
-         * Creates a new {@link NativeLoggingBackend} based on the provided configuration.
+         * Creates a new {@link ImmutableLoggingBackend} based on the provided configuration.
          *
-         * @return A new instance of {@link NativeLoggingBackend}
+         * @return A new instance of {@link ImmutableLoggingBackend}
          */
-        public NativeLoggingBackend create() {
+        public ImmutableLoggingBackend create() {
             Map<String, Map<Level, WriterRepository>> repositoriesForTags = new HashMap<>();
             for (String tag : writers.keySet()) {
                 Map<Level, WriterRepository> repositoriesForLevels = new EnumMap<>(Level.class);
@@ -994,7 +994,7 @@ class NativeLoggingBackendTest {
                 .collect(Collectors.toSet());
 
             WritingThread writingThread = uniqueWriters.isEmpty() ? null : new WritingThread(uniqueWriters, 64);
-            return new NativeLoggingBackend(context, loggingConfiguration, writingThread);
+            return new ImmutableLoggingBackend(context, loggingConfiguration, writingThread);
         }
 
     }

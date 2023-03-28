@@ -1,5 +1,5 @@
 import org.tinylog.core.backend.LoggingBackendBuilder;
-import org.tinylog.impl.backend.NativeLoggingBackendBuilder;
+import org.tinylog.impl.backend.TinylogLoggingBackendBuilder;
 import org.tinylog.impl.format.OutputFormatBuilder;
 import org.tinylog.impl.format.json.NewlineDelimitedJsonBuilder;
 import org.tinylog.impl.format.pattern.FormatPatternBuilder;
@@ -51,7 +51,7 @@ module org.tinylog.impl {
     requires org.tinylog.core;
 
     provides LoggingBackendBuilder with
-        NativeLoggingBackendBuilder;
+        TinylogLoggingBackendBuilder;
 
     provides OutputFormatBuilder with
         FormatPatternBuilder,

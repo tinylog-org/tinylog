@@ -9,14 +9,14 @@ import org.tinylog.impl.WritingThread;
 import org.tinylog.impl.writers.Writer;
 
 /**
- * Builder for creating an instance of {@link NativeLoggingBackend}.
+ * Builder for creating an instance of {@link ImmutableLoggingBackend}.
  */
-public class NativeLoggingBackendBuilder implements LoggingBackendBuilder {
+public class TinylogLoggingBackendBuilder implements LoggingBackendBuilder {
 
     private static final int QUEUE_SIZE = 64 * 1024;
 
     /** */
-    public NativeLoggingBackendBuilder() {
+    public TinylogLoggingBackendBuilder() {
     }
 
     @Override
@@ -28,7 +28,7 @@ public class NativeLoggingBackendBuilder implements LoggingBackendBuilder {
     public LoggingBackend create(LoggingContext context) {
         LoggingConfiguration configuration = new LoggingConfigurationParser(context).parse();
         WritingThread writingThread = createWritingThread(configuration.getAllWriters());
-        return new NativeLoggingBackend(context, configuration, writingThread);
+        return new ImmutableLoggingBackend(context, configuration, writingThread);
     }
 
     /**

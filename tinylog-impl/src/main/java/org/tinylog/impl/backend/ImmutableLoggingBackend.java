@@ -21,7 +21,7 @@ import org.tinylog.impl.writers.Writer;
 /**
  * Native logging backend for tinylog.
  */
-public class NativeLoggingBackend implements LoggingBackend {
+public class ImmutableLoggingBackend implements LoggingBackend {
 
     private final LoggingContext context;
     private final ContextStorage contextStorage;
@@ -33,7 +33,7 @@ public class NativeLoggingBackend implements LoggingBackend {
      * @param configuration All configured writers mapped to severity levels and tags
      * @param writingThread The writing thread for enqueuing log entries for writers
      */
-    public NativeLoggingBackend(
+    public ImmutableLoggingBackend(
         LoggingContext context,
         LoggingConfiguration configuration,
         WritingThread writingThread

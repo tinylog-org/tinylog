@@ -1,1 +1,1 @@
-org.tinylog.impl.backend.NativeLoggingBackendBuilder
+org.tinylog.impl.backend.TinylogLoggingBackendBuilder

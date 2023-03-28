@@ -14,10 +14,10 @@ import org.tinylog.impl.writers.file.FileWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class NativeLoggingBackendBuilderTest {
+class TinylogLoggingBackendBuilderTest {
 
     /**
-     * Verifies that a {@link NativeLoggingBackend} with a {@link FileWriter} can be created and used for logging.
+     * Verifies that a {@link ImmutableLoggingBackend} with a {@link FileWriter} can be created and used for logging.
      */
     @Test
     void creation() throws IOException {
@@ -37,7 +37,7 @@ class NativeLoggingBackendBuilderTest {
                 context.startUp();
 
                 LoggingBackend backend = context.getLoggingBackend();
-                assertThat(backend).isInstanceOf(NativeLoggingBackend.class);
+                assertThat(backend).isInstanceOf(ImmutableLoggingBackend.class);
 
                 backend.log(null, null, Level.DEBUG, null, "Hello World!", null, null);
                 backend.log(null, null, Level.INFO, null, "Hello World!", null, null);
@@ -57,7 +57,7 @@ class NativeLoggingBackendBuilderTest {
     @Test
     void service() {
         assertThat(ServiceLoader.load(LoggingBackendBuilder.class)).anySatisfy(builder -> {
-            assertThat(builder).isInstanceOf(NativeLoggingBackendBuilder.class);
+            assertThat(builder).isInstanceOf(TinylogLoggingBackendBuilder.class);
             assertThat(builder.getName()).isEqualTo("tinylog");
         });
     }
