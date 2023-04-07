@@ -516,7 +516,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.7.3.3</version>
+                    <version>4.7.3.4</version>
                     <configuration>
                         <excludeFilterFile>${root.basedir}/configuration/spotbugs-filters.xml</excludeFilterFile>
                     </configuration>
