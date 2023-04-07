@@ -61,7 +61,7 @@
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
-		<spotbugs-maven-plugin.version>4.7.3.3</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
 		<maven-bundle-plugin.version>5.1.8</maven-bundle-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
