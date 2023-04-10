@@ -58,7 +58,7 @@
 		<kotlin-maven-plugin.version>1.6.21</kotlin-maven-plugin.version>
 		<scala-maven-plugin.version>4.8.1</scala-maven-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.23</animal-sniffer-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.9</jacoco-maven-plugin.version>
 		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
 		<spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
