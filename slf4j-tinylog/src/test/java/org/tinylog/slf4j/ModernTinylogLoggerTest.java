@@ -47,6 +47,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -169,6 +170,86 @@ public final class ModernTinylogLoggerTest {
 		@Test
 		public void getName() {
 			assertThat(logger.getName()).isEqualTo(ModernTinylogLoggerTest.class.getName());
+		}
+
+		/**
+		 * Verifies that a trace message will be logged correctly.
+		 */
+		@Test
+		public void logTraceMessage() {
+			logger.atTrace().log("Hello World!");
+
+			if (traceEnabled) {
+				verify(provider).isEnabled(2, null, Level.TRACE);
+				verify(provider).log("org.slf4j.spi.DefaultLoggingEventBuilder", null, Level.TRACE, null,
+					null, "Hello World!", (Object[]) null);
+			} else {
+				verifyNoInteractions(provider);
+			}
+		}
+
+		/**
+		 * Verifies that a debug message will be logged correctly.
+		 */
+		@Test
+		public void logDebugMessage() {
+			logger.atDebug().log("Hello World!");
+
+			if (debugEnabled) {
+				verify(provider).isEnabled(2, null, Level.DEBUG);
+				verify(provider).log("org.slf4j.spi.DefaultLoggingEventBuilder", null, Level.DEBUG, null,
+					null, "Hello World!", (Object[]) null);
+			} else {
+				verifyNoInteractions(provider);
+			}
+		}
+
+		/**
+		 * Verifies that an info message will be logged correctly.
+		 */
+		@Test
+		public void logInfoMessage() {
+			logger.atInfo().log("Hello World!");
+
+			if (infoEnabled) {
+				verify(provider).isEnabled(2, null, Level.INFO);
+				verify(provider).log("org.slf4j.spi.DefaultLoggingEventBuilder", null, Level.INFO, null,
+					null, "Hello World!", (Object[]) null);
+			} else {
+				verifyNoInteractions(provider);
+			}
+		}
+
+		/**
+		 * Verifies that a warning message will be logged correctly.
+		 */
+		@Test
+		public void logWarnMessage() {
+			logger.atWarn().log("Hello World!");
+
+			if (warnEnabled) {
+				verify(provider).isEnabled(2, null, Level.WARN);
+				verify(provider).log("org.slf4j.spi.DefaultLoggingEventBuilder", null, Level.WARN, null,
+					null, "Hello World!", (Object[]) null);
+			} else {
+				verifyNoInteractions(provider);
+			}
+		}
+
+		/**
+		 * Verifies that an error message will be logged correctly.
+		 */
+		@Test
+		public void logErrorMessage() {
+			logger.atError().log("Hello World!");
+
+			if (errorEnabled) {
+				verify(provider).isEnabled(2, null, Level.ERROR);
+				verify(provider).log("org.slf4j.spi.DefaultLoggingEventBuilder", null, Level.ERROR, null,
+					null, "Hello World!", (Object[]) null);
+			} else {
+				verifyNoInteractions(provider);
+			}
 		}
 
 		/**

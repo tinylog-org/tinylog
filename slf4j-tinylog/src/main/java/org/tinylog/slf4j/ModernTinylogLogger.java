@@ -18,7 +18,10 @@ import java.util.List;
 import org.slf4j.Marker;
 import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LoggingEventAware;
+import org.slf4j.spi.LoggingEventBuilder;
+import org.slf4j.spi.NOPLoggingEventBuilder;
 import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
 
 /**
  * Location and event aware logger for modern SLF4J 2.
@@ -34,6 +37,51 @@ public final class ModernTinylogLogger extends AbstractTinylogLogger implements 
 	}
 
 	@Override
+	public LoggingEventBuilder atTrace() {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_TRACE && provider.isEnabled(STACKTRACE_DEPTH, null, Level.TRACE)) {
+			return makeLoggingEventBuilder(org.slf4j.event.Level.TRACE);
+		} else {
+			return NOPLoggingEventBuilder.singleton();
+		}
+	}
+
+	@Override
+	public LoggingEventBuilder atDebug() {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_DEBUG && provider.isEnabled(STACKTRACE_DEPTH, null, Level.DEBUG)) {
+			return makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG);
+		} else {
+			return NOPLoggingEventBuilder.singleton();
+		}
+	}
+
+	@Override
+	public LoggingEventBuilder atInfo() {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_INFO && provider.isEnabled(STACKTRACE_DEPTH, null, Level.INFO)) {
+			return makeLoggingEventBuilder(org.slf4j.event.Level.INFO);
+		} else {
+			return NOPLoggingEventBuilder.singleton();
+		}
+	}
+
+	@Override
+	public LoggingEventBuilder atWarn() {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_WARN && provider.isEnabled(STACKTRACE_DEPTH, null, Level.WARN)) {
+			return makeLoggingEventBuilder(org.slf4j.event.Level.WARN);
+		} else {
+			return NOPLoggingEventBuilder.singleton();
+		}
+	}
+
+	@Override
+	public LoggingEventBuilder atError() {
+		if (MINIMUM_DEFAULT_LEVEL_COVERS_ERROR && provider.isEnabled(STACKTRACE_DEPTH, null, Level.ERROR)) {
+			return makeLoggingEventBuilder(org.slf4j.event.Level.ERROR);
+		} else {
+			return NOPLoggingEventBuilder.singleton();
+		}
+	}
+
+	@Override
 	public void log(final LoggingEvent event) {
 		Level severityLevel = translateLevel(event.getLevel().toInt());
 		List<Marker> markers = event.getMarkers();
@@ -41,6 +89,9 @@ public final class ModernTinylogLogger extends AbstractTinylogLogger implements 
 		String tag = marker == null ? null : marker.getName();
 
 		if (provider.getMinimumLevel(tag).ordinal() <= severityLevel.ordinal()) {
+			Object[] arguments = event.getArgumentArray();
+			MessageFormatter formatter = arguments == null ? null : AbstractTinylogLogger.formatter;
+
 			provider.log(
 				event.getCallerBoundary(),
 				tag,
@@ -48,7 +99,7 @@ public final class ModernTinylogLogger extends AbstractTinylogLogger implements 
 				event.getThrowable(),
 				formatter,
 				event.getMessage(),
-				event.getArgumentArray()
+				arguments
 			);
 		}
 	}
