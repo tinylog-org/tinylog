@@ -34,12 +34,12 @@ public enum Level {
 	INFO,
 
 	/**
-	 * Warn log entries contain technical warnings. Typically warnings do not prevent the application from continuing.
+	 * Warn log entries contain technical warnings. Typically, warnings do not prevent the application from continuing.
 	 */
 	WARN,
 
 	/**
-	 * Error log entries contain severe technical errors. Typically errors prevent a function from continuing normally.
+	 * Error log entries contain severe technical errors. Typically, errors prevent a function from continuing normally.
 	 */
 	ERROR,
 
