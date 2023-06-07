@@ -65,7 +65,7 @@
 		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-		<dokka-maven-plugin.version>1.8.10</dokka-maven-plugin.version>
+		<dokka-maven-plugin.version>1.8.20</dokka-maven-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 		<flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
 		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
