@@ -15,6 +15,9 @@ package org.tinylog.writers.raw;
 
 import org.tinylog.Level;
 
+/**
+ * Syslog  severity codes.
+ */
 public enum SyslogSeverity {
 	
 	/**

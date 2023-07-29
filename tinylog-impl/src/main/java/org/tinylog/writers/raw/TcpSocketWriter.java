@@ -19,6 +19,9 @@ import java.util.Map;
 
 import org.tinylog.core.LogEntry;
 
+/**
+ * Base writer for outputting log entries to syslog server via TCP.
+ */
 public class TcpSocketWriter extends AbstractSocketWriter {
 
 	private Socket socket;

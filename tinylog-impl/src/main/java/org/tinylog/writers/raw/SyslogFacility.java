@@ -13,6 +13,9 @@
 
 package org.tinylog.writers.raw;
 
+/**
+ * Syslog Facility codes.
+ */
 public enum SyslogFacility {
 
 	/**

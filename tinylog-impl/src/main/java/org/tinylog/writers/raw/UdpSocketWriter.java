@@ -20,6 +20,9 @@ import java.util.Map;
 
 import org.tinylog.core.LogEntry;
 
+/**
+ * Base writer for outputting log entries to syslog server via UDP.
+ */
 public class UdpSocketWriter extends AbstractSocketWriter {
 
 	private DatagramSocket datagramSocket;

@@ -22,6 +22,9 @@ import org.tinylog.Level;
 import org.tinylog.core.LogEntry;
 import org.tinylog.writers.AbstractFormatPatternWriter;
 
+/**
+ * Base writer for outputting log entries to syslog server.
+ */
 public abstract class AbstractSocketWriter extends AbstractFormatPatternWriter {
 
 	private static final String DEFAULT_HOST_NAME = "localhost";
