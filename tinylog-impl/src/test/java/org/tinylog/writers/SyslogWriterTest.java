@@ -24,7 +24,6 @@ import org.tinylog.util.UdpSyslogServer;
 import org.tinylog.writers.raw.SyslogFacility;
 import org.tinylog.writers.raw.SyslogSeverity;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,9 +39,9 @@ public final class SyslogWriterTest {
 	private static final String TEST_MESSAGE = "Test Message";
 	
 	private String getExpectedSyslogMessage(final String message,
-											final SyslogFacility facility,
-											final SyslogSeverity severity,
-											final String identification) {
+						final SyslogFacility facility,
+						final SyslogSeverity severity,
+						final String identification) {
 		int code = (facility.getCode() << 3) + severity.getCode();
 		return "<" + code + ">" + identification + ": " + message;
 	}
@@ -56,8 +55,10 @@ public final class SyslogWriterTest {
 	public void sendDefaultUdpSyslogMessage() throws Exception {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogWriter writer = new SyslogWriter(tripletonMap("format", "{message}", "protocol", "udp", "port", TEST_PORT_NUMBER.toString()));
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
 		server.shutdown();
@@ -72,6 +73,7 @@ public final class SyslogWriterTest {
 	public void sendNondefaultUdpSyslogMessage() throws Exception {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.LOCAL0;
 		SyslogSeverity severity = SyslogSeverity.ERROR;
 		Map<String, String> properties = new HashMap<>();
@@ -80,21 +82,31 @@ public final class SyslogWriterTest {
 		properties.put("port", TEST_PORT_NUMBER.toString());
 		properties.put("facility", facility.toString());
 		properties.put("severity", severity.toString());
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, ""));
 		server.shutdown();
 	}
 
 	/**
-	 * Verifies that an exception will be thrown, if no protocol is defined.
+	 * Verifies that default UDP prrotocol will be used if no protocol is specified.
 	 * 
 	 * @throws Exception Failed.
 	 */
 	@Test
 	public void missingProtocol() throws Exception {
-		assertThatThrownBy(() -> new SyslogWriter(emptyMap())).hasMessageMatching("(?i).*protocol.*");
+		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
+		server.start();
+
+		SyslogWriter writer = new SyslogWriter(doubletonMap("format", "{message}", "port", TEST_PORT_NUMBER.toString()));
+		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
+		Thread.sleep(250);
+		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
+		server.shutdown();
 	}
 	
 	/**
@@ -114,8 +126,8 @@ public final class SyslogWriterTest {
 	 */
 	@Test
 	public void invalidFacility() throws Exception {
-		assertThatThrownBy(() -> new SyslogWriter(doubletonMap("protocol", "udp", "facility", "invalid")).
-				write(LogEntryBuilder.empty().message(TEST_MESSAGE).create())).hasMessageMatching("(?i).*SyslogFacility.*");
+		assertThatThrownBy(() -> new SyslogWriter(doubletonMap("protocol", "udp", "facility", "invalid"))
+				.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create())).hasMessageMatching("(?i).*SyslogFacility.*");
 	}
 	
 	/**
@@ -125,8 +137,8 @@ public final class SyslogWriterTest {
 	 */
 	@Test
 	public void invalidSeverity() throws Exception {
-		assertThatThrownBy(() -> new SyslogWriter(doubletonMap("protocol", "udp", "severity", "invalid")).
-				write(LogEntryBuilder.empty().message(TEST_MESSAGE).create())).hasMessageMatching("(?i).*SyslogSeverity.*");
+		assertThatThrownBy(() -> new SyslogWriter(doubletonMap("protocol", "udp", "severity", "invalid"))
+				.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create())).hasMessageMatching("(?i).*SyslogSeverity.*");
 	}
 	
 	/**
@@ -138,6 +150,7 @@ public final class SyslogWriterTest {
 	public void sendUdpSyslogMessageWithIdentification() throws Exception {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.KERN;
 		SyslogSeverity severity = SyslogSeverity.DEBUG;
 		String identification = "SyslogWriterTest";
@@ -148,8 +161,10 @@ public final class SyslogWriterTest {
 		properties.put("facility", facility.toString());
 		properties.put("severity", severity.toString());
 		properties.put("identification", identification);
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, identification));
 		server.shutdown();
@@ -164,36 +179,49 @@ public final class SyslogWriterTest {
 	public void sendLevelControlledUdpSyslogMessage() throws Exception {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.AUTH;
 		Map<String, String> properties = new HashMap<>();
 		properties.put("format", "{message}");
 		properties.put("protocol", "udp");
 		properties.put("port", TEST_PORT_NUMBER.toString());
 		properties.put("facility", facility.toString());
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
 		log.level(Level.DEBUG);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+
 		log.level(Level.ERROR);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
+
 		log.level(Level.INFO);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.INFO, ""));
+
 		log.level(Level.OFF);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERG, ""));
+
 		log.level(Level.TRACE);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+
 		log.level(Level.WARN);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
 		server.shutdown();
@@ -208,8 +236,10 @@ public final class SyslogWriterTest {
 	public void sendDefaultTcpSyslogMessage() throws Exception {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogWriter writer = new SyslogWriter(tripletonMap("format", "{message}", "protocol", "tcp", "port", TEST_PORT_NUMBER.toString()));
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
 		server.shutdown();
@@ -224,6 +254,7 @@ public final class SyslogWriterTest {
 	public void sendNondefaultTcpSyslogMessage() throws Exception {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.LOCAL0;
 		SyslogSeverity severity = SyslogSeverity.ERROR;
 		Map<String, String> properties = new HashMap<>();
@@ -232,8 +263,10 @@ public final class SyslogWriterTest {
 		properties.put("port", TEST_PORT_NUMBER.toString());
 		properties.put("facility", facility.toString());
 		properties.put("severity", severity.toString());
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, ""));
 		server.shutdown();
@@ -248,6 +281,7 @@ public final class SyslogWriterTest {
 	public void sendTcpSyslogMessageWithIdentification() throws Exception {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.KERN;
 		SyslogSeverity severity = SyslogSeverity.DEBUG;
 		String identification = "SyslogWriterTest";
@@ -258,8 +292,10 @@ public final class SyslogWriterTest {
 		properties.put("facility", facility.toString());
 		properties.put("severity", severity.toString());
 		properties.put("identification", identification);
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, identification));
 		server.shutdown();
@@ -274,38 +310,52 @@ public final class SyslogWriterTest {
 	public void sendLevelControlledTcpSyslogMessage() throws Exception {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
+
 		SyslogFacility facility = SyslogFacility.AUTH;
 		Map<String, String> properties = new HashMap<>();
 		properties.put("format", "{message}");
 		properties.put("protocol", "tcp");
 		properties.put("port", TEST_PORT_NUMBER.toString());
 		properties.put("facility", facility.toString());
+
 		SyslogWriter writer = new SyslogWriter(properties);
 		LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
 		log.level(Level.DEBUG);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+
 		log.level(Level.ERROR);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
+
 		log.level(Level.INFO);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.INFO, ""));
+
 		log.level(Level.OFF);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERG, ""));
+
 		log.level(Level.TRACE);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+
 		log.level(Level.WARN);
 		writer.write(log.create());
+
 		Thread.sleep(250);
 		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
 		server.shutdown();
 	}
+
 }

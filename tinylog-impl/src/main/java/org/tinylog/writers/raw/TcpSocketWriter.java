@@ -34,8 +34,8 @@ public class TcpSocketWriter extends AbstractSocketWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		byte[] b = formatMessage(logEntry);
-		socket.getOutputStream().write(b);
+		byte[] message = formatMessage(logEntry);
+		socket.getOutputStream().write(message);
 	}
 
 	@Override

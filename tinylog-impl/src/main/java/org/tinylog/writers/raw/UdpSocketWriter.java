@@ -35,8 +35,8 @@ public class UdpSocketWriter extends AbstractSocketWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) throws IOException {
-		byte[] b = formatMessage(logEntry);
-		final DatagramPacket packet = new DatagramPacket(b, b.length, getInetAddress(), getPort());
+		byte[] message = formatMessage(logEntry);
+		final DatagramPacket packet = new DatagramPacket(message, message.length, getInetAddress(), getPort());
 		datagramSocket.send(packet);
 	}
 

@@ -59,7 +59,7 @@ public abstract class AbstractSocketWriter extends AbstractFormatPatternWriter {
 		} else {
 			port = Integer.parseInt(portNumber);
 		}
-		charset = getCharset();
+		charset = super.getCharset();
 		String identification = getStringValue("identification");
 		if (identification == null) {
 			this.identification = "";
@@ -116,7 +116,6 @@ public abstract class AbstractSocketWriter extends AbstractFormatPatternWriter {
 	 * @return The formated message.
 	 */
 	public byte[] formatMessage(final LogEntry logEntry) {
-
 		StringBuilder builder = new StringBuilder();
 		builder.append("<");
 		builder.append(getCode(logEntry.getLevel()));

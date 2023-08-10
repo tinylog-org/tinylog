@@ -23,6 +23,7 @@ import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 public class UdpSyslogServer extends Thread {
+
 	private final DatagramSocket socket;
 	private volatile boolean shutdown;
 	private Thread thread;
@@ -76,4 +77,5 @@ public class UdpSyslogServer extends Thread {
 	public String getLastMessage() {
 		return lastMessage;
 	}
+
 }

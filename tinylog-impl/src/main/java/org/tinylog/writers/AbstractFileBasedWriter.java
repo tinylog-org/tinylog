@@ -65,7 +65,7 @@ public abstract class AbstractFileBasedWriter extends AbstractWriter {
 	 *
 	 * @return Configured charset
 	 */
-	protected final Charset getCharset() {
+	protected Charset getCharset() {
 		String charsetName = getStringValue("charset");
 		try {
 			return charsetName == null ? Charset.defaultCharset() : Charset.forName(charsetName);

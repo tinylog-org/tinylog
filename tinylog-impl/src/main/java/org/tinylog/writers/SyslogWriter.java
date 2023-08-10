@@ -42,9 +42,7 @@ public final class SyslogWriter extends AbstractFormatPatternWriter {
 		super(properties);
 
 		String protocol = getStringValue("protocol");
-		if (protocol == null) {
-			throw new IllegalArgumentException("Missing protocol");
-		} else if (protocol.toUpperCase(Locale.ROOT).equals("UDP")) {
+		if (protocol == null || protocol.toUpperCase(Locale.ROOT).equals("UDP")) {
 			socketWriter = new UdpSocketWriter(properties);
 		} else if (protocol.toUpperCase(Locale.ROOT).equals("TCP")) {
 			socketWriter = new TcpSocketWriter(properties);

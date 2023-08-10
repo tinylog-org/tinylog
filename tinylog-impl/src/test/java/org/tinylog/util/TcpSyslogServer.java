@@ -22,6 +22,7 @@ import org.tinylog.Level;
 import org.tinylog.provider.InternalLogger;
 
 public class TcpSyslogServer extends Thread {
+
 	private final ServerSocket serverSocket;
 	private volatile boolean shutdown;
 	private Thread thread;
@@ -74,4 +75,5 @@ public class TcpSyslogServer extends Thread {
 	public String getLastMessage() {
 		return lastMessage;
 	}
+
 }
