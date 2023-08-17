@@ -125,4 +125,5 @@ public abstract class AbstractSocketWriter extends AbstractFormatPatternWriter {
 		builder.append(render(logEntry));
 		return builder.toString().getBytes(charset);
 	}
+
 }
