@@ -118,7 +118,7 @@ class UptimePlaceholderTest {
      * @see #renderWithUptime(Duration, String, String)
      * @see #resolveStringWithUptime(Duration, String, String)
      */
-    private static class FormatPatternsProvider implements ArgumentsProvider {
+    private static final class FormatPatternsProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -217,7 +217,7 @@ class UptimePlaceholderTest {
      *
      * @see #resolveBigDecimalWithUptime(Duration, BigDecimal)
      */
-    private static class BigDecimalsProvider implements ArgumentsProvider {
+    private static final class BigDecimalsProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

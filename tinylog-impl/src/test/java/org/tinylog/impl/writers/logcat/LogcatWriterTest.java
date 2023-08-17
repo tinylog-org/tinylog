@@ -169,7 +169,7 @@ class LogcatWriterTest {
      * @see Logging#untaggedLogging(Level, int)
      * @see Logging#taggedLogging(Level, int)
      */
-    private static class LevelsAndPrioritiesProvider implements ArgumentsProvider {
+    private static final class LevelsAndPrioritiesProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

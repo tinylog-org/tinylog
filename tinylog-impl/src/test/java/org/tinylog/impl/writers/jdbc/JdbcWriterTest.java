@@ -594,7 +594,7 @@ class JdbcWriterTest {
     /**
      * Arguments provider for illegal character for database identifier like scheme, table, and field names.
      */
-    private static class IllegalCharacterProvider implements ArgumentsProvider {
+    private static final class IllegalCharacterProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

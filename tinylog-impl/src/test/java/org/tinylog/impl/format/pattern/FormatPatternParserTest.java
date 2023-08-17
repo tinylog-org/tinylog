@@ -219,7 +219,7 @@ class FormatPatternParserTest {
      *
      * @see #normalizeNewLines(String, String)
      */
-    private static class NewLineExamplesProvider implements ArgumentsProvider {
+    private static final class NewLineExamplesProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
