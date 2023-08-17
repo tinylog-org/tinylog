@@ -11,7 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import fuzzycsv.FuzzyCSVTable;
 
-import static fuzzycsv.FuzzyCSVTable.fromCsvReader;
+import static fuzzycsv.FuzzyCSVTable.from;
 import static fuzzycsv.FuzzyCSVTable.fromCsvString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +36,7 @@ class BenchmarkMergerTest {
         assertThat(target).isRegularFile().satisfies(file -> {
             try (Reader reader = Files.newBufferedReader(file)) {
                 FuzzyCSVTable expected = fromCsvString("Name,Number\nFoo 1.0 / foo,1\nBar 2.0-M1 / bar,2");
-                FuzzyCSVTable actual = fromCsvReader(reader);
+                FuzzyCSVTable actual = from().csv().parse(reader);
                 assertThat(expected).isEqualTo(actual);
             }
         });

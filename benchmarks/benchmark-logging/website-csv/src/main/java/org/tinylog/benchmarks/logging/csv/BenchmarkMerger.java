@@ -86,9 +86,9 @@ public class BenchmarkMerger {
         FuzzyCSVTable data = FuzzyCSVTable.fromCsvString(csv);
 
         for (int i = 0; i < data.size(); ++i) {
-            String original = (String) data.row(i + 1).getAt(0);
+            String original = (String) data.row(i + 1).get(0);
             String transformed = original.replaceAll("(.+)\\.", name.trim() + " / ");
-            data.putInCell(0, i + 1, transformed);
+            data.set(0, i + 1, transformed);
         }
 
         return data;
