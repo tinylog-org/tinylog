@@ -64,11 +64,12 @@ internal class TaggedLoggerTest {
         @Mock
         private lateinit var backend: LoggingBackend
 
-        private val framework: Framework = object : Framework(false, false) {
-            override fun getLoggingBackend(): LoggingBackend {
-                return backend
+        private val framework: Framework =
+            object : Framework(false, false) {
+                override fun getLoggingBackend(): LoggingBackend {
+                    return backend
+                }
             }
-        }
 
         /**
          * Verifies the results of the [TaggedLogger.isTraceEnabled] method.
@@ -87,7 +88,10 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isTraceEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isTraceEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     outputDetails,
@@ -121,7 +125,10 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isDebugEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
@@ -155,7 +162,10 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isInfoEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isInfoEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
@@ -189,7 +199,10 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isWarnEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isWarnEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
@@ -223,7 +236,10 @@ internal class TaggedLoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isErrorEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isErrorEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
@@ -858,7 +874,11 @@ internal class TaggedLoggerTest {
              * @param message   Text message
              * @return Created log entry
              */
-            private fun createLogEntry(level: Level, exception: Throwable?, message: String?): LogEntry {
+            private fun createLogEntry(
+                level: Level,
+                exception: Throwable?,
+                message: String?,
+            ): LogEntry {
                 return LogEntry(Enabled::class.java.name, "test", level, exception, message)
             }
         }

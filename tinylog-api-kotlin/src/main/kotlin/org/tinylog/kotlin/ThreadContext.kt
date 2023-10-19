@@ -47,7 +47,10 @@ object ThreadContext {
      * @param key The key with which the context value is to be associated
      * @param value The context value to store
      */
-    fun put(key: String, value: Any?) {
+    fun put(
+        key: String,
+        value: Any?,
+    ) {
         storage.put(key, value?.toString())
     }
 

@@ -117,7 +117,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun trace(message: String, vararg arguments: Any?) {
+    fun trace(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
             backend.log(location.get(), tag, Level.TRACE, null, message, arguments.withSuppliers(), formatter)
@@ -151,7 +154,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The message to log
      */
-    fun trace(exception: Throwable, message: String) {
+    fun trace(
+        exception: Throwable,
+        message: String,
+    ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
             backend.log(location.get(), tag, Level.TRACE, exception, message, null, null)
@@ -172,7 +178,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The lazy supplier for evaluating the message to log
      */
-    fun trace(exception: Throwable, message: () -> String) {
+    fun trace(
+        exception: Throwable,
+        message: () -> String,
+    ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
             backend.log(location.get(), tag, Level.TRACE, exception, message.asSupplier(), null, null)
@@ -199,7 +208,11 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun trace(exception: Throwable, message: String?, vararg arguments: Any?) {
+    fun trace(
+        exception: Throwable,
+        message: String?,
+        vararg arguments: Any?,
+    ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
             backend.log(location.get(), tag, Level.TRACE, exception, message, arguments.withSuppliers(), formatter)
@@ -292,7 +305,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun debug(message: String, vararg arguments: Any?) {
+    fun debug(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
             backend.log(location.get(), tag, Level.DEBUG, null, message, arguments.withSuppliers(), formatter)
@@ -326,7 +342,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The message to log
      */
-    fun debug(exception: Throwable, message: String) {
+    fun debug(
+        exception: Throwable,
+        message: String,
+    ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
             backend.log(location.get(), tag, Level.DEBUG, exception, message, null, null)
@@ -347,7 +366,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The lazy supplier for evaluating the message to log
      */
-    fun debug(exception: Throwable, message: () -> String) {
+    fun debug(
+        exception: Throwable,
+        message: () -> String,
+    ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
             backend.log(location.get(), tag, Level.DEBUG, exception, message.asSupplier(), null, null)
@@ -374,7 +396,11 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun debug(exception: Throwable, message: String?, vararg arguments: Any?) {
+    fun debug(
+        exception: Throwable,
+        message: String?,
+        vararg arguments: Any?,
+    ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
             backend.log(location.get(), tag, Level.DEBUG, exception, message, arguments.withSuppliers(), formatter)
@@ -467,7 +493,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun info(message: String, vararg arguments: Any?) {
+    fun info(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
             backend.log(location.get(), tag, Level.INFO, null, message, arguments.withSuppliers(), formatter)
@@ -501,7 +530,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The message to log
      */
-    fun info(exception: Throwable, message: String) {
+    fun info(
+        exception: Throwable,
+        message: String,
+    ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
             backend.log(location.get(), tag, Level.INFO, exception, message, null, null)
@@ -522,7 +554,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The lazy supplier for evaluating the message to log
      */
-    fun info(exception: Throwable, message: () -> String) {
+    fun info(
+        exception: Throwable,
+        message: () -> String,
+    ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
             backend.log(location.get(), tag, Level.INFO, exception, message.asSupplier(), null, null)
@@ -549,7 +584,11 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun info(exception: Throwable, message: String?, vararg arguments: Any?) {
+    fun info(
+        exception: Throwable,
+        message: String?,
+        vararg arguments: Any?,
+    ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
             backend.log(location.get(), tag, Level.INFO, exception, message, arguments.withSuppliers(), formatter)
@@ -642,7 +681,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun warn(message: String, vararg arguments: Any?) {
+    fun warn(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
             backend.log(location.get(), tag, Level.WARN, null, message, arguments.withSuppliers(), formatter)
@@ -676,7 +718,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The message to log
      */
-    fun warn(exception: Throwable, message: String) {
+    fun warn(
+        exception: Throwable,
+        message: String,
+    ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
             backend.log(location.get(), tag, Level.WARN, exception, message, null, null)
@@ -697,7 +742,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The lazy supplier for evaluating the message to log
      */
-    fun warn(exception: Throwable, message: () -> String) {
+    fun warn(
+        exception: Throwable,
+        message: () -> String,
+    ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
             backend.log(location.get(), tag, Level.WARN, exception, message.asSupplier(), null, null)
@@ -724,7 +772,11 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun warn(exception: Throwable, message: String?, vararg arguments: Any?) {
+    fun warn(
+        exception: Throwable,
+        message: String?,
+        vararg arguments: Any?,
+    ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
             backend.log(location.get(), tag, Level.WARN, exception, message, arguments.withSuppliers(), formatter)
@@ -817,7 +869,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun error(message: String, vararg arguments: Any?) {
+    fun error(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
             backend.log(location.get(), tag, Level.ERROR, null, message, arguments.withSuppliers(), formatter)
@@ -851,7 +906,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The message to log
      */
-    fun error(exception: Throwable, message: String) {
+    fun error(
+        exception: Throwable,
+        message: String,
+    ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
             backend.log(location.get(), tag, Level.ERROR, exception, message, null, null)
@@ -872,7 +930,10 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param exception The exception or other kind of throwable to log
      * @param message The lazy supplier for evaluating the message to log
      */
-    fun error(exception: Throwable, message: () -> String) {
+    fun error(
+        exception: Throwable,
+        message: () -> String,
+    ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
             backend.log(location.get(), tag, Level.ERROR, exception, message.asSupplier(), null, null)
@@ -899,7 +960,11 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      * @param message The text message with placeholders to log
      * @param arguments The real values or lazy suppliers for the placeholders
      */
-    fun error(exception: Throwable, message: String?, vararg arguments: Any?) {
+    fun error(
+        exception: Throwable,
+        message: String?,
+        vararg arguments: Any?,
+    ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
             backend.log(location.get(), tag, Level.ERROR, exception, message, arguments.withSuppliers(), formatter)

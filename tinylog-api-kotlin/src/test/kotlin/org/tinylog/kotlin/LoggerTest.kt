@@ -47,9 +47,11 @@ internal class LoggerTest {
 
         tinylogMock.`when`<Framework> {
             Tinylog.getFramework()
-        }.thenReturn(object : Framework(false, false) {
-            override fun getLoggingBackend() = backend
-        })
+        }.thenReturn(
+            object : Framework(false, false) {
+                override fun getLoggingBackend() = backend
+            },
+        )
 
         visibility = mock()
         whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
@@ -142,7 +144,10 @@ internal class LoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isTraceEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isTraceEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(visibility.trace).thenReturn(outputDetails)
             whenever(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled)
 
@@ -166,7 +171,10 @@ internal class LoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isDebugEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isDebugEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(visibility.debug).thenReturn(outputDetails)
             whenever(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled)
 
@@ -190,7 +198,10 @@ internal class LoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isInfoEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isInfoEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(visibility.info).thenReturn(outputDetails)
             whenever(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled)
 
@@ -214,7 +225,10 @@ internal class LoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isWarnEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isWarnEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(visibility.warn).thenReturn(outputDetails)
             whenever(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled)
 
@@ -238,7 +252,10 @@ internal class LoggerTest {
             "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
             "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
         )
-        fun isErrorEnabled(enabled: Boolean, outputDetails: OutputDetails) {
+        fun isErrorEnabled(
+            enabled: Boolean,
+            outputDetails: OutputDetails,
+        ) {
             whenever(visibility.error).thenReturn(outputDetails)
             whenever(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled)
 
@@ -844,7 +861,12 @@ internal class LoggerTest {
              * @param message   Message object
              * @param arguments Optional arguments
              */
-            private fun verifyLogEntry(level: Level, exception: Throwable?, message: Any?, vararg arguments: Any) {
+            private fun verifyLogEntry(
+                level: Level,
+                exception: Throwable?,
+                message: Any?,
+                vararg arguments: Any,
+            ) {
                 verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
                 verify(backend).log(
                     eq(Enabled::class.java),
@@ -865,7 +887,12 @@ internal class LoggerTest {
              * @param message   Message object supplier
              * @param arguments Optional arguments
              */
-            private fun verifyLogEntry(level: Level, exception: Throwable?, message: () -> Any, vararg arguments: Any) {
+            private fun verifyLogEntry(
+                level: Level,
+                exception: Throwable?,
+                message: () -> Any,
+                vararg arguments: Any,
+            ) {
                 verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
                 verify(backend).log(
                     eq(Enabled::class.java),
@@ -886,7 +913,12 @@ internal class LoggerTest {
              * @param message   Message object
              * @param arguments Optional argument suppliers
              */
-            private fun verifyLogEntry(level: Level, exception: Throwable?, message: Any, vararg arguments: () -> Any) {
+            private fun verifyLogEntry(
+                level: Level,
+                exception: Throwable?,
+                message: Any,
+                vararg arguments: () -> Any,
+            ) {
                 verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
                 verify(backend).log(
                     eq(Enabled::class.java),
@@ -898,9 +930,10 @@ internal class LoggerTest {
                         isNull()
                     } else {
                         argThat {
-                            this.size == arguments.size && this.withIndex().all { (index, value) ->
-                                value is Supplier<*> && value.get() == arguments[index]()
-                            }
+                            this.size == arguments.size &&
+                                this.withIndex().all { (index, value) ->
+                                    value is Supplier<*> && value.get() == arguments[index]()
+                                }
                         }
                     },
                     if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),

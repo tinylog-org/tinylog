@@ -32,17 +32,21 @@ internal class ThreadContextTest {
         fun create() {
             storage = mock()
 
-            backend = mock {
-                on { contextStorage } doReturn storage
-            }
+            backend =
+                mock {
+                    on { contextStorage } doReturn storage
+                }
 
-            tinylogMock = mockStatic(Tinylog::class.java).apply {
-                `when`<Any> {
-                    Tinylog.getFramework()
-                }.thenReturn(object : Framework(false, false) {
-                    override fun getLoggingBackend() = backend
-                })
-            }
+            tinylogMock =
+                mockStatic(Tinylog::class.java).apply {
+                    `when`<Any> {
+                        Tinylog.getFramework()
+                    }.thenReturn(
+                        object : Framework(false, false) {
+                            override fun getLoggingBackend() = backend
+                        },
+                    )
+                }
         }
 
         /**
