@@ -4,6 +4,10 @@
 		<Package name="~.*\.(jmh_)?generated" />
 	</Match>
 	<Match>
+		<!-- Allow throwing exceptions in constructors -->
+		<Bug pattern="CT_CONSTRUCTOR_THROW" />
+	</Match>
+	<Match>
 		<!-- Allow exposing internal representations -->
 		<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2, MS_EXPOSE_REP" />
 	</Match>

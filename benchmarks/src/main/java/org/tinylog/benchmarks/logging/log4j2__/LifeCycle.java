@@ -40,7 +40,6 @@ public class LifeCycle extends AbstractLifeCycle {
 	private boolean async;
 
 	private Logger logger;
-	private Path file;
 
 	/**
 	 *
