@@ -9,7 +9,7 @@ import java.nio.file.Path;
 /**
  * Buffered text file writer.
  */
-public class LogFile implements Closeable {
+public final class LogFile implements Closeable {
 
     private final RandomAccessFile file;
     private final boolean newFile;

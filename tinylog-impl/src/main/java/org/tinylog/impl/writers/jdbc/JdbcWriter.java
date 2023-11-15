@@ -29,7 +29,7 @@ import org.tinylog.impl.writers.Writer;
 /**
  * Writer for inserting log entries into a relational database table.
  */
-public class JdbcWriter implements Writer {
+public final class JdbcWriter implements Writer {
 
     private static final Pattern NO_CONTROLS_PATTERN = Pattern.compile("[^\\p{Cntrl}]+");
     private static final Pattern SAFE_IDENTIFIER_PATTERN = Pattern.compile("[A-Za-z0-9_@$#]+");
@@ -38,7 +38,6 @@ public class JdbcWriter implements Writer {
 
     private final List<Placeholder> placeholders;
     private final Connection connection;
-    private final String sql;
     private final PreparedStatement statement;
 
     private int count;
@@ -57,7 +56,8 @@ public class JdbcWriter implements Writer {
             Map<String, Placeholder> fields) throws NamingException, SQLException {
         this.placeholders = new ArrayList<>(fields.values());
         this.connection = connect(url, user, password);
-        this.sql = renderSql(connection, schema, table, fields.keySet());
+
+        String sql = renderSql(connection, schema, table, fields.keySet());
         this.statement = connection.prepareStatement(sql);
     }
 

@@ -16,7 +16,7 @@ import org.tinylog.impl.writers.Writer;
 /**
  * Writer for writing log entries to a file.
  */
-public class FileWriter implements Writer {
+public final class FileWriter implements Writer {
 
     private static final int BYTE_BUFFER_CAPACITY = 64 * 1024; // 64 KB
     private static final int BUILDER_START_CAPACITY = 1024;    //  1 KB

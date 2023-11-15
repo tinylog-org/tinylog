@@ -10,7 +10,7 @@ import java.security.CodeSource;
 /**
  * Location of a local Maven project.
  */
-public class ProjectLocation {
+public final class ProjectLocation {
 
     /**
      * File name for Maven's POM XML.
