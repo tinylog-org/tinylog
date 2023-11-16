@@ -115,6 +115,11 @@ public class ImmutableLoggingBackend implements LoggingBackend {
         }
     }
 
+    @Override
+    public LoggingBackend reconfigure() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Gets the configured output details for the passed tag and severity level.
      *

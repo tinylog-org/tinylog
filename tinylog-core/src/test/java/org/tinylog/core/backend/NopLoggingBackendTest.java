@@ -77,4 +77,13 @@ class NopLoggingBackendTest {
         );
     }
 
+    /**
+     * Verifies that reconfiguration leads to the same logging backend.
+     */
+    @Test
+    void reconfigure() {
+        LoggingBackend backend = new NopLoggingBackend();
+        assertThat(backend.reconfigure()).isSameAs(backend);
+    }
+
 }

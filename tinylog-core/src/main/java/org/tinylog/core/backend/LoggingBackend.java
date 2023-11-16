@@ -65,4 +65,12 @@ public interface LoggingBackend {
     void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
             MessageFormatter formatter);
 
+    /**
+     * Recreates the logging backend with the current configuration. If nothing has changed, this method can return
+     * the current instance.
+     *
+     * @return A new logging backend or the same current instance
+     */
+    LoggingBackend reconfigure();
+
 }

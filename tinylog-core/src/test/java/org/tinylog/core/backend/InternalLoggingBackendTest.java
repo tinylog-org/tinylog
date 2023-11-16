@@ -277,4 +277,13 @@ class InternalLoggingBackendTest {
         assertThat(output.consume()).isEmpty();
     }
 
+    /**
+     * Verifies that reconfiguration leads to the same logging backend.
+     */
+    @Test
+    void reconfigure() {
+        LoggingBackend backend = new InternalLoggingBackend(context);
+        assertThat(backend.reconfigure()).isSameAs(backend);
+    }
+
 }

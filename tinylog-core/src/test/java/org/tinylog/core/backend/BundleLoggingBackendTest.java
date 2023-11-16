@@ -13,7 +13,9 @@ import org.tinylog.core.format.message.MessageFormatter;
 
 import com.google.common.collect.ImmutableMap;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.any;
@@ -225,6 +227,15 @@ class BundleLoggingBackendTest {
             same(arguments),
             same(formatter)
         );
+    }
+
+    /**
+     * Verifies that reconfiguration is rejected.
+     */
+    @Test
+    void reconfigure() {
+        LoggingBackend backend = new BundleLoggingBackend(emptyList());
+        assertThatCode(backend::reconfigure).isInstanceOf(UnsupportedOperationException.class);
     }
 
 }

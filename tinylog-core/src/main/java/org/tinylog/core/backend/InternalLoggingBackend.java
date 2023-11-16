@@ -101,4 +101,9 @@ public class InternalLoggingBackend implements LoggingBackend {
         }
     }
 
+    @Override
+    public LoggingBackend reconfigure() {
+        return this;
+    }
+
 }

@@ -50,4 +50,9 @@ public class NopLoggingBackend implements LoggingBackend {
         // Ignore
     }
 
+    @Override
+    public LoggingBackend reconfigure() {
+        return this;
+    }
+
 }

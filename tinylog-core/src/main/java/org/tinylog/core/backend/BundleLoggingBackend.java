@@ -110,4 +110,9 @@ public class BundleLoggingBackend implements LoggingBackend {
         return first.ordinal() >= second.ordinal() ? first : second;
     }
 
+    @Override
+    public LoggingBackend reconfigure() {
+        throw new UnsupportedOperationException();
+    }
+
 }

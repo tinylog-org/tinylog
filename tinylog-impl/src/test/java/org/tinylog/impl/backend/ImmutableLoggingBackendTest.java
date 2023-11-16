@@ -27,7 +27,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.backend.BundleLoggingBackend;
 import org.tinylog.core.backend.LevelVisibility;
+import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
@@ -46,9 +48,11 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.EnumSet.complementOf;
 import static java.util.EnumSet.noneOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -776,6 +780,15 @@ class ImmutableLoggingBackendTest {
         assertThat(logEntryCaptor.getValue().getMessage()).isEqualTo("Hello tinylog!");
 
         assertThat(log.consume()).isEmpty();
+    }
+
+    /**
+     * Verifies that reconfiguration is rejected.
+     */
+    @Test
+    void reconfigure() {
+        LoggingBackend backend = new BundleLoggingBackend(emptyList());
+        assertThatCode(backend::reconfigure).isInstanceOf(UnsupportedOperationException.class);
     }
 
     /**

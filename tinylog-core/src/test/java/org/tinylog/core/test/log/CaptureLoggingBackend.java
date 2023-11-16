@@ -81,6 +81,11 @@ class CaptureLoggingBackend implements LoggingBackend {
         log.add(new LogEntry(caller, tag, level, throwable, output));
     }
 
+    @Override
+    public LoggingBackend reconfigure() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Retrieves the visibility of all severity levels.
      *
