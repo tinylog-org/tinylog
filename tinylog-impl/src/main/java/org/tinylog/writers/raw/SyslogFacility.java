@@ -86,12 +86,12 @@ public enum SyslogFacility {
 	/**
 	 * Log audit.
 	 */
-	LOG_AUDIT(13),
+	SECURITY(13),
 
 	/**
 	 * Log alert.
 	 */
-	LOG_ALERT(14),
+	CONSOLE(14),
 
 	/**
 	 * Clock daemon.

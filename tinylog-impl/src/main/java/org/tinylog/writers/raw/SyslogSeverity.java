@@ -16,14 +16,14 @@ package org.tinylog.writers.raw;
 import org.tinylog.Level;
 
 /**
- * Syslog  severity codes.
+ * Syslog severity levels.
  */
 public enum SyslogSeverity {
 	
 	/**
 	 * System is unusable.
 	 */
-	EMERG(0),
+	EMERGENCY(0),
 	/**
 	 * Action must be taken immediately.
 	 */
@@ -47,7 +47,7 @@ public enum SyslogSeverity {
 	/**
 	 * Informational messages.
 	 */
-	INFO(6),
+	INFORMATIONAL(6),
 	/**
 	 * Debug level messages.
 	 */
@@ -70,24 +70,23 @@ public enum SyslogSeverity {
 	/**
 	 * Returns the Severity for the specified Level.
 	 * @param level The Level.
-	 * @return The matching Severity, or INFO if there is no match.
+	 * @return The matching Severity, or INFORMATIONAL if there is no match.
 	 */
 	public static SyslogSeverity getSeverity(final Level level) {
 		switch (level) {
 			case TRACE:
-				return DEBUG;
 			case DEBUG:
 				return DEBUG;
 			case INFO:
-				return INFO;
+				return INFORMATIONAL;
 			case WARN:
 				return WARNING;
 			case ERROR:
 				return ERROR;
 			case OFF:
-				return EMERG;
+				return EMERGENCY;
 			default:
-				return INFO;	
+				return INFORMATIONAL;
 		}
 	}
 }

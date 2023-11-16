@@ -37,14 +37,6 @@ public final class SyslogWriterTest {
 
 	private static final Integer TEST_PORT_NUMBER = 9999;
 	private static final String TEST_MESSAGE = "Test Message";
-	
-	private String getExpectedSyslogMessage(final String message,
-						final SyslogFacility facility,
-						final SyslogSeverity severity,
-						final String identification) {
-		int code = (facility.getCode() << 3) + severity.getCode();
-		return "<" + code + ">" + identification + ": " + message;
-	}
 
 	/**
 	 * Sends udp message with default settings and verifies it is received.
@@ -56,12 +48,17 @@ public final class SyslogWriterTest {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogWriter writer = new SyslogWriter(tripletonMap("format", "{message}", "protocol", "udp", "port", TEST_PORT_NUMBER.toString()));
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+		try {
+			Map<String, String> configuration = tripletonMap("format", "{message}", "protocol", "udp", "port", TEST_PORT_NUMBER.toString());
+			SyslogWriter writer = new SyslogWriter(configuration);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			String expectedMessage = generateExpectedMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFORMATIONAL, "");
+			assertThat(server.getLastMessage()).isEqualTo(expectedMessage);
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -70,29 +67,32 @@ public final class SyslogWriterTest {
 	 * @throws Exception Failed.
 	 */
 	@Test
-	public void sendNondefaultUdpSyslogMessage() throws Exception {
+	public void sendNonDefaultUdpSyslogMessage() throws Exception {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.LOCAL0;
-		SyslogSeverity severity = SyslogSeverity.ERROR;
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "udp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
-		properties.put("severity", severity.toString());
+		try {
+			SyslogFacility facility = SyslogFacility.LOCAL0;
+			SyslogSeverity severity = SyslogSeverity.ERROR;
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "udp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
+			properties.put("severity", severity.toString());
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage()).isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, severity, ""));
+		} finally {
+			server.shutdown();
+		}
 	}
 
 	/**
-	 * Verifies that default UDP prrotocol will be used if no protocol is specified.
+	 * Verifies that default UDP protocol will be used if no protocol is specified.
 	 * 
 	 * @throws Exception Failed.
 	 */
@@ -101,12 +101,16 @@ public final class SyslogWriterTest {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogWriter writer = new SyslogWriter(doubletonMap("format", "{message}", "port", TEST_PORT_NUMBER.toString()));
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+		try {
+			SyslogWriter writer = new SyslogWriter(doubletonMap("format", "{message}", "port", TEST_PORT_NUMBER.toString()));
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			String expectedMessage = generateExpectedMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFORMATIONAL, "");
+			assertThat(server.getLastMessage()).isEqualTo(expectedMessage);
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -151,23 +155,26 @@ public final class SyslogWriterTest {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.KERN;
-		SyslogSeverity severity = SyslogSeverity.DEBUG;
-		String identification = "SyslogWriterTest";
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "udp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
-		properties.put("severity", severity.toString());
-		properties.put("identification", identification);
+		try {
+			SyslogFacility facility = SyslogFacility.KERN;
+			SyslogSeverity severity = SyslogSeverity.DEBUG;
+			String identification = "SyslogWriterTest";
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "udp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
+			properties.put("severity", severity.toString());
+			properties.put("identification", identification);
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, identification));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage()).isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, severity, identification));
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -180,51 +187,60 @@ public final class SyslogWriterTest {
 		UdpSyslogServer server = new UdpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.AUTH;
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "udp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
+		try {
+			SyslogFacility facility = SyslogFacility.AUTH;
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "udp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
-		log.level(Level.DEBUG);
-		writer.write(log.create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
+			log.level(Level.DEBUG);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
 
-		log.level(Level.ERROR);
-		writer.write(log.create());
+			log.level(Level.ERROR);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
 
-		log.level(Level.INFO);
-		writer.write(log.create());
+			log.level(Level.INFO);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.INFO, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.INFORMATIONAL, ""));
 
-		log.level(Level.OFF);
-		writer.write(log.create());
+			log.level(Level.OFF);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERGENCY, ""));
 
-		log.level(Level.TRACE);
-		writer.write(log.create());
+			log.level(Level.TRACE);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
 
-		log.level(Level.WARN);
-		writer.write(log.create());
+			log.level(Level.WARN);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -237,12 +253,17 @@ public final class SyslogWriterTest {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogWriter writer = new SyslogWriter(tripletonMap("format", "{message}", "protocol", "tcp", "port", TEST_PORT_NUMBER.toString()));
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+		try {
+			Map<String, String> configuration = tripletonMap("format", "{message}", "protocol", "tcp", "port", TEST_PORT_NUMBER.toString());
+			SyslogWriter writer = new SyslogWriter(configuration);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFO, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			String expectedMessage = generateExpectedMessage(TEST_MESSAGE, SyslogFacility.USER, SyslogSeverity.INFORMATIONAL, "");
+			assertThat(server.getLastMessage()).isEqualTo(expectedMessage);
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -251,25 +272,28 @@ public final class SyslogWriterTest {
 	 * @throws Exception Failed.
 	 */
 	@Test
-	public void sendNondefaultTcpSyslogMessage() throws Exception {
+	public void sendNonDefaultTcpSyslogMessage() throws Exception {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.LOCAL0;
-		SyslogSeverity severity = SyslogSeverity.ERROR;
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "tcp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
-		properties.put("severity", severity.toString());
+		try {
+			SyslogFacility facility = SyslogFacility.LOCAL0;
+			SyslogSeverity severity = SyslogSeverity.ERROR;
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "tcp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
+			properties.put("severity", severity.toString());
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage()).isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, severity, ""));
+		} finally {
+			server.shutdown();
+		}
 	}
 	
 	/**
@@ -282,23 +306,26 @@ public final class SyslogWriterTest {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.KERN;
-		SyslogSeverity severity = SyslogSeverity.DEBUG;
-		String identification = "SyslogWriterTest";
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "tcp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
-		properties.put("severity", severity.toString());
-		properties.put("identification", identification);
+		try {
+			SyslogFacility facility = SyslogFacility.KERN;
+			SyslogSeverity severity = SyslogSeverity.DEBUG;
+			String identification = "SyslogWriterTest";
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "tcp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
+			properties.put("severity", severity.toString());
+			properties.put("identification", identification);
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			writer.write(LogEntryBuilder.empty().message(TEST_MESSAGE).create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, severity, identification));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage()).isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, severity, identification));
+		} finally {
+			server.shutdown();
+		}
 	}
 
 	/**
@@ -311,51 +338,70 @@ public final class SyslogWriterTest {
 		TcpSyslogServer server = new TcpSyslogServer(TEST_PORT_NUMBER);
 		server.start();
 
-		SyslogFacility facility = SyslogFacility.AUTH;
-		Map<String, String> properties = new HashMap<>();
-		properties.put("format", "{message}");
-		properties.put("protocol", "tcp");
-		properties.put("port", TEST_PORT_NUMBER.toString());
-		properties.put("facility", facility.toString());
+		try {
+			SyslogFacility facility = SyslogFacility.AUTH;
+			Map<String, String> properties = new HashMap<>();
+			properties.put("format", "{message}");
+			properties.put("protocol", "tcp");
+			properties.put("port", TEST_PORT_NUMBER.toString());
+			properties.put("facility", facility.toString());
 
-		SyslogWriter writer = new SyslogWriter(properties);
-		LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
-		log.level(Level.DEBUG);
-		writer.write(log.create());
+			SyslogWriter writer = new SyslogWriter(properties);
+			LogEntryBuilder log = LogEntryBuilder.empty().message(TEST_MESSAGE);
+			log.level(Level.DEBUG);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
 
-		log.level(Level.ERROR);
-		writer.write(log.create());
+			log.level(Level.ERROR);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.ERROR, ""));
 
-		log.level(Level.INFO);
-		writer.write(log.create());
+			log.level(Level.INFO);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.INFO, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.INFORMATIONAL, ""));
 
-		log.level(Level.OFF);
-		writer.write(log.create());
+			log.level(Level.OFF);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.EMERGENCY, ""));
 
-		log.level(Level.TRACE);
-		writer.write(log.create());
+			log.level(Level.TRACE);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.DEBUG, ""));
 
-		log.level(Level.WARN);
-		writer.write(log.create());
+			log.level(Level.WARN);
+			writer.write(log.create());
 
-		Thread.sleep(250);
-		assertThat(server.getLastMessage()).isEqualTo(getExpectedSyslogMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
-		server.shutdown();
+			Thread.sleep(250);
+			assertThat(server.getLastMessage())
+				.isEqualTo(generateExpectedMessage(TEST_MESSAGE, facility, SyslogSeverity.WARNING, ""));
+		} finally {
+			server.shutdown();
+		}
+	}
+
+	private String generateExpectedMessage(
+		final String message,
+		final SyslogFacility facility,
+		final SyslogSeverity severity,
+		final String identification
+	) {
+		int code = (facility.getCode() << 3) + severity.getCode();
+		return "<" + code + ">" + identification + ": " + message;
 	}
 
 }

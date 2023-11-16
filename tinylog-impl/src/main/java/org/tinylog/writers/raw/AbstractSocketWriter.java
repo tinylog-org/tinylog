@@ -31,7 +31,7 @@ public abstract class AbstractSocketWriter extends AbstractFormatPatternWriter {
 	private static final int DEFAULT_PORT_NUMBER = 514;
 	private static final String DEFAULT_FACILITY = "USER";
 	private static final int FACILITY_CODE_SHIFT = 3;
-	private static final String DEFAULT_SEVERITY = "INFO";
+	private static final String DEFAULT_SEVERITY = "INFORMATIONAL";
 
 	private final InetAddress inetAddress;
 	private final int port;

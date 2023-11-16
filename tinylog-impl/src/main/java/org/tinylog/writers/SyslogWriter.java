@@ -27,12 +27,11 @@ import org.tinylog.writers.raw.UdpSocketWriter;
  */
 public final class SyslogWriter extends AbstractFormatPatternWriter {
 
-	private AbstractSocketWriter socketWriter;
+	private final AbstractSocketWriter socketWriter;
 
 	/**
 	 * @param properties
 	 *            Configuration for writer
-	 *
 	 * @throws IOException
 	 *             Socket cannot be opened for write access
 	 * @throws IllegalArgumentException
