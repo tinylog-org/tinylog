@@ -52,7 +52,12 @@ class FrameworkTest {
      */
     @Test
     void runtime() {
-        assertThat(new Framework(false, false).getRuntime()).isNotNull();
+        Framework framework = new Framework(false, false);
+        try {
+            assertThat(framework.getRuntime()).isNotNull();
+        } finally {
+            framework.shutDown();
+        }
     }
 
     /**
@@ -60,15 +65,20 @@ class FrameworkTest {
      */
     @Test
     void clock() throws InterruptedException {
-        Clock clock = new Framework(false, false).getClock();
+        Framework framework = new Framework(false, false);
+        try {
+            Clock clock = framework.getClock();
 
-        Instant before = Clock.systemDefaultZone().instant();
-        Thread.sleep(1);
-        Instant instant = clock.instant();
-        Thread.sleep(1);
-        Instant after = Clock.systemDefaultZone().instant();
+            Instant before = Clock.systemDefaultZone().instant();
+            Thread.sleep(1);
+            Instant instant = clock.instant();
+            Thread.sleep(1);
+            Instant after = Clock.systemDefaultZone().instant();
 
-        assertThat(instant).isStrictlyBetween(before, after);
+            assertThat(instant).isStrictlyBetween(before, after);
+        } finally {
+            framework.shutDown();
+        }
     }
 
     /**
@@ -89,9 +99,12 @@ class FrameworkTest {
             TestOneConfigurationLoader.data = singletonMap("foo", "bar");
 
             Framework framework = new Framework(false, false);
-            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-
-            assertThat(configuration.get("foo")).isNull();
+            try {
+                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
+                assertThat(configuration.get("foo")).isNull();
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -107,10 +120,13 @@ class FrameworkTest {
             TestTwoConfigurationLoader.data = singletonMap("second", "yes");
 
             Framework framework = new Framework(true, false);
-            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-
-            assertThat(configuration.get("first")).isNull();
-            assertThat(configuration.get("second")).isEqualTo("yes");
+            try {
+                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
+                assertThat(configuration.get("first")).isNull();
+                assertThat(configuration.get("second")).isEqualTo("yes");
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -126,10 +142,13 @@ class FrameworkTest {
             TestTwoConfigurationLoader.data = null;
 
             Framework framework = new Framework(true, false);
-            ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-
-            assertThat(configuration.get("first")).isEqualTo("yes");
-            assertThat(configuration.get("second")).isNull();
+            try {
+                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
+                assertThat(configuration.get("first")).isEqualTo("yes");
+                assertThat(configuration.get("second")).isNull();
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -138,10 +157,13 @@ class FrameworkTest {
         @Test
         void receiveEmptyConfigurationBuilder() {
             Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false).set("foo", "bar").activate();
-
-            ConfigurationBuilder builder = framework.getConfigurationBuilder(false);
-            assertThat(builder.get("foo")).isNull();
+            try {
+                framework.getConfigurationBuilder(false).set("foo", "bar").activate();
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(false);
+                assertThat(builder.get("foo")).isNull();
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -150,10 +172,13 @@ class FrameworkTest {
         @Test
         void receiveInheritedConfigurationBuilder() {
             Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false).set("foo", "bar").activate();
-
-            ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
-            assertThat(builder.get("foo")).isEqualTo("bar");
+            try {
+                framework.getConfigurationBuilder(false).set("foo", "bar").activate();
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
+                assertThat(builder.get("foo")).isEqualTo("bar");
+            } finally {
+                framework.shutDown();
+            }
         }
 
     }
@@ -169,8 +194,13 @@ class FrameworkTest {
          */
         @Test
         void provideFromCurrentThread() {
-            ClassLoader classLoader = new Framework(false, false).getClassLoader();
-            assertThat(classLoader).isNotNull().isEqualTo(Thread.currentThread().getContextClassLoader());
+            Framework framework = new Framework(false, false);
+            try {
+                ClassLoader classLoader = framework.getClassLoader();
+                assertThat(classLoader).isNotNull().isEqualTo(Thread.currentThread().getContextClassLoader());
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -183,8 +213,14 @@ class FrameworkTest {
             ClassLoader threadClassLoader = thread.getContextClassLoader();
             try {
                 thread.setContextClassLoader(null);
-                ClassLoader providedClassLoader = new Framework(false, false).getClassLoader();
-                assertThat(providedClassLoader).isNotNull().isEqualTo(Framework.class.getClassLoader());
+
+                Framework framework = new Framework(false, false);
+                try {
+                    ClassLoader providedClassLoader = framework.getClassLoader();
+                    assertThat(providedClassLoader).isNotNull().isEqualTo(Framework.class.getClassLoader());
+                } finally {
+                    framework.shutDown();
+                }
             } finally {
                 thread.setContextClassLoader(threadClassLoader);
             }
@@ -362,10 +398,14 @@ class FrameworkTest {
         @Test
         void loadInternalLoggingBackend() {
             Framework framework = new Framework(false, false);
-            assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class);
-            assertThat(output.consume())
-                .hasSize(1)
-                .allSatisfy(line -> assertThat(line).contains("TINYLOG WARN", "tinylog-impl.jar"));
+            try {
+                assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class);
+                assertThat(output.consume())
+                    .hasSize(1)
+                    .allSatisfy(line -> assertThat(line).contains("TINYLOG WARN", "tinylog-impl.jar"));
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -375,7 +415,11 @@ class FrameworkTest {
         @Test
         void loadSingleAvailableProvider() {
             Framework framework = new Framework(false, false);
-            assertThat(framework.getLoggingBackend()).isSameAs(TestOneLoggingBackendBuilder.backend);
+            try {
+                assertThat(framework.getLoggingBackend()).isSameAs(TestOneLoggingBackendBuilder.backend);
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -388,14 +432,18 @@ class FrameworkTest {
         @Test
         void loadAllAvailableProviders() {
             Framework framework = new Framework(false, false);
+            try {
+                LoggingBackend backend = framework.getLoggingBackend();
+                assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-            LoggingBackend backend = framework.getLoggingBackend();
-            assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
-
-            Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
-            assertThat(children).containsExactlyInAnyOrder(
-                TestOneLoggingBackendBuilder.backend, TestTwoLoggingBackendBuilder.backend
-            );
+                Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
+                assertThat(children).containsExactlyInAnyOrder(
+                    TestOneLoggingBackendBuilder.backend,
+                    TestTwoLoggingBackendBuilder.backend
+                );
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -408,11 +456,15 @@ class FrameworkTest {
         @Test
         void loadSingleProviderByName() {
             Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false)
-                .set("backends", "test2")
-                .activate();
+            try {
+                framework.getConfigurationBuilder(false)
+                    .set("backends", "test2")
+                    .activate();
 
-            assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
+                assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -425,18 +477,22 @@ class FrameworkTest {
         @Test
         void loadMultipleProvidersByName() {
             Framework framework = new Framework(true, false);
-            framework.getConfigurationBuilder(false)
-                .set("backends", "test1, nop")
-                .activate();
+            try {
+                framework.getConfigurationBuilder(false)
+                    .set("backends", "test1, nop")
+                    .activate();
 
-            LoggingBackend backend = framework.getLoggingBackend();
-            assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
+                LoggingBackend backend = framework.getLoggingBackend();
+                assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
 
-            Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
-            assertThat(children).containsExactlyInAnyOrder(
-                TestOneLoggingBackendBuilder.backend,
-                new NopLoggingBackendBuilder().create(null)
-            );
+                Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
+                assertThat(children).containsExactlyInAnyOrder(
+                    TestOneLoggingBackendBuilder.backend,
+                    new NopLoggingBackendBuilder().create(null)
+                );
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -445,12 +501,16 @@ class FrameworkTest {
         @Test
         void loadSameProvidersByName() {
             Framework framework = new Framework(true, false);
-            framework.getConfigurationBuilder(false)
-                .set("backends", "nop, NOP")
-                .activate();
+            try {
+                framework.getConfigurationBuilder(false)
+                    .set("backends", "nop, NOP")
+                    .activate();
 
-            LoggingBackend backend = framework.getLoggingBackend();
-            assertThat(backend).isInstanceOf(NopLoggingBackend.class);
+                LoggingBackend backend = framework.getLoggingBackend();
+                assertThat(backend).isInstanceOf(NopLoggingBackend.class);
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -461,16 +521,20 @@ class FrameworkTest {
         @Test
         void fallbackForEntireInvalidName() {
             Framework framework = new Framework(true, false);
-            framework.getConfigurationBuilder(false)
-                .set("backends", "test0")
-                .activate();
+            try {
+                framework.getConfigurationBuilder(false)
+                    .set("backends", "test0")
+                    .activate();
 
-            LoggingBackend backend = framework.getLoggingBackend();
+                LoggingBackend backend = framework.getLoggingBackend();
 
-            assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
-            assertThat(output.consume())
-                .hasSize(1)
-                .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test0"));
+                assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
+                assertThat(output.consume())
+                    .hasSize(1)
+                    .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test0"));
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -483,16 +547,20 @@ class FrameworkTest {
         @Test
         void fallbackForPartialInvalidName() {
             Framework framework = new Framework(true, false);
-            framework.getConfigurationBuilder(false)
-                .set("backends", "test2, test3")
-                .activate();
+            try {
+                framework.getConfigurationBuilder(false)
+                    .set("backends", "test2, test3")
+                    .activate();
 
-            LoggingBackend backend = framework.getLoggingBackend();
+                LoggingBackend backend = framework.getLoggingBackend();
 
-            assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
-            assertThat(output.consume())
-                .hasSize(1)
-                .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test3"));
+                assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
+                assertThat(output.consume())
+                    .hasSize(1)
+                    .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test3"));
+            } finally {
+                framework.shutDown();
+            }
         }
 
         /**
@@ -501,10 +569,13 @@ class FrameworkTest {
         @Test
         void freezeConfigurationAfterProvidingLoggingBackend() {
             Framework framework = new Framework(false, false);
-
-            assertThat(framework.getLoggingBackend()).isNotNull();
-            assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
-                .isInstanceOf(UnsupportedOperationException.class);
+            try {
+                assertThat(framework.getLoggingBackend()).isNotNull();
+                assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
+                    .isInstanceOf(UnsupportedOperationException.class);
+            } finally {
+                framework.shutDown();
+            }
         }
 
     }
