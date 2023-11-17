@@ -329,6 +329,13 @@ public class Framework {
         }
     }
 
+    /**
+     * Creates and adds a new logging bachend if it doesn't exist in the target backend map.
+     *
+     * @param builder The builder to use for creating the logging backend
+     * @param context The current logging context
+     * @param backends The target map with logging backends
+     */
     private static void createNonExistentBackend(
         LoggingBackendBuilder builder,
         LoggingContext context,
