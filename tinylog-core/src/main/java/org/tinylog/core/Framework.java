@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -221,7 +222,7 @@ public class Framework {
     protected LoggingBackend createLoggingBackend(LoggingContext context) {
         List<String> names = configuration.getList("backends");
         Map<String, LoggingBackendBuilder> builders = new HashMap<>();
-        List<LoggingBackend> backends = new ArrayList<>();
+        Map<String, LoggingBackend> backends = new LinkedHashMap<>();
 
         SafeServiceLoader.load(
             getClassLoader(),
@@ -231,7 +232,8 @@ public class Framework {
         );
 
         for (String name : names) {
-            LoggingBackendBuilder builder = builders.get(name.toLowerCase(Locale.ENGLISH));
+            String sanitizedName = name.toLowerCase(Locale.ENGLISH);
+            LoggingBackendBuilder builder = builders.get(sanitizedName);
             if (builder == null) {
                 InternalLogger.error(
                     null,
@@ -239,7 +241,7 @@ public class Framework {
                     name
                 );
             } else {
-                SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(context));
+                createNonExistentBackend(builder, context, backends);
             }
         }
 
@@ -248,7 +250,7 @@ public class Framework {
                 LoggingBackendBuilder builder = entry.getValue();
                 if (!(builder instanceof NopLoggingBackendBuilder)
                         && !(builder instanceof InternalLoggingBackendBuilder)) {
-                    SafeServiceLoader.execute(backends, builder, "execute", instance -> instance.create(context));
+                    createNonExistentBackend(builder, context, backends);
                 }
             }
         }
@@ -259,9 +261,9 @@ public class Framework {
                 + "entries, or disable logging explicitly by setting \"backends = nop\" in the configuration.");
             return new InternalLoggingBackend(context);
         } else if (backends.size() == 1) {
-            return backends.get(0);
+            return backends.values().stream().findAny().get();
         } else {
-            return new BundleLoggingBackend(backends);
+            return new BundleLoggingBackend(backends.values());
         }
     }
 
@@ -324,6 +326,20 @@ public class Framework {
             loggingBackend = createLoggingBackend(context);
             InternalLogger.init(context);
             InternalLogger.debug(null, "Active logging backend: {}", loggingBackend.getClass().getName());
+        }
+    }
+
+    private static void createNonExistentBackend(
+        LoggingBackendBuilder builder,
+        LoggingContext context,
+        Map<String, LoggingBackend> backends
+    ) {
+        if (!backends.containsKey(builder.getName())) {
+            SafeServiceLoader.execute(
+                builder,
+                "execute",
+                instance -> backends.put(builder.getName(), instance.create(context))
+            );
         }
     }
 

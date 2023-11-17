@@ -1,7 +1,6 @@
 package org.tinylog.core.internal;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
@@ -74,21 +73,6 @@ public final class SafeServiceLoader {
         );
 
         iterable.forEach(implementation -> execute(implementation, "initialize", action));
-    }
-
-    /**
-     * Executes a service implementation. If the execution is successful, the result will be added to the passed target
-     * collection.
-     *
-     * @param target The target collection to add the result to
-     * @param implementation The service implementation to execute
-     * @param activity The human-readable activity as verb for logging
-     * @param mapper The mapping function to apply for the passed service implementations
-     * @param <S> The service type
-     * @param <R> The result type
-     */
-    public static <S, R> void execute(Collection<R> target, S implementation, String activity, Function<S, R> mapper) {
-        execute(implementation, activity, instance -> target.add(mapper.apply(instance)));
     }
 
     /**

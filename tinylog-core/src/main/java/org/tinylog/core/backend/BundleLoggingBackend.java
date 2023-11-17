@@ -1,6 +1,7 @@
 package org.tinylog.core.backend;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class BundleLoggingBackend implements LoggingBackend {
     /**
      * @param backends Logging backends to combine
      */
-    public BundleLoggingBackend(List<LoggingBackend> backends) {
+    public BundleLoggingBackend(Collection<LoggingBackend> backends) {
         List<ContextStorage> storages = backends.stream()
             .map(LoggingBackend::getContextStorage)
             .collect(Collectors.toList());

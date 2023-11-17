@@ -58,33 +58,6 @@ class SafeServiceLoaderTest {
     }
 
     /**
-     * Verifies that a map operation can be executed for a single service implementation.
-     */
-    @Test
-    void mapSingleServiceImplementation() {
-        List<String> names = new ArrayList<>();
-        SafeServiceLoader.execute(names, new FirstServiceImpl(), "map", FooService::getName);
-
-        assertThat(names).containsExactly("first");
-    }
-
-    /**
-     * Verifies that a failed map operation is logged but does not throw any exception.
-     */
-    @Test
-    void logFailedMapping() {
-        List<String> names = new ArrayList<>();
-        SafeServiceLoader.execute(names, new EvilServiceImpl(), "map", FooService::getName);
-
-        assertThat(names).isEmpty();
-        assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(entry.getThrowable()).isExactlyInstanceOf(UnsupportedOperationException.class);
-            assertThat(entry.getMessage()).contains("map").contains(EvilServiceImpl.class.getName());
-        });
-    }
-
-    /**
      * Verifies that a consume operation can be executed for a single service implementation.
      */
     @SuppressWarnings("unchecked")

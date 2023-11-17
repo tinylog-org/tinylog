@@ -19,6 +19,7 @@ import org.tinylog.core.backend.BundleLoggingBackend;
 import org.tinylog.core.backend.InternalLoggingBackend;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
+import org.tinylog.core.backend.NopLoggingBackend;
 import org.tinylog.core.backend.NopLoggingBackendBuilder;
 import org.tinylog.core.internal.InternalLogger;
 import org.tinylog.core.internal.LoggingContext;
@@ -436,6 +437,20 @@ class FrameworkTest {
                 TestOneLoggingBackendBuilder.backend,
                 new NopLoggingBackendBuilder().create(null)
             );
+        }
+
+        /**
+         * Verifies that logging backends will be created only once, even if multiple times declared.
+         */
+        @Test
+        void loadSameProvidersByName() {
+            Framework framework = new Framework(true, false);
+            framework.getConfigurationBuilder(false)
+                .set("backends", "nop, NOP")
+                .activate();
+
+            LoggingBackend backend = framework.getLoggingBackend();
+            assertThat(backend).isInstanceOf(NopLoggingBackend.class);
         }
 
         /**
