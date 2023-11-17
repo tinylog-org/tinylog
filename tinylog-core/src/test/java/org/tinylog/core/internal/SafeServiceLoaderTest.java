@@ -1,6 +1,5 @@
 package org.tinylog.core.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
