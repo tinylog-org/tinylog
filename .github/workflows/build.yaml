@@ -32,7 +32,7 @@ jobs:
             tinylog3-jvm-${{ runner.os }}-maven-
 
       - name: Download and install JDK ${{ matrix.jdk }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: ${{ matrix.jdk }}
@@ -87,7 +87,7 @@ jobs:
           key: tinylog3-${{ runner.os }}-avd${{ matrix.api-level }}
 
       - name: Download and install JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: 17
