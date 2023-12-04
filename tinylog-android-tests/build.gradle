@@ -14,7 +14,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:8.1.4"
-        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.4"
+        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:5.2.5"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.10.0.0"
         classpath "org.jacoco:org.jacoco.core:0.8.11"
     }
