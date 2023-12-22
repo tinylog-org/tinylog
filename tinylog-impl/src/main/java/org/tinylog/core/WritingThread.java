@@ -28,8 +28,6 @@ import org.tinylog.writers.Writer;
 public final class WritingThread extends Thread {
 
 	private static final String THREAD_NAME = "tinylog-WritingThread";
-	private static final long MILLISECONDS_TO_SLEEP = 10L;
-
 	private final Object mutex;
 	private final Collection<Writer> writers;
 	private List<Task> tasks;
@@ -67,12 +65,6 @@ public final class WritingThread extends Thread {
 
 			flush(writers);
 			writers.clear();
-
-			try {
-				sleep(MILLISECONDS_TO_SLEEP);
-			} catch (InterruptedException ex) {
-				// Ignore and continue
-			}
 		}
 	}
 
@@ -88,6 +80,7 @@ public final class WritingThread extends Thread {
 		Task task = new Task(writer, logEntry);
 		synchronized (mutex) {
 			tasks.add(task);
+			mutex.notify();
 		}
 	}
 
@@ -102,9 +95,8 @@ public final class WritingThread extends Thread {
 	public void shutdown() {
 		synchronized (mutex) {
 			tasks.add(Task.POISON);
+			mutex.notify();
 		}
-
-		interrupt();
 	}
 
 	/**
@@ -114,13 +106,17 @@ public final class WritingThread extends Thread {
 	 */
 	private List<Task> receiveTasks() {
 		synchronized (mutex) {
-			if (tasks.isEmpty()) {
-				return Collections.emptyList();
-			} else {
-				List<Task> currentTasks = tasks;
-				tasks = new ArrayList<Task>();
-				return currentTasks;
+			while (tasks.isEmpty()) {
+				try {
+					mutex.wait();
+				} catch (InterruptedException ex) {
+					return Collections.emptyList();
+				}
 			}
+
+			List<Task> currentTasks = tasks;
+			tasks = new ArrayList<Task>();
+			return currentTasks;
 		}
 	}
 
