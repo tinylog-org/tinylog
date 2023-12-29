@@ -93,7 +93,7 @@
 		<mockk.version>1.12.4</mockk.version>
 		<powermock.version>2.0.9</powermock.version>
 		<scala.version>2.13.12</scala.version>
-		<slf4j.version>2.0.9</slf4j.version>
+		<slf4j.version>2.0.10</slf4j.version>
 
 	</properties>
 
