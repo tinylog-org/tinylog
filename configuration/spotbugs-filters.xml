@@ -87,4 +87,10 @@
 		<!-- Allow writing to static field org.tinylog.policies.DynamicPolicy.reset from instance method org.tinylog.policies.DynamicPolicy.reset -->
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
 	</Match>
+	<Match>
+		<!-- Writing Thread -->
+		<Class name="org.tinylog.core.WritingThread" />
+		<!-- There is only one writing thread instance to wake up -->
+		<Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+	</Match>
 </FindBugsFilter>
