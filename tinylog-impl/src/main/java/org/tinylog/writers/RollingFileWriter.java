@@ -84,7 +84,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		linkToLatest = properties.containsKey("latest") ? new DynamicPath(getStringValue("latest")) : null;
 
 		List<FileTuple> files = getAllFileTuplesWithoutLinks(converter.getBackupSuffix());
-		File latestFile = findLatestLogFile(files);
+		File latestFile = findLatestValidLogFile(path, files);
 
 		if (backups >= 0) {
 			deleteBackups(files, backups);
@@ -93,7 +93,7 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 		String fileName;
 		boolean append;
 
-		if (latestFile != null && path.isValid(latestFile)) {
+		if (latestFile != null) {
 			fileName = latestFile.getAbsolutePath();
 			if (canBeContinued(fileName, policies)) {
 				append = true;
@@ -262,16 +262,21 @@ public final class RollingFileWriter extends AbstractFormatPatternWriter {
 	}
 
 	/**
-	 * Finds the latest existing original log file.
+	 * Finds the latest valid existing original log file.
 	 *
+	 * @param path
+	 *            Dynamic path instance fo validation
 	 * @param files
 	 *            All original and backup files
 	 * @return Found original log file or {@code null} if there are no original log files
 	 */
-	private static File findLatestLogFile(final List<FileTuple> files) {
+	private static File findLatestValidLogFile(final DynamicPath path, final List<FileTuple> files) {
 		for (FileTuple file : files) {
 			if (file.getOriginal().isFile() && (file.getOriginal().equals(file.getBackup()) || !file.getBackup().isFile())) {
-				return file.getOriginal();
+				File original = file.getOriginal();
+				if (path.isValid(original)) {
+					return original;
+				}
 			}
 		}
 

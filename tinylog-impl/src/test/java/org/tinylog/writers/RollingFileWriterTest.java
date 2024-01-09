@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -27,6 +28,7 @@ import org.tinylog.configuration.ServiceLoader;
 import org.tinylog.converters.FileConverter;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.path.DynamicSegment;
+import org.tinylog.policies.DynamicPolicy;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 import org.tinylog.util.LogEntryBuilder;
@@ -60,6 +62,16 @@ public final class RollingFileWriterTest {
 	 */
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
+
+	/**
+	 * Resets the static dynamic segment and policy fields.
+	 */
+	@After
+	public void reset() {
+		Whitebox.setInternalState(DynamicSegment.class, boolean.class, false, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicSegment.class, String.class, null, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicPolicy.class, boolean.class, false, DynamicPolicy.class);
+	}
 
 	/**
 	 * Verifies that log entries will be immediately output, if buffer is disabled.
@@ -202,7 +214,7 @@ public final class RollingFileWriterTest {
 	 *             Interrupted while waiting for the converter
 	 */
 	@Test
-	public void continueExistingFile() throws IOException, InterruptedException {
+	public void continueSingleExistingFile() throws IOException, InterruptedException {
 		String file = FileSystem.createTemporaryFile();
 		Map<String, String> properties = tripletonMap("file", file, "format", "{message}", "policies", "size: 1MB");
 
@@ -215,6 +227,34 @@ public final class RollingFileWriterTest {
 		writer.close();
 
 		assertThat(FileSystem.readFile(file)).isEqualTo("First" + NEW_LINE + "Second" + NEW_LINE);
+	}
+
+	/**
+	 * Verifies that the latest valid existing file can be continued.
+	 *
+	 * @throws IOException
+	 *             Failed access to temporary file
+	 * @throws InterruptedException
+	 *             Interrupted while waiting for the converter
+	 */
+	@Test
+	public void continueLatestValidExistingFile() throws IOException, InterruptedException {
+		File file1 = folder.newFile("a");
+		File file2 = folder.newFile("42");
+		File file3 = folder.newFile("b");
+
+		file1.setLastModified(0);
+		file2.setLastModified(1000);
+		file3.setLastModified(2000);
+
+		String file = new File(folder.getRoot(), "{count}").getAbsolutePath();
+		Map<String, String> properties = tripletonMap("file", file, "format", "{message}", "policies", "size: 1MB");
+
+		RollingFileWriter writer = new RollingFileWriter(properties);
+		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+		writer.close();
+
+		assertThat(FileSystem.readFile(file2.getPath())).isEqualTo("Hello World!" + NEW_LINE);
 	}
 
 	/**
@@ -522,19 +562,20 @@ public final class RollingFileWriterTest {
 	public void dynamicText() throws IOException, InterruptedException {
 		String fooFile = FileSystem.createTemporaryFile();
 		String barFile = FileSystem.createTemporaryFile();
+		String bazFile = FileSystem.createTemporaryFile();
 
 		RollingFileWriter writer = new RollingFileWriter(tripletonMap(
-				"file", "{dynamic}",
+				"file", "{dynamic:" + fooFile + "}",
 				"format", "{message}",
 				"policies", "dynamic"));
-		DynamicSegment.setText(fooFile);
-		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
 		DynamicSegment.setText(barFile);
+		writer.write(LogEntryBuilder.empty().message("Hello World!").create());
+		DynamicSegment.setText(bazFile);
 		writer.write(LogEntryBuilder.empty().message("Goodbye!").create());
 		writer.close();
 
-		assertThat(FileSystem.readFile(fooFile)).isEqualTo("Hello World!" + NEW_LINE);
-		assertThat(FileSystem.readFile(barFile)).isEqualTo("Goodbye!" + NEW_LINE);
+		assertThat(FileSystem.readFile(barFile)).isEqualTo("Hello World!" + NEW_LINE);
+		assertThat(FileSystem.readFile(bazFile)).isEqualTo("Goodbye!" + NEW_LINE);
 	}
 
 	/**
