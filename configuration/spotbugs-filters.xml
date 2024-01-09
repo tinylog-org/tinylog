@@ -82,9 +82,12 @@
 		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 	</Match>
 	<Match>
-		<!-- Dynamic Policy -->
-		<Class name="org.tinylog.policies.DynamicPolicy" />
-		<!-- Allow writing to static field org.tinylog.policies.DynamicPolicy.reset from instance method org.tinylog.policies.DynamicPolicy.reset -->
+		<!-- Dynamic Path Segment and Dynamic Policy -->
+		<Or>
+			<Class name="org.tinylog.path.DynamicSegment" />
+			<Class name="org.tinylog.policies.DynamicPolicy" />
+		</Or>
+		<!-- Allow the instances to write to their static fields -->
 		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
 	</Match>
 	<Match>

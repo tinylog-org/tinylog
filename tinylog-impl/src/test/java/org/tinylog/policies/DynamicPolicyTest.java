@@ -15,9 +15,12 @@ package org.tinylog.policies;
 
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 import org.tinylog.configuration.ServiceLoader;
+import org.tinylog.path.DynamicSegment;
 import org.tinylog.rules.SystemStreamCollector;
 import org.tinylog.util.FileSystem;
 
@@ -33,6 +36,16 @@ public final class DynamicPolicyTest {
 	 */
 	@Rule
 	public final SystemStreamCollector systemStream = new SystemStreamCollector(true);
+
+	/**
+	 * Resets the static dynamic segment and policy fields.
+	 */
+	@After
+	public void reset() {
+		Whitebox.setInternalState(DynamicSegment.class, boolean.class, false, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicSegment.class, String.class, null, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicPolicy.class, boolean.class, false, DynamicPolicy.class);
+	}
 
 	/**
 	 * Verifies that an existing log file will always be continued.

@@ -22,12 +22,15 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
+import org.tinylog.policies.DynamicPolicy;
 import org.tinylog.runtime.RuntimeProvider;
 import org.tinylog.runtime.Timestamp;
 
@@ -48,6 +51,17 @@ public final class DynamicPathTest {
 	 */
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
+
+
+	/**
+	 * Resets the static dynamic segment and policy fields.
+	 */
+	@After
+	public void reset() {
+		Whitebox.setInternalState(DynamicSegment.class, boolean.class, false, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicSegment.class, String.class, null, DynamicSegment.class);
+		Whitebox.setInternalState(DynamicPolicy.class, boolean.class, false, DynamicPolicy.class);
+	}
 
 	/**
 	 * Verifies that a static path without any patterns can be resolved.

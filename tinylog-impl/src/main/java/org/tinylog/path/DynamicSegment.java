@@ -21,14 +21,20 @@ import org.tinylog.runtime.Timestamp;
  */
 public class DynamicSegment implements Segment {
 
-	private static String text;
 	private static final Object mutex = new Object();
+
+	private static boolean created;
+	private static String text;
 
 	/**
 	 * @param defaultValue Initial value for dynamic text
 	 */
 	DynamicSegment(final String defaultValue) {
-		setText(defaultValue);
+		synchronized (mutex) {
+			if (text == null) {
+				text = defaultValue;
+			}
+		}
 	}
 
 	/**
@@ -57,14 +63,21 @@ public class DynamicSegment implements Segment {
 			if (DynamicSegment.text != null && DynamicSegment.text.equals(text)) {
 				return;
 			}
+
 			DynamicSegment.text = text;
-			DynamicPolicy.setReset();
+
+			if (created) {
+				DynamicPolicy.setReset();
+			}
 		}
 	}
 
 	@Override
 	public String getStaticText() {
-		return getText();
+		synchronized (mutex) {
+			created = true;
+			return text;
+		}
 	}
 
 	@Override
@@ -76,7 +89,7 @@ public class DynamicSegment implements Segment {
 
 	@Override
 	public String createToken(final String prefix, final Timestamp timestamp) {
-		return getText();
+		return getStaticText();
 	}
 
 }
