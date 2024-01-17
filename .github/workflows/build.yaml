@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore local Maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: tinylog3-jvm-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore local Maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: tinylog3-android-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -68,7 +68,7 @@ jobs:
             tinylog3-android-${{ runner.os }}-maven-
 
       - name: Restore Gradle caches and wrapper
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -79,7 +79,7 @@ jobs:
 
       - name: Restore Android virtual device
         id: avd-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.android/avd/*
