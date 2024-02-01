@@ -24,7 +24,7 @@ jobs:
       - uses: skjolber/maven-cache-github-action@v1
         with:
           step: save
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
 
   release-build:
     name: Release build with JDK 9
@@ -42,4 +42,4 @@ jobs:
       - uses: skjolber/maven-cache-github-action@v1
         with:
           step: save
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
