@@ -41,7 +41,10 @@ jobs:
         run: mvn --batch-mode --update-snapshots verify
 
       - name: Upload code coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   android-tests:
 
@@ -120,4 +123,7 @@ jobs:
           script: chmod +x ./gradlew && ./gradlew createDebugCoverageReport spotbugsDebug checkstyle
 
       - name: Upload code coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
