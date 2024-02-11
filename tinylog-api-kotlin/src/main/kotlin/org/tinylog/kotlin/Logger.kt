@@ -53,7 +53,7 @@ object Logger {
 	 * @return Logger instance
 	 */
 	fun tag(tag: String?): TaggedLogger {
-		return if (tag == null || tag.isEmpty()) {
+		return if (tag.isNullOrEmpty()) {
 			instance
 		} else {
 			tags(tag)
