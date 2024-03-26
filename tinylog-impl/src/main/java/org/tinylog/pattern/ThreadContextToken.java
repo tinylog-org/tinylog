@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
@@ -76,8 +77,9 @@ final class ThreadContextToken implements Token {
 				builder.append(value);
 			}
 		} else {
+			Map<String, String> sortedContext = new TreeMap<String, String>(logEntry.getContext());
 			boolean first = true;
-			for (Map.Entry<String, String> contextEntry : logEntry.getContext().entrySet()) {
+			for (Map.Entry<String, String> contextEntry : sortedContext.entrySet()) {
 				if (first) {
 					first = false;
 				} else {

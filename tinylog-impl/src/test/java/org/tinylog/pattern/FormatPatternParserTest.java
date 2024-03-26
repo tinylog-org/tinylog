@@ -172,11 +172,11 @@ public final class FormatPatternParserTest {
 	 * Verifies that {@code {context}} without a defined key will output all keys and their values.
 	 */
 	@Test
-	public void contextMissingKey() {
+	public void contextWithoutKey() {
 		assertThat(render("context", LogEntryBuilder.empty().create())).isEmpty();
 		assertThat(render("context", LogEntryBuilder.empty().context("pi", "3.14").create())).isEqualTo("pi=3.14");
 		assertThat(render("context", LogEntryBuilder.empty().context("pi", "3.14").context("e", "2.72").create()))
-			.isIn("pi=3.14, e=2.72", "e=2.72, pi=3.14");
+			.isEqualTo("e=2.72, pi=3.14");
 	}
 
 	/**
