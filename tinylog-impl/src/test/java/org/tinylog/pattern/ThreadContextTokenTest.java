@@ -15,6 +15,7 @@ package org.tinylog.pattern;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -116,6 +117,39 @@ public final class ThreadContextTokenTest {
 		PreparedStatement statement = mock(PreparedStatement.class);
 		token.apply(createLogEntry(singletonMap("test", "42")), statement, 1);
 		verify(statement).setString(1, "42");
+	}
+
+	/**
+	 * Verifies that all properties will be rendered for a {@link StringBuilder} if the token has no key.
+	 */
+	@Test
+	public void renderAllProperties() {
+		ThreadContextToken token = new ThreadContextToken();
+
+		Map<String, String> context = new HashMap<>(2);
+		context.put("test", "42");
+		context.put("sample", "11");
+
+		assertThat(render(token, context)).isEqualTo("sample=11, test=42");
+	}
+
+	/**
+	 * Verifies that all properties in a thread context will be added to a {@link PreparedStatement}, if the token has no key.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value ot prepared SQL statement
+	 */
+	@Test
+	public void applyAllProperties() throws SQLException {
+		ThreadContextToken token = new ThreadContextToken();
+
+		Map<String, String> context = new HashMap<>(2);
+		context.put("test", "42");
+		context.put("sample", "11");
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		token.apply(createLogEntry(context), statement, 1);
+		verify(statement).setString(1, "sample=11, test=42");
 	}
 
 	/**

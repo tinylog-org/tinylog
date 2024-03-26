@@ -209,13 +209,12 @@ public final class FormatPatternParser {
 	 */
 	private static Token createThreadContextToken(final String configuration) {
 		if (configuration == null) {
-			InternalLogger.log(Level.ERROR, "\"{context}\" requires a key");
-			return new PlainTextToken("");
+			return new ThreadContextToken();
 		} else {
 			int splitIndex = configuration.indexOf(',');
 			String key = splitIndex == -1 ? configuration.trim() : configuration.substring(0, splitIndex).trim();
-			if (key.isEmpty()) {
-				InternalLogger.log(Level.ERROR, "\"{context}\" requires a key");
+			if (key.isEmpty() && splitIndex != -1) {
+				InternalLogger.log(Level.ERROR, "\"{context}\" requires a key if a default value is supplied");
 				return new PlainTextToken("");
 			} else {
 				String defaultValue = splitIndex == -1 ? null : configuration.substring(splitIndex + 1).trim();
