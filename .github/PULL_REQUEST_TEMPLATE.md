@@ -10,7 +10,7 @@ tinylog-org/website#000 <!-- Related pull request from https://github.com/tinylo
 
 ### Definition of Done
 
-- [ ] I read [contributing.md](https://github.com/tinylog-org/tinylog/blob/v2.7/contributing.md)
+- [ ] I read [contributing.md](https://github.com/tinylog-org/tinylog/blob/v2.8/contributing.md)
 - [ ] There are no TODOs left in the code
 - [ ] Code style follows the tinylog standard
 - [ ] All classes and methods have Javadoc
