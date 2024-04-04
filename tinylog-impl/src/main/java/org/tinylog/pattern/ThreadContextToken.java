@@ -17,6 +17,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
@@ -28,8 +30,17 @@ final class ThreadContextToken implements Token {
 
 	private static final String DEFAULT_EMPTY_VALUE = "";
 
+	private static final String DELIMITER = ", ";
+
+	private static final String SEPARATOR = "=";
+
 	private final String key;
 	private final String defaultValue;
+
+	ThreadContextToken() {
+		this.key = null;
+		this.defaultValue = DEFAULT_EMPTY_VALUE;
+	}
 
 	/**
 	 * @param key
@@ -58,21 +69,40 @@ final class ThreadContextToken implements Token {
 
 	@Override
 	public void render(final LogEntry logEntry, final StringBuilder builder) {
-		String value = logEntry.getContext().get(key);
-		if (value == null) {
-			builder.append(defaultValue);
+		if (key != null) {
+			String value = logEntry.getContext().get(key);
+			if (value == null) {
+				builder.append(defaultValue);
+			} else {
+				builder.append(value);
+			}
 		} else {
-			builder.append(value);
+			Map<String, String> sortedContext = new TreeMap<String, String>(logEntry.getContext());
+			boolean first = true;
+			for (Map.Entry<String, String> contextEntry : sortedContext.entrySet()) {
+				if (first) {
+					first = false;
+				} else {
+					builder.append(DELIMITER);
+				}
+				builder.append(contextEntry.getKey()).append(SEPARATOR).append(contextEntry.getValue());
+			}
 		}
 	}
 
 	@Override
 	public void apply(final LogEntry logEntry, final PreparedStatement statement, final int index) throws SQLException {
-		String value = logEntry.getContext().get(key);
-		if (value == null && !DEFAULT_EMPTY_VALUE.equals(defaultValue)) {
-			statement.setString(index, defaultValue);
+		if (key == null || key.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			render(logEntry, builder);
+			statement.setString(index, builder.toString());
 		} else {
-			statement.setString(index, value);
+			String value = logEntry.getContext().get(key);
+			if (value == null && !DEFAULT_EMPTY_VALUE.equals(defaultValue)) {
+				statement.setString(index, defaultValue);
+			} else {
+				statement.setString(index, value);
+			}
 		}
 	}
 
