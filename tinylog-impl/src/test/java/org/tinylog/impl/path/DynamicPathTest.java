@@ -17,7 +17,7 @@ import org.tinylog.core.test.log.TestClock;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@CaptureLogEntries(configuration = "zone=UTC")
 class DynamicPathTest {
 
     @TempDir
