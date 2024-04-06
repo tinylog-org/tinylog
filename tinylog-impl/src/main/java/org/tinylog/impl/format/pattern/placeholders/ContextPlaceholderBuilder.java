@@ -18,11 +18,6 @@ public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 
     @Override
     public Placeholder create(LoggingContext context, String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Thread context key is not defined for context placeholder");
-        } else {
-            return new ContextPlaceholder(value);
-        }
+        return new ContextPlaceholder(value);
     }
-
 }
