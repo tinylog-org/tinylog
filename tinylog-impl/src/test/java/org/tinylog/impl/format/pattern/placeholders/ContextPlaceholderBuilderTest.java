@@ -24,7 +24,7 @@ class ContextPlaceholderBuilderTest {
     @Test
     void creationWithoutConfigurationValue() {
         Placeholder placeholder = new ContextPlaceholderBuilder().create(context, null);
-        assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+        assertThat(placeholder).isInstanceOf(MultiValueContextPlaceholder.class);
 
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").context("baz", "quk").create();
         assertThat(placeholder.getValue(logEntry)).isEqualTo("baz=quk, foo=bar");
@@ -36,7 +36,7 @@ class ContextPlaceholderBuilderTest {
     @Test
     void creationWithConfigurationValue() {
         Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo");
-        assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+        assertThat(placeholder).isInstanceOf(SingleValueContextPlaceholder.class);
 
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
