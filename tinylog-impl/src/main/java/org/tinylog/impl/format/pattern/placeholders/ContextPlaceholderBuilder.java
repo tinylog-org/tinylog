@@ -18,6 +18,6 @@ public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 
     @Override
     public Placeholder create(LoggingContext context, String value) {
-        return value != null ? new SingleValueContextPlaceholder(value) : new MultiValueContextPlaceholder();
+        return value == null ? new MultiValueContextPlaceholder() : new SingleValueContextPlaceholder(value);
     }
 }
