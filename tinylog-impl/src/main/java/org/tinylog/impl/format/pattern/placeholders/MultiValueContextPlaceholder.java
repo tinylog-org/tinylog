@@ -41,7 +41,7 @@ public class MultiValueContextPlaceholder extends AbstractContextPlaceholder {
 
         return contextEntries.stream()
             .sorted(Map.Entry.comparingByKey())
-            .map(entry -> new StringBuilder().append(entry.getKey()).append("=").append(entry.getValue()))
+            .map(mapEntry -> new StringBuilder().append(mapEntry.getKey()).append("=").append(mapEntry.getValue()))
             .collect(Collectors.joining(", "));
     }
 
