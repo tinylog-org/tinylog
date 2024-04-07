@@ -9,7 +9,7 @@ import org.tinylog.impl.test.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ContextPlaceholderTest {
+class SingleValueContextPlaceholderTest {
 
     /**
      * Verifies that the log entry value {@link LogEntryValue#CONTEXT} is defined as required by the context
@@ -17,7 +17,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void requiredLogEntryValues() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleValueContextPlaceholder placeholder = new SingleValueContextPlaceholder("foo");
         assertThat(placeholder.getRequiredLogEntryValues()).containsExactly(LogEntryValue.CONTEXT);
     }
 
@@ -26,7 +26,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void resolveWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleValueContextPlaceholder placeholder = new SingleValueContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
@@ -37,7 +37,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void resolveWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleValueContextPlaceholder placeholder = new SingleValueContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isNull();
@@ -48,7 +48,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void renderWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleValueContextPlaceholder placeholder = new SingleValueContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(renderer.render(logEntry)).isEqualTo("bar");
@@ -59,10 +59,9 @@ class ContextPlaceholderTest {
      */
     @Test
     void renderWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleValueContextPlaceholder placeholder = new SingleValueContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(renderer.render(logEntry)).isEmpty();
     }
-
 }

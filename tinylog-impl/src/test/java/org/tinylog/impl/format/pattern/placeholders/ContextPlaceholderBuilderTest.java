@@ -11,7 +11,6 @@ import org.tinylog.impl.LogEntry;
 import org.tinylog.impl.test.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @CaptureLogEntries
 class ContextPlaceholderBuilderTest {
@@ -20,14 +19,15 @@ class ContextPlaceholderBuilderTest {
     private LoggingContext context;
 
     /**
-     * Verifies that an {@link IllegalArgumentException} with a meaningful message description will be thrown, if the
-     * thread context key is missing.
+     * Verifies that a context placeholder can be created without a thread context key.
      */
     @Test
     void creationWithoutConfigurationValue() {
-        assertThatThrownBy(() -> new ContextPlaceholderBuilder().create(context, null))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("key");
+        Placeholder placeholder = new ContextPlaceholderBuilder().create(context, null);
+        assertThat(placeholder).isInstanceOf(MultiValueContextPlaceholder.class);
+
+        LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").context("baz", "quk").create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("baz=quk, foo=bar");
     }
 
     /**
@@ -36,7 +36,7 @@ class ContextPlaceholderBuilderTest {
     @Test
     void creationWithConfigurationValue() {
         Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo");
-        assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+        assertThat(placeholder).isInstanceOf(SingleValueContextPlaceholder.class);
 
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
