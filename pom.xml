@@ -68,7 +68,7 @@
 		<dokka-maven-plugin.version>1.9.20</dokka-maven-plugin.version>
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 		<flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
-		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+		<maven-install-plugin.version>3.1.2</maven-install-plugin.version>
 		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
 		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 		<maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
