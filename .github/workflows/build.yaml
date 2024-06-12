@@ -49,7 +49,7 @@ jobs:
   android-tests:
 
     name: Tests on Android (API level ${{ matrix.api-level }})
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 60
 
     strategy:
