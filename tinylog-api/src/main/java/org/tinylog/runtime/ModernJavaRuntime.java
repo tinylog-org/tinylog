@@ -30,8 +30,6 @@ import org.tinylog.provider.InternalLogger;
 @IgnoreJRERequirement
 final class ModernJavaRuntime extends AbstractJavaRuntime {
 
-	private static final ClassContextSecurityManager securityManager = new ClassContextSecurityManager();
-
 	private static final Timestamp startTime = new PreciseTimestamp(
 		ManagementFactory.getRuntimeMXBean().getStartTime(),
 		0
@@ -60,29 +58,21 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final int depth) {
-		Class<?>[] classes = securityManager.getClassContext();
-		return classes.length > depth + 1 ? classes[depth + 1].getName() : null;
+		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		return walker.walk(frames -> frames.skip(depth)
+				.findFirst()
+				.map(StackFrame::getClassName)
+				.orElse(null));
 	}
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		Class<?>[] classes = securityManager.getClassContext();
-		int index = 0;
-
-		while (index < classes.length) {
-			if (loggerClassName.equals(classes[index++].getName())) {
-				break;
-			}
-		}
-
-		while (index < classes.length) {
-			String className = classes[index++].getName();
-			if (!loggerClassName.equals(className)) {
-				return className;
-			}
-		}
-
-		return null;
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+				.walk(stream -> stream.map(StackFrame::getClassName)
+						.dropWhile(name -> !name.equals(loggerClassName))
+						.skip(1)
+						.findFirst()
+						.orElse(null));
 	}
 
 	@Override
@@ -119,22 +109,6 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 			InternalLogger.log(Level.ERROR, ex, "Failed to receive the handle of the current process");
 			return null;
 		}
-	}
-
-	/**
-	 * Security manager with accessible {@link SecurityManager#getClassContext()}.
-	 */
-	private static final class ClassContextSecurityManager extends SecurityManager {
-
-		/** */
-		private ClassContextSecurityManager() {
-		}
-
-		@Override
-		protected Class<?>[] getClassContext() {
-			return super.getClassContext();
-		}
-
 	}
 
 	/**
