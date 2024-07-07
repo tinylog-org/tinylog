@@ -104,8 +104,8 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	 */
 	private static ProcessHandle getCurrentProcess() {
 		try {
-			return (ProcessHandle) ProcessHandle.class.getDeclaredMethod("current").invoke(null);
-		} catch (ReflectiveOperationException ex) {
+			return ProcessHandle.current();
+		} catch (SecurityException ex) {
 			InternalLogger.log(Level.ERROR, ex, "Failed to receive the handle of the current process");
 			return null;
 		}
