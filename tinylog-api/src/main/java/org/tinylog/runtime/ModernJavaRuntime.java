@@ -57,44 +57,15 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
-	@IgnoreJRERequirement
 	public String getCallerClassName(final int depth) {
 		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-		return walker.walk(new Function<Stream<StackFrame>, String>() {
-			@Override
-			public String apply(final Stream<StackFrame> frames) {
-				return frames.skip(depth)
-						.findFirst()
-						.map(new Function<StackFrame, String>() {
-							@Override
-							public String apply(final StackFrame stackFrame) {
-								return stackFrame.getClassName();
-							}
-						})
-						.orElse(null);
-			}
-		});
+		return walker.walk(new ClassNameExtractorByDepth(depth));
 	}
 
 	@Override
-	@IgnoreJRERequirement
 	public String getCallerClassName(final String loggerClassName) {
-		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(new Function<Stream<StackFrame>, String>() {
-			@Override
-			public String apply(final Stream<StackFrame> stream) {
-				return stream.map(new Function<StackFrame, String>() {
-					@Override
-					public String apply(final StackFrame stackFrame) {
-						return stackFrame.getClassName();
-					}
-				}).dropWhile(new Predicate<String>() {
-					@Override
-					public boolean test(final String name) {
-						return !name.equals(loggerClassName);
-					}
-				}).skip(1).findFirst().orElse(null);
-			}
-		});
+		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		return walker.walk(new ClassNameExtractorByLoggerClassName(loggerClassName));
 	}
 
 	@Override
@@ -130,6 +101,52 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 		} catch (SecurityException ex) {
 			InternalLogger.log(Level.ERROR, ex, "Failed to receive the handle of the current process");
 			return null;
+		}
+	}
+
+	@IgnoreJRERequirement
+	private static class ClassNameExtractorByDepth implements Function<Stream<StackFrame>, String> {
+		private final int depth;
+
+		private ClassNameExtractorByDepth(int depth) {
+			this.depth = depth;
+		}
+
+		@Override
+		public String apply(final Stream<StackFrame> frames) {
+			return frames.skip(depth)
+					.findFirst()
+					.map(new Function<StackFrame, String>() {
+						@Override
+						public String apply(StackFrame stackFrame) {
+							return stackFrame.getClassName();
+						}
+					})
+					.orElse(null);
+		}
+	}
+
+	@IgnoreJRERequirement
+	private static final class ClassNameExtractorByLoggerClassName implements Function<Stream<StackFrame>, String> {
+		private final String loggerClassName;
+
+		private ClassNameExtractorByLoggerClassName(String loggerClassName) {
+			this.loggerClassName = loggerClassName;
+		}
+
+		@Override
+		public String apply(final Stream<StackFrame> stream) {
+			return stream.map(new Function<StackFrame, String>() {
+				@Override
+				public String apply(final StackFrame stackFrame) {
+					return stackFrame.getClassName();
+				}
+			}).dropWhile(new Predicate<String>() {
+				@Override
+				public boolean test(final String name) {
+					return !name.equals(loggerClassName);
+				}
+			}).skip(1).findFirst().orElse(null);
 		}
 	}
 
@@ -192,5 +209,5 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 			return null;
 		}
 	}
-	
+
 }
