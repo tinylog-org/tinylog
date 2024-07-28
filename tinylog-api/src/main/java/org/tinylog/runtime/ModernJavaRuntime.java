@@ -17,6 +17,7 @@ import java.lang.StackWalker.StackFrame;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
@@ -58,20 +59,35 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	@Override
 	public String getCallerClassName(final int depth) {
 		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-		return walker.walk(frames -> frames.skip(depth)
-				.findFirst()
-				.map(StackFrame::getClassName)
-				.orElse(null));
+		return walker.walk(new Function<Stream<StackFrame>, String>() {
+			@Override
+			public String apply(Stream<StackFrame> frames) {
+				return frames.skip(depth)
+						.findFirst()
+						.map(StackFrame::getClassName)
+						.orElse(null);
+			}
+		});
 	}
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
 		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-				.walk(stream -> stream.map(StackFrame::getClassName)
-						.dropWhile(name -> !name.equals(loggerClassName))
-						.skip(1)
-						.findFirst()
-						.orElse(null));
+				.walk(new Function<Stream<StackFrame>, String>() {
+					@Override
+					public String apply(Stream<StackFrame> stream) {
+						return stream.map(StackFrame::getClassName)
+								.dropWhile(new Predicate<String>() {
+									@Override
+									public boolean test(String name) {
+										return !name.equals(loggerClassName);
+									}
+								})
+								.skip(1)
+								.findFirst()
+								.orElse(null);
+					}
+				});
 	}
 
 	@Override
