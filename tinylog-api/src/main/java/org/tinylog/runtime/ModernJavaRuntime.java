@@ -57,6 +57,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
+	@IgnoreJRERequirement
 	public String getCallerClassName(final int depth) {
 		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 		return walker.walk(new Function<Stream<StackFrame>, String>() {
@@ -76,6 +77,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@Override
+	@IgnoreJRERequirement
 	public String getCallerClassName(final String loggerClassName) {
 		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(new Function<Stream<StackFrame>, String>() {
 			@Override
