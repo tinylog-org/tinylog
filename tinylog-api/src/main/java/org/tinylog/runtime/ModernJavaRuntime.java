@@ -95,6 +95,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	 *
 	 * @return Process handle of current process
 	 */
+	@IgnoreJRERequirement
 	private static ProcessHandle getCurrentProcess() {
 		try {
 			return ProcessHandle.current();
@@ -105,10 +106,10 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	}
 
 	@IgnoreJRERequirement
-	private static class ClassNameExtractorByDepth implements Function<Stream<StackFrame>, String> {
+	private static final class ClassNameExtractorByDepth implements Function<Stream<StackFrame>, String> {
 		private final int depth;
 
-		private ClassNameExtractorByDepth(int depth) {
+		private ClassNameExtractorByDepth(final int depth) {
 			this.depth = depth;
 		}
 
@@ -118,7 +119,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 					.findFirst()
 					.map(new Function<StackFrame, String>() {
 						@Override
-						public String apply(StackFrame stackFrame) {
+						public String apply(final StackFrame stackFrame) {
 							return stackFrame.getClassName();
 						}
 					})
@@ -130,7 +131,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	private static final class ClassNameExtractorByLoggerClassName implements Function<Stream<StackFrame>, String> {
 		private final String loggerClassName;
 
-		private ClassNameExtractorByLoggerClassName(String loggerClassName) {
+		private ClassNameExtractorByLoggerClassName(final String loggerClassName) {
 			this.loggerClassName = loggerClassName;
 		}
 
