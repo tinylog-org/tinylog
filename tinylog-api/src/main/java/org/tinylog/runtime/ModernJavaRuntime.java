@@ -61,10 +61,15 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 		return walker.walk(new Function<Stream<StackFrame>, String>() {
 			@Override
-			public String apply(Stream<StackFrame> frames) {
+			public String apply(final Stream<StackFrame> frames) {
 				return frames.skip(depth)
 						.findFirst()
-						.map(StackFrame::getClassName)
+						.map(new Function<StackFrame, String>() {
+							@Override
+							public String apply(final StackFrame stackFrame) {
+								return stackFrame.getClassName();
+							}
+						})
 						.orElse(null);
 			}
 		});
@@ -72,22 +77,22 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-				.walk(new Function<Stream<StackFrame>, String>() {
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(new Function<Stream<StackFrame>, String>() {
+			@Override
+			public String apply(final Stream<StackFrame> stream) {
+				return stream.map(new Function<StackFrame, String>() {
 					@Override
-					public String apply(Stream<StackFrame> stream) {
-						return stream.map(StackFrame::getClassName)
-								.dropWhile(new Predicate<String>() {
-									@Override
-									public boolean test(String name) {
-										return !name.equals(loggerClassName);
-									}
-								})
-								.skip(1)
-								.findFirst()
-								.orElse(null);
+					public String apply(final StackFrame stackFrame) {
+						return stackFrame.getClassName();
 					}
-				});
+				}).dropWhile(new Predicate<String>() {
+					@Override
+					public boolean test(final String name) {
+						return !name.equals(loggerClassName);
+					}
+				}).skip(1).findFirst().orElse(null);
+			}
+		});
 	}
 
 	@Override
