@@ -14,10 +14,10 @@
 package org.tinylog.runtime;
 
 import java.lang.StackWalker.StackFrame;
-import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
@@ -30,11 +30,9 @@ import org.tinylog.provider.InternalLogger;
 @IgnoreJRERequirement
 final class ModernJavaRuntime extends AbstractJavaRuntime {
 
-	private static final ClassContextSecurityManager securityManager = new ClassContextSecurityManager();
-
 	private static final Timestamp startTime = new PreciseTimestamp(
-		ManagementFactory.getRuntimeMXBean().getStartTime(),
-		0
+			System.currentTimeMillis(),
+			0
 	);
 
 	private final ProcessHandle currentProcess = getCurrentProcess();
@@ -60,29 +58,14 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 	@Override
 	public String getCallerClassName(final int depth) {
-		Class<?>[] classes = securityManager.getClassContext();
-		return classes.length > depth + 1 ? classes[depth + 1].getName() : null;
+		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		return walker.walk(new ClassNameExtractorByDepth(depth));
 	}
 
 	@Override
 	public String getCallerClassName(final String loggerClassName) {
-		Class<?>[] classes = securityManager.getClassContext();
-		int index = 0;
-
-		while (index < classes.length) {
-			if (loggerClassName.equals(classes[index++].getName())) {
-				break;
-			}
-		}
-
-		while (index < classes.length) {
-			String className = classes[index++].getName();
-			if (!loggerClassName.equals(className)) {
-				return className;
-			}
-		}
-
-		return null;
+		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		return walker.walk(new ClassNameExtractorByLoggerClassName(loggerClassName));
 	}
 
 	@Override
@@ -112,27 +95,65 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 	 *
 	 * @return Process handle of current process
 	 */
+	@IgnoreJRERequirement
 	private static ProcessHandle getCurrentProcess() {
 		try {
-			return (ProcessHandle) ProcessHandle.class.getDeclaredMethod("current").invoke(null);
-		} catch (ReflectiveOperationException ex) {
+			return ProcessHandle.current();
+		} catch (SecurityException ex) {
 			InternalLogger.log(Level.ERROR, ex, "Failed to receive the handle of the current process");
 			return null;
 		}
 	}
 
-	/**
-	 * Security manager with accessible {@link SecurityManager#getClassContext()}.
-	 */
-	private static final class ClassContextSecurityManager extends SecurityManager {
+	@IgnoreJRERequirement
+	private static final class ClassNameExtractorByDepth implements Function<Stream<StackFrame>, String> {
+		private final int depth;
 
-		/** */
-		private ClassContextSecurityManager() {
+		private ClassNameExtractorByDepth(final int depth) {
+			this.depth = depth;
 		}
 
 		@Override
-		protected Class<?>[] getClassContext() {
-			return super.getClassContext();
+		public String apply(final Stream<StackFrame> frames) {
+			return frames.skip(depth)
+					.findFirst()
+					.map(new ClassNameMapper())
+					.orElse(null);
+		}
+	}
+
+	@IgnoreJRERequirement
+	private static final class ClassNameExtractorByLoggerClassName implements Function<Stream<StackFrame>, String> {
+		private final String loggerClassName;
+
+		private ClassNameExtractorByLoggerClassName(final String loggerClassName) {
+			this.loggerClassName = loggerClassName;
+		}
+
+		@Override
+		public String apply(final Stream<StackFrame> stream) {
+			return stream.map(new ClassNameMapper()).dropWhile(new Predicate<String>() {
+				@Override
+				public boolean test(final String name) {
+					return !name.equals(loggerClassName);
+				}
+			}).skip(1).findFirst().orElse(null);
+		}
+	}
+
+	/**
+	 * Mapper for getting the class name from a {@link StackFrame}.
+	 */
+	@IgnoreJRERequirement
+	private static final class ClassNameMapper implements Function<StackFrame, String> {
+
+		/** */
+		private ClassNameMapper() {
+		}
+
+		@Override
+		public String apply(final StackFrame stackFrame) {
+			return stackFrame.getClassName();
 		}
 
 	}
@@ -196,5 +217,5 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 			return null;
 		}
 	}
-	
+
 }
