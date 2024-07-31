@@ -117,12 +117,7 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 		public String apply(final Stream<StackFrame> frames) {
 			return frames.skip(depth)
 					.findFirst()
-					.map(new Function<StackFrame, String>() {
-						@Override
-						public String apply(final StackFrame stackFrame) {
-							return stackFrame.getClassName();
-						}
-					})
+					.map(new ClassNameMapper())
 					.orElse(null);
 		}
 	}
@@ -137,18 +132,30 @@ final class ModernJavaRuntime extends AbstractJavaRuntime {
 
 		@Override
 		public String apply(final Stream<StackFrame> stream) {
-			return stream.map(new Function<StackFrame, String>() {
-				@Override
-				public String apply(final StackFrame stackFrame) {
-					return stackFrame.getClassName();
-				}
-			}).dropWhile(new Predicate<String>() {
+			return stream.map(new ClassNameMapper()).dropWhile(new Predicate<String>() {
 				@Override
 				public boolean test(final String name) {
 					return !name.equals(loggerClassName);
 				}
 			}).skip(1).findFirst().orElse(null);
 		}
+	}
+
+	/**
+	 * Mapper for getting the class name from a {@link StackFrame}.
+	 */
+	@IgnoreJRERequirement
+	private static final class ClassNameMapper implements Function<StackFrame, String> {
+
+		/** */
+		private ClassNameMapper() {
+		}
+
+		@Override
+		public String apply(final StackFrame stackFrame) {
+			return stackFrame.getClassName();
+		}
+
 	}
 
 	/**
