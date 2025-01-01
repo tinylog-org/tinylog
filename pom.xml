@@ -15,11 +15,8 @@
 
     <properties>
         <builder.name>tinylog.org</builder.name>
-        <git.url>https://github.com/tinylog-org/tinylog</git.url>
-        <git.connection>scm:git:github.com/tinylog-org/tinylog.git</git.connection>
-        <git.developerConnection>scm:git:git@github.com:tinylog-org/tinylog.git</git.developerConnection>
-        <kotlin.compiler.languageVersion>1.8</kotlin.compiler.languageVersion>
-        <kotlin.compiler.apiVersion>1.8</kotlin.compiler.apiVersion>
+        <kotlin.compiler.languageVersion>2.0</kotlin.compiler.languageVersion>
+        <kotlin.compiler.apiVersion>2.0</kotlin.compiler.apiVersion>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,10 +47,14 @@
         </developer>
     </developers>
 
-    <scm>
-        <url>${git.url}</url>
-        <connection>${git.connection}</connection>
-        <developerConnection>${git.developerConnection}</developerConnection>
+    <scm
+        child.scm.url.inherit.append.path="false"
+        child.scm.connection.inherit.append.path="false"
+        child.scm.developerConnection.inherit.append.path="false"
+    >
+        <url>https://github.com/tinylog-org/tinylog</url>
+        <connection>scm:git:github.com/tinylog-org/tinylog.git</connection>
+        <developerConnection>scm:git:git@github.com:tinylog-org/tinylog.git</developerConnection>
     </scm>
 
     <issueManagement>
@@ -64,25 +65,29 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.google.android</groupId>
-                <artifactId>android</artifactId>
-                <version>4.1.1.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.khronos</groupId>
-                        <artifactId>opengl-api</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.robolectric</groupId>
+                <artifactId>android-all</artifactId>
+                <version>8.0.0_r4-robolectric-0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-annotations</artifactId>
+                <version>1.24</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.25.3</version>
+                <version>3.27.3</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-db</artifactId>
-                <version>2.0.2</version>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>4.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.kayr</groupId>
@@ -90,19 +95,14 @@
                 <version>1.9.1-groovy4</version>
             </dependency>
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>33.1.0-jre</version>
-            </dependency>
-            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.2.224</version>
+                <version>2.3.232</version>
             </dependency>
             <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>2.0.1.MR</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -112,62 +112,67 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.10.2</version>
+                <version>5.12.2</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.10.2</version>
+                <version>5.12.2</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.10.2</version>
+                <version>5.12.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.12.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit-pioneer</groupId>
+                <artifactId>junit-pioneer</artifactId>
+                <version>2.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>1.9.23</version>
+                <version>2.1.20</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-                <version>5.2.0</version>
+                <artifactId>mockito-core</artifactId>
+                <version>5.17.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito.kotlin</groupId>
                 <artifactId>mockito-kotlin</artifactId>
-                <version>5.3.1</version>
+                <version>5.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>5.11.0</version>
+                <version>5.17.0</version>
             </dependency>
             <dependency>
                 <groupId>com.github.h-thurow</groupId>
                 <artifactId>simple-jndi</artifactId>
-                <version>0.24.0</version>
+                <version>0.25.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.13</version>
+                <version>2.0.17</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
-                <version>2.0.13</version>
+                <version>2.0.17</version>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
                 <artifactId>slf4j-tinylog</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-lambda</artifactId>
-                <version>1.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
@@ -188,11 +193,6 @@
             </dependency>
             <dependency>
                 <groupId>org.tinylog</groupId>
-                <artifactId>tinylog-core-modern</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -205,35 +205,34 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <inherited>false</inherited>
-                <configuration>
-                    <doctitle>tinylog ${project.version}</doctitle>
-                    <windowtitle>tinylog ${project.version}</windowtitle>
-                    <linksource>true</linksource>
-                    <sourcepath>
-                        tinylog-api/src/main/java;
-                        tinylog-core/src/main/java;
-                        tinylog-impl/src/main/java
-                    </sourcepath>
-                    <additionalDependencies>
-                        <dependency>
-                            <groupId>com.google.android</groupId>
-                            <artifactId>android</artifactId>
-                            <version>4.1.1.4</version>
-                        </dependency>
-                    </additionalDependencies>
-                </configuration>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-maven-plugin</artifactId>
+                    <version>1.24</version>
+                    <configuration>
+                        <signature>
+                            <groupId>net.sf.androidscents.signature</groupId>
+                            <artifactId>android-api-level-26</artifactId>
+                            <version>8.0.0_r2</version>
+                        </signature>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>check</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.jetbrains.dokka</groupId>
                     <artifactId>dokka-maven-plugin</artifactId>
-                    <version>1.9.20</version>
+                    <version>2.0.0</version>
                     <configuration>
                         <archive>
                             <addMavenDescriptor>false</addMavenDescriptor>
@@ -249,7 +248,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>package</id>
+                            <id>javadoc-jar</id>
                             <phase>package</phase>
                             <goals>
                                 <goal>javadocJar</goal>
@@ -260,15 +259,42 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <executable>${java.home}/bin/java</executable>
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.7.0</version>
+                    <configuration>
+                        <pomElements>
+                            <name />
+                            <description />
+                            <url />
+                            <scm />
+                            <developers />
+                            <contributors />
+                            <issueManagement />
+                        </pomElements>
+                        <flattenDependencyMode>all</flattenDependencyMode>
+                        <omitExclusions>true</omitExclusions>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.12</version>
+                    <version>0.8.13</version>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>
@@ -277,7 +303,7 @@
                             </goals>
                         </execution>
                         <execution>
-                            <id>create-report</id>
+                            <id>report</id>
                             <goals>
                                 <goal>report</goal>
                             </goals>
@@ -285,9 +311,22 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>com.github.gantsign.maven</groupId>
+                    <artifactId>ktlint-maven-plugin</artifactId>
+                    <version>3.5.0</version>
+                    <executions>
+                        <execution>
+                            <id>check</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>1.9.23</version>
+                    <version>2.1.20</version>
                     <executions>
                         <execution>
                             <id>compile</id>
@@ -301,19 +340,6 @@
                             <phase>test-compile</phase>
                             <goals>
                                 <goal>test-compile</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.gantsign.maven</groupId>
-                    <artifactId>ktlint-maven-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <executions>
-                        <execution>
-                            <id>check</id>
-                            <goals>
-                                <goal>check</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -335,7 +361,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>package</id>
+                            <id>single</id>
                             <phase>package</phase>
                             <goals>
                                 <goal>single</goal>
@@ -350,7 +376,7 @@
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
-                            <Import-Package>!android.*,*</Import-Package>
+                            <Import-Package>!android.*,!dalvik.*,*</Import-Package>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
                             <_exportcontents>!META-INF.versions.11,*</_exportcontents>
                             <_fixupmessages>"*META-INF/versions/11*"</_fixupmessages>
@@ -360,7 +386,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <configLocation>configuration/checkstyle-rules.xml</configLocation>
@@ -370,12 +396,12 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.16.0</version>
+                            <version>10.23.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
                         <execution>
-                            <id>verify</id>
+                            <id>check</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
@@ -386,51 +412,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.13.0</version>
-                    <executions>
-                        <execution>
-                            <id>default-compile</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>compile-module-info</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <compileSourceRoots>
-                                    <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
-                                </compileSourceRoots>
-                                <multiReleaseOutput>true</multiReleaseOutput>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>default-testCompile</id>
-                            <phase>test-compile</phase>
-                            <goals>
-                                <goal>testCompile</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+                    <version>3.14.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <id>enforce</id>
@@ -451,12 +448,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.4.2</version>
                     <configuration>
                         <archive>
                             <addMavenDescriptor>false</addMavenDescriptor>
@@ -474,7 +471,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.11.2</version>
                     <configuration>
                         <archive>
                             <addMavenDescriptor>false</addMavenDescriptor>
@@ -489,7 +486,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>package</id>
+                            <id>jar</id>
                             <phase>package</phase>
                             <goals>
                                 <goal>jar</goal>
@@ -505,23 +502,51 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>4.0.0-M13</version>
+                    <version>4.0.0-M16</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.5.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.moditect</groupId>
+                    <artifactId>moditect-maven-plugin</artifactId>
+                    <version>1.2.2.Final</version>
+                    <configuration>
+                        <jvmVersion>11</jvmVersion>
+                        <overwriteExistingFiles>true</overwriteExistingFiles>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.robolectric</groupId>
+                                <artifactId>android-all</artifactId>
+                            </exclusion>
+                        </exclusions>
+                        <jdepsExtraArgs>
+                            <arg>--multi-release=${maven.compiler.release}</arg>
+                            <arg>--ignore-missing-deps</arg>
+                        </jdepsExtraArgs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>add-module-info</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>add-module-info</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.2.0</version>
+                    <version>4.9.3.0</version>
                     <configuration>
                         <excludeFilterFile>${root.basedir}/configuration/spotbugs-filters.xml</excludeFilterFile>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>verify</id>
+                            <id>check</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
