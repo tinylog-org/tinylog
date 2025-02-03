@@ -55,9 +55,9 @@ jobs:
       - name: Upload P2 repository
         uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
         with:
-          ftp_host: tinylog.org
-          ftp_username: tinylog2-p2-repository@tinylog.org
-          ftp_password: ${{secrets.FTP_PASSWORD_TINYLOG2_P2_REPOSITORY}}
+          ftp_host: ${{ vars.TINYLOG_WEBSITE_FTP_HOST }}
+          ftp_username: ${{ vars.TINYLOG_WEBSITE_FTP_USER }}
+          ftp_password: ${{ secrets.TINYLOG_WEBSITE_FTP_PASSWORD }}
           local_source_dir: "target/repository"
           dist_target_dir: ${{github.event.inputs.version}}
 
