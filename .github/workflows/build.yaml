@@ -10,7 +10,7 @@ jobs:
 
   development-build:
     name: Development build with JDK 9
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -31,7 +31,7 @@ jobs:
 
   release-build:
     name: Release build with JDK 9
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
